@@ -24,6 +24,9 @@ ALTER TABLE IF EXISTS inp_flwreg_type RENAME TO _inp_flwreg_type_;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_node", "column":"value"}}$$);
 
+-- 2021/04/24
+ALTER TABLE inp_controls_importinp RENAME TO _inp_controls_importinp_;
+
 
 
 

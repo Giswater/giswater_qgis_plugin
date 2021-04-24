@@ -35,13 +35,8 @@ BEGIN
     --nullif function returns null instead of cast value error in case when there is no value in the inp data
     
    IF TG_OP = 'INSERT' THEN
-	  IF v_view='vi_junctions' THEN
-	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.node_id, NEW.elevation,'EPAJUN-CAT','JUNCTION',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1)) ;
-	    INSERT INTO inp_junction (node_id, demand, pattern_id) VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
-	    INSERT INTO man_junction (node_id) VALUES (NEW.node_id); 
-	    
-	  ELSIF v_view='vi_reservoirs' THEN
+
+	  IF v_view='vi_reservoirs' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.node_id, NEW.head,'EPARES-CAT','RESERVOIR',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1)) ;
 	    INSERT INTO inp_reservoir (node_id, pattern_id) VALUES (NEW.node_id, NEW.pattern_id);
@@ -53,14 +48,6 @@ BEGIN
 	    INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id) 
 	    VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id);
 	    INSERT INTO man_tank (node_id) VALUES (NEW.node_id); 
-	    
-	  ELSIF v_view='vi_pipes' THEN
-	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,custom_length,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id,NEW.node_1, NEW.node_2,concat(NEW.roughness::numeric(10,3),'-',NEW.diameter::numeric(10,3))::text,'PIPE',NEW.length,1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
-	    INSERT INTO inp_pipe (arc_id, minorloss) VALUES (NEW.arc_id, NEW.minorloss);
-	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
-	    UPDATE inp_pipe SET status=id FROM inp_typevalue WHERE arc_id=NEW.arc_id AND NEW.status=inp_typevalue.idval AND typevalue='inp_value_status_pipe';
-
 	    
 	  ELSIF v_view='vi_pumps' THEN 
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
@@ -90,38 +77,33 @@ BEGIN
 	      END IF;         
 	    
 	  ELSIF v_view='vi_tags' THEN 
-	    INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
+		INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
-	    INSERT INTO inp_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
+		INSERT INTO inp_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
       	    
 	  ELSIF v_view='vi_patterns' THEN 
-	    INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
+		INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
 					   factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) VALUES 
 					   (NEW.pattern_id, NEW.factor_1,NEW.factor_2,NEW.factor_3,NEW.factor_4,NEW.factor_5,NEW.factor_6,NEW.factor_7,NEW.factor_8, NEW.factor_9,
 					   NEW.factor_10,NEW.factor_11,NEW.factor_12,NEW.factor_13,NEW.factor_14, NEW.factor_15, NEW.factor_16,NEW.factor_17, NEW.factor_18);
 	  
 	  ELSIF v_view='vi_curves' THEN
 
-	    IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
-	      INSERT INTO inp_curve (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
-	    END IF;
-	    INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
-	    
-	  ELSIF v_view='vi_controls' THEN 
-	    INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
-	    	    
-	  ELSIF v_view='vi_rules' THEN  
-		INSERT INTO inp_rules_importinp (text) VALUES (NEW.text);
+		IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
+			INSERT INTO inp_curve (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
+		END IF;
 
+		INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
+	    
 	  ELSIF v_view='vi_emitters' THEN
-	    INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
+		INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
 	    
 	  ELSIF v_view='vi_quality' THEN
-	    INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
+		INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
 	    
 	  ELSIF v_view='vi_sources' THEN
-	    INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
+		INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
 	    
 	  ELSIF v_view='vi_reactions' THEN
 
@@ -152,14 +134,12 @@ BEGIN
 	      VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user) 
 	     ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    END IF;
+	    
 	  ELSIF v_view='vi_report' THEN
 	    INSERT INTO config_param_user (parameter, value, cur_user) 
 	    SELECT id, vdefault, current_user FROM sys_param_user 
 	    WHERE layoutname IN ('lyt_reports_1', 'lyt_reports_2') AND ismandatory=true AND vdefault IS NOT NULL
 	    ON CONFLICT (parameter,cur_user) DO NOTHING;
-	    
-	  ELSIF v_view='vi_coordinates' THEN
-	    UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(NEW.xcoord,NEW.ycoord),v_epsg) WHERE node_id=NEW.node_id;
 	    
 	  ELSIF v_view='vi_labels' THEN
 	    INSERT INTO inp_label (xcoord, ycoord, label, node_id) VALUES (NEW.xcoord, NEW.ycoord, NEW.label, NEW.node_id);

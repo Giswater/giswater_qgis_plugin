@@ -63,6 +63,8 @@ v_version text;
 v_path text;
 v_error_context text;
 v_linkoffsets text;
+v_count_total integer;
+v_arc text;
 
 BEGIN
 	-- Search path
@@ -79,8 +81,15 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 239;
 	
 		-- create a header
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'IMPORT INP SWMM FILE');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, '-------------------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP SWMM FILE');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '-------------------------------');
+	
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '---------------');
+
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '-------');
+
 
 	v_delete_prev = true;
 
@@ -100,6 +109,7 @@ BEGIN
 		DELETE FROM ext_municipality;
 		DELETE FROM selector_expl;
 		DELETE FROM selector_state;
+		DELETE FROM selector_inp_hydrology;
 
 		DELETE FROM cat_feature_arc ;
 		DELETE FROM cat_feature_node ;
@@ -132,7 +142,6 @@ BEGIN
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
 		END LOOP;
 
-		
 		FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_epa' AND id NOT LIKE 'v%')
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
@@ -145,7 +154,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Constraints of schema temporary disabled -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF v_path IS NOT NULL THEN
@@ -153,7 +162,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'step 2/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data from inp file to temp_csv table -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data from inp file to temp_csv table -> Done');
 
 	UPDATE temp_csv SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
 	csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
@@ -183,7 +192,7 @@ BEGIN
 
 
 	RAISE NOTICE 'step 3/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating map zones and catalogs -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating map zones and catalogs -> Done');
 
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
@@ -200,7 +209,7 @@ BEGIN
 	INSERT INTO selector_inp_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
 	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Setting selectors -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Setting selectors -> Done');
 
 	-- CATALOGS
 	--cat_feature
@@ -218,7 +227,7 @@ BEGIN
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAORIF','VARC','ARC', 'v_edit_arc');
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTL','VARC','ARC', 'v_edit_arc');
 
-	INSERT INTO cat_dwf_scenario VALUES (1, 'test');
+	INSERT INTO cat_dwf_scenario VALUES (1, 'default');
 	
 	--arc_type
 	--arc
@@ -275,11 +284,29 @@ BEGIN
 	INSERT INTO inp_conduit (arc_id, custom_n, q0, qmax) SELECT csv1, csv5::numeric(12,3), csv8::numeric(12,3), csv9::numeric(12,3)
 	FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+	-- get random arc to insert into inp_controls_x_arc if control exists
+	SELECT arc_id INTO v_arc FROM arc LIMIT 1;
+
+	-- insert controls
+	INSERT INTO inp_controls_x_arc (arc_id, text, active)
+	SELECT v_arc, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';;%') AND cur_user=current_user order by 1;
+
+	-- subcathcments
+	INSERT INTO inp_subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id, hydrology_id) 
+	SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9, 1, 1
+	FROM temp_csv where source='[SUBCATCHMENTS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
+	
+	UPDATE inp_subcatchment SET nimp=csv2::numeric, nperv=csv3::numeric, simp=csv4::numeric, sperv=csv5::numeric, zero=csv6::numeric, routeto=csv7, rted=csv8::numeric 
+	FROM temp_csv WHERE source='[SUBAREAS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+	AND subc_id = csv1;
+			
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_conduits', 'vi_junction') order by orderby
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN 
+		('vi_conduits', 'vi_junction', 'vi_controls', 'vi_coordinates', 'vi_subcatchments', 'vi_subareas', 'vi_infiltration') order by orderby
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
+		WHERE table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP
 			IF v_rec_view.rid=1 THEN
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
@@ -296,6 +323,28 @@ BEGIN
 		EXECUTE v_sql;
 	END LOOP;
 
+	-- insert hydrology
+	INSERT INTO cat_hydrology (hydrology_id, infiltration)
+	SELECT 1, value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration' ON CONFLICT (hydrology_id) DO NOTHING;
+
+	-- update infiltration
+	IF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'CURVE_NUMBER' THEN
+		UPDATE inp_subcatchment SET curveno=csv2::numeric, conduct_2=csv3::numeric, drytime_2=csv4::numeric 
+		FROM temp_csv WHERE source='[INFILTRATION]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+		AND subc_id = csv1;
+				
+	ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'GREEN_AMPT' THEN
+		UPDATE inp_subcatchment SET suction=csv2::numeric , conduct=csv3::numeric  , initdef=csv4::numeric
+		FROM temp_csv WHERE source='[INFILTRATION]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+		AND subc_id = csv1;
+
+	ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like '%HORTON' THEN
+		UPDATE inp_subcatchment SET maxrate=csv2::numeric, minrate=csv3::numeric , decay=csv4::numeric, drytime=csv5::numeric, maxinfil=csv6::numeric
+		FROM temp_csv WHERE source='[INFILTRATION]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+		AND subc_id = csv1;
+
+	END IF;
+
 	-- refactor of linksoffsets
 	v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
 	IF v_linkoffsets != 'ELEVATION' THEN
@@ -303,14 +352,19 @@ BEGIN
 		(SELECT a.arc_id, n1.sys_elev - sys_elev1 AS a1, n2.sys_elev - sys_elev2 AS a2 FROM arc a JOIN v_edit_node n1 ON n1.node_id = node_1 JOIN v_edit_node n2 ON n2.node_id = node_2) b
 		WHERE b.arc_id = arc.arc_id;
 	END IF;
+
+	-- update coordinates
+	UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)
+	FROM temp_csv where source='[COORDINATES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user 
+	AND csv1 = node_id;
 	
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 	RAISE NOTICE 'step 4/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data into tables using vi_* views -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Controls and rules have been stored on inp_controls_importinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls_x_arc using a random arc_id');
 
 	-- Create arc geom
 	v_querytext = 'SELECT * FROM arc ';
@@ -336,8 +390,8 @@ BEGIN
 	END LOOP;
 
 	RAISE NOTICE 'step 5/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Link geometries like ORIFICE, WEIRS, PUMPS AND OULETS will not be transformed, using reverse node2arc strategy, into nodes. They will stay as arc');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Link geometries like ORIFICE, WEIRS, PUMPS AND OULETS will not be transformed, using reverse node2arc strategy, into nodes. They will stay as arc');
 
 	
 	-- Subcatchments geometry
@@ -383,7 +437,7 @@ BEGIN
 
 
 	RAISE NOTICE 'step-6/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating subcathcment polygons -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating subcathcment polygons -> Done');
 			
 	-- Mapzones geometry
 	--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
@@ -396,18 +450,32 @@ BEGIN
 
 	-- Create cat_mat_arc on import inp function
 	INSERT INTO cat_mat_arc	SELECT DISTINCT (matcat_id) FROM arc WHERE matcat_id IS NOT NULL;
+	
+	-- check for integer or varchar id's
+	IF v_count =v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+	ELSIF v_count < v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+		v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
+	END IF;
 
 	-- Enable constraints
 	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
 	RAISE NOTICE 'step-7/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
+
+
+	-- insert spacers on log
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid  order by id) row;
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

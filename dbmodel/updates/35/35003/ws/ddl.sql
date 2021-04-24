@@ -20,3 +20,8 @@ DROP TABLE IF EXISTS inp_node_type;
 DROP TABLE IF EXISTS inp_arc_type;
 
 
+-- 2021/04/24
+ALTER TABLE inp_valve ALTER COLUMN status SET DEFAULT 'ACTIVE';
+ALTER TABLE inp_rules_importinp RENAME TO _inp_rules_importinp_;
+
+

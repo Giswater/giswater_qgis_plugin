@@ -27,7 +27,7 @@ DECLARE
 rpt_rec record;
 v_epsg integer;
 v_point_geom public.geometry;
-v_mantablename text;
+v_mantype text;
 v_epatablename text;
 v_count integer=0;
 v_projecttype varchar;
@@ -45,7 +45,7 @@ v_node_id text;
 v_node1 text;
 v_node2 text;
 v_elevation float;
-v_arc2node_reverse boolean = TRUE; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
+v_isgwproject boolean = FALSE; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
 v_delete_prev boolean = true; -- used on dev mode to
 v_querytext text;
 v_nodecat text;
@@ -61,6 +61,8 @@ v_path text;
 v_error_context text;
 v_record record;
 v_epatype text;
+v_count_total integer;
+v_arc text;
 
 BEGIN
 
@@ -71,15 +73,34 @@ BEGIN
 	SELECT project_type, epsg INTO v_projecttype, v_epsg FROM sys_version LIMIT 1;
 
 	-- get input data
-	v_arc2node_reverse := (((p_data ->>'data')::json->>'parameters')::json->>'useNod2arc')::boolean;
 	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;
+
+	IF (select count(*) from SCHEMA_NAME.temp_csv where CSV1 = ';Created by Giswater') = 1 THEN
+		v_isgwproject := TRUE;
+	END IF;
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=239;
 	
 	-- create a header
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'IMPORT INP EPANET FILE');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, '--------------------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP EPANET FILE');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '--------------------------------');
+
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '---------------');
+
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '-------');
+	
+	
+	IF v_isgwproject THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES 
+		(239, 2, 'WARNING-239: It seems that inp file comes from Giswater project. If there are nodarcs (valves and pumps) they will be re-shaped ''on the fly'' to nodes');
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES 
+		(239, 2, 'WARNING-239: It seems that inp file not comes from Giswater project. All nodarcs (valves and pumps) will be imported as arc feature');
+	END IF;
+
 
 	v_delete_prev = true;
 
@@ -166,10 +187,10 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Constraints of schema temporary disabled -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
 
 	RAISE NOTICE 'step 2/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data from inp file to temp_csv table -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data from inp file to temp_csv table -> Done');
 	
 	--refactor options target
 	UPDATE temp_csv SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE source = '[OPTIONS]' AND lower(csv1)='specific';
@@ -205,7 +226,7 @@ BEGIN
 
 
 	RAISE NOTICE 'step 3/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating map zones and catalogs -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,'INFO: Creating map zones and catalogs -> Done');
 	
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(0,'undefined') ON CONFLICT (macroexpl_id) DO NOTHING;
@@ -224,11 +245,6 @@ BEGIN
 	INSERT INTO presszone(presszone_id,name,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (presszone_id) DO NOTHING;
 	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1') ON CONFLICT (muni_id) DO NOTHING;
 
-	-- SELECTORS
-	--insert values into selector
-	--INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user) ON CONFLICT (expl_id,cur_user) DO NOTHING;
-	--INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user) ON CONFLICT (state,cur_user) DO NOTHING;
-	
 	
 	-- CATALOGS
 	--cat_feature
@@ -272,6 +288,7 @@ BEGIN
 	INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 	INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	
 	--cat_feature_node
 	--node
 	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 2, FALSE) ON CONFLICT (id) DO NOTHING;
@@ -299,7 +316,7 @@ BEGIN
 	SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='EPAMAT';
 	
 	--cat_arc
-	--pipe w
+	--pipe
 	INSERT INTO cat_arc( id, arctype_id, matcat_id,  dint)
 	SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'EPAPIPE', csv6, csv5::float FROM temp_csv WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 	
@@ -346,8 +363,20 @@ BEGIN
 	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+	-- get random arc to insert into inp_controls_x_arc if control exists
+	SELECT arc_id INTO v_arc FROM arc LIMIT 1;
+
+	-- insert controls
+	INSERT INTO inp_controls_x_arc (arc_id, text, active)
+	select v_arc, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+
+	-- insert rules
+	INSERT INTO inp_rules_x_sector (sector_id, text, active)
+	select 1, csv1, true FROM temp_csv where source='[RULES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+
+
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_status') order by orderby
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 	LOOP
 		--identifing the number of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -365,7 +394,6 @@ BEGIN
 		END LOOP;
 		
 		--inserting values on editable view
-		
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source='||quote_literal(v_rec_table.target)||'
 		AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
 
@@ -373,6 +401,15 @@ BEGIN
 		EXECUTE v_sql;
 		
 	END LOOP;
+
+	-- update coordinates
+	UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)
+	FROM temp_csv where source='[COORDINATES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user 
+	AND csv1 = node_id;
+
+	-- force state type for arcs and nodes
+	UPDATE arc SET state_type = 2;
+	UPDATE node SET state_type = 2;
 
 	-- update status
 	UPDATE inp_valve_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
@@ -383,28 +420,27 @@ BEGIN
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 	
 	RAISE NOTICE 'step 4/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Values of options / times / report are not updated. Default values of Giswater are keeped');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data into tables using vi_* views -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES
-	(239, 'WARNING-239: Rules will be stored on inp_rules_importinp table. This is a temporary table. Data need to be moved to inp_rules_x_arc, inp_rules_x_node and inp_rules_x_sector tables to be used later');
-	
-
-	-- to_arc on pumps
-	UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
-	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
-		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
-		WHERE arc.epa_type IN ('PUMP-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
-	WHERE b.node_id = inp_pump_importinp.arc_id;
-
-	-- to_arc on valves
-	UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
-	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
-		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
-		WHERE arc.epa_type IN ('VALVE-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
-	WHERE b.node_id = inp_valve_importinp.arc_id;
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are not updated. Default values of Giswater are keeped');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If controls exists, it would have been related to random arc');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If rules exits, it would have been related to the whole sector');
 	
 			
-	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
+	IF v_isgwproject THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
+
+		-- to_arc on pumps
+		UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
+		(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
+			JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
+			WHERE arc.epa_type IN ('PUMP-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
+		WHERE b.node_id = inp_pump_importinp.arc_id;
+
+		-- to_arc on valves
+		UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
+		(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
+			JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
+			WHERE arc.epa_type IN ('VALVE-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
+		WHERE b.node_id = inp_valve_importinp.arc_id;
 	
 		FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE-IMPORTINP','PUMP-IMPORTINP')
 		LOOP
@@ -416,7 +452,7 @@ BEGIN
 			END IF;
 			
 			-- getting man_table to work with
-			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id 
+			SELECT type, epa_table INTO v_mantype, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id 
 			WHERE epa_default = v_epatype;
 
 			-- defining new node parameters
@@ -445,8 +481,7 @@ BEGIN
 			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_epatype,1,1,1,1,
 			(SELECT id FROM value_state_type WHERE state=1 LIMIT 1), v_thegeom) ;
 
-			RAISE NOTICE '% %', v_mantablename, v_node_id;
-			EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
+			EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 			IF v_epatablename = 'inp_pump' THEN
 				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue, to_arc)
@@ -497,15 +532,15 @@ BEGIN
 		DELETE FROM inp_valve_importinp;
 		DELETE FROM inp_pump_importinp;
 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 	END IF;
 
 	RAISE NOTICE 'step 5/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
 	
 	
 	-- Create arc geom
-	IF v_arc2node_reverse THEN
+	IF v_isgwproject THEN
 		v_querytext = 'SELECT * FROM arc WHERE epa_type=''PIPE''';
 	ELSE 
 		v_querytext = 'SELECT * FROM arc ';
@@ -530,7 +565,7 @@ BEGIN
 	END LOOP;
 
 	--update toarc field
-	IF v_arc2node_reverse THEN
+	IF v_isgwproject THEN
 		FOR v_data IN SELECT * FROM arc WHERE state=0
 		LOOP
 			v_node_id = replace(v_data.arc_id,'_n2a','');
@@ -552,14 +587,14 @@ BEGIN
 	INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value;
 
 	RAISE NOTICE 'step-6/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometries -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometries -> Done');
 
 
 
 	-- Enable constraints
 	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
-	IF v_arc2node_reverse THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
+	IF v_isgwproject THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 	
 		-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
 		UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='edit_arc_searchnodes';
@@ -584,17 +619,35 @@ BEGIN
 	INSERT INTO selector_sector VALUES (1,current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 	UPDATE arc SET code = arc_id;
 	UPDATE node SET code = node_id;
+
+	-- check for integer or varchar id's
+	v_count_total := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a);
+	v_count := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a WHERE fid ~ '^\d+$');
+	
+	IF v_count =v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+	ELSIF v_count < v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+		v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
+	END IF;
+	
 	INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
-			
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
+
+	-- insert spacers on log
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by id) row;
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
+
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 

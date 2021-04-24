@@ -122,3 +122,6 @@ UPDATE sys_fprocess SET fprocess_name = 'Features with EPA type UNDEFINED' WHERE
 
 --2021/04/20
 update sys_function set function_name ='gw_fct_setelevfromdem' where id=2760;
+
+UPDATE sys_function SET descript = 'Function to import network data from EPANET inp file into database.'
+WHERE id = 2522;

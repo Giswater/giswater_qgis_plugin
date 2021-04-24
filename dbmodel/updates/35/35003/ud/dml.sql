@@ -77,3 +77,6 @@ UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled
 {"actionName":"actionHelp", "disabled":false}, 
 {"actionName":"actionGetArcId", "disabled":false}]'
 WHERE formname ='v_edit_gully';
+
+-- 2021/04/24
+DELETE FROM sys_table WHERE id = 'inp_controls_importinp';

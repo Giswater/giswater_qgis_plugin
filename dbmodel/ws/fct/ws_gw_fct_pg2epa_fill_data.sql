@@ -104,6 +104,9 @@ BEGIN
 			LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
 			LEFT JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
+			LEFT JOIN inp_valve_importinp ON v_arc.arc_id = inp_valve_importinp.arc_id
+			LEFT JOIN inp_pump_importinp ON v_arc.arc_id = inp_pump_importinp.arc_id
+			LEFT JOIN inp_virtualvalve ON v_arc.arc_id = inp_pump_importinp.arc_id
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_mat_arc.id
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
@@ -143,6 +146,17 @@ BEGIN
 	FROM inp_shortpipe 
 	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_arc) a USING (node_id)
 	WHERE temp_node.node_id=inp_shortpipe.node_id;
+
+	-- update child param for inp_valve_importinp
+	UPDATE temp_arc SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',v.diameter,'", "flow":"',
+	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',v.minorloss,'", "status":"',v.status,
+	'"}')
+	FROM inp_valve_importinp v WHERE temp_arc.arc_id=v.arc_id;
+
+	-- update addparam for inp_pump_importinp
+	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',p.status,'",
+	"energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"FLOWPUMP"}')
+	FROM inp_pump_importinp p WHERE temp_arc.arc_id=p.arc_id;
 
     RETURN 1;
 		

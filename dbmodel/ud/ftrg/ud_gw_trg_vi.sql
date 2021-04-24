@@ -19,15 +19,15 @@ The main characterisitics mapping from SWMM to GW are:
 */
 
 
-
 DECLARE 
-	v_view text;
-	v_epsg integer;
-	v_epatype text;
-	v_catalog text;
-	v_linkoffsets text;
-	v_y1 float;
-	v_y2 float;
+v_view text;
+v_epsg integer;
+v_epatype text;
+v_catalog text;
+v_linkoffsets text;
+v_y1 float;
+v_y2 float;
+
 BEGIN
 
     --Get schema name
@@ -67,30 +67,7 @@ BEGIN
 				INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, fname, sta, units, expl_id) 
 				VALUES (NEW.rg_id,NEW.form_type,NEW.intvl,NEW.scf, 'FILE', NEW.other1, NEW.other2, NEW.other3, 1);
 			END IF;
-				
-		ELSIF v_view='vi_subcatchments' THEN 
 
-			INSERT INTO inp_subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
-			VALUES (NEW.subc_id, NEW.rg_id, NEW.outlet_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
-
-			INSERT INTO cat_hydrology (hydrology_id, infiltration)
-			SELECT 1, value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration' ON CONFLICT (hydrology_id) DO NOTHING;
-
-		ELSIF v_view='vi_subareas' THEN
-			UPDATE inp_subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;
-			
-		ELSIF v_view='vi_infiltration' THEN 
-			IF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'CURVE_NUMBER' THEN
-				UPDATE inp_subcatchment SET curveno=NEW.other1::numeric, conduct_2=NEW.other2::numeric, drytime_2=NEW.other3::numeric 
-				WHERE subc_id=NEW.subc_id;
-			ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'GREEN_AMPT' THEN
-				UPDATE inp_subcatchment SET suction=NEW.other1::numeric , conduct=NEW.other2::numeric  , initdef=NEW.other3::numeric
-				WHERE subc_id=NEW.subc_id;
-			ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like '%HORTON' THEN
-				UPDATE inp_subcatchment SET maxrate=NEW.other1::numeric, minrate=NEW.other2::numeric , decay=NEW.other3::numeric, drytime=NEW.other4::numeric, maxinfil=NEW.other5::numeric
-				WHERE subc_id=NEW.subc_id;
-			END IF;
-			
 		ELSIF v_view='vi_aquifers' THEN
 			INSERT INTO inp_aquifer (aquif_id, por, wp, fc, k, ks, ps, uef, led, gwr, be, wte, umc, pattern_id) 
 			VALUES (NEW.aquif_id, NEW.por, NEW.wp, NEW.fc, NEW.k, NEW.ks, NEW.ps, NEW.uef, NEW.led, NEW.gwr, NEW.be, NEW.wte, NEW.umc, NEW.pattern_id);
@@ -108,9 +85,6 @@ BEGIN
 
 		ELSIF v_view='vi_gwf' THEN 
 			UPDATE inp_groundwater set fl_eq_lat=split_part(NEW.fl_eq_lat,';',2),fl_eq_deep=split_part(NEW.fl_eq_deep,';',2) WHERE subc_id=NEW.subc_id;
-			
-		ELSIF v_view='vi_junction' THEN
-			-- code is improved using directy gw_fct_import_swmm_inp function			
 			
 		ELSIF v_view='vi_outfalls' THEN
 			INSERT INTO node (node_id, elev,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
@@ -163,11 +137,7 @@ BEGIN
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
 				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
-			END IF;
-			
-		ELSIF v_view='vi_conduits' THEN 
-
-			-- code is improved using directy gw_fct_import_swmm_inp function			
+			END IF;	
 			
 		ELSIF v_view='vi_pumps' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
@@ -239,10 +209,7 @@ BEGIN
 				INSERT INTO inp_transects (id) SELECT split_part(NEW.text,' ',2) WHERE split_part(NEW.text,' ',2)  NOT IN (SELECT id from inp_transects);			
 			END IF;
 			INSERT INTO inp_transects_value (tsect_id,text) VALUES (split_part(NEW.text,' ',1),NEW.text);
-			
-		ELSIF v_view='vi_controls' THEN
-			INSERT INTO inp_controls_importinp (text) VALUES (NEW.text);
-			
+						
 		ELSIF v_view='vi_pollutants' THEN 
 			INSERT INTO inp_pollutant (poll_id, units_type, crain, cgw, cii, kd, sflag, copoll_id, cofract, cdwf, cinit) 
 			VALUES (NEW.poll_id, NEW.units_type, NEW.crain, NEW.cgw, NEW.cii, NEW.kd, NEW.sflag, NEW.copoll_id, NEW.cofract, NEW.cdwf, NEW.cinit);
@@ -372,9 +339,6 @@ BEGIN
 		ELSIF v_view='vi_labels' THEN
 			INSERT INTO inp_labels (xcoord, ycoord, label, anchor, font, size, bold, italic) 
 			VALUES (NEW.xcoord, NEW.ycoord, NEW.label, NEW.anchor, NEW.font, NEW.size, NEW.bold, NEW.italic);
-			
-		ELSIF v_view='vi_coordinates' THEN
-			UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(NEW.xcoord,NEW.ycoord),v_epsg) WHERE node_id=NEW.node_id;
 	    END IF;
 	END IF;
 
