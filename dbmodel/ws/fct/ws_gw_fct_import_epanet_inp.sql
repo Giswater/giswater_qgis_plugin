@@ -695,8 +695,14 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","body":{"data":{"info":"Import failed"}}, "NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' ||
-	to_json(v_error_context) || '}')::json;
+	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION},
+																   {"message":"-----------------------------"},
+																   {"message":""},
+																   {"message":"ERRORS"},
+																   {"message":"----------"},
+																   {"message":'||to_json(v_error_context)||'},
+																   {"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
