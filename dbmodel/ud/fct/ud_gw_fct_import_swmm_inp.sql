@@ -65,7 +65,7 @@ v_error_context text;
 v_linkoffsets text;
 v_count_total integer;
 v_arc text;
-v_stop boolean = false;
+v_status text = 'Accepted';
 
 BEGIN
 	-- Search path
@@ -85,6 +85,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP SWMM FILE');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '-------------------------------');
 	
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERRORS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '------------');
+
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '---------------');
 
@@ -161,21 +164,22 @@ BEGIN
 
 	ELSIF v_count > 12 AND v_count < 17 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 
-		'WARNING-239: There are at least one network id (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) with more than 12 digits. This might crash using during the ''on-the-fly'' transformations');
+		'WARNING-239: There are at least one network id (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) with more than 12 digits but less than 17. This might crash using during the ''on-the-fly'' transformations');
 
 	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 
 		'ERROR-239: There are at least one network id (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) with more than 16 digits. Please check your data before continue');
-		v_stop = true;
+		v_status = 'Failed';
 	END IF;
 
 	-- check for hydrology object id string length
 	v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[SUBCATCHMENTS]', '[AQUIFERS]', '[RAINGAGE]', '[SNOWPACKS]', '[LID_CONTROLS]') AND csv1 NOT LIKE ';%');
-	IF v_count > 0 AND v_count < 1 THEN
+	IF v_count > 0 AND v_count < 17 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All hydrology objects (subcatchments aquifers, snowpacks, lidcontrols & raingages) id''s have a maximun of 16 digits');
 
-	ELSIF v_count > 1 THEN
+	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
+		v_status = 'Failed';
 	END IF;
 
 	-- check for quuality object id string length
@@ -185,7 +189,7 @@ BEGIN
 
 	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
-		v_stop = true;
+		v_status = 'Failed';
 	END IF;
 	 
 	-- check for non visual object id string length
@@ -195,10 +199,10 @@ BEGIN
 	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 
 		'ERROR-239: There are at least one non visual objects (curves & patterns & timeseries) id with more than 16 digits. Please check your data before continue');
-		v_stop = true;
+		v_status = 'Failed';
 	END IF;
 
-	IF v_stop IS FALSE THEN
+	IF v_status = 'Accepted' THEN
 
 		RAISE NOTICE 'step 1/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
@@ -517,6 +521,7 @@ BEGIN
 
 	-- insert spacers on log
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
 
@@ -534,7 +539,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
 	-- 	Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||

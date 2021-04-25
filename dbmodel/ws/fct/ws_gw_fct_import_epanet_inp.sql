@@ -63,7 +63,7 @@ v_record record;
 v_epatype text;
 v_count_total integer;
 v_arc text;
-v_stop boolean = false;
+v_status text = 'Accepted';
 
 BEGIN
 
@@ -198,7 +198,7 @@ BEGIN
 
 	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
-		v_stop = true;
+		v_status = 'Failed';
 	END IF;
 	 
 	-- check for non visual object id string length
@@ -208,10 +208,10 @@ BEGIN
 
 	ELSIF v_count > 16 THEN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one non visual objects (curves & patterns) id with more than 16 digits. Please check your data before continue');
-		v_stop = true;
+		v_status = 'Failed';
 	END IF;
 
-	IF v_stop IS FALSE THEN
+	IF v_status = 'Accepted' THEN
 
 		RAISE NOTICE 'step 1/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
@@ -685,7 +685,7 @@ BEGIN
 	v_version := COALESCE(v_version, '{}'); 	
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
