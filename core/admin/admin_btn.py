@@ -2294,7 +2294,8 @@ class GwAdminButton:
             if complet_result:
 
                 if complet_result['status'] == 'Failed':
-                    msg = "The importation process have been failed"
+                    msg = f'The importation process have been failed!<br>See Info log for more details.'
+                    self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
                     global_vars.dao.rollback()
                     self.error_count = 0
