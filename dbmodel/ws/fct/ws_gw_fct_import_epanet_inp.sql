@@ -277,31 +277,31 @@ BEGIN
 		--cat_feature
 		ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 		--node
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAJUN','JUNCTION','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATAN','TANK','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPARES','SOURCE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAJUN','JUNCTION','NODE', 'v_edit_node', 'Junction') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATAN','TANK','NODE', 'v_edit_node', 'Tank') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPARES','SOURCE','NODE', 'v_edit_node', 'Reservoir') ON CONFLICT (id) DO NOTHING;
 		--arc
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPIPE','PIPE','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPIPE','PIPE','ARC', 'v_edit_arc', 'Pipe') ON CONFLICT (id) DO NOTHING;
 
 		--nodarc (AS arc)
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACHV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAFCV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAGPV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPBV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPSV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPRV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATCV','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPACHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)') ON CONFLICT (id) DO NOTHING;
 
 		--nodarc (AS node)
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACHVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAFCVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAGPVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPBVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPSVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPRVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATCVA2N','VALVE','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMPA2N','PUMP','NODE', 'v_edit_node') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPACHVA2N','VALVE','NODE', 'v_edit_node','Check valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAFCVA2N','VALVE','NODE', 'v_edit_node','Flow control valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAGPVA2N','VALVE','NODE', 'v_edit_node','General purpose valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPBVA2N','VALVE','NODE', 'v_edit_node','Presure break valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPSVA2N','VALVE','NODE', 'v_edit_node','Presure sustain valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPRVA2N','VALVE','NODE', 'v_edit_node','Presure reduction valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATCVA2N','VALVE','NODE', 'v_edit_node','Throttle control valve') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPUMPA2N','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
 
 		--arc_type
 		--arc
