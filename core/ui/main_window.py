@@ -68,9 +68,14 @@ class GwMainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
 
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.key_escape.emit()
-            return super().keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
-            self.key_enter.emit()
-            return super().keyPressEvent(event)
+        try:
+            if event.key() == QtCore.Qt.Key_Escape:
+                self.key_escape.emit()
+                return super().keyPressEvent(event)
+            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+                self.key_enter.emit()
+                return super().keyPressEvent(event)
+        except RuntimeError:
+            # Multiples signals are emited when we use key_scape in order to close dialog
+            pass
+
