@@ -78,10 +78,6 @@ class GwDimensioning:
         tools_gw.add_icon(action_orientation, "133")
 
         # LAYER SIGNALS
-        self.layer_dimensions.editingStarted.connect(lambda: action_snapping.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: action_snapping.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(lambda: action_orientation.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: action_orientation.setEnabled(False))
         self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
         self.layer_dimensions.editingStopped.connect(partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
@@ -130,12 +126,8 @@ class GwDimensioning:
         if self.layer_dimensions:
             self.iface.setActiveLayer(self.layer_dimensions)
             if self.layer_dimensions.isEditable():
-                action_snapping.setEnabled(True)
-                action_orientation.setEnabled(True)
                 tools_gw.enable_all(self.dlg_dim, db_return['body']['data'])
             else:
-                action_snapping.setEnabled(False)
-                action_orientation.setEnabled(False)
                 tools_gw.enable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
