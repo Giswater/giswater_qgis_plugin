@@ -125,3 +125,6 @@ update sys_function set function_name ='gw_fct_setelevfromdem' where id=2760;
 
 UPDATE sys_function SET descript = 'Function to import network data from EPANET inp file into database.'
 WHERE id = 2522;
+
+-- 2021/04/26
+UPDATE ws_35.config_toolbox SET inputparams = NULL WHERE id = 2522;
