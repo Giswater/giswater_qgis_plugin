@@ -1070,7 +1070,10 @@ def add_button(**kwargs):
 
     functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) atm:
         module = tools_backend_calls -> def add_object(**kwargs)
+        module = tools_backend_calls -> def delete_object(**kwargs):
+        module = tools_backend_calls -> def manage_document(doc_id, **kwargs):
         module = tools_backend_calls -> def manage_element(element_id, **kwargs):
+        module = tools_backend_calls -> def open_selected_element(**kwargs):
 
 
     """
@@ -1352,7 +1355,9 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
     """
     Add widgets QTableView type.
         Function called in -> widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-        module = class GwInfo(QObject) -> open_rpt_result(**kwargs)
+            module = tools_backend_calls open_selected_path(**kwargs):
+            module = tools_backend_calls open_selected_element(**kwargs):
+
     """
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
@@ -1375,7 +1380,7 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
         exist = tools_os.check_python_function(module, function_name)
         if not exist:
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-            tools_qgis.show_message(msg, 2)
+            tools_qgis.show_message(msg, 1)
             return widget
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
@@ -2349,7 +2354,7 @@ def add_tableview_header(widget, field):
 
 def fill_tableview_rows(widget, field):
 
-    if field is None or field['value'] is None:return
+    if field is None or field['value'] is None: return widget
     model = widget.model()
 
     for item in field['value']:

@@ -339,6 +339,7 @@ class GwInfo(QObject):
         for field in result['fields']:
             if 'hidden' in field and field['hidden']: continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
+            if 'spacer' in field['widgettype']: continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
@@ -548,7 +549,7 @@ class GwInfo(QObject):
                     else:
                         layout.addWidget(widget, 1, field['layoutorder'])
                 # Layouts where the widget has no label
-                elif field['layoutname'] in ('lyt_rpt_1', 'lyt_elements_1'):
+                elif field['layoutname'] in ('lyt_rpt_1', 'lyt_elements_1', 'lyt_documents_1'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 0, field['layoutorder']*2)
@@ -2065,91 +2066,6 @@ class GwInfo(QObject):
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
 
-
-    def _add_object(self, widget, table_object, view_object):
-        """ Add object (doc or element) to selected feature """
-        #      ( widget, "element", "v_ui_element"))
-        # Get values from dialog
-        object_id = tools_qt.get_text(self.dlg_cf, table_object + "_id")
-        if object_id == 'null':
-            message = "You need to insert data"
-            tools_qgis.show_warning(message, parameter=table_object + "_id")
-            return
-
-        # Check if this object exists
-        field_object_id = "id"
-        sql = ("SELECT * FROM " + view_object + ""
-               " WHERE " + field_object_id + " = '" + object_id + "'")
-        row = tools_db.get_row(sql)
-        if not row:
-            tools_qgis.show_warning("Object id not found", parameter=object_id)
-            return
-
-        # Check if this object is already associated to current feature
-        field_object_id = table_object + "_id"
-        tablename = table_object + "_x_" + self.feature_type
-        sql = ("SELECT *"
-               " FROM " + str(tablename) + ""
-               " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
-               " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = tools_db.get_row(sql, log_info=False, log_sql=False)
-
-        # If object already exist show warning message
-        if row:
-            message = "Object already associated with this feature"
-            tools_qgis.show_warning(message)
-
-        # If object not exist perform an INSERT
-        else:
-            sql = ("INSERT INTO " + tablename + " "
-                   "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
-                   " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
-            tools_db.execute_sql(sql, log_sql=False)
-            if widget.objectName() == 'tbl_document':
-                date_to = self.dlg_cf.tab_main.findChild(QDateEdit, 'date_document_to')
-                if date_to:
-                    current_date = QDate.currentDate()
-                    date_to.setDate(current_date)
-            widget.model().select()
-
-    # TODO borrar esto, esta en toolsbackend ???
-    def _delete_records(self, widget, table_name):
-        """ Delete selected objects (elements or documents) of the @widget """
-
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        inf_text = ""
-        list_object_id = ""
-        row_index = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            object_id = widget.model().record(row).value("doc_id")
-            id_ = widget.model().record(row).value("id")
-            if object_id is None:
-                object_id = widget.model().record(row).value("element_id")
-            inf_text += str(object_id) + ", "
-            list_id += str(id_) + ", "
-            list_object_id = list_object_id + str(object_id) + ", "
-            row_index += str(row + 1) + ", "
-
-        list_object_id = list_object_id[:-2]
-        list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", list_object_id)
-        if answer:
-            sql = ("DELETE FROM " + table_name + ""
-                   " WHERE id::integer IN (" + list_id + ")")
-            tools_db.execute_sql(sql, log_sql=False)
-            widget.model().select()
-
-
-
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
 
     def _open_selected_feature(self, qtable):
@@ -2972,10 +2888,6 @@ class GwInfo(QObject):
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
         self.date_document_to = self.dlg_cf.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dlg_cf.findChild(QDateEdit, "date_document_from")
-        btn_open_doc = self.dlg_cf.findChild(QPushButton, "btn_open_doc")
-        btn_doc_delete = self.dlg_cf.findChild(QPushButton, "btn_doc_delete")
-        btn_doc_insert = self.dlg_cf.findChild(QPushButton, "btn_doc_insert")
-        btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
 
         # Set max and min dates
         tools_gw.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
@@ -2989,11 +2901,7 @@ class GwInfo(QObject):
         doc_type.currentIndexChanged.connect(partial(self._set_filter_table_man, widget))
         self.date_document_to.dateChanged.connect(partial(self._set_filter_table_man, widget))
         self.date_document_from.dateChanged.connect(partial(self._set_filter_table_man, widget))
-        self.tbl_document.doubleClicked.connect(partial(self._open_selected_document, widget))
-        btn_open_doc.clicked.connect(partial(self._open_selected_document, widget))
-        btn_doc_delete.clicked.connect(partial(self._delete_records, widget, table_name))
-        btn_doc_insert.clicked.connect(partial(self._add_object, widget, "doc", "v_ui_doc"))
-        btn_doc_new.clicked.connect(partial(self._manage_new_document, dialog, None, self.feature))
+
 
         # Fill ComboBox doc_type
         sql = "SELECT id, id FROM doc_type ORDER BY id"
@@ -3040,36 +2948,6 @@ class GwInfo(QObject):
         widget.model().select()
 
 
-    def _open_selected_document(self, widget):
-        """ Open selected document of the @widget """
-
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-        elif len(selected_list) > 1:
-            message = "Select just one document"
-            tools_qgis.show_warning(message)
-            return
-
-        # Get document path (can be relative or absolute)
-        row = selected_list[0].row()
-        path = widget.model().record(row).value("path")
-
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
-
-
     def _manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
 
@@ -3110,7 +2988,7 @@ class GwInfo(QObject):
             columnname = table.property('columnname')
             if columnname is None:
                 msg = f"widget {widgetname} in tab {self.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
-                tools_qgis.show_info(msg, 1)
+                tools_qgis.show_info(msg, 3)
                 continue
             linkedobject = table.property('linkedobject')
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields)
