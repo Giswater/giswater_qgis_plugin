@@ -537,14 +537,15 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
     if reset_text:
         text = ""
-    for item in data['info']['values']:
-        if 'message' in item:
-            if item['message'] is not None:
-                text += str(item['message']) + "\n"
-                if force_tab:
-                    change_tab = True
-            else:
-                text += "\n"
+    if 'info' in data and 'values' in data['info']:
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        change_tab = True
+                else:
+                    text += "\n"
 
     tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
