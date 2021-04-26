@@ -98,10 +98,10 @@ BEGIN
 			IF (SELECT count(arc_id) FROM arc WHERE arc_id=NEW.arc_id)=0 THEN
 				v_review_status=1;
 			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is TRUE THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is TRUE THEN
 				v_review_status=3;
 			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is FALSE THEN
 				v_review_status=2;
 			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN

@@ -100,10 +100,10 @@ BEGIN
 			IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.connec_id)=0 THEN
 				v_review_status=1;
 			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is TRUE THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is TRUE THEN
 				v_review_status=3;
 			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
 				v_review_status=2;
 			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN
