@@ -87,6 +87,13 @@ class GwEpaFileManager(GwTask):
     def finished(self, result):
 
         super().finished(result)
+
+        sql = f"SELECT {self.funtion_name}("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
+
         self.dlg_go2epa.btn_cancel.setEnabled(False)
         if self.isCanceled(): return
 
@@ -175,15 +182,15 @@ class GwEpaFileManager(GwTask):
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body)
-        self.complet_result = json_result
-        if json_result is None or not json_result:
+        self.body = self._create_body(extras=extras)
+        self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
+        self.complet_result = self.json_result
+        if self.json_result is None or not self.json_result:
             self.function_failed = True
             return False
 
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            tools_log.log_warning(json_result)
+        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+            tools_log.log_warning(self.json_result)
             self.function_failed = True
             return False
 
@@ -422,15 +429,15 @@ class GwEpaFileManager(GwTask):
         extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
-        body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', body)
-        self.rpt_result = json_result
-        if json_result is None or not json_result:
+        self.body = self._create_body(extras=extras)
+        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
+        self.rpt_result = self.json_result
+        if self.json_result is None or not self.json_result:
             self.function_failed = True
             return False
 
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            tools_log.log_warning(json_result)
+        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+            tools_log.log_warning(self.json_result)
             self.function_failed = True
             return False
 

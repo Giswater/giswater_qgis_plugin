@@ -49,8 +49,8 @@ class GwAutoMincutTask(GwTask):
             use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, 'chk_use_planified')
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
-            body = tools_gw.create_body(extras=extras)
-            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body, aux_conn=self.aux_conn)
+            self.body = tools_gw.create_body(extras=extras)
+            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', self.body, aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
             if not self.complet_result or self.complet_result['status'] == 'Failed':
@@ -66,6 +66,12 @@ class GwAutoMincutTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
+
+        sql = f"SELECT gw_fct_setmincut("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.complet_result, sql, None)
 
         # If user cancel task
         if self.isCanceled():

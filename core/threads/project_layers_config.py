@@ -45,6 +45,12 @@ class GwProjectLayersConfig(GwTask):
 
         super().finished(result)
 
+        sql = f"SELECT gw_fct_getinfofromid("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
+
         # If user cancel task
         if self.isCanceled():
             return
@@ -117,22 +123,22 @@ class GwProjectLayersConfig(GwTask):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self._create_body(feature=feature, extras=extras)
-            complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body, aux_conn=self.aux_conn)
-            if not complet_result:
+            self.body = self._create_body(feature=feature, extras=extras)
+            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)
+            if not self.json_result:
                 continue
-            if 'status' not in complet_result:
+            if 'status' not in self.json_result:
                 continue
-            if complet_result['status'] == 'Failed':
+            if self.json_result['status'] == 'Failed':
                 continue
-            if 'body' not in complet_result:
+            if 'body' not in self.json_result:
                 tools_log.log_info("Not 'body'")
                 continue
-            if 'data' not in complet_result['body']:
+            if 'data' not in self.json_result['body']:
                 tools_log.log_info("Not 'data'")
                 continue
 
-            for field in complet_result['body']['data']['fields']:
+            for field in self.json_result['body']['data']['fields']:
                 valuemap_values = {}
 
                 # Get column index

@@ -1514,7 +1514,7 @@ def get_actions_from_json(json_result, sql):
 
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
-                      json_loads=False, rubber_band=None, aux_conn=None):
+                      json_loads=False, rubber_band=None, aux_conn=None, is_thread=False):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1573,15 +1573,19 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql)
         return json_result
-
-    try:
-        # Layer styles
-        manage_json_return(json_result, sql, rubber_band)
-        get_actions_from_json(json_result, sql)
-    except Exception:
-        pass
-
+    if not is_thread:
+        manage_json_response(json_result, sql, rubber_band)
     return json_result
+
+
+def manage_json_response(complet_result, sql=None, rubber_band=None):
+    if complet_result not in (None, False):
+        try:
+            manage_json_return(complet_result, sql, rubber_band)
+            manage_layer_manager(complet_result)
+            get_actions_from_json(complet_result, sql)
+        except Exception:
+            pass
 
 
 def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0):

@@ -30,6 +30,7 @@ class GwToolBoxTask(GwTask):
         self.result = result
         self.json_result = None
         self.exception = None
+        self.function_name = None
 
 
     def run(self):
@@ -40,15 +41,15 @@ class GwToolBoxTask(GwTask):
 
         # Get function name
         function = None
-        function_name = None
+
         for group, function in list(self.result['fields'].items()):
             if len(function) != 0:
                 self.toolbox.save_settings_values(self.dialog, function)
                 self.toolbox.save_parametric_values(self.dialog, function)
-                function_name = function[0]['functionname']
+                self.function_name = function[0]['functionname']
                 break
 
-        if function_name is None:
+        if self.function_name is None:
             return False
 
         if function[0]['input_params']['featureType']:
@@ -126,8 +127,8 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2] + '}'
         else:
             extras += '}'
-        body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True, aux_conn=self.aux_conn)
+        self.body = tools_gw.create_body(feature=feature_field, extras=extras)
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True, aux_conn=self.aux_conn, is_thread=True)
         if self.isCanceled(): return False
         if self.json_result['status'] == 'Failed': return False
         if not self.json_result or self.json_result is None: return False
@@ -151,8 +152,11 @@ class GwToolBoxTask(GwTask):
 
         super().finished(result)
 
-        # Execute layer manager
-        tools_gw.manage_layer_manager(self.json_result)
+        sql = f"SELECT {self.function_name}("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
 
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
