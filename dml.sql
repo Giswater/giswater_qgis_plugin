@@ -31,6 +31,9 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  column
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'delete_element', 'lyt_documents_1', 3, 'button', 'Delete document', false, false, true, false,  '{"icon":"112"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "delete_object", "parameters":{"columnfind":"feature_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'new_element', 'lyt_documents_1', 4, 'button', 'New document', false, false, true, false,  '{"icon":"131"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_document", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'doc_type', 'lyt_documents_2', 1, 'string', 'combo',  'Doc type:', false, false, true, false, true, 'SELECT id as id, id as idval FROM doc_type WHERE id IS NOT NULL ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_doc_x_arc');
+
 
 
 

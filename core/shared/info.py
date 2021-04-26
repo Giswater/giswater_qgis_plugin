@@ -542,7 +542,7 @@ class GwInfo(QObject):
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
                 # Layouts where the label goes above the widget
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_rpt_2', 'lyt_relations_2'):
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_documents_2', 'lyt_rpt_2', 'lyt_relations_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 1, field['layoutorder'])
