@@ -997,8 +997,6 @@ class GwPsector:
                         if value is None or value == 'null':
                             sql += column_name + " = null, "
                         else:
-                            if type(value) is not bool:
-                                value = value.replace(",", ".")
                             sql += f"{column_name} = $${value}$$, "
 
                 sql = sql[:len(sql) - 2]
