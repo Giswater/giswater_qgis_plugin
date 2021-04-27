@@ -86,8 +86,8 @@ CREATE OR REPLACE VIEW v_ui_node_x_relations AS
     "data":{"viewName":[ "vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"False"}}$$);
 
 --REMOVE FIELDS FROM TABLE
-	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"fwature_id"}}$$);
-	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"fwaturecat_id"}}$$);
+	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"feature_id"}}$$);
+	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"featurecat_id"}}$$);
 
 --RESTORE ALL VIEWS
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
