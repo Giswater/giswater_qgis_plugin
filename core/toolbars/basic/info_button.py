@@ -269,4 +269,3 @@ class GwInfoButton(GwMaptool):
             self._get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
 
     # endregion
-

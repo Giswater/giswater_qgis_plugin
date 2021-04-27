@@ -417,7 +417,7 @@ class GwInfo(QObject):
             tools_gw.draw_by_json(complet_result, self.rubber_band)
 
         if feature_id:
-            self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
+            self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 1, self.dlg_cf.pos().y() + 7, self.dlg_cf.width(),
                                     self.dlg_cf.height())
 
         # Get widget controls
