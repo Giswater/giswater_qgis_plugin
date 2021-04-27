@@ -18,7 +18,7 @@ INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_do
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_documents_3', 'lyt_documents_3','lytDocuments3');
 INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
     VALUES ('tbl_doc_x_arc', 'SELECT id as sys_id, * FROM v_ui_doc_x_arc WHERE id IS NOT NULL', 4);
-
+delete from ws_sample35.config_form_fields where layoutname ilike '%document%';
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'tbl_documents', 'lyt_documents_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_path", "parameters":{"columnfind":"path"}}', 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
@@ -33,6 +33,12 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  column
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'new_element', 'lyt_documents_1', 4, 'button', 'New document', false, false, true, false,  '{"icon":"131"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_document", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'doc_type', 'lyt_documents_2', 1, 'string', 'combo',  'Doc type:', false, false, true, false, true, 'SELECT id as id, id as idval FROM doc_type WHERE id IS NOT NULL ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_doc_x_arc');
+
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetfunction, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'date_from', 'lyt_documents_2', 1, 'date', 'datetime',  'Date from:', false, false, true, false, true,  '{"functionName": "filter_table", "parameters":{}}', 'tbl_doc_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetfunction, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_documents', 'date_to', 'lyt_documents_2', 2, 'date', 'datetime',  'Date to:', false, false, true, false, true, '{"functionName": "filter_table", "parameters":{}}', 'tbl_doc_x_arc');
 
 
 

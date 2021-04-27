@@ -1273,9 +1273,19 @@ def add_calendar(dialog, field):
         tools_qt.set_calendar(dialog, widget, date)
     else:
         widget.clear()
-    btn_calendar = widget.findChild(QToolButton)
 
+    real_name = widget.objectName()
+    if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
+        func_name = field['widgetfunction']['functionName']
+        exist = tools_os.check_python_function(tools_backend_calls, func_name)
+        if not exist:
+            msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
+            tools_qgis.show_message(msg, 2)
+            return widget
+
+    btn_calendar = widget.findChild(QToolButton)
     btn_calendar.clicked.connect(partial(tools_qt.set_calendar_empty, widget))
+
 
     return widget
 

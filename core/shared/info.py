@@ -411,8 +411,6 @@ class GwInfo(QObject):
         self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
         tools_qt.set_tableview_config(self.tbl_event_cf)
-        self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        tools_qt.set_tableview_config(self.tbl_document)
 
         # Get table name
         self.tablename = complet_result['body']['feature']['tableName']
@@ -510,11 +508,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b", "24x24")
-        # tab doc
-        tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
+
 
         # Get feature type as feature_type (node, arc, connec, gully)
         self.feature_type = str(complet_result['body']['feature']['featureType'])
@@ -2874,8 +2868,8 @@ class GwInfo(QObject):
         """ Fill tab 'Document' """
 
         table_document = "v_ui_doc_x_" + self.feature_type
-        self._fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_document, table_document)
+        # self._fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
+        # tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_document, table_document)
 
 
     def _fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -2961,8 +2955,7 @@ class GwInfo(QObject):
         if doc_id:
             tools_qt.set_widget_text(dialog, "doc_id", doc_id)
 
-        # # Open dialog
-        # doc.open_dialog(doc.dlg_add_doc)
+
 
 
     def _manage_document_new(self, dialog, doc):
@@ -2972,7 +2965,7 @@ class GwInfo(QObject):
             return
 
         tools_qt.set_widget_text(dialog, "doc_id", doc.doc_id)
-        self._add_object(self.tbl_document, "doc", "v_ui_doc")
+        # self._add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
     """ FUNCTIONS RELATED WITH TAB RPT """
@@ -3100,6 +3093,9 @@ class GwInfo(QObject):
                 widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+            elif type(widget) is QgsDateTimeEdit:
+                widget.dateChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+
             else:
                 continue
             last_widget = widget

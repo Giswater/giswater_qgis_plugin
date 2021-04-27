@@ -14,6 +14,8 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
+from qgis.gui import QgsDateTimeEdit
+
 
 from ..shared.document import GwDocument
 from ..shared.element import GwElement
@@ -272,6 +274,7 @@ def filter_table(**kwargs):
          at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
                     widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
      """
+    print(f"TEST 10")
     complet_result = kwargs['complet_result']
     model = kwargs['model']
     dialog = kwargs['dialog']
@@ -640,6 +643,8 @@ def _get_filter_qtableview(dialog, widget_list):
                     filter_sign = widget.property('widgetcontrols')['filterSign']
             if type(widget) == QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
+            elif type(widget) is QgsDateTimeEdit:
+                value = tools_qt.get_calendar_date(dialog, widget)
             else:
                 value = tools_qt.get_text(dialog, widget, False, False)
 
