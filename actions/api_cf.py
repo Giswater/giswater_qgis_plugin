@@ -410,7 +410,7 @@ class ApiCF(ApiParent, QObject):
         self.draw(complet_result, zoom=False)
 
         if feature_id:
-            self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
+            self.dlg_cf.setGeometry(self.dlg_cf.pos().x()+1, self.dlg_cf.pos().y()+7, self.dlg_cf.width(),
                                     self.dlg_cf.height())
 
         # Get widget controls
