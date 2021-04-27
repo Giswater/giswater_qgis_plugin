@@ -114,3 +114,84 @@ FROM v_edit_link l
 JOIN vnode v ON exit_id::integer = vnode_id
 WHERE exit_type = 'VNODE'
 ORDER BY link_class  DESC)a;
+
+--2021/04/27
+DROP VIEW IF EXISTS v_plan_psector_arc;
+CREATE OR REPLACE VIEW v_plan_psector_arc AS
+SELECT row_number() OVER () AS rid,
+arc.arc_id,
+plan_psector_x_arc.psector_id,
+arc.code, 
+arc.arccat_id,
+cat_arc.arctype_id,
+cat_feature.system_id,
+arc.state AS original_state,
+arc.state_type AS original_state_type,
+plan_psector_x_arc.state AS plan_state,
+plan_psector_x_arc.doable,
+plan_psector_x_arc.addparam,
+arc.the_geom
+FROM selector_psector, arc
+JOIN plan_psector_x_arc USING (arc_id)
+JOIN cat_arc ON cat_arc.id=arc.arccat_id
+JOIN cat_feature ON cat_feature.id=cat_arc.arctype_id
+WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_plan_psector_node;
+CREATE OR REPLACE VIEW v_plan_psector_node AS
+SELECT row_number() OVER () AS rid,
+node.node_id,
+plan_psector_x_node.psector_id,
+node.code, 
+node.nodecat_id,
+cat_node.nodetype_id,
+cat_feature.system_id,
+node.state AS original_state,
+node.state_type AS original_state_type,
+plan_psector_x_node.state AS plan_state,
+plan_psector_x_node.doable,
+node.the_geom
+FROM selector_psector, node
+JOIN plan_psector_x_node USING (node_id)
+JOIN cat_node ON cat_node.id=node.nodecat_id
+JOIN cat_feature ON cat_feature.id=cat_node.nodetype_id
+WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_plan_psector_connec;
+CREATE OR REPLACE VIEW v_plan_psector_connec AS
+SELECT row_number() OVER () AS rid,
+connec.connec_id,
+plan_psector_x_connec.psector_id,
+connec.code, 
+connec.connecat_id,
+cat_connec.connectype_id,
+cat_feature.system_id,
+connec.state AS original_state,
+connec.state_type AS original_state_type,
+plan_psector_x_connec.state AS plan_state,
+plan_psector_x_connec.doable,
+connec.the_geom
+FROM selector_psector, connec
+JOIN plan_psector_x_connec USING (connec_id)
+JOIN cat_connec ON cat_connec.id=connec.connecat_id
+JOIN cat_feature ON cat_feature.id=cat_connec.connectype_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_plan_psector_link;
+CREATE OR REPLACE VIEW v_plan_psector_link AS 
+SELECT row_number() OVER () AS rid,
+link.link_id,
+plan_psector_x_connec.psector_id,
+connec.connec_id,
+connec.state AS original_state,
+connec.state_type AS original_state_type,
+plan_psector_x_connec.state AS plan_state,
+plan_psector_x_connec.doable,
+link.the_geom
+FROM selector_psector,connec
+JOIN plan_psector_x_connec USING (connec_id)
+JOIN link ON link.feature_id=connec.connec_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
