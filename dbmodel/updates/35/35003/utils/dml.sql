@@ -127,4 +127,8 @@ UPDATE sys_function SET descript = 'Function to import network data from EPANET 
 WHERE id = 2522;
 
 -- 2021/04/26
-UPDATE ws_35.config_toolbox SET inputparams = NULL WHERE id = 2522;
+UPDATE config_toolbox SET inputparams = NULL WHERE id = 2522;
+
+-- 2021/04/27
+INSERT INTO config_param_system(parameter, value, descript,isenabled, project_type, datatype)
+VALUES ('admin_manage_cat_feature','{"rename_view_x_id":false}','Manage updates of cat_feature and related views',false,'utils','json') ON CONFLICT (parameter) DO NOTHING;
