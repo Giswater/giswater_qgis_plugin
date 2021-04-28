@@ -212,9 +212,7 @@ class NotifyFunctions(ParentAction, QObject):
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['columnname'], field['hidden'])
-                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
-                    self.set_column_multiline(layer, field, fieldIndex)
+
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
@@ -238,7 +236,7 @@ class NotifyFunctions(ParentAction, QObject):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                elif field['widgettype'] == 'text':
+                elif field['widgettype'] == 'textarea':
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
                 elif field['widgettype'] == 'check':
@@ -254,8 +252,12 @@ class NotifyFunctions(ParentAction, QObject):
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
                 else:
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+                    self.set_column_multiline(layer, field, fieldIndex)
 
 
 
