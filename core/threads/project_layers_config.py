@@ -199,8 +199,11 @@ class GwProjectLayersConfig(GwTask):
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                else:
+                elif field['widgettype'] == 'textarea':
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         if msg_failed != "":
