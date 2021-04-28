@@ -834,9 +834,11 @@ BEGIN
 
 	-- header form
 
-	IF p_visittype = 1 THEN
-		v_formheader :=concat('VISIT - ',v_id);	
-	ELSE
+	IF p_visittype = 1 AND v_load_visit IS TRUE THEN
+		v_formheader :=concat('EXISTING VISIT - ',v_id);
+	ELSIF p_visittype = 1 AND v_load_visit IS NULL THEN
+		v_formheader :=concat('NEW VISIT - ',v_id);
+    ELSE
 		v_formheader :=concat('INCIDENCY - ',v_id);	
 	END IF;
 
