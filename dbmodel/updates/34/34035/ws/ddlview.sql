@@ -107,7 +107,7 @@ SELECT DISTINCT ON (vnode_id) * FROM
     l.sector_id,
     l.dma_id,
     l.state,
-    st_endpoint(l.the_geom),
+    st_endpoint(l.the_geom) as the_geom,
     l.expl_id,
     l.link_class
 FROM v_edit_link l
