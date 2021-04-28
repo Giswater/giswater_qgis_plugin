@@ -152,10 +152,6 @@ class GwProjectLayersConfig(GwTask):
                 if field['label']:
                     layer.setFieldAlias(field_index, field['label'])
 
-                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
-                if field['widgettype'] == 'text':
-                    self._set_column_multiline(layer, field, field_index)
-
                 # widgetcontrols
                 if 'widgetcontrols' in field:
 
@@ -205,6 +201,10 @@ class GwProjectLayersConfig(GwTask):
                 else:
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
+                if field['widgettype'] == 'text':
+                    self._set_column_multiline(layer, field, field_index)
 
         if msg_failed != "":
             tools_qt.show_exception_message("Execute failed.", msg_failed)
