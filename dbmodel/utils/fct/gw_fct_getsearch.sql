@@ -63,6 +63,12 @@ v_singletab text;
 
 rec_order text;
 
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
+v_errcontext text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -159,16 +165,22 @@ BEGIN
 			SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_add_network' ;
 
 			-- Init combo json
-			EXECUTE 'SELECT * FROM '||v_addschema||'.config_form_fields WHERE formname=''search'' AND columnname=''net_type'''
-			INTO rec_fields;
+			v_querystring = concat('SELECT * FROM ',v_addschema,'.config_form_fields WHERE formname=''search'' AND columnname=''net_type''');
+			v_debug_vars := json_build_object('v_addschema', v_addschema);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 10);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO rec_fields;
 
 			comboType := json_build_object('label',rec_fields.label, 'columnname', rec_fields.columnname, 'widgetname', concat('network_',rec_fields.columnname),
 			'widgettype','combo','datatype','string','placeholder','','disabled',false);
 			
 			-- Get Ids for type combo
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT ((value)::json->''sys_table_id'') AS id FROM '||v_addschema||'.config_param_system 
-			WHERE parameter like ''%basic_search_network%'' ORDER BY ((value)::json->>''orderby'')) a'
-			INTO combo_json;
+			v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (SELECT ((value)::json->''sys_table_id'') AS id FROM ',v_addschema,'.config_param_system 
+						WHERE parameter like ''%basic_search_network%'' ORDER BY ((value)::json->>''orderby'')) a');
+			v_debug_vars := json_build_object('v_addschema', v_addschema);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 20);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json;
 			
 			comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
@@ -176,14 +188,20 @@ BEGIN
 			comboType := gw_fct_json_object_set_key(comboType, 'selectedId', to_json(''::text)); 
 
 			-- Get Names for type combo
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT ((value)::json->''alias'') AS id FROM '||v_addschema||'.config_param_system  
-			WHERE parameter like ''%basic_search_network%'' ORDER BY ((value)::json->>''orderby''))a'
-			INTO combo_json ;
+			v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (SELECT ((value)::json->''alias'') AS id FROM ',v_addschema,'.config_param_system  
+						WHERE parameter like ''%basic_search_network%'' ORDER BY ((value)::json->>''orderby''))a');
+			v_debug_vars := json_build_object('v_addschema', v_addschema);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 30);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json;
 			comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 		
 			-- Add edit box to introduce search text
-			EXECUTE 'SELECT * FROM '||v_addschema||'.config_form_fields WHERE formname=''search'' AND columnname=''net_code'''
-			INTO rec_fields ;
+			v_querystring = concat('SELECT * FROM ',v_addschema,'.config_form_fields WHERE formname=''search'' AND columnname=''net_code''');
+			v_debug_vars := json_build_object('v_addschema', v_addschema);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 40);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO rec_fields;
 			editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname, 'widgetname', concat('add_network_',rec_fields.columnname),'widgettype','typeahead','datatype',
 			'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 			
@@ -257,8 +275,12 @@ BEGIN
 
 
 			-- Get Ids for type combo
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT '||quote_ident(v_search_muni_id_field)||' AS id FROM '||quote_ident(v_search_muni_table) ||
-			' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+			v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (SELECT ',quote_ident(v_search_muni_id_field),' AS id FROM ',quote_ident(v_search_muni_table) ,
+						' WHERE active IS TRUE ORDER BY ',quote_ident(v_search_muni_search_field),') a');
+			v_debug_vars := json_build_object('v_search_muni_id_field', v_search_muni_id_field, 'v_search_muni_table', v_search_muni_table, 'v_search_muni_search_field', v_search_muni_search_field);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 50);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json;
 			
 			comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
@@ -270,13 +292,21 @@ BEGIN
 			END IF;
 
 			-- Get name for type combo
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM (SELECT '||quote_ident(v_search_muni_search_field)||' AS idval FROM '||quote_ident(v_search_muni_table) ||
-			' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+			v_querystring = concat('SELECT array_to_json(array_agg(idval)) FROM (SELECT ',quote_ident(v_search_muni_search_field),' AS idval FROM ',quote_ident(v_search_muni_table) ,
+					' WHERE active IS TRUE ORDER BY ',quote_ident(v_search_muni_search_field),') a');
+			v_debug_vars := json_build_object('v_search_muni_search_field', v_search_muni_search_field, 'v_search_muni_table', v_search_muni_table);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 60);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json;
 			comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
 			-- Get geom for combo
-			EXECUTE 'SELECT array_to_json(array_agg(st_astext(st_envelope(geom)))) FROM (SELECT '||quote_ident(v_search_muni_geom_field)||' AS geom FROM '||
-			quote_ident(v_search_muni_table) ||' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+			v_querystring = concat('SELECT array_to_json(array_agg(st_astext(st_envelope(geom)))) FROM (SELECT ',quote_ident(v_search_muni_geom_field),' AS geom FROM ',
+					quote_ident(v_search_muni_table) ,' WHERE active IS TRUE ORDER BY ',quote_ident(v_search_muni_search_field),') a');
+			v_debug_vars := json_build_object('v_search_muni_geom_field', v_search_muni_geom_field, 'v_search_muni_table', v_search_muni_table, 'v_search_muni_search_field', v_search_muni_search_field);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getsearch', 'flag', 70);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json;
 			comboType := gw_fct_json_object_set_key(comboType, 'comboGeometry', combo_json);
 
 			-- Create street search field
@@ -514,9 +544,10 @@ BEGIN
 		'}')::json;
 	END IF;
 
-	--Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

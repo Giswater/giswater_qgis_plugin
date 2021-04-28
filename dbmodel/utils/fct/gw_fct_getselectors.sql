@@ -42,7 +42,7 @@ v_typeahead text;
 v_expl_x_user boolean;
 v_filter text;
 v_selectionMode text;
-v_error_context text;
+v_errcontext text;
 v_currenttab text;
 v_tab record;
 v_ids text;
@@ -56,6 +56,10 @@ v_geometry text;
 v_query text;
 v_name text;
 v_pkeyfield text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 
 BEGIN
@@ -88,8 +92,12 @@ BEGIN
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
 
-	v_query = 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
-	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby';
+
+	v_query = concat('SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=',quote_literal(v_selector_type),
+	' AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby');
+	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_querytab', v_querytab);
+	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	FOR v_tab IN EXECUTE v_query
 ​
@@ -112,7 +120,11 @@ BEGIN
 		v_name = v_tab.value::json->>'name';
 
 		-- profilactic control of v_orderby
-		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_table||''');' INTO v_pkeyfield;
+		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
+		v_debug_vars := json_build_object('v_table', v_table);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_pkeyfield;
 		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
@@ -145,12 +157,16 @@ BEGIN
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
 
-		v_finalquery =  'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-			FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_fullfilter ||' UNION 
-			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
-			 v_fullfilter ||' ORDER BY orderby desc) a';
+		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
+					 v_fullfilter ,' ORDER BY orderby desc) a');
+		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id, 
+						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
+		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 
 		raise notice 'v_finalquery %', v_finalquery;
@@ -223,8 +239,8 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

@@ -55,6 +55,11 @@ v_function integer;
 v_arrayresult text[];
 v_selectedid text;
 v_rec_replace json;
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -124,57 +129,67 @@ BEGIN
 	END IF;
 
 	-- get om toolbox parameters
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
-		 FROM sys_function 
-		 JOIN config_toolbox USING (id)
-		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
-		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
-		USING v_filter
-		INTO v_om_fields;
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
+			 FROM sys_function 
+			 JOIN config_toolbox USING (id)
+			 WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
+			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_om_fields;
 
 	-- get edit toolbox parameters
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
-		 FROM sys_function
- 		 JOIN config_toolbox USING (id)
-		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_edit'' AND config_toolbox.active IS TRUE
-		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
-		USING v_filter
-		INTO v_edit_fields;
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
+			 FROM sys_function
+			 JOIN config_toolbox USING (id)
+			 WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_edit'' AND config_toolbox.active IS TRUE
+			 AND ( project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 20);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_edit_fields;
 
 	-- get epa toolbox parameters
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
-		FROM sys_function
-		JOIN config_toolbox USING (id)
-		WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_epa'' AND config_toolbox.active IS TRUE
-		AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
-		USING v_filter
-		INTO v_epa_fields;
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
+			FROM sys_function
+			JOIN config_toolbox USING (id)
+			WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_epa'' AND config_toolbox.active IS TRUE
+			AND ( project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 30);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_epa_fields;
 				
 		v_epa_fields = REPLACE (v_epa_fields::text, '"value":""', concat('"value":"', v_epa_user, '"'));
 
 	-- get master toolbox parameters
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
-		 FROM sys_function
- 		 JOIN config_toolbox USING (id)
-		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_master'' AND config_toolbox.active IS TRUE
-		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
-		USING v_filter
-		INTO v_master_fields;
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
+			 FROM sys_function
+			 JOIN config_toolbox USING (id)
+			 WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_master'' AND config_toolbox.active IS TRUE
+			 AND (project_type=',quote_literal(v_projectype),' OR project_type=''utils'')) a');
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 40);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_master_fields;
 
 	-- get admin toolbox parameters
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, 
-		 function_name as functionname
-		 FROM sys_function
-		 JOIN config_toolbox USING (id)
-		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
-		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
-		USING v_filter
-		INTO v_admin_fields;
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, 
+			 function_name as functionname
+			 FROM sys_function
+			 JOIN config_toolbox USING (id)
+			 WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
+			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_admin_fields;
 
 	-- refactor dvquerytext			
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
@@ -192,7 +207,10 @@ BEGIN
 			END IF;
 		
 		v_selectedid = rec.inputparams::json->>'selectedId';
-		v_querytext='SELECT array_agg(id::text) FROM ('||v_querytext_mod||')a';
+		v_querytext = concat('SELECT array_agg(id::text) FROM (',v_querytext_mod,')a');
+		v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
+		v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 60);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querytext INTO v_arrayresult;
 			
 		IF v_selectedid ~ '^[0-9]+$'THEN
@@ -222,8 +240,11 @@ BEGIN
 		END IF;
 	raise notice 'v_arrayresult,%',v_arrayresult;
 	raise notice 'v_selectedid,%',v_selectedid;
-		v_querytext =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
-		"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext_mod||')a';
+		v_querytext = concat('SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
+			"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM (',v_querytext_mod,')a');
+		v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
+		v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 70);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querytext INTO v_queryresult;		
 		
 		v_rec_replace = (REPLACE(rec.inputparams::text, concat('"dvQueryText":"', rec.inputparams::json->>'dvQueryText','"') , v_queryresult))::json;
@@ -271,9 +292,10 @@ BEGIN
 
 	RETURN v_return;
        
-	--Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

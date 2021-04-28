@@ -33,8 +33,8 @@ SELECT SCHEMA_NAME.gw_fct_setcatalog($${
 SELECT SCHEMA_NAME.gw_fct_setcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"new_mapzone", "tabName":"data", "editable":"TRUE"},
-"feature":{"tableName":"v_edit_node", "idName":"node_id", "id":"2001", "feature_type":"JUNCTION"},
-"data":{"fields":{"mapzoneType": "DMA", "name": "test", "id":"12", "expl_id":"1","stylesheet":null}}}$$)
+"feature":{"tableName":"ve_node_flowmeter", "idName":"node_id", "id":"2001", "feature_type":"FLOWMETER"},
+"data":{"fields":{"mapzoneType": "DMA", "name": "test", "dma_id":"126", "expl_id":"1","stylesheet":null}}}$$)
 
 
 */
@@ -67,6 +67,8 @@ v_id_x_expl integer;
 v_mapzone_config json;
 v_idname text;
 v_id text;
+v_dma_id integer;
+v_presszone_id text;
 
 v_version text;
 v_error_context text;
@@ -91,13 +93,16 @@ BEGIN
 	v_feature_table := json_extract_path_text (p_data,'feature','tableName')::text;
 	v_idname := json_extract_path_text (p_data,'feature','idName')::text;
 	v_id := json_extract_path_text (p_data,'feature','id')::text;
-
+	
 	--set cat table to upate
 	IF v_formname = 'new_workcat' THEN
 		v_catname = 'cat_work';
 	ELSIF v_formname = 'new_mapzone' THEN
 		v_catname = lower(json_extract_path_text(v_fields, 'mapzoneType'))::text;
 		v_expl = json_extract_path_text(v_fields, 'expl_id')::integer;
+		v_dma_id := json_extract_path_text (v_fields,'dma_id')::integer;
+		v_presszone_id := json_extract_path_text (v_fields,'v_presszone_id')::text;
+		
 		IF v_catname IS NULL THEN
 			EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
 			WHERE child_layer = '||quote_literal(v_feature_table)||';'
@@ -209,7 +214,13 @@ BEGIN
 		INTO v_dvquery, v_columnname;
 	ELSE 
 		--change mapzone id depending on expl_id
-		IF json_extract_path_text (v_mapzone_config,'idXExpl')::boolean IS TRUE THEN	
+		IF v_dma_id IS NOT NULL THEN
+			EXECUTE 'UPDATE '||v_catname||' SET '||v_pkey||' = '||v_dma_id||' WHERE '||v_pkey||' = '||v_newid||';';
+			v_newid = v_dma_id;
+		ELSIF v_presszone_id IS NOT NULL THEN
+			EXECUTE 'UPDATE '||v_catname||' SET '||v_pkey||' = '||v_presszone_id||' WHERE '||v_pkey||' = '||v_newid||';';
+			v_newid = v_presszone_id;
+		ELSIF json_extract_path_text (v_mapzone_config,'idXExpl')::boolean IS TRUE THEN	
 			EXECUTE 'SELECT max('||v_pkey||'::integer) + 1  FROM '||v_catname||' WHERE expl_id='||v_expl||' and '||v_pkey||'!='||v_newid||'' INTO v_id_x_expl;
 			EXECUTE 'SELECT 1 FROM '||v_catname||' WHERE '||v_catname||'_id = '||v_id_x_expl||'' INTO v_checkpkey;
 			IF v_checkpkey IS NULL THEN

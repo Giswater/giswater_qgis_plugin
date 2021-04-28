@@ -29,6 +29,8 @@ DECLARE
 	v_query text;
 	v_arc_epa text;
 	v_new_child_layer text;
+	v_old_child_layer text;
+	v_isrenameview boolean;
 
 BEGIN	
 
@@ -40,6 +42,9 @@ BEGIN
 
 	--  Get project type
 	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+
+	SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system 
+	WHERE parameter='admin_manage_cat_feature';
 
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
 		--Controls on update or insert of cat_feature.id check if the new id or child layer has accents, dots or dashes. If so, give an error.
@@ -206,32 +211,41 @@ BEGIN
 				
 			END IF;
 			
+		END IF;
 
+		--if child layer name has changed OR id has changed and p, rename it
+		IF (NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL ) OR 
+		(NEW.id != OLD.id AND v_isrenameview IS TRUE )THEN
 
-		--if child layer name has changed, rename it
-		ELSIF NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL THEN
-
+			IF (NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL ) THEN
+				v_old_child_layer=OLD.child_layer;
+				v_viewname=NEW.child_layer;
+			ELSE
+				v_old_child_layer=NEW.child_layer;
+				v_viewname=concat('ve_',lower(NEW.feature_type),'_',lower(NEW.id));
+			END IF;
 
 			IF v_viewname IS NOT NULL THEN
 				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME'
-				AND table_name = v_viewname)) = true THEN
+				AND table_name = v_old_child_layer)) = true THEN
 		
 					--get the old view definition
-					EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||OLD.child_layer||''', true);'
+					EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_old_child_layer||''', true);'
 					INTO v_definition;	
 
 					--replace the existing view
-					EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';   
-					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||OLD.child_layer||';';
+					EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';   
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_old_child_layer||';';
 					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 
 					EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-					INSTEAD OF INSERT OR UPDATE OR DELETE ON '||lowe(NEW.child_layer)||' FOR EACH ROW EXECUTE 
+					INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE 
 					PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
+					EXECUTE 'UPDATE cat_feature SET child_layer='||quote_literal(v_viewname)||' WHERE id='||quote_literal(NEW.id)||';';	
 				ELSE
 	
-					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||OLD.child_layer||';';
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_old_child_layer||';';
 					v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 					PERFORM gw_fct_admin_manage_child_views(v_query::json);
@@ -244,6 +258,7 @@ BEGIN
 					END IF;
 
 				END IF;
+
 			END IF;
 
 			--delete configuration from config_form_fields
@@ -254,7 +269,7 @@ BEGIN
 
 			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"form":{}, 	"feature":{"catFeature":"'||NEW.id||'"},
-			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||NEW.child_layer||'", 
+			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", 
 			"feature_type":"'||lower(NEW.feature_type)||'" }}$$);';
 
 

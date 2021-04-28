@@ -24,3 +24,8 @@ WHERE parameter = 'epa_automatic_man2inp_values';
 
 UPDATE config_param_system set standardvalue = 'True' WHERE parameter = 'admin_raster_dem';
 
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, 
+iseditable, isautoupdate, layoutname, hidden)
+VALUES ('new_dma','form_catalog','dma_id',2, 'string', 'text', 'Dma id',false, false,true,false,'lyt_data_1',false); 
+
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='new_dma' AND columnname='name';

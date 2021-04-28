@@ -125,3 +125,10 @@ update sys_function set function_name ='gw_fct_setelevfromdem' where id=2760;
 
 UPDATE sys_function SET descript = 'Function to import network data from EPANET inp file into database.'
 WHERE id = 2522;
+
+-- 2021/04/26
+UPDATE config_toolbox SET inputparams = NULL WHERE id = 2522;
+
+-- 2021/04/27
+INSERT INTO config_param_system(parameter, value, descript,isenabled, project_type, datatype)
+VALUES ('admin_manage_cat_feature','{"rename_view_x_id":false}','Manage updates of cat_feature and related views',false,'utils','json') ON CONFLICT (parameter) DO NOTHING;
