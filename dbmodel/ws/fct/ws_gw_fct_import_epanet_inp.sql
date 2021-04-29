@@ -369,6 +369,11 @@ BEGIN
 		INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
 		INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
 
+
+		-- insert other catalog tables
+		INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
+
+
 		--create child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
@@ -609,6 +614,8 @@ BEGIN
 		update exploitation SET the_geom=v_extend_val;
 		update sector SET the_geom=v_extend_val;
 		update dma SET the_geom=v_extend_val;
+		update presszone SET the_geom=v_extend_val;
+		update dqa SET the_geom=v_extend_val;
 		update ext_municipality SET the_geom=v_extend_val;
 
 		INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value;
@@ -638,7 +645,7 @@ BEGIN
 			INTO v_record;
 
 			-- restore default default values
-			UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
+			UPDATE config_param_system SET value='{"activated":true,"value":0.1}' where parameter = 'edit_arc_searchnodes';
 
 		END IF;
 
@@ -658,6 +665,15 @@ BEGIN
 			v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 		END IF;
 
+		-- purge catalog tables
+		DELETE FROM arc WHERE state=0;
+		DELETE FROM cat_arc WHERE id NOT IN (SELECT arccat_id FROM arc);
+		DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
+		DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
+		DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
+		DELETE FROM cat_feature WHERE id NOT IN (SELECT arctype_id FROM cat_arc) AND feature_type = 'ARC';
+		DELETE FROM cat_feature WHERE id NOT IN (SELECT nodetype_id FROM cat_node) AND feature_type = 'NODE';
+	
 		INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
