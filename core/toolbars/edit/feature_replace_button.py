@@ -388,7 +388,7 @@ class GwFeatureReplaceButton(GwMaptool):
                 # Get id of new generated feature
                 sql = (f"SELECT {self.feature_type}_id "
                        f"FROM {self.geom_view} "
-                       f"ORDER BY {self.feature_type}_id::int4 DESC LIMIT 1")
+                       f"ORDER BY {self.feature_type}_id DESC LIMIT 1")
                 row = tools_db.get_row(sql)
                 if row:
                     if self.feature_type == 'connec':
