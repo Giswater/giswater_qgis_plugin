@@ -2266,8 +2266,7 @@ class GwAdminButton:
             # Execute import data
             if project_type.lower() == 'ws':
                 function_name = 'gw_fct_import_epanet_inp'
-                useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
-                extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}'
+                extras = '"parameters":{}'
             elif project_type.lower() == 'ud':
                 function_name = 'gw_fct_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
