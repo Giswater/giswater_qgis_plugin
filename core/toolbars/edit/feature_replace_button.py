@@ -373,6 +373,7 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_gw.close_dialog(dialog)
                 return
 
+            feature_id = complet_result['body']['data']['featureId']
             message = "Feature replaced successfully"
             tools_qgis.show_info(message)
 
@@ -385,12 +386,7 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_db.execute_sql(sql)
 
             if feature_type_new != "null" and featurecat_id != "null":
-                # Get id of new generated feature
-                sql = (f"SELECT {self.feature_type}_id "
-                       f"FROM {self.geom_view} "
-                       f"ORDER BY {self.feature_type}_id DESC LIMIT 1")
-                row = tools_db.get_row(sql)
-                if row:
+                if feature_id:
                     if self.feature_type == 'connec':
                         field_cat_id = "connecat_id"
                     else:
@@ -398,12 +394,12 @@ class GwFeatureReplaceButton(GwMaptool):
                     if self.feature_type != 'gully':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {field_cat_id} = '{featurecat_id}' "
-                               f"WHERE {self.feature_type}_id = '{row[0]}'")
+                               f"WHERE {self.feature_type}_id = '{feature_id}'")
                     tools_db.execute_sql(sql)
                     if self.project_type == 'ud':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {self.feature_type}_type = '{feature_type_new}' "
-                               f"WHERE {self.feature_type}_id = '{row[0]}'")
+                               f"WHERE {self.feature_type}_id = '{feature_id}'")
                         tools_db.execute_sql(sql)
 
                 message = "Values has been updated"
