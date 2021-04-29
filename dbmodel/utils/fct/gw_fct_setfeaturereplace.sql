@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 --FUNCTION CODE: 2714
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_feature_replace(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfeaturereplace (p_data json)
@@ -415,7 +416,7 @@ BEGIN
 			WHERE parameter='edit_connec_proximity';
 		END IF;
 
--- get log (fid: 143)
+	-- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 143) row;
 
@@ -442,13 +443,14 @@ BEGIN
 	-- Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||'}}'||
+		     ',"data":{ "featureId":"'||v_id||'",
+				"info":'||v_result_info||'}}'||
 	    '}')::json;
 	    
 	--    Exception handling
-    EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
