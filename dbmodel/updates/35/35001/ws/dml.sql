@@ -76,7 +76,7 @@ VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"point":{"style":"unique", "va
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL) ON CONFLICT (id) DO NOTHING;
+VALUES(2522,'gw_fct_import_epanet_inp',NULL, NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
