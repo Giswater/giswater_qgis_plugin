@@ -213,7 +213,7 @@ BEGIN
 		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:') ON CONFLICT (parameter) DO NOTHING;
 
 		--update value of rename_view_x_id parameter
-		UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='rename_view_x_id';
+		UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
 		
 		-- fk from utils schema
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
