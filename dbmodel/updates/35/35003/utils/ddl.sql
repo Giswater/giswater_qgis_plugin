@@ -41,8 +41,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_for
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"isfilter", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"tabname", "dataType":"varchar(30)", "isUtils":"False"}}$$);
 
---2021/03/29
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_node", "column":"grafconfig", "dataType":"varchar(30)", "isUtils":"False"}}$$);
 
 --2021/04/07
 ALTER TABLE IF EXISTS config_form_fields RENAME TO _config_form_fields_;
