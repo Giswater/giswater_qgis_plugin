@@ -86,8 +86,7 @@ class GwProjectLayersConfig(GwTask):
                 schema = layer_source['schema']
                 if schema and schema.replace('"', '') == self.schema_name:
                     table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"
-                    self.available_layers.append(table_name)
-
+                    if table_name not in self.available_layers: self.available_layers.append(table_name)
 
     def _set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
