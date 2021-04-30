@@ -134,6 +134,4 @@ INSERT INTO config_param_system(parameter, value, descript,isenabled, project_ty
 VALUES ('admin_manage_cat_feature','{"rename_view_x_id":false}','Manage updates of cat_feature and related views',false,'utils','json') ON CONFLICT (parameter) DO NOTHING;
 
 -- 2021/04/30
-ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 UPDATE config_form_fields SET widgetcontrols='{"setMultiline":false}' WHERE widgetcontrols IS NULL OR widgetcontrols::text = '{}';
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
