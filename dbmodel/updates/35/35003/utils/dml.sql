@@ -135,3 +135,105 @@ VALUES ('admin_manage_cat_feature','{"rename_view_x_id":false}','Manage updates 
 
 -- 2021/04/30
 UPDATE config_form_fields SET widgetcontrols='{"setMultiline":false}' WHERE widgetcontrols IS NULL OR widgetcontrols::text = '{}';
+
+
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','DMA','DMA') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','DQA','DQA') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','SECTOR','SECTOR') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','NONE','NONE') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','PRESSZONE','PRESSZONE') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('grafdelimiter_type','MINSECTOR','MINSECTOR') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','id',null,null, 'string','text', 'id',null,null,true,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature','form_feature', 'main','system_id',null,null, 'string','combo', 'system id',null,null,true,
+false, true, false, false, 'SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL', true, false,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature','form_feature', 'main','feature_type',null,null, 'string','text', 'feature type',null,null,true,
+false, false, false, false, 'SELECT type as id, type as idval FROM sys_feature_cat WHERE id IS NOT NULL', true, true,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','shortcut_key',null,null, 'string','text', 'shortcut',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','parent_layer',null,null, 'string','text', 'parent layer',null,null,true,
+false,false,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','child_layer',null,null, 'string','text', 'child layer',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','descript',null,null, 'string','text', 'descript',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','link_path',null,null, 'string','text', 'link path',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','code_autofill',null,null, 'boolean','check', 'code autofill',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder,datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate,hidden)
+VALUES ('cat_feature','form_feature', 'main','active',null,null, 'boolean','check', 'active',null,null,false,
+false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature_arc','form_feature', 'main','id',null,null, 'string','text', 'id',null,null,true,
+false, false, false, false, 'SELECT id as id, id as idval FROM cat_feature WHERE feature_type = ''ARC'' ', true, false,null, null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature_arc','form_feature', 'main','type',null,null, 'string','text', 'type',null,null,true,
+false, false, false, false, 'SELECT type as id, type as idval FROM sys_feature_cat WHERE type = ''ARC''', true, true,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature_arc','form_feature', 'main','epa_default',null,null, 'string','combo', 'epa default',null,null,true,
+false, true, false, false, 'SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''ARC''', true, false,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature_connec','form_feature', 'main','id',null,null, 'string','text', 'id',null,null,true,
+false, false, false, false, 'SELECT id as id, id as idval FROM cat_feature WHERE feature_type = ''CONNEC'' ', true, false,null, null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('cat_feature_connec','form_feature', 'main','type',null,null, 'string','text', 'type',null,null,true,
+false, false, false, false, 'SELECT type as id, type as idval FROM sys_feature_cat WHERE type = ''CONNEC''', true, true,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
