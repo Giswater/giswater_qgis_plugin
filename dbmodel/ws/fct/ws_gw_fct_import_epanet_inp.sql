@@ -333,10 +333,10 @@ BEGIN
 		ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 		--Materials
 		INSERT INTO cat_mat_arc 
-		SELECT DISTINCT csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
+		SELECT DISTINCT csv6, csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
 		DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
 		INSERT INTO cat_mat_node VALUES ('EPAMAT', 'EPAMAT') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT');
 
 		--Roughness
 		INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
@@ -711,13 +711,13 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION},
-																   {"message":"-----------------------------"},
-																   {"message":""},
-																   {"message":"ERRORS"},
-																   {"message":"----------"},
-																   {"message":'||to_json(v_error_context)||'},
-																   {"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
+		{"message":"-----------------------------"},
+		{"message":""},
+		{"message":"ERRORS"},
+		{"message":"----------"},
+		{"message":'||to_json(v_error_context)||'},
+		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;

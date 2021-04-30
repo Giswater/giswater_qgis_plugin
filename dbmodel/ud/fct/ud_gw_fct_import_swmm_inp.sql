@@ -503,7 +503,7 @@ BEGIN
 		update ext_municipality SET the_geom=v_extend_val;
 
 		-- Create cat_mat_arc on import inp function
-		INSERT INTO cat_mat_arc	SELECT DISTINCT (matcat_id) FROM arc WHERE matcat_id IS NOT NULL;
+		INSERT INTO cat_mat_arc	SELECT DISTINCT matcat_id, matcat_id FROM arc WHERE matcat_id IS NOT NULL;
 		
 		-- check for integer or varchar id's
 		IF v_count =v_count_total THEN
@@ -553,7 +553,7 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION},
+	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
 																   {"message":"-----------------------------"},
 																   {"message":""},
 																   {"message":"ERRORS"},
