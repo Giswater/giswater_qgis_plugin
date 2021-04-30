@@ -335,8 +335,8 @@ BEGIN
 		INSERT INTO cat_mat_arc 
 		SELECT DISTINCT csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
 		DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
-		INSERT INTO cat_mat_node VALUES ('EPAMAT') ON CONFLICT (id) DO NOTHING;
-		INSERT INTO cat_mat_arc VALUES ('EPAMAT');
+		INSERT INTO cat_mat_node VALUES ('EPAMAT', 'EPAMAT') ON CONFLICT (id) DO NOTHING;
+		INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT') ON CONFLICT (id) DO NOTHING;;
 
 		--Roughness
 		INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)

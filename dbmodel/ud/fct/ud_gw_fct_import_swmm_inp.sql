@@ -295,8 +295,8 @@ BEGIN
 		
 		ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 		--cat_mat_node 
-		INSERT INTO cat_mat_node VALUES ('EPAMAT');
-		INSERT INTO cat_mat_arc VALUES ('EPAMAT');
+		INSERT INTO cat_mat_node VALUES ('EPAMAT', 'EPAMAT');
+		INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT');
 		
 		--cat_node
 		INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPAMANH-CAT', 'EPAMAT', TRUE);
@@ -337,6 +337,9 @@ BEGIN
 
 		-- get random arc to insert into inp_controls_x_arc if control exists
 		SELECT arc_id INTO v_arc FROM arc LIMIT 1;
+
+		-- insert other catalog tables
+		INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
 		-- insert controls
 		INSERT INTO inp_controls_x_arc (arc_id, text, active)
