@@ -63,7 +63,7 @@ class GwArcFusionButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be removed"
+            message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(message)
 
 

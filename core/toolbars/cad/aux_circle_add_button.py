@@ -83,7 +83,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select an element and click it to set radius"
+            message = "Click on feature or any place on the map and set radius of a circle"
             tools_qgis.show_info(message)
 
         # Store user snapping configuration

@@ -124,7 +124,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the feature by clicking on it and it will be replaced"
+            message = "Click on node to replace it with a new one"
             tools_qgis.show_info(message)
 
 

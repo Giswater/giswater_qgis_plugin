@@ -68,7 +68,7 @@ class GwNodeTypeChangeButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be changed"
+            message = "Click on node to change it's type"
             tools_qgis.show_info(message)
 
 

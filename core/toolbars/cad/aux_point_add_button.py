@@ -94,7 +94,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click two points over canvas and draw a line"
+            message = "Click on 2 places on the map, creating a line, then set the location of a point"
             tools_qgis.show_info(message)
 
         # Store user snapping configuration
