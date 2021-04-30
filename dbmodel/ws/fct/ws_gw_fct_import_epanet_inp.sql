@@ -382,15 +382,15 @@ BEGIN
 		ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
 
 		-- improve velocity for junctions using directy tables in spite of vi_junctions view
-		INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-		SELECT csv1, csv2::numeric(12,3), 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
+		INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
+		SELECT csv1, csv2::numeric(12,3), 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2, 1
 		FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 		INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 		INSERT INTO man_junction SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 		-- improve velocity for pipes using directy tables in spite of vi_pipes view
-		INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-		SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2 
+		INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
+		SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2, 1 
 		FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 		INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 		INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;

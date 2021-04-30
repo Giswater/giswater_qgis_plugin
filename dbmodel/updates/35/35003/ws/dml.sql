@@ -181,3 +181,6 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate,hidden)
 VALUES ('cat_feature_node','form_feature', 'main','isprofilesurface',null,null, 'boolean','check', 'Profile surface',null,null,false,
 false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction","v_edit_inp_connec"]}]'
