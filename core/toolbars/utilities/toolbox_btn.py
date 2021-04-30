@@ -185,6 +185,8 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
 
+        # Open form and set title
+        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
