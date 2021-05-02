@@ -62,7 +62,6 @@ v_error_context text;
 v_record record;
 v_epatype text;
 v_count_total integer;
-v_arc text;
 v_status text = 'Accepted';
 
 BEGIN
@@ -164,9 +163,8 @@ BEGIN
 		DELETE FROM inp_pattern_value;
 		DELETE FROM inp_curve;
 		DELETE FROM inp_curve_value;
-		DELETE FROM inp_controls_x_arc;
-		DELETE FROM inp_rules_x_arc;
-		DELETE FROM inp_rules_x_node;
+		DELETE FROM inp_controls;
+		DELETE FROM inp_rules;
 		DELETE FROM inp_emitter;
 		DELETE FROM inp_quality;
 		DELETE FROM inp_source;
@@ -395,15 +393,12 @@ BEGIN
 		INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 		INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
-		-- get random arc to insert into inp_controls_x_arc if control exists
-		SELECT arc_id INTO v_arc FROM arc LIMIT 1;
-
 		-- insert controls
-		INSERT INTO inp_controls_x_arc (arc_id, text, active)
-		select v_arc, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+		INSERT INTO inp_controls (sector_id, text, active)
+		select 1, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 
 		-- insert rules
-		INSERT INTO inp_rules_x_sector (sector_id, text, active)
+		INSERT INTO inp_rules (sector_id, text, active)
 		select 1, csv1, true FROM temp_csv where source='[RULES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 
 
@@ -454,7 +449,7 @@ BEGIN
 		RAISE NOTICE 'step 4/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are not updated. Default values of Giswater are keeped');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If controls exists, it would have been related to random arc');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If controls exists, it would have been related to the whole sector');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If rules exits, it would have been related to the whole sector');
 
 				
@@ -564,7 +559,8 @@ BEGIN
 			DELETE FROM inp_valve_importinp;
 			DELETE FROM inp_pump_importinp;
 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 
+			'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 		END IF;
 
 		RAISE NOTICE 'step 5/7';

@@ -104,3 +104,16 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
   WHERE config_form_fields.formtype::text = 'form_feature'::text AND config_form_fields.formname::text <> 've_arc'::text AND config_form_fields.formname::text <> 've_node'::text AND config_form_fields.formname::text <> 've_connec'::text AND config_form_fields.formname::text <> 've_gully'::text;
 
 ALTER VIEW IF EXISTS v_edit_vnode RENAME TO v_vnode;
+
+
+-- 2021/05/01
+CREATE OR REPLACE VIEW vi_controls AS 
+ SELECT c.text
+   FROM (SELECT d.id,
+            d.text
+           FROM ( SELECT inp_controls.id + 2000000 AS id,
+                    inp_controls.text
+                   FROM selector_sector,inp_controls
+                  WHERE selector_sector.sector_id = inp_controls.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_controls.active IS NOT FALSE
+                  ORDER BY inp_controls.id) d) c
+  ORDER BY c.id;

@@ -24,4 +24,31 @@ DROP TABLE IF EXISTS inp_arc_type;
 ALTER TABLE inp_valve ALTER COLUMN status SET DEFAULT 'ACTIVE';
 ALTER TABLE inp_rules_importinp RENAME TO _inp_rules_importinp_;
 
+-- 2021/05/01
+ALTER TABLE inp_rules_x_sector DROP CONSTRAINT inp_rules_x_sector_sector_id_fkey;
+ALTER TABLE inp_controls_x_arc RENAME TO _inp_controls_x_arc_;
+ALTER TABLE inp_rules_x_arc RENAME TO _inp_rules_x_arc_;
+ALTER TABLE inp_rules_x_node RENAME TO _inp_rules_x_node_;
+ALTER TABLE inp_rules_x_sector RENAME TO inp_rules;
+
+CREATE TABLE inp_controls
+(
+  id serial NOT NULL,
+  sector_id integer NOT NULL,
+  text text NOT NULL,
+  active boolean,
+  CONSTRAINT inp_controls_pkey PRIMARY KEY (id),
+  CONSTRAINT inp_controls_x_sector_id_fkey FOREIGN KEY (sector_id)
+      REFERENCES sector (sector_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT);
+
+    
+
+
+
+
+
+
+
+
 

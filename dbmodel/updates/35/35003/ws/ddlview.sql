@@ -50,3 +50,18 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_inp_connec","v_ui_arc_x_relations","vi_parent_hydrometer", "v_edit_inp_demand", "vi_pjoint", "vp_basic_connec","v_rtc_period_hydrometer",
 "v_rtc_period_dma", "v_rtc_period_node", "v_rtc_period_nodepattern", "v_rtc_interval_nodepattern","v_rtc_period_pjointpattern",
 "v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_vnode","v_arc_x_vnode"], "action":"restoreView","hasChilds":"False"}}$$);
+
+
+-- 2021/05/01
+CREATE OR REPLACE VIEW vi_rules AS 
+ SELECT c.text
+   FROM (SELECT d.id,
+            d.text
+           FROM ( SELECT inp_rules.id + 2000000 AS id,
+                    inp_rules.text
+                   FROM selector_sector, inp_rules
+                  WHERE selector_sector.sector_id = inp_rules.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_rules.active IS NOT FALSE
+                  ORDER BY inp_rules.id) d) c
+  ORDER BY c.id;
+
+

@@ -27,6 +27,21 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_node",
 -- 2021/04/24
 ALTER TABLE inp_controls_importinp RENAME TO _inp_controls_importinp_;
 
+-- 2021/05/01
+ALTER TABLE inp_controls_x_arc RENAME TO _inp_controls_x_arc_;
+ALTER TABLE inp_controls_x_node RENAME TO _inp_controls_x_node_;
+
+
+CREATE TABLE inp_controls
+(
+  id serial NOT NULL,
+  sector_id integer NOT NULL,
+  text text NOT NULL,
+  active boolean,
+  CONSTRAINT inp_controls_pkey PRIMARY KEY (id),
+  CONSTRAINT inp_controls_x_sector_id_fkey FOREIGN KEY (sector_id)
+      REFERENCES sector (sector_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT);
 
 
 

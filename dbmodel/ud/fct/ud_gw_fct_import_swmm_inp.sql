@@ -64,7 +64,6 @@ v_path text;
 v_error_context text;
 v_linkoffsets text;
 v_count_total integer;
-v_arc text;
 v_status text = 'Accepted';
 
 BEGIN
@@ -335,15 +334,12 @@ BEGIN
 		INSERT INTO inp_conduit (arc_id, custom_n, q0, qmax) SELECT csv1, csv5::numeric(12,3), csv8::numeric(12,3), csv9::numeric(12,3)
 		FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
-		-- get random arc to insert into inp_controls_x_arc if control exists
-		SELECT arc_id INTO v_arc FROM arc LIMIT 1;
-
 		-- insert other catalog tables
 		INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
 		-- insert controls
-		INSERT INTO inp_controls_x_arc (arc_id, text, active)
-		SELECT v_arc, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';;%') AND cur_user=current_user order by 1;
+		INSERT INTO inp_controls (sector_id, text, active)
+		SELECT 1, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';;%') AND cur_user=current_user order by 1;
 
 		-- subcathcments
 		INSERT INTO inp_subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id, hydrology_id) 
@@ -418,7 +414,7 @@ BEGIN
 		RAISE NOTICE 'step 4/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls_x_arc using a random arc_id');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls');
 
 		-- Create arc geom
 		v_querytext = 'SELECT * FROM arc ';
