@@ -161,21 +161,21 @@ class GwMincut:
             self.dlg_mincut.btn_start.setDisabled(False)
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
-            if self.mincut_class == '1':
+            if self.mincut_class == 1:
                 self.action_mincut.setDisabled(False)
                 self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_change_valve_status.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
-            if self.mincut_class == '2':
+            if self.mincut_class == 2:
                 self.action_mincut.setDisabled(True)
                 self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
                 self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
                 self.action_add_hydrometer.setDisabled(True)
-            if self.mincut_class == '3':
+            if self.mincut_class == 3:
                 self.action_mincut.setDisabled(True)
                 self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
