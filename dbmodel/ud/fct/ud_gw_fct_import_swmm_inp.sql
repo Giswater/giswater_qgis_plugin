@@ -129,6 +129,7 @@ BEGIN
 		-- Delete data
 		DELETE FROM node;
 		DELETE FROM arc;
+		DELETE FROM plan_arc_x_pavement;
 
 		DELETE FROM man_storage;
 		DELETE FROM man_junction;
