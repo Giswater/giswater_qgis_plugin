@@ -236,6 +236,14 @@ BEGIN
 		UPDATE temp_csv SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ),
 		csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE source = '[CONTROLS]' and csv2 IS NOT NULL;
 
+		--refactor rules target
+		UPDATE temp_csv SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ),
+		csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE source = '[RULES]' and csv2 IS NOT NULL;
+
+		--refactor backdrop target
+		UPDATE temp_csv SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ),
+		csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE source = '[BACKDROP]' and csv2 IS NOT NULL;
+
 		-- refactor curves target
 		FOR rpt_rec IN SELECT * FROM temp_csv WHERE source ='[CURVES]'
 		LOOP
@@ -669,7 +677,10 @@ BEGIN
 		DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
 		DELETE FROM cat_feature WHERE id NOT IN (SELECT arctype_id FROM cat_arc) AND feature_type = 'ARC';
 		DELETE FROM cat_feature WHERE id NOT IN (SELECT nodetype_id FROM cat_node) AND feature_type = 'NODE';
-	
+
+		-- last process. Harmonize values
+		UPDATE inp_valve SET status = 'ACTIVE' WHER status IS NULL;
+		
 		INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
