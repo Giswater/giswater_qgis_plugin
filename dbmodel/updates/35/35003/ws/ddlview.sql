@@ -57,7 +57,7 @@ CREATE OR REPLACE VIEW vi_rules AS
  SELECT c.text
    FROM (SELECT d.id,
             d.text
-           FROM ( SELECT inp_rules.id + 2000000 AS id,
+           FROM ( SELECT inp_rules.id AS id,
                     inp_rules.text
                    FROM selector_sector, inp_rules
                   WHERE selector_sector.sector_id = inp_rules.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_rules.active IS NOT FALSE
@@ -65,3 +65,13 @@ CREATE OR REPLACE VIEW vi_rules AS
   ORDER BY c.id;
 
 
+CREATE OR REPLACE VIEW vi_controls AS 
+ SELECT c.text
+   FROM (SELECT d.id,
+            d.text
+           FROM ( SELECT inp_controls.id AS id,
+                    inp_controls.text
+                   FROM selector_sector,inp_controls
+                  WHERE selector_sector.sector_id = inp_controls.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_controls.active IS NOT FALSE
+                  ORDER BY inp_controls.id) d) c
+  ORDER BY c.id;
