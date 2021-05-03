@@ -141,7 +141,7 @@ false, false, false, false, NULL, true, false,null, null,false) ON CONFLICT (for
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
 VALUES ('cat_feature_node','form_feature', 'main','type',null,null, 'string','text', 'type',null,null,true,
-false, false, false, false, NULL', true, true,null, null,false) 
+false, false, false, false, NULL, true, true,null, null,false) 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
