@@ -146,3 +146,26 @@ false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO
 
 DELETE FROM sys_table WHERE id = 'inp_controls_x_arc';
 UPDATE sys_table SET id = 'inp_controls', sys_sequence = 'inp_controls_id_seq' WHERE id = 'inp_controls_x_node';
+
+-- 2021/05/03
+
+update config_form_fields set formname='inp_controls' WHERE formname = 'inp_controls_x_arc';
+delete from config_form_fields where formname in ('inp_controls_x_node');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('inp_controls','form_feature', 'main','id', NULL, NULL, 'integer','text', 'id', null, null,false,
+false, true, false, false, NULL, null, null, null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('inp_controls','form_feature', 'main','sector_id', NULL, NULL, 'string','combo', 'sector_id', null, null,false,
+false, true, false, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id<>0', true, false,null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,hidden)
+VALUES ('inp_controls','form_feature', 'main','active', NULL, NULL, 'boolean','check', 'active', null, null,false,
+false, true, false, false, NULL, null, null, null, null,false) 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

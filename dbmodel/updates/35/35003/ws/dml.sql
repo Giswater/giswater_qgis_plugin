@@ -192,3 +192,12 @@ isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_is
 VALUES ('v_edit_inp_demand','form_feature', 'main','feature_type','lyt_data_1', 7, 'string','combo', 'feature_type','feature_type', null,false,
 false, true, false, false, 'SELECT id as id, id as idval FROM sys_feature_type WHERE id IN (''NODE'', ''CONNEC'')', true, false,null, null,false) 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+update config_form_fields set formname='inp_rules' WHERE formname = 'inp_rules_x_arc';
+update config_form_fields set columnname='sector_id', label='sector_id', widgettype='combo', dv_querytext='SELECT sector_id as id, name as idval FROM sector WHERE sector_id<>0', dv_orderby_id=true, dv_isnullvalue=false WHERE formname = 'inp_rules' AND columnname='arc_id';
+delete from config_form_fields where formname in ('inp_rules_x_node', 'inp_rules_x_sector');
+
+update config_form_fields set formname='inp_controls' WHERE formname = 'inp_controls_x_arc';
+update config_form_fields set columnname='sector_id', label='sector_id', widgettype='combo', dv_querytext='SELECT sector_id as id, name as idval FROM sector WHERE sector_id<>0', dv_orderby_id=true, dv_isnullvalue=false WHERE formname = 'inp_controls' AND columnname='arc_id';
+update config_form_fields set widgetcontrols='{"setMultiline":true}' WHERE formname = 'inp_controls' AND columnname='text';
