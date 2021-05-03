@@ -162,7 +162,7 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if self.mincut_class == 1:
-                self.action_mincut.setDisabled(False)
+                self.action_mincut.setDisabled(True)
                 self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_change_valve_status.setDisabled(False)
