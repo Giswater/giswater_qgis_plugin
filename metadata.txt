@@ -12,8 +12,11 @@ version=3.5.003
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.5.003 (xx/xx/2021)
-   
+changelog=Version 3.5.003
+   - Big refactor of python code
+   - Code adapted to PEP8
+   - Full refactor of classes, methods, user and system variables. All have been harmonized
+   - New folder lib to amange 'as is' classes without dependences of Giswater
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
