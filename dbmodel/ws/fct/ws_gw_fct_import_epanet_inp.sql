@@ -137,7 +137,7 @@ BEGIN
 		-- Delete data
 		DELETE FROM node;
 		DELETE FROM arc;
-
+		DELETE FROM plan_arc_x_pavement;
 
 		DELETE FROM man_tank;
 		DELETE FROM man_source;
@@ -513,8 +513,7 @@ BEGIN
 				v_thegeom=ST_LineInterpolatePoint(v_thegeom, 0.5);
 
 				-- Introducing new node transforming line into point
-				INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_epatype,1,1,1,1,
-				(SELECT id FROM value_state_type WHERE state=1 LIMIT 1), v_thegeom) ;
+				INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_epatype,1,1,1,1,2, v_thegeom) ;
 
 				EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
@@ -535,8 +534,8 @@ BEGIN
 				v_elevation = ((SELECT elevation FROM node WHERE node_id=v_node1) + (SELECT elevation FROM node WHERE node_id=v_node2))/2;
 
 				-- downgrade to obsolete arcs and nodes
-				UPDATE arc SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE arc_id=v_data.arc_id;
-				UPDATE node SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE node_id IN (v_node1, v_node2);
+				UPDATE arc SET state=0,state_type=2 WHERE arc_id=v_data.arc_id;
+				UPDATE node SET state=0,state_type=2 WHERE node_id IN (v_node1, v_node2);
 
 				-- reconnect topology
 				UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 OR node_1=v_node2;
@@ -679,7 +678,9 @@ BEGIN
 		DELETE FROM cat_feature WHERE id NOT IN (SELECT nodetype_id FROM cat_node) AND feature_type = 'NODE';
 
 		-- last process. Harmonize values
-		UPDATE inp_valve SET status = 'ACTIVE' WHER status IS NULL;
+		UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;
+		UPDATE node SET presszone_id = '1' WHERE presszone_id is null;
+		UPDATE arc SET presszone_id = '1' WHERE presszone_id is null;
 		
 		INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
