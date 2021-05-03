@@ -143,3 +143,6 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate,hidden)
 VALUES ('cat_feature_node','form_feature', 'main','isexitupperintro',null,null, 'boolean','check', 'Exit upper intro',null,null,false,
 false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+DELETE FROM sys_table WHERE id = 'inp_controls_x_arc';
+UPDATE sys_table SET id = 'inp_controls', sys_sequence = 'inp_controls_id_seq' WHERE id = 'inp_controls_x_node';

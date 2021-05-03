@@ -179,3 +179,9 @@ false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO
 
 UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction","v_edit_inp_connec"]}]'
 WHERE id = 'inp_pattern';
+
+DELETE FROM sys_table WHERE id = 'inp_rules_x_node';
+DELETE FROM sys_table WHERE id = 'inp_rules_x_arc';
+
+UPDATE sys_table SET id = 'inp_controls', sys_sequence = 'inp_controls_id_seq' WHERE id = 'inp_controls_x_arc';
+UPDATE sys_table SET id = 'inp_rules', sys_sequence = 'inp_rules_id_seq'  WHERE id = 'inp_rules_x_sector';

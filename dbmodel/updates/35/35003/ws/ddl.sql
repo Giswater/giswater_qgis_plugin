@@ -29,7 +29,10 @@ ALTER TABLE inp_rules_x_sector DROP CONSTRAINT inp_rules_x_sector_sector_id_fkey
 ALTER TABLE inp_controls_x_arc RENAME TO _inp_controls_x_arc_;
 ALTER TABLE inp_rules_x_arc RENAME TO _inp_rules_x_arc_;
 ALTER TABLE inp_rules_x_node RENAME TO _inp_rules_x_node_;
+
 ALTER TABLE inp_rules_x_sector RENAME TO inp_rules;
+ALTER SEQUENCE inp_rules_x_sector_id_seq RENAME TO inp_rules_id_seq;
+
 
 CREATE TABLE inp_controls
 (
