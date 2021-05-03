@@ -497,7 +497,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN (SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '283',concat(
+		VALUES (v_fid, v_result_id, 2, '283',concat(
 		'WARNING-283: There is/are ',v_count,' register(s) on node''s catalog without dint defined. If this registers acts as shortipe on the epanet exportation dint is needed.'), v_count);
 		v_count=0;
 	ELSE
