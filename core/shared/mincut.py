@@ -2320,6 +2320,12 @@ class GwMincut:
             self.snapper_manager.recover_snapping_options()
             return
 
+        # Declare snapper_manager and emit_point
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
