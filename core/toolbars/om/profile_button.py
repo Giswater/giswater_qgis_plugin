@@ -223,7 +223,6 @@ class GwProfileButton(GwAction):
         message = f"{result_profile['message']}"
         tools_qgis.show_info(message)
 
-        self.dlg_load.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(partial(self._load_profile, result_profile))
         self.dlg_load.btn_delete_profile.clicked.connect(partial(self._delete_profile))
 
