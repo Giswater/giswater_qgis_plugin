@@ -159,7 +159,8 @@ class GwAdminButton:
                 return
 
         elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
-            if self.locale != 'en_US' or self.project_epsg != '25831':
+
+            if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
                 result = tools_qt.show_question(msg, "Info Message")
