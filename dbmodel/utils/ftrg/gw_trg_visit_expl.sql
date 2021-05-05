@@ -20,7 +20,7 @@ BEGIN
 	
     SELECT expl_id INTO expl_id_arg FROM exploitation WHERE active IS TRUE AND ST_DWithin(exploitation.the_geom, NEW.the_geom, 0.01);
 
-    IF expl_id_arg IS NOT NULL THEN
+    IF expl_id_arg IS NOT NULL AND NEW.expl_id IS NULL THEN
 	NEW.expl_id=expl_id_arg;	
     END IF;
 
