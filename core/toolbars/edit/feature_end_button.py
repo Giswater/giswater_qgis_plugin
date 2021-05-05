@@ -351,8 +351,7 @@ class GwFeatureEndButton(GwAction):
         if not row:
             return
 
-        arc_type = row[0].lower()
-        arc_table = "v_edit_man_" + arc_type
+        arc_table = "v_edit_arc"
         layer_arc = tools_qgis.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "
