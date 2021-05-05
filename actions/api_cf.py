@@ -2244,8 +2244,15 @@ class ApiCF(ApiParent, QObject):
         if type(table_name) is dict:
             table_name = str(table_name[utils_giswater.get_item_data(self.dlg_cf, self.cmb_visit_class, 0)])
 
-        sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
-        row = self.controller.get_row(sql)
+        sql = ("SELECT column_name FROM information_schema.columns "
+               "WHERE table_name = '" + str(table_name) + "' AND column_name='photo'")
+        column_exist = self.controller.get_row(sql)
+
+        if column_exist:
+            sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+            row = self.controller.get_row(sql)
+        else:
+            row = None
 
         if not row:
             return
@@ -2268,6 +2275,16 @@ class ApiCF(ApiParent, QObject):
             if url.scheme == "http" or url.scheme == "https":
                 # If path is URL open URL in browser
                 webbrowser.open(path[0])
+            else:
+                try:
+                    # Open the document
+                    if sys.platform == "win32":
+                        os.startfile(path[0])
+                    else:
+                        opener = "open" if sys.platform == "darwin" else "xdg-open"
+                        subprocess.call([opener, path[0]])
+                except:
+                    self.controller.log_warning("File path is not valid, check it", parameter=path[0])
 
 
     def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None, widget=None):
