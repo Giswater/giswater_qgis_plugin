@@ -47,6 +47,7 @@
 	rec_view text;
 	v_viewlist text[];
 	v_lastview text;
+	v_penultimate_field text;
 
 	--trg
 	v_trgquery text;
@@ -114,6 +115,14 @@
 						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
 						into v_viewdefinition;
 						
+						--find penultiate field and remove , before FROM
+						EXECUTE 'SELECT column_name FROM information_schema.columns 
+						WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||' AND 
+						ordinal_position = '||v_maxposition||' -1 ;'
+						INTO v_penultimate_field;
+
+						v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field)
+					
 						IF  position(v_fieldname in v_viewdefinition) = 0 then --v_fieldposition = 0 THEN
 							EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' WHERE fid=380 AND source='||quote_literal(rec_view)||';';
 						END IF;
