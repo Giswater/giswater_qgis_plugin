@@ -12,6 +12,19 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_audit_node()
   RETURNS trigger AS
 $BODY$
 
+/* INFORMATION ABOUT VALUES ON THIS TRIGGER REVIEW TABLE FUNCTIONALITY
+The only updatable value on this view is is_validated and have 3 diferent possible values:
+-- is_validated=0 means that I belive new values but I don't want to apply it to the real table
+-- is_validated=1 means that I belive new values and I want to apply it to the real table
+-- is_validated=2 mean that I don't belive new values and I update field_checked to FALSE again
+
+If is_validated=1, depending on review_status the trigger do diferent actions:
+-- review_status=1 new element
+-- review_status=2 modified geom (and maybe fields)
+-- review_status=3 modified fields but geom is the same
+
+*/
+
 DECLARE
 	v_review_status integer;
 	
@@ -39,16 +52,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
 
 				INSERT INTO v_edit_node (node_id, elevation, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
-				VALUES (NEW.node_id, NEW.new_elevation, NEW.new_depth, NEW.new_nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
+				VALUES (NEW.node_id, NEW.new_elevation, NEW.new_depth, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
 				
 		
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_node SET the_geom=NEW.the_geom, elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.annotation, observ=NEW.observ WHERE node_id=NEW.node_id;
+				UPDATE v_edit_node SET the_geom=NEW.the_geom, elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
 					
 			ELSIF v_review_status=3 THEN
 
 				UPDATE v_edit_node SET elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
-				annotation=NEW.annotation, observ=NEW.observ WHERE node_id=NEW.node_id;
+				annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
 	
 			END IF;	
 			

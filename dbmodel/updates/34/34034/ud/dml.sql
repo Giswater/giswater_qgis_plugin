@@ -41,11 +41,13 @@ INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'an
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'observ', 8, 'string', 'text', 'observ', NULL, 'observ', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'expl_id', 9, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'review_obs', 9, 'string', 'text', 'review_obs', NULL, 'review_obs', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'field_checked', 10, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'expl_id', 10, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'is_validated', 11, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'field_checked', 11, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+INSERT INTO config_form_fields VALUES ('v_edit_review_node', 'form_feature', 'is_validated', 12, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 -- v_edit_review_audit_node
@@ -113,11 +115,13 @@ INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'ann
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'observ', 8, 'string', 'text', 'observ', NULL, 'observ', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'expl_id', 9, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'review_obs', 9, 'string', 'text', 'review_obs', NULL, 'review_obs', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'field_checked', 10, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'expl_id', 10, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'is_validated', 11, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'field_checked', 11, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+INSERT INTO config_form_fields VALUES ('v_edit_review_arc', 'form_feature', 'is_validated', 12, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 -- v_edit_review_audit_arc
@@ -181,11 +185,13 @@ INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', '
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'observ', 8, 'string', 'text', 'observ', NULL, 'observ', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'expl_id', 9, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'review_obs', 9, 'string', 'text', 'review_obs', NULL, 'review_obs', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'field_checked', 10, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'expl_id', 10, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'is_validated', 11, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'field_checked', 11, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+INSERT INTO config_form_fields VALUES ('v_edit_review_connec', 'form_feature', 'is_validated', 12, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 -- v_edit_review_audit_connec
@@ -263,11 +269,13 @@ INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'a
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'observ', 16, 'string', 'text', 'observ', NULL, 'observ', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'expl_id', 17, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'review_obs', 17, 'string', 'text', 'review_obs', NULL, 'review_obs', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'field_checked', 18, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'expl_id', 18, 'integer', 'text', 'expl_id', NULL, 'expl_id', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'is_validated', 19, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'field_checked', 19, 'boolean', 'check', 'field_checked', NULL, 'field_checked', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+INSERT INTO config_form_fields VALUES ('v_edit_review_gully', 'form_feature', 'is_validated', 20, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 -- v_edit_review_audit_gully

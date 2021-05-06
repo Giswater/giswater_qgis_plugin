@@ -12,6 +12,19 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_audit_arc()
   RETURNS trigger AS
 $BODY$
 
+/* INFORMATION ABOUT VALUES ON THIS TRIGGER REVIEW TABLE FUNCTIONALITY
+The only updatable value on this view is is_validated and have 3 diferent possible values:
+-- is_validated=0 means that I belive new values but I don't want to apply it to the real table
+-- is_validated=1 means that I belive new values and I want to apply it to the real table
+-- is_validated=2 mean that I don't belive new values and I update field_checked to FALSE again
+
+If is_validated=1, depending on review_status the trigger do diferent actions:
+-- review_status=1 new element
+-- review_status=2 modified geom (and maybe fields)
+-- review_status=3 modified fields but geom is the same
+
+*/
+
 DECLARE
 	v_review_status integer;
 	
@@ -20,7 +33,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
 	
-		SELECT review_status INTO v_review_status FROM review_audit_arc WHERE arc_id=NEW.arc_id;
+		SELECT review_status_id INTO v_review_status FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		IF NEW.is_validated = 0 THEN
 			DELETE FROM review_arc WHERE arc_id = NEW.arc_id;
@@ -38,15 +51,15 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF v_review_status=1 AND NEW.arc_id NOT IN (SELECT arc_id FROM arc) THEN 
 
 				INSERT INTO v_edit_arc (arc_id,  arccat_id, annotation, observ, expl_id, the_geom)
-				VALUES (NEW. arc_id, NEW.new_arccat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
+				VALUES (NEW. arc_id, NEW.new_arccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
 				
 		
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_arc SET the_geom=NEW.the_geom, arccat_id=NEW.new_arccat_id,  annotation=NEW.annotation, observ=NEW.observ WHERE arc_id=NEW.arc_id;
+				UPDATE v_edit_arc SET the_geom=NEW.the_geom, arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ WHERE arc_id=NEW.arc_id;
 					
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_arc SET  arccat_id=NEW.new_arccat_id,  annotation=NEW.annotation, observ=NEW.observ
+				UPDATE v_edit_arc SET  arccat_id=NEW.new_arccat_id,  annotation=NEW.new_annotation, observ=NEW.new_observ
 				WHERE arc_id=NEW.arc_id;
 	
 			END IF;	

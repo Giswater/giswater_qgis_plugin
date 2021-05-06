@@ -17,7 +17,6 @@ DECLARE
 	v_tol_filter_bool boolean;
 	v_review_status smallint;
 	rec_arc record;
-	v_status_new integer;
 
 
 BEGIN
@@ -51,15 +50,15 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_arc (arc_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom, field_checked) 
-		VALUES (NEW.arc_id, NEW.matcat_id, NEW.pnom, NEW.dnom,  NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+		INSERT INTO review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked) 
+		VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked);
 		
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO review_audit_arc (arc_id, new_matcat_id, new_pnom, new_dnom, annotation, observ, expl_id, the_geom, 
+			INSERT INTO review_audit_arc (arc_id, new_arccat_id, new_annotation, new_observ, review_obs, expl_id, the_geom, 
 			review_status_id, field_date, field_user)
-			VALUES (NEW.arc_id, NEW.matcat_id, NEW.pnom, NEW.dnom, NEW.annotation, NEW.observ, 
+			VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs,
 			NEW.expl_id, NEW.the_geom, 1, now(), current_user);
 		
 		END IF;
@@ -69,19 +68,16 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- update values on review table
-		UPDATE review_arc SET matcat_id=NEW.matcat_id, pnom=NEW.pnom, dnom=NEW.dnom,annotation=NEW.annotation, 
-		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
+		UPDATE review_arc SET arccat_id=NEW.arccat_id, annotation=NEW.annotation, 
+		observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE arc_id=NEW.arc_id;
 
-		SELECT review_status_id INTO v_status_new FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 
-			rec_arc.matcat_id!= NEW.matcat_id OR  (rec_arc.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_arc.pnom != NEW.pnom	OR  (rec_arc.pnom IS NULL AND NEW.pnom IS NOT NULL) OR
-			rec_arc.dnom != NEW.dnom	OR  (rec_arc.dnom IS NULL AND NEW.dnom IS NOT NULL) OR
+			rec_arc.arccat_id!= NEW.arccat_id OR  (rec_arc.arccat_id IS NULL AND NEW.arccat_id IS NOT NULL) OR
 			rec_arc.annotation != NEW.annotation OR  (rec_arc.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_arc.observ != NEW.observ	OR  (rec_arc.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_arc.observ != NEW.observ OR (rec_arc.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_arc.the_geom::text<>NEW.the_geom::text THEN
 			v_tol_filter_bool=TRUE;
 		ELSE
@@ -92,27 +88,29 @@ BEGIN
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF v_status_new=1 THEN
+			-- new element, re-updated after its insert
+			IF (SELECT count(arc_id) FROM arc WHERE arc_id=NEW.arc_id)=0 THEN
 				v_review_status=1;
-			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
-				v_review_status=2;
-			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
+			-- only data changes
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is TRUE THEN
 				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	
 			END IF;
 		
 			-- upserting values on review_audit_arc arc table	
 			IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
-				UPDATE review_audit_arc	SET  old_matcat_id=rec_arc.matcat_id, new_matcat_id=NEW.matcat_id, old_pnom=rec_arc.pnom, new_pnom=NEW.pnom, old_dnom=rec_arc.dnom, new_dnom=NEW.dnom, 
-				old_arccat_id=rec_arc.arccat_id, annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
+				UPDATE review_audit_arc	SET  old_arccat_id=rec_arc.arccat_id, new_arccat_id=NEW.arccat_id, old_annotation=rec_arc.annotation, new_annotation=NEW.annotation, 
+				old_observ=rec_arc.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
 				review_status_id=v_review_status, field_date=now(), field_user=current_user WHERE arc_id=NEW.arc_id;
 			ELSE
 			
-				INSERT INTO review_audit_arc(arc_id, old_matcat_id, new_matcat_id, old_pnom, new_pnom,
-				old_dnom ,new_dnom ,old_arccat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
-				VALUES (NEW.arc_id, rec_arc.matcat_id, NEW.matcat_id, rec_arc.pnom,
-				NEW.pnom, rec_arc.dnom, NEW.dnom,  rec_arc.arccat_id, NEW.annotation, NEW.observ, NEW.expl_id,
+				INSERT INTO review_audit_arc(arc_id, old_arccat_id, new_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
+				VALUES (NEW.arc_id, rec_arc.arccat_id, NEW.arccat_id, rec_arc.annotation, NEW.annotation, rec_arc.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
 				NEW.the_geom, v_review_status, now(), current_user);
 			END IF;
 				
