@@ -452,8 +452,11 @@ BEGIN
 			ELSIF (OLD.epa_type = 'VIRTUALVALVE') THEN
 				v_inp_table:= 'inp_virtualvalve';
 			END IF;
-			v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-			EXECUTE v_sql;
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				EXECUTE v_sql;
+			END IF;
+			
 			v_inp_table := NULL;
 
 			-- insert into new inp table
