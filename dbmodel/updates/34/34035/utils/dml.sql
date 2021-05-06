@@ -57,3 +57,6 @@ VALUES ('v_edit_connec','form_feature', 'district_id', 'integer', 'combo', 'dist
 'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
 'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+-- 2021/05/06
+DELETE FROM sys_function WHERE id=2878 AND function_name='gw_fct_getvisitsfromfeature';
