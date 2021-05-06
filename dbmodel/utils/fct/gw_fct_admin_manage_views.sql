@@ -121,7 +121,7 @@
 						ordinal_position = '||v_maxposition||' -1 ;'
 						INTO v_penultimate_field;
 
-						v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field)
+						v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field);
 					
 						IF  position(v_fieldname in v_viewdefinition) = 0 then --v_fieldposition = 0 THEN
 							EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' WHERE fid=380 AND source='||quote_literal(rec_view)||';';
