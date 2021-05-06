@@ -85,6 +85,9 @@ class GwCSVButton(GwAction):
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
 
+        # Finally set label info
+        self._update_info(self.dlg_csv)
+
 
     def _populate_combos(self, combo, field_id, fields, table_name, roles):
 
