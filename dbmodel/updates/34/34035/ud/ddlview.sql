@@ -470,3 +470,208 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
              JOIN vnode v ON l.exit_id::integer = v.vnode_id
           WHERE l.exit_type::text = 'VNODE'::text
           ORDER BY l.link_class DESC) a;
+          
+          
+-- 2021/05/05
+CREATE OR REPLACE VIEW v_edit_review_audit_arc AS 
+ SELECT review_audit_arc.id,
+    review_audit_arc.arc_id,
+    review_audit_arc.old_y1,
+    review_audit_arc.new_y1,
+    review_audit_arc.old_y2,
+    review_audit_arc.new_y2,
+    review_audit_arc.old_arc_type,
+    review_audit_arc.new_arc_type,
+    review_audit_arc.old_matcat_id,
+    review_audit_arc.new_matcat_id,
+    review_audit_arc.old_arccat_id,
+    review_audit_arc.new_arccat_id,
+    review_audit_arc.old_annotation,
+    review_audit_arc.new_annotation,
+    review_audit_arc.old_observ,
+    review_audit_arc.new_observ,
+    review_audit_arc.review_obs,
+    review_audit_arc.expl_id,
+    review_audit_arc.the_geom,
+    review_audit_arc.review_status_id,
+    review_audit_arc.field_date,
+    review_audit_arc.field_user,
+    review_audit_arc.is_validated
+   FROM review_audit_arc,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_arc.expl_id = selector_expl.expl_id AND review_audit_arc.review_status_id <> 0;
+
+CREATE OR REPLACE VIEW v_edit_review_arc AS 
+ SELECT review_arc.arc_id,
+    arc.node_1,
+    review_arc.y1,
+    arc.node_2,
+    review_arc.y2,
+    review_arc.arc_type,
+    review_arc.matcat_id,
+    review_arc.arccat_id,
+    review_arc.annotation,
+    review_arc.observ,
+    review_arc.review_obs,
+    review_arc.expl_id,
+    review_arc.the_geom,
+    review_arc.field_checked,
+    review_arc.is_validated
+   FROM selector_expl,
+    review_arc
+     JOIN arc ON review_arc.arc_id::text = arc.arc_id::text
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
+
+ CREATE OR REPLACE VIEW v_edit_review_audit_gully AS 
+ SELECT review_audit_gully.id,
+    review_audit_gully.gully_id,
+    review_audit_gully.old_top_elev,
+    review_audit_gully.new_top_elev,
+    review_audit_gully.old_ymax,
+    review_audit_gully.new_ymax,
+    review_audit_gully.old_sandbox,
+    review_audit_gully.new_sandbox,
+    review_audit_gully.old_matcat_id,
+    review_audit_gully.new_matcat_id,
+    review_audit_gully.old_gully_type,
+    review_audit_gully.new_gully_type,
+    review_audit_gully.old_gratecat_id,
+    review_audit_gully.new_gratecat_id,
+    review_audit_gully.old_units,
+    review_audit_gully.new_units,
+    review_audit_gully.old_groove,
+    review_audit_gully.new_groove,
+    review_audit_gully.old_siphon,
+    review_audit_gully.new_siphon,
+    review_audit_gully.old_connec_arccat_id,
+    review_audit_gully.new_connec_arccat_id,
+    review_audit_gully.old_annotation,
+    review_audit_gully.new_annotation,
+    review_audit_gully.old_observ,
+    review_audit_gully.new_observ,
+    review_audit_gully.review_obs,
+    review_audit_gully.expl_id,
+    review_audit_gully.the_geom,
+    review_audit_gully.review_status_id,
+    review_audit_gully.field_date,
+    review_audit_gully.field_user,
+    review_audit_gully.is_validated
+   FROM review_audit_gully,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_gully.expl_id = selector_expl.expl_id AND review_audit_gully.review_status_id <> 0;
+
+CREATE OR REPLACE VIEW v_edit_review_gully AS 
+ SELECT review_gully.gully_id,
+    review_gully.top_elev,
+    review_gully.ymax,
+    review_gully.sandbox,
+    review_gully.matcat_id,
+    review_gully.gully_type,
+    review_gully.gratecat_id,
+    review_gully.units,
+    review_gully.groove,
+    review_gully.siphon,
+    review_gully.connec_arccat_id,
+    review_gully.annotation,
+    review_gully.observ,
+    review_gully.review_obs,
+    review_gully.expl_id,
+    review_gully.the_geom,
+    review_gully.field_checked,
+    review_gully.is_validated
+   FROM review_gully,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_gully.expl_id = selector_expl.expl_id;
+
+  CREATE OR REPLACE VIEW v_edit_review_audit_node AS 
+ SELECT review_audit_node.id,
+    review_audit_node.node_id,
+    review_audit_node.old_top_elev,
+    review_audit_node.new_top_elev,
+    review_audit_node.old_ymax,
+    review_audit_node.new_ymax,
+    review_audit_node.old_node_type,
+    review_audit_node.new_node_type,
+    review_audit_node.old_matcat_id,
+    review_audit_node.new_matcat_id,
+    review_audit_node.old_nodecat_id,
+    review_audit_node.new_nodecat_id,
+    review_audit_node.old_annotation,
+    review_audit_node.new_annotation,
+    review_audit_node.old_observ,
+    review_audit_node.new_observ,
+    review_audit_node.review_obs,
+    review_audit_node.expl_id,
+    review_audit_node.the_geom,
+    review_audit_node.review_status_id,
+    review_audit_node.field_date,
+    review_audit_node.field_user,
+    review_audit_node.is_validated
+   FROM review_audit_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0;
+
+CREATE OR REPLACE VIEW v_edit_review_node AS 
+ SELECT review_node.node_id,
+    review_node.top_elev,
+    review_node.ymax,
+    review_node.node_type,
+    review_node.matcat_id,
+    review_node.nodecat_id,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM review_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
+  CREATE OR REPLACE VIEW v_edit_review_audit_connec AS 
+ SELECT review_audit_connec.id,
+    review_audit_connec.connec_id,
+    review_audit_connec.old_y1,
+    review_audit_connec.new_y1,
+    review_audit_connec.old_y2,
+    review_audit_connec.new_y2,
+    review_audit_connec.old_connec_type,
+    review_audit_connec.new_connec_type,
+    review_audit_connec.old_matcat_id,
+    review_audit_connec.new_matcat_id,
+    review_audit_connec.old_connecat_id,
+    review_audit_connec.new_connecat_id,
+    review_audit_connec.old_annotation,
+    review_audit_connec.new_annotation,
+    review_audit_connec.old_observ,
+    review_audit_connec.new_observ,
+    review_audit_connec.review_obs,
+    review_audit_connec.expl_id,
+    review_audit_connec.the_geom,
+    review_audit_connec.review_status_id,
+    review_audit_connec.field_date,
+    review_audit_connec.field_user,
+    review_audit_connec.is_validated
+   FROM review_audit_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_connec.expl_id = selector_expl.expl_id AND review_audit_connec.review_status_id <> 0;
+
+CREATE OR REPLACE VIEW v_edit_review_connec AS 
+ SELECT review_connec.connec_id,
+    review_connec.y1,
+    review_connec.y2,
+    review_connec.connec_type,
+    review_connec.matcat_id,
+    review_connec.connecat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+

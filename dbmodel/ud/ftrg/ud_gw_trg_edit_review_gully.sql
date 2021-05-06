@@ -34,7 +34,7 @@ BEGIN
 
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully.gully_type, gratecat_id, units, groove, siphon,
-		connec_arccat_id, featurecat_id, feature_id, annotation, observ, expl_id, the_geom INTO rec_gully 
+		connec_arccat_id, annotation, observ, expl_id, the_geom INTO rec_gully 
 	FROM gully JOIN cat_grate ON cat_grate.id=gully.gratecat_id
 	WHERE gully_id=NEW.gully_id;
 	
@@ -61,18 +61,17 @@ BEGIN
 				
 		-- insert values on review table
 		INSERT INTO review_gully (gully_id, top_elev, ymax, sandbox, matcat_id, gully_type, gratecat_id, units, groove, siphon, connec_arccat_id,
-				featurecat_id, feature_id, annotation, observ, expl_id, the_geom, field_checked)
+				annotation, observ, review_obs, expl_id, the_geom, field_checked)
 		VALUES (NEW.gully_id, NEW.top_elev, NEW.ymax, NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.siphon, 
-				NEW.connec_arccat_id,NEW.featurecat_id, NEW.feature_id,NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+				NEW.connec_arccat_id,NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked);
 		
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
 			INSERT INTO review_audit_gully (gully_id, new_top_elev, new_ymax, new_sandbox, new_matcat_id, new_gully_type, new_gratecat_id, new_units, 
-				new_groove, new_siphon,new_connec_arccat_id, new_featurecat_id, new_feature_id, 
-				new_annotation, new_observ, expl_id, the_geom, review_status_id, field_date, field_user)
+				new_groove, new_siphon,new_connec_arccat_id,new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
 			VALUES (NEW.gully_id, NEW.top_elev, NEW.ymax, NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.siphon,
-				NEW.connec_arccat_id, NEW.featurecat_id, NEW.feature_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
+				NEW.connec_arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
 		
 		END IF;
 			
@@ -83,8 +82,7 @@ BEGIN
 		-- update values on review table
 		UPDATE review_gully SET top_elev=NEW.top_elev, ymax=NEW.ymax, sandbox=NEW.sandbox, matcat_id=NEW.matcat_id,gully_type=NEW.gully_type, 
 				gratecat_id=NEW.gratecat_id,units=NEW.units, groove=NEW.groove, siphon=NEW.siphon, connec_arccat_id=NEW.connec_arccat_id,
-				featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, annotation=NEW.annotation, 
-				observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
+				annotation=NEW.annotation, observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE gully_id=NEW.gully_id;
 		
 		--looking for insert/update/delete values on audit table
@@ -98,8 +96,6 @@ BEGIN
 			rec_gully.gratecat_id != NEW.gratecat_id	OR  (rec_gully.gratecat_id IS NULL AND NEW.gratecat_id IS NOT NULL) OR
 			rec_gully.groove != NEW.groove	OR  (rec_gully.groove IS NULL AND NEW.groove IS NOT NULL) OR
 			rec_gully.siphon != NEW.siphon	OR  (rec_gully.siphon IS NULL AND NEW.siphon IS NOT NULL) OR
-			rec_gully.featurecat_id != NEW.featurecat_id	OR  (rec_gully.featurecat_id IS NULL AND NEW.featurecat_id IS NOT NULL) OR
-			rec_gully.feature_id != NEW.feature_id	or  (rec_gully.feature_id IS NULL AND NEW.feature_id IS NOT NULL) OR
 			rec_gully.the_geom::text<>NEW.the_geom::text THEN
 			v_tol_filter_bool=TRUE;
 		ELSE
@@ -131,9 +127,8 @@ BEGIN
 				new_matcat_id=NEW.matcat_id, old_gully_type=rec_gully.gully_type, new_gully_type=NEW.gully_type, old_gratecat_id=rec_gully.gratecat_id,	
 				new_gratecat_id=NEW.gratecat_id, old_units=rec_gully.units, new_units=NEW.units, old_groove=rec_gully.groove,
 				new_groove=NEW.groove, old_siphon=rec_gully.siphon, new_siphon=NEW.siphon,new_connec_arccat_id=NEW.connec_arccat_id, old_connec_arccat_id=rec_gully.connec_arccat_id, 
-				old_featurecat_id=rec_gully.featurecat_id,new_featurecat_id=NEW.featurecat_id, old_feature_id=rec_gully.feature_id, new_feature_id=NEW.feature_id, old_annotation=rec_gully.annotation,
-				new_annotation=NEW.annotation, old_observ=rec_gully.observ, new_observ=NEW.observ,expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
-				review_status_id=v_review_status, field_date=now(), field_user=current_user
+				old_annotation=rec_gully.annotation,new_annotation=NEW.annotation, old_observ=rec_gully.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, 
+				the_geom=NEW.the_geom, review_status_id=v_review_status, field_date=now(), field_user=current_user
        			WHERE gully_id=NEW.gully_id;
 
 			ELSE
@@ -141,13 +136,11 @@ BEGIN
 				INSERT INTO review_audit_gully
 				(gully_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_sandbox, new_sandbox, old_matcat_id, 
 				new_matcat_id, new_gully_type, old_gully_type, old_gratecat_id,new_gratecat_id,old_units, new_units, old_groove, new_groove, old_siphon, 
-				new_siphon, old_connec_arccat_id, new_connec_arccat_id, old_featurecat_id, new_featurecat_id, old_feature_id, 
-				new_feature_id, old_annotation, new_annotation, old_observ, new_observ, expl_id, the_geom, review_status_id, field_date, field_user)
+				new_siphon, old_connec_arccat_id, new_connec_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
 				VALUES (NEW.gully_id, rec_gully.top_elev, NEW.top_elev, rec_gully.ymax, NEW.ymax, rec_gully.sandbox, NEW.sandbox,
 				rec_gully.matcat_id,NEW.matcat_id, rec_gully.gully_type, NEW.gully_type, rec_gully.gratecat_id, NEW.gratecat_id, rec_gully.units, 
 				NEW.units, rec_gully.groove, NEW.groove, rec_gully.siphon, NEW.siphon, rec_gully.connec_arccat_id, NEW.connec_arccat_id,
-				rec_gully.featurecat_id, NEW.featurecat_id, rec_gully.feature_id, NEW.feature_id, rec_gully.annotation, NEW.annotation, 
-				rec_gully.observ, NEW.observ, NEW.expl_id, NEW.the_geom, v_review_status, now(), current_user);
+				rec_gully.annotation, NEW.annotation, rec_gully.observ, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, v_review_status, now(), current_user);
 
 			END IF;
 				

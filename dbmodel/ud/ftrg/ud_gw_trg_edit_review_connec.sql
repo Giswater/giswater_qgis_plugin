@@ -63,9 +63,9 @@ BEGIN
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
 			INSERT INTO review_audit_connec (connec_id, new_y1, new_y2, new_connec_type, new_matcat_id, new_connecat_id, 
-					new_annotation, new_observ, expl_id, the_geom, review_status_id, field_date, field_user)
+					new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
 			VALUES (NEW.connec_id, NEW.y1, NEW.y2, NEW.connec_type, NEW.matcat_id, NEW.connecat_id, 
-					NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
+					NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
 		
 		END IF;
 			
@@ -75,9 +75,10 @@ BEGIN
 	
 		-- update values on review table
 		UPDATE review_connec SET y1=NEW.y1, y2=NEW.y2, connec_type=NEW.connec_type, matcat_id=NEW.matcat_id, connecat_id=NEW.connecat_id, 
-				annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, 
+				annotation=NEW.annotation, observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, 
 				the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE connec_id=NEW.connec_id;
+
 		
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_connec.y1-NEW.y1)>v_rev_connec_y1_tol OR  (rec_connec.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
@@ -115,7 +116,7 @@ BEGIN
 				UPDATE review_audit_connec SET old_y1=rec_connec.y1, new_y1=NEW.y1, old_y2=rec_connec.y2, 
        			new_y2=NEW.y2, old_connec_type=rec_connec.connec_type, new_connec_type=NEW.connec_type, old_matcat_id=rec_connec.matcat_id, 
        			new_matcat_id=NEW.matcat_id, old_connecat_id=rec_connec.connecat_id, new_connecat_id=NEW.connecat_id, old_annotation=rec_connec.annotation,
-				new_annotation=NEW.annotation, old_observ=rec_connec.observ, new_observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom,
+				new_annotation=NEW.annotation, old_observ=rec_connec.observ, new_observ=NEW.observ, review_obs=NEW.review_obs,expl_id=NEW.expl_id, the_geom=NEW.the_geom,
 				review_status_id=v_review_status, field_date=now(), field_user=current_user
        			WHERE connec_id=NEW.connec_id;
 
@@ -123,9 +124,9 @@ BEGIN
 			
 				INSERT INTO review_audit_connec
 				(connec_id, old_y1, new_y1, old_y2, new_y2, old_connec_type, new_connec_type, old_matcat_id, new_matcat_id, old_connecat_id, 
-				new_connecat_id, old_annotation, new_annotation, old_observ, new_observ, expl_id, the_geom, review_status_id, field_date, field_user)
+				new_connecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
 				VALUES (NEW.connec_id, rec_connec.y1, NEW.y1, rec_connec.y2, NEW.y2, rec_connec.connec_type, NEW.connec_type, rec_connec.matcat_id,
-				NEW.matcat_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.expl_id, 
+				NEW.matcat_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id, 
 				NEW.the_geom, v_review_status, now(), current_user);
 
 			END IF;
