@@ -1839,30 +1839,29 @@ def get_layers_from_feature_type(feature_type):
 
 def get_role_permissions(qgis_project_role):
 
+    role_master = False
     role_edit = False
     role_om = False
     role_epa = False
     role_basic = False
 
-    role_master = tools_db.check_role_user("role_master")
-    if not role_master:
-        role_epa = tools_db.check_role_user("role_epa")
-        if not role_epa:
-            role_edit = tools_db.check_role_user("role_edit")
-            if not role_edit:
-                role_om = tools_db.check_role_user("role_om")
-                if not role_om:
-                    role_basic = tools_db.check_role_user("role_basic")
+    role_admin = tools_db.check_role_user("role_admin")
+    if not role_admin:
+        role_master = tools_db.check_role_user("role_master")
+        if not role_master:
+            role_epa = tools_db.check_role_user("role_epa")
+            if not role_epa:
+                role_edit = tools_db.check_role_user("role_edit")
+                if not role_edit:
+                    role_om = tools_db.check_role_user("role_om")
+                    if not role_om:
+                        role_basic = tools_db.check_role_user("role_basic")
+
     super_users = get_config_parser('system', 'super_users', "project", "giswater")
 
-    # Manage user 'postgres', 'gisadmin'
-    if global_vars.current_user in ('postgres', 'gisadmin'):
+    # Manage user 'postgres', 'gisadmin' and super_users
+    if global_vars.current_user in ('postgres', 'gisadmin', super_users):
         role_master = True
-
-    # Manage super_user
-    if super_users is not None:
-        if global_vars.current_user in super_users:
-            role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'

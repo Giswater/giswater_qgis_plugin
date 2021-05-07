@@ -336,40 +336,39 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        if 'project_role' in global_vars.project_vars:
-            restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
+        restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
 
-            if restriction == 'role_basic':
-                return
+        if restriction == 'role_basic':
+            return
 
-            elif restriction == 'role_om':
-                self._enable_toolbar("om")
-                return
+        elif restriction == 'role_om':
+            self._enable_toolbar("om")
+            return
 
-            elif restriction == 'role_edit':
-                self._enable_toolbar("om")
-                self._enable_toolbar("edit")
-                self._enable_toolbar("cad")
+        elif restriction == 'role_edit':
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
 
-            elif restriction == 'role_epa':
-                self._enable_toolbar("om")
-                self._enable_toolbar("edit")
-                self._enable_toolbar("cad")
-                self._enable_toolbar("epa")
-                self._enable_toolbar("plan")
+        elif restriction == 'role_epa':
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
+            self._enable_toolbar("epa")
+            # self._enable_toolbar("plan")
 
-            elif restriction == 'role_master':
-                self._enable_toolbar("om")
-                self._enable_toolbar("edit")
-                self._enable_toolbar("cad")
-                self._enable_toolbar("epa")
-                self._enable_toolbar("plan")
+        elif restriction == 'role_master' or restriction == 'role_admin':
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
+            self._enable_toolbar("epa")
+            self._enable_toolbar("plan")
 
-            # Check if exist some feature_cat with active True on cat_feature table
-            self.feature_cat = tools_gw.manage_feature_cat()
-            if self.feature_cat is None:
-                self._enable_button("01", False)
-                self._enable_button("02", False)
+        # Check if exist some feature_cat with active True on cat_feature table
+        self.feature_cat = tools_gw.manage_feature_cat()
+        if self.feature_cat is None:
+            self._enable_button("01", False)
+            self._enable_button("02", False)
 
 
     def _enable_toolbars(self, visible=True):
