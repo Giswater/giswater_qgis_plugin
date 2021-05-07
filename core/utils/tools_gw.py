@@ -1873,6 +1873,8 @@ def get_role_permissions(qgis_project_role):
         return 'role_epa'
     elif role_master or qgis_project_role == 'role_master':
         return 'role_master'
+    elif role_admin or qgis_project_role == 'role_admin':
+        return 'role_admin'
     else:
         return 'role_basic'
 
