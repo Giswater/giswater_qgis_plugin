@@ -133,7 +133,7 @@ BEGIN
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 		FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
-	ELSE
+	ELSIF v_tabname='tab_exploitation' THEN
 		SELECT row_to_json (a) 
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
@@ -152,6 +152,9 @@ BEGIN
 	ELSE -- delete if more than one value on selector
 		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
+
+	-- Control NULL's
+	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}}');
