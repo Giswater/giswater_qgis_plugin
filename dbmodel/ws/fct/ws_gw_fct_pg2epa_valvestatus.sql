@@ -38,9 +38,9 @@ BEGIN
 
 		IF v_valvemode = 3 THEN	--mincut results
 			UPDATE temp_arc SET status='CLOSED' 
-				FROM (SELECT arc_id FROM temp_arc join om_mincut_valve ON node_id=node_1 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
+				FROM (SELECT arc_id FROM temp_arc join om_mincut_valve m ON node_id=node_1 AND m.result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 					UNION
-					SELECT arc_id FROM temp_arc join om_mincut_valve ON node_id=node_2 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
+					SELECT arc_id FROM temp_arc join om_mincut_valve m ON node_id=node_2 AND m.result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 					) a 
 				WHERE a.arc_id=temp_arc.arc_id;
 
@@ -89,11 +89,6 @@ BEGIN
 	
     END IF;
     
-    -- Reset demands if node is into mincut affectation
-    IF v_valvemode = 3 THEN
-		UPDATE temp_node SET demand=0 WHERE temp_node.node_id IN (SELECT node_id FROM om_mincut_node WHERE result_id=v_mincutresult) ;
-    END IF; 
-
     -- all that not are closed are open
     UPDATE temp_arc SET status='OPEN' WHERE status IS NULL;
 
