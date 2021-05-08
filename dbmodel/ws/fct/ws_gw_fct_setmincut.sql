@@ -76,6 +76,8 @@ BEGIN
 	ELSIF v_action = 'mincutAccept' THEN
 
 		IF v_mincut_class = 1 THEN
+
+			UPDATE config_param_user SET value = v_mincut::text WHERE parameter = 'inp_options_valve_mode_mincut_result' AND cur_user = current_user;
 		
 			RETURN gw_fct_mincut_result_overlap(p_data);
 
