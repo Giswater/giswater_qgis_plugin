@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/05/05
 UPDATE sys_param_user SET isenabled = false where id='edit_presszone_vdefault';
+UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(vdefault::json, 'inp_options_debug') WHERE id ='inp_options_debug';
+UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value::json, 'inp_options_debug') WHERE parameter ='inp_options_debug';

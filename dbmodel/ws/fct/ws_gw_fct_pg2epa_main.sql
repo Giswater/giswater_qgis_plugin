@@ -42,7 +42,6 @@ v_checkdata boolean;
 v_checknetwork boolean;
 v_vdefault boolean;
 v_delnetwork boolean;
-v_removedemand boolean;
 v_fid integer = 227;
 v_error_context text;
 v_breakpipes boolean;
@@ -68,7 +67,6 @@ BEGIN
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
@@ -245,10 +243,8 @@ BEGIN
 	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
 	-- when is forced to remove demand on disconnected nodes (variable of inp_options_debug)
-	IF v_removedemand THEN
-		RAISE NOTICE '21 Set demand = 0 for dry nodes';
-		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fid = 132 AND cur_user = current_user AND a.node_id = n.node_id;
-	END IF;
+	RAISE NOTICE '21 Set demand = 0 for dry nodes';
+	UPDATE temp_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) FROM anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
 
 	RAISE NOTICE '22 - Check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
