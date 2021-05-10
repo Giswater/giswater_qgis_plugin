@@ -339,13 +339,13 @@ class GwVisit(QObject):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
 
             # Attach model to table view
         if widget:
             widget.setModel(model)
         else:
-            self.controller.log_info("set_model_to_table: widget not found")
+            tools_log.log_info("set_model_to_table: widget not found")
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
         feature_type = 'node'
@@ -362,7 +362,7 @@ class GwVisit(QObject):
                " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type + ""
                " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type + ".class_id"
                " WHERE " + str(feature_key) + " IS NOT NULL AND " + str(feature_key) + " = '" + str(id) + "'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.set_combo_value(cmb_visitclass, rows, 1)
         tools_qt.fill_combo_values(cmb_visitclass, str(current_visit_class), 0)
 

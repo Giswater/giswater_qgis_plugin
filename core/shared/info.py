@@ -2576,11 +2576,11 @@ class GwInfo(QObject):
 
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = '{table_name}' AND column_name='photo'")
-        column_exist = self.controller.get_row(sql)
+        column_exist = tools_db.get_row(sql)
 
         if column_exist:
             sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
         else:
             row = None
 
@@ -2615,7 +2615,7 @@ class GwInfo(QObject):
                         opener = "open" if sys.platform == "darwin" else "xdg-open"
                         subprocess.call([opener, path[0]])
                 except:
-                    self.controller.log_warning("File path is not valid, check it", parameter=path[0])
+                    tools_log.log_warning("File path is not valid, check it", parameter=path[0])
 
 
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
