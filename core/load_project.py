@@ -119,11 +119,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Create a thread to listen selected database channels
-        global_vars.notify = GwNotify()
-        list_channels = ['desktop', global_vars.current_user]
-        global_vars.notify.start_listening(list_channels)
-
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
         if tools_os.set_boolean(open_search):
@@ -133,7 +128,11 @@ class GwLoadProject(QObject):
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
 
-
+        # Create a thread to listen selected database channels
+        global_vars.notify = GwNotify()
+        list_channels = ['desktop', global_vars.current_user]
+        global_vars.notify.start_listening(list_channels)
+        
         # Log it
         message = "Project read successfully"
         tools_log.log_info(message)
