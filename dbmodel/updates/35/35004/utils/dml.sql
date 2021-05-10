@@ -73,3 +73,6 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate,hidden)
 VALUES ('cat_work','form_feature', 'main','active',null,null, 'boolean','check', 'active',null,null,false,
 false,true,false,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (380, 'Arc materials not defined in cat_mat_roughness table', 'ws') ON CONFLICT (fid) DO NOTHING;

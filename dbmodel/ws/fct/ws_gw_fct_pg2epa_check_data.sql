@@ -660,6 +660,19 @@ BEGIN
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
 	END IF;
 
+	RAISE NOTICE '27 - Arc materials not defined in cat_mat_roughness table (380)';
+	v_querytext = 'SELECT id FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_mat_roughness)';
+	
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	IF v_count > 0 THEN
+		
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '380' ,concat('ERROR-380: There is/are ',v_count,' arc materials that are not defined in cat_mat_rougnhess table. Please, check your data before continue.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+	VALUES (v_fid, 1, '380','INFO: All arc materials are defined on cat_mat_rougnhess table.',v_count);
+	END IF;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
