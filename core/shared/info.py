@@ -2513,7 +2513,7 @@ class GwInfo(QObject):
 
         # Set model of selected widget
         if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
-            filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate desc"
+            filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
             tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
             tools_qt.fill_table(widget, table_name, filter_)
@@ -2551,7 +2551,6 @@ class GwInfo(QObject):
         visit_class_value = tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)
         if str(visit_class_value) != 'null':
             expr += " AND class_id::text = '" + str(visit_class_value) + "'"
-        expr += " ORDER BY startdate desc"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
