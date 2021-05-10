@@ -1,2 +1,6 @@
 3.5.004
 *************
+- Add active definition for cat_* on config_form_fields
+- Remove presszone_vdefault from config form
+- Control NULL geometry on setselectors
+- Improve the strategy of demand management by automatic remove when node is dry

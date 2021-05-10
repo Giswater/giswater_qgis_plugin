@@ -429,18 +429,20 @@ BEGIN
 		--visitcat
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user)::integer;
 		--code
-		v_querystring = concat('SELECT feature_type FROM config_visit_class WHERE id = ', quote_nullable(v_visitclass));
-		v_debug_vars := json_build_object('v_visitclass', v_visitclass);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 70);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_check_code;
-		IF v_check_code IS NOT NULL THEN
-			v_querystring = concat('SELECT code FROM ',v_featuretablename,' WHERE ',(v_featuretype),'_id = ',quote_nullable(v_featureid),'::text');
-			v_debug_vars := json_build_object('v_featuretablename', v_featuretablename, 'v_featuretype', v_featuretype, 'v_featureid', v_featureid);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 80);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_code;
-		END IF;
+		IF v_featureid IS NOT NULL THEN
+            v_querystring = concat('SELECT feature_type FROM config_visit_class WHERE id = ', quote_nullable(v_visitclass));
+            v_debug_vars := json_build_object('v_visitclass', v_visitclass);
+            v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 70);
+            SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+            EXECUTE v_querystring INTO v_check_code;
+            IF v_check_code IS NOT NULL THEN
+                v_querystring = concat('SELECT code FROM ',v_featuretablename,' WHERE ',(v_featuretype),'_id = ',quote_nullable(v_featureid),'::text');
+                v_debug_vars := json_build_object('v_featuretablename', v_featuretablename, 'v_featuretype', v_featuretype, 'v_featureid', v_featureid);
+                v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 80);
+                SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+                EXECUTE v_querystring INTO v_code;
+            END IF;
+        END IF;
 		
 		IF v_pluginlot = 'TRUE' THEN
 			-- lot
