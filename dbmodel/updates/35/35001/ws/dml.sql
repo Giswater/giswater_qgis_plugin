@@ -30,12 +30,6 @@ UPDATE config_toolbox SET inputparams  =
 WHERE id = 2768;
 
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
- 
- SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
-
 update config_form_fields SET columnname = 'staticpress1' where  columnname = 'staticpressure1';
 update config_form_fields SET columnname = 'staticpress2' where  columnname = 'staticpressure2';
 
