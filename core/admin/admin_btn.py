@@ -2070,7 +2070,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
+    def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=True):
         """"""
         if not os.path.exists(filedir):
             tools_log.log_info("Folder not found", parameter=filedir)
