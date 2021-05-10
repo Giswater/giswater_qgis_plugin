@@ -13,7 +13,10 @@ version=3.5.004
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 changelog=Version 3.5.004
-   - 
+   - Minor bug fix: load existing profile, error on close dialog
+   - Bug fix: manage if exist column photo on visit tableview and open file using http, https or locale path
+   - Replace node: remove sql from python
+   - Bug fix: refactor reference self.controller
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
