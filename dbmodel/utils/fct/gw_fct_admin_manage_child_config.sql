@@ -168,9 +168,9 @@ BEGIN
 		
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
-			label, ismandatory,isparent,iseditable,isautoupdate) 
+			label, ismandatory,isparent,iseditable,isautoupdate, tabname) 
 		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
-			rec.param_name, rec.is_mandatory, false,rec.iseditable,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+			rec.param_name, rec.is_mandatory, false,rec.iseditable,false, 'main') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 				
 	END LOOP;
 
