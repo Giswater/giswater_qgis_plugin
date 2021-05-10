@@ -362,6 +362,8 @@ class GwFeatureReplaceButton(GwMaptool):
             # Get function input parameters
             feature = f'"type":"{self.feature_type}"'
             extras = f'"old_feature_id":"{self.feature_id}"'
+            extras += f', "feature_type_new":"{feature_type_new}"'
+            extras += f', "featurecat_id":"{featurecat_id}"'
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
@@ -380,34 +382,6 @@ class GwFeatureReplaceButton(GwMaptool):
             feature_id = complet_result['body']['data']['featureId']
             message = "Feature replaced successfully"
             tools_qgis.show_info(message)
-
-            # Force user to manage with state = 1 features
-            current_user = global_vars.current_user
-            sql = (f"DELETE FROM selector_state "
-                   f"WHERE state_id = 1 AND cur_user = '{current_user}';"
-                   f"\nINSERT INTO selector_state (state_id, cur_user) "
-                   f"VALUES (1, '{current_user}');")
-            tools_db.execute_sql(sql)
-
-            if feature_type_new != "null" and featurecat_id != "null":
-                if feature_id:
-                    if self.feature_type == 'connec':
-                        field_cat_id = "connecat_id"
-                    else:
-                        field_cat_id = self.feature_type + "cat_id"
-                    if self.feature_type != 'gully':
-                        sql = (f"UPDATE {self.geom_view} "
-                               f"SET {field_cat_id} = '{featurecat_id}' "
-                               f"WHERE {self.feature_type}_id = '{feature_id}'")
-                    tools_db.execute_sql(sql)
-                    if self.project_type == 'ud':
-                        sql = (f"UPDATE {self.geom_view} "
-                               f"SET {self.feature_type}_type = '{feature_type_new}' "
-                               f"WHERE {self.feature_type}_id = '{feature_id}'")
-                        tools_db.execute_sql(sql)
-
-                message = "Values has been updated"
-                tools_qgis.show_info(message)
 
             # Fill tab 'Info log'
             if complet_result and complet_result['status'] == "Accepted":
