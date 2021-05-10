@@ -14,7 +14,8 @@ $BODY$
 /* example
 
 -- execute
-SELECT ws.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+
+SELECT ud.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
 
 ALTER TABLE ws.cat_feature_node DROP CONSTRAINT node_type_epa_table_check;
@@ -48,15 +49,16 @@ USING (epa_type)
 
 -- check ud
 SELECT * FROM 
-(SELECT epa_type, count(*) as count_node FROM node where state > 0 and expl_id = 44 group by epa_type order by 2)a
+(SELECT epa_type, count(*) as count_node FROM node where state > 0 group by epa_type order by 2)a
 FULL JOIN
-(SELECT 'JUNCTION' AS epa_type, count(*) as count_inp FROM inp_junction join node using (node_id ) where state > 0 and expl_id = 44 
+(SELECT 'JUNCTION' AS epa_type, count(*) as count_inp FROM inp_junction join node using (node_id ) where state > 0
 union
-SELECT 'STORAGE', count(*) FROM inp_storage join node using (node_id ) where state > 0 and expl_id = 44 
+SELECT 'STORAGE', count(*) FROM inp_storage join node using (node_id ) where state > 0  
 union
-SELECT 'DIVIDER', count(*) FROM inp_divider join node using (node_id ) where state > 0 and expl_id = 44 
+SELECT 'DIVIDER', count(*) FROM inp_divider join node using (node_id ) where state > 0 
 union
-SELECT 'OUTFALL', count(*) FROM inp_outfall join node using (node_id ) where state > 0 and expl_id = 44 )b
+SELECT 'OUTFALL', count(*) FROM inp_outfall join node using (node_id ) where state > 0  )b
+>>>>>>> 48e1595f5... Update pg2epa_repair_epa_type function
 USING (epa_type)
 */
 
@@ -210,19 +212,19 @@ BEGIN
 
 	ELSE 
 		INSERT INTO inp_junction
-		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'JUNCTION'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'JUNCTION'
 		ON CONFLICT (node_id) DO NOTHING;
-		
+
 		INSERT INTO inp_storage
-		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'STORAGE'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'STORAGE'
 		ON CONFLICT (node_id) DO NOTHING;
 
 		INSERT INTO inp_outfall
-		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'OUTFALL'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'OUTFALL'
 		ON CONFLICT (node_id) DO NOTHING;
 		
 		INSERT INTO inp_divider
-		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'DIVIDER'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'DIVIDER'
 		ON CONFLICT (node_id) DO NOTHING;
 		
 		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
@@ -235,8 +237,6 @@ BEGIN
 		DELETE FROM inp_outfall WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'OUTFALL');
 		DELETE FROM inp_divider WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'DIVIDER');
 
-	
-		
 	END IF;
 	     
 	-- Return
