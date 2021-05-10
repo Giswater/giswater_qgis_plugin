@@ -7,7 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:
 
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epatype(p_data json)
+CREATE OR REPLACE FUNCTION ud.gw_fct_pg2epa_repair_epatype(p_data json)
+  RETURNS json AS
+$BODY$
 
 /* example
 
@@ -24,7 +26,7 @@ ALTER TABLE ws.cat_feature_node
 -- log
 SELECT * FROM ws.audit_check_data where fid = 214 AND criticity  > 1 order by id
 
--- check
+-- check ws
 SELECT * FROM 
 (SELECT epa_type, count(*) as count_node FROM node where state > 0 group by epa_type order by 2)a
 FULL JOIN
@@ -42,7 +44,24 @@ SELECT 'VALVE', count(*) FROM inp_valve join node using (node_id ) where state >
 union
 SELECT 'INLET', count(*) FROM inp_inlet join node using (node_id ) where state > 0)b
 USING (epa_type)
+
+
+-- check ud
+SELECT * FROM 
+(SELECT epa_type, count(*) as count_node FROM node where state > 0 and expl_id = 44 group by epa_type order by 2)a
+FULL JOIN
+(SELECT 'JUNCTION' AS epa_type, count(*) as count_inp FROM inp_junction join node using (node_id ) where state > 0 and expl_id = 44 
+union
+SELECT 'STORAGE', count(*) FROM inp_storage join node using (node_id ) where state > 0 and expl_id = 44 
+union
+SELECT 'DIVIDER', count(*) FROM inp_divider join node using (node_id ) where state > 0 and expl_id = 44 
+union
+SELECT 'OUTFALL', count(*) FROM inp_outfall join node using (node_id ) where state > 0 and expl_id = 44 )b
+USING (epa_type)
 */
+
+
+
 
 
 DECLARE
@@ -59,7 +78,7 @@ BEGIN
 
 
 	-- Set search path to local schema
-	SET search_path = "ws", public;
+	SET search_path = "ud", public;
 	
 	--  get version
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version;
@@ -190,8 +209,33 @@ BEGIN
 		ON CONFLICT (connec_id) DO NOTHING;
 
 	ELSE 
+		INSERT INTO inp_junction
+		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'JUNCTION'
+		ON CONFLICT (node_id) DO NOTHING;
+		
+		INSERT INTO inp_storage
+		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'STORAGE'
+		ON CONFLICT (node_id) DO NOTHING;
 
-		-- UD TODO
+		INSERT INTO inp_outfall
+		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'OUTFALL'
+		ON CONFLICT (node_id) DO NOTHING;
+		
+		INSERT INTO inp_divider
+		SELECT node_id FROM node WHERE state >0 and expl_id = 44 and epa_type = 'DIVIDER'
+		ON CONFLICT (node_id) DO NOTHING;
+		
+		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+
+		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
+		DELETE FROM inp_storage WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'STORAGE');
+		DELETE FROM inp_outfall WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'OUTFALL');
+		DELETE FROM inp_divider WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'DIVIDER');
+
+	
 		
 	END IF;
 	     
