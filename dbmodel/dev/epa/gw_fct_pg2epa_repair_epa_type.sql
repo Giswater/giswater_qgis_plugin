@@ -131,7 +131,7 @@ BEGIN
 
 		-- node's delete
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id WHERE epa_default !='NOT DEFINED'
+		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id WHERE epa_default !='UNDEFINED'
 		LOOP
 			RAISE NOTICE 'rec_feature % ', rec_feature;
 			
@@ -142,7 +142,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (v_fid, v_criticity, concat(rec_feature.id,': DELETE FROM ',rec_feature.epa_table,' - ',v_affectrow, ' ROWS'));
 
-			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = ''NOT DEFINED'' AND state > 0)';
+			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = ''UNDEFINED'' AND state > 0)';
 			GET DIAGNOSTICS v_affectrow = row_count;
 			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -227,10 +227,10 @@ BEGIN
 		SELECT node_id FROM node WHERE state >0 and epa_type = 'DIVIDER'
 		ON CONFLICT (node_id) DO NOTHING;
 		
-		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
 		DELETE FROM inp_storage WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'STORAGE');
