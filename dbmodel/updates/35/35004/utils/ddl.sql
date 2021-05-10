@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/05/10
-ALTER TABLE plan_price_cat ALTER COLUMN insert_user SET DEFAULT "current_user"();
+ALTER TABLE plan_price_cat ALTER COLUMN cur_user SET DEFAULT "current_user"();
