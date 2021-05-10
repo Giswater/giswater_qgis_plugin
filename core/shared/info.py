@@ -8,7 +8,6 @@ or (at your option) any later version.
 import json
 import os
 import re
-import subprocess
 import urllib.parse as parse
 import webbrowser
 from collections import OrderedDict
@@ -2598,24 +2597,8 @@ class GwInfo(QObject):
                f" WHERE visit_id = '{self.visit_id}'")
         rows = tools_db.get_rows(sql, commit=True)
         for path in rows:
-            # Parse a URL into components
-            url = parse.urlsplit(path[0])
-
             # Open selected document
-            # Check if path is URL
-            if url.scheme == "http" or url.scheme == "https":
-                # If path is URL open URL in browser
-                webbrowser.open(path[0])
-            else:
-                try:
-                    # Open the document
-                    if sys.platform == "win32":
-                        os.startfile(path[0])
-                    else:
-                        opener = "open" if sys.platform == "darwin" else "xdg-open"
-                        subprocess.call([opener, path[0]])
-                except:
-                    tools_log.log_warning("File path is not valid, check it", parameter=path[0])
+            tools_os.open_file(path[0])
 
 
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
