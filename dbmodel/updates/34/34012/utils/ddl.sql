@@ -41,6 +41,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_csv",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_csv", "column":"csv2pgcat_id", "newName":"fid"}}$$);
 
 ALTER TABLE temp_csv DROP CONSTRAINT IF EXISTS temp_csv2pg_pkey1;
+ALTER TABLE temp_csv DROP CONSTRAINT IF EXISTS temp_csv2pg_csv2pgcat_id_fkey2;
 ALTER TABLE temp_csv ADD CONSTRAINT temp_csv_pkey PRIMARY KEY(id);
 ALTER TABLE temp_csv ADD CONSTRAINT temp_csv_fkey FOREIGN KEY (fid) REFERENCES sys_fprocess (fid) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
