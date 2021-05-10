@@ -73,7 +73,9 @@ v_status text;
 v_message text;
 rec_addfields record;
 v_count integer;
-
+v_field_cat text;
+v_feature_type_new text;
+v_featurecat_id_new text;
 BEGIN
 
 	-- Search path
@@ -102,6 +104,8 @@ BEGIN
 	v_workcat_id_end = ((p_data ->>'data')::json->>'workcat_id_end')::text;
 	v_enddate = ((p_data ->>'data')::json->>'enddate')::text;
 	v_keep_elements = ((p_data ->>'data')::json->>'keep_elements')::text;
+	v_feature_type_new = ((p_data ->>'data')::json->>'feature_type_new')::text;
+	v_featurecat_id_new = ((p_data ->>'data')::json->>'featurecat_id')::text;
 
 	--deactivate connec proximity control
 	IF v_feature_type='connec' THEN
@@ -415,6 +419,28 @@ BEGIN
 			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') 
 			WHERE parameter='edit_connec_proximity';
 		END IF;
+
+	--set selector
+	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
+
+	IF v_feature_type = 'connec' THEN
+		v_field_cat ='connecat_id';
+	ELSIF v_feature_type = 'gully' THEN
+		v_field_cat ='gratecat_id';
+	ELSE
+		v_field_cat=concat(v_feature_type,'cat_id');
+	END IF;
+	IF v_featurecat_id_new IS NOT NULL AND v_feature_type_new IS NOT NULL THEN
+
+		EXECUTE 'UPDATE v_edit_'||v_feature_type||' SET '||v_field_cat||' =  '||quote_literal(v_featurecat_id_new)||' 
+		WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||';';
+
+		IF v_feature_type!='gully' THEN
+			EXECUTE 'UPDATE v_edit_'||v_feature_type||' SET '||v_feature_type||'_type =  '||quote_literal(v_feature_type_new)||' 
+			WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||';';
+		END IF;
+
+	END IF;
 
 	-- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
