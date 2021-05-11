@@ -90,6 +90,8 @@ v_hide_form boolean;
 v_array_node_id json;
 v_node_id text;
 v_arc_closest text;
+v_set_arc_obsolete boolean;
+v_set_old_code boolean;
 
 BEGIN
 
@@ -133,14 +135,13 @@ BEGIN
 		FROM cat_feature_node JOIN node ON node.node_type = cat_feature_node.id WHERE node.node_id=v_node_id;
 	END IF;
 
-	-- get arc values
-	select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
-
 	-- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user;
 	SELECT value::smallint INTO v_ficticius FROM config_param_system WHERE parameter='plan_statetype_ficticius';
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
+	SELECT json_extract_path_text (value::json,'setArcObsolete')::boolean INTO v_set_arc_obsolete FROM config_param_system WHERE parameter='edit_arc_divide';
+	SELECT json_extract_path_text (value::json,'setOldCode')::boolean INTO v_set_old_code FROM config_param_system WHERE parameter='edit_arc_divide';
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=212 AND cur_user=current_user;
@@ -173,7 +174,7 @@ BEGIN
 			-- For the specificic case of extremal node not reconnected due topology issues (i.e. arc state (1) and node state (2)
 
 			-- Find closest arc inside tolerance
-			SELECT arc_id, state, the_geom INTO v_arc_id, v_state_arc, v_arc_geom  FROM v_edit_arc AS a 
+			SELECT arc_id, state, the_geom, code INTO v_arc_id, v_state_arc, v_arc_geom, v_code  FROM v_edit_arc AS a 
 			WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != v_node_id AND node_2 != v_node_id
 			ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
@@ -217,13 +218,21 @@ BEGIN
 
 					-- Update values of new arc_id (1)
 					rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
-					rec_aux1.code := rec_aux1.arc_id;
+					IF v_set_old_code IS TRUE THEN
+						rec_aux1.code := v_code;
+					ELSE 
+						rec_aux1.code := rec_aux1.arc_id;
+					END IF;
 					rec_aux1.node_2 := v_node_id ;-- rec_aux1.node_1 take values from original arc
 					rec_aux1.the_geom := v_line1;
 
 					-- Update values of new arc_id (2)
 					rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
-					rec_aux2.code := rec_aux2.arc_id;
+					IF v_set_old_code IS TRUE THEN
+						rec_aux2.code := v_code;
+					ELSE
+						rec_aux2.code := rec_aux2.arc_id;
+					END IF;
 					rec_aux2.node_1 := v_node_id; -- rec_aux2.node_2 take values from original arc
 					rec_aux2.the_geom := v_line2;
 
@@ -464,9 +473,8 @@ BEGIN
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, 'Update arc_id on node.');
 
-						-- reconnect operative links
-						UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
 
+						-- reconnect operative links
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
@@ -509,14 +517,18 @@ BEGIN
 							END IF;							
 						END LOOP;
 						
-						-- delete old arc
-						EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
-						"client":{"device":4, "infoType":1, "lang":"ES"},
-						"form":{},"feature":{"type":"ARC"},
-						"data":{"feature_id":"'||v_arc_id||'"}}$$);';
-
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
+						--set arc to obsolete or delete it
+						IF v_set_arc_obsolete IS TRUE THEN
+							UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
+						ELSE
+							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
+							
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
+						END IF;
 
 				
 					ELSIF v_state_node = 2 THEN --is psector
