@@ -702,7 +702,7 @@ BEGIN
 			-- setting values
 			IF (aux_json->>'widgettype')='combo' THEN 
 				--check if selected id is on combo list
-				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) then
+				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
 					v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE 
 					columnname::text = (',quote_literal(v_fields_array[array_index]),'::json->>''columnname'')::text
