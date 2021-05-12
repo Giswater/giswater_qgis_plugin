@@ -433,6 +433,9 @@ class GwSearch:
         if len(line_list) == 2:
             line_edit_add = line_list[1]
             value = tools_qt.get_text(self.dlg_search, line_edit_add)
+            if str(value) in display_list:
+                line_edit.setText(value)
+                return
             if str(value) == 'null':
                 return
 
