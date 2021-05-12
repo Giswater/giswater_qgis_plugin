@@ -922,7 +922,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setProperty('is_mandatory', field['isMandatory'])
                 else:
                     widget.setProperty('is_mandatory', True)
-                widget.setText(field['value'])
+                if 'value' in field:
+                    widget.setText(field['value'])
+                    widget.setProperty('value', field['value'])
                 if 'widgetcontrols' in field and field['widgetcontrols']:
                     if 'regexpControl' in field['widgetcontrols']:
                         if field['widgetcontrols']['regexpControl'] is not None:
@@ -1072,6 +1074,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
     real_name = widget.objectName()
@@ -1172,6 +1175,7 @@ def add_textarea(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
 
     # Set height as a function of text lines
     font = widget.document().defaultFont()
@@ -1205,6 +1209,7 @@ def add_hyperlink(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
@@ -1324,6 +1329,7 @@ def add_lineedit(field):
         widget.setPlaceholderText(field['placeholder'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
