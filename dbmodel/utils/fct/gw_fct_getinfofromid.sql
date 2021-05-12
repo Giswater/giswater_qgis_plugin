@@ -676,7 +676,7 @@ BEGIN
 	
 			-- in case of insert status must be failed when topocontrol fails
 			IF (v_fields->>'status')='Failed' THEN
-				v_message = (v_fields->>'message');
+				v_message = (v_fields->>'MSGERR');
 				v_status = 'Failed';
 			END IF;
 						
