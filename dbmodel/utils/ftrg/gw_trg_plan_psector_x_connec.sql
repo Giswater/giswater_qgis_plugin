@@ -58,6 +58,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3182", "function":"1130","debug_msg":""}}$$);';
 		END IF;
+		NEW.state = 1;
 		NEW.doable=true;
 		-- looking for arc_id state=2 closest
 	END IF;
