@@ -19,3 +19,6 @@ UPDATE man_type_location set featurecat_id=NULL WHERE featurecat_id in ('{NODE}'
 UPDATE man_type_category set featurecat_id=NULL WHERE featurecat_id in ('{NODE}','{CONNEC}','{ARC}','{GULLY}');
 UPDATE man_type_function set featurecat_id=NULL WHERE featurecat_id in ('{NODE}','{CONNEC}','{ARC}','{GULLY}');
 UPDATE man_type_fluid set featurecat_id=NULL WHERE featurecat_id in ('{NODE}','{CONNEC}','{ARC}','{GULLY}');
+
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3034, 'gw_fct_pg2epa_repair_epatype', 'utils', 'function', 'role_epa');
