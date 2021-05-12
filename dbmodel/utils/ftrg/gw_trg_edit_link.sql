@@ -397,11 +397,6 @@ BEGIN
 			"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
 		END IF;
 
-		-- state control related to start and end point
-		IF v_connect.state=1 AND v_end_state=2 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
-		END IF;
 
 		-- psector control (only possible link with feature state=2 on connec/gully 2 on same psector
 		IF v_connect.state=2 AND v_end_state=2 THEN
