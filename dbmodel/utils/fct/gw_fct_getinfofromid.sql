@@ -47,7 +47,6 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
 
-
 INFO EPA
 -- epa not defined
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
@@ -133,16 +132,14 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_pkeyfield text;
+v_featuredialog text;
+v_onlydata boolean = false;
 
 BEGIN
-
-	--  Get,check and set parameteres
-	----------------------------
 	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname := 'SCHEMA_NAME';
-
 
 	-- input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -154,8 +151,9 @@ BEGIN
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_editable = (p_data ->> 'data')::json->> 'editable';
+	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
 
-		-- Get values from config
+	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 		
@@ -248,7 +246,6 @@ BEGIN
 						v_isepatoarc = TRUE;
 					END IF;
 				END IF;
-				
 			END IF;
 		END IF;
 	END IF;
@@ -265,8 +262,6 @@ BEGIN
 	v_parentfields = replace (v_parentfields::text, '{', '[');
 	v_parentfields = replace (v_parentfields::text, '}', ']');
 
-	--      Get form (if exists) for the layer 
-	------------------------------------------
         -- to build json
 	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template, headertext AS "headerText"
 				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_tablename),' LIMIT 1) row');
@@ -349,7 +344,6 @@ BEGIN
 	EXECUTE v_querystring INTO column_type;
 
 	-- Get geometry_column
-	------------------------------------------
 	v_querystring = concat('SELECT attname FROM pg_attribute a        
             JOIN pg_class t on a.attrelid = t.oid
             JOIN pg_namespace s on t.relnamespace = s.oid
@@ -366,7 +360,6 @@ BEGIN
 	EXECUTE v_querystring INTO v_the_geom;
            
 	-- Get geometry (to feature response)
-	------------------------------------------
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
 		v_querystring = concat('SELECT row_to_json(row) FROM (SELECT St_AsText(',quote_ident(v_the_geom),') FROM ',quote_ident(v_tablename),' WHERE ',quote_ident(v_idname),' = CAST(',quote_nullable(v_id),' AS ',(column_type),'))row');
 		v_debug_vars := json_build_object('v_the_geom', v_the_geom, 'v_tablename', v_tablename, 'v_idname', v_idname, 'v_id', v_id, 'column_type', column_type);
@@ -377,7 +370,6 @@ BEGIN
 	
 	
 	-- Get tabs for form
-	--------------------------------
 	IF v_isgrafdelimiter THEN 
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
 			tabfunction as "tabFunction", b.tab as tabActions 
@@ -492,7 +484,6 @@ BEGIN
 	END IF;
 	
 	-- Check if it is parent table 
-	-------------------------------------
         IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
@@ -572,22 +563,19 @@ BEGIN
 	v_childtype := COALESCE(v_childtype, ''); 
 	
 	-- Propierties of info layer's
-	------------------------------
 	IF v_tablename IS NULL THEN 
 
-		v_message='{"level":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_layer_x_type or config_info_layer)", "results":0}';
+		v_message='{"level":2, "text":"The config environment is bad configured. Please take a look on table config layers (config_info_layer_x_type or config_info_layer)", "results":0}';
 	
 	ELSIF v_tablename IS NOT NULL THEN 
 
 		-- Check generic
-		-------------------
 		IF v_forminfo ISNULL THEN
 			v_forminfo := json_build_object('formName','Generic','template','info_generic');
 			formid_arg := 'F16';
 		END IF;
 
 		-- Add default tab
-		---------------------
 		form_tabs_json := array_to_json(form_tabs);
 	
 		-- Form Tabs info
@@ -621,7 +609,6 @@ BEGIN
 		END IF;
 
 		-- Get editability
-		------------------------
 		IF v_editable IS FALSE THEN 
 			v_editable := FALSE;
 		ELSE
@@ -635,7 +622,6 @@ BEGIN
 		END IF;
 	
 		--  Get if field's table are configured on config_info_layer_field
-		------------------------------------------------------------------
 		IF (SELECT distinct formname from config_form_fields WHERE formname=v_tablename) IS NOT NULL THEN 
 			v_configtabledefined  = TRUE;
 		ELSE 
@@ -653,80 +639,66 @@ BEGIN
 			v_formtype := 'default';
 		END IF;
 
-
-
-		-- call fields function
-		-------------------
-		IF v_editable THEN
-
-			-- getting id from URN
-			IF v_id IS NULL AND v_islayer is not true THEN
-				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
-			END IF;
-
-			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
-			-- call edit form function
-			v_querystring = concat('SELECT gw_fct_getfeatureupsert(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_inputgeometry::text),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_tg_op),', ',
-						quote_nullable(v_configtabledefined),', ',quote_nullable(v_idname),', ',quote_nullable(column_type),');');
-			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_inputgeometry', v_inputgeometry, 'v_device', v_device, 'v_infotype', v_infotype, 'v_tg_op', v_tg_op, 
-							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_fields;
-	
-			-- in case of insert status must be failed when topocontrol fails
-			IF (v_fields->>'status')='Failed' THEN
-				v_message = (v_fields->>'MSGERR');
-				v_status = 'Failed';
-			END IF;
-						
-		ELSIF v_editable = FALSE OR v_islayer THEN 
+		-- set onlydata variable
+		v_featuredialog = concat('{',substring((v_featuredialog) from 2 for LENGTH(v_featuredialog)));
+		v_featuredialog = concat('}',substring(reverse(v_featuredialog) from 2 for LENGTH(v_featuredialog)));
+		v_featuredialog := reverse(v_featuredialog);
+		EXECUTE concat('SELECT true FROM cat_feature WHERE id = any(',quote_literal(v_featuredialog),'::text[]) AND child_layer = ',quote_literal(v_tablename))
+		INTO v_onlydata;
+		IF v_onlydata IS NULL THEN v_onlydata = false; end if;
 		
-			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
-			-- call info form function
-			v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
-						', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
-			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
-							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 350);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_fields;
-		END IF;
+		IF v_onlydata IS FALSE THEN
 
+			-- call fields function
+			IF v_editable THEN
 
-	ELSE
-		IF (SELECT distinct formname from config_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
-			v_configtabledefined  = TRUE;
-		ELSE 
-			v_configtabledefined  = FALSE;
-		END IF;
+				-- getting id from URN
+				IF v_id IS NULL AND v_islayer is not true THEN
+					v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
+				END IF;
+
+				RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
+				-- call edit form function
+				v_querystring = concat('SELECT gw_fct_getfeatureupsert(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',
+				quote_nullable(v_inputgeometry::text),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_tg_op),', ',
+							quote_nullable(v_configtabledefined),', ',quote_nullable(v_idname),', ',quote_nullable(column_type),');');
+				v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_inputgeometry', v_inputgeometry, 'v_device', v_device, 'v_infotype', v_infotype, 'v_tg_op', v_tg_op, 
+								  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_fields;
 		
-		-- call info form function for parent layer
-		v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_table_parent),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),', ',
-					quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
-		v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
-						  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 360);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_fields;
-
-		IF v_configtabledefined IS FALSE  THEN
-			v_forminfo := json_build_object('formName','F16','template','GENERIC');
+				-- in case of insert status must be failed when topocontrol fails
+				IF (v_fields->>'status')='Failed' THEN
+					v_message = (v_fields->>'MSGERR');
+					v_status = 'Failed';
+				END IF;
+							
+			ELSIF v_editable = FALSE OR v_islayer THEN 
+			
+				RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
+				-- call info form function
+				v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
+							', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
+				v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
+								  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 350);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_fields;
+			END IF;
 		END IF;
-        
 	END IF;
 
 	-- Feature info
 	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
-		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
+		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json);
 
 
 	v_tablename:= (to_json(v_tablename));
 	v_table_parent:= (to_json(v_table_parent));
 
 	--    Hydrometer 'id' fix
-	------------------------
 	IF v_idname = 'sys_hydrometer_id' THEN
 		v_idname = 'hydrometer_id';
 	END IF;
@@ -737,7 +709,6 @@ BEGIN
 	END IF;
 
     	--    Control NULL's
-	----------------------
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
 	v_linkpath := COALESCE(v_linkpath, '{}');
@@ -745,9 +716,25 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
 
-	--    Return
-	-----------------------
-	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
+	IF v_onlydata THEN  -- when cat_feature has dialog on client and is not insert and is cat feature and is editable
+	
+		EXECUTE 'SELECT row_to_json(a) FROM (SELECT * FROM '||v_tablename||' WHERE '||v_idname||'::text = '||v_id||'::text)a'
+		INTO v_fields;
+
+		-- return
+		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
+	       ',"body":{"form":"None"'||
+		     ', "feature":'|| v_featureinfo ||
+		      ',"data":{"linkPath":' || v_linkpath ||
+		      	      ',"editable":true'
+			      ',"fields":' || v_fields || 
+			      '}'||
+			'}'||
+		'}')::json, 2582, null, null, null);
+
+	ELSE
+		--    Return
+		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
@@ -757,6 +744,8 @@ BEGIN
 			      '}'||
 			'}'||
 		'}')::json, 2582, null, null, null);
+
+	END IF;
 
 	-- Exception handling
 	 EXCEPTION WHEN OTHERS THEN

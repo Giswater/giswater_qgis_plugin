@@ -32,7 +32,16 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"epa",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "activeLayer":"", 
+"featureDialog":["PIPE"],
+"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"], "mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.5907975402754}}}$$);
+
+
+ SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "rolePermissions":"None", "activeLayer":"",
+  "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", 
+  "featureDialog":["VALVE"],
+  "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+   
 
  SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 
@@ -75,6 +84,7 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+v_featuredialog text;
 
 
 BEGIN
@@ -112,6 +122,7 @@ BEGIN
 	END IF;
 		
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
+	v_featuredialog := coalesce((p_data ->> 'data')::json->> 'featureDialog','[]');
 	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayer';
 
 	--  Harmonize v_visiblelayer
@@ -276,10 +287,10 @@ BEGIN
 	END IF;
     
 	PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_toolbar,'"}}')::json);
-			
+	
 	--   Call and return gw_fct_getinfofromid
-	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
-	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json), 2580, null, null, null);
+	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, '", "featureDialog": ',v_featuredialog,
+	'},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json), 2580, null, null, null);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
