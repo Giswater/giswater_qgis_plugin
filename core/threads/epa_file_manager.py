@@ -32,6 +32,8 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        self.json_result = None
+        self.rpt_result = None
         self.file_rpt = None
         self.fid = 140
         self.set_variables_from_go2epa()
@@ -133,11 +135,13 @@ class GwEpaFileManager(GwTask):
             return
 
         if self.function_failed:
-
             if "Failed" in self.complet_result['status']:
                 tools_gw.manage_json_exception(self.complet_result)
-            if self.rpt_result and "Failed" in self.rpt_result['status']:
-                tools_gw.manage_json_exception(self.rpt_result)
+            if self.rpt_result:
+                if 'status' in self.rpt_result:
+                    if "Failed" in self.rpt_result['status']:
+                        tools_gw.manage_json_exception(self.rpt_result)
+
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
             tools_qt.show_info_box(self.error_msg, title=title)
@@ -174,7 +178,6 @@ class GwEpaFileManager(GwTask):
 
 
     # region private functions
-
 
     def _exec_function_pg2epa(self):
 
