@@ -247,7 +247,7 @@ BEGIN
 		INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
 		INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
 		INSERT INTO sector(sector_id,name) VALUES(1,'sector1');
-		INSERT INTO dma(dma_id,name) VALUES(1,'dma1');
+		INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1', 1);
 		INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
 
 		-- SELECTORS
