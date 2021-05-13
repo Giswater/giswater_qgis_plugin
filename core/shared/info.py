@@ -2460,6 +2460,7 @@ class GwInfo(QObject):
         sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
         rows = tools_db.get_rows(sql)
         table_visit_node_dict = {}
+        if not rows: return
         for row in rows:
             table_visit_node_dict[row[0]] = str(row[1])
         self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
