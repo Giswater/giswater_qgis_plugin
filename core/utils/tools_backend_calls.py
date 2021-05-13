@@ -236,7 +236,9 @@ def load_qml(**kwargs):
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
             widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
-    tools_os.open_file(widget.text())
+    status, message = tools_os.open_file(widget.text())
+    if status is False and message is not None:
+        tools_qgis.show_warning(message, parameter=widget.text())
 
 
 # region unused functions atm

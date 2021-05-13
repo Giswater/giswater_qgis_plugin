@@ -148,7 +148,9 @@ class GwMenuLoad(QObject):
         """ Opens the OS-specific Config directory """
 
         path = os.path.realpath(self.user_folder_dir)
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _open_manage_file(self):
