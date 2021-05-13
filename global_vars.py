@@ -63,6 +63,13 @@ session_vars['info_docker'] = None      # An instance of current status of the i
 session_vars['docker_type'] = None      # An instance of current status of the docker form configured by user. Can be configured "qgis_info_docker" and "qgis_form_docker"
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
 
+
+info_templates = {}
+info_templates['feature'] = None
+info_templates['feature_arc'] = None
+info_templates['feature_node'] = None
+info_templates['visit'] = None
+
 # endregion
 
 # region Init Variables Functions

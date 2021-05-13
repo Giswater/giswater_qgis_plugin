@@ -12,6 +12,7 @@ import urllib.parse as parse
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+import time
 
 from sip import isdeleted
 
@@ -233,6 +234,7 @@ class GwInfo(QObject):
 
         elif template == 'visit':
             visit_id = self.complet_result['body']['feature']['id']
+            # manage_visit = GwVisit() if global_vars.info_templates['visit'] is None else global_vars.info_templates['visit']
             manage_visit = GwVisit()
             manage_visit.get_visit(visit_id=visit_id, tag='info')
             dlg_add_visit = manage_visit.get_visit_dialog()
@@ -403,8 +405,15 @@ class GwInfo(QObject):
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
 
+        template_name = f'feature_{sub_tag}' if sub_tag not in (None, 'None') else 'feature'
+
+        # if global_vars.info_templates[template_name] is not None:
+        #     self = global_vars.info_templates[template_name]  # Aixi en principi totes les referencies a self apuntaran a la plantilla
+        print(f"{time.time()}")
+
+        # if global_vars.info_templates[template_name] is None:
         # Dialog
-        self.dlg_cf = GwInfoFeatureUi(sub_tag)
+        self.dlg_cf = GwInfoFeatureUi(sub_tag) if global_vars.info_templates[template_name] is None else global_vars.info_templates[template_name]
         tools_gw.load_settings(self.dlg_cf)
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -477,6 +486,7 @@ class GwInfo(QObject):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
                 tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
 
+
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
@@ -496,6 +506,7 @@ class GwInfo(QObject):
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
+
         if self.new_feature_id is not None:
             self._enable_action(self.dlg_cf, "actionZoom", False)
             self._enable_action(self.dlg_cf, "actionZoomOut", False)
@@ -508,45 +519,46 @@ class GwInfo(QObject):
         except KeyError:
             pass
 
-        # Set actions icon
-        tools_gw.add_icon(action_edit, "101")
-        tools_gw.add_icon(action_copy_paste, "107b", "24x24")
-        tools_gw.add_icon(action_rotation, "107c", "24x24")
-        tools_gw.add_icon(action_catalog, "195")
-        tools_gw.add_icon(action_workcat, "193")
-        tools_gw.add_icon(action_mapzone, "213")
-        tools_gw.add_icon(action_set_to_arc, "212")
-        tools_gw.add_icon(action_get_arc_id, "209")
-        tools_gw.add_icon(action_get_parent_id, "210")
-        tools_gw.add_icon(action_zoom_in, "103")
-        tools_gw.add_icon(action_zoom_out, "107")
-        tools_gw.add_icon(action_centered, "104")
-        tools_gw.add_icon(action_link, "173")
-        tools_gw.add_icon(action_section, "207")
-        tools_gw.add_icon(action_help, "73")
-        tools_gw.add_icon(action_interpolate, "194")
+        if global_vars.info_templates[template_name] is None:
+            # Set actions icon
+            tools_gw.add_icon(action_edit, "101")
+            tools_gw.add_icon(action_copy_paste, "107b", "24x24")
+            tools_gw.add_icon(action_rotation, "107c", "24x24")
+            tools_gw.add_icon(action_catalog, "195")
+            tools_gw.add_icon(action_workcat, "193")
+            tools_gw.add_icon(action_mapzone, "213")
+            tools_gw.add_icon(action_set_to_arc, "212")
+            tools_gw.add_icon(action_get_arc_id, "209")
+            tools_gw.add_icon(action_get_parent_id, "210")
+            tools_gw.add_icon(action_zoom_in, "103")
+            tools_gw.add_icon(action_zoom_out, "107")
+            tools_gw.add_icon(action_centered, "104")
+            tools_gw.add_icon(action_link, "173")
+            tools_gw.add_icon(action_section, "207")
+            tools_gw.add_icon(action_help, "73")
+            tools_gw.add_icon(action_interpolate, "194")
 
-        # Set buttons icon
-        # tab elements
-        tools_gw.add_icon(self.dlg_cf.btn_insert, "111b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_delete, "112b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b", "24x24")
-        # tab hydrometer
-        tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
-        # tab visit
-        tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
-        # tab event
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b", "24x24")
-        # tab doc
-        tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
+            # Set buttons icon
+            # tab elements
+            tools_gw.add_icon(self.dlg_cf.btn_insert, "111b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_delete, "112b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b", "24x24")
+            # tab hydrometer
+            tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
+            # tab visit
+            tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
+            # tab event
+            tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b", "24x24")
+            # tab doc
+            tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
+            tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
 
         # Get feature type as feature_type (node, arc, connec, gully)
         self.feature_type = str(complet_result['body']['feature']['featureType'])
@@ -563,22 +575,23 @@ class GwInfo(QObject):
         result = complet_result['body']['data']
         layout_list = []
 
-        for field in complet_result['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
-                continue
-            label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
-            if widget is None:
-                continue
-            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
-            if layout is not None:
-                # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                    layout_list.append(layout)
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                    layout.addWidget(label, 0, field['layoutorder'])
-                    layout.addWidget(widget, 1, field['layoutorder'])
-                else:
-                    tools_gw.add_widget(self.dlg_cf, field, label, widget)
+        if global_vars.info_templates[template_name] is None:
+            for field in complet_result['body']['data']['fields']:
+                if 'hidden' in field and field['hidden']:
+                    continue
+                label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
+                if widget is None:
+                    continue
+                layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+                if layout is not None:
+                    # Take the QGridLayout with the intention of adding a QSpacerItem later
+                    if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                        layout_list.append(layout)
+                    if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                        layout.addWidget(label, 0, field['layoutorder'])
+                        layout.addWidget(widget, 1, field['layoutorder'])
+                    else:
+                        tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -676,6 +689,11 @@ class GwInfo(QObject):
         tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
         self.dlg_cf.setWindowTitle(title)
 
+        if global_vars.info_templates[template_name] is None:
+            global_vars.info_templates[template_name] = self.dlg_cf
+
+
+        print(f"{time.time()}")
         return self.complet_result, self.dlg_cf
 
 

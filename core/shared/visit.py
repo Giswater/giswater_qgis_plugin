@@ -83,7 +83,7 @@ class GwVisit(QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
-        self.dlg_add_visit = GwVisitUi(tag)
+        self.dlg_add_visit = GwVisitUi(tag) if global_vars.info_templates['visit'] is None else global_vars.info_templates['visit']
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
@@ -91,6 +91,7 @@ class GwVisit(QObject):
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
+
         self.dlg_add_visit.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
         self.dlg_add_visit.accepted.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -129,6 +130,7 @@ class GwVisit(QObject):
 
         # Reset geometry
         self.point_xy = {"x": None, "y": None}
+
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")
@@ -246,6 +248,9 @@ class GwVisit(QObject):
                     for layer in self.layers[self.feature_type]:
                         box = layer.boundingBoxOfSelected()
                         self._zoom_box(box)
+
+        if global_vars.info_templates['visit'] is None:
+            global_vars.info_templates['visit'] = self.dlg_add_visit
 
         # Open the dialog
         if open_dlg:
