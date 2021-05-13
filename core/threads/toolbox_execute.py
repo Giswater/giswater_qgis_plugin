@@ -176,7 +176,7 @@ class GwToolBoxTask(GwTask):
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
         # If sql function return null
         elif result is False:
-            msg = f"Data base return null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
     def cancel(self):

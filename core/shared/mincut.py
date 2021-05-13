@@ -608,7 +608,7 @@ class GwMincut:
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.mincutCanceled = True
 
-        # If id exists in data base on btn_cancel delete
+        # If id exists in database on btn_cancel delete
         if self.action == "get_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
             sql = (f"SELECT id FROM om_mincut"

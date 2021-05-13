@@ -101,7 +101,7 @@ class GwEpaFileManager(GwTask):
 
         # If sql function return null
         if self.complet_result is None:
-            msg = f"Data base return null. Check postgres function '{self.funtion_name}'"
+            msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
             tools_log.log_warning(msg)
 
         elif result:

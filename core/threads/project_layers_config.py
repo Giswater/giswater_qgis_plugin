@@ -60,7 +60,7 @@ class GwProjectLayersConfig(GwTask):
 
         # If sql function return null
         if result is False:
-            msg = f"Data base return null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
         if self.exception:

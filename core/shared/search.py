@@ -424,7 +424,7 @@ class GwSearch:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
 
-            # Get list of items from returned json from data base and make a list for completer
+            # Get list of items from returned json from database and make a list for completer
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
