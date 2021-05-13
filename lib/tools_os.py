@@ -9,6 +9,7 @@ import os
 import pathlib
 import sys
 import subprocess
+import urllib.parse as parse
 import webbrowser
 
 from qgis.PyQt.QtWidgets import QFileDialog
@@ -41,18 +42,27 @@ def open_file(file_path):
     """
 
     try:
-        if os.path.exists(file_path):
-            if sys.platform == "win32":
-                os.startfile(file_path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, file_path])
-        else:
+        # Parse a URL into components
+        url = parse.urlsplit(file_path)
+
+        # Open selected document
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
             webbrowser.open(file_path)
+        else:
+            if not os.path.exists(file_path):
+                message = "File not found"
+                return False, message
+            else:
+                if sys.platform == "win32":
+                    os.startfile(file_path)
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, file_path])
+        return True, None
     except Exception:
-        return False
-    finally:
-        return True
+        return False, None
+
 
 
 def get_relative_path(filepath, levels=1):

@@ -1308,7 +1308,9 @@ class GwVisit(QObject):
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _populate_tbl_docs_x_event(self, event_id=0):

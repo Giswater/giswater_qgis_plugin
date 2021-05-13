@@ -2378,7 +2378,9 @@ class GwInfo(QObject):
         row = selected_list[0].row()
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
-            tools_os.open_file(url)
+            status, message = tools_os.open_file(url)
+            if status is False and message is not None:
+                tools_qgis.show_warning(message, parameter=url)
 
 
     def _fill_tbl_hydrometer(self, qtable, table_name):
@@ -2598,8 +2600,9 @@ class GwInfo(QObject):
         rows = tools_db.get_rows(sql, commit=True)
         for path in rows:
             # Open selected document
-            tools_os.open_file(path[0])
-
+            status, message = tools_os.open_file(path[0])
+            if status is False and message is not None:
+                tools_qgis.show_warning(message, parameter=path[0])
 
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
                           value_filter=None, widget=None):
@@ -2799,7 +2802,9 @@ class GwInfo(QObject):
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _tbl_event_clicked(self, table_name):
@@ -3004,7 +3009,9 @@ class GwInfo(QObject):
                     message = "File not found"
                     tools_qgis.show_warning(message, parameter=path)
                 else:
-                    tools_os.open_file(path)
+                    status, message = tools_os.open_file(path)
+                    if status is False and message is not None:
+                        tools_qgis.show_warning(message, parameter=path)
 
         else:
             # If more then one document is attached open dialog with list of documents
@@ -3057,7 +3064,9 @@ class GwInfo(QObject):
                 message = "File not found"
                 tools_qgis.show_warning(message, parameter=path)
             else:
-                tools_os.open_file(path)
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
@@ -3166,7 +3175,9 @@ class GwInfo(QObject):
         # Get document path (can be relative or absolute)
         row = selected_list[0].row()
         path = widget.model().record(row).value("path")
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _manage_new_document(self, dialog, doc_id=None, feature=None):

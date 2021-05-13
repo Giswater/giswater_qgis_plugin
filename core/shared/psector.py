@@ -629,7 +629,9 @@ class GwPsector:
                 if os.path.exists(path):
                     message = "Document PDF created in"
                     tools_qgis.show_info(message, parameter=path)
-                    tools_os.open_file(path)
+                    status, message = tools_os.open_file(path)
+                    if status is False and message is not None:
+                        tools_qgis.show_warning(message, parameter=path)
                 else:
                     message = "Cannot create file, check if its open"
                     tools_qgis.show_warning(message, parameter=path)
