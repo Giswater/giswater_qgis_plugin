@@ -122,6 +122,7 @@ BEGIN
 		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE (is_operative IS TRUE)
+		AND epa_type !='UNDEFINED'
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user;
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
