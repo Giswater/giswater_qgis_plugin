@@ -42,10 +42,9 @@ BEGIN
 	IF v_nod2arc is null then 
 		v_nod2arc = 0.3;
 	END IF;
-	
-	IF v_nod2arc > v_nodarc_min-0.01 THEN
-		v_nod2arc = v_nodarc_min-0.01;
-	END IF;
+
+	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min; END IF;
+
 
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	IF v_roughness is null then v_roughness = 0; END IF;
@@ -103,7 +102,7 @@ BEGIN
 		arc_distance, the_geom FROM anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
+		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
 		3
 		FROM temp_arc c LEFT JOIN querytext n ON node_1 = node_id
@@ -117,7 +116,7 @@ BEGIN
 		arc_distance, the_geom FROM anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
+		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
 		4
 		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
@@ -160,7 +159,7 @@ BEGIN
 		
 		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
+		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
 		1
 		FROM temp_arc c LEFT JOIN querytext n ON node_1 = node_id
@@ -174,7 +173,7 @@ BEGIN
 		arc_distance, the_geom FROM anl_node WHERE fid = 124 AND cur_user = current_user)
 		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
+		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/st_length(c.the_geom))) AS the_geom,
 		n.node_id,
 		2
 		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
@@ -258,7 +257,7 @@ BEGIN
 		  WHERE b.node_id  = temp_node.node_id';
 
 	RAISE NOTICE ' Update geometries and node_1';
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1) 
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_arc.the_geom)) , 1) 
 			FROM temp_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE''';
 
 	EXECUTE 'UPDATE temp_arc a SET node_1 = node_id FROM (
@@ -271,7 +270,7 @@ BEGIN
 			AND node_1 IN (SELECT node_id FROM temp_node WHERE epa_type =''TODELETE'')'; 
 
 	RAISE NOTICE ' update geometries and node_2';
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' / length))
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_arc.the_geom)))
 			FROM temp_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE''';
 
 	EXECUTE 'UPDATE temp_arc a SET node_2 = node_id FROM (
