@@ -117,6 +117,9 @@ BEGIN
 	-- when existing network is used (check on go2epa dialog)
 	IF v_usenetworkgeom IS NOT TRUE THEN
 
+		-- repair inp tables
+		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+
 		RAISE NOTICE '2 - check system data';
 		IF v_checkdata THEN
 			PERFORM gw_fct_pg2epa_check_data(v_input);
