@@ -201,3 +201,16 @@ delete from config_form_fields where formname in ('inp_rules_x_node', 'inp_rules
 update config_form_fields set formname='inp_controls' WHERE formname = 'inp_controls_x_arc';
 update config_form_fields set columnname='sector_id', label='sector_id', widgettype='combo', dv_querytext='SELECT sector_id as id, name as idval FROM sector WHERE sector_id<>0', dv_orderby_id=true, dv_isnullvalue=false WHERE formname = 'inp_controls' AND columnname='arc_id';
 update config_form_fields set widgetcontrols='{"setMultiline":true}' WHERE formname = 'inp_controls' AND columnname='text';
+
+
+INSERT INTO inp_controls (sector_id, text, active)
+SELECT sector_id, text, active FROM _inp_controls_x_arc_
+JOIN arc USING(arc_id);
+
+INSERT INTO inp_rules (sector_id, text, active)
+SELECT sector_id, text, active FROM _inp_rules_x_arc_
+JOIN arc USING(arc_id);
+
+INSERT INTO inp_rules (sector_id, text, active)
+SELECT sector_id, text, active FROM _inp_rules_x_node_
+JOIN node USING(node_id);

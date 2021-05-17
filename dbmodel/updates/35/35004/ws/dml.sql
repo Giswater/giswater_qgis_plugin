@@ -13,14 +13,3 @@ UPDATE sys_param_user SET isenabled = false where id='edit_presszone_vdefault';
 UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(vdefault::json, 'inp_options_debug') WHERE id ='inp_options_debug';
 UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value::json, 'inp_options_debug') WHERE parameter ='inp_options_debug';
 
-INSERT INTO inp_controls (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_controls_x_arc_
-JOIN arc USING(arc_id);
-
-INSERT INTO inp_rules (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_rules_x_arc_
-JOIN arc USING(arc_id);
-
-INSERT INTO inp_rules (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_rules_x_node_
-JOIN node USING(node_id);
