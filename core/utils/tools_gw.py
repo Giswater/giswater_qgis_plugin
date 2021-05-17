@@ -2612,6 +2612,11 @@ def user_params_to_userconfig():
 
         # For each parameter (inventory)
         for parameter in parameters:
+
+            # Manage if parameter need prefix and project_type is not defined
+            if parameter.startswith("_") and global_vars.project_vars['project_type'] is None:
+                continue
+
             _pre = False
             inv_param = parameter
             # If it needs a prefix
