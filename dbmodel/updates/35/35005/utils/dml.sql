@@ -22,3 +22,9 @@ UPDATE man_type_fluid set featurecat_id=NULL WHERE featurecat_id in ('{NODE}','{
 
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3034, 'gw_fct_pg2epa_repair_epatype', 'utils', 'function', 'role_epa');
+
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":"$userInpResult"}]'
+WHERE id = 2680;
+
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":"$userInpResult"}]'
+WHERE id = 2848;
