@@ -722,7 +722,7 @@ class GwInfo(QObject):
     def _connect_signals(self):
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
+            # self.layer.editingStopped.connect(self.fct_stop_editing)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').triggered.connect(self.fct_block_action_edit)
             self.connected = True
 
