@@ -29,3 +29,8 @@ WHERE id = 2680;
 
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":"$userInpResult"}]'
 WHERE id = 2848;
+
+--2021/05/18
+UPDATE sys_table SET notify_action=
+'[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool", "v_edit_dma", "v_edit_presszone", "v_ext_plot","v_ext_streetaxis", "v_ext_address"]}]'
+WHERE id='exploitation';
