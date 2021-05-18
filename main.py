@@ -64,6 +64,13 @@ class Giswater(QObject):
 
         try:
 
+            # Reset values for global_vars.project_vars
+            global_vars.project_vars['info_type'] = None
+            global_vars.project_vars['add_schema'] = None
+            global_vars.project_vars['main_schema'] = None
+            global_vars.project_vars['project_role'] = None
+            global_vars.project_vars['project_type'] = None
+
             # Remove Giswater dockers
             self._remove_dockers()
 
