@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/05/11
 INSERT INTO config_param_system(parameter, value, descript,  project_type, datatype, label, isenabled, dv_isparent, isautoupdate, widgettype,
 ismandatory, iseditable, layoutname, layoutorder)
-VALUES ('edit_arc_divide', '{"setArcObsolete":"false","setOldCode":"false"}', 
+VALUES ('edit_arc_divide', '{"setArcObsolete":"true","setOldCode":"false"}', 
 'Configuration of arc divide tool. If setArcObsolete true state of old arc would be set to 0, otherwise arc will be deleted. If setOldCode true, new arcs will have same code as old arc.',
 'utils', 'json', 'Arc divide:', true, false, false, 'linetext', true, true, 'lyt_topology', 18 ) ON CONFLICT (parameter) DO NOTHING;
 

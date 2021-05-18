@@ -92,6 +92,7 @@ v_node_id text;
 v_arc_closest text;
 v_set_arc_obsolete boolean;
 v_set_old_code boolean;
+v_obsoletetype integer;
 
 BEGIN
 
@@ -142,6 +143,10 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 	SELECT json_extract_path_text (value::json,'setArcObsolete')::boolean INTO v_set_arc_obsolete FROM config_param_system WHERE parameter='edit_arc_divide';
 	SELECT json_extract_path_text (value::json,'setOldCode')::boolean INTO v_set_old_code FROM config_param_system WHERE parameter='edit_arc_divide';
+	SELECT value::smallint INTO v_obsoletetype FROM config_param_user where parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+	IF v_obsoletetype IS NULL THEN
+		SELECT id INTO v_obsoletetype FROM value_state_type WHERE state=0 LIMIT 1;
+	END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=212 AND cur_user=current_user;
@@ -519,7 +524,7 @@ BEGIN
 						
 						--set arc to obsolete or delete it
 						IF v_set_arc_obsolete IS TRUE THEN
-							UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
+							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
 						ELSE
