@@ -349,7 +349,7 @@ class GwFeatureReplaceButton(GwMaptool):
         featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
 
         # Check null values
-        if self.workcat_id_end_aux in (None, 'null') or feature_type_new in (None, 'null') or featurecat_id in (None, 'null'):
+        if feature_type_new in (None, 'null') or featurecat_id in (None, 'null'):
             message = "Mandatory fields are missing. Please, set values"
             tools_qgis.show_warning(message, parameter='Workcat id, New feature type and Catalog id')
             return

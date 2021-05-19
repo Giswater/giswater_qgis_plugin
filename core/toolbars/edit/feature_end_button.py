@@ -237,11 +237,6 @@ class GwFeatureEndButton(GwAction):
         self.workcatdate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.builtdate)
         self.description = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.descript, False, False)
 
-        if self.workcat_id_end in ('null', None):
-            message = "Please select a workcat id end"
-            tools_qgis.show_warning(message)
-            return
-
         self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
 
         row = None
