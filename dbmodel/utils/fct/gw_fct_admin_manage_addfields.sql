@@ -26,7 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoT
 "parameters":{"label": "pump1", "active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 "datatype": "boolean",  "columnname": "pump1", "widgettype": "check", "dv_isnullvalue": false,
 "isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reloadField": null, 
-"isparent": false,   "dv_querytext_filterc": null, "linkedaction": null, 
+"isparent": false,   "dv_querytext_filterc": null, "linkedobject": null, 
 "stylesheet": null, "widgetdim": null,"hidden":"False","layoutname":"lyt_data_1"}}}$$)::text
 
 	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -36,7 +36,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoT
 	"parameters":{"label": "pump111", "active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 	"datatype": "integer", "columnname": "pump1", "widgettype": "text", "dv_isnullvalue": false,
 	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reloadField": null, 
-	"isparent": false,  "dv_querytext_filterc": null, "linkedaction": null, 
+	"isparent": false,  "dv_querytext_filterc": null, "linkedobject": null, 
 	"stylesheet": null, "widgetdim": null, "hidden":"False","layoutname":"lyt_data_1"}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
@@ -87,11 +87,11 @@ v_isnullvalue boolean;
 v_stylesheet json;
 v_multicreate boolean;
 v_querytextfilterc text;
-v_widgetfunction text;
+v_widgetfunction json;
 v_widgetdim integer;
 v_jsonwidgetdim json;
 v_isautoupdate boolean;
-v_linkedaction text;
+v_linkedobject text;
 v_update_old_datatype text;
 v_project_type text;
 v_param_user_id integer;
@@ -156,12 +156,12 @@ BEGIN
 	v_parentid = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
 	v_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
 	v_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
-	v_linkedaction = (((p_data ->>'data')::json->>'parameters')::json ->>'linkedaction')::text;
+	v_linkedobject = (((p_data ->>'data')::json->>'parameters')::json ->>'linkedobject')::text;
 	v_hidden = (((p_data ->>'data')::json->>'parameters')::json ->>'hidden')::boolean;
 	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
 	v_multicreate = ((p_data ->>'data')::json->>'multiCreate')::text;
 	v_querytextfilterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
-	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
+	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::json;
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
 	v_layoutname = (((p_data ->>'data')::json->>'parameters')::json ->>'layoutname')::text;
@@ -366,11 +366,11 @@ BEGIN
 				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutorder, datatype, widgettype,
 				label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
 				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
-				dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedaction, hidden)	
+				dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)	
 				VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
 				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
 				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
-				v_parentid, v_querytextfilterc, v_querytext,  v_linkedaction, v_hidden);
+				v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden);
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (218, null, 4, 'Insert parameter into config_form_fields.');
@@ -386,7 +386,7 @@ BEGIN
 				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
 				widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
 				dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
-				dv_querytext=v_querytext, linkedaction=v_linkedaction, hidden = v_hidden
+				dv_querytext=v_querytext, linkedobject=v_linkedobject, hidden = v_hidden
 				WHERE columnname=v_param_name AND formname=v_viewname;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -617,11 +617,11 @@ BEGIN
 			INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutorder,
 			datatype, widgettype, label, ismandatory, isparent, iseditable, 
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
-			dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedaction, hidden)
+			dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)
 			VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
 			v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
-			v_parentid, v_querytextfilterc, v_querytext,  v_linkedaction, v_hidden);
+			v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden);
 
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -659,7 +659,7 @@ BEGIN
 				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
 				widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
 				dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
-				dv_querytext=v_querytext, linkedaction=v_linkedaction,
+				dv_querytext=v_querytext, linkedobject=v_linkedobject,
 				hidden = v_hidden
 				WHERE columnname=v_param_name AND formname=v_viewname;
 		
