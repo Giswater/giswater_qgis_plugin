@@ -616,7 +616,8 @@ class GwInfo(QObject):
 
         else:
             for field in complet_result['body']['data']['fields']:
-                tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
+                if complet_result['body']['data']['fields'][field] not in (None, "", "null"):
+                    tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
 
         # Set variables
         id_name = complet_result['body']['feature']['idName']
