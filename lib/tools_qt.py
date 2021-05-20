@@ -279,7 +279,9 @@ def set_selected_item(dialog, widget, text):
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
     if widget:
-        index = widget.findText(text)
+        print(f"{get_combo_value(dialog, widget, 0)}")
+        print(f"{get_combo_value(dialog, widget, 1)}")
+        index = widget.findText(str(text))
         if index == -1:
             index = 0
         widget.setCurrentIndex(index)

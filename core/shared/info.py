@@ -154,6 +154,7 @@ class GwInfo(QObject):
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+            extras += f', "featureDialog":{tools_gw.get_info_templates()}'
             body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
@@ -172,6 +173,7 @@ class GwInfo(QObject):
             return False, None
 
         json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+
         if json_result in (None, False):
             return False, None
 
@@ -197,7 +199,11 @@ class GwInfo(QObject):
                 tools_qgis.show_message(msg, message_level=level)
                 return False, None
 
-        self.complet_result = json_result
+        # print(f"TEST childType: {json_result['body']}")
+        result_guardat = global_vars.info_templates[json_result['body']['feature']['childType']]['json']
+        new_result = json_result
+        self.complet_result = json_result if result_guardat is None else result_guardat
+
         try:
             template = self.complet_result['body']['form']['template']
         except Exception as e:
@@ -205,6 +211,7 @@ class GwInfo(QObject):
             return False, None
 
         if template == 'info_generic':
+            print(f'TEST IF INFO_GENERIC')
             result, dialog = self._open_generic_form(self.complet_result)
             # Fill self.my_json for new qgis_feature
             if feature_cat is not None:
@@ -212,6 +219,7 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
+            print(f'TEST IF DIMENSIONING')
             self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
             if self.lyr_dim:
                 self.dimensioning = GwDimensioning()
@@ -226,8 +234,8 @@ class GwInfo(QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
-            feature_id = self.complet_result['body']['feature']['id']
-            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
+            feature_id = new_result['body']['feature']['id']
+            result, dialog = self._open_custom_form(feature_id, new_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
             if feature_cat is not None:
                 self._manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -404,8 +412,18 @@ class GwInfo(QObject):
 
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
-
-        template_name = f'feature_{sub_tag}' if sub_tag not in (None, 'None') else 'feature'
+        print(f'TEST 5: {complet_result}')
+        template_name = f"{complet_result['body']['feature']['childType']}"
+        print(f"TEST childType: {template_name}")
+        # template_name = f'{feature_id}'
+        # new_result = complet_result
+        # if global_vars.info_templates[template_name]['json'] is not None:
+        #     print(f'TEST IF')
+        #     self.complet_result = global_vars.info_templates[template_name]['json']
+        #     complet_result = self.complet_result
+        #     print(f'TEST json: complet_result {complet_result}')
+        #     print(f'TEST json: self.complet_result {self.complet_result}')
+        #     print(f'TEST json: new_result {new_result}')
 
         # if global_vars.info_templates[template_name] is not None:
         #     self = global_vars.info_templates[template_name]  # Aixi en principi totes les referencies a self apuntaran a la plantilla
@@ -413,7 +431,7 @@ class GwInfo(QObject):
 
         # if global_vars.info_templates[template_name] is None:
         # Dialog
-        self.dlg_cf = GwInfoFeatureUi(sub_tag) if global_vars.info_templates[template_name] is None else global_vars.info_templates[template_name]
+        self.dlg_cf = GwInfoFeatureUi(sub_tag) if global_vars.info_templates[template_name]['dlg'] is None else global_vars.info_templates[template_name]['dlg']
         tools_gw.load_settings(self.dlg_cf)
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -519,7 +537,7 @@ class GwInfo(QObject):
         except KeyError:
             pass
 
-        if global_vars.info_templates[template_name] is None:
+        if global_vars.info_templates[template_name]['dlg'] is None:
             # Set actions icon
             tools_gw.add_icon(action_edit, "101")
             tools_gw.add_icon(action_copy_paste, "107b", "24x24")
@@ -575,7 +593,7 @@ class GwInfo(QObject):
         result = complet_result['body']['data']
         layout_list = []
 
-        if global_vars.info_templates[template_name] is None:
+        if global_vars.info_templates[template_name]['dlg'] is None:
             for field in complet_result['body']['data']['fields']:
                 if 'hidden' in field and field['hidden']:
                     continue
@@ -593,19 +611,28 @@ class GwInfo(QObject):
                     else:
                         tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
-        # Add a QSpacerItem into each QGridLayout of the list
-        for layout in layout_list:
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-            layout.addItem(vertical_spacer1)
+            # Add a QSpacerItem into each QGridLayout of the list
+            for layout in layout_list:
+                vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                layout.addItem(vertical_spacer1)
 
-        # Manage combo parents and children:
-        for field in result['fields']:
-            if field['isparent']:
-                if field['widgettype'] == 'combo':
-                    widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
-                    if widget is not None:
-                        widget.currentIndexChanged.connect(partial(
-                            self._get_combo_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
+            # Manage combo parents and children:
+            for field in result['fields']:
+                if field['isparent']:
+                    if field['widgettype'] == 'combo':
+                        widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
+                        if widget is not None:
+                            widget.currentIndexChanged.connect(partial(
+                                self._get_combo_child, self.dlg_cf, widget, self.feature_type,
+                                self.tablename, self.field_id))
+
+        else:
+            # print(f"TEST 15: {complet_result['body']['data']['fields']}")
+            for field in complet_result['body']['data']['fields']:
+                # print(f"TEST 20: {field}: {complet_result['body']['data']['fields'][field]}")
+                # self.dlg_cf.findChild(QWidget, field)
+                tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
+            # self.dlg_cf.findChild(QWidget, field)
 
         # Set variables
         id_name = complet_result['body']['feature']['idName']
@@ -689,8 +716,9 @@ class GwInfo(QObject):
         tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
         self.dlg_cf.setWindowTitle(title)
 
-        if global_vars.info_templates[template_name] is None:
-            global_vars.info_templates[template_name] = self.dlg_cf
+        if global_vars.info_templates[template_name]['dlg'] is None:
+            global_vars.info_templates[template_name]['dlg'] = self.dlg_cf
+            global_vars.info_templates[template_name]['json'] = self.complet_result
 
 
         print(f"{time.time()}")

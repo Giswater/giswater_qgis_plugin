@@ -2636,6 +2636,16 @@ def user_params_to_userconfig():
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
 
+def get_info_templates():
+    """ Returns a string array with the existing templates' names """
+
+    templates = ''
+    for key in global_vars.info_templates:
+        if global_vars.info_templates[key]['dlg'] is not None:
+            templates += f'"{key}", '
+    templates = f'[{templates[:-2]}]'
+    return templates
+
 # region private functions
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """

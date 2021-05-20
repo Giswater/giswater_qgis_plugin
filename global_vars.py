@@ -65,10 +65,9 @@ session_vars['logged_status'] = None    # An instance of connection status. Can 
 
 
 info_templates = {}
-info_templates['feature'] = None
-info_templates['feature_arc'] = None
-info_templates['feature_node'] = None
-info_templates['visit'] = None
+info_templates['SHUTOFF_VALVE'] = {}
+info_templates['SHUTOFF_VALVE']['dlg'] = None
+info_templates['SHUTOFF_VALVE']['json'] = None
 
 # endregion
 
