@@ -211,7 +211,6 @@ class GwInfo(QObject):
             return False, None
 
         if template == 'info_generic':
-            print(f'TEST IF INFO_GENERIC')
             result, dialog = self._open_generic_form(self.complet_result)
             # Fill self.my_json for new qgis_feature
             if feature_cat is not None:
@@ -219,7 +218,6 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
-            print(f'TEST IF DIMENSIONING')
             self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
             if self.lyr_dim:
                 self.dimensioning = GwDimensioning()
@@ -412,18 +410,8 @@ class GwInfo(QObject):
 
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
-        print(f'TEST 5: {complet_result}')
+
         template_name = f"{complet_result['body']['feature']['childType']}"
-        print(f"TEST childType: {template_name}")
-        # template_name = f'{feature_id}'
-        # new_result = complet_result
-        # if global_vars.info_templates[template_name]['json'] is not None:
-        #     print(f'TEST IF')
-        #     self.complet_result = global_vars.info_templates[template_name]['json']
-        #     complet_result = self.complet_result
-        #     print(f'TEST json: complet_result {complet_result}')
-        #     print(f'TEST json: self.complet_result {self.complet_result}')
-        #     print(f'TEST json: new_result {new_result}')
 
         # if global_vars.info_templates[template_name] is not None:
         #     self = global_vars.info_templates[template_name]  # Aixi en principi totes les referencies a self apuntaran a la plantilla
@@ -496,8 +484,8 @@ class GwInfo(QObject):
             feature = tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id)
             list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
 
-        if 'visibleTabs' in complet_result['body']['form']:
-            for tab in complet_result['body']['form']['visibleTabs']:
+        if 'visibleTabs' in self.complet_result['body']['form']:
+            for tab in self.complet_result['body']['form']['visibleTabs']:
                 tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
@@ -627,12 +615,8 @@ class GwInfo(QObject):
                                 self.tablename, self.field_id))
 
         else:
-            # print(f"TEST 15: {complet_result['body']['data']['fields']}")
             for field in complet_result['body']['data']['fields']:
-                # print(f"TEST 20: {field}: {complet_result['body']['data']['fields'][field]}")
-                # self.dlg_cf.findChild(QWidget, field)
                 tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
-            # self.dlg_cf.findChild(QWidget, field)
 
         # Set variables
         id_name = complet_result['body']['feature']['idName']

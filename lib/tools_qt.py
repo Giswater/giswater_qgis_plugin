@@ -226,7 +226,8 @@ def set_widget_text(dialog, widget, text):
             text = 0
         widget.setValue(float(text))
     elif type(widget) is QComboBox:
-        set_selected_item(dialog, widget, text)
+        # set_selected_item(dialog, widget, text)
+        set_combo_value(widget, str(text), 0)
     elif type(widget) is QTimeEdit:
         set_time(dialog, widget, text)
     elif type(widget) is QCheckBox:
@@ -279,9 +280,7 @@ def set_selected_item(dialog, widget, text):
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
     if widget:
-        print(f"{get_combo_value(dialog, widget, 0)}")
-        print(f"{get_combo_value(dialog, widget, 1)}")
-        index = widget.findText(str(text))
+        index = widget.findText(text)
         if index == -1:
             index = 0
         widget.setCurrentIndex(index)
