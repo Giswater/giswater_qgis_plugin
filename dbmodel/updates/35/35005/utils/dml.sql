@@ -34,3 +34,7 @@ WHERE id = 2848;
 UPDATE sys_table SET notify_action=
 '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool", "v_edit_dma", "v_edit_presszone", "v_ext_plot","v_ext_streetaxis", "v_ext_address"]}]'
 WHERE id='exploitation';
+
+--2021/05/21
+UPDATE config_form_tabs SET orderby = 5 where tabname='tab_psector' and formname='selector_basic';
+UPDATE config_form_tabs SET orderby = 4 where tabname='tab_sector' and formname='selector_basic';
