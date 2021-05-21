@@ -297,7 +297,7 @@ BEGIN
 	RAISE NOTICE '13 - Valve status (274), to_arc (368), pressure (275), curve_id (276), coef_loss (277), flow (278)';
 
 	-- status (274)
-	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE status IS NULL;
+	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE status IS NULL AND state > 0;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '274', concat(
@@ -557,7 +557,8 @@ BEGIN
 	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_2 = node_id ) a
 	GROUP BY node_id
 	HAVING count(*)>2)b
-	JOIN node USING (node_id);
+	JOIN node USING (node_id)
+	WHERE node.state > 0;
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=293 AND cur_user=current_user;
 	IF v_count > 0 THEN
