@@ -70,7 +70,7 @@ BEGIN
 	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
-
+	
 	-- update child param for inp_inlet
 	UPDATE temp_node SET addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
@@ -86,6 +86,24 @@ BEGIN
 	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
+
+	-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
+	UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
+	SELECT node_id FROM (
+	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+	UNION
+	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+	group by node_id
+	HAVING count(sector_id)=1);
+
+	-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
+	UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
+	SELECT node_id FROM (
+	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+	UNION
+	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+	group by node_id
+	HAVING count(sector_id)>1);
 
 
 	raise notice 'inserting arcs on temp_arc table';
