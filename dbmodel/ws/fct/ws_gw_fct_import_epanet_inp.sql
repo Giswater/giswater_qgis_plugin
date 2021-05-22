@@ -626,8 +626,6 @@ BEGIN
 		RAISE NOTICE 'step-6/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometries -> Done');
 
-
-
 		-- Enable constraints
 		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
@@ -681,6 +679,7 @@ BEGIN
 		UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;
 		UPDATE node SET presszone_id = '1' WHERE presszone_id is null;
 		UPDATE arc SET presszone_id = '1' WHERE presszone_id is null;
+		UPDATE config_param_user SET value = null WHERE parameter = 'inp_options_pattern';
 		
 		INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
