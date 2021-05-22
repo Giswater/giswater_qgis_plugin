@@ -23,15 +23,16 @@ BEGIN
 		ON CONFLICT (id) DO NOTHING;
 
 		-- after insert
-		UPDATE ext_raster_dem SET envelope  =  (
-					SELECT ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast),
-					ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast), SRID_VALUE)) WHERE id = NEW.id;
-		RETURN NEW;
+		UPDATE raster_dem2 SET envelope =  
+			ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),
+								 ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast), ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast),
+								 ST_SRID(NEW.rast)) 
+		WHERE id = NEW.id;
 				
     ELSIF TG_OP = 'DELETE' THEN  
 
 		-- after delete and only if it's last row for that raster
-		IF (SELECT count(*) FROM ext_raster_dem WHERE rastercat_id=OLD.rastercat_id) = 0 THEN
+		IF (SELECT count(*) FROM ext_raster_dem WHERE rastercat_id = OLD.rastercat_id) = 0 THEN
 	 		DELETE FROM ext_cat_raster WHERE id = OLD.rastercat_id;		
 	 	END IF;
 	 	
