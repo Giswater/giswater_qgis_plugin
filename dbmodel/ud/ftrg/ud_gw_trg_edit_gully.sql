@@ -558,8 +558,8 @@ BEGIN
 			ELSE
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
-				
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
+
+				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='GULLY' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL THEN				
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';

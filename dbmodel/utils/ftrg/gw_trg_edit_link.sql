@@ -246,6 +246,8 @@ BEGIN
 		
 			NEW.exit_type='VNODE';
 			NEW.exit_id=v_node_id;
+			v_pjoint_id = v_node_id;
+			v_pjoint_type = 'VNODE';
 			v_end_state= (SELECT state FROM arc WHERE arc_id = v_arc.arc_id);
 			v_expl_id = v_arc.expl_id;
 			v_arc_id = v_arc.arc_id;
@@ -591,9 +593,9 @@ BEGIN
 
 		-- update arc_id of connect
 		IF OLD.feature_type='CONNEC' THEN
-			UPDATE connec SET arc_id=NULL WHERE connec_id = OLD.feature_id;
+			UPDATE connec SET arc_id=NULL, pjoint_id=NULL, pjoint_type = NULL WHERE connec_id = OLD.feature_id;
 		ELSIF OLD.feature_type='GULLY' THEN
-			UPDATE gully SET arc_id=NULL WHERE gully_id = OLD.feature_id;
+			UPDATE gully SET arc_id=NULL, pjoint_id=NULL, pjoint_type = NULL WHERE gully_id = OLD.feature_id;
 		END IF;
 
 		RETURN NULL;
