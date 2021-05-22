@@ -23,11 +23,13 @@ BEGIN
 		ON CONFLICT (id) DO NOTHING;
 
 		-- after insert
-		UPDATE raster_dem2 SET envelope =  
+		UPDATE ext_raster_dem SET envelope =  
 			ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),
 								 ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast), ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast),
 								 ST_SRID(NEW.rast)) 
 		WHERE id = NEW.id;
+		
+		RETURN NEW;
 				
     ELSIF TG_OP = 'DELETE' THEN  
 
