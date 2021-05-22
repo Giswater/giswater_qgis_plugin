@@ -38,3 +38,6 @@ WHERE id='exploitation';
 --2021/05/21
 UPDATE config_form_tabs SET orderby = 5 where tabname='tab_psector' and formname='selector_basic';
 UPDATE config_form_tabs SET orderby = 4 where tabname='tab_sector' and formname='selector_basic';
+
+--2021/05/22
+UPDATE sys_feature_epa_type SET active=true WHERE id = 'INLET';
