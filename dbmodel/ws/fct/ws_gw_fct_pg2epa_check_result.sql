@@ -175,6 +175,10 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of Presspump (Double-n2a): ', v_doublen2a));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
 
+	UPDATE rpt_cat_result SET 
+	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Demand type": "', v_demandtypeval, '", "Pattern method": "', v_patternmethodval, '"}')::json
+	WHERE result_id = v_result_id;
+
 	IF v_checkresult THEN
 	
 		IF v_default::boolean THEN

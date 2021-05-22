@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/05/11
 ALTER TABLE plan_price ADD CONSTRAINT plan_price_unit_check CHECK (unit::text = ANY (ARRAY['kg','m','m2','m3','pa', 't', 'u']::text[]));
+
+-- 2021/05/22 
+ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_status_check CHECK (status = ANY (ARRAY[1, 2]));

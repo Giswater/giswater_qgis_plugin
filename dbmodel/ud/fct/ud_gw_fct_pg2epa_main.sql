@@ -91,7 +91,7 @@ BEGIN
 
 	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
 	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
+	INSERT INTO rpt_cat_result (result_id, inp_options, status) VALUES (v_result, v_inpoptions, 1);
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 

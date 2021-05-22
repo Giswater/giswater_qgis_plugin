@@ -74,6 +74,7 @@ v_advanced boolean;
 v_advancedval text;
 v_default boolean;
 v_defaultval text;
+v_dwfscenarioval text;
 
 BEGIN
 
@@ -112,6 +113,7 @@ BEGIN
 	-- get user parameters
 	v_hydroscenario = (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user);
 	v_hydroscenarioval = (SELECT name FROM selector_inp_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user);
+	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
 
 	-- get settings values
 	v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
@@ -147,8 +149,12 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Hidrology scenario: ', v_hydroscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, 
-	concat('DWF scenario: ',(SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user)));
+	concat('DWF scenario: ',));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));
+
+	UPDATE rpt_cat_result SET 
+	export_options = concat('{"Hydrology scenario": "', v_hydroscenarioval,'", "DWF scenario":"',v_dwfscenarioval,'"}')::json
+	WHERE result_id = v_result_id;
 
 	IF v_checkresult THEN
 

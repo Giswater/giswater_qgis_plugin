@@ -215,4 +215,20 @@ CREATE OR REPLACE VIEW v_price_x_catsoil AS
      JOIN v_price_compost price_m3exc ON cat_soil.m3exc_cost::text = price_m3exc.id::text
      JOIN v_price_compost price_m3fill ON cat_soil.m3fill_cost::text = price_m3fill.id::text
      JOIN v_price_compost price_m3excess ON cat_soil.m3excess_cost::text = price_m3excess.id::text
-     LEFT JOIN v_price_compost price_m2trenchl ON cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text
+     LEFT JOIN v_price_compost price_m2trenchl ON cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text;
+	 
+	 
+DROP VIEW v_ui_rpt_cat_result;
+
+CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS 
+ SELECT rpt_cat_result.result_id,
+    rpt_cat_result.cur_user,
+    rpt_cat_result.exec_date,
+    idval as status,
+    rpt_cat_result.export_options,
+    rpt_cat_result.network_stats,
+    rpt_cat_result.inp_options,
+    rpt_cat_result.rpt_stats
+   FROM rpt_cat_result
+  JOIN inp_typevalue ON status::text = id
+  WHERE typevalue = 'inp_result_status';

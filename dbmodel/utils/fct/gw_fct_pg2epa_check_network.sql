@@ -49,6 +49,8 @@ v_count integer = 0;
 v_min float;
 v_max float;
 v_version text;
+v_networkstats json;
+v_sumlength numeric (12,2);
 
 BEGIN
 	-- Search path
@@ -360,6 +362,11 @@ BEGIN
 	RAISE NOTICE '6 - Stats';
 	
 	IF v_project_type =  'WS' THEN
+
+		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		concat('Total length (Km) : ',v_sumlength,'.'));
+	
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
@@ -375,8 +382,14 @@ BEGIN
 		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
+
+		v_networkstats = concat('{"Total length (Km) ":"',v_sumlength,'"}');
 		
 	ELSIF v_project_type  ='UD' THEN
+
+		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		concat('Total length (Km) : ',v_sumlength,'.'));
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
@@ -401,9 +414,12 @@ BEGIN
 		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
-	END IF;
-	
 
+		v_networkstats = '{"Total length (Km) ":',v_sumlength,'}';
+	END IF;
+
+	UPDATE rpt_cat_result SET network_stats = v_networkstats WHERE result_id = v_result_id;
+	
 	-- insert spacers on log	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, '');
@@ -464,9 +480,9 @@ BEGIN
 	    '}')::json, 2680, null, null, null);
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

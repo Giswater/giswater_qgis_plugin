@@ -60,3 +60,17 @@ true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 -- 2021/05/06
 DELETE FROM sys_function WHERE id=2878 AND function_name='gw_fct_getvisitsfromfeature';
+
+-- 2021/05/22
+INSERT INTO inp_typevalue VALUES ('inp_result_status', '1', 'PARTIAL');
+INSERT INTO inp_typevalue VALUES ('inp_result_status', '2', 'COMPLETED');
+
+DELETE FROM config_form_tableview WHERE tablename = 'v_ui_rpt_cat_result';
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'result_id', 0, true, 75);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'cur_user', 1, true);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'exec_date', 2, true);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'status', 3, true);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'export_options', 4, true, 150);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'network_stats', 5, true);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'inp_options', 6, true);
+INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'rpt_stats', 7, true);

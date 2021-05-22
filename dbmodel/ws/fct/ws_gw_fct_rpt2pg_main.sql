@@ -54,6 +54,9 @@ BEGIN
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main (result_id, cur_user) VALUES (v_result, current_user);
 
+	-- update rpt_cat_result
+	UPDATE rpt_cat_result SET exec_date = now(), cur_user = current_user , status = 2 WHERE result_id = v_result;
+
 	-- create log message
 	RETURN gw_fct_rpt2pg_log(v_result, v_import);
 	

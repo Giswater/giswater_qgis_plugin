@@ -151,7 +151,7 @@ BEGIN
 
 	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM audit_check_data WHERE result_id='stats' AND fid=114 AND cur_user=current_user);
 
-	UPDATE rpt_cat_result SET stats = v_stats WHERE result_id=p_result;
+	UPDATE rpt_cat_result SET rpt_stats = v_stats WHERE result_id=p_result;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 	SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
