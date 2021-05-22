@@ -379,7 +379,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	IF v_patternmethod IN (11,12,13,21,22,31,33,41,43) THEN
+	IF v_patternmethod IN (11,12,13,21,22,23, 31,33,41,43) THEN
 
 		-- move patterns from inp_pattern_value to rpt_pattern_value
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
