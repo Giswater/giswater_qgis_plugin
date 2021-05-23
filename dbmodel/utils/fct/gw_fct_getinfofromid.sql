@@ -280,8 +280,6 @@ BEGIN
 		EXECUTE v_querystring INTO v_forminfo;
         END IF;
             
-	RAISE NOTICE 'Form number: %', v_forminfo;
-
 	-- Get feature type
 	v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
 	v_debug_vars := json_build_object('v_tablename', v_tablename);
@@ -308,67 +306,96 @@ BEGIN
 	-- Control NULL's
 	v_vdefault_array := COALESCE(v_vdefault_array, '[]'); 
 	
+	-- getting source table in order to enhance performance
+	IF v_tablename LIKE 'v_edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
+	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
+	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
+	ELSE v_sourcetable = v_tablename;
+	END IF;
+
 	-- Get id column
-	v_querystring = concat('SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ',quote_nullable(v_tablename),'::regclass AND i.indisprimary');
-	v_debug_vars := json_build_object('v_tablename', v_tablename);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 80);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_idname;
-	
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_sourcetable;
+
 	-- For views it suposse pk is the first column
 	IF v_idname ISNULL THEN
-		v_querystring = concat('
+		EXECUTE '
 		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = ',quote_nullable(v_tablename),' 
-		AND s.nspname = ',quote_nullable(v_schemaname),'
-		ORDER BY a.attnum LIMIT 1');
-		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_schemaname', v_schemaname);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 90);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_idname;
+		AND t.relname = $1 
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING v_sourcetable, v_schemaname;
 	END IF;
 
 	-- Get id column type
-	v_querystring = concat('SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 		JOIN pg_class t on a.attrelid = t.oid
 		JOIN pg_namespace s on t.relnamespace = s.oid
 		WHERE a.attnum > 0 
 		AND NOT a.attisdropped
-		AND a.attname = ',quote_nullable(v_idname),'
-		AND t.relname = ',quote_nullable(v_tablename),' 
-		AND s.nspname = ',quote_nullable(v_schemaname),'
-		ORDER BY a.attnum');
-	v_debug_vars := json_build_object('v_idname', v_idname, 'v_tablename', v_tablename, 'v_schemaname', v_schemaname);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 100);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO column_type;
+		AND a.attname = $3
+		AND t.relname = $2 
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+			USING v_schemaname, v_sourcetable, v_idname
+			INTO column_type;
 
 	-- Get geometry_column
-	v_querystring = concat('SELECT attname FROM pg_attribute a        
-            JOIN pg_class t on a.attrelid = t.oid
-            JOIN pg_namespace s on t.relnamespace = s.oid
-            WHERE a.attnum > 0 
-            AND NOT a.attisdropped
-            AND t.relname = ',quote_nullable(v_tablename),'
-            AND s.nspname = ',quote_nullable(v_schemaname),'
-            AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-            ORDER BY a.attnum
-			LIMIT 1');
-	v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_schemaname', v_schemaname);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 110);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_the_geom;
-           
+	EXECUTE 'SELECT attname FROM pg_attribute a        
+	    JOIN pg_class t on a.attrelid = t.oid
+	    JOIN pg_namespace s on t.relnamespace = s.oid
+	    WHERE a.attnum > 0 
+	    AND NOT a.attisdropped
+	    AND t.relname = $1
+	    AND s.nspname = $2
+	    AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+	    ORDER BY a.attnum
+		LIMIT 1'
+		INTO v_the_geom
+		USING v_sourcetable, v_schemaname;
+
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-		v_querystring = concat('SELECT row_to_json(row) FROM (SELECT St_AsText(',quote_ident(v_the_geom),') FROM ',quote_ident(v_tablename),' WHERE ',quote_ident(v_idname),' = CAST(',quote_nullable(v_id),' AS ',(column_type),'))row');
-		v_debug_vars := json_build_object('v_the_geom', v_the_geom, 'v_tablename', v_tablename, 'v_idname', v_idname, 'v_id', v_id, 'column_type', column_type);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 120);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_geometry;
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
+		INTO v_geometry;
 	END IF;
-	
-	
+
+	IF v_tablename != v_sourcetable THEN
+
+		-- Get id column for tablename
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+			INTO v_idname
+			USING v_tablename;
+
+		-- For views it suposse pk is the first column
+		IF v_idname ISNULL THEN
+			EXECUTE '
+			SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+			AND t.relname = $1 
+			AND s.nspname = $2
+			ORDER BY a.attnum LIMIT 1'
+			INTO v_idname
+			USING v_tablename, v_schemaname;
+		END IF;
+
+		-- Get id column type
+		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+			JOIN pg_class t on a.attrelid = t.oid
+			JOIN pg_namespace s on t.relnamespace = s.oid
+			WHERE a.attnum > 0 
+			AND NOT a.attisdropped
+			AND a.attname = $3
+			AND t.relname = $2 
+			AND s.nspname = $1
+			ORDER BY a.attnum'
+				USING v_schemaname, v_tablename, v_idname
+				INTO column_type;
+	END IF;
+			
 	-- Get tabs for form
 	IF v_isgrafdelimiter THEN 
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
@@ -424,9 +451,9 @@ BEGIN
 	END IF;
 
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
-        IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
+	IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
         	
-        	IF v_isgrafdelimiter THEN 
+        IF v_isgrafdelimiter THEN 
 			-- Get form_tabs
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
 				tabfunction as "tabFunction", b.tab as tabActions  
@@ -484,7 +511,7 @@ BEGIN
 	END IF;
 	
 	-- Check if it is parent table 
-        IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
+    IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
 
@@ -546,7 +573,6 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_tablename;
 		END IF;
-					
 
 	-- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
 	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE) THEN 
@@ -694,7 +720,6 @@ BEGIN
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
 		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json);
 
-
 	v_tablename:= (to_json(v_tablename));
 	v_table_parent:= (to_json(v_table_parent));
 
@@ -708,7 +733,7 @@ BEGIN
 		v_message='{"level":0, "text":"No feature found", "results":0}';
 	END IF;
 
-    	--    Control NULL's
+	--    Control NULL's
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
 	v_linkpath := COALESCE(v_linkpath, '{}');
