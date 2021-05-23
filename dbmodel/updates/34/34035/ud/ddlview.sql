@@ -674,24 +674,3 @@ CREATE OR REPLACE VIEW v_edit_review_connec AS
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
-
-
-CREATE OR REPLACE VIEW vp_basic_arc AS 
-SELECT arc_id AS nid,
-arc_type AS custom_type
-FROM arc;
-
-CREATE OR REPLACE VIEW vp_basic_connec AS 
-SELECT connec_id AS nid,
-connec_type AS custom_type
-FROM connec;
-
-CREATE OR REPLACE VIEW vp_basic_gully AS 
-SELECT gully_id AS nid,
-gully_type AS custom_type
-FROM gully;
-
-CREATE OR REPLACE VIEW vp_basic_node AS 
-SELECT node_id AS nid,
-node_type AS custom_type
-FROM node;
