@@ -336,3 +336,23 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
 
+
+CREATE OR REPLACE VIEW vp_basic_arc AS 
+SELECT arc_id AS nid,
+arctype_id AS custom_type
+FROM arc
+JOIN cat_arc ON id=arccat_id;
+
+
+CREATE OR REPLACE VIEW vp_basic_node AS 
+SELECT node_id AS nid,
+nodetype_id AS custom_type
+FROM node
+JOIN cat_node ON id=nodecat_id;
+
+
+CREATE OR REPLACE VIEW vp_basic_connec AS 
+SELECT connec_id AS nid,
+connectype_id AS custom_type
+FROM connec
+JOIN cat_connec ON id=connecat_id;
