@@ -41,3 +41,6 @@ UPDATE config_form_tabs SET orderby = 4 where tabname='tab_sector' and formname=
 
 --2021/05/22
 UPDATE sys_feature_epa_type SET active=true WHERE id = 'INLET';
+
+--2021/05/24
+DELETE FROM ws_sample35.sys_table WHERE id IN ('vp_epa_node','vp_epa_arc');
