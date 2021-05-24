@@ -232,3 +232,8 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
    FROM rpt_cat_result
   JOIN inp_typevalue ON status::text = id
   WHERE typevalue = 'inp_result_status';
+
+
+--2021/05/24
+DROP VIEW IF EXISTS vp_epa_arc;
+DROP VIEW IF EXISTS vp_epa_node;
