@@ -70,6 +70,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${"client":{"device":4, "infoType":1, "
 DECLARE
 
 v_tablename character varying;
+v_sourcetable character varying;
 v_tablename_original character varying;
 v_id character varying;
 v_inputgeometry public.geometry;
