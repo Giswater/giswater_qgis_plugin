@@ -44,3 +44,14 @@ UPDATE sys_feature_epa_type SET active=true WHERE id = 'INLET';
 
 --2021/05/24
 DELETE FROM ws_sample35.sys_table WHERE id IN ('vp_epa_node','vp_epa_arc');
+
+INSERT INTO cat_mat_arc SELECT * FROM cat_mat_node WHERE id in (select matcat_id from cat_connec) 
+and id not in (select matcat_id from cat_arc);
+
+DELETE FROM cat_mat_node WHERE id in (select matcat_id from cat_connec) AND id not in (select matcat_id from cat_node);
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, descript AS idval FROM cat_mat_arc WHERE id IS NOT NULL' 
+WHERE columnname='matcat_id' AND formname='cat_connec';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id AS idval FROM cat_mat_arc' 
+WHERE columnname='matcat_id' AND formname ilike 've_connec%';
