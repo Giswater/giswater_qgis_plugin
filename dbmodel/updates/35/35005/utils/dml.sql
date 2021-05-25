@@ -43,7 +43,7 @@ UPDATE config_form_tabs SET orderby = 4 where tabname='tab_sector' and formname=
 UPDATE sys_feature_epa_type SET active=true WHERE id = 'INLET';
 
 --2021/05/24
-DELETE FROM ws_sample35.sys_table WHERE id IN ('vp_epa_node','vp_epa_arc');
+DELETE FROM sys_table WHERE id IN ('vp_epa_node','vp_epa_arc');
 
 INSERT INTO cat_mat_arc SELECT * FROM cat_mat_node WHERE id in (select matcat_id from cat_connec) 
 and id not in (select matcat_id from cat_arc);
