@@ -83,7 +83,7 @@ class GwVisit(QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
-        self.dlg_add_visit = GwVisitUi(tag) if global_vars.info_templates['visit'] is None else global_vars.info_templates['visit']
+        self.dlg_add_visit = GwVisitUi(tag)
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
@@ -248,9 +248,6 @@ class GwVisit(QObject):
                     for layer in self.layers[self.feature_type]:
                         box = layer.boundingBoxOfSelected()
                         self._zoom_box(box)
-
-        if global_vars.info_templates['visit'] is None:
-            global_vars.info_templates['visit'] = self.dlg_add_visit
 
         # Open the dialog
         if open_dlg:
