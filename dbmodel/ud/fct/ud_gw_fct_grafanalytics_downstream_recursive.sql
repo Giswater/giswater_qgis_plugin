@@ -65,7 +65,7 @@ BEGIN
     IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
-        v_message = 'Arc fusion done successfully';
+        v_message = 'Process done successfully';
     ELSE
 
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
