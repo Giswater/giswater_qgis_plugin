@@ -890,9 +890,9 @@ BEGIN
 	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 9'
 	INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, node_1, node_2, descript, the_geom, expl_id)
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, node_2, descript, the_geom, expl_id)
 		SELECT 372, t.arc_id, t.node_1, t.node_2, concat(''Operative arcs with wrong topology. Proposed nodes: {node_1:'',t.node_1,'', node_2:'', t.node_2, ''}''), a.the_geom, a.expl_id 
-		FROM temp_arc t JOIN arc a USING(arc_id) WHERE t.state = 9');
+		FROM temp_arc t JOIN arc a USING(arc_id) WHERE t.state = 9'	;
 		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
 		VALUES (125, 3, '372', concat('ERROR-372: There is/are ',v_count,' operative arcs with wrong topology.'),v_count);
 	ELSE
