@@ -30,7 +30,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_config
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 
@@ -3079,7 +3079,22 @@ class GwAdminButton:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self._set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self._set_credentials, self.dlg_credentials, new_connection=True))
+        self.dlg_credentials.cmb_sslmode.currentIndexChanged.connect(
+            partial(self._set_user_sslmode))
+
+        sslmode_list = [['disable', 'disable'], ['allow', 'allow'], ['prefer', 'prefer'], ['require', 'require'],
+                        ['verify - ca', 'verify - ca'], ['verify - full', 'verify - full']]
+        tools_qt.fill_combo_values(self.dlg_credentials.cmb_sslmode, sslmode_list, 0)
+        sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
+
         tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
+
+
+    def _set_user_sslmode(self):
+
+        sslmode = tools_qt.get_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 1)
+        tools_config.set_config_parser_value('system', 'sslmode', sslmode.strip("'"))
 
 
     def _manage_user_params(self):
