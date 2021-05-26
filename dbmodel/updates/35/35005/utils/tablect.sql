@@ -13,3 +13,7 @@ ALTER TABLE plan_price ADD CONSTRAINT plan_price_unit_check CHECK (unit::text = 
 
 -- 2021/05/22 
 ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_status_check CHECK (status = ANY (ARRAY[1, 2]));
+
+ALTER TABLE cat_connec ADD CONSTRAINT cat_connec_matcat_id_fkey FOREIGN KEY (matcat_id)
+REFERENCES cat_mat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+

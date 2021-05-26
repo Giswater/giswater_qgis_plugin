@@ -45,6 +45,8 @@ UPDATE sys_feature_epa_type SET active=true WHERE id = 'INLET';
 --2021/05/24
 DELETE FROM sys_table WHERE id IN ('vp_epa_node','vp_epa_arc');
 
+ALTER TABLE cat_connec DROP CONSTRAINT IF EXISTS cat_connec_matcat_id_fkey;
+
 INSERT INTO cat_mat_arc SELECT * FROM cat_mat_node WHERE id in (select matcat_id from cat_connec) 
 and id not in (select matcat_id from cat_arc);
 
