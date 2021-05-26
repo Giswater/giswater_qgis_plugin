@@ -31,12 +31,12 @@ def create_list_for_completer(sql):
 def check_table(tablename, schemaname=None):
     """ Check if selected table exists in selected schema """
 
-    if schemaname is None:
+    if schemaname in (None, 'null'):
         schemaname = global_vars.schema_name
-        if schemaname is None:
-            get_layer_source_from_credentials('disable')
+        if schemaname in (None, 'null'):
+            get_layer_source_from_credentials('prefer')
             schemaname = global_vars.schema_name
-            if schemaname is None:
+            if schemaname in (None, 'null'):
                 return None
 
     schemaname = schemaname.replace('"', '')
@@ -159,7 +159,7 @@ def set_database_connection():
     global_vars.session_vars['logged_status'] = False
     global_vars.current_user = None
 
-    layer_source, not_version = get_layer_source_from_credentials('disable')
+    layer_source, not_version = get_layer_source_from_credentials('prefer')
     if layer_source:
         if layer_source['service'] is None and (layer_source['db'] is None or layer_source['host'] is None or
                                                 layer_source['user'] is None or layer_source['password'] is None or

@@ -2264,7 +2264,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
-    rows = tools_db.get_rows(sql, log_info=False)
+    rows = tools_db.get_rows(sql)
+
     if not rows:
         return
 
@@ -2354,6 +2355,7 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
 def load_tablename(dialog, table_object, feature_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
+    widget_name = None
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
@@ -2369,6 +2371,8 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         return None
     table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
+    if widget_name is not None:
+        set_tablemodel_config(dialog, widget_name, table_name)
     return expr
 
 

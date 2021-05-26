@@ -137,7 +137,7 @@ class GwGisFileCreate:
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 
-        layer_source, not_version = tools_db.get_layer_source_from_credentials('disable')
+        layer_source, not_version = tools_db.get_layer_source_from_credentials('prefer')
         if layer_source is None:
             tools_qgis.show_warning("Error getting database parameters")
             return False
