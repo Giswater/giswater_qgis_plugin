@@ -38,7 +38,10 @@ class GwConfigButton(GwAction):
     def _open_config(self):
 
         # Get user and role
+        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
+            super_users = f"{super_users}, {global_vars.current_user}"
         cur_user = tools_db.get_current_user()
 
         self.list_update = []

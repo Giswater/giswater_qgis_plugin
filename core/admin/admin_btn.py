@@ -435,7 +435,10 @@ class GwAdminButton:
 
         # Manage super users
         self.super_users = []
+        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
+            super_users = f"{super_users}, {global_vars.current_user}"
         if super_users:
             super_users = super_users.split(',')
             for super_user in super_users:
