@@ -272,15 +272,16 @@ BEGIN
 		ELSE 
 			v_orderby='idval';
 		END IF;	
-
+		
 		-- Get combo id's
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
 			
-			v_querystring = concat('SELECT (array_agg(id)) FROM (', (aux_json->>'queryText') ,(aux_json->>'queryTextFilter'),'::text = ',quote_literal(v_selected_id)
+			v_querystring = concat('SELECT (array_agg(id)) FROM (', (aux_json->>'queryText') ,' ',(aux_json->>'queryTextFilter'),'::text = ',quote_literal(v_selected_id)
 			,' ORDER BY ',v_orderby,') a');
 			v_debug_vars := json_build_object('aux_json->>''queryText''', (aux_json->>'queryText'), 'aux_json->>''queryTextFilter''', (aux_json->>'queryTextFilter'), 'v_selected_id', v_selected_id, 'v_orderby', v_orderby);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+			
 			EXECUTE v_querystring INTO v_array;
 		ELSE 	
 			v_querystring = concat('SELECT (array_agg(id)) FROM (',(aux_json->>'queryText'),' ORDER BY ',v_orderby,')a');
@@ -290,7 +291,7 @@ BEGIN
 			EXECUTE v_querystring INTO v_array;
 			
 		END IF;
-
+		
 		-- set false the editability
 		v_editability = replace (((aux_json->>'widgetcontrols')::json->>'enableWhenParent'), '[', '{');
 		v_editability = replace (v_editability, ']', '}');
@@ -309,7 +310,7 @@ BEGIN
 		
 		-- Get combo values
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
-			v_querystring = concat('SELECT (array_agg(idval)) FROM (', (aux_json->>'queryText') ,(aux_json->>'queryTextFilter'),'::text = ',quote_literal(v_selected_id)
+			v_querystring = concat('SELECT (array_agg(idval)) FROM (', (aux_json->>'queryText') , ' ' ,(aux_json->>'queryTextFilter'),'::text = ',quote_literal(v_selected_id)
 			,' ORDER BY ',v_orderby,') a');
 			v_debug_vars := json_build_object('aux_json->>''queryText''', (aux_json->>'queryText'), 'aux_json->>''queryTextFilter''', (aux_json->>'queryTextFilter'), 'v_selected_id', v_selected_id, 'v_orderby', v_orderby);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 80);
