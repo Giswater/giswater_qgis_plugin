@@ -57,3 +57,8 @@ WHERE columnname='matcat_id' AND formname='cat_connec';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id AS idval FROM cat_mat_arc' 
 WHERE columnname='matcat_id' AND formname ilike 've_connec%';
+
+--2021/05/28
+UPDATE config_form_fields set dv_querytext=concat(dv_querytext,' ')
+where (formname ilike 've_arc%' or formname ilike 've_node%' or formname ilike 've_connec%' or formname ilike 've_gully%') 
+and concat(dv_querytext,dv_querytext_filterc) ilike '%NULLAND%';
