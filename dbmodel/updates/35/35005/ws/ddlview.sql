@@ -105,3 +105,13 @@ CREATE OR REPLACE VIEW v_edit_presszone AS
     presszone.active
    FROM selector_expl, presszone
   WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW ve_pol_fountain AS 
+ SELECT man_fountain.pol_id,
+    connec.connec_id,
+    polygon.the_geom
+   FROM connec
+   JOIN v_state_connec USING (connec_id) 
+   JOIN man_fountain ON man_fountain.connec_id::text = connec.connec_id::text
+   JOIN polygon ON polygon.pol_id::text = man_fountain.pol_id::text;
