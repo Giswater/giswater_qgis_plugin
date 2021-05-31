@@ -80,7 +80,7 @@ class GwAutoMincutTask(GwTask):
         # If sql function return null
         elif self.complet_result is None:
             self.task_finished.emit([False, self.complet_result])
-            msg = f"Error. Data base return null. Check postgres function 'gw_fct_setmincut'"
+            msg = f"Error. Database returned null. Check postgres function 'gw_fct_setmincut'"
             tools_log.log_warning(msg)
 
         # Handle python exception

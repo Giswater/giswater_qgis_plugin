@@ -334,7 +334,10 @@ class GwCSVButton(GwAction):
     def _get_rolenames(self):
         """ Get list of rolenames of current user """
 
+        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
+            super_users = f"{super_users}, {global_vars.current_user}"
         if global_vars.current_user in super_users:
             roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
         else:

@@ -424,7 +424,7 @@ class GwSearch:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
 
-            # Get list of items from returned json from data base and make a list for completer
+            # Get list of items from returned json from database and make a list for completer
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
@@ -433,6 +433,9 @@ class GwSearch:
         if len(line_list) == 2:
             line_edit_add = line_list[1]
             value = tools_qt.get_text(self.dlg_search, line_edit_add)
+            if str(value) in display_list:
+                line_edit.setText(value)
+                return
             if str(value) == 'null':
                 return
 

@@ -21,7 +21,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 from .catalog import GwCatalog
@@ -600,7 +600,6 @@ class GwInfo(QObject):
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
-        my_json = self.my_json
         if layer:
             if layer.isEditable():
                 tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
@@ -610,7 +609,7 @@ class GwInfo(QObject):
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, my_json, new_feature)
+        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, self.my_json, new_feature)
         self.fct_start_editing = lambda: self._start_editing(dlg_cf, action_edit, complet_result['body']['data'], layer)
         self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
         self._connect_signals()
@@ -663,6 +662,8 @@ class GwInfo(QObject):
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
         dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+
+        dlg_cf.dlg_closed.connect(partial(self._reset_my_json))
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -721,7 +722,7 @@ class GwInfo(QObject):
     def _connect_signals(self):
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
+            # self.layer.editingStopped.connect(self.fct_stop_editing)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').triggered.connect(self.fct_block_action_edit)
             self.connected = True
 
@@ -1238,12 +1239,12 @@ class GwInfo(QObject):
             save = self._ask_for_save(action_edit, fid)
             if save:
                 self._manage_accept(dialog, action_edit, new_feature, self.my_json, False)
-                self.my_json = {}
             elif self.new_feature_id is not None:
                 if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
+            self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
@@ -1257,6 +1258,7 @@ class GwInfo(QObject):
             return
 
         self._manage_accept(dialog, action_edit, new_feature, my_json, True)
+        self._reset_my_json()
 
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
@@ -1272,31 +1274,29 @@ class GwInfo(QObject):
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
 
         if my_json == '' or str(my_json) == '{}':
-            self._disconnect_signals()
-            # Use commitChanges just for closse edition
-            layer.commitChanges()
-            self._connect_signals()
+            QgsProject.instance().blockSignals(True)
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
-            self._connect_signals()
+            QgsProject.instance().blockSignals(False)
         else:
             save = self._ask_for_save(action_edit, fid)
             if save:
+                self._reset_my_json()
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-
+            self._reset_my_json()
             return save
 
 
     def _start_editing(self, dialog, action_edit, result, layer):
 
-        self._disconnect_signals()
+        QgsProject.instance().blockSignals(True)
         self.iface.setActiveLayer(layer)
         tools_qt.set_action_checked(action_edit, True)
         tools_gw.enable_all(dialog, self.complet_result['body']['data'])
         self._enable_actions(dialog, True)
         layer.startEditing()
-        self._connect_signals()
+        QgsProject.instance().blockSignals(True)
 
 
     def _ask_for_save(self, action_edit, fid):
@@ -1623,7 +1623,7 @@ class GwInfo(QObject):
         :return: (boolean)
         """
 
-        self._disconnect_signals()
+        QgsProject.instance().blockSignals(True)
 
         # Check if C++ object has been deleted
         if isdeleted(dialog):
@@ -1661,7 +1661,7 @@ class GwInfo(QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg)
             tools_qt.set_action_checked("actionEdit", True, dialog)
-            self._connect_signals()
+            QgsProject.instance().blockSignals(False)
             return False
 
         # If we create a new feature
@@ -1680,9 +1680,9 @@ class GwInfo(QObject):
             if status is False:
                 error = self.layer_new_feature.commitErrors()
                 tools_log.log_warning(f"{error}")
-                self._connect_signals()
+                QgsProject.instance().blockSignals(False)
                 return False
-            
+
             self.new_feature_id = None
             self._enable_action(dialog, "actionZoom", True)
             self._enable_action(dialog, "actionZoomOut", True)
@@ -1714,11 +1714,13 @@ class GwInfo(QObject):
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
-            self._connect_signals()
+            QgsProject.instance().blockSignals(False)
             return False
 
         if clear_json:
             _json = {}
+
+        self._reset_my_json()
 
         if "Accepted" in json_result['status']:
             msg = "OK"
@@ -1726,7 +1728,7 @@ class GwInfo(QObject):
             self._reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-            self._connect_signals()
+            QgsProject.instance().blockSignals(False)
             return False
 
         if close_dlg:
@@ -1859,6 +1861,12 @@ class GwInfo(QObject):
             self.my_json.pop(str(widget.property('columnname')), None)
         except KeyError:
             pass
+
+
+    def _reset_my_json(self):
+        """ Delete keys if exist, when widget is autoupdate """
+
+        self.my_json = {}
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -2488,7 +2496,10 @@ class GwInfo(QObject):
 
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
-        self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+        if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
+            filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+            self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=True, column_filter=feature_key, value_filter=self.feature_id))
         self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
@@ -2513,10 +2524,7 @@ class GwInfo(QObject):
             tools_qgis.show_warning(message)
             return
 
-        # Set model of selected widget
-        if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
-            filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
-            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+        # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
             tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,

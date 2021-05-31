@@ -52,9 +52,10 @@ class GwArcAddButton(GwAction):
 
     def _check_reload(self):
         """ Check for reload button """
-        super_users = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
-        super_users = tools_os.set_boolean(super_users)
-        if super_users:
+
+        reload_cat_feature = tools_gw.get_config_parser('system', 'reload_cat_feature', 'project', 'giswater')
+        reload_cat_feature = tools_os.set_boolean(reload_cat_feature)
+        if reload_cat_feature:
             self._fill_arc_menu()
 
 

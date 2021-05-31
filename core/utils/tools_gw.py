@@ -922,7 +922,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setProperty('is_mandatory', field['isMandatory'])
                 else:
                     widget.setProperty('is_mandatory', True)
-                widget.setText(field['value'])
+                if 'value' in field:
+                    widget.setText(field['value'])
+                    widget.setProperty('value', field['value'])
                 if 'widgetcontrols' in field and field['widgetcontrols']:
                     if 'regexpControl' in field['widgetcontrols']:
                         if field['widgetcontrols']['regexpControl'] is not None:
@@ -1072,6 +1074,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
     real_name = widget.objectName()
@@ -1172,6 +1175,7 @@ def add_textarea(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
 
     # Set height as a function of text lines
     font = widget.document().defaultFont()
@@ -1205,6 +1209,7 @@ def add_hyperlink(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
@@ -1324,6 +1329,7 @@ def add_lineedit(field):
         widget.setPlaceholderText(field['placeholder'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
@@ -2258,7 +2264,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
-    rows = tools_db.get_rows(sql, log_info=False)
+    rows = tools_db.get_rows(sql)
+
     if not rows:
         return
 
@@ -2348,6 +2355,7 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
 def load_tablename(dialog, table_object, feature_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
+    widget_name = None
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
@@ -2363,6 +2371,8 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         return None
     table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
+    if widget_name is not None:
+        set_tablemodel_config(dialog, widget_name, table_name)
     return expr
 
 
@@ -2606,6 +2616,11 @@ def user_params_to_userconfig():
 
         # For each parameter (inventory)
         for parameter in parameters:
+
+            # Manage if parameter need prefix and project_type is not defined
+            if parameter.startswith("_") and global_vars.project_vars['project_type'] is None:
+                continue
+
             _pre = False
             inv_param = parameter
             # If it needs a prefix

@@ -174,7 +174,7 @@ class GwFeatureEndButton(GwAction):
 
         sql = "SELECT id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
+        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, True)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
@@ -236,11 +236,6 @@ class GwFeatureEndButton(GwAction):
         self.enddate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.enddate)
         self.workcatdate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.builtdate)
         self.description = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.descript, False, False)
-
-        if self.workcat_id_end in ('null', None):
-            message = "Please select a workcat id end"
-            tools_qgis.show_warning(message)
-            return
 
         self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
 
@@ -319,8 +314,10 @@ class GwFeatureEndButton(GwAction):
         id_list = "[" + id_list[:-2] + "]"
 
         feature = f'"featureType":"{feature_type}", "featureId":{id_list}'
-        extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
+        extras = f'"state_type":"{self.statetype_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
+        if self.workcat_id_end not in (None, 'null', ''):
+            extras += f', "workcat_id_end":"{self.workcat_id_end}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         tools_gw.execute_procedure('gw_fct_setendfeature', body)
 

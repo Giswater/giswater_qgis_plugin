@@ -269,7 +269,7 @@ class GwVisit(QObject):
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}")
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, table_object)
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
@@ -280,7 +280,7 @@ class GwVisit(QObject):
             table_object = "v_ui_om_visitman_x_" + str(feature_type)
             expr_filter = f"{feature_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, table_object, expr_filter)
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
@@ -631,19 +631,19 @@ class GwVisit(QObject):
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = f"{self.schema_name}.v_ui_om_event"
+        table_name = "v_ui_om_event"
         message = tools_qt.fill_table(self.tbl_event, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
-        self._set_configuration(dialog, self.tbl_event, table_name)
+        tools_gw.set_tablemodel_config(dialog, self.tbl_event, table_name)
         self._manage_events_changed()
 
         # D) load all related documents in the relative table
-        table_name = f"{self.schema_name}.v_ui_doc_x_visit"
+        table_name = "v_ui_doc_x_visit"
         message = tools_qt.fill_table(self.tbl_document, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
-        self._set_configuration(dialog, self.tbl_document, table_name)
+        tools_gw.set_tablemodel_config(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
         self._set_feature_type_by_visit_id()
@@ -918,14 +918,12 @@ class GwVisit(QObject):
         except Exception as e:
             tools_log.log_info(f"manage_feature_type_selected exception: {e}")
         finally:
-
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
                  self.dlg_add_visit, widget_table, False, False, None, None))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
-
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.feature_type) + "_id")
@@ -940,11 +938,10 @@ class GwVisit(QObject):
             return
 
         # configure model visibility
-        table_name = f"v_edit_{self.feature_type}"
-        self._set_configuration(dialog, "tbl_visit_x_arc", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_node", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_connec", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_gully", table_name)
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_arc", "v_edit_arc")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_node", "v_edit_node")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_connec", "v_edit_connec")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_gully", "v_edit_gully")
 
 
     def _event_feature_type_selected(self, dialog, feature_type=None):
@@ -1669,43 +1666,6 @@ class GwVisit(QObject):
         self.dlg_add_visit.tbl_document.model().select()
 
 
-    def _set_configuration(self, dialog, widget, table_name):
-        """ Configuration of tables. Set visibility and width of columns """
-
-        widget = tools_qt.get_widget(dialog, widget)
-        if not widget:
-            return
-
-        # Set width and alias of visible columns
-        columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, visible"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = tools_db.get_rows(sql, log_info=False)
-        if not rows:
-            return
-
-        for row in rows:
-            if not row['visible']:
-                columns_to_delete.append(row['columnindex'])
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['columnindex'], width)
-                widget.model().setHeaderData(
-                    row['columnindex'], Qt.Horizontal, row['alias'])
-
-        # Set order
-        widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
-        # Delete columns
-        for column in columns_to_delete:
-            widget.hideColumn(column)
-
-
     def _populate_position_id(self):
 
         self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
@@ -1761,7 +1721,7 @@ class GwVisit(QObject):
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit,  'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")

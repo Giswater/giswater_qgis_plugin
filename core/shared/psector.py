@@ -834,6 +834,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
                 tools_qgis.show_warning(message)
 

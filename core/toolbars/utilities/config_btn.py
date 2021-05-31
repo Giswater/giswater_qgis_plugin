@@ -17,7 +17,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 from .... import global_vars
 
 class GwConfigButton(GwAction):
@@ -38,7 +38,10 @@ class GwConfigButton(GwAction):
     def _open_config(self):
 
         # Get user and role
+        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
+            super_users = f"{super_users}, {global_vars.current_user}"
         cur_user = tools_db.get_current_user()
 
         self.list_update = []

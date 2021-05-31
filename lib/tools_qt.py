@@ -599,7 +599,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
                sort_order=Qt.AscendingOrder):
     """ Set a model with selected filter. Attach that model to selected table
     :param qtable: tableview where set the model (QTableView)
-    :param table_name: data base table name or view name (String)
+    :param table_name: database table name or view name (String)
     :param expr_filter: expression to filter the model (String)
     :param edit_strategy: (QSqlTableModel.OnFieldChange, QSqlTableModel.OnManualSubmit, QSqlTableModel.OnRowChange)
     :param sort_order: can be 0 or 1 (Qt.AscendingOrder or Qt.AscendingOrder)

@@ -179,6 +179,7 @@ class GwMenuLoad(QObject):
             return
 
         # Open dialog
+        self.dlg_manage_menu.setWindowTitle(f'Advanced Menu')
         self.dlg_manage_menu.open()
 
 

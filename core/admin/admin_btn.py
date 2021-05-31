@@ -30,7 +30,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_config
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 
@@ -435,7 +435,10 @@ class GwAdminButton:
 
         # Manage super users
         self.super_users = []
+        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
+            super_users = f"{super_users}, {global_vars.current_user}"
         if super_users:
             super_users = super_users.split(',')
             for super_user in super_users:
@@ -690,23 +693,22 @@ class GwAdminButton:
         # Get roletype and export password
         roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
-        sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
 
         if export_passwd:
             msg = "Credentials will be stored in GIS project file"
             tools_qt.show_info_box(msg, "Warning")
 
         # Generate QGIS project
-        self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+        self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
 
 
-    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
+    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype,
                                get_database_parameters=True):
         """ Generate QGIS project """
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, sample, get_database_parameters)
+                                                    roletype, get_database_parameters)
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -743,34 +745,18 @@ class GwAdminButton:
         users_home = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
-        # Manage widgets
-        if self.project_issample:
-            self.dlg_create_gis_project.lbl_is_sample.setVisible(True)
-            self.dlg_create_gis_project.chk_is_sample.setVisible(True)
-        else:
-            self.dlg_create_gis_project.lbl_is_sample.setVisible(False)
-            self.dlg_create_gis_project.chk_is_sample.setVisible(False)
-
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self._gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
-        self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self._sample_state_changed))
 
         # Set shortcut keys
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
-
-
-    def _sample_state_changed(self):
-        """"""
-        checked = self.dlg_create_gis_project.chk_is_sample.isChecked()
-        self.dlg_create_gis_project.cmb_roletype.setEnabled(not checked)
-        tools_qt.set_widget_text(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
 
 
     def _btn_constrains_changed(self, button, call_function=False):
@@ -1333,7 +1319,10 @@ class GwAdminButton:
         self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
 
-        # Open dialog
+        # Close dialog create_project
+        self._close_dialog_admin(self.dlg_readsql_create_project)
+
+        # Open dialog admin_importinp
         tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
 
 
@@ -2317,10 +2306,7 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Info")
             global_vars.dao.rollback()
             self.error_count = 0
-
-        # Close dialog
-        self._close_dialog_admin(self.dlg_import_inp)
-        self._close_dialog_admin(self.dlg_readsql_create_project)
+            self._close_dialog_admin(self.dlg_import_inp)
 
 
     def _create_qgis_template(self):
@@ -3079,7 +3065,22 @@ class GwAdminButton:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self._set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self._set_credentials, self.dlg_credentials, new_connection=True))
+        self.dlg_credentials.cmb_sslmode.currentIndexChanged.connect(
+            partial(self._set_user_sslmode))
+
+        sslmode_list = [['disable', 'disable'], ['allow', 'allow'], ['prefer', 'prefer'], ['require', 'require'],
+                        ['verify - ca', 'verify - ca'], ['verify - full', 'verify - full']]
+        tools_qt.fill_combo_values(self.dlg_credentials.cmb_sslmode, sslmode_list, 0)
+        sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
+
         tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
+
+
+    def _set_user_sslmode(self):
+
+        sslmode = tools_qt.get_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 1)
+        tools_config.set_config_parser_value('system', 'sslmode', sslmode.strip("'"))
 
 
     def _manage_user_params(self):
