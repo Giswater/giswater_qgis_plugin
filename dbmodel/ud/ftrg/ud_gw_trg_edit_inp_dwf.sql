@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_dwf()  RETURNS trigger 
 $BODY$
 
 DECLARE 
-	v_expl_id_int integer;
 
 BEGIN
 

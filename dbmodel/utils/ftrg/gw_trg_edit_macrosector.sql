@@ -38,15 +38,16 @@ BEGIN
 		*/
 			
         -- FEATURE INSERT
-				INSERT INTO macrosector (macrosector_id, name, descript,  the_geom, undelete)
-				VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete);
+				INSERT INTO macrosector (macrosector_id, name, descript,  the_geom, undelete, active)
+				VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.active);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	-- FEATURE UPDATE
 			UPDATE macrosector 
-			SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,
+      active=NEW.active
 			WHERE macrosector_id=NEW.macrosector_id;
 		
         RETURN NEW;

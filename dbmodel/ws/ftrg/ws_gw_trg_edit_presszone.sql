@@ -30,8 +30,8 @@ BEGIN
 				RETURN NULL; 
             END IF;
 			
-		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, grafconfig, head, stylesheet)
-		VALUES (NEW.presszone_id, NEW.name, expl_id_int, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.stylesheet::json);
+		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, grafconfig, head, stylesheet, active)
+		VALUES (NEW.presszone_id, NEW.name, expl_id_int, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;
 		
@@ -39,7 +39,7 @@ BEGIN
    	
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json,
-		head = NEW.head, stylesheet=NEW.stylesheet::json
+		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active
 		WHERE presszone_id=NEW.presszone_id;
 		
 		RETURN NEW;

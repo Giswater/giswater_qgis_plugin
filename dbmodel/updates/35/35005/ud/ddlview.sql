@@ -206,3 +206,33 @@ CREATE OR REPLACE VIEW vu_node AS
     vu_node.lastupdate_user,
     vu_node.workcat_id_plan
    FROM vu_node;
+
+
+--2021/05/31
+CREATE OR REPLACE VIEW v_edit_dma AS 
+ SELECT dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.descript,
+    dma.the_geom,
+    dma.undelete,
+    dma.expl_id,
+    dma.pattern_id,
+    dma.link,
+    dma.minc,
+    dma.maxc,
+    dma.effc,
+    dma.active
+   FROM selector_expl, dma
+  WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_sector AS 
+ SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.the_geom,
+    sector.undelete,
+    sector.active
+   FROM selector_sector, sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

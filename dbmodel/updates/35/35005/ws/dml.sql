@@ -75,3 +75,22 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('cat_mat_roughness', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
 null,null,null,false);
+
+
+--2021/05/31
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_dqa', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false) on conflict (formname, formtype, columnname, tabname) do nothing;
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_presszone', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false) on conflict (formname, formtype, columnname, tabname) do nothing;

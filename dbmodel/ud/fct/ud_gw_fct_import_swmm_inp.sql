@@ -70,6 +70,7 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+
 	-- get project type and srid
 	SELECT project_type, epsg, giswater INTO v_projecttype, v_epsg, v_version FROM sys_version LIMIT 1;
 
@@ -80,7 +81,7 @@ BEGIN
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 239;
 	
-		-- create a header
+	-- create a header
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP SWMM FILE');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '-------------------------------');
 	
@@ -287,26 +288,27 @@ BEGIN
 		INSERT INTO cat_feature_arc VALUES ('EPAOUTL', 'VARC', 'OUTLET');
 
 		--node_type
-		INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 2, TRUE,TRUE);
-		INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 2, TRUE,TRUE);
-		INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 2, TRUE,TRUE);
+		INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 9, TRUE, TRUE, TRUE, 1);
+		INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 1, TRUE, TRUE, TRUE, 0);
+		INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 9, TRUE, TRUE, TRUE, 2);
 		
 		ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
+		
 		--cat_mat_node 
-		INSERT INTO cat_mat_node VALUES ('EPAMAT', 'EPAMAT');
-		INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT');
+		INSERT INTO cat_mat_arc VALUES ('VIRTUAL', 'VIRTUAL');
 		
 		--cat_node
-		INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPAMANH-CAT', 'EPAMAT', TRUE);
-		INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPAOUTF-CAT', 'EPAMAT', TRUE);
-		INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPASTOR-CAT', 'EPAMAT', TRUE);
+		INSERT INTO cat_node (id, node_type, active) VALUES ('EPAMANH-CAT', 'EPAMANH', TRUE);
+		INSERT INTO cat_node (id, node_type, active) VALUES ('EPAOUTF-CAT', 'EPAOUTF', TRUE);
+		INSERT INTO cat_node (id, node_type, active) VALUES ('EPASTOR-CAT', 'EPASTOR', TRUE);
 
 		-- cat_arc
-		INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAWEIR-CAT', 'EPAMAT', TRUE);
-		INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAORIF-CAT', 'EPAMAT', TRUE);
-		INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAPUMP-CAT', 'EPAMAT', TRUE);
-		INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAOUTL-CAT', 'EPAMAT', TRUE);
-
+		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAWEIR-CAT', TRUE, 'EPAWEIR');
+		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAORIF-CAT', TRUE, 'EPAORIF');
+		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAPUMP-CAT', TRUE, 'EPAPUMP');
+		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAOUTL-CAT', TRUE, 'EPAOUTL');
+		
+		UPDATE cat_arc SET geom2=null, geom3=null, geom4=null, geom5=null, geom6=null, geom7=null, geom8=null
 
 		--create child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
@@ -325,7 +327,7 @@ BEGIN
 		SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 		-- improve velocity for conduits using directly tables in spite of vi_conduits view
-		INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, sys_elev1, sys_elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
+		INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, elev1, elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
 		SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'EPACOND', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
 		FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 		INSERT INTO man_conduit(arc_id) SELECT csv1
@@ -397,8 +399,10 @@ BEGIN
 		-- refactor of linksoffsets
 		v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
 		IF v_linkoffsets != 'ELEVATION' THEN
-			UPDATE arc SET sys_elev1 = b.a1,  sys_elev2 = b.a2 FROM 
-			(SELECT a.arc_id, n1.sys_elev - sys_elev1 AS a1, n2.sys_elev - sys_elev2 AS a2 FROM arc a JOIN v_edit_node n1 ON n1.node_id = node_1 JOIN v_edit_node n2 ON n2.node_id = node_2) b
+			UPDATE arc SET elev1 = b.a1,  elev2 = b.a2 FROM 
+			(SELECT a.arc_id, n1.sys_elev - elev1 AS a1, n2.sys_elev - elev2 AS a2 FROM arc a 
+			JOIN v_edit_node n1 ON n1.node_id = node_1 
+			JOIN v_edit_node n2 ON n2.node_id = node_2) b
 			WHERE b.arc_id = arc.arc_id;
 		END IF;
 
@@ -508,12 +512,39 @@ BEGIN
 			v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 		END IF;
 
+			-- check for integer or varchar id's
+		v_count_total := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a);
+		v_count := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a WHERE fid ~ '^\d+$');
+
+		IF v_count =v_count_total THEN
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+		ELSIF v_count < v_count_total THEN
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+			v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
+		END IF;
+		
+		-- last process. Harmonize values
+		UPDATE node SET top_elev = elev+ymax;
+		UPDATE cat_arc SET arc_type = 'EPACOND' WHERE arc_type IS NULL;
+		UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
+		UPDATE cat_hydrology SET name = 'Default';
+	
 		-- Enable constraints
-		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
+		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);	
+		
+		-- purge catalog tables
+		DELETE FROM arc WHERE state=0;
+		DELETE FROM cat_arc WHERE id NOT IN (SELECT arccat_id FROM arc);
+		DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
+		DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
+		DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
+		DELETE FROM cat_feature WHERE id NOT IN (SELECT arc_type FROM arc) AND feature_type = 'ARC';
+		DELETE FROM cat_feature WHERE id NOT IN (SELECT node_type FROM node) AND feature_type = 'NODE';
 
 		RAISE NOTICE 'step-7/7';
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
+
 
 	END IF;
 
@@ -530,20 +561,22 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
+	
 	--Control nulls
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
+	
 
 	-- 	Return
-	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
+	RETURN ('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 		       '}'||
-	    '}')::json, 2524, null, null, null);
+	    '}')::json;
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
