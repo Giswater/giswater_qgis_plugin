@@ -203,7 +203,7 @@ BEGIN
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '113', 
-		concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only junctions node sink with outfallparam values will be transformed on the fly to OUTFALL.', 0),v_count);
+		concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only nodes sink with outfallparam values can do it.'),v_count);
 	END IF;
 	
 	RAISE NOTICE '107- Node exit upper intro (111)';
@@ -260,7 +260,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '285', concat('INFO: All mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '285', concat('INFO: Mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.'),v_count);
 	END IF;		
 	
 	SELECT count(*) INTO v_count FROM v_edit_raingage where rgage_type='TIMESERIES' AND timser_id IS NULL;
@@ -270,7 +270,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '286', concat('INFO: All mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '286', concat('INFO: Mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.'),v_count);
 	END IF;		
 
 	SELECT count(*) INTO v_count FROM v_edit_raingage where rgage_type='FILE' AND (fname IS NULL or sta IS NULL or units IS NULL);
@@ -281,7 +281,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '287', concat('INFO: All mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '287', concat('INFO: Mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.'),v_count);
 	END IF;	
 
 	RAISE NOTICE '10 - Inconsistency on inp node tables (294)';
@@ -372,7 +372,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '382', concat('INFO: All mandatory colums for volume values of storage type selected on storage have been checked without any values missed.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '382', concat('INFO: Mandatory colums for volume values used on storage type have been checked without any values missed.'),v_count);
 	END IF;		
 
 

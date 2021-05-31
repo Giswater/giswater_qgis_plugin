@@ -322,7 +322,7 @@ BEGIN
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on scenario subcatchments (curveno, conduct_2, drytime_2) have been checked without any values missed.'));
+				concat('INFO: Mandatory columns for ''CURVE_NUMBER'' infitration method (curveno, drytime_2) have been checked without any values missed.'));
 			END IF;
 		
 		ELSIF v_infiltration='GREEN_AMPT' THEN
@@ -338,7 +338,7 @@ BEGIN
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: All mandatory columns for ''GREEN_AMPT'' infiltration method on scenario subcatchments (suction, conduct, initdef) have been checked without any values missed.'));
+				concat('INFO: Mandatory columns for ''GREEN_AMPT'' infitration method (suction, conduct, initdef) have been checked without any values missed.'));
 			END IF;
 		
 		
@@ -355,7 +355,7 @@ BEGIN
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: All mandatory columns for ''MODIFIED_HORTON'' infiltration method on scenario subcatchments (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
+				concat('INFO: Mandatory columns for ''MODIFIED_HORTON'' infitration method (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
 			END IF;
 		END IF;
 	END IF;
