@@ -343,6 +343,7 @@ class GwFeatureReplaceButton(GwMaptool):
     def _replace_feature(self, dialog):
 
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
+
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
@@ -364,7 +365,8 @@ class GwFeatureReplaceButton(GwMaptool):
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
-            extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
+            if self.workcat_id_end_aux not in (None, 'null', ''):
+                extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
