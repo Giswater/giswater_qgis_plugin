@@ -29,7 +29,7 @@ UPDATE config_form_fields SET iseditable=true WHERE formname = 'cat_arc' AND col
 UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, id as idval FROM cat_feature_arc JOIN cat_feature USING (id) WHERE active is true' WHERE formname = 'cat_arc' AND columnname = 'arc_type';
 UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, id as idval FROM cat_feature_node JOIN cat_feature USING (id)  WHERE active is true' WHERE formname = 'cat_node' AND columnname = 'node_type';
 UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, id as idval FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active is true' WHERE formname = 'cat_connec' AND columnname = 'connec_type';
-UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, id as idval FROM cat_feature_guly JOIN cat_feature USING (id) WHERE active is true' WHERE formname = 'cat_grate' AND columnname = 'gully_type';
+UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, id as idval FROM cat_feature_gully JOIN cat_feature USING (id) WHERE active is true' WHERE formname = 'cat_grate' AND columnname = 'gully_type';
 
 
 UPDATE sys_param_user SET layoutname ='lyt_utils' WHERE  layoutname ='lyt_gully';
