@@ -693,23 +693,22 @@ class GwAdminButton:
         # Get roletype and export password
         roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
-        sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
 
         if export_passwd:
             msg = "Credentials will be stored in GIS project file"
             tools_qt.show_info_box(msg, "Warning")
 
         # Generate QGIS project
-        self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+        self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
 
 
-    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
+    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype,
                                get_database_parameters=True):
         """ Generate QGIS project """
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, sample, get_database_parameters)
+                                                    roletype, get_database_parameters)
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -746,34 +745,18 @@ class GwAdminButton:
         users_home = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
-        # Manage widgets
-        if self.project_issample:
-            self.dlg_create_gis_project.lbl_is_sample.setVisible(True)
-            self.dlg_create_gis_project.chk_is_sample.setVisible(True)
-        else:
-            self.dlg_create_gis_project.lbl_is_sample.setVisible(False)
-            self.dlg_create_gis_project.chk_is_sample.setVisible(False)
-
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self._gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
-        self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self._sample_state_changed))
 
         # Set shortcut keys
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
-
-
-    def _sample_state_changed(self):
-        """"""
-        checked = self.dlg_create_gis_project.chk_is_sample.isChecked()
-        self.dlg_create_gis_project.cmb_roletype.setEnabled(not checked)
-        tools_qt.set_widget_text(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
 
 
     def _btn_constrains_changed(self, button, call_function=False):
