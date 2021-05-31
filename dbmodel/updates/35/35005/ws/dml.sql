@@ -94,3 +94,30 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_presszone', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
 null,null,null,false) on conflict (formname, formtype, columnname, tabname) do nothing;
+
+UPDATE config_form_fields SET columnname='feature_id', label='feature_id' WHERE formname='v_edit_inp_demand' AND columnname='node_id';
+UPDATE config_form_fields SET columnname='demand_type', label='demand_type' WHERE formname='v_edit_inp_demand' AND columnname='deman_type';
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'dscenario_id', null, null, 'string', 'text', 'dscenario_id', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'name', null, null, 'string', 'text', 'name', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'descript', null, null, 'string', 'text', 'descript', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
