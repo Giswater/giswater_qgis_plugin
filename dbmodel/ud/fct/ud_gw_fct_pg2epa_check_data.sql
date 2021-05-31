@@ -349,8 +349,33 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
 	END IF;
-
 	
+
+	RAISE NOTICE '13- y0 on storage data (381)';
+	SELECT count(*) INTO v_count FROM v_edit_inp_storage where (y0 is null);
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '381', concat('ERROR-381: There is/are ',v_count,
+		' storages) with null values at least on mandatory columns for initial status (y0).'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '381', concat('INFO: No y0 column without values for storages.'),v_count);
+	END IF;		
+
+	RAISE NOTICE '14- Volume dimensions for storage data (382)';
+	SELECT count(*) INTO v_count FROM v_edit_inp_storage where (a1 is null and a2 is null and a0 is null AND storage_type='FUNCTIONAL') OR (curve_id IS NULL AND storage_type='TABULAR');
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '382', concat('ERROR-382: There is/are ',v_count,
+		' storage(s) with null values at least on mandatory columns to define volume parameters (a1,a2,a0 for FUNCTIONAL or curve_id for TABULAR).'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '382', concat('INFO: All mandatory colums for volume values of storage type selected on storage have been checked without any values missed.'),v_count);
+	END IF;		
+
+
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
@@ -380,8 +405,8 @@ BEGIN
 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 187, 294)) row) features;
+	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 187, 294, 381, 382)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
@@ -395,7 +420,7 @@ BEGIN
 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
+	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
 	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 295)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 

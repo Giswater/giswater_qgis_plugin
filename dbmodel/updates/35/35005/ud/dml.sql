@@ -44,3 +44,6 @@ ALTER TABLE inp_subcatchment ALTER COLUMN conduct_2 SET DEFAULT 0;
 ALTER TABLE inp_subcatchment ALTER COLUMN drytime_2 SET DEFAULT 10;
 
 UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_inp_subcatchment' AND columnname IN('conduct_2');
+
+INSERT INTO sys_fprocess VALUES (381,'Check y0 on storage data', 'ud');
+INSERT INTO sys_fprocess VALUES (382,'Check missed values for storage volume', 'ud');

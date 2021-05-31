@@ -528,7 +528,9 @@ BEGIN
 		UPDATE cat_arc SET arc_type = 'EPACOND' WHERE arc_type IS NULL;
 		UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
 		UPDATE cat_hydrology SET name = 'Default';
-	
+		UPDATE node SET code = node_id WHERE code is null;
+		UPDATE arc SET code = arc_id WHERE code is null;
+			
 		-- Enable constraints
 		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);	
 		
