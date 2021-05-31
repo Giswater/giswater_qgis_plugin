@@ -47,3 +47,13 @@ UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_inp_subcatchm
 
 INSERT INTO sys_fprocess VALUES (381,'Check y0 on storage data', 'ud');
 INSERT INTO sys_fprocess VALUES (382,'Check missed values for storage volume', 'ud');
+
+
+--2021/05/31
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dwf', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields where formname = 'inp_dwf' and columnname!='value'
