@@ -117,8 +117,14 @@ BEGIN
 
 	IF v_audit_result is null THEN
 		FOREACH rec_id IN ARRAY(v_id_list) LOOP
-			EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-			enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
+			IF v_workcat_id_end IS NOT NULL THEN 
+				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
+				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
+				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
+			ELSE 
+				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
+				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
+			END IF;
 		END LOOP;
 	END IF;
 
