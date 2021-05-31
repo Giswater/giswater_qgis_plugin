@@ -73,6 +73,11 @@ BEGIN
 	EXECUTE 'SELECT count(*) FROM '||v_worklayer
 		INTO v_totcount;
 	
+	IF v_arcsearchnodes IS NULL THEN 
+		SELECT (value::json ->>'value')::numeric into v_arcsearchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
+		INSERT INTO audit_check_data(fid,  error_message)
+		VALUES (103,  concat('Value of search nodes automatically set to ',v_arcsearchnodes));
+	END IF;
 	
 	-- Computing process
 	FOR arc_rec IN EXECUTE 'SELECT * FROM '||v_worklayer||''
