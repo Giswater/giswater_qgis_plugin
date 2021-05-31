@@ -17,7 +17,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 from .... import global_vars
 
 class GwConfigButton(GwAction):
