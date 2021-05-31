@@ -478,6 +478,19 @@ BEGIN
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, 'Update arc_id on node.');
 
+						--set arc to obsolete or delete it
+						IF v_set_arc_obsolete IS TRUE THEN
+							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
+						ELSE
+							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
+							
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
+						END IF;
+
 
 						-- reconnect operative links
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
@@ -521,20 +534,6 @@ BEGIN
 								UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
 							END IF;							
 						END LOOP;
-						
-						--set arc to obsolete or delete it
-						IF v_set_arc_obsolete IS TRUE THEN
-							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
-						ELSE
-							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
-							
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
-						END IF;
-
 				
 					ELSIF v_state_node = 2 THEN --is psector
 
