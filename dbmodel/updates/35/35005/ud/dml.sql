@@ -56,4 +56,4 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_inp_dwf', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields where formname = 'inp_dwf' and columnname!='value'
+FROM config_form_fields where formname = 'inp_dwf' and columnname!='value' on conflict (formname, formtype, columnname, tabname) do nothing;
