@@ -56,4 +56,14 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_inp_dwf', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields where formname = 'inp_dwf' and columnname!='value' on conflict (formname, formtype, columnname, tabname) do nothing;
+FROM config_form_fields where formname = 'inp_dwf' on conflict (formname, formtype, columnname, tabname) do nothing;
+
+UPDATE config_form_fields SET widgettype='combo',dv_orderby_id=true, dv_isnullvalue=true,
+dv_querytext='SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL'
+WHERE columnname in ('pat1','pat2', 'pat3', 'pat4') and formname='v_edit_inp_dwf';
+
+UPDATE config_form_fields SET widgettype='combo',dv_orderby_id=true, dv_isnullvalue=true,
+dv_querytext='SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL'
+WHERE columnname in ('pat1','pat2', 'pat3', 'pat4') and formname='v_edit_inp_dwf';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM cat_dwf_scenario WHERE active IS true' WHERE columnname='dwfscenario_id';
