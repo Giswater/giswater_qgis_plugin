@@ -37,8 +37,8 @@ BEGIN
        END IF;
         
         -- FEATURE INSERT
-	INSERT INTO macrodma (macrodma_id, name, descript, the_geom, undelete, expl_id)
-	VALUES (NEW.macrodma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id);
+	INSERT INTO macrodma (macrodma_id, name, descript, the_geom, undelete, expl_id, active)
+	VALUES (NEW.macrodma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.active);
 				
 	RETURN NEW;
 		
@@ -46,7 +46,8 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 	UPDATE macrodma 
-	SET macrodma_id=NEW.macrodma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,expl_id=NEW.expl_id
+	SET macrodma_id=NEW.macrodma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,expl_id=NEW.expl_id,
+  active=NEW.active
 	WHERE macrodma_id=NEW.macrodma_id;
 		
         RETURN NEW;

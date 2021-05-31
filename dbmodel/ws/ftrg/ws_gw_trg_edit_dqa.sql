@@ -31,9 +31,10 @@ BEGIN
 				RETURN NULL; 
             END IF;
 			
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig, stylesheet)
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig, 
+		stylesheet,active)
 		VALUES (NEW.dqa_id, NEW.name, expl_id_int, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type, 
-		NEW.link, NEW.grafconfig::json, NEW.stylesheet::json);
+		NEW.link, NEW.grafconfig::json, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;
 		
@@ -41,7 +42,8 @@ BEGIN
    	
 		UPDATE dqa 
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
-		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, grafconfig=NEW.grafconfig::json, stylesheet = NEW.stylesheet::json
+		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, grafconfig=NEW.grafconfig::json, 
+		stylesheet = NEW.stylesheet::json, active=NEW.active
 		WHERE dqa_id=NEW.dqa_id;
 		
 		RETURN NEW;

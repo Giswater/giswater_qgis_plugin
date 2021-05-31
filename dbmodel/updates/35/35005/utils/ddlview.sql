@@ -237,3 +237,28 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
 --2021/05/24
 DROP VIEW IF EXISTS vp_epa_arc;
 DROP VIEW IF EXISTS vp_epa_node;
+
+
+--2021/05/31
+CREATE OR REPLACE VIEW v_edit_macrodma AS 
+ SELECT macrodma.macrodma_id,
+    macrodma.name,
+    macrodma.descript,
+    macrodma.the_geom,
+    macrodma.undelete,
+    macrodma.expl_id,
+    macrodma.active
+   FROM selector_expl, macrodma
+  WHERE macrodma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_macrosector AS 
+ SELECT DISTINCT ON (macrosector.macrosector_id) macrosector.macrosector_id,
+    macrosector.name,
+    macrosector.descript,
+    macrosector.the_geom,
+    macrosector.undelete,
+    macrosector.active
+   FROM selector_sector, sector
+     JOIN macrosector ON macrosector.macrosector_id = sector.macrosector_id
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

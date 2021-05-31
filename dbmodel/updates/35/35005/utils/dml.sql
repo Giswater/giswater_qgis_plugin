@@ -62,3 +62,28 @@ WHERE columnname='matcat_id' AND formname ilike 've_connec%';
 UPDATE config_form_fields set dv_querytext=concat(dv_querytext,' ')
 where (formname ilike 've_arc%' or formname ilike 've_node%' or formname ilike 've_connec%' or formname ilike 've_gully%') 
 and concat(dv_querytext,dv_querytext_filterc) ilike '%NULLAND%';
+
+--2021/05/31
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_exploitation', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_dma', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_sector', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
