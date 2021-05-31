@@ -34,13 +34,8 @@ UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, i
 
 UPDATE sys_param_user SET layoutname ='lyt_utils' WHERE  layoutname ='lyt_gully';
 
-INSERT INTO sys_table VALUES ('sys_feature_epa_type', 'epa types', 'role_admin', 0, null, null, null, null, null, null, null, null, 'giswater') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_function VALUES (3036, 'gw_fct_setcsv','utils','function','json','json','Insert values into temp_csv','role_edit', NULL);
-
-
-INSERT INTO sys_table (v_edit_inp_dwf);
-INSERT INTO sys_function (gw_trg_edit_inp_dwf);
-INSERT INTO config_form_fields (v_edit_inp_dwf);
+INSERT INTO sys_table VALUES ('v_edit_inp_dwf', 'editable view for dry weather flows', 'role_epa', 0, null, null, null, null, null, null, null, null, 'giswater') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (3036, 'gw_trg_edit_inp_dwf','ud','trigger function',null,null,'Trigger to make editable v_edit_inp_dwf','role_epa', NULL);
 
 UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["v_edit_raingage", "inp_inflows", "inp_inflows_pol_x_node","inp_timeseries_value"]}]'
 WHERE id = 'inp_timeseries';
