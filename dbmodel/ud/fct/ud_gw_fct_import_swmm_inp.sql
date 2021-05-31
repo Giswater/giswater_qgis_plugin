@@ -303,12 +303,15 @@ BEGIN
 		INSERT INTO cat_node (id, node_type, active) VALUES ('EPASTOR-CAT', 'EPASTOR', TRUE);
 
 		-- cat_arc
-		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAWEIR-CAT', TRUE, 'EPAWEIR');
-		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAORIF-CAT', TRUE, 'EPAORIF');
-		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAPUMP-CAT', TRUE, 'EPAPUMP');
-		INSERT INTO cat_arc (id, matcat_id, active, arc_type) VALUES ('EPAOUTL-CAT', TRUE, 'EPAOUTL');
+		INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAWEIR-CAT', TRUE, 'EPAWEIR');
+		INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAORIF-CAT', TRUE, 'EPAORIF');
+		INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAPUMP-CAT', TRUE, 'EPAPUMP');
+		INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAOUTL-CAT', TRUE, 'EPAOUTL');
 		
-		UPDATE cat_arc SET geom2=null, geom3=null, geom4=null, geom5=null, geom6=null, geom7=null, geom8=null
+		UPDATE cat_arc SET geom5=null, geom6=null, geom7=null, geom8=null;
+		UPDATE cat_arc SET geom2=null WHERE geom2=0;
+		UPDATE cat_arc SET geom3=null WHERE geom3=0;
+		UPDATE cat_arc SET geom4=null WHERE geom4=0;
 
 		--create child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
