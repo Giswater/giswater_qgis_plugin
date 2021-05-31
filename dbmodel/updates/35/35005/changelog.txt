@@ -1,2 +1,6 @@
 3.5.005
 *************
+New v_edit_inp_dwf created for Ud
+Improvement of the velocity for getinfofromcoordinates method
+Minor bugs fixed
+Enhamement of the start-from-scratch using ud inp file
