@@ -710,7 +710,7 @@ class GwInfo(QObject):
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
-        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
 
         dlg_cf.dlg_closed.connect(partial(self._reset_my_json))
 
@@ -917,33 +917,33 @@ class GwInfo(QObject):
         # action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
         # action_section.triggered.connect(partial(self._open_section_form))
         # action_help.triggered.connect(partial(self._open_help, self.feature_type))
-        self.ep = QgsMapToolEmitPoint(self.canvas)
+        # self.ep = QgsMapToolEmitPoint(self.canvas)
         # action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
 
-        # if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
-        #     # Delete last form from memory
-        #     last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
-        #     if last_info:
-        #         last_info.setParent(None)
-        #         del last_info
-        #
-        #     tools_gw.docker_dialog(dlg_cf)
-        #     global_vars.session_vars['dialog_docker'].dlg_closed.connect(self._manage_docker_close)
-        #     global_vars.session_vars['dialog_docker'].setWindowTitle(title)
-        #     btn_cancel.clicked.connect(self._manage_docker_close)
-        #
-        # else:
-        #     dlg_cf.dlg_closed.connect(self._roll_back)
-        #     dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
-        #     dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
-        #     dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
-        #     btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
+        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
+            # Delete last form from memory
+            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
+            if last_info:
+                last_info.setParent(None)
+                del last_info
+
+            # tools_gw.docker_dialog(dlg_cf)
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(self._manage_docker_close)
+            # global_vars.session_vars['dialog_docker'].setWindowTitle(title)
+            btn_cancel.clicked.connect(self._manage_docker_close)
+
+        else:
+            dlg_cf.dlg_closed.connect(self._roll_back)
+            dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
+            # dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
+            btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
-        # dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
         # dlg_cf.dlg_closed.connect(partial(self._clear_dlg_templates, is_docker))
 
         # Set title
@@ -967,15 +967,15 @@ class GwInfo(QObject):
         for field in global_vars.info_templates[self.complet_result['body']['feature']['childType']]['json']['body']['data']['fields']:
             tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
 
-        # if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
-        #     global_vars.session_vars['dialog_docker'].dlg_closed.disconnect()
-        #     dlg.btn_cancel.clicked.disconnect()
-        # else:
-        #     dlg.dlg_closed.disconnect()
-        #     dlg.key_escape.disconnect()
-        #     dlg.btn_cancel.clicked.disconnect()
+        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
+            global_vars.session_vars['dialog_docker'].dlg_closed.disconnect()
+            # dlg.btn_cancel.clicked.disconnect()
+        else:
+            dlg.dlg_closed.disconnect()
+            # dlg.key_escape.disconnect()
+        dlg.btn_cancel.clicked.disconnect()
         dlg.btn_accept.clicked.disconnect()
-        # dlg.key_enter.disconnect()
+        dlg.key_enter.disconnect()
 
 
     def _open_help(self, feature_type):
