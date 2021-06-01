@@ -1319,10 +1319,7 @@ class GwAdminButton:
         self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
 
-        # Close dialog create_project
-        self._close_dialog_admin(self.dlg_readsql_create_project)
-
-        # Open dialog admin_importinp
+        # Open dialog
         tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
 
 
@@ -2306,7 +2303,10 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Info")
             global_vars.dao.rollback()
             self.error_count = 0
-            self._close_dialog_admin(self.dlg_import_inp)
+
+        # Close dialog
+        self._close_dialog_admin(self.dlg_import_inp)
+        self._close_dialog_admin(self.dlg_readsql_create_project)
 
 
     def _create_qgis_template(self):
