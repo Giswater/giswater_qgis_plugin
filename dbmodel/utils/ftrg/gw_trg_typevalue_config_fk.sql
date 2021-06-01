@@ -87,9 +87,13 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' then --and v_table IN (SELECT typevalue_table FROM sys_foreignkey) THEN
 
-		--select configuration from the related typevalue table
-		v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
-
+		IF v_table = 'sys_typevalue' THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+       		"data":{"message":"3028", "function":"2750","debug_msg":""}}$$);';
+		ELSE
+			--select configuration from the related typevalue table
+			v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
+		END IF;
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			
