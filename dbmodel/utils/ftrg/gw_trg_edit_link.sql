@@ -580,12 +580,12 @@ BEGIN
 			END IF;
 			
 		ELSE
-			UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
+			UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, arc_id=NULL
 			WHERE plan_psector_x_connec.id=OLD.psector_rowid;
 			
 			IF v_projectype = 'UD' THEN
 				IF OLD.feature_type='GULLY' THEN
-					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
+					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL
 					WHERE plan_psector_x_gully.id=OLD.psector_rowid;
 				END IF;
 			END IF;
