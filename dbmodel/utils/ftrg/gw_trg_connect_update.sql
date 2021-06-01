@@ -94,17 +94,13 @@ BEGIN
 			END IF;
 			
 		END LOOP;
-
-		IF v_projectype = 'WS' AND NEW.arc_id IS NOT NULL THEN
-			-- update fields that inherit values from arc
-			UPDATE v_edit_connec SET presszone_id=a.presszone_id, dqa_id=a.dqa_id, minsector_id=a.minsector_id
+		-- update fields that inherit values from arc
+		IF v_projectype = 'WS' AND NEW.arc_id IS NOT NULL AND (NEW.arc_id != OLD.arc_id) THEN
+			UPDATE v_edit_connec SET presszone_id=a.presszone_id, dqa_id=a.dqa_id, minsector_id=a.minsector_id, fluid_type = a.fluid_type
 			FROM arc a WHERE a.arc_id = NEW.arc_id;
 		END IF;
-
-		-- update fields that inherit values from arc
-		UPDATE v_edit_connec SET fluid_type = a.fluid_type FROM arc a WHERE a.arc_id = NEW.arc_id;
 		
-		IF v_projectype = 'UD' AND NEW.arc_id IS NOT NULL THEN
+		IF v_projectype = 'UD' AND NEW.arc_id IS NOT NULL AND (NEW.arc_id != OLD.arc_id) THEN
 			UPDATE v_edit_gully SET fluid_type = a.fluid_type FROM arc a WHERE a.arc_id = NEW.arc_id;
 		END IF;
 
