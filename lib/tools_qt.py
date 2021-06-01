@@ -374,7 +374,7 @@ def set_combo_value(combo, value, item1):
 
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if value == str(elem[item1]):
+        if elem is not None and value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
 
@@ -382,7 +382,7 @@ def set_combo_value(combo, value, item1):
     if value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
         # Control if the QComboBox has been previously filled
-        if combo.count() > 0:
+        if combo.count() > 0 and combo.itemData(0) is not None:
             for x in range(len(combo.itemData(0))):
                 new_elem.append("")
         else:
