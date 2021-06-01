@@ -378,8 +378,7 @@ def check_function(function_name, schema_name=None, commit=True, aux_conn=None):
 
     if schema_name is None:
         schema_name = global_vars.schema_name
-    if schema_name is None:
-        return True
+
     schema_name = schema_name.replace('"', '')
     sql = ("SELECT routine_name FROM information_schema.routines "
            "WHERE lower(routine_schema) = %s "
