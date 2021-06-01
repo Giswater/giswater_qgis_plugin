@@ -646,6 +646,10 @@ BEGIN
 							INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
 							VALUES ('DIVIDE EXISTING ARC WITH PLANNED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id, now(), current_user);
 
+							-- Insert existig arc (downgraded) to the current alternative
+							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
+							ON CONFLICT (arc_id, psector_id) DO NOTHING;
+
 							-- insert operative connec's on alternative in order to reconnect
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
 							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id
@@ -689,11 +693,7 @@ BEGIN
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 
-							-- Insert existig arc (downgraded) to the current alternative
-							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
-							ON CONFLICT (arc_id, psector_id) DO NOTHING;
-
-						ELSIF v_state_arc = 2 THEN -- planned arc									
+						ELSIF v_state_arc = 2 THEN -- planned arc
 
 							-- Insert data into traceability table
 							INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
@@ -709,14 +709,18 @@ BEGIN
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 							END IF;	
 
-							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;
+							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
+
+							v_querytext = 'SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
+							WHERE v_edit_link.feature_type=''CONNEC'' AND exit_type=''VNODE'' AND arc_id='||v_arc_id;
 
 							-- reconnect planned vnode links
 							FOR rec_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
 							WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
 							LOOP
-								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id AND arc_id !=v_arc_id LIMIT 1; 
 								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
@@ -726,6 +730,8 @@ BEGIN
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
 									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+
 								END LOOP;
 							END IF;						
 
@@ -740,14 +746,12 @@ BEGIN
 								END IF;							
 							END LOOP;
 
-							IF v_count > 1 THEN
-								DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
-							ELSE
-								EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
-								"client":{"device":4, "infoType":1, "lang":"ES"},
-								"form":{},"feature":{"type":"ARC"},
-								"data":{"feature_id":"'||v_arc_id||'"}}$$);';
+							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;						
+
+							IF v_count = 0 THEN
+								DELETE FROM arc WHERE arc_id=v_arc_id;
 							END IF;
+							
 						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
