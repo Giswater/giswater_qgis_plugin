@@ -711,9 +711,6 @@ BEGIN
 
 							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
 
-							v_querytext = 'SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
-							WHERE v_edit_link.feature_type=''CONNEC'' AND exit_type=''VNODE'' AND arc_id='||v_arc_id;
-
 							-- reconnect planned vnode links
 							FOR rec_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
 							WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
