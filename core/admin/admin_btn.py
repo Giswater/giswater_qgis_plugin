@@ -2304,9 +2304,8 @@ class GwAdminButton:
             global_vars.dao.rollback()
             self.error_count = 0
 
-        # Close dialog
-        self._close_dialog_admin(self.dlg_import_inp)
-        self._close_dialog_admin(self.dlg_readsql_create_project)
+        # Hide button execute
+        self.dlg_import_inp.btn_run.setVisible(False)
 
 
     def _create_qgis_template(self):
