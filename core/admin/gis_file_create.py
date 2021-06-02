@@ -184,27 +184,25 @@ class GwGisFileCreate:
     def _replace_connection_parameters(self, content, export_passwd):
 
         if self.layer_source['service']:
-            tools_log.log_warning("DB connection through service file. Map creation not supported")
-            return content
+            datasource = f"service='{self.layer_source['service']}'"
 
-        datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
-                      f"port={self.layer_source['port']}")
+        else:
 
-        # Replace labels __DBNAME__, __HOST__ and __SSLMODE__
-        content = content.replace("__DBNAME__", self.layer_source['db'])
-        content = content.replace("__HOST__", self.layer_source['host'])
+            datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
+                          f"port={self.layer_source['port']}")
+
+            content = content.replace("__DBNAME__", self.layer_source['db'])
+            content = content.replace("__HOST__", self.layer_source['host'])
+            credentials = self.layer_source['port']
+            if export_passwd:
+                username = self.layer_source['user']
+                password = self.layer_source['password']
+                credentials = f"{self.layer_source['port']} username={username} password={password}"
+                datasource += f" username={username} password={password}"
+
+            content = content.replace("__PORT__", credentials)
+
         content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
-
-        # Manage username and password
-        credentials = self.layer_source['port']
-        if export_passwd:
-            username = self.layer_source['user']
-            password = self.layer_source['password']
-            credentials = f"{self.layer_source['port']} username={username} password={password}"
-            datasource += f" username={username} password={password}"
-
-        # Replace labels __PORT__ and __DATASOURCE__
-        content = content.replace("__PORT__", credentials)
         content = content.replace("__DATASOURCE__", datasource)
 
         return content
