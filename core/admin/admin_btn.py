@@ -102,6 +102,7 @@ class GwAdminButton:
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
         """"""
+
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
             project_name_schema = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
@@ -654,6 +655,7 @@ class GwAdminButton:
 
     def _set_credentials(self, dialog, new_connection=False):
         """ Set connection parameters in settings """
+
         user_name = tools_qt.get_text(dialog, dialog.txt_user, False, False)
         password = tools_qt.get_text(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
@@ -676,6 +678,7 @@ class GwAdminButton:
 
     def _gis_create_project(self):
         """"""
+
         # Get gis folder, gis file, project type and schema
         gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
@@ -702,13 +705,12 @@ class GwAdminButton:
         self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
 
 
-    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype,
-                               get_database_parameters=True):
+    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype):
         """ Generate QGIS project """
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, get_database_parameters)
+                                                    roletype)
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -718,6 +720,7 @@ class GwAdminButton:
 
     def _open_project(self, qgs_path):
         """ Open a QGis project """
+
         project = QgsProject.instance()
         project.read(qgs_path)
 
@@ -728,6 +731,7 @@ class GwAdminButton:
 
     def _open_form_create_gis_project(self):
         """"""
+
         # Check if exist schema
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
@@ -761,6 +765,7 @@ class GwAdminButton:
 
     def _btn_constrains_changed(self, button, call_function=False):
         """"""
+
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
 
         if button.text() == 'OFF':
@@ -779,10 +784,12 @@ class GwAdminButton:
                 sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
                 tools_db.execute_sql(sql)
 
+
     """ Declare all read sql process """
 
     def _load_base(self, project_type=False):
         """"""
+
         if str(project_type) in ('ws', 'ud'):
 
             folder = self.folderUtils + self.file_pattern_ddl
@@ -1034,6 +1041,7 @@ class GwAdminButton:
 
     def _load_views(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_ddlview
             status = self._execute_files(folder)
@@ -1182,6 +1190,7 @@ class GwAdminButton:
 
     def _load_dev_data(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'dev' + os.sep + project_type
             status = self._execute_files(folder)
@@ -1198,6 +1207,7 @@ class GwAdminButton:
 
     def _load_fct_ftrg(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_fct
             status = self._execute_files(folder)
@@ -1235,6 +1245,7 @@ class GwAdminButton:
 
     def _load_tablect(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self._execute_files(folder)
@@ -1257,6 +1268,7 @@ class GwAdminButton:
 
     def _load_trg(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_trg
             status = self._execute_files(folder)
@@ -1279,6 +1291,7 @@ class GwAdminButton:
 
     def _load_sql(self, path_folder, no_ct=False):
         """"""
+
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self._execute_files(path, no_ct=no_ct)
             if not status:
@@ -1291,6 +1304,7 @@ class GwAdminButton:
 
     def _execute_import_data(self, project_name, project_type):
         """"""
+
         # Create dialog
         self.dlg_import_inp = GwAdminImportUi()
         tools_gw.load_settings(self.dlg_import_inp)
@@ -1561,6 +1575,7 @@ class GwAdminButton:
 
     def _load_custom_sql_files(self, dialog, widget):
         """"""
+
         folder_path = tools_qt.get_text(dialog, widget)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1663,6 +1678,7 @@ class GwAdminButton:
 
     def _set_last_connection(self, connection_name):
         """"""
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         settings.setValue('selected', connection_name)
@@ -1671,6 +1687,7 @@ class GwAdminButton:
 
     def _get_last_connection(self):
         """"""
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         connection_name = settings.value('selected')
@@ -1680,6 +1697,7 @@ class GwAdminButton:
 
     def _get_user_connection(self, connection_name):
         """"""
+
         connection_username = None
         settings = QSettings()
         if connection_name:
@@ -1692,6 +1710,7 @@ class GwAdminButton:
 
     def _create_visit_class(self):
         """"""
+
         # Create the dialog and signals
         self.dlg_manage_visit_class = GwAdminVisitClassUi()
         tools_gw.load_settings(self.dlg_manage_visit_class)
@@ -3042,6 +3061,7 @@ class GwAdminButton:
 
     def _save_selection(self):
         """"""
+
         # Save last Project schema name and type selected
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, False, False)
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -3051,6 +3071,7 @@ class GwAdminButton:
 
     def _create_credentials_form(self, set_connection):
         """"""
+
         self.dlg_credentials = GwCredentialsUi()
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':

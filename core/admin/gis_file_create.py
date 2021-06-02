@@ -27,7 +27,7 @@ class GwGisFileCreate:
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', get_database_parameters=True):
+                             export_passwd=False, roletype='admin'):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
@@ -43,7 +43,6 @@ class GwGisFileCreate:
             gis_locale_path = gis_folder + os.sep + "en_US"
 
         # Check if template_path and folder_path exists
-
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
             tools_qgis.show_warning("Template GIS file not found", parameter=template_path, duration=20)
@@ -71,11 +70,10 @@ class GwGisFileCreate:
         tools_log.log_info("Creating GIS file... " + qgs_path)
         shutil.copyfile(template_path, qgs_path)
 
-        if get_database_parameters:
-            # Get database parameters from layer source
-            status = self._get_database_parameters(schema)
-            if not status:
-                return False, None
+        # Get database parameters from layer source
+        status = self._get_database_parameters(schema)
+        if not status:
+            return False, None
 
         # Read file content
         with open(qgs_path) as f:
