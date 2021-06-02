@@ -187,7 +187,10 @@ class GwGisFileCreate:
             tools_log.log_warning("DB connection through service file. Map creation not supported")
             return content
 
-        # Replace labels __DBNAME__ for db parameter. __HOST__ for host parameter. __PORT__ for port parameter
+        datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
+                      f"port={self.layer_source['port']}")
+
+        # Replace labels __DBNAME__, __HOST__ and __SSLMODE__
         content = content.replace("__DBNAME__", self.layer_source['db'])
         content = content.replace("__HOST__", self.layer_source['host'])
         content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
@@ -198,7 +201,11 @@ class GwGisFileCreate:
             username = self.layer_source['user']
             password = self.layer_source['password']
             credentials = f"{self.layer_source['port']} username={username} password={password}"
+            datasource += f" username={username} password={password}"
+
+        # Replace labels __PORT__ and __DATASOURCE__
         content = content.replace("__PORT__", credentials)
+        content = content.replace("__DATASOURCE__", datasource)
 
         return content
 
