@@ -409,9 +409,9 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
     return logged, credentials
 
 
-def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
+def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node'):
     """ Get database parameters from layer @layer_name or database connection settings
-    sslmode should be (disable, allow, prefer, require, verify-ca, verify-full)"""
+    sslmode_default should be (disable, allow, prefer, require, verify-ca, verify-full)"""
 
     # Get layer @layer_name
     layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -426,15 +426,14 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
         global_vars.session_vars['last_error'] = f"Layer not found: '{layer_name}'"
         return None, not_version
 
-    # Get sslmode from user init config file
-    tools_config.manage_init_config_file()
-    sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_value)
-
     credentials = None
     not_version = True
     if layer:
         not_version = False
         credentials = tools_qgis.get_layer_source(layer)
+        # Get sslmode from user init config file
+        tools_config.manage_init_config_file()
+        sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_default)
         credentials['sslmode'] = sslmode
         global_vars.schema_name = credentials['schema']
         conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
@@ -455,14 +454,17 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
         if default_connection:
             settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
+            credentials['host'] = settings.value('host')
             if settings.value('host') in (None, ""):
                 credentials['host'] = 'localhost'
-            else:
-                credentials['host'] = settings.value('host')
             credentials['port'] = settings.value('port')
             credentials['db'] = settings.value('database')
             credentials['user'] = settings.value('username')
             credentials['password'] = settings.value('password')
+            credentials['service'] = settings.value('service')
+            sslmode = settings.value('sslmode')
+            if sslmode:
+                sslmode = sslmode.lower().replace("ssl", "")
             credentials['sslmode'] = sslmode
             settings.endGroup()
             status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
