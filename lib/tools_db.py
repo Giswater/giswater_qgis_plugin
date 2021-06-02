@@ -251,8 +251,6 @@ def connect_to_database_service(service, sslmode=None):
     if sslmode:
         conn_string += f" sslmode={sslmode}"
 
-    tools_log.log_info(f"connect_to_database_service: {conn_string}")
-
     # We need to create this connections for Table Views
     global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
     global_vars.qgis_db_credentials.setConnectOptions(conn_string)
@@ -470,7 +468,6 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
             sslmode = sslmode_settings
             if isinstance(sslmode_settings, str):
                 sslmode_settings = sslmode_settings.lower().replace("ssl", "")
-                tools_log.log_info(f"sslmode: {sslmode_settings}")
                 sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
                 sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
             credentials['sslmode'] = sslmode

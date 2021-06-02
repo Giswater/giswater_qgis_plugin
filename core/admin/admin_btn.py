@@ -1511,34 +1511,38 @@ class GwAdminButton:
         """"""
         self._load_trg(project_type)
 
+
     """ Create new connection when change combo connections """
 
     def _event_change_connection(self):
         """"""
+
         connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
-        credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
-
-        # Get sslmode for database connection
-        sslmode = 'prefer'
+        credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
+                       'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
         settings = QSettings()
-        settings.beginGroup("PostgreSQL/connections/" + connection_name)
+        settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
+        credentials['host'] = settings.value('host')
         if settings.value('host') in (None, ""):
             credentials['host'] = 'localhost'
-        else:
-            credentials['host'] = settings.value('host')
         credentials['port'] = settings.value('port')
         credentials['db'] = settings.value('database')
         credentials['user'] = settings.value('username')
         credentials['password'] = settings.value('password')
+        credentials['service'] = settings.value('service')
+
+        sslmode_settings = settings.value('sslmode')
+        sslmode = sslmode_settings
+        if isinstance(sslmode_settings, str):
+            sslmode_settings = sslmode_settings.lower().replace("ssl", "")
+            sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
+            sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
         credentials['sslmode'] = sslmode
         settings.endGroup()
 
-        self.logged = tools_db.connect_to_database(credentials['host'], credentials['port'],
-                                                   credentials['db'], credentials['user'],
-                                                   credentials['password'], credentials['sslmode'])
-
+        self.logged, credentials = tools_db.connect_to_database_credentials(credentials)
         if not self.logged:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
@@ -1562,15 +1566,15 @@ class GwAdminButton:
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
 
-        if self.logged:
-            self.username = self._get_user_connection(self._get_last_connection())
-            role_admin = tools_db.check_role_user("role_admin", self.username)
-            if not role_admin and self.username not in self.super_users:
-                tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
-                self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
-                    "You don't have permissions to administrate project schemas on this connection")
-                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            if credentials['service'] is None:
+                self.username = self._get_user_connection(self._get_last_connection())
+                role_admin = tools_db.check_role_user("role_admin", self.username)
+                if not role_admin and self.username not in self.super_users:
+                    tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                    self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                    status_text = "You don't have permissions to administrate project schemas on this connection"
+                    tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', status_text)
+                    tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
 
 
     def _set_last_connection(self, connection_name):
