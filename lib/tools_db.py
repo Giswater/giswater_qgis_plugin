@@ -429,6 +429,7 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
     credentials = None
     not_version = True
     if layer:
+
         not_version = False
         credentials = tools_qgis.get_layer_source(layer)
         # Get sslmode from user init config file
@@ -447,11 +448,13 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
         QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
 
     elif settings:
+
         not_version = True
         default_connection = settings.value('selected')
         settings.endGroup()
         credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+
         if default_connection:
             settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
             credentials['host'] = settings.value('host')
@@ -462,22 +465,30 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
             credentials['user'] = settings.value('username')
             credentials['password'] = settings.value('password')
             credentials['service'] = settings.value('service')
-            sslmode = settings.value('sslmode')
-            if sslmode:
-                sslmode = sslmode.lower().replace("ssl", "")
+
+            sslmode_settings = settings.value('sslmode')
+            sslmode = sslmode_settings
+            if isinstance(sslmode_settings, str):
+                sslmode_settings = sslmode_settings.lower().replace("ssl", "")
+                tools_log.log_info(f"sslmode: {sslmode_settings}")
+                sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
+                sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
             credentials['sslmode'] = sslmode
             settings.endGroup()
+
             status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
             if not status:
                 tools_log.log_warning("Error connecting to database (settings)")
                 global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", None, 'ui_message')
                 return None, not_version
+
         else:
             tools_log.log_warning("Error getting default connection (settings)")
             global_vars.session_vars['last_error'] = tools_qt.tr("Error getting default connection", None, 'ui_message')
             return None, not_version
 
     global_vars.dao_db_credentials = credentials
+
     return credentials, not_version
 
 
