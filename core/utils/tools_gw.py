@@ -88,8 +88,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     try:
         raw_parameter = parameter
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
+
+        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
+            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -2679,7 +2680,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     if section == "i18n_generator" or parameter == "dev_commit":
         return
     # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_type is not None:
+    if prefix and global_vars.project_vars['project_type'] is not None:
         parameter = f"_{parameter}"
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False, True,
