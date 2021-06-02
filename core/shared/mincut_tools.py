@@ -16,7 +16,7 @@ from ..shared.selector import GwSelector
 from ..ui.ui_manager import GwSelectorUi, GwMincutUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_db
+from ...lib import tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwMincutTools:
@@ -48,7 +48,7 @@ class GwMincutTools:
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_mincut_man.findChild(QLineEdit, "txt_mincut_id")
-        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(self.tbl_mincut_edit)
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
@@ -72,7 +72,7 @@ class GwMincutTools:
         self.dlg_mincut_man.btn_next_days.clicked.connect(self._filter_by_days)
         self.dlg_mincut_man.spn_next_days.valueChanged.connect(self._filter_by_days)
         self.dlg_mincut_man.btn_cancel_mincut.clicked.connect(self._set_state_cancel_mincut)
-        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(partial(self._open_mincut, GwMincutUi()))
+        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(partial(self._open_mincut))
         self.dlg_mincut_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.btn_delete.clicked.connect(partial(
@@ -166,9 +166,10 @@ class GwMincutTools:
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
 
-    def _open_mincut(self, mincut_dialog):
+    def _open_mincut(self):
         """ Open mincut form with selected record of the table """
 
+        dlg_mincut = GwMincutUi()
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -181,9 +182,11 @@ class GwMincutTools:
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        tools_gw.close_dialog(self.dlg_mincut_man)
+        keep_open_form = tools_gw.get_config_parser('keep_opened_forms', 'mincut_manager', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
-        self.mincut.set_dialog(mincut_dialog)
+        self.mincut.set_dialog(dlg_mincut)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()
