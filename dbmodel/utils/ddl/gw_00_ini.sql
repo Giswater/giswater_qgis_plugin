@@ -16,6 +16,8 @@ SET client_min_messages = warning;
 -- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
 --
 
+-- The postgis extension is checked when connection is stablished. In case of does not exists, it tries to create. In case of failure, message is reported
+
 CREATE EXTENSION IF NOT EXISTS tablefunc;
 
 CREATE EXTENSION IF NOT EXISTS pgrouting;
