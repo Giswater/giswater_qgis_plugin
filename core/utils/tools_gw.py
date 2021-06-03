@@ -206,7 +206,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None, hide_config_widgets=False):
     """ Open dialog """
 
     # Check database connection before opening dialog
@@ -235,6 +235,9 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
         flags |= Qt.WindowStaysOnTopHint
 
     dlg.setWindowFlags(flags)
+
+    if hide_config_widgets:
+        hide_widgets_form(dlg, dlg_name)
 
     # Open dialog
     if issubclass(type(dlg), GwDialog):
@@ -2650,6 +2653,20 @@ def user_params_to_userconfig():
                         # Get the comment (inventory) and set it (user config file)
                         comment = value2.split('#')[1]
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
+
+
+def hide_widgets_form(dialog, dlg_name):
+
+    row = get_config_value(parameter=f'edit_{dlg_name}_widgets_to_hide', columns='value::text', table='config_param_system')
+    if row:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.objectName() and widget.objectName() in row[0]:
+                lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
+                if lbl_widget:
+                    lbl_widget.setVisible(False)
+                widget.setVisible(False)
+
 
 
 # region private functions

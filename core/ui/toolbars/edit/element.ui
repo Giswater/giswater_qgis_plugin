@@ -355,7 +355,7 @@
              <widget class="QComboBox" name="ownercat_id"/>
             </item>
             <item row="8" column="1">
-             <widget class="QLabel" name="lbl_owner">
+             <widget class="QLabel" name="lbl_ownercat_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
