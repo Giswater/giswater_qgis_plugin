@@ -180,3 +180,9 @@ INSERT INTO config_form_fields VALUES ('v_edit_review_audit_connec', 'form_featu
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields VALUES ('v_edit_review_audit_connec', 'form_feature', 'is_validated', 13, 'integer', 'text', 'is_validated', NULL, 'is_validated', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) 
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+--2021/05/13
+UPDATE sys_table SET sys_role='role_edit' WHERE id='inp_connec';
+
+--2021/06/03
+UPDATE sys_table SET sys_role='role_om' WHERE id='temp_arc';
