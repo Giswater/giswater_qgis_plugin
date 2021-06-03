@@ -123,19 +123,26 @@ class NotifyFunctions(ParentAction, QObject):
             dao = self.controller.dao
             dao.get_poll()
 
-            last_paiload = None
+            executed_notifies = []
             while dao.conn.notifies:
+                # We take the poll of notifies, from this we take the last one, if it is not in the list, we put it in
+                # the list and execute it. If there is one like it in the executed list, it means that of all those that
+                # were in the initial poll we have executed the last one and we do not want to execute the previous ones
                 notify = dao.conn.notifies.pop()
+
+                if notify in executed_notifies: continue
+                executed_notifies.append(notify)
+
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
-                if notify.payload and notify.payload != last_paiload:
-                    last_paiload = notify.payload
-                    try:
-                        complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
-                        self.execute_functions(complet_result)
-                    except Exception:
-                        pass
+
+                try:
+                     complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
+                     self._execute_functions(complet_result)
+                except Exception:
+                    pass
+
             thread = threading.Timer(interval=1, function=self.wait_notifications)
             thread.start()
         except AttributeError:
