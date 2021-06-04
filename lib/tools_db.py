@@ -103,6 +103,22 @@ def check_role_user(role_name, username=None):
         return False
 
 
+def check_super_user(username=None):
+
+    # Check @username exists
+    if username is None:
+        username = global_vars.current_user
+
+    if not check_role(username):
+        return False
+
+    sql = (f"SELECT usesuper FROM pg_user WHERE usename = '{username}';")
+    row = get_row(sql)
+    if row:
+        return row[0]
+    else:
+        return False
+
 def get_current_user():
     """ Get current user connected to database """
 

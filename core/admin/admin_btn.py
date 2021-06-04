@@ -433,17 +433,6 @@ class GwAdminButton:
 
         self.project_version = '0'
 
-        # Manage super users
-        self.super_users = []
-        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
-        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
-            super_users = f"{super_users}, {global_vars.current_user}"
-        if super_users:
-            super_users = super_users.split(',')
-            for super_user in super_users:
-                self.super_users.append(str(super_user).strip())
-
         # Get locale of QGIS application
         self.locale = tools_qgis.get_locale()
 
@@ -618,11 +607,11 @@ class GwAdminButton:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
-        role_admin = tools_db.check_role_user("role_admin", self.username)
-        if not role_admin and self.username not in self.super_users:
+        super_user = tools_db.check_super_user(self.username)
+        if not super_user:
             msg = "You don't have permissions to administrate project schemas on this connection"
             tools_qgis.show_message(msg, 1)
-            tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
         else:
@@ -1344,8 +1333,6 @@ class GwAdminButton:
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
 
-        extras += ', "superUsers":' + str(self.super_users).replace("'", '"') + ''
-
         self.schema_name = schema_name
 
         # Get current locale
@@ -1649,9 +1636,9 @@ class GwAdminButton:
 
         if self.logged:
             self.username = self._get_user_connection(self._get_last_connection())
-            role_admin = tools_db.check_role_user("role_admin", self.username)
-            if not role_admin and self.username not in self.super_users:
-                tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            super_user = tools_db.check_super_user(self.username)
+            if not super_user:
+                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
