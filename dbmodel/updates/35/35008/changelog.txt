@@ -2,3 +2,4 @@
 *************
 - Minor updates on sys_table
 - Enhancement on impor swmm function
+- Grant role_admin for current_user when creation schema in case of it does not has
