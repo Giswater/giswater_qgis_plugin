@@ -17,7 +17,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log, tools_db, tools_qgis
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
 class GwCSVButton(GwAction):
