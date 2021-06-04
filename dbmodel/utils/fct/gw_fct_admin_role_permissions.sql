@@ -88,6 +88,12 @@ BEGIN
 		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
 
+	-- Assign role admin to current user
+	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+		GRANT role_admin TO current_user;
+	END IF;
+
+
 	-- Grant generic permissions
 	IF v_vpn_dbuser THEN
 	
