@@ -335,7 +335,7 @@ BEGIN
 		FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 		INSERT INTO man_conduit(arc_id) SELECT csv1
 		FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
-		INSERT INTO inp_conduit (arc_id, custom_n, q0, qmax) SELECT csv1, csv5::numeric(12,3), csv8::numeric(12,3), csv9::numeric(12,3)
+		INSERT INTO inp_conduit (arc_id, q0, qmax) SELECT csv1, csv8::numeric(12,3), csv9::numeric(12,3)
 		FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 		-- insert other catalog tables
@@ -531,6 +531,7 @@ BEGIN
 		UPDATE cat_arc SET arc_type = 'EPACOND' WHERE arc_type IS NULL;
 		UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
 		UPDATE cat_hydrology SET name = 'Default';
+		UPDATE cswmm.cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
 		UPDATE node SET code = node_id WHERE code is null;
 		UPDATE arc SET code = arc_id WHERE code is null;
 			
