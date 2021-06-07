@@ -1867,10 +1867,6 @@ def get_role_permissions(qgis_project_role):
                     if not role_om:
                         role_basic = tools_db.check_role_user("role_basic")
 
-    # Manage user 'postgres', 'gisadmin'
-    if global_vars.current_user in ('postgres', 'gisadmin'):
-        role_master = True
-
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'
     elif role_om or qgis_project_role == 'role_om':
