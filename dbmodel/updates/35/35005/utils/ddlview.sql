@@ -262,3 +262,83 @@ CREATE OR REPLACE VIEW v_edit_macrosector AS
    FROM selector_sector, sector
      JOIN macrosector ON macrosector.macrosector_id = sector.macrosector_id
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+--2021/06/07
+DROP VIEW IF EXISTS v_ui_element_x_node;
+CREATE OR REPLACE VIEW v_ui_element_x_node AS
+SELECT element_x_node.id,
+    element_x_node.node_id,
+    element_x_node.element_id,
+    v_edit_element.elementcat_id,
+    cat_element.descript,
+    v_edit_element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    v_edit_element.observ,
+    v_edit_element.comment,
+    v_edit_element.location_type,
+    v_edit_element.builtdate,
+    v_edit_element.enddate,
+    v_edit_element.link,
+    v_edit_element.publish,
+    v_edit_element.inventory
+   FROM element_x_node
+JOIN v_edit_element ON v_edit_element.element_id = element_x_node.element_id
+JOIN value_state ON v_edit_element.state = value_state.id
+LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
+LEFT JOIN man_type_location ON man_type_location.location_type = v_edit_element.location_type AND man_type_location.feature_type='ELEMENT'
+LEFT JOIN cat_element ON cat_element.id=v_edit_element.elementcat_id;
+
+
+DROP VIEW IF EXISTS v_ui_element_x_arc;
+CREATE OR REPLACE VIEW v_ui_element_x_arc AS
+SELECT element_x_arc.id,
+    element_x_arc.arc_id,
+    element_x_arc.element_id,
+    v_edit_element.elementcat_id,
+    cat_element.descript,
+    v_edit_element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    v_edit_element.observ,
+    v_edit_element.comment,
+    v_edit_element.location_type,
+    v_edit_element.builtdate,
+    v_edit_element.enddate,
+    v_edit_element.link,
+    v_edit_element.publish,
+    v_edit_element.inventory
+   FROM element_x_arc
+JOIN v_edit_element ON v_edit_element.element_id = element_x_arc.element_id
+JOIN value_state ON v_edit_element.state = value_state.id
+LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
+LEFT JOIN man_type_location ON man_type_location.location_type = v_edit_element.location_type AND man_type_location.feature_type='ELEMENT'
+LEFT JOIN cat_element ON cat_element.id=v_edit_element.elementcat_id;
+
+
+DROP VIEW IF EXISTS v_ui_element_x_connec;
+CREATE OR REPLACE VIEW v_ui_element_x_connec AS
+SELECT element_x_connec.id,
+    element_x_connec.connec_id,
+    element_x_connec.element_id,
+    v_edit_element.elementcat_id,
+    cat_element.descript,
+    v_edit_element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    v_edit_element.observ,
+    v_edit_element.comment,
+    v_edit_element.location_type,
+    v_edit_element.builtdate,
+    v_edit_element.enddate,
+    v_edit_element.link,
+    v_edit_element.publish,
+    v_edit_element.inventory
+   FROM element_x_connec
+JOIN v_edit_element ON v_edit_element.element_id = element_x_connec.element_id
+JOIN value_state ON v_edit_element.state = value_state.id
+LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
+LEFT JOIN man_type_location ON man_type_location.location_type = v_edit_element.location_type AND man_type_location.feature_type='ELEMENT'
+LEFT JOIN cat_element ON cat_element.id=v_edit_element.elementcat_id;
+

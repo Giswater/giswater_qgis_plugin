@@ -674,3 +674,48 @@ CREATE OR REPLACE VIEW v_edit_review_connec AS
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW vp_basic_arc AS 
+SELECT arc_id AS nid,
+arc_type AS custom_type
+FROM arc;
+
+CREATE OR REPLACE VIEW vp_basic_connec AS 
+SELECT connec_id AS nid,
+connec_type AS custom_type
+FROM connec;
+
+CREATE OR REPLACE VIEW vp_basic_gully AS 
+SELECT gully_id AS nid,
+gully_type AS custom_type
+FROM gully;
+
+CREATE OR REPLACE VIEW vp_basic_node AS 
+SELECT node_id AS nid,
+node_type AS custom_type
+FROM node;
+
+
+
+-- 2021/06/07
+DROP VIEW IF EXISTS v_ui_element_x_gully;
+CREATE OR REPLACE VIEW v_ui_element_x_gully AS
+SELECT element_x_gully.id,
+    element_x_gully.gully_id,
+    element_x_gully.element_id,
+    v_edit_element.elementcat_id,
+    cat_element.descript,
+    v_edit_element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    v_edit_element.observ,
+    v_edit_element.comment,
+    v_edit_element.location_type,
+    v_edit_element.builtdate,
+    v_edit_element.enddate
+   FROM element_x_gully
+JOIN v_edit_element ON v_edit_element.element_id = element_x_gully.element_id
+JOIN value_state ON v_edit_element.state = value_state.id
+LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
+LEFT JOIN man_type_location ON man_type_location.location_type = v_edit_element.location_type AND man_type_location.feature_type='ELEMENT'
+LEFT JOIN cat_element ON cat_element.id=v_edit_element.elementcat_id;

@@ -1,2 +1,3 @@
 3.4.035
 ************
+- Allow obsolete features on Element tab
