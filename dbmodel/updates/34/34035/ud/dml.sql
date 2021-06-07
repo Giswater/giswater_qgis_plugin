@@ -17,3 +17,18 @@ VALUES ('v_edit_gully','form_feature', 'district_id', 'integer', 'combo', 'distr
 'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
 'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+--2021/06/07
+UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]' WHERE formname='v_edit_gully';
+
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT (id) AS id, id AS idval FROM cat_grate WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND columnname='id';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT(matcat_id) AS id,  matcat_id  AS idval FROM cat_grate WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND columnname='matcat_id';
