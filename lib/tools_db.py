@@ -251,6 +251,8 @@ def connect_to_database_service(service, sslmode=None):
     if sslmode:
         conn_string += f" sslmode={sslmode}"
 
+    tools_log.log_info(conn_string)
+
     # We need to create this connections for Table Views
     global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
     global_vars.qgis_db_credentials.setConnectOptions(conn_string)
