@@ -119,6 +119,16 @@ def check_super_user(username=None):
     else:
         return False
 
+
+def check_postgis_version():
+
+    sql = f"select name FROM pg_available_extensions where name = 'postgis'"
+    row = get_row(sql)
+    if row:
+        return row[0]
+    else:
+        return False
+
 def get_current_user():
     """ Get current user connected to database """
 

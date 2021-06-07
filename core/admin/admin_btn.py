@@ -54,6 +54,12 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.project_issample = True
+        self.form_enabled = True
+
+        self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
+                                                              "giswater"))
+        self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
+                                                              "giswater"))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -556,12 +562,12 @@ class GwAdminButton:
         self.schema = None
 
         # Get last database connection
-        self.last_connection = self._get_last_connection()
+        last_connection = self._get_last_connection()
 
         # Get database connection user and role
         self.username = username
         if username is None:
-            self.username = self._get_user_connection(self.last_connection)
+            self.username = self._get_user_connection(last_connection)
 
         self.dlg_readsql.btn_info.setText('Update Project Schema')
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
@@ -573,7 +579,7 @@ class GwAdminButton:
             tools_qt.fill_combo_values(self.cmb_connection, self.list_connections, 1)
 
         # Set last connection for default
-        tools_qt.set_combo_value(self.cmb_connection, str(self.last_connection), 1)
+        tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
 
         # Set title
         connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
@@ -590,10 +596,6 @@ class GwAdminButton:
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
             return
 
-        # Create extension postgis if not exist
-        sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-        tools_db.execute_sql(sql)
-
         # Set projecte type
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
@@ -607,14 +609,21 @@ class GwAdminButton:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
+        self.form_enabled = True
+        message = ''
+
+        # Check PostgreSQL Version
+        if int(self.postgresql_version) not in range(self.lower_postgresql_version, self.upper_postgresql_version) and self.form_enabled:
+            message = "Incompatible version of PostgreSQL"
+            self.form_enabled = False
+
+        # Check super_user
         super_user = tools_db.check_super_user(self.username)
-        if not super_user:
-            msg = "You don't have permissions to administrate project schemas on this connection"
-            tools_qgis.show_message(msg, 1)
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-        else:
+        if not super_user and self.form_enabled:
+            message = "You don't have permissions to administrate project schemas on this connection"
+            self.form_enabled = False
+        elif self.form_enabled:
+
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
@@ -630,6 +639,25 @@ class GwAdminButton:
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.enable_dialog(self.dlg_readsql, True)
+
+        # Check postgis extension and create if not exist
+        postgis_extension = tools_db.check_postgis_version()
+        if postgis_extension and self.form_enabled:
+            sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+            tools_db.execute_sql(sql)
+        elif self.form_enabled:
+            message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+
+        if self.form_enabled is False:
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+        else:
+            tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            self.dlg_readsql.btn_info.setEnabled(False)
 
         # Load last schema name selected and project type
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
@@ -1634,16 +1662,42 @@ class GwAdminButton:
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
 
-        if self.logged:
-            self.username = self._get_user_connection(self._get_last_connection())
+            message = ''
+            self.form_enabled = True
+
+            # Check super_user
+            self.username = self._get_user_connection(connection_name)
             super_user = tools_db.check_super_user(self.username)
-            if not super_user:
+
+            if not super_user and self.form_enabled:
+                message = "You don't have permissions to administrate project schemas on this connection"
+                self.form_enabled = False
+
+            # Check PostgreSQL Version
+            self.postgresql_version = tools_db.get_pg_version()
+            if int(self.postgresql_version) not in range(self.lower_postgresql_version,
+                                                         self.upper_postgresql_version) and self.form_enabled:
+                message = "Incompatible version of PostgreSQL"
+                self.form_enabled = False
+
+            # Check postgis extension and create if not exist
+            postgis_extension = tools_db.check_postgis_version()
+            if postgis_extension and self.form_enabled:
+                sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+                tools_db.execute_sql(sql)
+            elif self.form_enabled:
+                message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+
+            if self.form_enabled is False:
                 tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
-                    "You don't have permissions to administrate project schemas on this connection")
+                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-
+            else:
+                tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                self.dlg_readsql.btn_info.setEnabled(False)
 
     def _set_last_connection(self, connection_name):
         """"""
@@ -1917,7 +1971,8 @@ class GwAdminButton:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
         # Set label schema name
-        self.lbl_schema_name.setText(str(schema_name))
+        if schema_name not in (None, '', 'null'):
+            self.lbl_schema_name.setText(str(schema_name))
 
         if schema_name == 'Nothing to select' or schema_name == '':
             self.project_issample = None
@@ -1937,19 +1992,19 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if schema_name == 'Nothing to select' or schema_name == '':
+        if schema_name == 'Nothing to select' or schema_name == '' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-        elif str(self.plugin_version) > str(self.project_version):
+        elif str(self.plugin_version) > str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
-        elif str(self.plugin_version) < str(self.project_version):
+        elif str(self.plugin_version) < str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
-        else:
+        elif self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             self.dlg_readsql.btn_info.setEnabled(False)
