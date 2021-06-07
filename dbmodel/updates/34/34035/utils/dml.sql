@@ -74,3 +74,13 @@ INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_
 INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'network_stats', 5, true);
 INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'inp_options', 6, true);
 INSERT INTO config_form_tableview VALUES ('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'rpt_stats', 7, true);
+
+-- 2021/05/12
+INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3034, 'gw_fct_pg2epa_autorepair_epatype', 'utils', 'function', 'role_epa');
+
+-- 2021/06/07
+UPDATE config_form_fields SET dv_querytext_filterc=NULL WHERE dv_querytext_filterc=' AND id ';
+UPDATE config_form_fields SET dv_parent_id='muni_id' WHERE columnname='streetname' AND formname='v_om_mincut';
+UPDATE config_form_fields SET dv_querytext_filterc=' AND m.name' WHERE dv_querytext_filterc='AND m.name';
+UPDATE config_form_fields SET dv_querytext_filterc=' AND m.muni_id' WHERE dv_querytext_filterc='AND m.muni_id';
+
