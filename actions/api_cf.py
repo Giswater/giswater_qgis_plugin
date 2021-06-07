@@ -1587,6 +1587,8 @@ class ApiCF(ApiParent, QObject):
         # Check geom_type
         if self.geom_type == 'connec':
             widget = f'{tab_type}_{self.geom_type}at_id'
+        elif self.geom_type == 'gully':
+            widget = f'{tab_type}_gratecat_id'
         else:
             widget = f'{tab_type}_{self.geom_type}cat_id'
         self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
