@@ -211,6 +211,11 @@ class NotifyFunctions(ParentAction, QObject):
             result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
             if not result:
                 continue
+
+            if 'status' in result and result['status'] == 'Failed':
+                self.controller.manage_exception_api(result)
+                continue
+
             for field in result['body']['data']['fields']:
                 _values = {}
                 # Get column index

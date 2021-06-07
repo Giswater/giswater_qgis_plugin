@@ -1379,6 +1379,10 @@ class Giswater(QObject):
             if not complet_result:
                 continue
 
+            if 'status' in complet_result and complet_result['status'] == 'Failed':
+                self.controller.manage_exception_api(complet_result)
+                continue
+
             for field in complet_result['body']['data']['fields']:
                 valuemap_values = {}
 
