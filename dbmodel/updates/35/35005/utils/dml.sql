@@ -22,7 +22,8 @@ UPDATE man_type_function set featurecat_id=NULL WHERE featurecat_id in ('{NODE}'
 UPDATE man_type_fluid set featurecat_id=NULL WHERE featurecat_id in ('{NODE}','{CONNEC}','{ARC}','{GULLY}');
 
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3034, 'gw_fct_pg2epa_autorepair_epatype', 'utils', 'function', 'role_epa');
+INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) 
+VALUES (3034, 'gw_fct_pg2epa_autorepair_epatype', 'utils', 'function', 'role_epa') ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":"$userInpResult"}]'
 WHERE id = 2680;
@@ -70,7 +71,7 @@ isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_i
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_exploitation', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
-null,null,null,false);
+null,null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
@@ -78,7 +79,7 @@ isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_i
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_dma', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
-null,null,null,false);
+null,null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
@@ -86,7 +87,7 @@ isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_i
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_sector', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
-null,null,null,false);
+null,null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 INSERT INTO edit_typevalue VALUES ('value_boolean','0','FALSE');
