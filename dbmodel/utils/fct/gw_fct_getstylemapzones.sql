@@ -76,6 +76,11 @@ BEGIN
 	v_dma  := COALESCE(v_dma, '{}');
 	v_presszone := COALESCE(v_presszone, '{}');
 	v_dqa  := COALESCE(v_dqa, '{}');
+	v_colsector  := COALESCE(v_colsector, '{}');
+	v_colpresszone  := COALESCE(v_colpresszone, '{}');
+	v_coldma  := COALESCE(v_coldma, '{}');
+	v_coldqa  := COALESCE(v_coldqa, '{}');
+
 	
 	--    Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
