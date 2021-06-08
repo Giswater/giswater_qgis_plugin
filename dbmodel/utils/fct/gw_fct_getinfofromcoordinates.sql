@@ -231,7 +231,7 @@ BEGIN
 
 			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
-			ORDER BY  ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
+			ORDER BY  CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
 			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
