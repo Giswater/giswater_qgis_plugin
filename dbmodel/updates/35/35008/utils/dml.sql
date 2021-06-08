@@ -33,3 +33,7 @@ VALUES (3036,'Check arcs duplicated', '{"featureType":["arc"]}',
 '[{"widgetname":"checkType", "label":"Check type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["geometry","finalNodes"], "comboNames":["GEOMETRY", "FINAL NODES"], "selectedId":"finalNodes"}]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
+
+
+-- 2021/06/08
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_version", "column":"sample"}}$$)
