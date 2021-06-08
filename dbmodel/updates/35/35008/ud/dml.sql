@@ -22,4 +22,4 @@ UPDATE sys_table SET notify_action  ='[{"channel":"desktop","name":"refresh_attr
 WHERE id  = 'cat_feature_node';
 
 UPDATE sys_table SET notify_action  ='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["v_edit_inp_dwf", "inp_aquifer", "inp_inflows", "inp_inflows_pol_x_node",  "inp_dwf_pol_x_node"]}]'
-WHERE id  = 'cat_feature_node';
+WHERE id  = 'inp_pattern';
