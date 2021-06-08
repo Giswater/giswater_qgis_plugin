@@ -53,7 +53,6 @@ class GwAdminButton:
         self.dlg_readsql_create_project = None
         self.project_type_selected = None
         self.schema_type = None
-        self.project_issample = True
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
@@ -129,7 +128,6 @@ class GwAdminButton:
 
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
 
-        self.project_issample = example_data
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -1183,9 +1181,6 @@ class GwAdminButton:
 
     def _load_sample_data(self, project_type=False):
 
-        sql = f"UPDATE {self.schema}.sys_version SET sample = True"
-        tools_db.execute_sql(sql, commit=False)
-
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep + project_type
             status = self._execute_files(folder)
@@ -1349,7 +1344,6 @@ class GwAdminButton:
 
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
-            extras += '"isSample":"' + str(self.project_issample) + '", '
         else:
             extras = '"isNewProject":"' + str('FALSE') + '", '
         extras += '"gwVersion":"' + str(self.plugin_version) + '", '
@@ -1977,9 +1971,6 @@ class GwAdminButton:
         # Set label schema name
         if schema_name not in (None, '', 'null'):
             self.lbl_schema_name.setText(str(schema_name))
-
-        if schema_name == 'Nothing to select' or schema_name == '':
-            self.project_issample = None
 
         if self.project_type:
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
