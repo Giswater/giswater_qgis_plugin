@@ -696,12 +696,6 @@ BEGIN
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_fields;
-		
-				-- in case of insert status must be failed when topocontrol fails
-				IF (v_fields->>'status')='Failed' THEN
-					v_message = (v_fields->>'MSGERR');
-					v_status = 'Failed';
-				END IF;
 							
 			ELSIF v_editable = FALSE OR v_islayer THEN 
 			
@@ -730,12 +724,17 @@ BEGIN
 	IF v_idname = 'sys_hydrometer_id' THEN
 		v_idname = 'hydrometer_id';
 	END IF;
-		
+	
+	IF (v_fields->>'status')='Failed' THEN
+		v_message = (v_fields->>'message');
+		v_status = 'Failed';
+	END IF;
+	
 	-- message for null
 	IF v_tablename IS NULL THEN
 		v_message='{"level":0, "text":"No feature found", "results":0}';
 	END IF;
-
+	
 	--    Control NULL's
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_featureinfo := COALESCE(v_featureinfo, '{}');
