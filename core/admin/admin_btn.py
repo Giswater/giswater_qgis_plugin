@@ -3101,7 +3101,8 @@ class GwAdminButton:
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
         else:
-            msg = "You don't have any connection configurated on QGIS. Check your connections."
+            msg = "You don't have any connection to PostGIS database configurated. " \
+                  "Check your QGIS data source manager and create at least one"
             tools_qt.show_info_box(msg, "Info")
             return
 
