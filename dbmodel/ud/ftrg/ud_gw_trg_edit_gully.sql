@@ -334,7 +334,7 @@ BEGIN
 
 		-- Code
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
-		IF (v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
 			NEW.code=NEW.gully_id;
 		END IF;	
 		
