@@ -65,6 +65,7 @@ class ManageElement(ParentManage):
             layer.selectByIds([feature.id()])
 
         utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_add_element.enddate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
@@ -201,7 +202,6 @@ class ManageElement(ParentManage):
         self.manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self.manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
         self.manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
-        self.manage_combo(self.dlg_add_element.builtdate, 'edit_builtdate_vdefault')
         self.manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self.manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self.manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
@@ -263,6 +263,7 @@ class ManageElement(ParentManage):
         location_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.location_type)
         buildercat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.buildercat_id)
         builtdate = utils_giswater.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
+        enddate = utils_giswater.getWidgetText(self.dlg_add_element, "enddate", return_string_null=False)
         workcat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id)
         workcat_id_end = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
         comment = utils_giswater.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
@@ -304,14 +305,14 @@ class ManageElement(ParentManage):
             # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, "
                               f"$${link}$$, '{undelete}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
 
                 sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', '{state_type}', "
@@ -320,6 +321,10 @@ class ManageElement(ParentManage):
 
             if builtdate:
                 sql_values += f", '{builtdate}'"
+            else:
+                sql_values += ", null"
+            if enddate:
+                sql_values += f", '{enddate}'"
             else:
                 sql_values += ", null"
             if ownercat_id:
@@ -382,6 +387,10 @@ class ManageElement(ParentManage):
                 sql += f", builtdate = '{builtdate}'"
             else:
                 sql += ", builtdate = null"
+            if enddate:
+                sql += f", enddate = '{enddate}'"
+            else:
+                sql += ", enddate = null"
             if ownercat_id:
                 sql += f", ownercat_id = '{ownercat_id}'"
             else:
