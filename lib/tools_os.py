@@ -5,6 +5,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+import configparser
 import os
 import pathlib
 import sys
@@ -13,6 +14,8 @@ import urllib.parse as parse
 import webbrowser
 
 from qgis.PyQt.QtWidgets import QFileDialog
+
+from . import tools_log
 
 
 def get_datadir() -> pathlib.Path:
@@ -122,4 +125,34 @@ def get_folder_size(folder):
             size += os.path.getsize(filepath)
 
     return size
+
+
+def manage_pg_service(section):
+
+    service_file = os.environ.get('PGSERVICEFILE')
+    if service_file is None:
+        tools_log.log_warning(f"Environment variable 'PGSERVICEFILE' not set")
+        return None
+    if not os.path.exists(service_file):
+        tools_log.log_warning(f"File not found: {service_file}")
+        return None
+
+    config_parser = configparser.ConfigParser()
+    credentials = {'host': None, 'port': None, 'dbname': None, 'user': None, 'password': None, 'sslmode': None}
+    try:
+        config_parser.read(service_file)
+        if config_parser.has_section(section):
+            params = config_parser.items(section)
+            if not params:
+                tools_log.log_warning(f"No parameters found in section {section}")
+                return None
+            else:
+                for param in params:
+                    credentials[param[0]] = param[1]
+        else:
+            tools_log.log_warning(f"Section '{section}' not found in the file {service_file}")
+    except configparser.DuplicateSectionError as e:
+        tools_log.log_warning(e)
+    finally:
+        return credentials
 
