@@ -363,6 +363,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '381', concat('INFO: No y0 column without values for storages.'),v_count);
 	END IF;		
 
+
 	RAISE NOTICE '14- Volume dimensions for storage data (382)';
 	SELECT count(*) INTO v_count FROM v_edit_inp_storage where (a1 is null and a2 is null and a0 is null AND storage_type='FUNCTIONAL') OR (curve_id IS NULL AND storage_type='TABULAR');
 	IF v_count > 0 THEN
@@ -375,6 +376,17 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '382', concat('INFO: Mandatory colums for volume values used on storage type have been checked without any values missed.'),v_count);
 	END IF;		
 
+	RAISE NOTICE '15- Manning values for cat_mat_arc';
+	SELECT count(*) INTO v_count FROM cat_mat_arc JOIN v_edit_arc ON matcat_id = id where sys_type !='VARC' AND n is null;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '383', concat('ERROR-383: There is/are ',v_count,
+		' material(s) with null values on manning coefficient column used on a real arc wich manning is needed.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '383', concat('INFO: Manning coefficient on cat_mat_arc is filled for those materials used on real arcs (not varcs).'),v_count);
+	END IF;	
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
