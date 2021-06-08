@@ -4,3 +4,4 @@
 - Enhancement on impor swmm function
 - Grant role_admin for current_user when creation schema in case of it does not has
 - Create new function gw_fct_anl_arc_duplicated
+- Check missed values for cat_mat.arc n used on real arcs
