@@ -10,7 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/06/04
 UPDATE sys_feature_cat SET epa_default = 'CONDUIT' WHERE id = 'SIPHON';
-DELETE FROM sys_feature_cat  WHERE id = 'ELEMENT';
 
 UPDATE sys_table SET notify_action  ='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "cat_arc"]}]'
 WHERE id  = 'cat_feature_arc';
