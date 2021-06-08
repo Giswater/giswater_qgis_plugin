@@ -22,3 +22,13 @@ WHERE id  = 'cat_feature_node';
 
 UPDATE sys_table SET notify_action  ='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["v_edit_inp_dwf", "inp_aquifer", "inp_inflows", "inp_inflows_pol_x_node",  "inp_dwf_pol_x_node"]}]'
 WHERE id  = 'inp_pattern';
+
+UPDATE inp_typevalue SET idval = 'BIO-RETENTION CELL' WHERE id = 'BC';
+UPDATE inp_typevalue SET idval = 'GREEN ROOF (5.1)' WHERE id = 'GR';
+UPDATE inp_typevalue SET idval = 'INFILTRATION TRENCH' WHERE id = 'IT';
+UPDATE inp_typevalue SET idval = 'PERMEABLE PAVEMENT' WHERE id = 'PP';
+UPDATE inp_typevalue SET idval = 'RAIN BARREL' WHERE id = 'RB';
+UPDATE inp_typevalue SET idval = 'VEGETATIVE SWALE' WHERE id = 'VS';
+
+INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RG', 'RAIN GARDEN (5.1)');
+INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONNECTION (5.1)');

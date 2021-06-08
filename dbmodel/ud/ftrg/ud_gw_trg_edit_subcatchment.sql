@@ -39,12 +39,11 @@ BEGIN
 			NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
 		END IF;
 
-       		
 		-- FEATURE INSERT
-		INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, 
-		drytime_2, sector_id, hydrology_id, the_geom, descript) 
+		INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction,
+		conduct, initdef, curveno, drytime_2, sector_id, hydrology_id, the_geom, descript) 
 		VALUES (NEW.subc_id, NEW.outlet_id, NEW.rg_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, NEW.nimp, NEW.nperv, NEW.simp, NEW.sperv, NEW.zero, NEW.routeto, NEW.rted, NEW.maxrate, 
-		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.conduct_2, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, NEW.descript);
+		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, NEW.descript);
 		
 		RETURN NEW;
 
