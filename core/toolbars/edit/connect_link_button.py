@@ -18,6 +18,7 @@ from ....lib import tools_qgis, tools_qt
 
 from ...threads.connect_link import GwConnectLink
 
+from .... import global_vars
 
 class GwConnectLinkButton(GwMaptool):
     """ Button 20: Connect Link
@@ -128,22 +129,6 @@ class GwConnectLinkButton(GwMaptool):
                     QgsApplication.taskManager().addTask(self.connect_link_task)
                     QgsApplication.taskManager().triggerTask(self.connect_link_task)
 
-            layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-            if layer:
-                # Check selected records
-                number_features = 0
-                number_features += layer.selectedFeatureCount()
-
-                if number_features > 0:
-                    message = "Number of features selected in the group of"
-                    title = "Interpolate value - Do you want to update values"
-                    answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
-                    if answer:
-                        # Create link
-                        self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer)
-                        QgsApplication.taskManager().addTask(self.connect_link_task)
-                        QgsApplication.taskManager().triggerTask(self.connect_link_task)
-
             if number_features == 0:
                 self.cancel_map_tool()
 
@@ -188,6 +173,9 @@ class GwConnectLinkButton(GwMaptool):
             self.dlg_dtext.setWindowTitle('Connect to network')
             self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
             self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+            if layer.name() == 'Connec' and global_vars.project_type == 'ud':
+                self.dlg_dtext.btn_close.clicked.connect(partial(self.manage_gully_result))
+                self.dlg_dtext.rejected.connect(partial(self.manage_gully_result))
             tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
 
             tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
@@ -195,13 +183,35 @@ class GwConnectLinkButton(GwMaptool):
         layer.removeSelection()
 
         # Refresh map canvas
-        self.rubber_band.reset()
-        self.refresh_map_canvas()
-        self.iface.actionPan().trigger()
+        if layer.name() == 'Gully' or global_vars.project_type == 'ws':
+            self.rubber_band.reset()
+            self.refresh_map_canvas()
+            self.iface.actionPan().trigger()
 
         # Force reload dataProvider of layer
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_vnode')
+
+
+    def manage_gully_result(self):
+
+        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
+        if layer:
+            # Check selected records
+            number_features = 0
+            number_features += layer.selectedFeatureCount()
+            if number_features > 0:
+                message = "Number of features selected in the group of"
+                title = "Interpolate value - Do you want to update values"
+                answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
+                if answer:
+                    # Create link
+                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer)
+                    QgsApplication.taskManager().addTask(self.connect_link_task)
+                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
+
+            if number_features == 0:
+                self.cancel_map_tool()
 
     # endregion
 
