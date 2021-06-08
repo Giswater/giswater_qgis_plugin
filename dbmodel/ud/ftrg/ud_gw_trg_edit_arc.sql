@@ -62,8 +62,10 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN   
 
 		-- Arc ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.arc_id IS NULL THEN 
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
 		 -- Arc type
 		IF (NEW.arc_type IS NULL) THEN
@@ -278,15 +280,21 @@ BEGIN
 	       	END IF;			
    
 
-		--Inventory	
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		--Inventory
+		IF NEW.inventory IS NULL THEN 
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		END IF;
 
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		IF NEW.publish IS NULL THEN 
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		END IF;
 
 		--Uncertain
-		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	       	
-		
+		IF NEW.uncertain IS NULL THEN 
+			NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	       	
+		END IF;
+
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
 			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -314,7 +322,7 @@ BEGIN
 		--Copy id to code field
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.arc_type;
 		
-		IF (v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
 			NEW.code=NEW.arc_id;
 		END IF;
 		
@@ -366,26 +374,26 @@ BEGIN
 			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, 
-			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value) 
+			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, lastupdate, lastupdate_user) 
 			VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user);
 		ELSE
 			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, 
-			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id) 
+			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, lastupdate, lastupdate_user) 
 			VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id);		
+			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.lastupdate, NEW.lastupdate_user);		
 		END IF;
 		
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls

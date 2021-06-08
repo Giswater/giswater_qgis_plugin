@@ -64,8 +64,10 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- connec ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.connec_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.connec_id IS NULL THEN
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.connec_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
 		-- connec type
 		IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
@@ -285,18 +287,24 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.connec_type;
 
 		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
 			NEW.code=NEW.connec_id;
 		END IF;
 
 		--Inventory	
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		IF NEW.inventory IS NULL THEN 
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		END IF;
 
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
+		IF NEW.publish IS NULL THEN 
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
+		END IF;
 
 		--Uncertain
-		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
+		IF NEW.uncertain IS NULL THEN 
+			NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	
+		END IF;
 		
 	    -- LINK
 	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean= TRUE THEN
@@ -371,25 +379,29 @@ BEGIN
 			"observ","comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete,  label_x, label_y, 
-			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_connecat_id)
+			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_connecat_id,
+			lastupdate, lastupdate_user)
 			VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth, 
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, 
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, 
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
-			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);	
+			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id,
+			NEW.lastupdate, NEW.lastupdate_user);	
 		ELSE
 			INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, 
 			"observ","comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete, label_x, label_y, 
-			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_connecat_id, matcat_id)
+			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_connecat_id, matcat_id,
+			lastupdate, lastupdate_user)
 			VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth, 
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, 
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
-			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id, NEW.matcat_id);
+			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id, NEW.matcat_id,
+			NEW.lastupdate, NEW.lastupdate_user);
 		END IF;
 		
 		IF NEW.state=1 THEN

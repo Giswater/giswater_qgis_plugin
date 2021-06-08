@@ -153,8 +153,10 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- Node ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.node_id IS NULL THEN 
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
 		-- set and get id for polygon
 		IF v_doublegeometry THEN
@@ -470,7 +472,7 @@ BEGIN
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id,v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
-			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, now(), current_user);	
+			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user);	
 		ELSE
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id,
@@ -481,7 +483,7 @@ BEGIN
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
-			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, now(), current_user, NEW.matcat_id);	
+			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.lastupdate, NEW.lastupdate_user);	
 		END IF;
 				
 		IF v_man_table='man_junction' THEN
