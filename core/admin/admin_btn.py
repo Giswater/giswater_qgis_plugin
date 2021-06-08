@@ -699,6 +699,8 @@ class GwAdminButton:
             tools_qgis.show_warning("GIS folder not set")
             return
 
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
+
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
             tools_qgis.show_warning("GIS file name not set")
@@ -759,8 +761,10 @@ class GwAdminButton:
         # Set default values
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
-        users_home = os.path.expanduser("~")
-        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
+        qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False)
+        if qgis_file_path is None:
+            qgis_file_path = os.path.expanduser("~")
+        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
