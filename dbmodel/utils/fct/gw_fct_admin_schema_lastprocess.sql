@@ -14,7 +14,7 @@ $BODY$
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"}, 
-"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true,
+"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS",
 		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
 
 
@@ -47,7 +47,6 @@ v_superusers text;
 v_tablename record;
 v_schemaname text;
 v_oldversion text;
-v_issample boolean = FALSE;
 v_sample_exist text = '';
 	
 BEGIN 
@@ -62,7 +61,6 @@ BEGIN
 	v_projecttype := (p_data ->> 'data')::json->> 'projectType';
 	v_epsg := (p_data ->> 'data')::json->> 'epsg';
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
-	v_issample := (p_data ->> 'data')::json->> 'isSample';
 	v_descript := (p_data ->> 'data')::json->> 'descript';
     v_name := (p_data ->> 'data')::json->> 'name';
 	v_author := (p_data ->> 'data')::json->> 'author';
@@ -94,8 +92,8 @@ BEGIN
 		ON CONFLICT (parameter) DO NOTHING;
 			
 		-- inserting version table
-		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
-		(select postgis_version()), v_language, v_epsg, v_issample);
+		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+		(select postgis_version()), v_language, v_epsg);
 		
 		v_message='Project sucessfully created';
 		
