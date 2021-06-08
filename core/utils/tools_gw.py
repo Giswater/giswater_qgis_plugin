@@ -457,6 +457,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(vlayer, qml)
 
+    # Set layer config
+    if tablename:
+        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
+        extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+        body = create_body(feature=feature, extras=extras)
+        execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
+
     global_vars.iface.mapCanvas().refresh()
 
 
