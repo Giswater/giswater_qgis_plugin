@@ -92,8 +92,10 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 	
 		-- Node ID	
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.node_id IS NULL THEN 
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 			
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
@@ -335,17 +337,19 @@ BEGIN
 		
 		
 		--Inventory
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-		
-		
+		IF NEW.inventory IS NULL THEN 
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		END IF;
+
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
-		
+		IF NEW.publish IS NULL THEN 
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		END IF;	
 		
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 		
 		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
 			NEW.code=NEW.node_id;
 		END IF;
 
@@ -442,14 +446,14 @@ BEGIN
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
-		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility)
+		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, lastupdate, lastupdate_user)
 
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, 
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
-		NEW.adate, NEW.adescript, NEW.accessibility);
+		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user);
 
 		
 		IF v_man_table='man_tank' THEN
