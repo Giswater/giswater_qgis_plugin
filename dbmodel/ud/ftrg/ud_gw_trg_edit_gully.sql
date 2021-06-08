@@ -324,13 +324,18 @@ BEGIN
 		END IF;  
 
 		--Inventory	
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-
+		IF NEW.inventory IS NULL THEN 
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		END IF;
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		IF NEW.publish IS NULL THEN 
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		END IF;
 
 		--Uncertain
-		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	
+		IF NEW.uncertain IS NULL THEN 
+			NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
+		END IF;
 
 		-- Code
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
@@ -480,7 +485,8 @@ BEGIN
 			connec_depth, siphon, arc_id, pol_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, 
 			category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
 			postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
-			link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value)
+			link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
+			lastupdate, lastupdate_user)
 		VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
 			NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
 			NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
@@ -488,7 +494,7 @@ BEGIN
 			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
 			NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 			NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
-			 NEW.uncertain, NEW.num_value);
+			 NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user);
 
 
 		IF NEW.state=1 THEN

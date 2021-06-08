@@ -371,13 +371,18 @@ BEGIN
 		END IF;
 	
 		--Inventory	
-		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-
+		IF NEW.inventory IS NULL THEN 
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		END IF;
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		IF NEW.publish IS NULL THEN 
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		END IF;
 
 		--Uncertain
-		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
+		IF NEW.uncertain IS NULL THEN 
+			NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
+		END IF;
 		
 		-- code autofill
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.node_type;
