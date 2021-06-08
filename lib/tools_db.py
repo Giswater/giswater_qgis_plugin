@@ -10,7 +10,7 @@ from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
-from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao
+from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao, tools_os
 
 
 def create_list_for_completer(sql):
@@ -153,7 +153,6 @@ def get_srid(tablename, schemaname=None):
 def set_database_connection():
     """ Set database connection """
 
-    # Initialize variables
     global_vars.dao = None
     global_vars.session_vars['last_error'] = None
     global_vars.session_vars['logged_status'] = False
@@ -214,7 +213,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     # Update current user
     global_vars.current_user = user
 
-    # We need to create this connections for Table Views
+    # QSqlDatabase connection for Table Views
     global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
     global_vars.qgis_db_credentials.setHostName(host)
     if port != '':
@@ -224,19 +223,19 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     global_vars.qgis_db_credentials.setPassword(pwd)
     status = global_vars.qgis_db_credentials.open()
     if not status:
-        message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.session_vars['last_error'] = tools_qt.tr(message)
+        msg = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
+        global_vars.session_vars['last_error'] = tools_qt.tr(msg)
         details = global_vars.qgis_db_credentials.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
 
-    # Connect to Database
+    # psycopg2 connection
     global_vars.dao = tools_pgdao.GwPgDao()
     global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
     status = global_vars.dao.init_db()
     if not status:
-        message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.session_vars['last_error'] = tools_qt.tr(message)
+        msg = "Database connection error (psycopg2). Please open plugin log file to get more details"
+        global_vars.session_vars['last_error'] = tools_qt.tr(msg)
         tools_log.log_warning(str(global_vars.dao.last_error))
         return False
 
@@ -251,28 +250,34 @@ def connect_to_database_service(service, sslmode=None):
     if sslmode:
         conn_string += f" sslmode={sslmode}"
 
-    tools_log.log_info(conn_string)
+    # Get credentials from .pg_service.conf
+    credentials = tools_os.manage_pg_service(service)
+    if credentials:
+        status = connect_to_database(credentials['host'], credentials['port'], credentials['dbname'],
+                                     credentials['user'], credentials['password'], credentials['sslmode'])
 
-    # We need to create this connections for Table Views
-    global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.qgis_db_credentials.setConnectOptions(conn_string)
-    status = global_vars.qgis_db_credentials.open()
-    if not status:
-        message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-        global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        details = global_vars.qgis_db_credentials.lastError().databaseText()
-        tools_log.log_warning(str(details))
-        return False
+    else:
+        # Try to connect using name defined in service file
+        # QSqlDatabase connection
+        global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+        global_vars.qgis_db_credentials.setConnectOptions(conn_string)
+        status = global_vars.qgis_db_credentials.open()
+        if not status:
+            msg = "Service database connection error (QSqlDatabase). Please open plugin log file to get more details"
+            global_vars.session_vars['last_error'] = tools_qt.tr(msg)
+            details = global_vars.qgis_db_credentials.lastError().databaseText()
+            tools_log.log_warning(str(details))
+            return False
 
-    # Connect to Database
-    global_vars.dao = tools_pgdao.GwPgDao()
-    global_vars.dao.set_conn_string(conn_string)
-    status = global_vars.dao.init_db()
-    if not status:
-        message = "Database connection error (PgDao). Please open plugin log file to get more details"
-        global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        tools_log.log_warning(str(global_vars.dao.last_error))
-        return False
+        # psycopg2 connection
+        global_vars.dao = tools_pgdao.GwPgDao()
+        global_vars.dao.set_conn_string(conn_string)
+        status = global_vars.dao.init_db()
+        if not status:
+            msg = "Service database connection error (psycopg2). Please open plugin log file to get more details"
+            global_vars.session_vars['last_error'] = tools_qt.tr(msg)
+            tools_log.log_warning(str(global_vars.dao.last_error))
+            return False
 
     return status
 
