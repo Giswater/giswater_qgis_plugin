@@ -122,12 +122,12 @@ BEGIN
       		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
       		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
       		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       		stylesheet, widgetfunction, linkedaction, hidden)
+       		stylesheet, widgetfunction, linkedobject, hidden)
 			SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
        		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
      		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       		stylesheet, widgetfunction, linkedaction, hidden
+       		stylesheet, widgetfunction,linkedobject, hidden
 			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 			
@@ -159,12 +159,12 @@ BEGIN
        datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
        dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       stylesheet, widgetfunction, linkedaction, hidden)
+       stylesheet, widgetfunction, linkedobject, hidden)
 		SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
        datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
        dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       stylesheet, widgetfunction, linkedaction, hidden
+       stylesheet, widgetfunction, linkedobject, hidden
 		FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 		ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 	
