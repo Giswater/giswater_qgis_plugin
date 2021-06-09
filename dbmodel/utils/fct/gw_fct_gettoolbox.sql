@@ -214,7 +214,11 @@ BEGIN
 			v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querytext INTO v_arrayresult;
-				
+	
+			IF (rec.inputparams::json->>'isNullValue')::boolean IS TRUE THEN
+				v_arrayresult = array_prepend('',v_arrayresult);
+			END IF;
+
 			IF v_selectedid ~ '^[0-9]+$'THEN
 				
 				v_selectedid = concat('"selectedId":"',v_arrayresult[v_selectedid::integer],'"');
