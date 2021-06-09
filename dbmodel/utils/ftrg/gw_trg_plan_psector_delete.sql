@@ -13,7 +13,7 @@ DECLARE
 v_parent text;
 v_count integer;
 v_state integer;
-
+v_cur_selector text;
 BEGIN 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_parent:= TG_ARGV[0];
@@ -41,6 +41,13 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3160", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
 		ELSE
+			
+ 			select string_agg(state_id::text,',') INTO v_cur_selector from selector_state where cur_user=current_user;
+ 			
+ 			DELETE FROM selector_state WHERE cur_user=current_user;
+
+ 			INSERT INTO selector_state VALUES(2, current_user) ON CONFLICT DO NOTHING;
+
 			IF v_parent = 'arc' THEN
 				EXECUTE' SELECT gw_fct_setfeaturedelete($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -62,6 +69,11 @@ BEGIN
 				"form":{},"feature":{"type":"GULLY"},
 				"data":{"feature_id":"'||OLD.gully_id||'"}}$$);';
 			END IF;
+
+			DELETE FROM selector_state WHERE cur_user=current_user;
+ 			INSERT INTO selector_state SELECT id, current_user FROM value_state WHERE id::text IN (v_cur_selector) 
+ 			ON CONFLICT DO NOTHING;
+ 			
 		END IF;
 	END IF;
 	
