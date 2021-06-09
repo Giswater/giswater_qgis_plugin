@@ -9,6 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/06/09
+DROP VIEW IF EXISTS v_ui_node_x_relations;
 CREATE OR REPLACE VIEW v_ui_node_x_relations AS 
  SELECT row_number() OVER (ORDER BY v_node.node_id) AS rid,
     v_node.parent_id AS node_id,
