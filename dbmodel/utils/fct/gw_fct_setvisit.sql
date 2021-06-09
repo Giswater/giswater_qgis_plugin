@@ -310,13 +310,9 @@ BEGIN
 	END IF;
 	
 	-- only applied for arbrat viari (nodes).
-	IF v_status='4' THEN
+	IF v_status='4' AND v_project_type='TM' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
-
-	    IF v_project_type='TM' THEN
 		SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
-    	END IF;
-    	
     END IF;
 
 	--  Control NULL's

@@ -335,3 +335,42 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
    FROM review_node,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
+
+
+CREATE OR REPLACE VIEW vp_basic_arc AS 
+SELECT arc_id AS nid,
+arctype_id AS custom_type
+FROM arc
+JOIN cat_arc ON id=arccat_id;
+
+
+CREATE OR REPLACE VIEW vp_basic_node AS 
+SELECT node_id AS nid,
+nodetype_id AS custom_type
+FROM node
+JOIN cat_node ON id=nodecat_id;
+
+
+CREATE OR REPLACE VIEW vp_basic_connec AS 
+SELECT connec_id AS nid,
+connectype_id AS custom_type
+FROM connec
+JOIN cat_connec ON id=connecat_id;
+
+-- 2021/06/09
+CREATE OR REPLACE VIEW v_om_mincut_hydrometer AS 
+ SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.code AS connec_code
+   FROM selector_mincut_result,
+    om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id = ext_rtc_hydrometer.id
+     JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
