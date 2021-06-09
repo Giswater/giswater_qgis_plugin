@@ -13,6 +13,8 @@ import random
 import re
 import sys
 import sqlite3
+import webbrowser
+
 if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
@@ -221,14 +223,7 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
         dlg.setWindowTitle(title)
 
     # Manage stay on top, maximize/minimize button and information button
-    # if info is True maximize flag will be ignored
-    # To enable maximize button you must set info to False
-    flags = Qt.WindowCloseButtonHint
-    if info:
-        flags |= Qt.WindowSystemMenuHint | Qt.WindowContextHelpButtonHint
-    else:
-        if maximize_button:
-            flags |= Qt.WindowMinMaxButtonsHint
+    flags = Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
 
     if stay_on_top:
         flags |= Qt.WindowStaysOnTopHint
@@ -248,6 +243,7 @@ def close_dialog(dlg):
     """ Close dialog """
 
     save_settings(dlg)
+    global_vars.session_vars['last_focus'] = None
     dlg.close()
 
 
@@ -2570,6 +2566,29 @@ def restore_parent_layers_visibility(layers):
 
     for layer, visibility in layers.items():
         tools_qgis.set_layer_visible(layer, False, visibility)
+
+
+def open_dlg_help():
+    """
+    Opens the help page for the las focused dialog
+        :return:
+    """
+
+    parser = configparser.ConfigParser()
+    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
+    if not os.path.exists(path):
+        webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
+        return True
+
+    parser.read(path)
+
+    try:
+        web_tag = parser.get('web_tag', global_vars.session_vars['last_focus'])
+        webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
+    except Exception:
+        webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
+    finally:
+        return True
 
 
 def create_sqlite_conn(file_name):
