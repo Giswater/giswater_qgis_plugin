@@ -186,3 +186,9 @@ UPDATE sys_table SET sys_role='role_edit' WHERE id='inp_connec';
 
 --2021/06/03
 UPDATE sys_table SET sys_role='role_om' WHERE id='temp_arc';
+
+--2021/06/09
+INSERT INTO config_form_tableview VALUES ('mincut_form', 'ws', 'v_om_mincut_hydrometer', 'hydrometer_id', 4, TRUE, 100) ON CONFLICT (tablename, columnname) DO NOTHING;
+INSERT INTO config_form_tableview VALUES ('mincut_form', 'ws', 'v_om_mincut_hydrometer', 'hydrometer_customer_code', 5, TRUE, 170) ON CONFLICT (tablename, columnname) DO NOTHING;
+INSERT INTO config_form_tableview VALUES ('mincut_form', 'ws', 'v_om_mincut_hydrometer', 'connec_id', 6, TRUE, 100) ON CONFLICT (tablename, columnname) DO NOTHING;
+INSERT INTO config_form_tableview VALUES ('mincut_form', 'ws', 'v_om_mincut_hydrometer', 'connec_code', 7, TRUE, 100) ON CONFLICT (tablename, columnname) DO NOTHING;
