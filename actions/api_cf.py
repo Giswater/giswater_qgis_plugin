@@ -1724,7 +1724,7 @@ class ApiCF(ApiParent, QObject):
         self.manage_element(dialog, element_id, update=True)
 
 
-    def add_object(self, widget, table_object, view_object, update=None):
+    def add_object(self, widget, table_object, view_object, update=False):
         """ Add object (doc or element) to selected feature """
 
         # Get values from dialog
@@ -1758,7 +1758,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_warning(message)
 
         # If object not exist perform an INSERT
-        elif update is None:
+        elif update is False:
             sql = ("INSERT INTO " + tablename + " "
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
@@ -1827,7 +1827,7 @@ class ApiCF(ApiParent, QObject):
         elem.open_dialog(elem.dlg_add_element)
 
 
-    def manage_element_new(self, dialog, elem, update=None):
+    def manage_element_new(self, dialog, elem, update=False):
         """ Get inserted element_id and add it to current feature """
 
         if elem.element_id is None:
