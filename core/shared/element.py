@@ -16,7 +16,7 @@ from ..utils import tools_gw
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_db
+from ...lib import tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwElement:
@@ -561,7 +561,9 @@ class GwElement:
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'element_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         self.get_element(new_element_id=False, selected_object_id=selected_object_id)
 

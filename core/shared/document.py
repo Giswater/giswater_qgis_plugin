@@ -15,7 +15,7 @@ from qgis.gui import QgsRubberBand
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
 from ... import global_vars
-from ...lib import tools_qt, tools_db, tools_qgis
+from ...lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwDocument:
@@ -377,7 +377,9 @@ class GwDocument:
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'doc_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         self.get_document(row=widget.model().record(row))
         tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
