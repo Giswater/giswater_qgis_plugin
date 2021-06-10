@@ -24,12 +24,12 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
 VALUES (381, 'Arc duplicated', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3036, 'gw_fct_anl_arc_duplicated', 'utils', 'function', 'json', 'json',
+VALUES (3040, 'gw_fct_anl_arc_duplicated', 'utils', 'function', 'json', 'json',
 'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry',
 'role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3036,'Check arcs duplicated', '{"featureType":["arc"]}', 
+VALUES (3040,'Check arcs duplicated', '{"featureType":["arc"]}', 
 '[{"widgetname":"checkType", "label":"Check type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["geometry","finalNodes"], "comboNames":["GEOMETRY", "FINAL NODES"], "selectedId":"finalNodes"}]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;

@@ -4,7 +4,7 @@
 	This version of Giswater is provided by Giswater Association
 	*/
 
-	--FUNCTION CODE: 3036
+	--FUNCTION CODE: 3040
 
 	CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_duplicated(p_data json) RETURNS json AS 
 	$BODY$
