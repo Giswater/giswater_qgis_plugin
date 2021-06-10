@@ -61,7 +61,8 @@ class ManageElement(ParentManage):
         # Remove all previous selections
         self.remove_selection(True)
         if feature:
-            layer = self.iface.activeLayer()
+            layer = self.controller.get_layer_by_tablename(f'v_edit_{geom_type}')
+            self.iface.setActiveLayer(layer)
             layer.selectByIds([feature.id()])
 
         utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
