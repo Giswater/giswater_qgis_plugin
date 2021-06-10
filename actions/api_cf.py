@@ -1721,10 +1721,10 @@ class ApiCF(ApiParent, QObject):
             break
 
         # Open selected element
-        self.manage_element(dialog, element_id)
+        self.manage_element(dialog, element_id, update=True)
 
 
-    def add_object(self, widget, table_object, view_object):
+    def add_object(self, widget, table_object, view_object, update=None):
         """ Add object (doc or element) to selected feature """
 
         # Get values from dialog
@@ -1753,12 +1753,12 @@ class ApiCF(ApiParent, QObject):
         row = self.controller.get_row(sql, log_info=False, log_sql=False)
 
         # If object already exist show warning message
-        if row:
+        if row and update is None:
             message = "Object already associated with this feature"
             self.controller.show_warning(message)
 
         # If object not exist perform an INSERT
-        else:
+        elif update is None:
             sql = ("INSERT INTO " + tablename + " "
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
@@ -1809,13 +1809,13 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
 
-    def manage_element(self, dialog, element_id=None, feature=None):
+    def manage_element(self, dialog, element_id=None, feature=None, update=False):
         """ Execute action of button 33 """
 
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
         elem.manage_element(True, feature, self.geom_type)
-        elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
-        elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
+        elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem, update))
+        elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem, update))
 
         # Set completer
         self.set_completer_object(dialog, self.table_object)
@@ -1827,14 +1827,14 @@ class ApiCF(ApiParent, QObject):
         elem.open_dialog(elem.dlg_add_element)
 
 
-    def manage_element_new(self, dialog, elem):
+    def manage_element_new(self, dialog, elem, update=None):
         """ Get inserted element_id and add it to current feature """
 
         if elem.element_id is None:
             return
 
         utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element", "v_ui_element")
+        self.add_object(self.tbl_element, "element", "v_ui_element", update)
         self.tbl_element.model().select()
 
 

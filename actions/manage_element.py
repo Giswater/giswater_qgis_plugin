@@ -22,7 +22,7 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_element(self, new_element_id=True, feature=None, geom_type=None):
+    def manage_element(self, new_element_id=True, feature=None, geom_type=None, update=None):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
