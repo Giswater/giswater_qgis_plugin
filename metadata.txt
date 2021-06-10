@@ -13,11 +13,13 @@ version=3.4.035
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.034 (14/04/2021)
-   - Create new thread when notify is empty instead of every second
-   - Enhance node interpolate tool, adding extrapolate function
-   - Manage line edit widgets from Element form with special characters
-   - Fix i18n locale default
+changelog=Version 3.4.035
+   - Bug fix: manage if exist column photo on visit tableview and open file using http, https or locale path
+   - Bug fix: Error on search address, setting street name into numberwidget
+   - Manage enddate from element
+   - Bug fix: set catalog for gully features using custom form action
+   - Keep Mincut manager opened when open existing mincut
+
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
