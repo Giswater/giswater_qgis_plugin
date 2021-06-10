@@ -53,7 +53,7 @@ class MincutConfig(ParentAction):
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
-        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        utils_giswater.set_qtv_config(self.dlg_min_edit.tbl_mincut_edit)
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
@@ -106,7 +106,7 @@ class MincutConfig(ParentAction):
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
-        self.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')
+        self.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager', info=False)
 
 
     def get_clients_codes(self, qtable):
@@ -276,7 +276,6 @@ class MincutConfig(ParentAction):
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        self.close_dialog(self.dlg_min_edit)
         self.mincut.is_new = False
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
