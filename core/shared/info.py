@@ -165,8 +165,9 @@ class GwInfo(QObject):
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'
+            form = f'"featureDialog":{tools_gw.get_info_templates()}'
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            body = tools_gw.create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(form=form, feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
         if function_name is None:

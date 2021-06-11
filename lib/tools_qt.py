@@ -213,7 +213,7 @@ def set_widget_text(dialog, widget, text):
     if not widget:
         return
 
-    if type(widget) in (QLabel, QLineEdit, QTextEdit):
+    if type(widget) in (QLabel, QLineEdit, QTextEdit, QPushButton):
         if str(text) == 'None':
             text = ""
         widget.setText(f"{text}")
