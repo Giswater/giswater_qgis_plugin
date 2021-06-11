@@ -929,7 +929,7 @@ class GwInfo(QObject):
         #
         # else:
         #     dlg_cf.dlg_closed.connect(self._roll_back)
-        #     dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+        dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
         #     dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
         #     # dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
         #     btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
