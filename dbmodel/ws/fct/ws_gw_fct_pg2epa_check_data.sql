@@ -645,8 +645,9 @@ BEGIN
 	END IF;	
 
 	RAISE NOTICE '26 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc)a 
-		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) WHERE n.node_id IS NOT NULL';
+	v_querytext =  'SELECT DISTINCT ON (node_id) n.node_id, nodecat_id, the_geom FROM selector_sector s, (SELECT node_1 node_id, sector_id FROM v_edit_arc 
+					UNION SELECT node_2, sector_id FROM v_edit_arc)a LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''NOT DEFINED'') n 
+					USING (node_id) WHERE n.node_id IS NOT NULL AND s.sector_id = a.sector_id AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
@@ -703,7 +704,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 

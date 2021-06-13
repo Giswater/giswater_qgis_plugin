@@ -110,27 +110,39 @@ BEGIN
 		ON CONFLICT (node_id) DO NOTHING;
 
 		INSERT INTO inp_reservoir
-		SELECT node_id FROM node WHERE state >0 and epa_type = 'STORAGE'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'RESERVOIR'
 		ON CONFLICT (node_id) DO NOTHING;
 
 		INSERT INTO inp_tank
-		SELECT node_id FROM node WHERE state >0 and epa_type = 'OUTFALL'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'TANK'
 		ON CONFLICT (node_id) DO NOTHING;
 		
 		INSERT INTO inp_inlet
-		SELECT node_id FROM node WHERE state >0 and epa_type = 'DIVIDER'
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'INLET'
 		ON CONFLICT (node_id) DO NOTHING;
 		
-		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_reservoir WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_tank WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_inlet WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		INSERT INTO inp_valve
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'VALVE'
+		ON CONFLICT (node_id) DO NOTHING;
+		
+		INSERT INTO inp_pump
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'PUMP'
+		ON CONFLICT (node_id) DO NOTHING;
+		
+		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_reservoir WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_tank WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_inlet WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_valve WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_pump WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+
 
 		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
 		DELETE FROM inp_reservoir WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'RESERVOIR');
 		DELETE FROM inp_tank WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'TANK');
 		DELETE FROM inp_inlet WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'INLET');
-
+		DELETE FROM inp_valve WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'VALVE');
+		DELETE FROM inp_pump WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'PUMP');
 
 		-- arc ws
 		INSERT INTO inp_virtualvalve
@@ -149,10 +161,10 @@ BEGIN
 		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PIPE'
 		ON CONFLICT (arc_id) DO NOTHING;
 
-		DELETE FROM inp_virtualvalve WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_pump_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_valve_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_pipe WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_virtualvalve WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_pump_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_valve_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_pipe WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_virtualvalve WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'VIRTUALVALVE');
 		DELETE FROM inp_pump_importinp WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'PUMP-IMPORTINP');
@@ -177,10 +189,10 @@ BEGIN
 		SELECT node_id FROM node WHERE state >0 and epa_type = 'DIVIDER'
 		ON CONFLICT (node_id) DO NOTHING;
 		
-		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
 		DELETE FROM inp_storage WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'STORAGE');
@@ -212,12 +224,12 @@ BEGIN
 		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'OUTLET'
 		ON CONFLICT (arc_id) DO NOTHING;
 		
-		DELETE FROM inp_conduit WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_pump WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_virtual WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_weir WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_orifice WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
-		DELETE FROM inp_outlet WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'NOT DEFINED');
+		DELETE FROM inp_conduit WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_pump WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_virtual WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_weir WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_orifice WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_outlet WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_conduit WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'CONDUIT');
 		DELETE FROM inp_pump WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'PUMP');
