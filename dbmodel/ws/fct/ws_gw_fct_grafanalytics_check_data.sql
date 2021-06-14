@@ -387,14 +387,14 @@ BEGIN
 	
 		v_querytext = 'SELECT b.arc_id, b.'||rec||'_id as zone_id FROM (
 		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((grafconfig->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||rec||')b 
-		WHERE arc_id not in (select arc_id FROM arc)';
+		WHERE arc_id not in (select arc_id FROM arc WHERE state=1)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			SELECT 211, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
-			'' arc(s) that are configured as toArc for '','''||rec||''','' but does not exist on arc table. Arc_id - '',
-			string_agg(concat('''||rec||':'',zone_id,''-'',a.arc_id),'', ''),''.'') FROM('|| v_querytext||')a, '||v_count||';';
+			'' arc(s) that are configured as toArc for '','''||rec||''','' but is not operative on arc table. Arc_id - '',
+			string_agg(concat('''||rec||':'',zone_id,''-'',a.arc_id),'', ''),''.''), '||v_count||' FROM('|| v_querytext||')a';
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (211, 1, 367, concat('INFO: All arcs defined as toArc on ',rec,' exists on DB.'), 0);
@@ -402,14 +402,14 @@ BEGIN
 
 		v_querytext = 'SELECT b.node_id, b.'||rec||'_id as zone_id FROM (
 		SELECT '||rec||'_id, ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::json as node_id FROM '||rec||')b 
-		WHERE node_id::text not in (select node_id FROM node)';
+		WHERE node_id::text not in (select node_id FROM node WHERE state=1)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			SELECT 211, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
-			'' node(s) that are configured as nodeParent for '','''||rec||''','' but does not exist on node table. Node_id - '',
-			string_agg(concat('''||rec||':'',zone_id,''-'',a.node_id::text),'', ''),''.'') FROM('|| v_querytext||')a, '||v_count||';';
+			'' node(s) that are configured as nodeParent for '','''||rec||''','' but is not operative on node table. Node_id - '',
+			string_agg(concat('''||rec||':'',zone_id,''-'',a.node_id::text),'', ''),''.''), '||v_count||' FROM('|| v_querytext||')a';
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (211, 1, 367, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'),0);
