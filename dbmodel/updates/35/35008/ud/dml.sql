@@ -324,10 +324,12 @@ UPDATE config_toolbox SET inputparams='[{"widgetname":"insertIntoNode", "label":
 WHERE id=2118;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
- VALUES (3040, 'gw_trg_scenario_management', 'ud', 'trigger function', null, null, 'Function to enhance the management of scenarios (hydrology and dwf)', 'role_epa',null,null) ON CONFLICT (id) DO NOTHING;
+VALUES (3040, 'gw_trg_scenario_management', 'ud', 'trigger function', null, null, 'Function to enhance the management of scenarios (hydrology and dwf)', 'role_epa',null,null)
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
-VALUES ('inp_scenario_hydrology', 'hidden', 'Variable to control cat_hydrology scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}');
+VALUES ('inp_scenario_hydrology', 'hidden', 'Variable to control cat_hydrology scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
-VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}');
+VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}')
+ON CONFLICT (id) DO NOTHING;
