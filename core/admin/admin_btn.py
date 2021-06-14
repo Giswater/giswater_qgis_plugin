@@ -2479,8 +2479,10 @@ class GwAdminButton:
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
-        extras = '"multiCreate":' + str(
-            tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
+        if tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create):
+            extras = '"action":"MULTI-CREATE"'
+        else:
+            extras = '"action":"SINGLE-CREATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
