@@ -5,8 +5,22 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = moliba, public, pg_catalog;
 
 -- 2020/01/07
 CREATE TRIGGER gw_trg_edit_inp_lid INSTEAD OF INSERT OR UPDATE OR DELETE 
 ON v_edit_inp_lid FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_lid();
+
+-- 2020/06/14
+DROP TRIGGER if exists gw_trg_scenario_management ON cat_hydrology;
+CREATE TRIGGER gw_trg_scenario_management AFTER INSERT ON cat_hydrology  
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_scenario_management('cat_hydrology');
+
+
+-- 2020/06/14
+DROP TRIGGER if exists gw_trg_scenario_management ON cat_dwf_scenario;
+CREATE TRIGGER gw_trg_scenario_management AFTER INSERT ON cat_dwf_scenario  
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_scenario_management('cat_dwf_scenario');
+
+
+

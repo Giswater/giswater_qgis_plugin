@@ -35,7 +35,7 @@ INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONN
 
 INSERT INTO sys_fprocess VALUES (383,'Check missed values for cat_mat.arc n used on real arcs', 'ud');
 
-	--2021/06/09
+--2021/06/09
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
@@ -322,3 +322,12 @@ UPDATE config_toolbox SET inputparams='[{"widgetname":"insertIntoNode", "label":
 {"widgetname":"nodeType", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null", "selectedId":"$userNodetype"},
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where node_type = $userNodetype  OR node_type is null order by id", "selectedId":"$userNodecat"}]'
 WHERE id=2118;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+ VALUES (3040, 'gw_trg_scenario_management', 'ud', 'trigger function', null, null, 'Function to enhance the management of scenarios (hydrology and dwf)', 'role_epa',null,null) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
+VALUES ('inp_scenario_hydrology', 'hidden', 'Variable to control cat_hydrology scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}');
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
+VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}');
