@@ -128,6 +128,8 @@ class GwConnectLinkButton(GwMaptool):
                     self.connect_link_task = GwConnectLink("Connect link", self, 'connec', layer)
                     QgsApplication.taskManager().addTask(self.connect_link_task)
                     QgsApplication.taskManager().triggerTask(self.connect_link_task)
+            else:
+                self.manage_gully_result()
 
             if number_features == 0:
                 self.cancel_map_tool()
@@ -166,7 +168,7 @@ class GwConnectLinkButton(GwMaptool):
         super().deactivate()
 
     def manage_result(self, result, layer):
-        if result is not False:
+        if result is not False and result['status'] != 'Failed':
             self.dlg_dtext = GwDialogTextUi('connect_to_network')
             tools_gw.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_accept.hide()
