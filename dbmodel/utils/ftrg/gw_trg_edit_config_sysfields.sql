@@ -41,8 +41,7 @@ BEGIN
 	dv_querytext_filterc = NEW.dv_querytext_filterc,
 	widgetcontrols = NEW.widgetcontrols::json,
 	widgetfunction = NEW.widgetfunction,
-	linkedobject = NEW.linkedobject,
-	listfilterparam = NEW.listfilterparam::json
+	linkedobject = NEW.linkedobject
 	WHERE formname = OLD.formname AND columnname=OLD.columnname AND formtype=OLD.formtype;
 
 	RETURN NEW;
