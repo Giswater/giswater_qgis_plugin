@@ -914,6 +914,43 @@ class GwInfo(QObject):
         dlg.btn_accept.clicked.disconnect()
         dlg.key_enter.disconnect()
 
+        # Tabs
+        self.tab_main.currentChanged.disconnect()
+
+        # Element tab
+        try:
+            self.tbl_element.doubleClicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_element").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_delete").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_insert").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_new_element").clicked.disconnect()
+        except Exception:
+            pass
+        # Relations tab
+        try:
+            self.tbl_relations.doubleClicked.disconnect()
+        except Exception:
+            pass
+        # Connections tab
+        try:
+            self.dlg_cf.tbl_upstream.doubleClicked.disconnect()
+            self.dlg_cf.tbl_downstream.doubleClicked.disconnnect()
+        except Exception:
+            pass
+        # Hydrometer tab
+        try:
+            self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id").textChanged.disconnect()
+            self.tbl_hydrometer.doubleClicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_link").clicked.disconnect()
+        except Exception:
+            pass
+        # Hydrometer values
+        try:
+            self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.disconnect()
+            self.dlg_cf.cmb_hyd_customer_code.currentIndexChanged.disconnect()
+        except Exception:
+            pass
+
 
     def _open_help(self, feature_type):
         """ Open PDF file with selected @project_type and @feature_type """
