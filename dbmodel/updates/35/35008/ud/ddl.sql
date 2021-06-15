@@ -11,3 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusage_subc_x_lidco", "column":"hydrology_id", "dataType":"integer", "isUtils":"False"}}$$);
 ALTER TABLE inp_lidusage_subc_x_lidco ALTER COLUMN hydrology_id SET DEFAULT 1;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusage_subc_x_lidco", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
+
+--2021/06/15
+DROP TABLE IF EXISTS inp_raingage;

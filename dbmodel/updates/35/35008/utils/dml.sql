@@ -53,3 +53,6 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE config_form_fields SET layoutname=NULL WHERE formname='v_edit_element';
 UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_element' AND columnname='state';
 UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_element' AND columnname='state_type';
+
+--2021/06/15
+DELETE FROM sys_table WHERE id = 'inp_report';
