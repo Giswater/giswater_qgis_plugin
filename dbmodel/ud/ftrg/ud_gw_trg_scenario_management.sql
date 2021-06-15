@@ -37,8 +37,10 @@ BEGIN
 
 			-- fill automatic new values on cat_dwf_scenario
 			IF v_hydrology_status THEN 
-				INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, clength, width, slope, sector_id, hydrology_id, the_geom)
-				SELECT concat('H',NEW.hydrology_id,'-',substring(subc_id,0,13)), outlet_id, rg_id, area, clength, width, slope, sector_id, NEW.hydrology_id, the_geom 
+				INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, 
+				maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript)
+				SELECT concat('H',NEW.hydrology_id,'-',substring(subc_id,0,13)), outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, 
+				minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript
 				FROM inp_subcatchment WHERE hydrology_id = v_hydrology_value;
 			END IF;
 
