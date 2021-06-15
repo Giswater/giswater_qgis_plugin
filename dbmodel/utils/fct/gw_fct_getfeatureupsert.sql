@@ -399,7 +399,7 @@ BEGIN
 
 		-- getting values from feature
 		v_querystring = concat('SELECT (row_to_json(a)) FROM 
-			(SELECT * FROM ',p_table_id,' WHERE ',quote_ident(p_idname),' = CAST(',p_id,' AS ',(p_columntype),'))a');
+			(SELECT * FROM ',p_table_id,' WHERE ',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
 		v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
