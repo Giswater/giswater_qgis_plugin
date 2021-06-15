@@ -432,12 +432,13 @@ class GwInfo(QObject):
         template_name = f"{complet_result['body']['feature']['childType']}"
         self.feature_id = feature_id
 
+        print(f"{time.time()}")
         # Check if there is a template for that node type
         if new_feature or global_vars.info_templates[template_name]['dlg'] is None:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
-
+        print(f"{time.time()}")
         return self.complet_result, self.dlg_cf
 
 
@@ -812,6 +813,8 @@ class GwInfo(QObject):
         self.field_id = str(complet_result['body']['feature']['idName'])
         self.feature_id = complet_result['body']['feature']['id']
 
+        list_points = tools_qgis.get_points_from_geometry(self.layer, tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id))
+
         if 'visibleTabs' in self.complet_result['body']['form']:
             for tab in self.complet_result['body']['form']['visibleTabs']:
                 tabs_to_show.append(tab['tabName'])
@@ -822,6 +825,22 @@ class GwInfo(QObject):
 
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
+        action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
+        action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
+        action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
+        action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
+        action_mapzone = self.dlg_cf.findChild(QAction, "actionMapZone")
+        action_set_to_arc = self.dlg_cf.findChild(QAction, "actionSetToArc")
+        action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
+        action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
+        action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
+        action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
+        action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
+        action_link = self.dlg_cf.findChild(QAction, "actionLink")
+        action_help = self.dlg_cf.findChild(QAction, "actionHelp")
+        action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
+        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
+        action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
         if self.new_feature_id is not None:
             self._enable_action(self.dlg_cf, "actionZoom", False)
@@ -878,6 +897,34 @@ class GwInfo(QObject):
         self._enable_actions(dlg_cf, layer.isEditable())
 
         action_edit.setChecked(layer.isEditable())
+        child_type = complet_result['body']['feature']['childType']
+
+        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
+        action_workcat.triggered.connect(
+            partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
+                    id_name))
+        action_mapzone.triggered.connect(
+            partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
+                    id_name))
+        action_set_to_arc.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None,
+                    child_type))
+        action_get_arc_id.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'v_edit_arc', 'arc', 'data_arc_id',
+                    child_type))
+        action_get_parent_id.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id',
+                    child_type))
+        action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
+        action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
+        action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
+        action_copy_paste.triggered.connect(
+            partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
+        action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, action_rotation))
+        action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
+        action_section.triggered.connect(partial(self._open_section_form))
+        action_help.triggered.connect(partial(self._open_help, self.feature_type))
+        action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, QgsMapToolEmitPoint(self.canvas)))
 
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
@@ -914,77 +961,107 @@ class GwInfo(QObject):
         dlg.btn_accept.clicked.disconnect()
         dlg.key_enter.disconnect()
 
+        dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
+        dlg.findChild(QAction, "actionWorkcat").triggered.disconnect()
+        dlg.findChild(QAction, "actionMapZone").triggered.disconnect()
+        dlg.findChild(QAction, "actionSetToArc").triggered.disconnect()
+        dlg.findChild(QAction, "actionGetArcId").triggered.disconnect()
+        dlg.findChild(QAction, "actionGetParentId").triggered.disconnect()
+        dlg.findChild(QAction, "actionZoom").triggered.disconnect()
+        dlg.findChild(QAction, "actionCentered").triggered.disconnect()
+        dlg.findChild(QAction, "actionZoomOut").triggered.disconnect()
+        dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
+        dlg.findChild(QAction, "actionRotation").triggered.disconnect()
+        dlg.findChild(QAction, "actionLink").triggered.disconnect()
+        dlg.findChild(QAction, "actionSection").triggered.disconnect()
+        dlg.findChild(QAction, "actionHelp").triggered.disconnect()
+
+
         # Tabs
         self.tab_main.currentChanged.disconnect()
 
         # Element tab
         try:
+            # self.tab_element_loaded = False
             self.tbl_element.doubleClicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_element").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_delete").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_insert").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_new_element").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_element").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_delete").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_insert").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_new_element").clicked.disconnect()
         except Exception:
             pass
         # Relations tab
         try:
+            # self.tab_relations_loaded = False
             self.tbl_relations.doubleClicked.disconnect()
         except Exception:
             pass
         # Connections tab
         try:
-            self.dlg_cf.tbl_upstream.doubleClicked.disconnect()
-            self.dlg_cf.tbl_downstream.doubleClicked.disconnnect()
+            # self.tab_connections_loaded = False
+            dlg.tbl_upstream.doubleClicked.disconnect()
+            dlg.tbl_downstream.doubleClicked.disconnnect()
         except Exception:
             pass
         # Hydrometer tab
         try:
-            self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id").textChanged.disconnect()
+            # self.tab_hydrometer_loaded = False
+            dlg.findChild(QLineEdit, "txt_hydrometer_id").textChanged.disconnect()
             self.tbl_hydrometer.doubleClicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_link").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_link").clicked.disconnect()
         except Exception:
             pass
         # Hydrometer values
         try:
-            self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.disconnect()
-            self.dlg_cf.cmb_hyd_customer_code.currentIndexChanged.disconnect()
+            # self.tab_hydrometer_val_loaded = False
+            dlg.cmb_cat_period_id_filter.currentIndexChanged.disconnect()
+            dlg.cmb_hyd_customer_code.currentIndexChanged.disconnect()
         except Exception:
             pass
         # Visit tab
         try:
+            # self.tab_visit_loaded = False
             self.tbl_visit_cf.clicked.disconnect()
             if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
                 self.cmb_visit_class.currentIndexChanged.disconnect()
             self.date_visit_to.dateChanged.disconnect()
             self.date_visit_from.dateChanged.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_gallery_2").clicked.disconnect()
         except Exception:
             pass
         # Event tab
         try:
+            # self.tab_event_loaded = False
             self.tbl_event_cf.doubleClicked.disconnect()
             self.tbl_event_cf.clicked.disconnect()
-            self.dlg_cf.findChild(QComboBox, "event_type").currentIndexChanged.disconnect()
-            self.dlg_cf.findChild(QComboBox, "event_id").currentIndexChanged.disconnect()
+            dlg.findChild(QComboBox, "event_type").currentIndexChanged.disconnect()
+            dlg.findChild(QComboBox, "event_id").currentIndexChanged.disconnect()
             self.date_event_to.dateChanged.disconnect()
             self.date_event_from.dateChanged.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_visit").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_new_visit").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_gallery").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_visit_event").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_new_visit").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_gallery").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit_doc").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit_event").clicked.disconnect()
         except Exception:
             pass
         # Documents tab
         try:
-            self.dlg_cf.findChild(QComboBox, "doc_type").currentIndexChanged.disconnect()
+            # self.tab_document_loaded = False
+            # self.tab_rpt_loaded = False
+            dlg.findChild(QComboBox, "doc_type").currentIndexChanged.disconnect()
             self.date_document_to.dateChanged.disconnect()
             self.date_document_from.dateChanged.disconnect()
             self.tbl_document.doubleClicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_open_doc").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_doc_delete").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_doc_insert").clicked.disconnect()
-            self.dlg_cf.findChild(QPushButton, "btn_doc_new").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_doc").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_delete").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_insert").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_new").clicked.disconnect()
+        except Exception:
+            pass
+        # self.tab_plan_loaded = False
+        try:
+            self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
         except Exception:
             pass
 
@@ -1548,7 +1625,7 @@ class GwInfo(QObject):
                 return
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False)
+                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, global_vars.test_last_json)
             elif self.new_feature_id is not None:
                 if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
