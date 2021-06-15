@@ -343,8 +343,7 @@ class ManageElement(ParentManage):
             if workcat_id:
                 sql_values += f", '{workcat_id}'"
             else:
-                self.set_style_sheet(self.dlg_add_element.workcat_id)
-                return
+                sql_values += ", null"
             if workcat_id_end:
                 sql_values += f", '{workcat_id_end}'"
             else:
