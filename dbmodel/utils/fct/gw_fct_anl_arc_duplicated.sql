@@ -24,7 +24,7 @@
 	v_worklayer text;
 	v_result json;
 	v_result_info json;
-	v_result_point json;
+	v_result_line json;
 	v_array text;
 	v_version text;
 	v_error_context text;
@@ -111,7 +111,7 @@
 	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=381) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 	
 		IF v_checktype='finalNodes' THEN
 			SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=381;
@@ -141,15 +141,15 @@
 		
 		--    Control nulls
 		v_result_info := COALESCE(v_result_info, '{}'); 
-		v_result_point := COALESCE(v_result_point, '{}'); 
+		v_result_line := COALESCE(v_result_line, '{}'); 
 
 		--  Return
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
-					'"line":'||v_result_point||
+					'"line":'||v_result_line||
 				'}}'||
-		    '}')::json, 3036, null, null, null);
+		    '}')::json, 3040, null, null, null);
 
 		EXCEPTION WHEN OTHERS THEN
 		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
