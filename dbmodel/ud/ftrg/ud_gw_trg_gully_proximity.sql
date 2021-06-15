@@ -25,7 +25,7 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         -- Existing gullys  
-        v_numConnecs:= (SELECT COUNT(*) FROM gully WHERE gully.the_geom && ST_Expand(NEW.the_geom, v_gully_proximity));
+        v_numConnecs:= (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing gullys  

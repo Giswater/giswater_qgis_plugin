@@ -25,7 +25,7 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         -- Existing connecs  
-        v_numConnecs:= (SELECT COUNT(*) FROM connec WHERE connec.the_geom && ST_Expand(NEW.the_geom, v_connec_proximity));
+        v_numConnecs:= (SELECT COUNT(*) FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom, v_connec_proximity) AND connec.connec_id != NEW.connec_id);
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing connecs  
