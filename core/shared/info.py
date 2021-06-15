@@ -950,6 +950,43 @@ class GwInfo(QObject):
             self.dlg_cf.cmb_hyd_customer_code.currentIndexChanged.disconnect()
         except Exception:
             pass
+        # Visit tab
+        try:
+            self.tbl_visit_cf.clicked.disconnect()
+            if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
+                self.cmb_visit_class.currentIndexChanged.disconnect()
+            self.date_visit_to.dateChanged.disconnect()
+            self.date_visit_from.dateChanged.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2").clicked.disconnect()
+        except Exception:
+            pass
+        # Event tab
+        try:
+            self.tbl_event_cf.doubleClicked.disconnect()
+            self.tbl_event_cf.clicked.disconnect()
+            self.dlg_cf.findChild(QComboBox, "event_type").currentIndexChanged.disconnect()
+            self.dlg_cf.findChild(QComboBox, "event_id").currentIndexChanged.disconnect()
+            self.date_event_to.dateChanged.disconnect()
+            self.date_event_from.dateChanged.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_visit").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_new_visit").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_gallery").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_visit_event").clicked.disconnect()
+        except Exception:
+            pass
+        # Documents tab
+        try:
+            self.dlg_cf.findChild(QComboBox, "doc_type").currentIndexChanged.disconnect()
+            self.date_document_to.dateChanged.disconnect()
+            self.date_document_from.dateChanged.disconnect()
+            self.tbl_document.doubleClicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_open_doc").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_doc_delete").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_doc_insert").clicked.disconnect()
+            self.dlg_cf.findChild(QPushButton, "btn_doc_new").clicked.disconnect()
+        except Exception:
+            pass
 
 
     def _open_help(self, feature_type):
