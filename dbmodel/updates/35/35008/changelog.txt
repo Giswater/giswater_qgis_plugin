@@ -5,3 +5,8 @@
 - Grant role_admin for current_user when creation schema in case of it does not has
 - Create new function gw_fct_anl_arc_duplicated
 - Check missed values for cat_mat.arc n used on real arcs
+- Enhance getfeatureupsert function
+- Delete not used tables inp_report
+- Create new function to enhance scenario control for ud
+- Create new function to import curves from csv
+

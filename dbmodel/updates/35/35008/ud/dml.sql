@@ -333,7 +333,3 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
 VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}')
 ON CONFLICT (id) DO NOTHING;
-
-
---2021/06/15
-DELETE FROM sys_table WHERE id = 'inp_raingage';
