@@ -2435,7 +2435,7 @@ class GwAdminButton:
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        if schema_name is None:
+        if schema_name in (None, 'null', ''):
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
