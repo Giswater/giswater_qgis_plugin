@@ -36,4 +36,4 @@ ON CONFLICT (id) DO NOTHING;
 
 
 -- 2021/06/08
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_version", "column":"sample"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_version", "column":"sample"}}$$);
