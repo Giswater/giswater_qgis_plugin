@@ -49,3 +49,7 @@ VALUES (2496,'gw_fct_arc_repair', '{"style":{"point":{"style":"unique", "values"
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_fields SET layoutname=NULL WHERE formname='v_edit_element';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_element' AND columnname='state';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_element' AND columnname='state_type';
