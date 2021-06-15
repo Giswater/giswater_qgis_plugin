@@ -302,8 +302,13 @@ class GwElement:
         self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
-        self.dlg_add_element.builtdate.setText(tools_gw.get_config_value('edit_builtdate_vdefault')[0].replace('/', '-'))
-        self.dlg_add_element.enddate.setText(tools_gw.get_config_value('edit_enddate_vdefault')[0].replace('/', '-'))
+
+        builtdate_vdef = tools_gw.get_config_value('edit_builtdate_vdefault')
+        enddate_vdef = tools_gw.get_config_value('edit_enddate_vdefault')
+        if builtdate_vdef:
+            self.dlg_add_element.builtdate.setText(builtdate_vdef[0].replace('/', '-'))
+        if enddate_vdef:
+            self.dlg_add_element.enddate.setText(enddate_vdef[0].replace('/', '-'))
 
 
     def _manage_combo(self, combo, parameter):
@@ -428,8 +433,7 @@ class GwElement:
             if workcat_id:
                 sql_values += f", '{workcat_id}'"
             else:
-                tools_qt.set_stylesheet(self.dlg_add_element.workcat_id)
-                return
+                sql_values += ", null"
             if workcat_id_end:
                 sql_values += f", '{workcat_id_end}'"
             else:
