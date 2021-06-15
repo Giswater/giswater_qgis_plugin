@@ -34,6 +34,18 @@ VALUES (3040,'Check arcs duplicated', '{"featureType":["arc"]}',
 "comboIds":["geometry","finalNodes"], "comboNames":["GEOMETRY", "FINAL NODES"], "selectedId":"finalNodes"}]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
-
 -- 2021/06/08
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_version", "column":"sample"}}$$);
+
+-- 2021/06/15
+INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
+VALUES (3040,'gw_fct_anl_arc_duplicated', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
+VALUES (2496,'gw_fct_arc_repair', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
