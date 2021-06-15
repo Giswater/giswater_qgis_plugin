@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication
+from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
@@ -114,24 +114,26 @@ class GwConnectLinkButton(GwMaptool):
 
         elif event.button() == Qt.RightButton:
             # Check selected records
-            number_features = 0
-            layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
-            if layer:
-                number_features += layer.selectedFeatureCount()
+            number_connec_features = 0
 
-            if number_features > 0:
+            layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
+            if layer_connec:
+                number_connec_features += layer_connec.selectedFeatureCount()
+            if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_features))
+                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
                 if answer:
                     # Create link
-                    self.connect_link_task = GwConnectLink("Connect link", self, 'connec', layer)
+                    self.connect_link_task = GwConnectLink("Connect link", self, 'connec', layer_connec)
                     QgsApplication.taskManager().addTask(self.connect_link_task)
                     QgsApplication.taskManager().triggerTask(self.connect_link_task)
+                else:
+                    self.manage_gully_result()
             else:
                 self.manage_gully_result()
 
-            if number_features == 0:
+            if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
                 self.cancel_map_tool()
 
 
@@ -197,22 +199,22 @@ class GwConnectLinkButton(GwMaptool):
 
     def manage_gully_result(self):
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer:
+        layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
+        if layer_gully:
             # Check selected records
             number_features = 0
-            number_features += layer.selectedFeatureCount()
-            if number_features > 0:
+            number_features += layer_gully.selectedFeatureCount()
+            if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
                 answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
                 if answer:
                     # Create link
-                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer)
+                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer_gully)
                     QgsApplication.taskManager().addTask(self.connect_link_task)
                     QgsApplication.taskManager().triggerTask(self.connect_link_task)
 
-            if number_features == 0:
+            if number_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible() is False:
                 self.cancel_map_tool()
 
     # endregion
