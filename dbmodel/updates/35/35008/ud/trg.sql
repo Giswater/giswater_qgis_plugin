@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = moliba, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/07
 CREATE TRIGGER gw_trg_edit_inp_lid INSTEAD OF INSERT OR UPDATE OR DELETE 
