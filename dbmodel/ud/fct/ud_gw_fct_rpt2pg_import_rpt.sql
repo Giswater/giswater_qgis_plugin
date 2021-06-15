@@ -70,15 +70,84 @@ BEGIN
 	END LOOP;
 
 
+	-- delete trash rows
+	DELETE FROM temp_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
+		
+	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='begun';
+	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='ended';
+	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Total' and csv2='elapsed';
+
+	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='Runoff';
+	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Total' and csv2='Total';
+	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Precip' and csv2='Runon';
+	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='mm';
+	
+	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
+	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
+	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Depth' and csv2='Depth';
+	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Type';
+	
+	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Inflow';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Maximum' and csv2='Maximum';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Lateral' and csv2='Total';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Inflow' and csv2='Inflow';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Type';
+
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Surcharge';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Surcharging' and csv2='occurs';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Max.' and csv2='Height';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
+
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Maximum' and csv2='Time';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Hours' and csv2='Rate';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
+
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
+
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
+	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
+
+	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Outfall' and csv2='Loading';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Flow' and csv2='Avg.';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Freq.' and csv2='Flow';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Outfall' and csv2='Node';
+	
+	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
+	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Occurrence';
+	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='|Flow|' and csv2='Occurrence';
+	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Type';
+	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Time';
+	
+	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='Flow' and csv2='Classification';
+	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='/Actual' and csv2='Up';
+	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
+
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
+
+	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Pumping' and csv2='Summary';
+	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Min' and csv2='Avg';
+	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Percent' and csv2='Number';
+	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Pump' and csv2='Utilized';
+	
 	FOR rpt_rec IN SELECT * FROM temp_csv order by id
 	LOOP
-
-		IF (SELECT tablename FROM config_fprocess WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND fid=v_fid) IS NOT NULL THEN
-			type_aux=(SELECT tablename FROM config_fprocess WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND fid=v_fid);
-		ELSIF rpt_rec.csv1 = 'WARNING' THEN
+		IF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
-		END IF;	
-						
+		ELSE
+			type_aux = rpt_rec.source;
+		END IF;
+								
 		IF type_aux='rpt_cat_result' THEN
 			UPDATE rpt_cat_result set flow_units=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Flow Units%' and result_id=v_result_id;
 			UPDATE rpt_cat_result set rain_runof=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Rainfall/Runoff%' and result_id=v_result_id;
@@ -182,7 +251,7 @@ BEGIN
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3,' ',rpt_rec.csv4,' ',rpt_rec.csv5,' ',
 			rpt_rec.csv6,' ',rpt_rec.csv7));
 
-		ELSIF rpt_rec.csv1 IN (SELECT subc_id FROM inp_subcatchment) AND type_aux='rpt_subcathrunoff_sum' then 
+		ELSIF type_aux='rpt_subcathrunoff_sum' then 
 
 			IF v_epaversion = '5.1' then
 
@@ -199,31 +268,32 @@ BEGIN
 
 			END IF;
 
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodedepth_sum' then
+		ELSIF type_aux='rpt_nodedepth_sum' then
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6,
 			rpt_rec.csv7);
 			
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodeinflow_sum' then
+		ELSIF type_aux='rpt_nodeinflow_sum' then
 			INSERT INTO rpt_nodeinflow_sum(result_id, node_id, swnod_type, max_latinf, max_totinf, time_days, 
 			time_hour, latinf_vol, totinf_vol, flow_balance_error, other_info)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5,rpt_rec.csv6,
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10);
 
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodesurcharge_sum' then
+		ELSIF type_aux='rpt_nodesurcharge_sum' then
 			INSERT INTO rpt_nodesurcharge_sum(result_id, node_id, swnod_type, hour_surch, max_height, min_depth)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
 
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodeflooding_sum' then
+		ELSIF type_aux='rpt_nodeflooding_sum' then
+			raise notice 'ghashash';
 			INSERT INTO rpt_nodeflooding_sum(result_id, node_id, hour_flood, max_rate, time_days, time_hour, tot_flood, max_ponded)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4,rpt_rec.csv5,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric);
 
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node WHERE epa_type='OUTFALL') AND type_aux='rpt_outfallflow_sum' then
+		ELSIF type_aux='rpt_outfallflow_sum' then
 			INSERT INTO rpt_outfallflow_sum(result_id, node_id, flow_freq, avg_flow, max_flow, total_vol)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
 		
-		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node WHERE epa_type='STORAGE') AND type_aux='rpt_storagevol_sum' then
+		ELSIF type_aux='rpt_storagevol_sum' then
 
 			IF v_epaversion = '5.1' then
 
@@ -240,7 +310,7 @@ BEGIN
 
 			END IF;
 				
-		ELSIF rpt_rec.csv1 IN (SELECT arc_id FROM rpt_inp_arc) AND type_aux='rpt_arcflow_sum' then
+		ELSIF type_aux='rpt_arcflow_sum' then
 			CASE WHEN rpt_rec.csv6='>50.00' THEN rpt_rec.csv6='50.00'; else end case;
 			INSERT INTO rpt_arcflow_sum(result_id, arc_id, arc_type, max_flow, time_days, time_hour, max_veloc, 
 			mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min)
@@ -248,17 +318,17 @@ BEGIN
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12,
 			rpt_rec.csv13,rpt_rec.csv14::numeric,rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
 
-		ELSIF rpt_rec.csv1 IN (SELECT arc_id FROM rpt_inp_arc) AND type_aux='rpt_flowclass_sum' then
+		ELSIF type_aux='rpt_flowclass_sum' then
 			INSERT INTO rpt_flowclass_sum(result_id, arc_id, length, dry, up_dry, down_dry, sub_crit,
 			sub_crit_1, up_crit, down_crit, froud_numb, flow_chang)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric);
 
-		ELSIF rpt_rec.csv1 IN (SELECT arc_id FROM rpt_inp_arc) AND type_aux='rpt_condsurcharge_sum' THEN
+		ELSIF type_aux='rpt_condsurcharge_sum' THEN
 			INSERT INTO rpt_condsurcharge_sum(result_id, arc_id, both_ends, upstream, dnstream, hour_nflow, hour_limit)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric);
 
-		ELSIF rpt_rec.csv1 IN (SELECT arc_id FROM rpt_inp_arc WHERE epa_type='PUMP') AND type_aux='rpt_pumping_sum' THEN
+		ELSIF type_aux='rpt_pumping_sum' THEN
 			INSERT INTO rpt_pumping_sum (result_id, arc_id, percent, num_startup, min_flow, avg_flow, max_flow, vol_ltr,
 			powus_kwh, timoff_min, timoff_max)
 			VALUES (v_result_id,rpt_rec.csv1, rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
@@ -278,7 +348,7 @@ BEGIN
 			INSERT INTO rpt_instability_index(result_id, text)
    			VALUES (v_result_id,  concat(rpt_rec.csv1,' ',rpt_rec.csv2,'',rpt_rec.csv3));
    		
-		ELSIF rpt_rec.csv1 IN (SELECT poll_id FROM inp_pollutant) AND type_aux='rpt_outfallload_sum' THEN
+		ELSIF type_aux='rpt_outfallload_sum' THEN
    			INSERT INTO rpt_outfallload_sum(result_id, poll_id, node_id, value)
 			VALUES (v_result_id, rpt_rec.csv1,null,null);-- update poll_id, que es el value? compare rpt and table	
 		END IF;
