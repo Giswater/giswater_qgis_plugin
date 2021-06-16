@@ -59,13 +59,13 @@ DELETE FROM sys_table WHERE id = 'inp_report';
 DELETE FROM sys_foreignkey WHERE target_table='inp_report';
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3042, 'gw_fct_import_inp_curve', 'utils', 'function', 'json', 'json',
+VALUES (3044, 'gw_fct_import_inp_curve', 'utils', 'function', 'json', 'json',
 'Function to assist the import of curves for inp models',
 'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
-VALUES (3042,'Import inp curves', 
+VALUES (3044,'Import inp curves', 
 'Function to automatize the import of inp curves files. 
 The csv file must containts next columns on same position: 
 curve_id, x_value, y_value, curve_type (for WS project OR UD project curve_type has diferent values. Check user manual)', 
