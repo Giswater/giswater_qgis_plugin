@@ -64,6 +64,7 @@ class GwCSVButton(GwAction):
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
+        self.dlg_csv.rb_space.setChecked(False)
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_csv))
@@ -75,6 +76,7 @@ class GwCSVButton(GwAction):
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_space.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self._get_function_name()
         self._load_settings_values()
 
@@ -110,6 +112,7 @@ class GwCSVButton(GwAction):
             self.dlg_csv.cmb_unicode_list.setEnabled(False)
             self.dlg_csv.rb_comma.setEnabled(False)
             self.dlg_csv.rb_semicolon.setEnabled(False)
+            self.dlg_csv.rb_space.setEnabled(False)
             self.dlg_csv.btn_file_csv.setEnabled(False)
             self.dlg_csv.tbl_csv.setEnabled(False)
             self.dlg_csv.btn_accept.setEnabled(False)
@@ -260,6 +263,8 @@ class GwCSVButton(GwAction):
             delimiter = ';'
         elif dialog.rb_comma.isChecked():
             delimiter = ','
+        elif dialog.rb_space.isChecked():
+            delimiter = ' '
         return delimiter
 
 
