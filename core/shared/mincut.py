@@ -1998,7 +1998,8 @@ class GwMincut:
         if btn == Qt.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+            global_vars.iface.actionPan().trigger()
             return
 
         # Get clicked point
