@@ -56,7 +56,7 @@ UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_element' AND 
 
 --2021/06/15
 DELETE FROM sys_table WHERE id = 'inp_report';
-
+DELETE FROM sys_foreignkey WHERE target_table='inp_report';
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3042, 'gw_fct_import_inp_curve', 'utils', 'function', 'json', 'json',
@@ -74,3 +74,4 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
 VALUES (383, 'Import inp curve', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+
