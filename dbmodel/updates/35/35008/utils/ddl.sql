@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/06/15
 DROP TABLE IF EXISTS inp_report;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_brand", "column":"featurecat_id", "dataType":"character varying(300)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_brand_model", "column":"featurecat_id", "dataType":"character varying(300)", "isUtils":"False"}}$$);
+
