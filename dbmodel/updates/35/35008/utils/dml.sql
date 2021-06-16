@@ -74,3 +74,6 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
 VALUES (383, 'Import inp curve', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+
+
+DELETE FROM config_csv WHERE fid = 141;
