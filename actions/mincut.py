@@ -153,8 +153,9 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
-               "FROM cat_users "
+               "FROM cat_users WHERE active is not False "
                "ORDER BY name")
+
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
 
@@ -1917,6 +1918,17 @@ class MincutParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
         utils_giswater.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
         utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
+
+        # Manage assigend_to combo
+        index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
+        if index == -1:
+            sql = (f"SELECT id, name "
+                   f"FROM cat_users WHERE name = '{row['assigned_to_name']}'"
+                   f"ORDER BY name")
+
+            rows = self.controller.get_rows(sql)
+            utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1, combo_clear=False)
+
         utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'selector_mincut_result'
