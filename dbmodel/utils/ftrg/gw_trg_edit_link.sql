@@ -72,7 +72,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_mantable:= TG_ARGV[0];
 	
-	v_link_searchbuffer=0.01; 	
+	v_link_searchbuffer=0.1; 	
 
 	-- control of project type
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;

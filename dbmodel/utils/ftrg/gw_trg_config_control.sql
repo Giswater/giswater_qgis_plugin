@@ -30,12 +30,16 @@ BEGIN
 
 		IF v_configtable = 'sys_param_user' THEN 
 		
-		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location') THEN 
+		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location', 'cat_brand', 'cat_brand_model') THEN 
 			v_querytext='SELECT * FROM '||v_configtable||';';
 
 			--add parenthesis if new definition of featurecat doesn't have it
 	 		IF NEW.featurecat_id NOT ILIKE '{%}' AND NEW.featurecat_id IS NOT NULL THEN
-				EXECUTE 'UPDATE '||v_configtable||' SET featurecat_id = concat(''{'','||quote_literal(NEW.featurecat_id)||',''}'') WHERE id = '||NEW.id||';';
+	 			IF v_configtable IN ( 'cat_brand', 'cat_brand_model') THEN
+					EXECUTE 'UPDATE '||v_configtable||' SET featurecat_id = concat(''{'','||quote_literal(NEW.featurecat_id)||',''}'') WHERE id = '||quote_literal(NEW.id)||';';
+				ELSE 
+					EXECUTE 'UPDATE '||v_configtable||' SET featurecat_id = concat(''{'','||quote_literal(NEW.featurecat_id)||',''}'') WHERE id = '||NEW.id||';';
+				END IF;
 			END IF;
 			
 			--check if all featurecat are present on table cat_feature

@@ -19,3 +19,11 @@ ALTER TABLE config_fprocess RENAME CONSTRAINT config_csv_param_pkey TO config_fp
 ALTER TABLE config_info_layer RENAME CONSTRAINT config_api_layer_pkey TO config_info_layer_pkey;
 ALTER TABLE config_typevalue RENAME CONSTRAINT config_api_typevalue_pkey TO config_typevalue_pkey;
 ALTER TABLE config_visit_parameter_action RENAME CONSTRAINT config_visit_param_x_param_pkey TO config_visit_parameter_action_pkey;
+
+DROP TRIGGER IF EXISTS gw_trg_config_control ON cat_brand;
+CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON cat_brand
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('cat_brand');
+
+DROP TRIGGER IF EXISTS gw_trg_config_control ON cat_brand_model;
+CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON cat_brand_model
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('cat_brand_model');

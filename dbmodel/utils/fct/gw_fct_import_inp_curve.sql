@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:3042
+--FUNCTION CODE:3044
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_import_inp_curve(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_inp_curve(p_data json)
@@ -16,7 +16,7 @@ SELECT SCHEMA_NAME.gw_fct_import_inp_curve($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
---fid:383
+--fid:384
 
 */
 
@@ -28,7 +28,7 @@ v_result json;
 v_result_info json;
 v_project_type text;
 v_version text;
-v_fid integer = 383;
+v_fid integer = 384;
 
 BEGIN
 
