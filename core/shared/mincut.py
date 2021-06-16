@@ -114,9 +114,19 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "real_description", row['exec_descript'])
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
-        tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
-
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
+
+        # Manage assigend_to combo
+        index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
+        if index == -1:
+            sql = (f"SELECT id, name "
+                   f"FROM cat_users WHERE name = '{row['assigned_to_name']}'"
+                   f"ORDER BY name")
+
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1, combo_clear=False)
+
+        tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'selector_mincut_result'
         self._update_result_selector(result_mincut_id)
@@ -343,7 +353,7 @@ class GwMincut:
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
-               "FROM cat_users "
+               "FROM cat_users WHERE active is not False "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
