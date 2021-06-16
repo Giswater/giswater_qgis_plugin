@@ -16,7 +16,7 @@ SELECT SCHEMA_NAME.gw_fct_import_inp_curve($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
---fid:383
+--fid:384
 
 */
 
@@ -28,7 +28,7 @@ v_result json;
 v_result_info json;
 v_project_type text;
 v_version text;
-v_fid integer = 383;
+v_fid integer = 384;
 
 BEGIN
 

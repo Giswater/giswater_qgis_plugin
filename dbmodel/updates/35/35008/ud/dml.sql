@@ -33,7 +33,7 @@ UPDATE inp_typevalue SET idval = 'VEGETATIVE SWALE' WHERE id = 'VS';
 INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RG', 'RAIN GARDEN (5.1)');
 INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONNECTION (5.1)');
 
-INSERT INTO sys_fprocess VALUES (383,'Check missed values for cat_mat.arc n used on real arcs', 'ud');
+INSERT INTO sys_fprocess VALUES (383,'Check missed values for cat_mat.arc n used on real arcs', 'ud') ON CONFLICT (fid) DO NOTHING;
 
 --2021/06/09
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 

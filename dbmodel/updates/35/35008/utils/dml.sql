@@ -73,5 +73,5 @@ curve_id, x_value, y_value, curve_type (for WS project OR UD project curve_type 
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
-VALUES (383, 'Import inp curve', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+VALUES (384, 'Import inp curve', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
 
