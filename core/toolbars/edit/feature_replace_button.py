@@ -422,19 +422,21 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
+                   f"WHERE {self.feature_type_ws} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
         elif self.project_type == 'ud':
             self.dlg_replace.featurecat_id.clear()
             if self.feature_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} " \
-                      f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL ORDER BY id"
+                      f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL " \
+                      f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.feature_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate " \
-                      f"WHERE gully_type = '{feature_type_new}' OR gully_type IS NULL ORDER BY id"
+                      f"WHERE gully_type = '{feature_type_new}' OR gully_type IS NULL  " \
+                      f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
