@@ -43,8 +43,11 @@ BEGIN
 		v_nod2arc = 0.3;
 	END IF;
 
-	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min; END IF;
-
+	IF  > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.01; END IF;
+	
+	IF v_nod2arc < 0.001 THEN
+		RAISE EXCEPTION 'The nodarcs values is close to cero. Please make bigger your shorter pipes';
+	END IF;
 
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	IF v_roughness is null then v_roughness = 0; END IF;
