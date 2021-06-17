@@ -35,6 +35,7 @@ v_advancedsettings boolean;
 v_input json;
 v_vdefault boolean;
 v_error_context text;
+v_count integer;
 
 
 BEGIN
@@ -55,6 +56,12 @@ BEGIN
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
+	-- check sector selector
+	SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+	IF v_count = 0 THEN
+		RETURN ('{"status":"Failed","message":{"level":1, "text":"There is any sector selected. Please select at least one"}}')::json;
+	END IF;
 
 	-- delete aux table
 	DELETE FROM audit_check_data WHERE fid = 227 AND cur_user=current_user;
