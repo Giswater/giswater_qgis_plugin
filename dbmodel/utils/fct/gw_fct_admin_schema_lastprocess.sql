@@ -47,7 +47,6 @@ v_superusers text;
 v_tablename record;
 v_schemaname text;
 v_oldversion text;
-v_sample_exist text = '';
 	
 BEGIN 
 	-- search path
@@ -272,8 +271,8 @@ BEGIN
 
 		-- inserting version table
 		SELECT * INTO v_version FROM sys_version LIMIT 1;
-		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample)
-		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_version.sample);
+		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
+		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
 
 		-- get return message
 		IF v_priority=0 THEN
