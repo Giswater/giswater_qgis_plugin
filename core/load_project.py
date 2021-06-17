@@ -132,6 +132,9 @@ class GwLoadProject(QObject):
         global_vars.notify = GwNotify()
         list_channels = ['desktop', global_vars.current_user]
         global_vars.notify.start_listening(list_channels)
+
+        # Reset some session/init user variables as vdefault
+        self._manage_reset_user_variables()
         
         # Log it
         message = "Project read successfully"
@@ -430,5 +433,11 @@ class GwLoadProject(QObject):
             plugin_toolbar.toolbar.setVisible(enable)
             for index_action in plugin_toolbar.list_actions:
                 self._enable_button(index_action, enable)
+
+
+    def _manage_reset_user_variables(self):
+
+        # Set dlg_selector_basic as tab_exploitation
+        tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
 
     # endregion
