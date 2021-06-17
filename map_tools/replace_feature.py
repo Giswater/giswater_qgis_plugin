@@ -95,11 +95,11 @@ class ReplaceFeatureMapTool(ParentMapTool):
         elif self.project_type == 'ud':
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
-                sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
+                sql = f"SELECT DISTINCT(id) FROM {self.cat_table} WHERE active IS TRUE OR active IS NULL ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.geom_type in ('gully'):
-                sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
+                sql = f"SELECT DISTINCT(id) FROM cat_grate WHERE active IS TRUE OR active IS NULL ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
@@ -483,7 +483,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
+                   f"WHERE {self.feature_type_ws} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
