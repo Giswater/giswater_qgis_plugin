@@ -73,7 +73,7 @@ BEGIN
 	-- check sector selector
 	SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user;
 	IF v_count = 0 THEN
-		RETURN ('{"status":"Failed","message":{"level":1, "text":"There is any sector selected. Please select at least one"}}')::json;
+		RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 	END IF;
 
 	-- delete audit table
