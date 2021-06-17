@@ -134,7 +134,8 @@ class GwLoadProject(QObject):
         global_vars.notify.start_listening(list_channels)
 
         # Reset some session/init user variables as vdefault
-        self._manage_reset_user_variables()
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+            self._manage_reset_user_variables()
         
         # Log it
         message = "Project read successfully"
