@@ -730,6 +730,10 @@ class GwMincut:
 
     def _set_real_location(self):
 
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
 
@@ -1778,10 +1782,12 @@ class GwMincut:
 
         # Snapping
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
-        if not result.isValid():
-            return
 
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        self.iface.actionPan().trigger()
+
+        if not result.isValid():
+            return
 
         layer = self.snapper_manager.get_snapped_layer(result)
 
