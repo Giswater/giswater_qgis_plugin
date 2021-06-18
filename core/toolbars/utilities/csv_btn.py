@@ -17,7 +17,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log, tools_db, tools_qgis
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
 class GwCSVButton(GwAction):
@@ -60,6 +60,9 @@ class GwCSVButton(GwAction):
         self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
+        read_header = tools_gw.get_config_parser("btn_csv", "chk_read_header", "user", "session")
+        tools_qt.set_checked(self.dlg_csv, self.dlg_csv.chk_import_header, read_header)
+
         self.dlg_csv.lbl_info.setWordWrap(True)
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
@@ -100,6 +103,7 @@ class GwCSVButton(GwAction):
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
                f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
+
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
@@ -282,12 +286,13 @@ class GwCSVButton(GwAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        readheader = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 4)
+        readheader = dialog.chk_import_header.isChecked()
+        tools_gw.set_config_parser("btn_csv", "chk_read_header", readheader, "user", "session")
         fields = []
         cont = 1
         for row in reader:
             field = {'fid': fid_aux}
-            if readheader is False:
+            if tools_os.set_boolean(readheader) is False:
                 readheader = True
                 continue
 
