@@ -45,8 +45,11 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Cheking for exisiting curve id on table inp_curve -> Done'));
 
-  	-- starting process
- 	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
+	-- reset sequence
+	PERFORM setval('SCHEMA_NAME.inp_curve_value_id_seq', (SELECT max(id) FROM inp_curve_value), true);
+
+    -- starting process
+    FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
 
 		IF rec_csv.csv1 IS NOT NULL THEN -- to control those null rows because user has a bad structured csv file (common last lines)
