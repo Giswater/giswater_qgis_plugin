@@ -333,3 +333,22 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
 VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}')
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
+VALUES (385, 'Import inp timeseries', 'ud',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3046, 'gw_fct_import_inp_timeseries', 'ud', 'function', 'json', 'json',
+'Function to assist the import of timeseries for inp models',
+'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
+VALUES (385,'Import inp timeseries', 
+'Function to assist the import of timeseries for inp models.
+The csv file must containts next columns on same position: 
+timeseries, type, mode, date, hour, time, value (fill date/hour for ABSOLUTE or time for RELATIVE)', 
+'gw_fct_import_inp_timeseries', true, 9, false)
+ON CONFLICT (fid) DO NOTHING;
+
+
+

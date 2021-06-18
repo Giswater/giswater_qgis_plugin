@@ -12,6 +12,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusag
 ALTER TABLE inp_lidusage_subc_x_lidco ALTER COLUMN hydrology_id SET DEFAULT 1;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusage_subc_x_lidco", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
 
-
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
+
+--2021/06/17
+ALTER SEQUENCE inp_curve_seq RENAME TO inp_curve_value_id_seq;
+ALTER SEQUENCE inp_timeseries_value_seq RENAME TO inp_timeseries_value_id_seq;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeseries", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);

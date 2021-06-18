@@ -60,7 +60,6 @@ VALUES (3044, 'gw_fct_import_inp_curve', 'utils', 'function', 'json', 'json',
 'Function to assist the import of curves for inp models',
 'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
-
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
 VALUES (3044,'Import inp curves', 
 'Function to automatize the import of inp curves files. 
@@ -70,6 +69,42 @@ curve_id, x_value, y_value, curve_type (for WS project OR UD project curve_type 
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
-VALUES (384, 'Import inp curve', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+VALUES (384, 'Import inp curves', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
 
 DELETE FROM config_csv WHERE fid = 141;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3044, 'gw_fct_import_inp_curve', 'utils', 'function', 'json', 'json',
+'Function to assist the import of curves for inp models',
+'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
+VALUES (384,'Import inp curves', 
+'Function to automatize the import of inp curves files. 
+The csv file must containts next columns on same position: 
+curve_id, x_value, y_value, curve_type (for WS project OR UD project curve_type has diferent values. Check user manual)', 
+'gw_fct_import_inp_curve', true, 9, false)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
+VALUES (386, 'Import inp patterns', 'utils',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3048, 'gw_fct_import_inp_pattern', 'utils', 'function', 'json', 'json',
+'Function to assist the import of patterns for inp models',
+'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
+VALUES (386,'Import inp patterns', 
+'Function to automatize the import of inp patterns files. 
+The csv file must containts next columns on same position: 
+pattern_id, pattern_type, factor1,.......,factorn. 
+For WS use up factor18, repeating rows if you like. 
+For UD use up factor24. More than one row for pattern is not allowed', 
+'gw_fct_import_inp_pattern', true, 9, false)
+ON CONFLICT (fid) DO NOTHING;
+
+
+
+
+
