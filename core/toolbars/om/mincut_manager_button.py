@@ -9,13 +9,16 @@ from ..dialog import GwAction
 from ...shared.mincut import GwMincut
 from ...ui.ui_manager import GwMincutManagerUi
 
+from .... import global_vars
+
 
 class GwMincutManagerButton(GwAction):
     """ Button 27: Mincut manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.mincut = GwMincut()
+        if global_vars.project_type == 'ws':
+            self.mincut = GwMincut()
 
 
     def clicked_event(self):
