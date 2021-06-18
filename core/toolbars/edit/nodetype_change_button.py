@@ -204,7 +204,8 @@ class GwNodeTypeChangeButton(GwMaptool):
             return
 
         # Populate catalog_id
-        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
+        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' " \
+              f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
