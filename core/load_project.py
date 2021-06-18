@@ -79,10 +79,6 @@ class GwLoadProject(QObject):
         value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value
 
-        # Log values of system user parameters located in 'giswater.config'
-        for parameter, value in tools_qgis.user_parameters.items():
-            tools_log.log_info(f"parameter '{parameter}': {value}")
-
         # Manage locale and corresponding 'i18n' file
         tools_qt.manage_translation(self.plugin_name)
 
