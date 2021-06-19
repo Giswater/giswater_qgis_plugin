@@ -1643,6 +1643,9 @@ class GwAdminButton:
             connection_username = settings.value('username')
             settings.endGroup()
 
+        if connection_username is None or connection_username == "":
+            connection_username = tools_db.get_current_user()
+
         return connection_username
 
 
