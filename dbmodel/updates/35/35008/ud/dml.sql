@@ -30,8 +30,10 @@ UPDATE inp_typevalue SET idval = 'PERMEABLE PAVEMENT' WHERE id = 'PP';
 UPDATE inp_typevalue SET idval = 'RAIN BARREL' WHERE id = 'RB';
 UPDATE inp_typevalue SET idval = 'VEGETATIVE SWALE' WHERE id = 'VS';
 
-INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RG', 'RAIN GARDEN (5.1)');
-INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONNECTION (5.1)');
+INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RG', 'RAIN GARDEN (5.1)')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONNECTION (5.1)')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (383,'Check missed values for cat_mat.arc n used on real arcs', 'ud') ON CONFLICT (fid) DO NOTHING;
 
@@ -324,7 +326,8 @@ UPDATE config_toolbox SET inputparams='[{"widgetname":"insertIntoNode", "label":
 WHERE id=2118;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3042, 'gw_trg_scenario_management', 'ud', 'trigger function', null, null, 'Function to enhance the management of scenarios (hydrology and dwf)', 'role_epa',null,null);
+VALUES (3042, 'gw_trg_scenario_management', 'ud', 'trigger function', null, null, 'Function to enhance the management of scenarios (hydrology and dwf)', 'role_epa',null,null)
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
 VALUES ('inp_scenario_hydrology', 'hidden', 'Variable to control cat_hydrology scenario table', 'role_epa', TRUE, '{"automaticInsert":{"status":false, "sourceScenario":1}}')
@@ -335,12 +338,14 @@ VALUES ('inp_scenario_dwf', 'hidden', 'Variable to control the cat_dwf_scenario 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
-VALUES (385, 'Import inp timeseries', 'ud',NULL, NULL) ON CONFLICT (fid) DO NOTHING;
+VALUES (385, 'Import inp timeseries', 'ud',NULL, NULL)
+ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3046, 'gw_fct_import_inp_timeseries', 'ud', 'function', 'json', 'json',
 'Function to assist the import of timeseries for inp models',
-'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+'role_epa', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, readheader)
 VALUES (385,'Import inp timeseries', 
@@ -350,5 +355,9 @@ timeseries, type, mode, date, hour, time, value (fill date/hour for ABSOLUTE or 
 'gw_fct_import_inp_timeseries', true, 9, false)
 ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO inp_typevalue VALUES ('inp_value_timserid', 'Orifice', 'Orifice')
+ON CONFLICT (typevalue, id) DO NOTHING;
 
+INSERT INTO inp_typevalue VALUES ('inp_value_timserid', 'Other', 'Other')
+ON CONFLICT (typevalue, id) DO NOTHING;
 
