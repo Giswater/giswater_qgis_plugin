@@ -107,7 +107,8 @@ class GwToolBoxTask(GwTask):
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
                             value = tools_qt.get_combo_value(self.dialog, widget, 0)
-                            extras += f'"{param_name}":"{value}", '
+                            if value not in (None, ''):
+                                extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
                             value = tools_qt.is_checked(self.dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '

@@ -110,6 +110,20 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="lbl_import_header">
+              <property name="text">
+               <string>Read headers:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chk_import_header">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -271,6 +285,13 @@
                 </property>
                 <property name="text">
                  <string>;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rb_space">
+                <property name="text">
+                 <string>Space</string>
                 </property>
                </widget>
               </item>

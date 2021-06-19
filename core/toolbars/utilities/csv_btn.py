@@ -17,7 +17,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log, tools_db, tools_qgis
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
 class GwCSVButton(GwAction):
@@ -60,10 +60,14 @@ class GwCSVButton(GwAction):
         self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
+        read_header = tools_gw.get_config_parser("btn_csv", "chk_read_header", "user", "session")
+        tools_qt.set_checked(self.dlg_csv, self.dlg_csv.chk_import_header, read_header)
+
         self.dlg_csv.lbl_info.setWordWrap(True)
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
+        self.dlg_csv.rb_space.setChecked(False)
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_csv))
@@ -75,6 +79,7 @@ class GwCSVButton(GwAction):
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_space.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self._get_function_name()
         self._load_settings_values()
 
@@ -98,6 +103,7 @@ class GwCSVButton(GwAction):
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
                f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
+
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
@@ -110,6 +116,7 @@ class GwCSVButton(GwAction):
             self.dlg_csv.cmb_unicode_list.setEnabled(False)
             self.dlg_csv.rb_comma.setEnabled(False)
             self.dlg_csv.rb_semicolon.setEnabled(False)
+            self.dlg_csv.rb_space.setEnabled(False)
             self.dlg_csv.btn_file_csv.setEnabled(False)
             self.dlg_csv.tbl_csv.setEnabled(False)
             self.dlg_csv.btn_accept.setEnabled(False)
@@ -260,6 +267,8 @@ class GwCSVButton(GwAction):
             delimiter = ';'
         elif dialog.rb_comma.isChecked():
             delimiter = ','
+        elif dialog.rb_space.isChecked():
+            delimiter = ' '
         return delimiter
 
 
@@ -277,12 +286,13 @@ class GwCSVButton(GwAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        readheader = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 4)
+        readheader = dialog.chk_import_header.isChecked()
+        tools_gw.set_config_parser("btn_csv", "chk_read_header", readheader, "user", "session")
         fields = []
         cont = 1
         for row in reader:
             field = {'fid': fid_aux}
-            if readheader is False:
+            if tools_os.set_boolean(readheader) is False:
                 readheader = True
                 continue
 
@@ -334,24 +344,17 @@ class GwCSVButton(GwAction):
     def _get_rolenames(self):
         """ Get list of rolenames of current user """
 
-        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
-        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
-            super_users = f"{super_users}, {global_vars.current_user}"
-        if global_vars.current_user in super_users:
-            roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
-        else:
-            sql = ("SELECT rolname FROM pg_roles "
-                   " WHERE pg_has_role(current_user, oid, 'member')")
-            rows = tools_db.get_rows(sql)
-            if not rows:
-                return None
+        sql = ("SELECT rolname FROM pg_roles "
+               " WHERE pg_has_role(current_user, oid, 'member')")
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return None
 
-            roles = "("
-            for i in range(0, len(rows)):
-                roles += "'" + str(rows[i][0]) + "', "
-            roles = roles[:-2]
-            roles += ")"
+        roles = "("
+        for i in range(0, len(rows)):
+            roles += "'" + str(rows[i][0]) + "', "
+        roles = roles[:-2]
+        roles += ")"
 
         return roles
 

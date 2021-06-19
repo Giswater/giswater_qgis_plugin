@@ -177,7 +177,7 @@ class GwNodeTypeChangeButton(GwMaptool):
             self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
+            sql = "SELECT DISTINCT(id), id FROM cat_node  WHERE active IS TRUE OR active IS NULL ORDER BY id"
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
@@ -204,7 +204,8 @@ class GwNodeTypeChangeButton(GwMaptool):
             return
 
         # Populate catalog_id
-        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
+        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' " \
+              f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 

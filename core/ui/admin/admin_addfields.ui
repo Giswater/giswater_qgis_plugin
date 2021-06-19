@@ -64,9 +64,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>577</width>
-            <height>843</height>
+            <y>-159</y>
+            <width>565</width>
+            <height>936</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -283,9 +283,9 @@
                  </widget>
                 </item>
                 <item row="13" column="0">
-                 <widget class="QLabel" name="listfilterparam_2">
+                 <widget class="QLabel" name="lbl_linkedobject">
                   <property name="text">
-                   <string>List filter param:</string>
+                   <string>Linkedobject</string>
                   </property>
                  </widget>
                 </item>
@@ -303,13 +303,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="2">
-                 <widget class="QPlainTextEdit" name="listfilterparam">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;sign&amp;quot;:&amp;quot;&amp;gt;&amp;quot;,&amp;quot;vdefault&amp;quot;:&amp;quot;01-01-2014&amp;quot; }&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="11" column="2">
                  <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
                 </item>
@@ -321,16 +314,9 @@
                  </widget>
                 </item>
                 <item row="8" column="0">
-                 <widget class="QLabel" name="lbl_widget_dim">
+                 <widget class="QLabel" name="lbl_widgetcontrols">
                   <property name="text">
-                   <string>Widget dim:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="2">
-                 <widget class="QSpinBox" name="widgetdim">
-                  <property name="maximum">
-                   <number>999999999</number>
+                   <string>Widgetcontrols</string>
                   </property>
                  </widget>
                 </item>
@@ -354,6 +340,12 @@
                    <string/>
                   </property>
                  </widget>
+                </item>
+                <item row="8" column="2">
+                 <widget class="QLineEdit" name="widgetcontrols"/>
+                </item>
+                <item row="13" column="2">
+                 <widget class="QLineEdit" name="linkedobject"/>
                 </item>
                </layout>
               </item>

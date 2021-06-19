@@ -62,6 +62,7 @@ session_vars['dialog_docker'] = None    # An instance of GwDocker from "/core/ui
 session_vars['info_docker'] = None      # An instance of current status of the info docker form configured by user. Can be True or False
 session_vars['docker_type'] = None      # An instance of current status of the docker form configured by user. Can be configured "qgis_info_docker" and "qgis_form_docker"
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
+session_vars['last_focus'] = None       # An instance of the last focused dialog's tag
 
 # endregion
 

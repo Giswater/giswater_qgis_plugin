@@ -439,7 +439,9 @@ class GwVisit(QObject):
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'visit_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
             self.get_visit(visit_id=selected_object_id)

@@ -105,6 +105,14 @@ class GwMenuLoad(QObject):
         action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
 
         action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+
+        action_help = actions_menu.addAction(f"Get help")
+        action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
+        if not action_help_shortcut:
+            tools_gw.set_config_parser("system", f"help_shortcut", f"{action_help_shortcut}", "user", "init",
+                                       prefix=False)
+        action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
+        action_help.triggered.connect(tools_gw.open_dlg_help)
         # endregion
 
         # region Adavanced
