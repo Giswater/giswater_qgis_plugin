@@ -141,11 +141,12 @@ class GwTestQgis:
         gis_file = project_name
         export_passwd = True
         roletype = 'admin'
-        get_database_parameters = False
+        sample = True
         gis = GwGisFileCreate(self.test_giswater.plugin_dir)
-        gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
-        gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd, roletype,
-                                 get_database_parameters)
+        layer_source = {'host': "host", 'port': "port", 'db': "db",
+                        'user': "user", 'password': "password" ,"srid": "25831"}
+        gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
+            roletype, sample, layer_source=layer_source)
 
         print("Finish create_gis_project")
 
