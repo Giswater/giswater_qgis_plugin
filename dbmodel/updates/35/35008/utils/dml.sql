@@ -104,7 +104,5 @@ For UD use up factor24. More than one row for pattern is not allowed',
 'gw_fct_import_inp_pattern', true, 9, false)
 ON CONFLICT (fid) DO NOTHING;
 
-
-
-
-
+--2021/06/21
+UPDATE sys_param_user SET label=concat(label,':') WHERE label not ilike '%:';
