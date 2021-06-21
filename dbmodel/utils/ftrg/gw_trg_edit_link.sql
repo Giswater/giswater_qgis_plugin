@@ -102,12 +102,12 @@ BEGIN
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
 		-- control of relationship with connec / gully
-		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
-		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+		SELECT * INTO v_connect FROM connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), connec.the_geom, v_link_searchbuffer) 
+		ORDER BY CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, st_distance(ST_StartPoint(NEW.the_geom), connec.the_geom) LIMIT 1;
 		
 		IF v_projectype = 'UD' AND v_connect.connec_id IS NULL THEN
-			SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state>0
-			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+			SELECT * INTO v_connect FROM gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), gully.the_geom, v_link_searchbuffer) 
+			ORDER BY CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, st_distance(ST_StartPoint(NEW.the_geom), gully.the_geom) LIMIT 1;
 		END IF;
 
 		IF v_connect IS NULL THEN
@@ -115,12 +115,12 @@ BEGIN
 			NEW.the_geom = ST_reverse (NEW.the_geom);
 
 			-- check control again
-			SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
-			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+			SELECT * INTO v_connect FROM connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), connec.the_geom, v_link_searchbuffer) 
+			ORDER BY CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, st_distance(ST_StartPoint(NEW.the_geom), connec.the_geom) LIMIT 1;
 		
 			IF v_projectype = 'UD' THEN
-				SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state>0
-				ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				SELECT * INTO v_connect FROM gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), gully.the_geom, v_link_searchbuffer) 
+				ORDER BY CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, st_distance(ST_StartPoint(NEW.the_geom), gully.the_geom) LIMIT 1;
 			END IF;
 			
 			IF v_connect IS NULL THEN
@@ -151,7 +151,7 @@ BEGIN
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
 		-- connec as end point
-		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0
+		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0 
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
 			IF v_projectype='UD' then
@@ -175,11 +175,59 @@ BEGIN
 			NEW.feature_type='CONNEC';
 		END IF;
 
+		--look for obsolete features if init point not found
+		IF NEW.feature_type IS NULL THEN
+			INSERT INTO selector_state VALUES (0, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
+
+			SELECT * INTO v_connec1 FROM connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), connec.the_geom,v_link_searchbuffer) AND state=0 
+			ORDER by st_distance(ST_StartPoint(NEW.the_geom), connec.the_geom) LIMIT 1;
+
+			IF v_projectype='UD' then
+				SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
+				AND state=0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				IF v_gully1.gully_id IS NOT NULL THEN
+					NEW.feature_id=v_gully1.gully_id;
+					NEW.feature_type='GULLY';
+					NEW.state = 0;
+				END IF;
+			END IF;
+			IF v_connec1.connec_id IS NOT NULL THEN
+				NEW.feature_id=v_connec1.connec_id;
+				NEW.feature_type='CONNEC';
+				NEW.state = 0;
+			END IF;
+		END IF;
+
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
 		END IF;	
+		--for links related to state 0  features look again for final feature if its null
+		IF NEW.state = 0 THEN
+			IF v_arc IS NULL THEN 
+				-- arc as end point
+				SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state=0
+				ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
+			END IF;
+			IF v_node IS NULL THEN 
+				-- node as end point
+				SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state=0
+				ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom) LIMIT 1;
+			END IF;
+			IF v_connec2 IS NULL THEN 
+			-- connec as end point
+				SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state=0
+				ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+			END IF;
+			IF v_projectype='UD' THEN 
+				IF v_gully2 IS NULL THEN
+					--gully as end point
+					SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) AND state=0 
+					ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				END IF;
+			END IF;
+		END IF;
 
 		-- end control
 		IF ( v_arc.arc_id IS NOT NULL AND v_node.node_id IS NULL) THEN
@@ -305,6 +353,9 @@ BEGIN
 			v_pjoint_id = v_node.node_id;
 			v_pjoint_type = 'NODE';
 			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
+			IF v_arc_id IS NULL AND NEW.state=0 THEN
+				v_arc_id = (SELECT arc_id FROM arc WHERE state = 0 AND node_1 = v_node.node_id LIMIT 1);
+			END IF;
 			v_expl_id = v_node.expl_id;
 
 		
