@@ -454,7 +454,6 @@ class GwElement:
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
                 new_elem_id = tools_db.execute_returning(sql)
-                print(f"sql -> {sql}")
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])

@@ -74,9 +74,15 @@ class GwAdminButton:
         else:
             connection_status = global_vars.session_vars['logged_status']
 
-        if not connection_status:
+        settings = QSettings()
+        settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
+        self.is_service = settings.value('service')
+        if not connection_status and not self.is_service:
             self._create_credentials_form(set_connection=default_connection)
             return
+
+        if not connection_status and self.is_service:
+            self.form_enabled = False
 
         # Set label status connection
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
@@ -86,23 +92,7 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._init_show_database()
-        self._info_show_database(username=username, show_dialog=show_dialog, layer_source=layer_source)
-
-
-    def manage_docker(self):
-        """ Puts the dialog in a docker, depending on the user configuration """
-
-        try:
-            tools_gw.close_docker()
-            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
-            global_vars.session_vars['dialog_docker'] = GwDocker()
-            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
-            tools_gw.manage_docker_options()
-            tools_gw.docker_dialog(self.dlg_readsql)
-            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
-        except Exception as e:
-            tools_log.log_info(str(e))
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog, layer_source=layer_source)
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
@@ -586,14 +576,28 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if connection_status is False:
+        self.form_enabled = True
+        message = ''
+
+        if self.is_service and connection_status is False:
+            self.form_enabled = False
+            message = 'There is an error in the configuration of the pgservice file, ' \
+                      'please check it or consult your administrator'
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self._manage_docker()
+            return
+
+        elif connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
             tools_qgis.show_message(msg, 1)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            self._manage_docker()
             return
 
         # Set projecte type
@@ -608,9 +612,6 @@ class GwAdminButton:
         if not tools_db.check_role(self.username) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
             return
-
-        self.form_enabled = True
-        message = ''
 
         # Check PostgreSQL Version
         if int(self.postgresql_version) not in range(self.lower_postgresql_version, self.upper_postgresql_version) and self.form_enabled:
@@ -666,7 +667,7 @@ class GwAdminButton:
                                  tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False))
 
         if show_dialog:
-            self.manage_docker()
+            self._manage_docker()
 
 
     def _set_credentials(self, dialog, new_connection=False):
@@ -1535,6 +1536,9 @@ class GwAdminButton:
         credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
+        self.form_enabled = True
+        message = ''
+
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
         credentials['host'] = settings.value('host')
@@ -1557,7 +1561,16 @@ class GwAdminButton:
         settings.endGroup()
 
         self.logged, credentials = tools_db.connect_to_database_credentials(credentials)
-        if not self.logged:
+        if self.is_service and not self.logged:
+            self.form_enabled = False
+            message = 'There is an error in the configuration of the pgservice file, ' \
+                      'please check it or consult your administrator'
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+
+        elif not self.logged:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
@@ -1579,9 +1592,6 @@ class GwAdminButton:
 
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
-
-            message = ''
-            self.form_enabled = True
 
             # Check super_user
             self.username = self._get_user_connection(connection_name)
@@ -1881,6 +1891,9 @@ class GwAdminButton:
 
     def _set_info_project(self):
         """"""
+
+        if self.is_service and self.form_enabled is False:
+            return
 
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -3157,5 +3170,21 @@ class GwAdminButton:
         sql = f"SELECT locale as id, name as idval FROM locales WHERE active = 1"
         sqlite_cursor.execute(sql)
         return sqlite_cursor.fetchall()
+
+
+    def _manage_docker(self):
+        """ Puts the dialog in a docker, depending on the user configuration """
+
+        try:
+            tools_gw.close_docker()
+            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
+            global_vars.session_vars['dialog_docker'] = GwDocker()
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
+            tools_gw.manage_docker_options()
+            tools_gw.docker_dialog(self.dlg_readsql)
+            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
+        except Exception as e:
+            tools_log.log_info(str(e))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
 
     # endregion

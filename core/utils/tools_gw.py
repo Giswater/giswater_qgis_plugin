@@ -212,7 +212,7 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
     """ Open dialog """
 
     # Check database connection before opening dialog
-    if dlg_name != 'admin_credentials' and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin_ui') and not tools_db.check_db_connection():
         return
 
     # Manage translate
