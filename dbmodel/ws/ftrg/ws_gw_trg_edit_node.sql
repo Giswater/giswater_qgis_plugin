@@ -715,7 +715,7 @@ BEGIN
 		END IF;
 
 		-- rotation
-		IF NEW.rotation != OLD.rotation THEN
+		IF NEW.rotation != OLD.rotation OR OLD.rotation IS NULL THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
         
