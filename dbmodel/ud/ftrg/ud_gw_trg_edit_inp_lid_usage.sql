@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3038
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_edit_inp_lid() CASCADE;
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_lid()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_lid_usage()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -22,8 +21,8 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
     
 		-- FEATURE INSERT
-		INSERT INTO inp_lidusage_subc_x_lidco (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv,rptfile, hydrology_id, descript) 
-		VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.hydrology_id, NEW.descript);
+		INSERT INTO inp_lid_usage (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv,rptfile, descript) 
+		VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript);
 		
 		RETURN NEW;
 
@@ -31,15 +30,15 @@ BEGIN
     
 		-- UPDATE values
 		
-		UPDATE inp_lidusage_subc_x_lidco 
+		UPDATE inp_lid_usage 
 		SET subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, "number"=NEW."number", area=NEW.area, width=NEW.width, initsat=NEW.initsat, fromimp=NEW.fromimp,
-		toperv=NEW.toperv, rptfile=NEW.rptfile, hydrology_id=NEW.hydrology_id, descript=NEW.descript
-		WHERE subc_id = OLD.subc_id AND hydrology_id=OLD.hydrology_id;
+		toperv=NEW.toperv, rptfile=NEW.rptfile, descript=NEW.descript
+		WHERE subc_id = OLD.subc_id;
                 
 		RETURN NEW;
    
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM inp_lidusage_subc_x_lidco WHERE subc_id = OLD.subc_id AND hydrology_id=OLD.hydrology_id;
+		DELETE FROM inp_lid_usage WHERE subc_id = OLD.subc_id;
 
 		RETURN NULL;
    

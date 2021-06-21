@@ -20,13 +20,10 @@ initsat,
 fromimp, 
 toperv, 
 rptfile, 
-l.hydrology_id, 
 l.descript,
 s.the_geom
 FROM inp_lid_usage l
-JOIN v_edit_inp_subcatchment s USING(subc_id)
-WHERE s.hydrology_id=l.hydrology_id;
-
+JOIN v_edit_inp_subcatchment s USING(subc_id);
 
 
 CREATE OR REPLACE VIEW vi_lid_usage AS 
@@ -38,12 +35,9 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
     inp_lid_usage.initsat,
     inp_lid_usage.fromimp,
     inp_lid_usage.toperv::integer AS toperv,
-    inp_lid_usage.rptfile,
-    inp_lid_usage.hydrology_id
-   FROM v_edit_inp_subcatchment
-   JOIN inp_lid_usage ON inp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-   WHERE v_edit_inp_subcatchment.hydrology_id = inp_lid_usage.hydrology_id;
-
+    inp_lid_usage.rptfile
+    FROM v_edit_inp_subcatchment
+   JOIN inp_lid_usage ON inp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
 
 --SAVE VIEWS
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
