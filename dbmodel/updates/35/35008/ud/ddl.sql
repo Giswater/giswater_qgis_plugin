@@ -8,9 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/06/10
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusage_subc_x_lidco", "column":"hydrology_id", "dataType":"integer", "isUtils":"False"}}$$);
-ALTER TABLE inp_lidusage_subc_x_lidco ALTER COLUMN hydrology_id SET DEFAULT 1;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lidusage_subc_x_lidco", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
+ALTER TABLE inp_lidusage_subc_x_lidco RENAME TO inp_lid_usage;
+ALTER TABLE inp_lid_usage RENAME CONSTRAINT inp_lidusage_subc_x_lidco_pkey TO inp_lid_usage_pkey;
+ALTER TABLE inp_lid_usage RENAME CONSTRAINT inp_lidusage_subc_x_lidco_subc_id_fkey TO inp_lid_usage_subc_id_fkey;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lid_usage", "column":"hydrology_id", "dataType":"integer", "isUtils":"False"}}$$);
+ALTER TABLE inp_lid_usage ALTER COLUMN hydrology_id SET DEFAULT 1;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lid_usage", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"descript", "dataType":"text", "isUtils":"False"}}$$);
 
