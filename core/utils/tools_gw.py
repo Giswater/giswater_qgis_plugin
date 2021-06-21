@@ -2677,7 +2677,7 @@ def user_params_to_userconfig():
 
 def hide_widgets_form(dialog, dlg_name):
 
-    row = get_config_value(parameter=f'edit_{dlg_name}_widgets_to_hide', columns='value::text', table='config_param_system')
+    row = get_config_value(parameter=f'qgis_form_{dlg_name}_hidewidgets', columns='value::text', table='config_param_system')
     if row:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
