@@ -60,9 +60,6 @@ class GwCSVButton(GwAction):
         self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
-        read_header = tools_gw.get_config_parser("btn_csv", "chk_read_header", "user", "session")
-        tools_qt.set_checked(self.dlg_csv, self.dlg_csv.chk_import_header, read_header)
-
         self.dlg_csv.lbl_info.setWordWrap(True)
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
@@ -286,8 +283,7 @@ class GwCSVButton(GwAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        readheader = dialog.chk_import_header.isChecked()
-        tools_gw.set_config_parser("btn_csv", "chk_read_header", readheader, "user", "session")
+        readheader = dialog.chk_ignore_header.isChecked()
         fields = []
         cont = 1
         for row in reader:

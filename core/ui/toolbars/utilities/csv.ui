@@ -110,14 +110,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="lbl_import_header">
+             <widget class="QLabel" name="lbl_ignore_header">
               <property name="text">
-               <string>Read headers:</string>
+               <string>Ignore headers:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="chk_import_header">
+             <widget class="QCheckBox" name="chk_ignore_header">
               <property name="text">
                <string/>
               </property>
