@@ -31,9 +31,9 @@ UPDATE inp_typevalue SET idval = 'RAIN BARREL' WHERE id = 'RB';
 UPDATE inp_typevalue SET idval = 'VEGETATIVE SWALE' WHERE id = 'VS';
 
 INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RG', 'RAIN GARDEN (5.1)')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue values ('inp_value_lidcontrol', 'RD', 'ROOFTOP DISCONNECTION (5.1)')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (383,'Check missed values for cat_mat.arc n used on real arcs', 'ud') ON CONFLICT (fid) DO NOTHING;
 
