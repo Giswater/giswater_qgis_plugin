@@ -768,6 +768,9 @@ class GwAdminButton:
         if qgis_file_path is None:
             qgis_file_path = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
+        if self.is_service:
+            self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
+            self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
@@ -1542,6 +1545,7 @@ class GwAdminButton:
         credentials['user'] = settings.value('username')
         credentials['password'] = settings.value('password')
         credentials['service'] = settings.value('service')
+        self.is_service = credentials['service']
 
         sslmode_settings = settings.value('sslmode')
         sslmode = sslmode_settings
