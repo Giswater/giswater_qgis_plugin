@@ -3592,7 +3592,7 @@ class GwInfo(QObject):
         """
 
         w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
-        dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
+        dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
         presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
         w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')
