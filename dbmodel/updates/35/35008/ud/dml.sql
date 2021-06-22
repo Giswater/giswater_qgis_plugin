@@ -290,13 +290,6 @@ VALUES ('v_edit_inp_lid_usage','form_feature', 'main', 'rptfile',null,null,'stri
 false, true, false, false, null,null,null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden)
-VALUES ('v_edit_inp_lid_usage','form_feature', 'main', 'hydrology_id',null,null,'string', 'combo','hydrology_id','Hydrology identifier', false,
-false, true, false, false, 'SELECT DISTINCT (hydrology_id) AS id,  name  AS idval FROM cat_hydrology WHERE hydrology_id IS NOT NULL',true,
-null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_inp_lid_usage','form_feature', 'main', 'descript',null,null,'string', 'text','descript','Descript', false,
@@ -311,7 +304,7 @@ VALUES ('v_edit_inp_dwf', 'Shows editable information about dry weather flow', '
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
- VALUES (3038, 'gw_trg_edit_inp_lid', 'ud', 'trigger function', null, null, 'Function to edit inp lids', 'role_epa',null,null) ON CONFLICT (id) DO NOTHING;
+ VALUES (3038, 'gw_trg_edit_inp_lid_usage', 'ud', 'trigger function', null, null, 'Function to edit inp lids', 'role_epa',null,null) ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET inputparams='[{"widgetname":"insertIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1,"value":"true"},
 {"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layoutorder":2,"value":0.01},

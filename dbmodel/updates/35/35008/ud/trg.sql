@@ -8,8 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/07
-CREATE TRIGGER gw_trg_edit_inp_lid INSTEAD OF INSERT OR UPDATE OR DELETE 
-ON v_edit_inp_lid_usage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_lid();
+CREATE TRIGGER gw_trg_edit_inp_lid_usage INSTEAD OF INSERT OR UPDATE OR DELETE 
+ON v_edit_inp_lid_usage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_lid_usage();
 
 -- 2020/06/14
 DROP TRIGGER if exists gw_trg_scenario_management ON cat_hydrology;
