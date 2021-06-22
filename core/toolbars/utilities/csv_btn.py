@@ -53,12 +53,10 @@ class GwCSVButton(GwAction):
         self.dlg_csv = GwCsvUi()
         tools_gw.load_settings(self.dlg_csv)
 
-        # Get roles from BD
-        roles = self._get_rolenames()
         temp_tablename = 'temp_csv'
         tools_qt.fill_combo_unicodes(self.dlg_csv.cmb_unicode_list)
         self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
-                             'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
+                             'alias, config_csv.descript, functionname, orderby', 'config_csv')
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -91,15 +89,20 @@ class GwCSVButton(GwAction):
         self._update_info(self.dlg_csv)
 
 
-    def _populate_combos(self, combo, field_id, fields, table_name, roles):
+    def _populate_combos(self, combo, field_id, fields, table_name):
 
-        if roles is None:
-            return
+        # Get role
+        roles_dict = {"role_basic": "'role_basic'",
+                      "role_om": "'role_basic', 'role_om'",
+                      "role_edit": "'role_basic', 'role_om', 'role_edit'",
+                      "role_epa": "'role_basic', 'role_om', 'role_edit', 'role_epa'",
+                      "role_master": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master'",
+                      "role_admin": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master', 'role_admin'"}
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
-               f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
+               f" WHERE sys_role IN ({roles_dict[global_vars.project_vars['project_role']]}) AND active is True ORDER BY orderby")
 
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -117,11 +120,9 @@ class GwCSVButton(GwAction):
             self.dlg_csv.btn_file_csv.setEnabled(False)
             self.dlg_csv.tbl_csv.setEnabled(False)
             self.dlg_csv.btn_accept.setEnabled(False)
-            return
-
-
-        tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
-        self._update_info(self.dlg_csv)
+        else:
+            tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
+            self._update_info(self.dlg_csv)
 
 
     def _write_csv(self, dialog, temp_tablename):
@@ -166,14 +167,19 @@ class GwCSVButton(GwAction):
 
     def _update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
-
-        dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        try:
+            dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        except Exception as e:
+            tools_log.log_warning(str(e))
 
 
     def _get_function_name(self):
 
-        self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
-        tools_log.log_info(str(self.func_name))
+        try:
+            self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+            tools_log.log_info(str(self.func_name))
+        except Exception as e:
+            tools_log.log_warning(str(e))
 
 
     def _select_file_csv(self):
@@ -283,13 +289,13 @@ class GwCSVButton(GwAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        readheader = dialog.chk_ignore_header.isChecked()
+        ignoreheader = dialog.chk_ignore_header.isChecked()
         fields = []
         cont = 1
         for row in reader:
             field = {'fid': fid_aux}
-            if tools_os.set_boolean(readheader) is False:
-                readheader = True
+            if tools_os.set_boolean(ignoreheader) is True:
+                ignoreheader = False
                 continue
 
             for x in range(0, len(row)):
