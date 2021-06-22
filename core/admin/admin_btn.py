@@ -587,6 +587,7 @@ class GwAdminButton:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self.dlg_readsql.btn_gis_create.setEnabled(False)
             self._manage_docker()
             return
 
@@ -1569,6 +1570,7 @@ class GwAdminButton:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self.dlg_readsql.btn_gis_create.setEnabled(False)
 
         elif not self.logged:
             self._close_dialog_admin(self.dlg_readsql)
