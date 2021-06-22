@@ -43,7 +43,7 @@ BEGIN
 		v_nod2arc = 0.3;
 	END IF;
 
-	IF  > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.01; END IF;
+	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.005; END IF;
 	
 	IF v_nod2arc < 0.001 THEN
 		RAISE EXCEPTION 'The nodarcs values is close to cero. Please make bigger your shorter pipes';

@@ -73,6 +73,10 @@ BEGIN
 	-- delete trash rows
 	DELETE FROM temp_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
 		
+	DELETE FROM temp_csv WHERE csv1='Analysis' and csv2='begun';
+	DELETE FROM temp_csv WHERE csv1='Analysis' and csv2='ended';
+	DELETE FROM temp_csv WHERE csv1='Total' and csv2='elapsed';
+
 	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='begun';
 	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='ended';
 	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Total' and csv2='elapsed';
