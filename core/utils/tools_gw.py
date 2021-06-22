@@ -2641,7 +2641,7 @@ def get_info_templates():
 
     templates = ''
     for key in global_vars.info_templates:
-        if global_vars.info_templates[key]['dlg'] is not None:
+        if global_vars.info_templates[key]['dlg'] is not None and global_vars.info_templates[key]['open'] < 1:
             templates += f'"{key}", '
     templates = f'[{templates[:-2]}]'
     return templates

@@ -205,6 +205,7 @@ class GwInfo(QObject):
             global_vars.info_templates[json_result['body']['feature']['childType']] = {}
             global_vars.info_templates[json_result['body']['feature']['childType']]['dlg'] = None
             global_vars.info_templates[json_result['body']['feature']['childType']]['json'] = None
+            global_vars.info_templates[json_result['body']['feature']['childType']]['open'] = 0
         # Manage the json result
         #   - new_result is always the last result
         #   - self.complet_result is the first result for that template
@@ -434,11 +435,12 @@ class GwInfo(QObject):
 
         print(f"{time.time()}")
         # Check if there is a template for that node type
-        if new_feature or global_vars.info_templates[template_name]['dlg'] is None:
+        if new_feature or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         print(f"{time.time()}")
+        global_vars.info_templates[template_name]['open'] += 1
         return self.complet_result, self.dlg_cf
 
 
@@ -952,6 +954,9 @@ class GwInfo(QObject):
     def _clear_dlg_templates(self):
         """ Clears all the widgets of the last info and disconnects the necessary signals """
 
+        global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] -= 1
+        if global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] > 0:
+            return
         dlg = global_vars.info_templates[self.complet_result['body']['feature']['childType']]['dlg']
         # Empty out the text for every widget
         for field in global_vars.info_templates[self.complet_result['body']['feature']['childType']]['json']['body']['data']['fields']:
