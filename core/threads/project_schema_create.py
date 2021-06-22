@@ -48,9 +48,6 @@ class GwCreateSchemaTask(GwTask):
 
             if not self.is_test:
                 self.setProgress(10)
-            status = self.admin._update_30to31(new_project=True, project_type=project_type)
-            if not status and self.admin.dev_commit is False:
-                return False
 
             if not self.is_test:
                 self.setProgress(20)
