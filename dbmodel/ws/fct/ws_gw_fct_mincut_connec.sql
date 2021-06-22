@@ -55,7 +55,7 @@ BEGIN
 	IF v_mincut_class=3 THEN
 		INSERT INTO om_mincut_connec (result_id, connec_id) 
 		SELECT DISTINCT ON (connec_id) result_id, connec_id FROM rtc_hydrometer_x_connec JOIN om_mincut_hydrometer USING (hydrometer_id) 
-		WHERE result_id = v_mincut;
+		WHERE result_id = v_mincut ON CONFLICT (result_id, connec_id) DO NOTHING; 
 	END IF;
 
 	-- update om_mincut table
