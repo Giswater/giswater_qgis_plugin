@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>896</width>
-    <height>390</height>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,20 +106,6 @@
                 <width>16777215</width>
                 <height>16777215</height>
                </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lbl_ignore_header">
-              <property name="text">
-               <string>Ignore headers:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="chk_ignore_header">
-              <property name="text">
-               <string/>
               </property>
              </widget>
             </item>
@@ -230,6 +216,20 @@
                   <width>16777215</width>
                   <height>16777215</height>
                  </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lbl_ignore_header">
+                <property name="text">
+                 <string>Ignore headers:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="chk_ignore_header">
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
