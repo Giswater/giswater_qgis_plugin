@@ -166,6 +166,8 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+v_new_visit boolean = FALSE;
+
 BEGIN
 	
 	-- Set search path to local schema
@@ -305,15 +307,22 @@ BEGIN
 			END IF;
 			-- if visit exists, get v_id and control if we have to load its form according to days interval
 			IF v_visit_id IS NOT NULL THEN
-				v_id = v_visit_id;
-				v_querystring = concat('SELECT true FROM om_visit WHERE enddate > now() - ''7 days''::interval AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
+				v_querystring = concat('SELECT true FROM om_visit WHERE startdate > now() - ''7 days''::interval AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
 				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 50);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_load_visit;
 			END IF;
-		
-			RAISE NOTICE 'v_load_visit -> %',v_load_visit;
+            
+            IF v_load_visit IS NOT TRUE AND v_id IS NULL THEN
+				v_new_visit=TRUE;
+			END IF;
+            
+            IF v_visit_id IS NOT NULL AND v_id IS NULL THEN
+            	v_id = v_visit_id;
+            END IF;
+            
+            RAISE NOTICE 'v_new_visit -> %', v_new_visit;
 
 		END IF;
 		
@@ -385,7 +394,8 @@ BEGIN
 			v_id=1;
 		END IF;
 		
-		isnewvisit = true;		
+		v_new_visit = true;
+				
 	END IF;
 
 	
@@ -401,7 +411,7 @@ BEGIN
 	END IF;
 
 
-	IF isnewvisit IS FALSE THEN
+	IF v_new_visit IS FALSE THEN
 
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
 		v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
@@ -421,7 +431,7 @@ BEGIN
 	END IF;
 
 	-- setting values default of new visit
-	IF isnewvisit THEN
+	IF v_new_visit THEN
 	
 		-- dynamics (last user's choice)--
 		-- excode
@@ -509,8 +519,8 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_columntype;
 
-	RAISE NOTICE '--- gw_fct_getvisit : Visit parameters: p_visittype % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
-							     p_visittype, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
+	RAISE NOTICE '--- gw_fct_getvisit : Visit parameters: p_visittype % v_new_visit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
+							     p_visittype, v_new_visit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data when change from tabData to tabFile
 	IF v_currentactivetab = 'tabData' AND (v_isclasschanged IS FALSE OR v_tab_data IS FALSE) AND v_status > 0 THEN
@@ -577,7 +587,7 @@ BEGIN
 		END IF;
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
 
-			IF isnewvisit THEN
+			IF v_new_visit THEN
 
 				IF v_formname IS NULL THEN
 					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
@@ -768,7 +778,7 @@ BEGIN
 		
 		--show tab only if it is not new visit or offline is true
 		
-		IF NOT isnewvisit THEN
+		IF NOT v_new_visit THEN
 			--filling tab (only if it's active)
 			
 			IF v_activefilestab THEN
@@ -836,12 +846,14 @@ BEGIN
 
 	-- header form
 
-	IF p_visittype = 1 AND v_load_visit IS TRUE THEN
+	IF p_visittype = 1 AND v_new_visit IS FALSE THEN
 		v_formheader :=concat('EXISTING VISIT - ',v_id);
-	ELSIF p_visittype = 1 AND v_load_visit IS NULL THEN
+	ELSIF p_visittype = 1 AND v_new_visit IS TRUE THEN
 		v_formheader :=concat('NEW VISIT - ',v_id);
-    ELSE
-		v_formheader :=concat('INCIDENCY - ',v_id);	
+	ELSIF p_visittyppe = 2 AND v_new_visit IS FALSE THEN
+		v_formheader :=concat('EXISTING INCIDENCY - ',v_id);	
+	ELSIF p_visittype = 2 AND v_new_visit IS TRUE THEN
+		v_formheader :=concat('NEW INCIDENCY - ',v_id);
 	END IF;
 
 	-- getting geometry
@@ -851,7 +863,7 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_geometry;
 
-        IF isnewvisit IS FALSE THEN        
+        IF v_new_visit IS FALSE THEN        
 		IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
 			v_querystring = concat('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ',quote_ident(v_featuretype),' WHERE ',(v_featuretype),'_id::text=',quote_literal(v_featureid),'::text)a');
 			v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid);
