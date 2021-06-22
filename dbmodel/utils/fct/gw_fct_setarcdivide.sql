@@ -675,7 +675,7 @@ BEGIN
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON v_edit_link.feature_id=gully_id 
+								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
 								WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
