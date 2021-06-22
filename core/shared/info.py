@@ -774,6 +774,7 @@ class GwInfo(QObject):
 
         # Get widget controls
         self.tab_main = self.dlg_cf.tab_main
+        self.tab_main.setCurrentIndex(0)
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
         self.tbl_element = self.dlg_cf.tbl_element
         tools_qt.set_tableview_config(self.tbl_element)
