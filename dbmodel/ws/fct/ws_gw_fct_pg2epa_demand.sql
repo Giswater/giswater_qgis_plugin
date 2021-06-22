@@ -395,9 +395,9 @@ BEGIN
 	INSERT INTO selector_hydrometer (state_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=357 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
-
-	UPDATE rpt_inp_node SET pattern_id = null WHERE demand = 0;
-
+	
+	UPDATE temp_node SET demand = 0 WHERE demand is null;
+	
 RETURN 0;
 END;
 $BODY$
