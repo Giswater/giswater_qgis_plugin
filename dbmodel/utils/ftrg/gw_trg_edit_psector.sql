@@ -35,6 +35,8 @@ v_execute_mode text;
 v_parent_id integer;
 v_temporal_psector_id integer;
 v_current_psector integer;
+v_plan_obsolete_state_type integer;
+v_affectrow integer;
 
 BEGIN
 
@@ -42,6 +44,7 @@ BEGIN
 
     om_aux:= TG_ARGV[0];
     v_execute_mode:= (SELECT value::json ->> 'mode' FROM config_param_system WHERE parameter='plan_psector_execute_action');
+    v_plan_obsolete_state_type:= (SELECT value::json ->> 'plan_obsolete_state_type' FROM config_param_system WHERE parameter='plan_psector_execute_action');
     v_current_psector:= (SELECT value::integer FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user);
 
     -- Control insertions ID
@@ -164,19 +167,32 @@ BEGIN
 
 						END IF;
 
-						-- set obsolete features where psector_x_* state is 0
-						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
-						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
-						AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
 						
-						-- delete from psector_x_* where state is 0
-						EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
-						WHERE psector_id = '||OLD.psector_id||' AND '||lower(rec_type.id)||'_id = '''||rec.id||''' AND '''||rec.state||''' = 0;';
-
-						-- set on service feature where psector_x_* state is 1
+						-- set on service features where psector_x_* state is 1					
 						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 1, state_type = '||v_statetype_onservice||' 
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
-						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
+						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type<>'||v_plan_obsolete_state_type||';';
+
+						GET DIAGNOSTICS v_affectrow = row_count;
+						IF v_affectrow=0 THEN
+
+							-- set obsolete features where psector_x_* state is 1 but feature state_type is in plan_obsolete_state_type					
+							EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
+							FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
+							AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type='||v_plan_obsolete_state_type||';';
+
+								GET DIAGNOSTICS v_affectrow = row_count;
+								IF v_affectrow=0 THEN
+
+									-- set obsolete features where psector_x_* state is 0									
+									EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
+									FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
+									AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
+
+								END IF;			
+						END IF;
+
+	
 
 						-- change arc_id for planified connecs (useful when existing connec changes to planified arc)
 						IF lower(rec_type.id) IN ('connec', 'gully') THEN
@@ -193,6 +209,10 @@ BEGIN
 							AND link.feature_id = '''||rec.id||''' WHERE link.exit_id::integer=vnode.vnode_id;';
 							
 						END IF;
+
+						-- delete from psector_x_* where state is 0
+						EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
+						WHERE psector_id = '||OLD.psector_id||' AND '||lower(rec_type.id)||'_id = '''||rec.id||''' AND '''||rec.state||''' = 0;';
 
 						-- delete from psector_x_* where state is 1
 						EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
@@ -215,7 +235,8 @@ BEGIN
 				
 				INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
 				SELECT arc_id, OLD.psector_id, state, doable, descript, addparam FROM plan_psector_x_arc 
-				WHERE psector_id=v_temporal_psector_id AND (addparam IS NULL  OR ((addparam::json) ->> 'arcDivide')='parent');
+				WHERE psector_id=v_temporal_psector_id AND (addparam IS NULL  OR ((addparam::json) ->> 'arcDivide')='parent')
+				ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 				INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
 				SELECT node_id, OLD.psector_id, state, doable, descript FROM plan_psector_x_node WHERE psector_id=v_temporal_psector_id;

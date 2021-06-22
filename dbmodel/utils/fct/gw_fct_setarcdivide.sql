@@ -654,13 +654,13 @@ BEGIN
 
 							-- insert operative connec's on alternative in order to reconnect
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
-							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id
+							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id AND state=1
 							ON CONFLICT DO NOTHING;
 
 							-- insert operative gully's on alternative in order to reconnect
 							IF v_project_type='UD' THEN
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
-								SELECT v_psector, gully_id, NULL, 1, false FROM gully WHERE arc_id = v_arc_id
+								SELECT v_psector, gully_id, NULL, 1, false FROM gully WHERE arc_id = v_arc_id AND state=1
 								ON CONFLICT DO NOTHING;
 							END IF;
 
