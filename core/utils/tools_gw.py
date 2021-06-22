@@ -1802,7 +1802,7 @@ def get_project_type(schemaname=None):
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
-    elif schemaname is None:
+    elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     # start process

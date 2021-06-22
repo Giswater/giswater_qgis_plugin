@@ -49,7 +49,7 @@ def check_table(tablename, schemaname=None):
 def check_view(viewname, schemaname=None):
     """ Check if selected view exists in selected schema """
 
-    if schemaname is None:
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     schemaname = schemaname.replace('"', '')
@@ -63,7 +63,7 @@ def check_view(viewname, schemaname=None):
 def check_column(tablename, columname, schemaname=None):
     """ Check if @columname exists table @schemaname.@tablename """
 
-    if schemaname is None:
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     schemaname = schemaname.replace('"', '')
@@ -147,7 +147,7 @@ def get_current_user():
 def get_columns_list(tablename, schemaname=None):
     """ Return list of all columns in @tablename """
 
-    if schemaname is None:
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     schemaname = schemaname.replace('"', '')
@@ -162,7 +162,7 @@ def get_columns_list(tablename, schemaname=None):
 def get_srid(tablename, schemaname=None):
     """ Find SRID of selected schema """
 
-    if schemaname is None:
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     schemaname = schemaname.replace('"', '')

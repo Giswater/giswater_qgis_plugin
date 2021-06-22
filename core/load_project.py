@@ -412,7 +412,7 @@ class GwLoadProject(QObject):
     def _check_schema(self, schemaname=None):
         """ Check if selected schema exists """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         schemaname = schemaname.replace('"', '')

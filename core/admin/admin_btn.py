@@ -375,7 +375,7 @@ class GwAdminButton:
     def _get_project_epsg(self, schemaname=None):
         """ Get project epsg from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_epsg = None
@@ -3216,7 +3216,7 @@ class GwAdminButton:
     def _get_project_version(self, schemaname=None):
         """ Get project version from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_version = None
@@ -3242,7 +3242,7 @@ class GwAdminButton:
     def _get_project_language(self, schemaname=None):
         """ Get project langugage from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_language = None
