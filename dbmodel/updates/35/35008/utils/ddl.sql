@@ -17,3 +17,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_brand_m
 
 -- 2021/06/08
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_version", "column":"sample"}}$$);
+
+-- 2021/06/22
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_csv", "column":"readheader"}}$$);

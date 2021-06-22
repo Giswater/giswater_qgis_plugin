@@ -107,3 +107,7 @@ ON CONFLICT (fid) DO NOTHING;
 --2021/06/21
 UPDATE sys_param_user SET label=concat(label,':') WHERE label not ilike '%:';
 UPDATE sys_param_user SET formname='hidden' WHERE id='edit_cadtools_baselayer_vdefault';
+
+--2021/06/22
+DELETE FROM config_csv WHERE fid=154;
+DELETE FROM sys_fprocess WHERE fid=154;
