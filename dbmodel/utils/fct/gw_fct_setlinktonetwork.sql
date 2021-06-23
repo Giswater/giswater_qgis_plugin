@@ -68,6 +68,7 @@ v_status text;
 v_message text;
 v_version text;
 v_autoupdate_dma boolean;
+v_autoupdate_fluid boolean;
 
 BEGIN
 	
@@ -82,6 +83,7 @@ BEGIN
 
 	-- control autoupdate_dma
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 
     -- Get parameters from input json
     v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
@@ -246,20 +248,23 @@ BEGIN
 			
 				IF v_autoupdate_dma IS FALSE THEN
                     UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
                     WHERE connec_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values (except dma).'));
 				ELSE
                     UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
                     WHERE connec_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;
-
+				IF v_autoupdate_fluid IS TRUE THEN
+					UPDATE connec SET fluid_type = v_arc.fluid_type 
+                    WHERE connec_id = v_connect_id;
+				END IF; 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
 					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
@@ -277,20 +282,23 @@ BEGIN
 			
 				IF v_autoupdate_dma IS FALSE THEN
                     UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
                     WHERE gully_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values (except dma).'));
 				ELSE
                     UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
                     WHERE gully_id = v_connect_id;
 					
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;
-				
+				IF v_autoupdate_fluid IS TRUE THEN
+					UPDATE gully SET fluid_type = v_arc.fluid_type 
+                    WHERE gully_id = v_connect_id;
+				END IF; 
 
 				-- Update state_type if edit_connect_update_statetype is TRUE
 				IF (SELECT ((value::json->>'gully')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN

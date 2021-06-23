@@ -25,7 +25,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
 v_force_delete boolean;
-
+v_autoupdate_fluid boolean;
 
 BEGIN
 
@@ -40,7 +40,9 @@ BEGIN
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
-
+	
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
@@ -336,8 +338,8 @@ BEGIN
 		END IF;
 
 		--Fluid type
-		IF NEW.arc_id IS NOT NULL THEN
-				NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+		IF v_autoupdate_fluid IS TRUE AND  NEW.arc_id IS NOT NULL THEN
+			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 
 		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -551,7 +553,7 @@ BEGIN
 		END IF;
 		
 		--fluid_type
-		IF NEW.arc_id IS NOT NULL THEN
+		IF v_autoupdate_fluid IS TRUE AND NEW.arc_id IS NOT NULL THEN
 			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 

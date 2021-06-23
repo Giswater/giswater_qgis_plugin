@@ -103,3 +103,7 @@ DELETE FROM sys_fprocess WHERE fid=154;
 UPDATE config_param_system SET value='{"mode":"disabled", "plan_obsolete_state_type":24}', descript='Define which mode psector trigger would use. Modes: "disabled", "onService"(transform all features afected by psector to its planified state and makes a
  copy of psector), "obsolete"(set all features afected to obsolete but manage their state_type). Define which plan state_type is going to be set to obsolete when execute psector' 
  WHERE parameter='plan_psector_execute_action' AND descript LIKE '%state_type)';
+
+INSERT INTO config_param_system 
+VALUES ('edit_connect_autoupdate_fluid', 'TRUE', 'If true, after inserting a link, gully or connec will have the same fluid as arc they are connected to. If false, this value won''t propagate', 'Connect autoupdate fluid', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean')
+ON CONFLICT (parameter) DO NOTHING;

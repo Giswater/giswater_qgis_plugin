@@ -31,6 +31,7 @@ v_link record;
 xvar float;
 yvar float;
 v_autoupdate_dma boolean;
+v_autoupdate_fluid boolean;
 
 BEGIN 
 
@@ -41,8 +42,9 @@ BEGIN
 
 	v_projectype = (SELECT project_type FROM sys_version LIMIT 1);
 
-	-- control autoupdate_dma
+	-- control autoupdate_dma and fluid
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	
 	
 	IF v_featuretype='connec' THEN
@@ -96,11 +98,15 @@ BEGIN
 		END LOOP;
 		-- update fields that inherit values from arc
 		IF v_projectype = 'WS' AND NEW.arc_id IS NOT NULL AND (NEW.arc_id != OLD.arc_id) THEN
-			UPDATE v_edit_connec SET presszone_id=a.presszone_id, dqa_id=a.dqa_id, minsector_id=a.minsector_id, fluid_type = a.fluid_type
+			UPDATE v_edit_connec SET presszone_id=a.presszone_id, dqa_id=a.dqa_id, minsector_id=a.minsector_id
 			FROM arc a WHERE a.arc_id = NEW.arc_id;
+			IF v_autoupdate_fluid IS TRUE THEN
+				UPDATE v_edit_connec SET fluid_type = a.fluid_type
+				FROM arc a WHERE a.arc_id = NEW.arc_id;
+			END IF;
 		END IF;
 		
-		IF v_projectype = 'UD' AND NEW.arc_id IS NOT NULL AND (NEW.arc_id != OLD.arc_id) THEN
+		IF v_projectype = 'UD' AND v_autoupdate_fluid IS TRUE AND NEW.arc_id IS NOT NULL AND (NEW.arc_id != OLD.arc_id) THEN
 			UPDATE v_edit_gully SET fluid_type = a.fluid_type FROM arc a WHERE a.arc_id = NEW.arc_id;
 		END IF;
 

@@ -205,6 +205,8 @@ BEGIN
 		END IF;	
 		--for links related to state 0  features look again for final feature if its null
 		IF NEW.state = 0 THEN
+			INSERT INTO selector_state VALUES (0, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
+
 			IF v_arc IS NULL THEN 
 				-- arc as end point
 				SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state=0

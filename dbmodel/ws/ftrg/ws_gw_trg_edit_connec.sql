@@ -36,7 +36,7 @@ v_auto_pol_id text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_force_delete boolean;
-
+v_autoupdate_fluid boolean;
 
 BEGIN
 
@@ -54,7 +54,8 @@ BEGIN
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
-	
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
 	IF v_double_geom_buffer IS NULL THEN v_double_geom_buffer=1; END IF;
@@ -374,8 +375,8 @@ BEGIN
 		END IF;
 
 		--Fluid type
-		IF NEW.arc_id IS NOT NULL THEN
-				NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+		IF v_autoupdate_fluid IS TRUE AND NEW.arc_id IS NOT NULL THEN
+			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 
 		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -576,7 +577,9 @@ BEGIN
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				ELSE
 					IF NEW.arc_id IS NOT NULL THEN
-						NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+						IF v_autoupdate_fluid IS TRUE THEN 
+							NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+						END IF;
 						NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
 						NEW.presszone_id = (SELECT presszone_id FROM arc WHERE arc_id = NEW.arc_id);
 						NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);

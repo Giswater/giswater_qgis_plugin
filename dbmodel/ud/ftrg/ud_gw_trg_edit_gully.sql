@@ -51,7 +51,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_autorotation_disabled boolean;
 v_force_delete boolean;
-
+v_autoupdate_fluid boolean;
     
 BEGIN
 
@@ -67,6 +67,8 @@ BEGIN
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+
 	IF v_unitsfactor IS NULL THEN
 		v_doublegeometry = FALSE;
 	ELSE 
@@ -371,8 +373,8 @@ BEGIN
 		END IF;
 
 		--Fluid type
-		IF NEW.arc_id IS NOT NULL THEN
-				NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+		IF v_autoupdate_fluid IS TRUE AND NEW.arc_id IS NOT NULL THEN
+			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 
 		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -709,7 +711,7 @@ BEGIN
 		END IF;
 
 		--fluid_type
-		IF NEW.arc_id IS NOT NULL THEN
+		IF v_autoupdate_fluid IS TRUE AND NEW.arc_id IS NOT NULL THEN
 			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 
