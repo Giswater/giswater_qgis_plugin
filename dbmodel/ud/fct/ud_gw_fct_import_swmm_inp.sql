@@ -531,7 +531,7 @@ BEGIN
 		UPDATE cat_arc SET arc_type = 'EPACOND' WHERE arc_type IS NULL;
 		UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
 		UPDATE cat_hydrology SET name = 'Default';
-		UPDATE cswmm.cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
+		UPDATE cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
 		UPDATE node SET code = node_id WHERE code is null;
 		UPDATE arc SET code = arc_id WHERE code is null;
 			
