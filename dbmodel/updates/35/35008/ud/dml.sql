@@ -370,3 +370,7 @@ ALTER TABLE man_manhole ALTER COLUMN length SET DEFAULT 0;
 ALTER TABLE man_manhole ALTER COLUMN width SET DEFAULT 0;
 ALTER TABLE man_chamber ALTER COLUMN length SET DEFAULT 0;
 ALTER TABLE man_chamber ALTER COLUMN width SET DEFAULT 0;
+
+--2021/06/23
+UPDATE sys_table SET id='inp_lid_usage' WHERE id='inp_lidusage_subc_x_lidco';
+UPDATE sys_table SET id='v_edit_inp_lid_usage' WHERE id='v_edit_inp_inp';
