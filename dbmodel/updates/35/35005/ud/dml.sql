@@ -34,7 +34,9 @@ UPDATE config_form_fields SET widgettype = 'combo', dv_querytext = 'SELECT id, i
 
 UPDATE sys_param_user SET layoutname ='lyt_utils' WHERE  layoutname ='lyt_gully';
 
-INSERT INTO sys_table VALUES ('v_edit_inp_dwf', 'editable view for dry weather flows', 'role_epa', 0, null, null, null, null, null, null, null, null, 'giswater') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity,  qgis_message, sys_sequence, sys_sequence_field, notify_action, source) 
+VALUES ('v_edit_inp_dwf', 'editable view for dry weather flows', 'role_epa', 0, null, null, null, null, null, null,  'giswater') ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO sys_function VALUES (3036, 'gw_trg_edit_inp_dwf','ud','trigger function',null,null,'Trigger to make editable v_edit_inp_dwf','role_epa', NULL);
 
 UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["v_edit_raingage", "inp_inflows", "inp_inflows_pol_x_node","inp_timeseries_value"]}]'

@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/03/25
+DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
 CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS 
 SELECT ext_rtc_hydrometer_x_data.id,
     rtc_hydrometer_x_connec.connec_id,
