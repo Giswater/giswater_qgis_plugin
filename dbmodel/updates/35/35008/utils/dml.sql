@@ -107,3 +107,8 @@ UPDATE config_param_system SET value='{"mode":"disabled", "plan_obsolete_state_t
 INSERT INTO config_param_system 
 VALUES ('edit_connect_autoupdate_fluid', 'TRUE', 'If true, after inserting a link, gully or connec will have the same fluid as arc they are connected to. If false, this value won''t propagate', 'Connect autoupdate fluid', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean')
 ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3050, 'gw_fct_getfeaturegeom', 'utils', 'function', 'json', 'json',
+'Return geometries from id list',
+'role_basic', NULL, NULL) ON CONFLICT (id) DO NOTHING;
