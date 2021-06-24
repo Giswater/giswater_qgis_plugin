@@ -23,4 +23,8 @@ false, true, false,false, 'SELECT id, id AS idval FROM cat_feature_arc WHERE id 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields set widgettype='text', datatype='double', iseditable=true WHERE formname='cat_arc', label=columnname 
-WHERE columnname in ('geom1','geom2','geom3','geom4','geom5','geom6','geom7','geom8'); 
+WHERE columnname in ('geom1','geom2','geom3','geom4','geom5','geom6','geom7','geom8');
+
+--2021/06/24
+UPDATE inp_timeseries SET fname = a.fname FROM inp_timeseries_value a WHERE timser_id=inp_timeseries.id;
+UPDATE config_form_fields SET formname = 'inp_timeseries' WHERE formname='inp_timeseries_value' AND columnname = 'fname';
