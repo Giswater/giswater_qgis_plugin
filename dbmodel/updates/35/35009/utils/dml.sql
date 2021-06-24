@@ -83,3 +83,22 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('cat_arc','form_feature', 'main', 'acoeff',null,null,'double', 'text','acoeff',null, false,
 false, true, false, null, null, null,null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+-- 2021/06/24
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3052, 'gw_fct_anl_arc_length', 'utils', 'function', 'json', 'json',
+'Check topology assistant. Detect arcs duplicated only by final nodes or the entire geometry',
+'role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3052,'Arcs shorter than specific length', '{"featureType":["arc"]}', 
+'[{"widgetname":"arcLength", "label":"Arc length:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":1}]', NULL, TRUE) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
+VALUES (3052,'gw_fct_anl_arc_length', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (387, 'Find short arcs', 'utils') ON CONFLICT (fid) DO NOTHING;
