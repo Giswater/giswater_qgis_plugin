@@ -13,11 +13,8 @@ version=3.5.008
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 
-changelog=Version 3.5.005
+changelog=Version 3.5.007
 	- Minor bugs fixed
-	- Remove issample check for create qgis project
-	- Set table model for all qttablemodels used
-	- Change the strategy of superusers and ssl mode used on connection tool
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM

@@ -2404,6 +2404,7 @@ class GwAdminButton:
             global_vars.dao.rollback()
             self.error_count = 0
 
+
         # Hide button execute
         self.dlg_import_inp.btn_run.setVisible(False)
 
