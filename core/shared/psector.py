@@ -1471,7 +1471,9 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        tools_gw.close_dialog(self.dlg_psector_mng)
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'psector_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
 
 

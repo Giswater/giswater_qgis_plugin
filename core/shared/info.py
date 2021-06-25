@@ -35,7 +35,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os, tools_qt
 
 global is_inserting
 is_inserting = False
@@ -657,6 +657,7 @@ class GwInfo(QObject):
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
             dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
@@ -1134,6 +1135,7 @@ class GwInfo(QObject):
 
         self._roll_back()
         self.rubber_band.reset()
+        self.layer.removeSelection()
         tools_gw.close_docker()
 
 
@@ -2025,6 +2027,8 @@ class GwInfo(QObject):
         # Check feature_type
         if self.feature_type == 'connec':
             widget = f'{tab_type}_{self.feature_type}at_id'
+        elif self.feature_type == 'gully':
+            widget = f'{tab_type}_gratecat_id'
         else:
             widget = f'{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
@@ -2481,7 +2485,7 @@ class GwInfo(QObject):
         """ Fill the table control to show documents """
 
         # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(widget)
         self.cmb_visit_class = self.dlg_cf.findChild(QComboBox, "cmb_visit_class")
         self.date_visit_to = self.dlg_cf.findChild(QDateEdit, "date_visit_to")
         self.date_visit_from = self.dlg_cf.findChild(QDateEdit, "date_visit_from")
@@ -2493,6 +2497,22 @@ class GwInfo(QObject):
 
         feature_key = f"{geom_type}_id"
         feature_type = geom_type.upper()
+
+        # Get selected dates
+        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            tools_qgis.show_warning(message)
+            return
+
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
+               " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
 
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
@@ -2508,27 +2528,11 @@ class GwInfo(QObject):
 
         btn_open_gallery.clicked.connect(partial(self._open_visit_files))
 
-        # Fill ComboBox cmb_visit_class
-        sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
-               " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
-               " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
-               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
-
-        # Get selected dates
-        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
-        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
-        if date_from > date_to:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
-            return
-
         # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
-            tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
-            tools_qt.fill_table(widget, table_name, filter_)
-            self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
-                                   column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+        tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
+        tools_qt.fill_table(widget, table_name, filter_)
+        self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                               column_filter=feature_key, value_filter=self.feature_id, widget=widget)
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -3588,7 +3592,7 @@ class GwInfo(QObject):
         """
 
         w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
-        dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
+        dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
         presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
         w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')

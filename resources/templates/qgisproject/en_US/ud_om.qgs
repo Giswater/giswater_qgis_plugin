@@ -22,21 +22,21 @@
     <customproperties/>
     <layer-tree-group checked="Qt::Unchecked" expanded="0" name="O&amp;M">
       <customproperties/>
-      <layer-tree-layer checked="Qt::Unchecked" id="v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_om_visit&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="OM Visits">
+      <layer-tree-layer checked="Qt::Unchecked" id="v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_om_visit&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="OM Visits">
         <customproperties/>
       </layer-tree-layer>
       <layer-tree-group checked="Qt::Unchecked" expanded="0" name="Flowtrace analysis">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_node&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace node">
+        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_node&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace node">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_connec&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace connec">
+        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_connec&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace connec">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_gully&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace gully">
+        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_gully&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace gully">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_arc&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace arc">
+        <layer-tree-layer checked="Qt::Checked" id="v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_arc&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Flowtrace arc">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -45,91 +45,91 @@
       <customproperties/>
       <layer-tree-group checked="Qt::Checked" expanded="0" name="Catalogs">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="cat_feature_ae5d6ffc_6547_484b_a418_acd3d3ccb97a" patch_size="-1,-1" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_feature&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Feature catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_feature_ae5d6ffc_6547_484b_a418_acd3d3ccb97a" patch_size="-1,-1" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_feature&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Feature catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_feature_node_dd3dccd3_8537_48c0_98d1_40fde517acb5" patch_size="-1,-1" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_feature_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Feature node catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_feature_node_dd3dccd3_8537_48c0_98d1_40fde517acb5" patch_size="-1,-1" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_feature_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Feature node catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_mat_node_78cd77ff_0c52_4719_a447_c588e95b21a3" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Node material catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_mat_node_78cd77ff_0c52_4719_a447_c588e95b21a3" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Node material catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_mat_arc_bba8ab41_f652_4864_95d3_45c7e39b5175" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_arc&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Arc material catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_mat_arc_bba8ab41_f652_4864_95d3_45c7e39b5175" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_arc&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Arc material catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_mat_grate_3021f691_143d_43b1_b6a3_c4c83c58791b" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_grate&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Grate material catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_mat_grate_3021f691_143d_43b1_b6a3_c4c83c58791b" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_mat_grate&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Grate material catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_node_612b7617_0e3d_43f8_bffe_e49e3afa89f5" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Node catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_node_612b7617_0e3d_43f8_bffe_e49e3afa89f5" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_node&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Node catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_arc_52f24e12_c228_47c2_b347_69b187f2d984" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_arc&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Arc catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_arc_52f24e12_c228_47c2_b347_69b187f2d984" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_arc&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Arc catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_connec_c478157f_493b_462e_addb_2de2fbf4f4da" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_connec&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Connec catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_connec_c478157f_493b_462e_addb_2de2fbf4f4da" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_connec&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Connec catalog">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_grate&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Grate catalog">
+        <layer-tree-layer checked="Qt::Checked" id="cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_grate&quot;" expanded="1" legend_split_behavior="0" legend_exp="" name="Grate catalog">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
       <layer-tree-group checked="Qt::Checked" expanded="0" name="Map zones">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='expl_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Exploitation">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='expl_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Exploitation">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='dma_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dma&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Dma">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='dma_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dma&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Dma">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='sector_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_sector&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Sector">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='sector_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_sector&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Sector">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
       <layer-tree-group checked="Qt::Checked" expanded="1" name="Network">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Node">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Node">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Connec">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Connec">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_gully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Gully">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_gully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Gully">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Arc">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Arc">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='link_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Link">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='link_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Link">
           <customproperties/>
         </layer-tree-layer>
         <layer-tree-group checked="Qt::Checked" expanded="0" name="Polygon GROUP">
           <customproperties/>
-          <layer-tree-layer checked="Qt::Checked" id="ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_chamber&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Chamber polygon">
+          <layer-tree-layer checked="Qt::Checked" id="ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_chamber&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Chamber polygon">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer checked="Qt::Checked" id="ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_gully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Gully polygon">
+          <layer-tree-layer checked="Qt::Checked" id="ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_gully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Gully polygon">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer checked="Qt::Checked" id="ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_netgully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Netgully polygon">
+          <layer-tree-layer checked="Qt::Checked" id="ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_netgully&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Netgully polygon">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer checked="Qt::Checked" id="ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_storage&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Storage polygon">
+          <layer-tree-layer checked="Qt::Checked" id="ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_storage&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Storage polygon">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer checked="Qt::Checked" id="ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_wwtp&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Wwtp polygon">
+          <layer-tree-layer checked="Qt::Checked" id="ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_wwtp&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Wwtp polygon">
             <customproperties/>
           </layer-tree-layer>
         </layer-tree-group>
       </layer-tree-group>
       <layer-tree-group checked="Qt::Unchecked" expanded="0" name="Other">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Dimensioning">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" expanded="0" legend_split_behavior="0" legend_exp="" name="Dimensioning">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='element_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_element&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Element">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='element_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_element&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Element">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='sample_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_samplepoint&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Samplepoint">
+        <layer-tree-layer checked="Qt::Checked" id="v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='sample_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_samplepoint&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Samplepoint">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -138,16 +138,16 @@
       <customproperties/>
       <layer-tree-group checked="Qt::Checked" expanded="1" name="Address">
         <customproperties/>
-        <layer-tree-layer checked="Qt::Checked" id="ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='muni_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;ext_municipality&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Municipality">
+        <layer-tree-layer checked="Qt::Checked" id="ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='muni_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;ext_municipality&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Municipality">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Unchecked" id="v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Address">
+        <layer-tree-layer checked="Qt::Unchecked" id="v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Address">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Streetaxis">
+        <layer-tree-layer checked="Qt::Checked" id="v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Streetaxis">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer checked="Qt::Checked" id="v_ext_plot_16824253_6498_4e46_a047_38297ad658c7" patch_size="0,0" providerKey="postgres" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Plot">
+        <layer-tree-layer checked="Qt::Checked" id="v_ext_plot_16824253_6498_4e46_a047_38297ad658c7" patch_size="0,0" providerKey="postgres" source="__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" expanded="1" legend_split_behavior="0" legend_exp="" name="Plot">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -559,7 +559,7 @@
   <projectlayers>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_arc_52f24e12_c228_47c2_b347_69b187f2d984</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_arc"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_arc"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1032,7 +1032,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_connec_c478157f_493b_462e_addb_2de2fbf4f4da</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_connec"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_connec"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1351,7 +1351,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_feature_ae5d6ffc_6547_484b_a418_acd3d3ccb97a</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_feature"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_feature"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1571,7 +1571,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_feature_node_dd3dccd3_8537_48c0_98d1_40fde517acb5</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_feature_node"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_feature_node"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1783,7 +1783,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_grate"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_grate"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2113,7 +2113,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_mat_arc_bba8ab41_f652_4864_95d3_45c7e39b5175</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_arc"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_arc"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2278,7 +2278,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_mat_grate_3021f691_143d_43b1_b6a3_c4c83c58791b</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_grate"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_grate"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2432,7 +2432,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_mat_node_78cd77ff_0c52_4719_a447_c588e95b21a3</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_node"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_mat_node"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2586,7 +2586,7 @@
     </maplayer>
     <maplayer readOnly="0" autoRefreshEnabled="0" styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" maxScale="0" geometry="No geometry" minScale="1e+08" type="vector" wkbType="NoGeometry">
       <id>cat_node_612b7617_0e3d_43f8_bffe_e49e3afa89f5</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_node"</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_node"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2900,7 +2900,7 @@
          <ymax>__YMAX__</ymax>
       </extent>
       <id>ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='muni_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."ext_municipality" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='muni_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."ext_municipality" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -3207,7 +3207,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="0" wkbType="LineString" minScale="100000000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Line" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="1" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_arc" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_arc" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -3483,7 +3483,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="0" wkbType="Point" minScale="100000000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Point" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="0" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_connec" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_connec" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -3825,7 +3825,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="0" wkbType="Point" minScale="100000000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Point" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="1" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_gully" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_gully" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -4070,7 +4070,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="0" wkbType="Point" minScale="100000000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Point" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="1" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_node" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_node" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -4343,7 +4343,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_arc" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_arc" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -6423,7 +6423,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_connec" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_connec" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -7658,7 +7658,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="0" wkbType="LineString" minScale="100000000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Line" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="1" simplifyDrawingHints="1" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dimensions" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dimensions" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -9438,7 +9438,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='dma_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dma" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='dma_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dma" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -9713,7 +9713,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="1" hasScaleBasedVisibilityFlag="1" wkbType="Point" minScale="1500" simplifyMaxScale="1" autoRefreshTime="0" geometry="Point" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="0" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='element_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_element" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='element_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_element" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -10386,7 +10386,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='expl_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_exploitation" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='expl_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_exploitation" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -10610,7 +10610,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_gully" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='gully_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_gully" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -11824,7 +11824,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='link_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='link_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12347,7 +12347,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_node" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_node" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -13956,7 +13956,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_om_visit" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_om_visit" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14304,7 +14304,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="1" hasScaleBasedVisibilityFlag="1" wkbType="Point" minScale="2000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Point" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="0" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='sample_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_samplepoint" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='sample_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_samplepoint" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14965,7 +14965,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='sector_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_sector" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='sector_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_sector" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -15167,7 +15167,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_address" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_address" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -15626,7 +15626,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_plot_16824253_6498_4e46_a047_38297ad658c7</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_plot" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_plot" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -16077,7 +16077,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_streetaxis" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='id'  srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_streetaxis" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -16539,7 +16539,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_chamber" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_chamber" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -16808,7 +16808,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_gully" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_gully" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -17077,7 +17077,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_netgully" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_netgully" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -17346,7 +17346,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_storage" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_storage" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -17609,7 +17609,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyMessage="" type="vector" refreshOnNotifyEnabled="0" maxScale="0" hasScaleBasedVisibilityFlag="1" wkbType="MultiPolygon" minScale="5000" simplifyMaxScale="1" autoRefreshTime="0" geometry="Polygon" simplifyDrawingTol="1" autoRefreshEnabled="0" labelsEnabled="0" simplifyDrawingHints="1" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyAlgorithm="0">
       <id>ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_wwtp" (the_geom)</datasource>
+      <datasource>__DATASOURCE__ sslmode=__SSLMODE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_wwtp" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>

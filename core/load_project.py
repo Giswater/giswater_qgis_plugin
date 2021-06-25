@@ -79,10 +79,6 @@ class GwLoadProject(QObject):
         value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value
 
-        # Log values of system user parameters located in 'giswater.config'
-        for parameter, value in tools_qgis.user_parameters.items():
-            tools_log.log_info(f"parameter '{parameter}': {value}")
-
         # Manage locale and corresponding 'i18n' file
         tools_qt.manage_translation(self.plugin_name)
 
@@ -132,6 +128,10 @@ class GwLoadProject(QObject):
         global_vars.notify = GwNotify()
         list_channels = ['desktop', global_vars.current_user]
         global_vars.notify.start_listening(list_channels)
+
+        # Reset some session/init user variables as vdefault
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+            self._manage_reset_user_variables()
         
         # Log it
         message = "Project read successfully"
@@ -412,7 +412,7 @@ class GwLoadProject(QObject):
     def _check_schema(self, schemaname=None):
         """ Check if selected schema exists """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         schemaname = schemaname.replace('"', '')
@@ -430,5 +430,11 @@ class GwLoadProject(QObject):
             plugin_toolbar.toolbar.setVisible(enable)
             for index_action in plugin_toolbar.list_actions:
                 self._enable_button(index_action, enable)
+
+
+    def _manage_reset_user_variables(self):
+
+        # Set dlg_selector_basic as tab_exploitation
+        tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
 
     # endregion

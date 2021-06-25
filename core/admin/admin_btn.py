@@ -53,7 +53,12 @@ class GwAdminButton:
         self.dlg_readsql_create_project = None
         self.project_type_selected = None
         self.schema_type = None
-        self.project_issample = True
+        self.form_enabled = True
+
+        self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
+                                                              "giswater"))
+        self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
+                                                              "giswater"))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -63,14 +68,21 @@ class GwAdminButton:
         default_connection = self._populate_combo_connections()
         # Bug #733 was here
         # Check if connection is still False
+        layer_source = None
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
             connection_status = global_vars.session_vars['logged_status']
 
-        if not connection_status:
+        settings = QSettings()
+        settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
+        self.is_service = settings.value('service')
+        if not connection_status and not self.is_service:
             self._create_credentials_form(set_connection=default_connection)
             return
+
+        if not connection_status and self.is_service:
+            self.form_enabled = False
 
         # Set label status connection
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
@@ -80,28 +92,13 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._init_show_database()
-        self._info_show_database(username=username, show_dialog=show_dialog)
-
-
-    def manage_docker(self):
-        """ Puts the dialog in a docker, depending on the user configuration """
-
-        try:
-            tools_gw.close_docker()
-            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
-            global_vars.session_vars['dialog_docker'] = GwDocker()
-            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
-            tools_gw.manage_docker_options()
-            tools_gw.docker_dialog(self.dlg_readsql)
-            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
-        except Exception as e:
-            tools_log.log_info(str(e))
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog, layer_source=layer_source)
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
         """"""
+
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
             project_name_schema = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
@@ -123,7 +120,6 @@ class GwAdminButton:
 
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
 
-        self.project_issample = example_data
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -243,8 +239,6 @@ class GwAdminButton:
         self.task1.setProgress(0)
         status = self._load_fct_ftrg(project_type=project_type)
         self.task1.setProgress(20)
-        if status:
-            status = self._update_30to31(project_type=project_type)
         self.task1.setProgress(40)
         if status:
             status = self._update_31to39(project_type=project_type)
@@ -381,7 +375,7 @@ class GwAdminButton:
     def _get_project_epsg(self, schemaname=None):
         """ Get project epsg from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_epsg = None
@@ -432,17 +426,6 @@ class GwAdminButton:
             return
 
         self.project_version = '0'
-
-        # Manage super users
-        self.super_users = []
-        super_user = tools_gw.get_config_parser('system', 'super_user', 'user', 'init')
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
-        if tools_os.set_boolean(super_user) and global_vars.current_user not in super_users:
-            super_users = f"{super_users}, {global_vars.current_user}"
-        if super_users:
-            super_users = super_users.split(',')
-            for super_user in super_users:
-                self.super_users.append(str(super_user).strip())
 
         # Get locale of QGIS application
         self.locale = tools_qgis.get_locale()
@@ -556,23 +539,25 @@ class GwAdminButton:
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
+
         qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
 
 
-    def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
+    def _info_show_database(self, connection_status=True, username=None, show_dialog=False, layer_source=None):
         """"""
+
         self.message_update = ''
         self.error_count = 0
         self.schema = None
 
         # Get last database connection
-        self.last_connection = self._get_last_connection()
+        last_connection = self._get_last_connection()
 
         # Get database connection user and role
         self.username = username
         if username is None:
-            self.username = self._get_user_connection(self.last_connection)
+            self.username = self._get_user_connection(last_connection)
 
         self.dlg_readsql.btn_info.setText('Update Project Schema')
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
@@ -584,26 +569,37 @@ class GwAdminButton:
             tools_qt.fill_combo_values(self.cmb_connection, self.list_connections, 1)
 
         # Set last connection for default
-        tools_qt.set_combo_value(self.cmb_connection, str(self.last_connection), 1)
+        tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
 
         # Set title
         connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if connection_status is False:
+        self.form_enabled = True
+        message = ''
+
+        if self.is_service and connection_status is False:
+            self.form_enabled = False
+            message = 'There is an error in the configuration of the pgservice file, ' \
+                      'please check it or consult your administrator'
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self.dlg_readsql.btn_gis_create.setEnabled(False)
+            self._manage_docker()
+            return
+
+        elif connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
             tools_qgis.show_message(msg, 1)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+            self._manage_docker()
             return
-
-        # Create extension postgis if not exist
-        sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-        tools_db.execute_sql(sql)
 
         # Set projecte type
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -618,14 +614,18 @@ class GwAdminButton:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
-        role_admin = tools_db.check_role_user("role_admin", self.username)
-        if not role_admin and self.username not in self.super_users:
-            msg = "You don't have permissions to administrate project schemas on this connection"
-            tools_qgis.show_message(msg, 1)
-            tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-        else:
+        # Check PostgreSQL Version
+        if int(self.postgresql_version) not in range(self.lower_postgresql_version, self.upper_postgresql_version) and self.form_enabled:
+            message = "Incompatible version of PostgreSQL"
+            self.form_enabled = False
+
+        # Check super_user
+        super_user = tools_db.check_super_user(self.username)
+        if not super_user and self.form_enabled:
+            message = "You don't have permissions to administrate project schemas on this connection"
+            self.form_enabled = False
+
+        elif self.form_enabled:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
@@ -642,6 +642,25 @@ class GwAdminButton:
                 self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.enable_dialog(self.dlg_readsql, True)
 
+        # Check postgis extension and create if not exist
+        postgis_extension = tools_db.check_postgis_version()
+        if postgis_extension and self.form_enabled:
+            sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+            tools_db.execute_sql(sql)
+        elif self.form_enabled:
+            message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+
+        if self.form_enabled is False:
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+        else:
+            tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            self.dlg_readsql.btn_info.setEnabled(False)
+
         # Load last schema name selected and project type
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
                                  tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False))
@@ -649,11 +668,12 @@ class GwAdminButton:
                                  tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False))
 
         if show_dialog:
-            self.manage_docker()
+            self._manage_docker()
 
 
     def _set_credentials(self, dialog, new_connection=False):
         """ Set connection parameters in settings """
+
         user_name = tools_qt.get_text(dialog, dialog.txt_user, False, False)
         password = tools_qt.get_text(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
@@ -676,11 +696,14 @@ class GwAdminButton:
 
     def _gis_create_project(self):
         """"""
+
         # Get gis folder, gis file, project type and schema
         gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
             tools_qgis.show_warning("GIS folder not set")
             return
+
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
 
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
@@ -702,13 +725,12 @@ class GwAdminButton:
         self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
 
 
-    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype,
-                               get_database_parameters=True):
+    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype):
         """ Generate QGIS project """
 
         gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, get_database_parameters)
+                                                    roletype)
 
         self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
@@ -718,6 +740,7 @@ class GwAdminButton:
 
     def _open_project(self, qgs_path):
         """ Open a QGis project """
+
         project = QgsProject.instance()
         project.read(qgs_path)
 
@@ -728,6 +751,7 @@ class GwAdminButton:
 
     def _open_form_create_gis_project(self):
         """"""
+
         # Check if exist schema
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
@@ -742,8 +766,13 @@ class GwAdminButton:
         # Set default values
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
-        users_home = os.path.expanduser("~")
-        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
+        qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False)
+        if qgis_file_path is None:
+            qgis_file_path = os.path.expanduser("~")
+        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
+        if self.is_service:
+            self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
+            self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
@@ -761,6 +790,7 @@ class GwAdminButton:
 
     def _btn_constrains_changed(self, button, call_function=False):
         """"""
+
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
 
         if button.text() == 'OFF':
@@ -779,10 +809,12 @@ class GwAdminButton:
                 sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
                 tools_db.execute_sql(sql)
 
+
     """ Declare all read sql process """
 
     def _load_base(self, project_type=False):
         """"""
+
         if str(project_type) in ('ws', 'ud'):
 
             folder = self.folderUtils + self.file_pattern_ddl
@@ -1034,6 +1066,7 @@ class GwAdminButton:
 
     def _load_views(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_ddlview
             status = self._execute_files(folder)
@@ -1162,9 +1195,6 @@ class GwAdminButton:
 
     def _load_sample_data(self, project_type=False):
 
-        sql = f"UPDATE {self.schema}.sys_version SET sample = True"
-        tools_db.execute_sql(sql, commit=False)
-
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep + project_type
             status = self._execute_files(folder)
@@ -1182,6 +1212,7 @@ class GwAdminButton:
 
     def _load_dev_data(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'dev' + os.sep + project_type
             status = self._execute_files(folder)
@@ -1198,6 +1229,7 @@ class GwAdminButton:
 
     def _load_fct_ftrg(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_fct
             status = self._execute_files(folder)
@@ -1235,6 +1267,7 @@ class GwAdminButton:
 
     def _load_tablect(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self._execute_files(folder)
@@ -1257,6 +1290,7 @@ class GwAdminButton:
 
     def _load_trg(self, project_type=False):
         """"""
+
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_trg
             status = self._execute_files(folder)
@@ -1279,6 +1313,7 @@ class GwAdminButton:
 
     def _load_sql(self, path_folder, no_ct=False):
         """"""
+
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self._execute_files(path, no_ct=no_ct)
             if not status:
@@ -1291,6 +1326,7 @@ class GwAdminButton:
 
     def _execute_import_data(self, project_name, project_type):
         """"""
+
         # Create dialog
         self.dlg_import_inp = GwAdminImportUi()
         tools_gw.load_settings(self.dlg_import_inp)
@@ -1328,7 +1364,6 @@ class GwAdminButton:
 
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
-            extras += '"isSample":"' + str(self.project_issample) + '", '
         else:
             extras = '"isNewProject":"' + str('FALSE') + '", '
         extras += '"gwVersion":"' + str(self.plugin_version) + '", '
@@ -1343,8 +1378,6 @@ class GwAdminButton:
             extras += ', ' + '"author":"' + str(self.username) + '"'
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
-
-        extras += ', "superUsers":' + str(self.super_users).replace("'", '"') + ''
 
         self.schema_name = schema_name
 
@@ -1420,6 +1453,7 @@ class GwAdminButton:
 
     def _task_example(self):
         """ Add task example to taskManager """
+
         tools_log.log_info("task_example")
         task1 = QgsTask.fromFunction('task_example', self._task_started, on_finished=self._task_completed, wait_time=20)
         QgsApplication.taskManager().addTask(task1)
@@ -1504,6 +1538,7 @@ class GwAdminButton:
 
     def _rename_project_data_schema(self, schema, create_project=None):
         """"""
+
         if create_project is None:
             close_dlg_rename = True
             self.schema = tools_qt.get_text(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
@@ -1558,6 +1593,7 @@ class GwAdminButton:
 
     def _load_custom_sql_files(self, dialog, widget):
         """"""
+
         folder_path = tools_qt.get_text(dialog, widget)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1596,35 +1632,53 @@ class GwAdminButton:
         """"""
         self._load_trg(project_type)
 
+
     """ Create new connection when change combo connections """
 
     def _event_change_connection(self):
         """"""
+
         connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
-        credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+        credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
+                       'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
-        # Get sslmode for database connection
-        sslmode = 'prefer'
+        self.form_enabled = True
+        message = ''
 
         settings = QSettings()
-        settings.beginGroup("PostgreSQL/connections/" + connection_name)
+        settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
+        credentials['host'] = settings.value('host')
         if settings.value('host') in (None, ""):
             credentials['host'] = 'localhost'
-        else:
-            credentials['host'] = settings.value('host')
         credentials['port'] = settings.value('port')
         credentials['db'] = settings.value('database')
         credentials['user'] = settings.value('username')
         credentials['password'] = settings.value('password')
+        credentials['service'] = settings.value('service')
+        self.is_service = credentials['service']
+
+        sslmode_settings = settings.value('sslmode')
+        sslmode = sslmode_settings
+        if isinstance(sslmode_settings, str):
+            sslmode_settings = sslmode_settings.lower().replace("ssl", "")
+            sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
+            sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
         credentials['sslmode'] = sslmode
         settings.endGroup()
 
-        self.logged = tools_db.connect_to_database(credentials['host'], credentials['port'],
-                                                   credentials['db'], credentials['user'],
-                                                   credentials['password'], credentials['sslmode'])
+        self.logged, credentials = tools_db.connect_to_database_credentials(credentials)
+        if self.is_service and not self.logged:
+            self.form_enabled = False
+            message = 'There is an error in the configuration of the pgservice file, ' \
+                      'please check it or consult your administrator'
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self.dlg_readsql.btn_gis_create.setEnabled(False)
 
-        if not self.logged:
+        elif not self.logged:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
@@ -1647,19 +1701,44 @@ class GwAdminButton:
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
 
-        if self.logged:
-            self.username = self._get_user_connection(self._get_last_connection())
-            role_admin = tools_db.check_role_user("role_admin", self.username)
-            if not role_admin and self.username not in self.super_users:
-                tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            # Check super_user
+            self.username = self._get_user_connection(connection_name)
+            super_user = tools_db.check_super_user(self.username)
+
+            if not super_user and self.form_enabled:
+                message = "You don't have permissions to administrate project schemas on this connection"
+                self.form_enabled = False
+
+            # Check PostgreSQL Version
+            self.postgresql_version = tools_db.get_pg_version()
+            if int(self.postgresql_version) not in range(self.lower_postgresql_version,
+                                                         self.upper_postgresql_version) and self.form_enabled:
+                message = "Incompatible version of PostgreSQL"
+                self.form_enabled = False
+
+            # Check postgis extension and create if not exist
+            postgis_extension = tools_db.check_postgis_version()
+            if postgis_extension and self.form_enabled:
+                sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+                tools_db.execute_sql(sql)
+            elif self.form_enabled:
+                message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+
+            if self.form_enabled is False:
+                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
-                    "You don't have permissions to administrate project schemas on this connection")
+                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            else:
+                tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                self.dlg_readsql.btn_info.setEnabled(False)
 
 
     def _set_last_connection(self, connection_name):
         """"""
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         settings.setValue('selected', connection_name)
@@ -1668,6 +1747,7 @@ class GwAdminButton:
 
     def _get_last_connection(self):
         """"""
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         connection_name = settings.value('selected')
@@ -1677,18 +1757,23 @@ class GwAdminButton:
 
     def _get_user_connection(self, connection_name):
         """"""
+
         connection_username = None
         settings = QSettings()
         if connection_name:
-            settings.beginGroup("PostgreSQL/connections/" + connection_name)
+            settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
             connection_username = settings.value('username')
             settings.endGroup()
+
+        if connection_username is None or connection_username == "":
+            connection_username = tools_db.get_current_user()
 
         return connection_username
 
 
     def _create_visit_class(self):
         """"""
+
         # Create the dialog and signals
         self.dlg_manage_visit_class = GwAdminVisitClassUi()
         tools_gw.load_settings(self.dlg_manage_visit_class)
@@ -1698,15 +1783,14 @@ class GwAdminButton:
         rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
 
-        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
+        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows, 1)
-
-        # Set listeners
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
         return
+
 
     # FIXME: Function is entirely commented
     def _create_visit_param(self):
@@ -1754,6 +1838,7 @@ class GwAdminButton:
 
     def _open_update_info(self):
         """"""
+
         # Create dialog
         self.dlg_readsql_show_info = GwAdminProjectInfoUi()
         tools_gw.load_settings(self.dlg_readsql_show_info)
@@ -1781,6 +1866,7 @@ class GwAdminButton:
 
     def _read_info_version(self):
         """"""
+
         if not os.path.exists(self.folderUpdates):
             tools_qgis.show_message("The update folder was not found in sql folder")
             return
@@ -1816,6 +1902,7 @@ class GwAdminButton:
 
     def _enable_datafile(self):
         """"""
+
         if self.rdb_import_data.isChecked() is True:
             self.data_file.setEnabled(True)
             self.btn_push_file.setEnabled(True)
@@ -1826,6 +1913,7 @@ class GwAdminButton:
 
     def _populate_data_schema_name(self, widget):
         """"""
+
         # Get filter
         filter_ = tools_qt.get_text(self.dlg_readsql, widget)
         if filter_ in (None, 'null') and self.schema_type:
@@ -1912,6 +2000,9 @@ class GwAdminButton:
     def _set_info_project(self):
         """"""
 
+        if self.is_service and self.form_enabled is False:
+            return
+
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
@@ -1930,10 +2021,8 @@ class GwAdminButton:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
         # Set label schema name
-        self.lbl_schema_name.setText(str(schema_name))
-
-        if schema_name == 'Nothing to select' or schema_name == '':
-            self.project_issample = None
+        if schema_name not in (None, '', 'null'):
+            self.lbl_schema_name.setText(str(schema_name))
 
         if self.project_type:
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
@@ -1950,19 +2039,19 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if schema_name == 'Nothing to select' or schema_name == '':
+        if schema_name == 'Nothing to select' or schema_name == '' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-        elif str(self.plugin_version) > str(self.project_version):
+        elif str(self.plugin_version) > str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
-        elif str(self.plugin_version) < str(self.project_version):
+        elif str(self.plugin_version) < str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
-        else:
+        elif self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             self.dlg_readsql.btn_info.setEnabled(False)
@@ -1970,6 +2059,7 @@ class GwAdminButton:
 
     def _process_folder(self, folderpath, filepattern):
         """"""
+
         try:
             os.listdir(folderpath + filepattern)
             return True
@@ -1979,6 +2069,7 @@ class GwAdminButton:
 
     def _schema_file_to_db(self):
         """"""
+
         if self.chk_schema_funcion.isChecked():
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -1999,6 +2090,7 @@ class GwAdminButton:
 
     def _set_signals_create_project(self):
         """"""
+
         self.dlg_readsql_create_project.btn_cancel_task.clicked.connect(self.cancel_task)
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
@@ -2013,6 +2105,7 @@ class GwAdminButton:
 
     def _open_create_project(self):
         """"""
+
         # Create dialog and signals
         if self.dlg_readsql_create_project is None:
             self.init_dialog_create_project()
@@ -2032,6 +2125,7 @@ class GwAdminButton:
 
     def _open_rename(self):
         """"""
+
         # Open rename if schema is updated
         if str(self.plugin_version) != str(self.project_version):
             msg = "The schema version has to be updated to make rename"
@@ -2058,6 +2152,7 @@ class GwAdminButton:
 
     def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=True):
         """"""
+
         if not os.path.exists(filedir):
             tools_log.log_info("Folder not found", parameter=filedir)
             return True
@@ -2106,6 +2201,7 @@ class GwAdminButton:
 
     def _read_execute_file(self, filedir, file, schema_name, project_epsg):
         """"""
+
         status = False
         f = None
         try:
@@ -2140,6 +2236,7 @@ class GwAdminButton:
 
     def _read_files(self, filelist, filedir):
         """"""
+
         if "changelog.txt" in filelist:
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
@@ -2157,6 +2254,7 @@ class GwAdminButton:
 
     def _copy_schema(self):
         """"""
+
         # Create dialog
         self.dlg_readsql_copy = GwAdminRenameProjUi()
         tools_gw.load_settings(self.dlg_readsql_copy)
@@ -2177,6 +2275,7 @@ class GwAdminButton:
 
     def _copy_project_data_schema(self, schema):
         """"""
+
         new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = tools_db.get_rows(sql)
@@ -2219,6 +2318,7 @@ class GwAdminButton:
 
     def _delete_schema(self):
         """"""
+
         project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "Please, select a project to delete"
@@ -2304,13 +2404,14 @@ class GwAdminButton:
             global_vars.dao.rollback()
             self.error_count = 0
 
-        # Close dialog
-        self._close_dialog_admin(self.dlg_import_inp)
-        self._close_dialog_admin(self.dlg_readsql_create_project)
+
+        # Hide button execute
+        self.dlg_import_inp.btn_run.setVisible(False)
 
 
     def _create_qgis_template(self):
         """"""
+
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
         result = tools_qt.show_question(msg, "Info")
@@ -2399,7 +2500,7 @@ class GwAdminButton:
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        if schema_name is None:
+        if schema_name in (None, 'null', ''):
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
@@ -2443,8 +2544,10 @@ class GwAdminButton:
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
-        extras = '"multiCreate":' + str(
-            tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
+        if tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create):
+            extras = '"action":"MULTI-CREATE"'
+        else:
+            extras = '"action":"SINGLE-CREATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
@@ -2489,6 +2592,7 @@ class GwAdminButton:
 
     def _open_manage_field(self, action):
         """"""
+
         # Create the dialog and signals
         self.dlg_manage_fields = GwAdminFieldsUi()
         tools_gw.load_settings(self.dlg_manage_fields)
@@ -2526,10 +2630,12 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
 
+
     # TODO:: Enhance this function and use parametric parameters
 
     def _update_selected_sys_fild(self, widget):
         """"""
+
         selected_list = widget.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
@@ -2581,6 +2687,7 @@ class GwAdminButton:
 
     def _update_selected_addfild(self, widget):
         """"""
+
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -2631,6 +2738,7 @@ class GwAdminButton:
 
     def _manage_create_field(self, form_name):
         """"""
+
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
@@ -2672,6 +2780,7 @@ class GwAdminButton:
 
     def _manage_update_field(self, dialog, form_name, tableview):
         """"""
+
         if form_name is None:
             return
 
@@ -2698,6 +2807,7 @@ class GwAdminButton:
 
     def _manage_delete_field(self, form_name):
         """"""
+
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
@@ -2721,6 +2831,7 @@ class GwAdminButton:
 
     def _manage_close_dlg(self, dlg_to_close):
         """"""
+
         self._close_dialog_admin(dlg_to_close)
         if dlg_to_close.objectName() == 'dlg_man_sys_fields':
             self._update_sys_fields()
@@ -2730,6 +2841,7 @@ class GwAdminButton:
 
     def _manage_sys_update(self, form_name):
         """"""
+
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
         column_id = tools_qt.get_text(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.columnname)
@@ -2910,6 +3022,7 @@ class GwAdminButton:
 
     def _insert_inp_into_db(self, folder_path=None):
         """"""
+
         _file = open(folder_path, "r+", encoding='utf8')
         full_file = _file.readlines()
         sql = ""
@@ -2991,6 +3104,7 @@ class GwAdminButton:
 
     def _populate_functions_dlg(self, dialog, result):
         """"""
+
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
@@ -3006,6 +3120,7 @@ class GwAdminButton:
 
     def _set_log_text(self, dialog, data):
         """"""
+
         for k, v in list(data.items()):
             if str(k) == "info":
                 tools_gw.fill_tab_log(dialog, data)
@@ -3042,6 +3157,7 @@ class GwAdminButton:
 
     def _save_selection(self):
         """"""
+
         # Save last Project schema name and type selected
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, False, False)
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -3051,12 +3167,14 @@ class GwAdminButton:
 
     def _create_credentials_form(self, set_connection):
         """"""
+
         self.dlg_credentials = GwCredentialsUi()
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
         else:
-            msg = "You don't have any connection configurated on QGIS. Check your connections."
+            msg = "You don't have any connection to PostGIS database configurated. " \
+                  "Check your QGIS data source manager and create at least one"
             tools_qt.show_info_box(msg, "Info")
             return
 
@@ -3085,6 +3203,7 @@ class GwAdminButton:
 
     def _manage_user_params(self):
         """"""
+
         # Update variable composer_path on config_param_user
         folder_name = os.path.dirname(os.path.abspath(__file__))
         composers_path_vdef = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + \
@@ -3098,7 +3217,7 @@ class GwAdminButton:
     def _get_project_version(self, schemaname=None):
         """ Get project version from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_version = None
@@ -3124,7 +3243,7 @@ class GwAdminButton:
     def _get_project_language(self, schemaname=None):
         """ Get project langugage from table 'version' """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         project_language = None
@@ -3156,8 +3275,25 @@ class GwAdminButton:
 
 
     def _select_active_locales(self, sqlite_cursor):
-        sql = f"SELECT locale as id, name as idval FROM locales WHERE active=1"
+
+        sql = f"SELECT locale as id, name as idval FROM locales WHERE active = 1"
         sqlite_cursor.execute(sql)
         return sqlite_cursor.fetchall()
+
+
+    def _manage_docker(self):
+        """ Puts the dialog in a docker, depending on the user configuration """
+
+        try:
+            tools_gw.close_docker()
+            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
+            global_vars.session_vars['dialog_docker'] = GwDocker()
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
+            tools_gw.manage_docker_options()
+            tools_gw.docker_dialog(self.dlg_readsql)
+            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
+        except Exception as e:
+            tools_log.log_info(str(e))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
 
     # endregion

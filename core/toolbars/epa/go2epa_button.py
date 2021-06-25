@@ -486,7 +486,7 @@ class GwGo2EpaButton(GwAction):
 
         # Check for sector selector
         if self.export_inp:
-            sql = "SELECT sector_id FROM selector_sector LIMIT 1"
+            sql = "SELECT sector_id FROM selector_sector WHERE sector_id > 0 LIMIT 1"
             row = tools_db.get_row(sql)
             if row is None:
                 msg = "You need to select some sector"

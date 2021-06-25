@@ -13,6 +13,8 @@ import random
 import re
 import sys
 import sqlite3
+import webbrowser
+
 if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
@@ -88,8 +90,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     try:
         raw_parameter = parameter
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
+
+        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
+            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -205,11 +208,11 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None, hide_config_widgets=False):
     """ Open dialog """
 
     # Check database connection before opening dialog
-    if dlg_name != 'admin_credentials' and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin_ui') and not tools_db.check_db_connection():
         return
 
     # Manage translate
@@ -221,19 +224,15 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
         dlg.setWindowTitle(title)
 
     # Manage stay on top, maximize/minimize button and information button
-    # if info is True maximize flag will be ignored
-    # To enable maximize button you must set info to False
-    flags = Qt.WindowCloseButtonHint
-    if info:
-        flags |= Qt.WindowSystemMenuHint | Qt.WindowContextHelpButtonHint
-    else:
-        if maximize_button:
-            flags |= Qt.WindowMinMaxButtonsHint
+    flags = Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
 
     if stay_on_top:
         flags |= Qt.WindowStaysOnTopHint
 
     dlg.setWindowFlags(flags)
+
+    if hide_config_widgets:
+        hide_widgets_form(dlg, dlg_name)
 
     # Open dialog
     if issubclass(type(dlg), GwDialog):
@@ -248,6 +247,7 @@ def close_dialog(dlg):
     """ Close dialog """
 
     save_settings(dlg)
+    global_vars.session_vars['last_focus'] = None
     dlg.close()
 
 
@@ -452,6 +452,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(vlayer, qml)
+
+    # Set layer config
+    if tablename:
+        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
+        extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+        body = create_body(feature=feature, extras=extras)
+        execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -1795,7 +1802,7 @@ def get_project_type(schemaname=None):
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
-    elif schemaname is None:
+    elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     # start process
@@ -1862,12 +1869,6 @@ def get_role_permissions(qgis_project_role):
                     role_om = tools_db.check_role_user("role_om")
                     if not role_om:
                         role_basic = tools_db.check_role_user("role_basic")
-
-    super_users = get_config_parser('system', 'super_users', "project", "giswater")
-
-    # Manage user 'postgres', 'gisadmin' and super_users
-    if global_vars.current_user in ('postgres', 'gisadmin', super_users):
-        role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'
@@ -2582,6 +2583,29 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
+def open_dlg_help():
+    """
+    Opens the help page for the las focused dialog
+        :return:
+    """
+
+    parser = configparser.ConfigParser()
+    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
+    if not os.path.exists(path):
+        webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
+        return True
+
+    parser.read(path)
+
+    try:
+        web_tag = parser.get('web_tag', global_vars.session_vars['last_focus'])
+        webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
+    except Exception:
+        webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
+    finally:
+        return True
+
+
 def create_sqlite_conn(file_name):
     """ Creates an sqlite connection to a file """
 
@@ -2651,6 +2675,20 @@ def user_params_to_userconfig():
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
 
+def hide_widgets_form(dialog, dlg_name):
+
+    row = get_config_value(parameter=f'qgis_form_{dlg_name}_hidewidgets', columns='value::text', table='config_param_system')
+    if row:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.objectName() and widget.objectName() in row[0]:
+                lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
+                if lbl_widget:
+                    lbl_widget.setVisible(False)
+                widget.setVisible(False)
+
+
+
 # region private functions
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
@@ -2679,7 +2717,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     if section == "i18n_generator" or parameter == "dev_commit":
         return
     # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_type is not None:
+    if prefix and global_vars.project_vars['project_type'] is not None:
         parameter = f"_{parameter}"
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False, True,
