@@ -13,8 +13,13 @@ version=3.5.008
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 
-changelog=Version 3.5.007
-	- Minor bugs fixed
+changelog=Version 3.5.008
+    - Allow use of pgservice to connect with database
+	- Add v_edit_inp_lid to QGIS templates
+    - Add check read headers on import csv form
+    - Populate combos featurecat_id applying active filter
+    - Added 'Get help' action to Giswater menu
+    - Bugs fixed
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
