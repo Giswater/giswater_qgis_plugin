@@ -850,7 +850,7 @@ BEGIN
 		v_formheader :=concat('EXISTING VISIT - ',v_id);
 	ELSIF p_visittype = 1 AND v_new_visit IS TRUE THEN
 		v_formheader :=concat('NEW VISIT - ',v_id);
-	ELSIF p_visittyppe = 2 AND v_new_visit IS FALSE THEN
+	ELSIF p_visittype = 2 AND v_new_visit IS FALSE THEN
 		v_formheader :=concat('EXISTING INCIDENCY - ',v_id);	
 	ELSIF p_visittype = 2 AND v_new_visit IS TRUE THEN
 		v_formheader :=concat('NEW INCIDENCY - ',v_id);
