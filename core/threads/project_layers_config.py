@@ -120,7 +120,7 @@ class GwProjectLayersConfig(GwTask):
             layer_number = layer_number + 1
             self.setProgress((layer_number * 100) / total_layers)
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
+            feature = f'"tableName":"{layer_name}", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             self.body = self._create_body(feature=feature, extras=extras)
             self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)
