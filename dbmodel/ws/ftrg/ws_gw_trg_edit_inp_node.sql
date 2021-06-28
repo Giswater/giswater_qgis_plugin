@@ -109,7 +109,7 @@ BEGIN
         END IF;
 
         UPDATE node 
-        SET sector_id=NEW.sector_id, annotation=NEW.annotation
+        SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
         WHERE node_id=OLD.node_id;
 
 

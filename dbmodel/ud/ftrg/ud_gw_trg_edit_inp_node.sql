@@ -61,7 +61,7 @@ BEGIN
 	END IF; 
 
         UPDATE node 
-        SET nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, annotation=NEW.annotation
+        SET nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type
         WHERE node_id=OLD.node_id;
 
         IF v_node_table = 'inp_junction' THEN
