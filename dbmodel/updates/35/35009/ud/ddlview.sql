@@ -34,5 +34,3 @@ UNION
      JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
   WHERE inp_timeseries.times_type::text = 'RELATIVE'::text
   ORDER BY 1, 2;
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_timeseries_value", "column":"fname"}}$$);
