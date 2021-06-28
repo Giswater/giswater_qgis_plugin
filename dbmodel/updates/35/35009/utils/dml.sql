@@ -102,3 +102,9 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (387, 'Find short arcs', 'utils') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3054, 'gw_fct_setmapzoneconfig', 'utils', 'function', 'json', 'json',
+'Function that changes configuration of a mapzone after using node replace, arc fusion or divide tool on features that are involved in a mapzone',
+'role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+

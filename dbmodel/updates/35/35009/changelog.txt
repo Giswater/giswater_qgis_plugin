@@ -1,2 +1,3 @@
 3.5.009
 *************
+- Create new function to reconfigure mapzones after network changes
