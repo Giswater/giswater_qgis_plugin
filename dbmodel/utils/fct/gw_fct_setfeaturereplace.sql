@@ -76,6 +76,9 @@ v_count integer;
 v_field_cat text;
 v_feature_type_new text;
 v_featurecat_id_new text;
+v_mapzone_old text;
+v_mapzone_new text;
+
 BEGIN
 
 	-- Search path
@@ -452,6 +455,59 @@ BEGIN
 		END IF;
 
 	END IF;
+	--reset mapzone configuration
+	IF v_feature_type = 'node' AND v_project_type='WS' THEN
+
+		EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
+		FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
+		INTO v_mapzone_old;
+
+		EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
+		FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
+		INTO v_mapzone_new;
+
+		IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+		END IF;
+
+		IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
+			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+			"client":{"device":4, "infoType":1,"lang":"ES"},
+			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
+
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
+		
+		ELSIF v_mapzone_old!=v_mapzone_new AND v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
+			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+			"client":{"device":4, "infoType":1,"lang":"ES"},
+			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":null, "action":"replaceNode"}}}$$);';
+			
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node will be removed.'));
+
+		ELSIF v_mapzone_new is not null AND  v_mapzone_old is null THEN
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+		
+		
+		ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
+			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+			"client":{"device":4, "infoType":1,"lang":"ES"},
+			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
+			
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter needs to be configured.'));
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('Configuration for old node will be removed.'));
+			
+		END IF;
+		
+	END IF;
 
 	-- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -485,9 +541,9 @@ BEGIN
 	    '}')::json;
 	    
 	--    Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+--	EXCEPTION WHEN OTHERS THEN
+--	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+--	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

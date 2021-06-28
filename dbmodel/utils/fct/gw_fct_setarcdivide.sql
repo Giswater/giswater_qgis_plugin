@@ -93,6 +93,12 @@ v_arc_closest text;
 v_set_arc_obsolete boolean;
 v_set_old_code boolean;
 v_obsoletetype integer;
+v_node1_graf text;
+v_node2_graf text;
+v_node_1 text;
+v_node_2 text;
+v_new_node_graf text;
+v_graf_arc_id TEXT;
 
 BEGIN
 
@@ -184,10 +190,9 @@ BEGIN
 			ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
 			IF v_arc_id IS NOT NULL THEN 
-
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (212, 1, concat('Divide arc ', v_arc_id,'.'));
-
+				
 				--  Locate position of the nearest point
 				v_intersect_loc := ST_LineLocatePoint(v_arc_geom, v_node_geom);
 				
@@ -263,6 +268,27 @@ BEGIN
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
 
+					IF v_project_type = 'WS' THEN
+					--check if final nodes may be graf delimiters
+						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
+						JOIN v_edit_node n1 ON n1.node_id=node_1
+						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
+						WHERE a.arc_id='''||v_arc_id||''';'
+						INTO v_node1_graf, v_node_1;
+						
+						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf,node_2 FROM v_edit_arc a 
+						JOIN v_edit_node n2 ON n2.node_id=node_2
+						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
+						WHERE a.arc_id='''||v_arc_id||''';'
+						INTO v_node2_graf, v_node_2;
+
+						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf FROM v_edit_node
+						JOIN cat_feature_node cf2 ON node_type = cf2.id 
+						WHERE node_id='''||v_node_id||''';'
+						INTO v_new_node_graf;
+
+					END IF;
+						
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN 
 
@@ -536,7 +562,46 @@ BEGIN
 								UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
 							END IF;							
 						END LOOP;
-				
+						IF v_project_type = 'WS' THEN
+							--reconfigure mapzones
+							IF v_new_node_graf IS NOT NULL THEN
+								INSERT INTO audit_check_data (fid, criticity, error_message)
+								VALUES (212, 1, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+							END IF;
+
+							IF v_node1_graf IS NOT NULL THEN
+								IF rec_aux1.node_1 =v_node_1 OR rec_aux1.node_2 = v_node_1 THEN
+									v_graf_arc_id =  rec_aux1.arc_id;
+								ELSIF rec_aux2.node_1 =v_node_1 OR rec_aux2.node_2 = v_node_1 THEN
+									v_graf_arc_id =  rec_aux2.arc_id;
+								END IF;
+
+								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+								"client":{"device":4, "infoType":1,"lang":"ES"},
+								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
+								"arcIdOld":'||v_arc_id||',"arcIdNew":'||v_graf_arc_id||',"action":"arcDivide"}}}$$);';
+
+								INSERT INTO audit_check_data (fid, criticity, error_message)
+								VALUES (212, 1, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+							END IF;
+							
+							IF v_node2_graf IS NOT NULL THEN
+								IF rec_aux1.node_1 =v_node_2 OR rec_aux1.node_2 = v_node_2 THEN
+									v_graf_arc_id =  rec_aux1.arc_id;
+								ELSIF rec_aux2.node_1 =v_node_2 OR rec_aux2.node_2 = v_node_2 THEN
+									v_graf_arc_id =  rec_aux2.arc_id;
+								END IF;
+
+								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+								"client":{"device":4, "infoType":1,"lang":"ES"},
+								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
+								"arcIdOld":'||v_arc_id||',"arcIdNew":'||v_graf_arc_id||',"action":"arcDivide"}}}$$);';
+
+								INSERT INTO audit_check_data (fid, criticity, error_message)
+								VALUES (212, 1, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+							END IF;
+						END IF;
+	
 					ELSIF v_state_node = 2 THEN --is psector
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres (it seems that does not recognize the new node inserted)
@@ -837,9 +902,9 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+--	EXCEPTION WHEN OTHERS THEN
+--	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+--	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

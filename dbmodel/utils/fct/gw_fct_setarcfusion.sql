@@ -56,6 +56,11 @@ v_workcat_id_end text;
 v_enddate date;
 v_state_node int2;
 v_state_arc int2;
+v_old_node_graf text;
+v_node2_graf text;
+v_node1_graf text;
+v_node_2 text;
+v_node_1 text;
 
 BEGIN
 
@@ -251,7 +256,8 @@ BEGIN
 				-- update elements
 				SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 				IF v_count > 0 THEN
-					UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+					UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id
+					AND element_id not in (select element_id FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id);	
 
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
@@ -273,6 +279,71 @@ BEGIN
 
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
+				END IF;
+
+				IF v_project_type = 'WS' THEN
+					--check if final nodes may be graf delimiters
+					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
+					JOIN v_edit_node n1 ON n1.node_id=node_1
+					JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
+					WHERE a.arc_id='''||v_new_record.arc_id||''';'
+					INTO v_node1_graf, v_node_1;
+
+					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf,node_2 FROM v_edit_arc a 
+					JOIN v_edit_node n2 ON n2.node_id=node_2
+					JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
+					WHERE a.arc_id='''||v_new_record.arc_id||''';'
+					INTO v_node2_graf, v_node_2;
+					
+			        EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf FROM v_edit_node
+					JOIN cat_feature_node cf2 ON node_type = cf2.id 
+					WHERE node_id='''||v_exists_node_id||''';'
+					INTO v_old_node_graf;
+
+					IF v_old_node_graf IS NOT NULL OR v_node1_graf IS NOT NULL OR v_node2_graf IS NOT NULL THEN
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
+					END IF;
+
+					IF v_old_node_graf IS NOT NULL THEN 
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},
+						"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_exists_node_id||'","mapzoneOld":"'||v_old_node_graf||'", 
+						"action":"arcFusion"}}}$$);';
+
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
+				        VALUES (214, 1, concat('Selected node is a mapzone delimiter. Configuration for node will be removed.'));
+				    END IF;
+
+				    IF v_node1_graf IS NOT NULL THEN 
+				       	EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},
+						"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
+						"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},
+						"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
+						"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (214, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+				    END IF;
+
+				    IF v_node2_graf IS NOT NULL THEN 
+				       	EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},
+						"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
+						"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},
+						"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
+						"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (214, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+				    END IF;
 				END IF;
 
 				-- Delete arcs
