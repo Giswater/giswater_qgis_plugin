@@ -82,14 +82,15 @@ BEGIN
 					(rec_csv.csv1, rec_csv.csv4::time, rec_csv.csv5::float);
 				END IF;
 
-			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_timeseries) THEN
-
-				IF (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user AND table_id = rec_csv.csv1) THEN 
+			ELSE 
+			
+				IF rec_csv.csv1 in (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
 				
 				ELSE 
 					-- insert log
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
-					VALUES (v_fid, v_result_id, 2, concat('WARNING: Timseries id (',rec_csv.csv1,') already exists on inp_timeseries -> Import have been canceled for this timeseries'), rec_csv.csv1);
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, column_id, cur_user) 
+					VALUES (v_fid, v_result_id, 2, 
+					concat('WARNING: Timseries id (',rec_csv.csv1,') already exists on inp_timeseries -> Import have been canceled for this timeseries'), rec_csv.csv1, current_user);
 				END IF;
 			END IF;
 		END IF;

@@ -75,12 +75,12 @@ BEGIN
 
 			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_curve) THEN
 
-				IF (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user AND table_id = rec_csv.csv1) THEN 
+				IF rec_csv.csv1 IN (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
 				
 				ELSE 
 					-- insert log
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
-					VALUES (v_fid, v_result_id, 2, concat('WARNING: Curve id (',rec_csv.csv1,') already exists on inp_curve -> Import have been canceled for this curve'), rec_csv.csv1);
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message, column_id, cur_user) 
+					VALUES (v_fid, v_result_id, 2, concat('WARNING: Curve id (',rec_csv.csv1,') already exists on inp_curve -> Import have been canceled for this curve'), rec_csv.csv1, current_user);
 				END IF;
 			END IF;
 		END IF;
