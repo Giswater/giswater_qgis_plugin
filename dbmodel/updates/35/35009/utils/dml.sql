@@ -108,3 +108,19 @@ VALUES (3054, 'gw_fct_setmapzoneconfig', 'utils', 'function', 'json', 'json',
 'Function that changes configuration of a mapzone after using node replace, arc fusion or divide tool on features that are involved in a mapzone',
 'role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
+-- 2021/06/28
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3056, 'gw_trg_edit_inp_controls', 'utils', 'function trigger', NULL, NULL,
+'Allows editing inp controls view','role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3058, 'gw_trg_edit_inp_rules', 'ws', 'function trigger', NULL, NULL,
+'Allows editing inp rules view','role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3060, 'gw_trg_edit_inp_curve', 'ws', 'function trigger', NULL, NULL,
+'Allows editing inp rules view','role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3062, 'gw_trg_edit_inp_pattern', 'ws', 'function trigger', NULL, NULL,
+'Allows editing inp rules view','role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
