@@ -283,9 +283,9 @@ BEGIN
 		ELSIF v_view='vi_timeseries' THEN 
 			IF NEW.other1 ilike 'FILE' THEN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
-					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'FILE') ;
+					INSERT INTO inp_timeseries(id,times_type,fname) VALUES (NEW.timser_id,'FILE',NEW.other2) ;
 				END IF;
-				INSERT INTO inp_timeseries_value (timser_id,fname) VALUES (NEW.timser_id, NEW.other2);
+				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
 			ELSIF  NEW.other1 ilike '%:%'  THEN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
