@@ -128,13 +128,19 @@ BEGIN
 		INSERT INTO inp_pump
 		SELECT node_id FROM node WHERE state >0 and epa_type = 'PUMP'
 		ON CONFLICT (node_id) DO NOTHING;
+
+		INSERT INTO inp_shortpipe
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'SHORTPIPE'
+		ON CONFLICT (node_id) DO NOTHING;
 		
+
 		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_reservoir WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_tank WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_inlet WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_valve WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_pump WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_shortpipe WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 
 
 		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
@@ -143,6 +149,7 @@ BEGIN
 		DELETE FROM inp_inlet WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'INLET');
 		DELETE FROM inp_valve WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'VALVE');
 		DELETE FROM inp_pump WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'PUMP');
+		DELETE FROM inp_shortpipe WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'SHORTPIPE');
 
 		-- arc ws
 		INSERT INTO inp_virtualvalve
