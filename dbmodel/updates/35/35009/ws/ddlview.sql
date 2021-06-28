@@ -41,7 +41,7 @@ WHERE (c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "c
 CREATE OR REPLACE VIEW v_edit_inp_curve_value AS 
 SELECT DISTINCT
 cv.id, 
-cv.curve_id
+cv.curve_id,
 curve_type, 
 descript, 
 c.sector_id,
