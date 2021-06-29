@@ -1096,15 +1096,15 @@ class DaoController(object):
             return None
 
         uri_table = None
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('table=')
-        pos_end_schema = uri.rfind('.')
-        pos_fi = uri.find('" ')
-        if pos_ini != -1 and pos_fi != -1:
-            uri_table = uri[pos_end_schema + 2:pos_fi]
 
-        return uri_table
-
+        try:
+            uri = layer.dataProvider().dataSourceUri().lower()
+            pos_fi = uri.split('.')[1][1:].find('"')
+            uri_table = uri.split('.')[1][1:pos_fi+1]
+        except Exception as e:
+            pass
+        finally:
+            return uri_table
 
     def get_layer_schema(self, layer):
         """ Get table or view schema_name of selected layer """
