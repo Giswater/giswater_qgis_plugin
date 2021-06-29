@@ -9,15 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/06/28
-CREATE OR REPLACE VIEW v_edit_inp_controls AS 
-SELECT DISTINCT controls.id,
-controls.sector_id,
-controls.text,
-controls.active
-FROM selector_sector,
-inp_controls controls
-WHERE controls.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
 CREATE OR REPLACE VIEW v_edit_inp_rules AS 
 SELECT DISTINCT rules.id,
 rules.sector_id,
@@ -26,30 +17,6 @@ rules.active
 FROM selector_sector,
 inp_rules rules
 WHERE rules.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW v_edit_inp_curve AS 
-SELECT DISTINCT id, 
-curve_type, 
-descript, 
-c.sector_id
-FROM selector_sector,
-inp_curve c
-WHERE (c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR c.sector_id IS NULL  ORDER BY id;
-
-
-CREATE OR REPLACE VIEW v_edit_inp_curve_value AS 
-SELECT DISTINCT
-cv.id, 
-cv.curve_id,
-curve_type, 
-descript, 
-c.sector_id,
-x_value, 
-y_value
-FROM selector_sector, inp_curve c
-JOIN inp_curve_value cv ON c.id=cv.curve_id
-WHERE (c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR c.sector_id IS NULL ORDER BY id;
 
 CREATE OR REPLACE VIEW v_edit_inp_pattern AS 
  SELECT DISTINCT  

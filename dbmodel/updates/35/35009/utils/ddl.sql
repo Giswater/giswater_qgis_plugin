@@ -8,6 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2021/06/25
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
+--2021/06/29
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);

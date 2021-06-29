@@ -124,3 +124,46 @@ VALUES (3060, 'gw_trg_edit_inp_curve', 'ws', 'function trigger', NULL, NULL,
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3062, 'gw_trg_edit_inp_pattern', 'ws', 'function trigger', NULL, NULL,
 'Allows editing inp rules view','role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+--2021/06/29
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname)
+VALUES ('inp_curve', 'form_feature', 'sector_id', NULL, 'integer', 'combo', 'sector_id', FALSE, FALSE,
+TRUE, FALSE, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL ' , TRUE, TRUE,
+NULL,NULL,NULL, NULL,FALSE,'main') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname)
+SELECT 'v_edit_inp_curve', formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname
+FROM config_form_fields WHERE formname = 'inp_curve' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname)
+SELECT 'v_edit_inp_curve_value', formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+FALSE, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname
+FROM config_form_fields WHERE formname = 'inp_curve' AND columnname IN ('curve_type', 'descript', 'sector_id') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname)
+SELECT 'v_edit_inp_curve_value', formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden,tabname
+FROM config_form_fields WHERE formname = 'inp_curve_value' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname)
+SELECT 'v_edit_inp_controls', formtype, columnname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname
+FROM config_form_fields WHERE formname = 'inp_controls' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
