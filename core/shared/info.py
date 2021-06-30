@@ -640,7 +640,7 @@ class GwInfo(QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
+        title = f"{complet_result['body']['form']['headerText']}"
 
         if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
             # Delete last form from memory
