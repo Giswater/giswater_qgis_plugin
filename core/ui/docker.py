@@ -7,7 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QDockWidget
+from qgis.PyQt.QtWidgets import QDockWidget, QWhatsThis, QShortcut
+from qgis.PyQt.QtGui import QKeySequence
+
+from ... import global_vars
+from ..utils import tools_gw
 
 
 class GwDocker(QDockWidget):
@@ -27,3 +31,13 @@ class GwDocker(QDockWidget):
     def closeEvent(self, event):
         self.dlg_closed.emit()
         return super().closeEvent(event)
+
+
+    def event(self, event):
+        if (event.type() == QtCore.QEvent.WindowActivate or event.type() == QtCore.QEvent.Show) and self.isActiveWindow():
+            if hasattr(self, "subtag") and self.subtag is not None:
+                tag = f'{self.widget().objectName()}_{self.subtag}'
+            else:
+                tag = str(self.widget().objectName())
+            global_vars.session_vars['last_focus'] = tag
+        return super().event(event)
