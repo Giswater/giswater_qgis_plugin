@@ -59,7 +59,7 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1, current_user);
 
 				-- insert inp_pattern
-				INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date));
+				INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date), rec_csv.csv3::integer);
 
 				-- insert inp_pattern_value	
 				IF v_project_type = 'UD' THEN

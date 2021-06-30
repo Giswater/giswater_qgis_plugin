@@ -61,7 +61,7 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Curve id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
 
 				-- insert inp_curve
-				INSERT INTO inp_curve VALUES (rec_csv.csv1, rec_csv.csv4, concat('Imported by ',current_user,' on ', now()::date));
+				INSERT INTO inp_curve VALUES (rec_csv.csv1, rec_csv.csv4, concat('Imported by ',current_user,' on ', now()::date), rec_csv.csv5::integer);
 					
 				-- insert into inp_curve_value
 				INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES
