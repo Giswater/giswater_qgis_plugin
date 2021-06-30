@@ -201,15 +201,16 @@ class GwInfo(QObject):
                 return False, None
 
         # Create the template if it doesn't exist
-        if json_result['body']['feature']['childType'] not in global_vars.info_templates:
-            global_vars.info_templates[json_result['body']['feature']['childType']] = {}
-            global_vars.info_templates[json_result['body']['feature']['childType']]['dlg'] = None
-            global_vars.info_templates[json_result['body']['feature']['childType']]['json'] = None
-            global_vars.info_templates[json_result['body']['feature']['childType']]['open'] = 0
+        template_name = json_result['body']['feature']['childType']
+        if template_name not in global_vars.info_templates:
+            global_vars.info_templates[template_name] = {}
+            global_vars.info_templates[template_name]['dlg'] = None
+            global_vars.info_templates[template_name]['json'] = None
+            global_vars.info_templates[template_name]['open'] = 0
         # Manage the json result
         #   - new_result is always the last result
         #   - self.complet_result is the first result for that template
-        result_guardat = global_vars.info_templates[json_result['body']['feature']['childType']]['json']
+        result_guardat = global_vars.info_templates[template_name]['json']
         new_result = json_result
         global_vars.test_last_json = json_result
         self.complet_result = json_result if result_guardat is None else result_guardat
@@ -449,6 +450,9 @@ class GwInfo(QObject):
         """ Opens a custom form without using any template """
 
         template_name = f"{complet_result['body']['feature']['childType']}"
+        self.template_name = template_name
+        global_vars.info_templates[template_name][f'my_json_{feature_id}'] = {}
+        global_vars.info_templates[template_name][f'last_json_{feature_id}'] = complet_result
 
         # Dialog
         self.dlg_cf = GwInfoFeatureUi(sub_tag)
@@ -660,10 +664,10 @@ class GwInfo(QObject):
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, self.my_json,
+        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, global_vars.info_templates[self.template_name][f'my_json_{fid}'],
                                                                      new_feature)
         self.fct_start_editing = lambda: self._start_editing(dlg_cf, action_edit, complet_result['body']['data'], layer)
-        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
+        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, global_vars.info_templates[self.template_name][f'my_json_{fid}'], new_feature)
         self._connect_signals()
 
         self._enable_actions(dlg_cf, layer.isEditable())
@@ -724,10 +728,10 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._clear_dlg_templates)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
-        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
-        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
+        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
 
-        dlg_cf.dlg_closed.connect(partial(self._reset_my_json))
+        dlg_cf.dlg_closed.connect(partial(self._reset_my_json, dlg_cf))
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -754,6 +758,9 @@ class GwInfo(QObject):
         """ Opens a custom form using the corresponding template """
 
         template_name = f"{complet_result['body']['feature']['childType']}"
+        self.template_name = template_name
+        global_vars.info_templates[template_name][f'my_json_{feature_id}'] = {}
+        global_vars.info_templates[template_name][f'last_json_{feature_id}'] = complet_result
 
         # Dialog
         self.dlg_cf = global_vars.info_templates[template_name]['dlg']
@@ -891,10 +898,10 @@ class GwInfo(QObject):
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, self.my_json,
+        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, global_vars.info_templates[self.template_name][f'my_json_{fid}'],
                                                                      new_feature)
         self.fct_start_editing = lambda: self._start_editing(dlg_cf, action_edit, complet_result['body']['data'], layer)
-        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
+        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, global_vars.info_templates[self.template_name][f'my_json_{fid}'], new_feature)
         self._connect_signals()
 
         self._enable_actions(dlg_cf, layer.isEditable())
@@ -902,6 +909,7 @@ class GwInfo(QObject):
         action_edit.setChecked(layer.isEditable())
         child_type = complet_result['body']['feature']['childType']
 
+        action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
         action_workcat.triggered.connect(
             partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
@@ -934,8 +942,8 @@ class GwInfo(QObject):
 
         # Connect some signals
         dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
-        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
-        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.test_my_json, global_vars.test_last_json))
+        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -967,6 +975,7 @@ class GwInfo(QObject):
         dlg.btn_accept.clicked.disconnect()
         dlg.key_enter.disconnect()
 
+        dlg.findChild(QAction, "actionEdit").triggered.disconnect()
         dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
         dlg.findChild(QAction, "actionWorkcat").triggered.disconnect()
         dlg.findChild(QAction, "actionMapZone").triggered.disconnect()
@@ -1612,7 +1621,7 @@ class GwInfo(QObject):
                 if widget.hasFocus():
                     value = tools_qt.get_text(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                        self.my_json[str(widget.property('columnname'))] = str(value)
+                        global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = str(value)
                     widget.clearFocus()
         except RuntimeError:
             pass
@@ -1624,20 +1633,21 @@ class GwInfo(QObject):
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         if not action_edit.isChecked():
             self._get_last_value()
-            if str(self.my_json) == '{}':
+            if str(global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
                 tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
                 self._enable_actions(dialog, False)
                 return
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, global_vars.test_last_json)
+                self._manage_accept(dialog, action_edit, new_feature, global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'], False,
+                                    global_vars.info_templates[self.template_name][f'last_json_{self.feature_id}'])
             elif self.new_feature_id is not None:
                 if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
-            self._reset_my_json()
+            self._reset_my_json(dialog)
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
@@ -1651,7 +1661,7 @@ class GwInfo(QObject):
             return
 
         self._manage_accept(dialog, action_edit, new_feature, my_json, True, last_json)
-        self._reset_my_json()
+        self._reset_my_json(dialog)
 
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, last_json):
@@ -1675,10 +1685,10 @@ class GwInfo(QObject):
         else:
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._reset_my_json()
+                self._reset_my_json(dialog)
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
 
-            self._reset_my_json()
+            self._reset_my_json(dialog)
             return save
 
 
@@ -1863,7 +1873,7 @@ class GwInfo(QObject):
         new_feature = kwargs['new_feature']
 
         widget = tools_gw.add_checkbox(field)
-        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']))
         widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
@@ -2020,6 +2030,8 @@ class GwInfo(QObject):
         self.feature_id = last_json['body']['feature']['id']
         QgsProject.instance().blockSignals(True)
 
+        # print(f"my_json_{self.feature_id} -> {global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']}")
+
         # Check if C++ object has been deleted
         if isdeleted(dialog):
             return False
@@ -2116,7 +2128,7 @@ class GwInfo(QObject):
         if clear_json:
             _json = {}
 
-        self._reset_my_json()
+        self._reset_my_json(dialog)
 
         if "Accepted" in json_result['status']:
             msg = "OK"
@@ -2254,15 +2266,17 @@ class GwInfo(QObject):
         """ Delete keys if exist, when widget is autoupdate """
 
         try:
-            self.my_json.pop(str(widget.property('columnname')), None)
+            # self.my_json.pop(str(widget.property('columnname')), None)
+            global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'].pop(str(widget.property('columnname')), None)
         except KeyError:
             pass
 
 
-    def _reset_my_json(self):
+    def _reset_my_json(self, dialog):
         """ Delete keys if exist, when widget is autoupdate """
 
         self.my_json = {}
+        global_vars.info_templates[self.template_name][f'my_json_{dialog.windowTitle()}'] = {}
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -2277,8 +2291,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
-                widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-                widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, global_vars.test_my_json))
+                widget.editingFinished.connect(partial(self._get_values, dialog, widget))
 
             widget.textChanged.connect(partial(self._enabled_accept, dialog))
             widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -2299,7 +2312,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
-                widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.textChanged.connect(partial(self._get_values, dialog, widget))
 
             widget.textChanged.connect(partial(self._enabled_accept, dialog))
             widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -2366,7 +2379,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.currentIndexChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -2381,7 +2394,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.dateChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -2396,7 +2409,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -2411,8 +2424,16 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.stateChanged.connect(partial(self._get_values, dialog, widget))
         return widget
+
+
+    def _get_values(self, dialog, widget):
+        """ Function used by the widgets when its value changes. """
+
+        fid = str(dialog.windowTitle()).split(' ')[-1]
+        my_json = global_vars.info_templates[self.template_name][f'my_json_{fid}']
+        tools_gw.get_values(dialog, widget, my_json)
 
 
     def _open_catalog(self, tab_type, feature_type, child_type):
@@ -3895,12 +3916,12 @@ class GwInfo(QObject):
             if widget.property('typeahead'):
                 tools_qt.set_completer_object(QCompleter(), QStringListModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
-                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+                global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
                 widget = tools_gw.fill_combo(widget, field)
                 tools_qt.set_combo_value(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
-                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+                global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = field['selectedId']
 
         tools_gw.close_dialog(dialog)
 
