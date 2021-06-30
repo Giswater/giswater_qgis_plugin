@@ -7,11 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QDockWidget, QWhatsThis, QShortcut
-from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtWidgets import QDockWidget
 
 from ... import global_vars
-from ..utils import tools_gw
 
 
 class GwDocker(QDockWidget):
