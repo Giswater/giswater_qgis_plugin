@@ -150,7 +150,14 @@ BEGIN
 		DELETE FROM inp_valve WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'VALVE');
 		DELETE FROM inp_pump WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'PUMP');
 		DELETE FROM inp_shortpipe WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'SHORTPIPE');
+		
+		-- connec ws
+		INSERT INTO inp_connec
+		SELECT connec_id FROM connec WHERE state >0
+		ON CONFLICT (connec_id) DO NOTHING;
 
+		DELETE FROM inp_connec WHERE connec_id NOT IN (SELECT connec_id FROM connec);
+		
 		-- arc ws
 		INSERT INTO inp_virtualvalve
 		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALVALVE'

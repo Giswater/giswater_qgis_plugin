@@ -60,7 +60,7 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 225 AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 169, 170, 171, 198, 292, 293, 294) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 169, 170, 171, 198, 292, 293, 294, 379) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (188, 229, 230, 295) AND cur_user=current_user;
 	
 
