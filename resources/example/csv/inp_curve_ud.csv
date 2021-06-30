@@ -1,3 +1,4 @@
+curve_name;xval;yval;curve_type;exp_id(optative)
 example_pump1;1;4;PUMP1
 example_pump1;10;3;PUMP1
 example_pump1;100;2;PUMP1
