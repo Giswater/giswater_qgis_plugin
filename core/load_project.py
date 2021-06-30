@@ -227,8 +227,9 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            self.schema_name = global_vars.project_vars['main_schema']
-            global_vars.schema_name = global_vars.project_vars['main_schema']
+            if global_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
+                self.schema_name = global_vars.project_vars['main_schema']
+                global_vars.schema_name = global_vars.project_vars['main_schema']
 
         return True
 

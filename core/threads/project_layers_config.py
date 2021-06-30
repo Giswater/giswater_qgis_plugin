@@ -28,6 +28,8 @@ class GwProjectLayersConfig(GwTask):
         self.schema_name = params['schema_name']
         self.qgis_project_infotype = params['qgis_project_infotype']
         self.db_layers = params['db_layers']
+        self.body = None
+        self.json_result = None
 
 
     def run(self):
