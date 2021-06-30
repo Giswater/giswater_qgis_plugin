@@ -349,7 +349,8 @@ class GwSearch:
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_info(msg)
+                self.manage_visit.get_visit(visit_id=item['sys_id'])
                 return
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             self._reset_rubber_band()
