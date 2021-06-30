@@ -30,3 +30,9 @@ UPDATE inp_timeseries SET fname = a.fname FROM inp_timeseries_value a WHERE tims
 UPDATE config_form_fields SET formname = 'inp_timeseries' WHERE formname='inp_timeseries_value' AND columnname = 'fname';
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_timeseries_value", "column":"fname"}}$$);
+
+--2021/06/30
+UPDATE sys_table SET notify_action =
+'[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve","inp_curve_value", "v_edit_inp_divider","v_edit_inp_storage","v_edit_inp_curve_value"]}]'
+WHERE id ='inp_curve';
+

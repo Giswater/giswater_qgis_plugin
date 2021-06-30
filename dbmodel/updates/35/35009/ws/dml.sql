@@ -77,4 +77,11 @@ iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue,
 dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname
 FROM config_form_fields WHERE formname = 'inp_rules' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+--2021/06/30
+UPDATE sys_table SET notify_action =
+'[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction","v_edit_inp_connec","v_edit_inp_pattern_value"]}]'
+WHERE id ='inp_pattern';
 
+UPDATE sys_table SET notify_action =
+'[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","inp_curve_value","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump","v_edit_inp_curve_value"]}]'
+WHERE id ='inp_curve';
