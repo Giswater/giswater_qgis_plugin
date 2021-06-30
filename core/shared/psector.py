@@ -352,6 +352,8 @@ class GwPsector:
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
+        if hasattr(self, 'dlg_psector_mng'):
+            self.dlg_plan_psector.rejected.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self._enable_layers))
 
