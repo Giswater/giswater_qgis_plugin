@@ -167,3 +167,37 @@ SELECT 'v_edit_inp_controls', formtype, columnname, layoutorder, datatype, widge
 iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
 dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname
 FROM config_form_fields WHERE formname = 'inp_controls' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3064, 'gw_fct_anl_node_elev', 'ud', 'function', 'json', 'json',
+'Analysis of duplicated values inserted on fieds top_elev, ymax and elev','role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3066, 'gw_fct_anl_arc_elev', 'ud', 'function', 'json', 'json',
+'Analysis of duplicated values inserted on fieds y and elev','role_edit', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (389, 'Nodes with duplicated values of top_elev, ymax and elev', 'ud') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (390, 'Arcs with duplicated values of y and elev', 'ud') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3064,'Check nodes elevation values', '{"featureType":["node"]}', NULL, NULL, TRUE) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3066,'Check arcs elevation values', '{"featureType":["arc"]}', NULL, NULL, TRUE) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
+VALUES (3064,'gw_fct_anl_node_elev', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
+VALUES (3066,'gw_fct_anl_node_elev', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
