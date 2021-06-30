@@ -12,7 +12,7 @@ $BODY$
 SELECT gw_fct_anl_node_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"nodeTolerance":"3.0"}}}$$)::text
+"parameters":{}}}$$)::text
 
 -- fid: 389
 
@@ -210,7 +210,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
-	SELECT count(*)/2 INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=389;
+	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=389;
 
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)

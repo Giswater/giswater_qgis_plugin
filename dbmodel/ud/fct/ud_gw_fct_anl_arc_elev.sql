@@ -1,209 +1,207 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+	/*
+	This file is part of Giswater 3
+	The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+	This version of Giswater is provided by Giswater Association
+	*/
 
---FUNCTION CODE: 3066
+	--FUNCTION CODE: 3066
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_elev(p_data json) RETURNS json AS 
-$BODY$
-/*EXAMPLE
-SELECT gw_fct_anl_arc_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"nodeTolerance":"3.0"}}}$$)::text
+	CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_elev(p_data json) RETURNS json AS 
+	$BODY$
+	/*EXAMPLE
+	SELECT gw_fct_anl_arc_elev($${"client":{"device":4, "infoType":1, "lang":"ES"},
+	"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+	"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+	"parameters":{}}}$$)::text
 
--- fid: 390
+	-- fid: 390
 
-*/
+	*/
 
-DECLARE
-    
-v_id json;
-v_selectionmode text;
-v_nodetolerance float;
-v_worklayer text;
-v_result json;
-v_result_info json;
-v_result_line json;
-v_array text;
-v_version text;
-v_error_context text;
-v_count integer;
+	DECLARE
+	    
+	v_id json;
+	v_selectionmode text;
+	v_worklayer text;
+	v_result json;
+	v_result_info json;
+	v_result_line json;
+	v_array text;
+	v_version text;
+	v_error_context text;
+	v_count integer;
 
-BEGIN
+	BEGIN
 
-	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+		-- Search path
+		SET search_path = "SCHEMA_NAME", public;
 
-	-- select version
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
-	
-	-- getting input data 	
-	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
-	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_nodetolerance := ((p_data ->>'data')::json->>'parameters')::json->>'nodeTolerance';
+		-- select version
+		SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+		
+		-- getting input data 	
+		v_id :=  ((p_data ->>'feature')::json->>'id')::json;
+		v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
+		v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 
-	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+		select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
-	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=390;	
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, concat('ARC ELEVATION ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, '-------------------------------------------------------------');
+		-- Reset values
+		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=390;	
+		
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, concat('ARC ELEVATION ANALYSIS'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (390, null, 4, '-------------------------------------------------------------');
 
-	-- Computing process - check y1*elev1
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, elev1, ''Values on y1 and elev1''  
-	 			FROM '||v_worklayer||' WHERE y1*elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, elev1, ''Values on y1 and elev1'' 
-	 			FROM '||v_worklayer||' WHERE y1*elev1 IS NOT NULL';
-	END IF;
+		-- Computing process - check y1*elev1
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, elev1, ''Values on y1 and elev1''  
+		 			FROM '||v_worklayer||' WHERE y1*elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y1, elev1, ''Values on y1 and elev1'' 
+		 			FROM '||v_worklayer||' WHERE y1*elev1 IS NOT NULL';
+		END IF;
 
-	-- Computing process - check y2*elev2
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, elev2, ''Values on y2 and elev2''  
-	 			FROM '||v_worklayer||' WHERE y2*elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, elev2, ''Values on y2 and elev2'' 
-	 			FROM '||v_worklayer||' WHERE y2*elev2 IS NOT NULL';
-	END IF;
+		-- Computing process - check y2*elev2
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, elev2, ''Values on y2 and elev2''  
+		 			FROM '||v_worklayer||' WHERE y2*elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, y2, elev2, ''Values on y2 and elev2'' 
+		 			FROM '||v_worklayer||' WHERE y2*elev2 IS NOT NULL';
+		END IF;
 
--- Computing process - check custom_y1*custom_elev1
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-	 			FROM '||v_worklayer||' WHERE custom_y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-	 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL';
-	END IF;
+	-- Computing process - check custom_y1*custom_elev1
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
+		 			FROM '||v_worklayer||' WHERE custom_y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
+		 			FROM '||v_worklayer||' WHERE custom_y1*custom_elev1 IS NOT NULL';
+		END IF;
 
-	-- Computing process - check custom_y2*custom_elev2
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-	 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL  AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-	 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL';
-	END IF;
+		-- Computing process - check custom_y2*custom_elev2
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
+		 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL  AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
+		 			FROM '||v_worklayer||' WHERE custom_y2*custom_elev2 IS NOT NULL';
+		END IF;
 
--- Computing process - check custom_y1*elev1
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
-	 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
-	 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL';
-	END IF;
+	-- Computing process - check custom_y1*elev1
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
+		 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, elev1, ''Values on custom_y1 and elev1''  
+		 			FROM '||v_worklayer||' WHERE custom_y1*elev1 IS NOT NULL';
+		END IF;
 
-	-- Computing process - check custom_y2*elev2
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2'' 
-	 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2''  
-	 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL';
-	END IF;
+		-- Computing process - check custom_y2*elev2
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2'' 
+		 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, elev2, ''Values on custom_y2 and elev2''  
+		 			FROM '||v_worklayer||' WHERE custom_y2*elev2 IS NOT NULL';
+		END IF;
 
--- Computing process - check y1*custom_elev1
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-	 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on custom_y1 and custom_elev1''  
-	 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL';
-	END IF;
+	-- Computing process - check y1*custom_elev1
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on y1 and custom_elev1''  
+		 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y1,elev1, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y1, custom_elev1, ''Values on y1 and custom_elev1''  
+		 			FROM '||v_worklayer||' WHERE y1*custom_elev1 IS NOT NULL';
+		END IF;
 
-	-- Computing process - check y2*custom_elev2
-	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-	 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
-	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
-	 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on custom_y2 and custom_elev2''  
-	 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL';
-	END IF;
+		-- Computing process - check y2*custom_elev2
+		IF v_selectionmode = 'previousSelection' THEN
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state, y2,elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on y2 and custom_elev2''  
+		 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL AND arc_id IN ('||v_array||');';
+		ELSE
+			EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state,y2, elev2, descript)
+		 			SELECT arc_id, expl_id, 390, the_geom, arccat_id, state, custom_y2, custom_elev2, ''Values on y2 and custom_elev2''  
+		 			FROM '||v_worklayer||' WHERE y2*custom_elev2 IS NOT NULL';
+		END IF;
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=390 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (390, current_user);
+		-- set selector
+		DELETE FROM selector_audit WHERE fid=390 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (390, current_user);
 
-	-- get results
-	--line
-	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-  	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=390) row) features;
+		-- get results
+		--line
+		v_result = null;
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
+	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=390) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=390 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (390, current_user);
+		-- set selector
+		DELETE FROM selector_audit WHERE fid=390 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (390, current_user);
 
-	SELECT count(*)/2 INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=390;
+		SELECT count(DISTINCT arc_id) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
 
-	IF v_count = 0 THEN
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (390,  'There are no arcs with both values of y and elev inserted.', v_count);
-	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (390,  concat ('There are ',v_count,' arcs with both values of y and elev inserted.'), v_count);
+		IF v_count = 0 THEN
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			VALUES (390,  'There are no arcs with both values of y and elev inserted.', v_count);
+		ELSE
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			VALUES (390,  concat ('There are ',v_count,' arcs with both values of y and elev inserted.'), v_count);
 
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 390,  concat ('Arc_id: ',string_agg(node_id, ', '), '.' ), v_count 
-		FROM anl_node WHERE cur_user="current_user"() AND fid=390;
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			SELECT 390,  concat ('Arc_id: ',string_agg(distinct arc_id, ', '), '.' ), v_count 
+			FROM anl_arc WHERE cur_user="current_user"() AND fid=390;
 
-	END IF;
-	
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=390 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
-	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"line":'||v_result_line||
-			'}}'||
-	    '}')::json, 3066, null, null, null);
+		END IF;
+		
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=390 order by  id asc) row;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		
+		--    Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		v_result_line := COALESCE(v_result_line, '{}'); 
+		--  Return
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	             ',"body":{"form":{}'||
+			     ',"data":{ "info":'||v_result_info||','||
+					'"line":'||v_result_line||
+				'}}'||
+		    '}')::json, 3066, null, null, null);
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+		EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+	END;
+	$BODY$
+	  LANGUAGE plpgsql VOLATILE
+	  COST 100;
