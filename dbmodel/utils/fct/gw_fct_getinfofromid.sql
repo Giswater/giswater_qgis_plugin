@@ -114,7 +114,6 @@ v_mincanvasmargin double precision;
 v_canvasmargin  double precision;
 v_canvasmargin_text text ;
 v_toolbar text;
---v_layermanager json;
 v_role text;
 v_parentfields text;
 v_status text ='Accepted';
@@ -135,6 +134,10 @@ v_msgerr json;
 v_pkeyfield text;
 v_featuredialog text;
 v_onlydata boolean = false;
+v_headertext text;
+v_formheader_value text;
+v_formheader_field text;
+v_formheader_new_text text;
 
 BEGIN
 	
@@ -312,8 +315,10 @@ BEGIN
 	ELSIF v_tablename LIKE 'v_edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
-	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'connec';
 	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
+	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
+	ELSIF v_tablename LIKE '%element%' THEN v_sourcetable = 'element';
 	ELSE v_sourcetable = v_tablename;
 	END IF;
 
@@ -712,6 +717,36 @@ BEGIN
 		END IF;
 	END IF;
 
+	--Formheader
+	-- get column to use on header
+	EXECUTE 'SELECT value::json->>'||quote_literal(v_sourcetable)||' FROM config_param_system WHERE parameter=''admin_formheader_field''' INTO v_formheader_field;
+	
+	-- get text to use when insert new feature
+	EXECUTE 'SELECT value::json->>''newText'' FROM config_param_system WHERE parameter=''admin_formheader_field''' INTO v_formheader_new_text;
+
+	-- get value to use on header
+	IF v_sourcetable ='v_rtc_hydrometer' THEN	
+		v_childtype = (SELECT (value::json->>'hydrometer')::json->>'childType' FROM config_param_system WHERE parameter='admin_formheader_field');
+		v_formheader_field = (SELECT (value::json->>'hydrometer')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
+		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE hydrometer_id ='||quote_literal(v_id);
+	ELSIF v_sourcetable ='element' THEN	
+		v_childtype = (SELECT (value::json->>'element')::json->>'childType' FROM config_param_system WHERE parameter='admin_formheader_field');
+		v_formheader_field = (SELECT (value::json->>'element')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
+		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE element_id ='||quote_literal(v_id);
+	ELSE
+		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||quote_literal(v_id);
+	END IF;
+	
+	EXECUTE v_querystring INTO v_formheader_value;
+	
+	-- define v_headertext
+	IF v_formheader_value IS NOT NULL THEN
+		v_headertext= concat(v_childtype,' - ', v_formheader_value);
+	ELSE
+		v_headertext=concat(v_formheader_new_text,' ',v_childtype, ' (',v_id,')');
+	END IF;
+	
+
 	-- Feature info
 	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
@@ -743,6 +778,8 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
 
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_headertext);
+
 	IF v_onlydata THEN  -- when cat_feature has dialog on client and is not insert and is cat feature and is editable
 	
 		EXECUTE 'SELECT row_to_json(a) FROM (SELECT * FROM '||v_tablename||' WHERE '||v_idname||'::text = '||v_id||'::text)a'
@@ -750,7 +787,7 @@ BEGIN
 
 		-- return
 		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
-	       ',"body":{"form":"None"'||
+	       ',"body":{"form":{"headerText":"'||v_headertext||'"}'||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
 		      	      ',"editable":true'
