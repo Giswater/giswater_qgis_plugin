@@ -271,7 +271,8 @@ class ApiSearch(ApiParent):
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                self.controller.show_warning(msg)
+                self.controller.show_info(msg)
+                self.manage_visit.manage_visit(visit_id=item['sys_id'])
                 return
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.resetRubberbands()
