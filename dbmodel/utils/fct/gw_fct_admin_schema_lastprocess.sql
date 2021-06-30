@@ -212,11 +212,9 @@ BEGIN
 		--update value of rename_view_x_id parameter
 		UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
 		
-		-- fk from utils schema
-		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
-			PERFORM gw_fct_admin_schema_utils_fk();  -- this is the position to use it because we need values on version table to work with
-		END IF;
-
+		-- -- fk for ext tables or utils schema
+		PERFORM gw_fct_admin_schema_utils_fk();  
+		
 		-- generate child views 
 		UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},

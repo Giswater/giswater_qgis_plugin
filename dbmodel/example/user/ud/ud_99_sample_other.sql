@@ -481,11 +481,6 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' 
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
 
-INSERT INTO ext_district (district_id,name, muni_id,active)
-values(1,'Camps Blancs',1, true);
-INSERT INTO ext_district (district_id,name, muni_id,active)
-values(2,'Marianao',1, true);
-
 UPDATE node SET district_id =1 WHERE expl_id=1;
 UPDATE node SET district_id =2 WHERE expl_id=2;
 
