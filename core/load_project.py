@@ -43,6 +43,8 @@ class GwLoadProject(QObject):
         # Get variables from qgis project
         tools_qgis.get_project_variables()
 
+        tools_gw.remove_deprecated_config_vars()
+
         # Check if user has all config params
         tools_gw.user_params_to_userconfig()
 

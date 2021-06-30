@@ -2675,6 +2675,53 @@ def user_params_to_userconfig():
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
 
+def remove_deprecated_config_vars():
+    """ Removes all deprecated variables defined at giswater.config """
+
+    init_parser = configparser.ConfigParser()
+    session_parser = configparser.ConfigParser()
+    path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
+    project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
+
+    # Get deprecated vars for init
+    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    init_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not init_parser.has_section(section):
+                continue
+            option = var.split('.')[1].strip()
+            if option.startswith('_'):
+                for proj in project_types:
+                    init_parser.remove_option(section, f"{proj}{option}")
+            else:
+                init_parser.remove_option(section, option)
+    with open(path, 'w') as configfile:
+        init_parser.write(configfile)
+        configfile.close()
+
+    # Get deprecated vars for session
+    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    session_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not session_parser.has_section(section):
+                continue
+            option = var.split('.')[1].strip()
+            if option.startswith('_'):
+                for proj in project_types:
+                    session_parser.remove_option(section, f"{proj}{option}")
+            else:
+                session_parser.remove_option(section, option)
+    with open(path, 'w') as configfile:
+        session_parser.write(configfile)
+        configfile.close()
+
+
 def hide_widgets_form(dialog, dlg_name):
 
     row = get_config_value(parameter=f'qgis_form_{dlg_name}_hidewidgets', columns='value::text', table='config_param_system')
