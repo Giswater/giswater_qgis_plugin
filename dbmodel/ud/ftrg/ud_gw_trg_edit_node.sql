@@ -75,7 +75,7 @@ BEGIN
 	SELECT ((value::json)->>'activated')::boolean INTO v_doublegeometry FROM config_param_system WHERE parameter='edit_node_doublegeom';
 	SELECT ((value::json)->>'value') INTO v_doublegeom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
-	v_srid = (SELECT epsg FROM sys_version LIMIT 1);
+	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN

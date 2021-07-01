@@ -39,7 +39,7 @@ BEGIN
 	v_table_name:= TG_ARGV[0];
 	v_schemaname='SCHEMA_NAME';
 
-	v_projecttype = (SELECT project_type FROM sys_version LIMIT 1);
+	v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	IF NEW.arc_id='' THEN NEW.arc_id=NULL; END IF;
 

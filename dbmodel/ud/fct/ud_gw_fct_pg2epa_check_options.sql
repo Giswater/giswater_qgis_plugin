@@ -37,7 +37,7 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
 	-- select system values
-	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	--  Return
 	RETURN gw_fct_json_create_return(v_return, 2860, null, null, null);

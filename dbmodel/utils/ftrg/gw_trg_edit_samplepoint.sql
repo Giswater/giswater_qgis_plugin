@@ -20,7 +20,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	v_projectype = (SELECT project_type FROM sys_version LIMIT 1);
+	v_projectype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN

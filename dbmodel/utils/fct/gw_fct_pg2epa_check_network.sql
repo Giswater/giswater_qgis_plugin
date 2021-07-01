@@ -61,8 +61,8 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 	
 	-- get project type
-	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
-	v_version = (SELECT giswater FROM sys_version LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_version = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN

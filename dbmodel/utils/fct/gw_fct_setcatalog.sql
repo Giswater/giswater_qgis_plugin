@@ -85,7 +85,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 	
 	--  get version
-	SELECT giswater INTO v_version FROM sys_version;		
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;		
       
 	-- Get input parameters:
 	v_formname := json_extract_path_text (p_data,'form','formName')::text;

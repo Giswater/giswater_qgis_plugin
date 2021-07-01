@@ -42,7 +42,7 @@ BEGIN
 	DELETE FROM anl_node WHERE fid IN (107, 114, 164, 166, 170, 171, 198) AND cur_user=current_user;
 
 	-- select config values
-	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('IMPORT RPT FILE LOG'));

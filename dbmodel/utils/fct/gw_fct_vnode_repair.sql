@@ -29,7 +29,7 @@ BEGIN
 
 	SET search_path="SCHEMA_NAME", public;
 
-	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	
 	-- create vnode

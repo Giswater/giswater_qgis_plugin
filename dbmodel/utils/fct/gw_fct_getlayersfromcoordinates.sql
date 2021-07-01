@@ -76,7 +76,7 @@ BEGIN
 	v_ycoord := ((p_data ->> 'data')::json->> 'pointClickCoords')::json->>'ycoord';
 	v_visibleLayers := (p_data ->> 'data')::json->> 'visibleLayers';
 	v_zoomScale := (p_data ->> 'data')::json->> 'zoomScale';
-	v_epsg := (SELECT epsg FROM sys_version LIMIT 1);
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- Sensibility factor
 	IF v_device = 1 OR v_device = 2 THEN

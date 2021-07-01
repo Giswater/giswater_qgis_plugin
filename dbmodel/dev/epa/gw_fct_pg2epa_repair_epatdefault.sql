@@ -94,7 +94,7 @@ BEGIN
 	SET search_path = "ws", public;
 	
 	--  get version
-	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version;
+	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- delete auxiliar tables
 	DELETE FROM audit_check_data WHERE fid = v_fid;

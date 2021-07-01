@@ -39,7 +39,7 @@ BEGIN
 
 	-- get system variables
 	SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
-	SELECT project_type INTO v_project_type FROM sys_version;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Reset sequences
 	PERFORM setval('SCHEMA_NAME.om_visit_id_seq', (SELECT max(id) FROM om_visit) , true);

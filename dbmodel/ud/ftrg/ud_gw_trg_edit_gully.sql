@@ -75,7 +75,7 @@ BEGIN
 		v_doublegeometry = TRUE;
 	END IF;
 
-	v_srid = (SELECT epsg FROM sys_version limit 1);
+	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 

@@ -21,7 +21,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_element FROM element WHERE element_id=element_id_aux;
-	SELECT project_type INTO project_type_aux FROM sys_version;
+	SELECT project_type INTO project_type_aux FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 	IF project_type_aux='UD' THEN

@@ -40,8 +40,8 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 
 	-- get system variables
-	v_epsg := (SELECT epsg FROM sys_version LIMIT 1);
-	v_version := (SELECT giswater FROM sys_version LIMIT 1);
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_version := (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	-- post-procesed variables
 	SELECT ST_GeomFromText(v_geometry, v_epsg) INTO v_polygon;

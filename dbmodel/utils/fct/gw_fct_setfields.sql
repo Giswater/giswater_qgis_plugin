@@ -77,7 +77,7 @@ BEGIN
         INTO v_version;
 
         -- get project type
-        v_projecttype = (SELECT project_type FROM sys_version LIMIT 1);
+        v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');

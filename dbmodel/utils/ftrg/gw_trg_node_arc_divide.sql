@@ -23,7 +23,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- get node type arc division config
 	IF v_project_type = 'UD' THEN
