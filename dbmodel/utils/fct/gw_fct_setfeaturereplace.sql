@@ -480,7 +480,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (143, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
 		
-		ELSIF v_mapzone_old!=v_mapzone_new AND v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
+		ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
 			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 			"client":{"device":4, "infoType":1,"lang":"ES"},
 			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
@@ -489,7 +489,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (143, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node will be removed.'));
 
-		ELSIF v_mapzone_new is not null AND  v_mapzone_old is null THEN
+		ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (143, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
 		
