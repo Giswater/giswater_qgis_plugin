@@ -31,7 +31,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Select version
-	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version order by 1 desc limit 1;
+	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 		-- Get values
 	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM cat_feature WHERE active IS TRUE ORDER BY id) a'

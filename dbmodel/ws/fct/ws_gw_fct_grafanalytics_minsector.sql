@@ -102,7 +102,7 @@ BEGIN
 	v_maxmsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'MaxMinsectors');
 	
 	-- select config values
-	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by 1 desc limit 1;
+	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- set variables
 	v_fid=134;

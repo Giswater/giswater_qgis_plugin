@@ -49,7 +49,7 @@ BEGIN
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
 	
-	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version order by 1 desc limit 1;
+	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id; 

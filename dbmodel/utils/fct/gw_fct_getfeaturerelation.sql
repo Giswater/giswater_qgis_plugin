@@ -61,7 +61,7 @@ v_error_context text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
-	SELECT project_type INTO v_project_type FROM sys_version order by 1 desc limit 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- manage log (fid: 151)
 	DELETE FROM audit_check_data WHERE fid = 151 AND cur_user=current_user;

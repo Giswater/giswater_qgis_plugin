@@ -74,7 +74,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=118 AND cur_user=current_user;
 
 	-- select config values
-	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;

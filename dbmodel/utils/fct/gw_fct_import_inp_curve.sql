@@ -36,7 +36,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;

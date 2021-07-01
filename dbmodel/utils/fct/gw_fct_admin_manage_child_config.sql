@@ -45,7 +45,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- dissable temporary trigger to manage control_config
 	UPDATE config_param_system SET value = 'FALSE'  WHERE parameter='admin_config_control_trigger';

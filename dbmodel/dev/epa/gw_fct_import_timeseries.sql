@@ -113,7 +113,7 @@
 		SET search_path = "SCHEMA_NAME", public;
 
 		-- project type
-		SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version order by 1 desc limit 1;
+		SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 		
 		-- Insert into audit table
 		/*INSERT INTO audit_log_csv2pg 

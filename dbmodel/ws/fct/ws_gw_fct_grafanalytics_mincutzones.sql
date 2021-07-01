@@ -81,7 +81,7 @@ BEGIN
 	v_maxmsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'maxMsector');
 
 	-- select config values
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- data quality analysis
 	IF v_checkdata THEN

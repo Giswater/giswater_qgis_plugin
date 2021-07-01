@@ -48,7 +48,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
-	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version order by 1 desc limit 1;
+	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;

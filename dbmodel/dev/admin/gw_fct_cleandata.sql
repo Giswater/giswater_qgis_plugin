@@ -53,7 +53,7 @@ BEGIN
 
 	v_schema='SCHEMA_NAME';
 	-- select version
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
 	v_table :=  (((p_data ->>'data')::json->>'parameters')::json->>'table')::text;

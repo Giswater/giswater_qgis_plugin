@@ -54,7 +54,7 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT project_type INTO v_project_type FROM sys_version order by 1 desc limit 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 		--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'

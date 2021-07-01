@@ -43,7 +43,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=108;

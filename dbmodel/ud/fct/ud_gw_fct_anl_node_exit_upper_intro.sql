@@ -55,7 +55,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, '-------------------------------------------------------------');
 
     	-- select version
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;

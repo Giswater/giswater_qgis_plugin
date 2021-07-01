@@ -40,7 +40,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT project_type, giswater, epsg  INTO v_project_type, v_version, v_epsg FROM sys_version order by 1 desc limit 1;
+	SELECT project_type, giswater, epsg  INTO v_project_type, v_version, v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameter
 	v_featuretype = (SELECT csv2 FROM temp_csv WHERE cur_user=current_user AND fid = 154 LIMIT 1);

@@ -188,7 +188,7 @@ BEGIN
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
 
 	-- select config values
-	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by 1 desc limit 1;
+	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- data quality analysis
 	IF v_checkdata THEN
