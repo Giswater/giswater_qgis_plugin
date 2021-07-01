@@ -212,5 +212,5 @@ VALUES (391, 'Arcs shorter than value set as node proximity', 'utils') ON CONFLI
 
 INSERT INTO config_param_system(parameter, value, descript, label,isenabled, project_type,  datatype)
 VALUES ('basic_selector_sectorfromexpl', '{"activated":"false"}', 'If true, sector selector is set automatically set to the sector which  geometry overlaps the selected exploitation.',
-'Selector variables', FALSE, 'utils','json');
+'Selector variables', FALSE, 'utils','json') ON CONFLICT (parameter) DO NOTHING;;
 
