@@ -900,6 +900,25 @@ BEGIN
 		VALUES (125, 1, '372','INFO: All arcs has well-defined topology',v_count);
 	END IF;
 
+	RAISE NOTICE '32 - Check arcs shorter than value set as node proximity (391)';
+
+	v_querytext = 'SELECT arc_id,arccat_id,st_length(the_geom), the_geom, expl_id, json_extract_path_text(value::json,''value'')::numeric as nprox
+	FROM '||v_edit||'arc, config_param_system where parameter = ''edit_node_proximity''
+	and  st_length(the_geom) < json_extract_path_text(value::json,''value'')::numeric ';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+		SELECT 391, arc_id, arccat_id, ''arcs shorter than value set as node proximity'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (125, 391, 2, 
+		concat('WARNING-391: There is/are ',v_count,' arc(s) with length shorter than value set as node proximity. Please, check your data before continue'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (125, '391', 1, 'INFO: No arcs shorter than value set as node proximity.',v_count);
+	END IF;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
@@ -948,7 +967,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
