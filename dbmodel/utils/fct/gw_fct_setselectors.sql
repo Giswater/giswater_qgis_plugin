@@ -43,6 +43,7 @@ v_table text;
 v_tableid text;
 v_checkall boolean;
 v_geometry text;
+v_sector integer;
 
 BEGIN
 
@@ -104,6 +105,16 @@ BEGIN
 			WHERE e.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';	
+	END IF;
+
+	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system 
+		WHERE parameter = 'basic_selector_sectorfromexpl') IS TRUE THEN
+
+		v_sector = (SELECT sector_id FROM exploitation e, sector s 
+		WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), s.the_geom, 0) 
+		AND expl_id::text = v_id::text limit 1);
+		EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
+		EXECUTE 'INSERT INTO selector_sector (sector_id, cur_user) VALUES('|| v_sector ||', '''|| current_user ||''')';	
 	END IF;
 
 	-- manage check all
