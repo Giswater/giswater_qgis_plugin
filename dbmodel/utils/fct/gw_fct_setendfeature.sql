@@ -46,7 +46,7 @@ BEGIN
 	EXECUTE 'SELECT value FROM config_param_system WHERE parameter=''admin_version'''
 	INTO v_version;
       
-    SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+    SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
     --set current process as users parameter
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 

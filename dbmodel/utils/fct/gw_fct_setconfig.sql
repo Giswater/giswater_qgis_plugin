@@ -64,7 +64,7 @@ BEGIN
     p_data = REPLACE (p_data::text, '''''', 'null');
 
 	--  Get project type
-    SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  Get schema name
     schemas_array := current_schemas(FALSE);

@@ -59,7 +59,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	 -- select project type
-    SELECT giswater INTO  v_version FROM sys_version LIMIT 1;
+    SELECT giswater INTO  v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameters
 	v_action := (p_data ->> 'data')::json->> 'action';

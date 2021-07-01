@@ -50,7 +50,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- get project type
-	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
+	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- Get input parameters:
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';

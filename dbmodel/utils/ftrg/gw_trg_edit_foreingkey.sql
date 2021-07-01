@@ -26,7 +26,7 @@ BEGIN
     v_featurefield:= TG_ARGV[0];
 
 	-- get project type
-	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
     IF TG_OP ='UPDATE' THEN
 	

@@ -42,7 +42,7 @@ BEGIN
 	--  Search path
     SET search_path = "SCHEMA_NAME", public; 
 
-    SELECT * INTO rec FROM sys_version LIMIT 1;
+    SELECT * INTO rec FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- assign value for record_new_arc
 	SELECT * INTO record_new_arc FROM arc LIMIT 1;

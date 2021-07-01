@@ -34,7 +34,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	psector_type_aux:= TG_ARGV[0];
 
-	SELECT epsg, project_type INTO epsg_val, v_projecttype FROM sys_version LIMIT 1;
+	SELECT epsg, project_type INTO epsg_val, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	
 	IF TG_OP='INSERT' OR TG_OP='UPDATE' THEN

@@ -61,7 +61,7 @@ BEGIN
 		INTO v_version;
 		
 	-- Get project type
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 
 	v_x1 := (((p_data ->>'data')::json->>'coordinates')::json->>'x1')::float;

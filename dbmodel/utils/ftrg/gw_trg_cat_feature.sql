@@ -41,7 +41,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  Get project type
-	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system 
 	WHERE parameter='admin_manage_cat_feature';

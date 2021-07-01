@@ -24,7 +24,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get SRID
-  SELECT epsg INTO v_epsg FROM sys_version LIMIT 1;
+  SELECT epsg INTO v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
   
     --Get view name
     v_view = TG_ARGV[0];

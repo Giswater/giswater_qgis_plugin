@@ -18,7 +18,7 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 	
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	------------------
 	-- ACTIVATE TRIGGER

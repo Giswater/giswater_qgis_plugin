@@ -72,7 +72,7 @@ BEGIN
 
 
 	-- get project type and srid
-	SELECT project_type, epsg, giswater INTO v_projecttype, v_epsg, v_version FROM sys_version LIMIT 1;
+	SELECT project_type, epsg, giswater INTO v_projecttype, v_epsg, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input data
 	v_createsubcgeom := (((p_data ->>'data')::json->>'parameters')::json->>'createSubcGeom')::boolean;

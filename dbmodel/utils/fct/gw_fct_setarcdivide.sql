@@ -117,7 +117,7 @@ BEGIN
 
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
 	-- Get project type
-	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version LIMIT 1;
+	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- set sequences
 	FOR rec_table IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence LIKE '%visit%'

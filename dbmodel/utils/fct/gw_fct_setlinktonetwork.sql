@@ -79,7 +79,7 @@ BEGIN
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
 
     -- select project type
-    SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
+    SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- control autoupdate_dma
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';

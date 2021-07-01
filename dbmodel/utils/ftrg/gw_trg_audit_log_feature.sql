@@ -16,7 +16,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	SELECT project_type INTO project_type_aux FROM sys_version LIMIT 1;
+	SELECT project_type INTO project_type_aux FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- ARC
 	IF OLD.feature_type = 'ARC' THEN
