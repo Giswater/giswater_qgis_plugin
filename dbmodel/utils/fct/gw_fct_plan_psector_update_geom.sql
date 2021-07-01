@@ -23,7 +23,7 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-	SELECT epsg INTO v_epsg FROM sys_version LIMIT 1;
+	SELECT epsg INTO v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
     
     -- point coordinates calculation
     x1 = ST_x(point_aux)-0.5*dim_aux::float;

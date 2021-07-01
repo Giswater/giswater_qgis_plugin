@@ -51,7 +51,7 @@ BEGIN
 	SET search_path= 'SCHEMA_NAME','public';
 
 	-- select config values
-	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
 	v_tolerance :=  (((p_data ->>'data')::json->>'parameters')::json)->>'tolerance';

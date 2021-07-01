@@ -35,7 +35,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get values
-	SELECT epsg INTO v_srid FROM sys_version LIMIT 1;
+	SELECT epsg INTO v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- get input data
 	v_result = ((p_data->>'data')::json->>'parameters')::json->>'resultId';

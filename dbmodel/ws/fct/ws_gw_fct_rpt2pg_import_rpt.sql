@@ -62,7 +62,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input data
 	v_result_id := ((p_data ->>'data')::json->>'resultId')::text;

@@ -42,7 +42,7 @@ BEGIN
 		INTO v_version;
 
 	-- get project type
-	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get parameters from input
 	v_featuretype = (p_data ->>'feature')::json->>'featureType';

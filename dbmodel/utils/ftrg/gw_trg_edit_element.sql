@@ -55,8 +55,8 @@ BEGIN
 		v_unitsfactor = 1;
 	END IF;
 
-	v_srid = (SELECT epsg FROM sys_version limit 1);
-	v_project_type = (SELECT project_type FROM sys_version limit 1);
+	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- get associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN

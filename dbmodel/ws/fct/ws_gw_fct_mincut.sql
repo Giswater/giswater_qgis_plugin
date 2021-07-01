@@ -73,7 +73,7 @@ BEGIN
 	SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
 
 	-- Get project version
-	SELECT giswater INTO  v_version FROM sys_version LIMIT 1;
+	SELECT giswater INTO  v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--set current process as users parameter
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;

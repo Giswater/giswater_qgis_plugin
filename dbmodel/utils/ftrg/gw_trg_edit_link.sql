@@ -75,7 +75,7 @@ BEGIN
 	v_link_searchbuffer=0.1; 	
 
 	-- control of project type
-	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- control autoupdate_dma
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';

@@ -83,7 +83,7 @@ Generate one form for layer and one form for visitclass=incident
 
 
 	-- get project type
-	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get parameters from input
 	v_client = (p_data ->>'client')::json;

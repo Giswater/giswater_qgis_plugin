@@ -76,7 +76,7 @@ BEGIN
 	v_function := (p_data ->> 'data')::json->> 'function';
 
 	-- get project type
-        SELECT lower(project_type) INTO v_projectype FROM sys_version LIMIT 1;
+        SELECT lower(project_type) INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- convert v_function to alias
 	IF v_function IS NOT NULL THEN

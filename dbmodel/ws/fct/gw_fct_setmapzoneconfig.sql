@@ -53,7 +53,7 @@ BEGIN
 -- Search path
 SET search_path = "SCHEMA_NAME", public;
 
-SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version LIMIT 1;
+SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 v_node_id_old=json_extract_path_text(p_data, 'data','parameters','nodeIdOld');

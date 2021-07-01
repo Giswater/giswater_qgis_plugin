@@ -123,7 +123,7 @@ ELSIF function_aux='master' THEN
 		FOR arc_id_aux IN SELECT arc_id FROM arc WHERE node_1=old_node_id_aux OR node_2=old_node_id_aux AND state=1
 		LOOP
 			-- Looking for the table that belongs arc
-			IF (SELECT project_type FROM sys_version LIMIT 1)='WS' THEN
+			IF (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1)='WS' THEN
 				SELECT man_table into table_aux FROM node_type JOIN cat_arc ON arctype_id=id JOIN arc ON arccat_id=id WHERE arc_id=arc_id_aux;
 			ELSE
 				SELECT man_table into table_aux FROM node_type JOIN arc ON arc_type="type" WHERE arc_id=arc_id_aux;

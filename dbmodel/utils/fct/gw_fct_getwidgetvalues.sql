@@ -46,7 +46,7 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	--  get project type
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  get parameters from input
 	v_id = ((p_data ->>'feature')::json->>'id')::text;

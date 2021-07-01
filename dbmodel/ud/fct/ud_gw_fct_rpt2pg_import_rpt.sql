@@ -47,7 +47,7 @@ BEGIN
 
 
 	-- get system parameters
-	SELECT giswater  INTO v_version FROM sys_version order by 1 desc limit 1;
+	SELECT giswater  INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user parameters
 	SELECT value INTO v_epaversion FROM config_param_user WHERE cur_user = current_user AND parameter = 'inp_options_epaversion';

@@ -37,7 +37,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- Looking for project type
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	v_dbnname =  (SELECT current_database());
 	v_schema_array := current_schemas(FALSE);

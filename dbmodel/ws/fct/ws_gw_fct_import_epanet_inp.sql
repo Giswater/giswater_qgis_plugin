@@ -70,7 +70,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type
-	SELECT project_type, epsg INTO v_projecttype, v_epsg FROM sys_version LIMIT 1;
+	SELECT project_type, epsg INTO v_projecttype, v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input data
 	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;

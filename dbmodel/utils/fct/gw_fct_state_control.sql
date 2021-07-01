@@ -29,7 +29,7 @@ BEGIN
 
     SET search_path="SCHEMA_NAME", public;
 
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_downgrade_force:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	
     -- control for downgrade features to state(0)

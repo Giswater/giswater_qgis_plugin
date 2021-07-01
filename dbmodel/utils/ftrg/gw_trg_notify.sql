@@ -42,7 +42,7 @@ BEGIN
 
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_table = TG_ARGV[0];
 

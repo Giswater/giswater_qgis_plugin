@@ -50,7 +50,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
  
 	-- Get system variables
- 	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+ 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='edit_slope_direction' ;
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;

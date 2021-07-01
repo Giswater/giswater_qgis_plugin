@@ -50,7 +50,7 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 	
 	-- select config values
-	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- init variables
 	v_count=0;

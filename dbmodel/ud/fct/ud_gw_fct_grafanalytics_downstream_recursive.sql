@@ -33,7 +33,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
     
     -- select version
-    SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+    SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
     
     v_node_json = ((p_data ->>'feature')::json->>'id'::text);
     v_node_id = (SELECT json_array_elements_text(v_node_json)); 

@@ -346,7 +346,7 @@ BEGIN
 		DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;	
 		DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);	
 		DELETE FROM connec WHERE state = 2 AND connec_id IN (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id = OLD.psector_id);
-		IF (select project_type FROM sys_version LIMIT 1)='UD' THEN	
+		IF (select project_type FROM sys_version ORDER BY id DESC LIMIT 1)='UD' THEN	
 			DELETE FROM gully WHERE state = 2 AND gully_id IN (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id = OLD.psector_id);
 		END IF;
 		RETURN NULL;

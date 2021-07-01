@@ -48,7 +48,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get values
-	SELECT epsg INTO v_srid FROM sys_version LIMIT 1;
+	SELECT epsg INTO v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user variables
 	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;

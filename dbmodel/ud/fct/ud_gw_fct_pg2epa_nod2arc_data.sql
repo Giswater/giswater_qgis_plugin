@@ -49,7 +49,7 @@ BEGIN
 	--  Start process	
     RAISE NOTICE 'Starting flowregulators process.';
 
-    SELECT * INTO rec FROM sys_version LIMIT 1;
+    SELECT * INTO rec FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- setting record_new_arc
 	SELECT * INTO record_new_arc FROM temp_arc LIMIT 1;

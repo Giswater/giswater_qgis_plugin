@@ -81,7 +81,7 @@ BEGIN
 	v_formname := (p_data ->> 'form')::json->> 'formName';
         
 	--  Get project type
-    SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  Set epaversion
     IF v_project_type='WS' then

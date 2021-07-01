@@ -40,7 +40,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- Get srid
-	v_epsg = (SELECT epsg FROM sys_version LIMIT 1);
+	v_epsg = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	--  get version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'

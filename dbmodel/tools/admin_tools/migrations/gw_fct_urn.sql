@@ -18,7 +18,7 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-	SELECT project_type INTO project_type_aux FROM sys_version LIMIT 1;
+	SELECT project_type INTO project_type_aux FROM sys_version ORDER BY id DESC LIMIT 1;
 	IF project_type_aux='WS' THEN
 	SELECT GREATEST (
 		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),

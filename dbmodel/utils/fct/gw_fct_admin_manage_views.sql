@@ -60,7 +60,7 @@
 		SET search_path = "SCHEMA_NAME", public;
 		v_schemaname =  'SCHEMA_NAME';
 
-		SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY 1 desc LIMIT 1;
+		SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 		-- get info from version table

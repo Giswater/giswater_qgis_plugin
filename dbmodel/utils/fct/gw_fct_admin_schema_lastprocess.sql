@@ -268,7 +268,7 @@ BEGIN
 		END IF;
 
 		-- inserting version table
-		SELECT * INTO v_version FROM sys_version LIMIT 1;
+		SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
 		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
 

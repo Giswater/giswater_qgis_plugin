@@ -86,7 +86,7 @@ BEGIN
 	DELETE FROM anl_polygon WHERE fid=216 and cur_user=current_user;
 	DELETE FROM selector_audit WHERE cur_user = current_user;
 
-	SELECT * INTO v_version FROM sys_version LIMIT 1;
+	SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('MINCUT ANALYSIS'));

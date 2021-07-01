@@ -129,7 +129,7 @@ BEGIN
 	SET search_path = "ud", public;
 
 	-- get projectytpe
-	SELECT project_type, giswater FROM sys_version LIMIT 1 INTO v_project_type, v_version;
+	SELECT project_type, giswater FROM sys_version ORDER BY id DESC LIMIT 1 INTO v_project_type, v_version;
 
 	--  Get input data
 	v_init = (p_data->>'data')::json->>'initNode';

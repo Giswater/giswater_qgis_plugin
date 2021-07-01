@@ -47,7 +47,7 @@ BEGIN
 			
 		END LOOP;
 
-		IF (select project_type FROM sys_version LIMIT 1)='UD' THEN
+		IF (select project_type FROM sys_version ORDER BY id DESC LIMIT 1)='UD' THEN
 		
 			-- check if there are not-selected psector affected
 			IF (SELECT count (*) FROM plan_psector_x_gully JOIN plan_psector USING (psector_id) 

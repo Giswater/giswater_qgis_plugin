@@ -136,8 +136,8 @@ BEGIN
 		INTO v_version;
 
 	-- Get project type
-	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
-	SELECT epsg INTO v_srid FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT epsg INTO v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 
 	-- Get tab

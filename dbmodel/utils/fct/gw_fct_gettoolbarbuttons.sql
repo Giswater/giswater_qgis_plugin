@@ -40,7 +40,7 @@ BEGIN
 	-- get user's role
 		
 	-- get project type
-    SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
+    SELECT project_type INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--  Harmonize buttons
 	v_clientbuttons = concat('{',substring((v_clientbuttons) from 2 for LENGTH(v_clientbuttons)));
