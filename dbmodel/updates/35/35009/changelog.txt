@@ -3,3 +3,5 @@
 - Create new function to reconfigure mapzones after network changes
 - Create new function to find short arcs
 - Enhance getinfofromid allowing select column to use on formheader
+- Create new function to find nodes with duplicated values of top_elev, ymax and elev
+- Create new function to find arcs with duplicated values of y and elev
