@@ -583,7 +583,7 @@ class GwAdminButton:
             self.form_enabled = False
             message = 'There is an error in the configuration of the pgservice file, ' \
                       'please check it or consult your administrator'
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -592,6 +592,7 @@ class GwAdminButton:
             return
 
         elif connection_status is False:
+            self.form_enabled = False
             msg = "Connection Failed. Please, check connection parameters"
             tools_qgis.show_message(msg, 1)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
@@ -648,10 +649,11 @@ class GwAdminButton:
             sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
             tools_db.execute_sql(sql)
         elif self.form_enabled:
+            self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
 
         if self.form_enabled is False:
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1672,7 +1674,7 @@ class GwAdminButton:
             self.form_enabled = False
             message = 'There is an error in the configuration of the pgservice file, ' \
                       'please check it or consult your administrator'
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1723,9 +1725,9 @@ class GwAdminButton:
                 tools_db.execute_sql(sql)
             elif self.form_enabled:
                 message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
-
+                self.form_enabled = False
             if self.form_enabled is False:
-                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
