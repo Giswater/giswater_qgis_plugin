@@ -68,19 +68,22 @@ v_mapzone_old=json_extract_path_text(p_data, 'data','parameters','mapzoneOld');
 v_mapzone_new=json_extract_path_text(p_data, 'data','parameters','mapzoneNew');
 v_action=json_extract_path_text(p_data, 'data','parameters','action');
 
-EXECUTE 'SELECT upper(nodetype_id) FROM node 
-JOIN cat_node c on c.id=nodecat_id
-WHERE node_id = '||quote_literal(v_node_id_new)||''
-INTO v_nodetype_new;
-
-EXECUTE 'SELECT upper(nodetype_id) FROM node 
-JOIN cat_node c on c.id=nodecat_id
-WHERE node_id = '||quote_literal(v_node_id_old)||''
-INTO v_nodetype_old;
+IF v_node_id_new IS NOT NULL THEN
+	EXECUTE 'SELECT upper(nodetype_id) FROM node 
+	JOIN cat_node c on c.id=nodecat_id
+	WHERE node_id = '||quote_literal(v_node_id_new)||''
+	INTO v_nodetype_new;
+END IF;
+IF v_node_id_old IS NOT NULL THEN
+	EXECUTE 'SELECT upper(nodetype_id) FROM node 
+	JOIN cat_node c on c.id=nodecat_id
+	WHERE node_id = '||quote_literal(v_node_id_old)||''
+	INTO v_nodetype_old;
+END IF;
 
 IF v_nodetype_old in ('TANK', 'SOURCE', 'WATERWELL') THEN
 	v_zonelist = '{sector,dma,presszone}';
-ELSE 
+ELSE
 	v_zonelist = array_agg(v_mapzone_old);
 END IF;
 
@@ -131,13 +134,16 @@ IF v_action = 'replaceNode' THEN
 	END IF;
 
 ELSIF v_action='arcDivide' THEN
-	--update toArc value with newly created arc id
-	EXECUTE 'UPDATE '||v_mapzone_new||' set grafconfig = replace(grafconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
-	select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
-	from '||v_mapzone_new||'
-	cross join json_array_elements((grafconfig->>''use'')::json) elem
-	where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
-	AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
+	FOREACH v_zone IN ARRAY v_zonelist LOOP
+
+		--update toArc value with newly created arc id
+		EXECUTE 'UPDATE '||v_zone||' set grafconfig = replace(grafconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
+		select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
+		from '||v_zone||'
+		cross join json_array_elements((grafconfig->>''use'')::json) elem
+		where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
+		AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
+	END LOOP;
 
 ELSIF v_action='arcFusion' THEN
 	--remove configuration if fusion node was a delimiter
