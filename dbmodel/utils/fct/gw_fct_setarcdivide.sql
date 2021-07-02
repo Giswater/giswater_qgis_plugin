@@ -578,8 +578,8 @@ BEGIN
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 								"client":{"device":4, "infoType":1,"lang":"ES"},
-								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
-								"arcIdOld":'||v_arc_id||',"arcIdNew":'||v_graf_arc_id||',"action":"arcDivide"}}}$$);';
+								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneOld":"'||v_node1_graf||'", 
+								"arcIdOld":"'||v_arc_id||'","arcIdNew":"'||v_graf_arc_id||'","action":"arcDivide"}}}$$);';
 
 								INSERT INTO audit_check_data (fid, criticity, error_message)
 								VALUES (212, 1, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
@@ -594,8 +594,8 @@ BEGIN
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 								"client":{"device":4, "infoType":1,"lang":"ES"},
-								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
-								"arcIdOld":'||v_arc_id||',"arcIdNew":'||v_graf_arc_id||',"action":"arcDivide"}}}$$);';
+								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneOld":"'||v_node2_graf||'", 
+								"arcIdOld":"'||v_arc_id||'","arcIdNew":"'||v_graf_arc_id||'","action":"arcDivide"}}}$$);';
 
 								INSERT INTO audit_check_data (fid, criticity, error_message)
 								VALUES (212, 1, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));

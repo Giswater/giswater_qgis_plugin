@@ -211,6 +211,7 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (391, 'Arcs shorter than value set as node proximity', 'utils') ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label,isenabled, project_type,  datatype)
-VALUES ('basic_selector_sectorfromexpl', '{"activated":"false"}', 'If true, sector selector is set automatically set to the sector which  geometry overlaps the selected exploitation.',
+VALUES ('basic_selector_mapzone_relation', '{"sectorfromexpl":"false","explfromsector":"false"}', 
+'If sectorfromexpl is true, sector selector is set automatically set to the sector which geometry overlaps the selected exploitation.
+If explfromsector is true, exploitation selector is set automatically set to the exploitation which geometry overlaps the selected sector.',
 'Selector variables', FALSE, 'utils','json') ON CONFLICT (parameter) DO NOTHING;;
-
