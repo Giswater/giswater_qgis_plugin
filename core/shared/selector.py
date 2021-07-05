@@ -257,7 +257,7 @@ class GwSelector:
         if json_result is None or json_result['status'] == 'Failed': return
         if str(tab_name) not in ('tab_state', 'tab_hydrometer'):
             try:
-                # Zoom to exploitation
+                # Zoom to feature
                 x1 = json_result['body']['data']['geometry']['x1']
                 y1 = json_result['body']['data']['geometry']['y1']
                 x2 = json_result['body']['data']['geometry']['x2']
