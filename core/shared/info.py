@@ -2277,7 +2277,7 @@ class GwInfo(QObject):
         """ Delete keys if exist, when widget is autoupdate """
 
         self.my_json = {}
-        global_vars.info_templates[self.template_name][f'my_json_{dialog.windowTitle()}'] = {}
+        global_vars.info_templates[self.template_name][f"my_json_{dialog.property('gw_code')}"] = {}
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
