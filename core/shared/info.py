@@ -441,6 +441,7 @@ class GwInfo(QObject):
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         print(f"{time.time()}")
+        self.dlg_cf.setProperty('gw_code', tools_qt.get_text(self.dlg_cf, f"data_code"))
         global_vars.info_templates[template_name]['open'] += 1
         return self.complet_result, self.dlg_cf
 
@@ -2431,7 +2432,7 @@ class GwInfo(QObject):
     def _get_values(self, dialog, widget):
         """ Function used by the widgets when its value changes. """
 
-        fid = str(dialog.windowTitle()).split(' ')[-1]
+        fid = dialog.property('gw_code')
         my_json = global_vars.info_templates[self.template_name][f'my_json_{fid}']
         tools_gw.get_values(dialog, widget, my_json)
 
