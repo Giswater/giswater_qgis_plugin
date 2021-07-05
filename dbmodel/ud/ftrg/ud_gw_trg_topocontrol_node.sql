@@ -173,7 +173,7 @@ BEGIN
 						IF  v_querytext IS NULL THEN 
 							v_querytext='';
 						END IF;
-						v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
+						v_epaquerytext1 =  'INSERT INTO '||v_epatable||' (arc_id' ||v_querytext||') SELECT ';
 						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'::text';
 						
 						-- insert new records into man_table
@@ -205,8 +205,8 @@ BEGIN
 						SELECT connec_id FROM connec WHERE arc_id=v_arc.arc_id AND connec.state = 1
 						LOOP
 							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, st_endpoint(l.the_geom), userdefined_geom 
-							FROM ws_sample.link l JOIN ws_sample.connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
+							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
 						END LOOP;
 
 						-- manage gully linked feature
@@ -214,8 +214,8 @@ BEGIN
 						SELECT gully_id FROM gully WHERE arc_id=v_arc.arc_id AND gully.state = 1
 						LOOP
 							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, st_endpoint(l.the_geom), userdefined_geom 
-							FROM ws_sample.link l JOIN ws_sample.gully c ON gully_id = l.feature_id WHERE l.feature_type  ='GULLY' AND gully_id = v_gully_id;
+							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							FROM link l JOIN gully c ON gully_id = l.feature_id WHERE l.feature_type  ='GULLY' AND gully_id = v_gully_id;
 						END LOOP;
 					END IF;
 				END LOOP;				

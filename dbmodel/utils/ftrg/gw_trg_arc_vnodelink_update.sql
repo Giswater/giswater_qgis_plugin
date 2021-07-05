@@ -35,8 +35,8 @@ BEGIN
 		END IF;
 		
 		-- Redraw link and vnode
-		FOR v_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
-		WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
+		FOR v_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
+		WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
 		LOOP
 			SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
 			EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
@@ -56,8 +56,8 @@ BEGIN
 				"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);';								
 			END IF;
 
-			FOR v_link IN SELECT v_edit_link.* FROM v_edit_gully JOIN v_edit_link ON v_edit_link.feature_id=gully_id 
-			WHERE v_edit_link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
+			FOR v_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
+			WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
 			LOOP
 				SELECT St_closestpoint(a.the_geom, St_endpoint(v_link.the_geom)) INTO v_closest_point FROM arc a WHERE arc_id = NEW.arc_id AND a.state > 0;
 				EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_link."link_id")
