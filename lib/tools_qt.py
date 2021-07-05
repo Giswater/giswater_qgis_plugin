@@ -208,7 +208,7 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
 
 def set_widget_text(dialog, widget, text):
 
-    if type(widget) is str or type(widget) is str:
+    if type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
