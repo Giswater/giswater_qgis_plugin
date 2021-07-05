@@ -11,3 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/06/25
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+--2021/07/05
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"losses", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"losses", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
