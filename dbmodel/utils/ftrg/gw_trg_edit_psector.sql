@@ -131,7 +131,7 @@ BEGIN
 				END IF;
 				
 				--temporary remove topology control
-				UPDATE config_param_system set value = 'false' WHERE parameter='edit_state_topocontrol';
+				UPDATE config_param_user SET value = 'true' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
 				--use automatic downgrade link variable 
 				SELECT value::boolean INTO v_auto_downgrade_link FROM config_param_user WHERE parameter='edit_connect_downgrade_link' AND cur_user=current_user;
@@ -256,6 +256,9 @@ BEGIN
 				UPDATE config_param_user SET value=v_current_psector WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
 
 				PERFORM setval('plan_psector_id_seq', (SELECT max(psector_id) FROM plan_psector));
+
+				--reset topology control
+				UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 				
 			END IF;
 		END IF;
