@@ -283,7 +283,7 @@ BEGIN
 		IF position(rec.table_name IN v_querytext) = 0 THEN
 			v_errortext=concat('WARNING-317: View ',rec.table_name,' is defined in a DB but is not related to any feature in cat_feature.');
 			INSERT INTO audit_check_data (fid,  criticity,result_id, error_message, fcount)
-			VALUES (195, 2, '317',v_errortext);
+			VALUES (195, 2, '317',v_errortext, 0);
 		END IF;
 	END LOOP;
 
