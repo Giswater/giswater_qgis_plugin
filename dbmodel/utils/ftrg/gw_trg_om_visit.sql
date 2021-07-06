@@ -24,9 +24,9 @@ BEGIN
 
 
 	IF v_featuretype IS NULL THEN
-	v_triggerfromtable = 'om_visit';
+        v_triggerfromtable = 'om_visit';
 	ELSE 
-	v_triggerfromtable = 'om_visit_x_feature';
+        v_triggerfromtable = 'om_visit_x_feature';
 	END IF;
 
 	IF TG_OP='INSERT' THEN
@@ -41,6 +41,7 @@ BEGIN
 			-- Setting expl_id when visit have geometry
 			IF NEW.expl_id IS NULL THEN
 				v_expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+                UPDATE om_visit SET expl_id=v_expl_id WHERE id=NEW.id;
 			END IF;
 
 			-- if uses lot_manage, equal visitcat and visitclass (in order to fill Visit tab)
@@ -58,7 +59,7 @@ BEGIN
 			END IF;
             
 			--set visit_type captured from class_id
-			UPDATE om_visit SET visit_type=(SELECT visit_type FROM config_visit_class WHERE id=NEW.class_id), expl_id=v_expl_id WHERE id=NEW.id;
+			UPDATE om_visit SET visit_type=(SELECT visit_type FROM config_visit_class WHERE id=NEW.class_id) WHERE id=NEW.id;
 
 			--TODO: when visit is inserted via QGIS, we need to set class_id (adding this widget in the form of the new visit)
 		
