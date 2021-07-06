@@ -3496,7 +3496,7 @@ class GwInfo(QObject):
         values = {}
         for widget in widgets:
             if widget.property('columnname') in (None, ''): continue
-            values = tools_gw.get_values(dialog, widget, values)
+            values = tools_gw.get_values(dialog, widget, values, ignore_editability=True)
         fields = json.dumps(values)
 
         # Call gw_fct_setcatalog
@@ -3520,7 +3520,7 @@ class GwInfo(QObject):
                 tools_qt.set_combo_value(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
-
+        self._enable_buttons()
         tools_gw.close_dialog(dialog)
 
 
