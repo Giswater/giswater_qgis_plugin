@@ -3170,7 +3170,8 @@ class ApiCF(ApiParent, QObject):
         values = {}
         for widget in widgets:
             if widget.property('columnname') in (None, ''): continue
-            values = self.get_values(dialog, widget, values)
+            values = self.get_values(dialog, widget, values, ignore_editability=True)
+
         fields = json.dumps(values)
 
         # Call gw_fct_setcatalog
@@ -3194,7 +3195,7 @@ class ApiCF(ApiParent, QObject):
                 utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
-
+        self._enable_dialog()
         self.close_dialog(dialog)
 
 

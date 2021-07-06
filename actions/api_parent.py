@@ -1407,16 +1407,16 @@ class ApiParent(ParentAction):
         return label, widget
 
 
-    def get_values(self, dialog, widget, _json=None):
+    def get_values(self, dialog, widget, _json=None, ignore_editability=False):
 
         value = None
-        if type(widget) in(QLineEdit, QTextEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+        if type(widget) in(QLineEdit, QTextEdit, QSpinBox, QDoubleSpinBox) and (widget.isReadOnly() is False or ignore_editability):
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
-        elif type(widget) is QComboBox and widget.isEnabled():
+        elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
             value = utils_giswater.get_item_data(dialog, widget, 0)
-        elif type(widget) is QCheckBox and widget.isEnabled():
+        elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
             value = utils_giswater.isChecked(dialog, widget)
-        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+        elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
             value = utils_giswater.getCalendarDate(dialog, widget)
 
         if str(value) == '' or value is None:
