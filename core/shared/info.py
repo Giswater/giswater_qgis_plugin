@@ -435,6 +435,7 @@ class GwInfo(QObject):
         self.feature_id = feature_id
 
         print(f"{time.time()}")
+        print(f"is_docker = {is_docker}")
         # Check if there is a template for that node type
         if new_feature or is_docker or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
@@ -594,13 +595,13 @@ class GwInfo(QObject):
             if result:
                 self.feature_type = result[0]
 
-        result = complet_result['body']['data']
+        result = self.complet_result['body']['data']
         layout_list = []
 
-        for field in complet_result['body']['data']['fields']:
+        for field in self.complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
+            label, widget = self._set_widgets(self.dlg_cf, self.complet_result, field, new_feature)
             if widget is None:
                 continue
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
@@ -628,6 +629,11 @@ class GwInfo(QObject):
                         widget.currentIndexChanged.connect(partial(
                             self._get_combo_child, self.dlg_cf, widget, self.feature_type,
                             self.tablename, self.field_id))
+
+        if is_docker and global_vars.info_templates[template_name]['dlg'] is not None:
+            for field in complet_result['body']['data']['fields']:
+                if complet_result['body']['data']['fields'][field] not in (None, "", "null"):
+                    tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
 
         # Set variables
         id_name = complet_result['body']['feature']['idName']
@@ -725,7 +731,7 @@ class GwInfo(QObject):
         self.dlg_cf.setWindowTitle(title)
 
         # Save the dialog as a template
-        if global_vars.info_templates[template_name]['dlg'] is None:
+        if not is_docker and global_vars.info_templates[template_name]['dlg'] is None:
             global_vars.info_templates[template_name]['dlg'] = self.dlg_cf
             global_vars.info_templates[template_name]['json'] = self.complet_result
 
@@ -1540,7 +1546,7 @@ class GwInfo(QObject):
 
         self._roll_back()
         self.rubber_band.reset()
-        self._clear_dlg_templates()
+        # self._clear_dlg_templates()
         tools_gw.close_docker()
 
 
