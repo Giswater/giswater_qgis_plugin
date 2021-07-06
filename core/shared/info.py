@@ -436,7 +436,7 @@ class GwInfo(QObject):
 
         print(f"{time.time()}")
         # Check if there is a template for that node type
-        if new_feature or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0:
+        if new_feature or is_docker or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
@@ -473,32 +473,10 @@ class GwInfo(QObject):
                                     self.dlg_cf.height())
 
         # Get widget controls
-        self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
-        self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        tools_qt.set_tableview_config(self.tbl_element)
-        self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        tools_qt.set_tableview_config(self.tbl_relations)
-        self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        tools_qt.set_tableview_config(self.tbl_upstream)
-        self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        tools_qt.set_tableview_config(self.tbl_downstream)
-        self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        tools_qt.set_tableview_config(self.tbl_hydrometer)
-        self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
-                                      QTableView.CurrentChanged)
-        self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
-        self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        tools_qt.set_tableview_config(self.tbl_event_cf)
-        self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        tools_qt.set_tableview_config(self.tbl_document)
+        self._get_widget_controls(new_feature)
 
         # Get table name
-        if global_vars.info_templates[template_name]['dlg'] is None:
-            self.tablename = complet_result['body']['feature']['tableName']
-        else:
-            self.tablename = complet_result['body']['feature']['tableName']
+        self.tablename = complet_result['body']['feature']['tableName']
 
         # Get feature type (Junction, manhole, valve, fountain...)
         self.feature_type = complet_result['body']['feature']['childType']
@@ -781,27 +759,7 @@ class GwInfo(QObject):
                                     self.dlg_cf.height())
 
         # Get widget controls
-        self.tab_main = self.dlg_cf.tab_main
-        self.tab_main.setCurrentIndex(0)
-        self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
-        self.tbl_element = self.dlg_cf.tbl_element
-        tools_qt.set_tableview_config(self.tbl_element)
-        self.tbl_relations = self.dlg_cf.tbl_relations
-        tools_qt.set_tableview_config(self.tbl_relations)
-        self.tbl_upstream = self.dlg_cf.tbl_upstream
-        tools_qt.set_tableview_config(self.tbl_upstream)
-        self.tbl_downstream = self.dlg_cf.tbl_downstream
-        tools_qt.set_tableview_config(self.tbl_downstream)
-        self.tbl_hydrometer = self.dlg_cf.tbl_hydrometer
-        tools_qt.set_tableview_config(self.tbl_hydrometer)
-        self.tbl_hydrometer_value = self.dlg_cf.tbl_hydrometer_value
-        tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
-                                      QTableView.CurrentChanged)
-        self.tbl_visit_cf = self.dlg_cf.tbl_visit_cf
-        self.tbl_event_cf = self.dlg_cf.tbl_event_cf
-        tools_qt.set_tableview_config(self.tbl_event_cf)
-        self.tbl_document = self.dlg_cf.tbl_document
-        tools_qt.set_tableview_config(self.tbl_document)
+        self._get_widget_controls(new_feature, True)
 
         # Get table name
         self.tablename = complet_result['body']['feature']['tableName']
@@ -959,6 +917,52 @@ class GwInfo(QObject):
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
+
+
+    def _get_widget_controls(self, new_feature, is_template=False):
+        if is_template:
+            self.tab_main = self.dlg_cf.tab_main
+            self.tab_main.setCurrentIndex(0)
+            self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
+            self.tbl_element = self.dlg_cf.tbl_element
+            tools_qt.set_tableview_config(self.tbl_element)
+            self.tbl_relations = self.dlg_cf.tbl_relations
+            tools_qt.set_tableview_config(self.tbl_relations)
+            self.tbl_upstream = self.dlg_cf.tbl_upstream
+            tools_qt.set_tableview_config(self.tbl_upstream)
+            self.tbl_downstream = self.dlg_cf.tbl_downstream
+            tools_qt.set_tableview_config(self.tbl_downstream)
+            self.tbl_hydrometer = self.dlg_cf.tbl_hydrometer
+            tools_qt.set_tableview_config(self.tbl_hydrometer)
+            self.tbl_hydrometer_value = self.dlg_cf.tbl_hydrometer_value
+            tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
+                                          QTableView.CurrentChanged)
+            self.tbl_visit_cf = self.dlg_cf.tbl_visit_cf
+            self.tbl_event_cf = self.dlg_cf.tbl_event_cf
+            tools_qt.set_tableview_config(self.tbl_event_cf)
+            self.tbl_document = self.dlg_cf.tbl_document
+            tools_qt.set_tableview_config(self.tbl_document)
+        else:
+            self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
+            self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
+            self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
+            tools_qt.set_tableview_config(self.tbl_element)
+            self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
+            tools_qt.set_tableview_config(self.tbl_relations)
+            self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
+            tools_qt.set_tableview_config(self.tbl_upstream)
+            self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+            tools_qt.set_tableview_config(self.tbl_downstream)
+            self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
+            tools_qt.set_tableview_config(self.tbl_hydrometer)
+            self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
+            tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
+                                          QTableView.CurrentChanged)
+            self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
+            self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
+            tools_qt.set_tableview_config(self.tbl_event_cf)
+            self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
+            tools_qt.set_tableview_config(self.tbl_document)
 
 
     def _clear_dlg_templates(self):
