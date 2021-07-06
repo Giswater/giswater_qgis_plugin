@@ -562,7 +562,7 @@ class GwAdminButton:
 
         # Get database connection user and role
         self.username = username
-        if username is None:
+        if username in (None, False):
             self.username = self._get_user_connection(last_connection)
 
         self.dlg_readsql.btn_info.setText('Update Project Schema')
