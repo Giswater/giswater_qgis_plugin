@@ -508,8 +508,8 @@ class GwInfo(QObject):
             feature = tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id)
             list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
 
-        if 'visibleTabs' in self.complet_result['body']['form']:
-            for tab in self.complet_result['body']['form']['visibleTabs']:
+        if 'visibleTabs' in complet_result['body']['form']:
+            for tab in complet_result['body']['form']['visibleTabs']:
                 tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
@@ -543,7 +543,7 @@ class GwInfo(QObject):
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
-            action_edit.setEnabled(self.complet_result['body']['feature']['permissions']['isEditable'])
+            action_edit.setEnabled(complet_result['body']['feature']['permissions']['isEditable'])
         except KeyError:
             pass
 
@@ -599,13 +599,13 @@ class GwInfo(QObject):
             if result:
                 self.feature_type = result[0]
 
-        result = self.complet_result['body']['data']
+        result = complet_result['body']['data']
         layout_list = []
 
-        for field in self.complet_result['body']['data']['fields']:
+        for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self._set_widgets(self.dlg_cf, self.complet_result, field, new_feature)
+            label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
             if widget is None:
                 continue
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
@@ -642,9 +642,9 @@ class GwInfo(QObject):
         fid = self.feature_id
         if layer:
             if layer.isEditable():
-                tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
+                tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
             else:
-                tools_gw.enable_widgets(dlg_cf, self.complet_result['body']['data'], False)
+                tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
