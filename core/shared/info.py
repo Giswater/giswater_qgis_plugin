@@ -1544,9 +1544,10 @@ class GwInfo(QObject):
 
     def _manage_docker_close(self):
 
+        global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] -= 1
         self._roll_back()
         self.rubber_band.reset()
-        # self._clear_dlg_templates()
+        global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         tools_gw.close_docker()
 
 
