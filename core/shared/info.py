@@ -154,7 +154,9 @@ class GwInfo(QObject):
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
-            extras += f', "featureDialog":{tools_gw.get_info_templates()}'
+            # If it's docker we don't want templates
+            if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']):
+                extras += f', "featureDialog":{tools_gw.get_info_templates()}'
             body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
@@ -435,9 +437,11 @@ class GwInfo(QObject):
         self.feature_id = feature_id
 
         print(f"{time.time()}")
-        print(f"is_docker = {is_docker}")
-        # Check if there is a template for that node type
-        if new_feature or is_docker or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0:
+        dock = global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']
+        # Don't use template when inserting a new feature, there is no template saved, there is already an info open or is docker
+        no_template = new_feature or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0 or dock
+
+        if no_template:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
@@ -630,11 +634,6 @@ class GwInfo(QObject):
                             self._get_combo_child, self.dlg_cf, widget, self.feature_type,
                             self.tablename, self.field_id))
 
-        if is_docker and global_vars.info_templates[template_name]['dlg'] is not None:
-            for field in complet_result['body']['data']['fields']:
-                if complet_result['body']['data']['fields'][field] not in (None, "", "null"):
-                    tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
-
         # Set variables
         id_name = complet_result['body']['feature']['idName']
         self.filter = str(id_name) + " = '" + str(self.feature_id) + "'"
@@ -731,7 +730,8 @@ class GwInfo(QObject):
         self.dlg_cf.setWindowTitle(title)
 
         # Save the dialog as a template
-        if not is_docker and global_vars.info_templates[template_name]['dlg'] is None:
+        if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']) and global_vars.info_templates[template_name]['dlg'] is None:
+            print(f"template guardat")
             global_vars.info_templates[template_name]['dlg'] = self.dlg_cf
             global_vars.info_templates[template_name]['json'] = self.complet_result
 
