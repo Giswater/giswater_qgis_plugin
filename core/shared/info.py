@@ -701,7 +701,7 @@ class GwInfo(QObject):
                 del last_info
 
             tools_gw.docker_dialog(dlg_cf)
-            global_vars.session_vars['dialog_docker'].dlg_closed.connect(self._manage_docker_close)
+            global_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
             global_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
 
