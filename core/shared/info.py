@@ -474,16 +474,7 @@ class GwInfo(QObject):
         # Get widget controls
         self._get_widget_controls(new_feature)
 
-        # Get table name
-        self.tablename = complet_result['body']['feature']['tableName']
-
-        # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result['body']['feature']['childType']
-
-        # Get tableParent and select layer
-        self.table_parent = str(complet_result['body']['feature']['tableParent'])
-        schema_name = str(complet_result['body']['feature']['schemaName'])
-        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
+        self._get_features(complet_result)
         if self.layer is None:
             tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
@@ -528,19 +519,7 @@ class GwInfo(QObject):
         # Add icons to actions & buttons
         self._manage_icons()
 
-        # Get feature type as feature_type (node, arc, connec, gully)
-        self.feature_type = str(complet_result['body']['feature']['featureType'])
-        if str(self.feature_type) in ('', '[]'):
-            if 'feature_cat' in globals():
-                parent_layer = self.feature_cat.parent_layer
-            else:
-                parent_layer = str(complet_result['body']['feature']['tableParent'])
-            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = tools_db.get_row(sql)
-            if result:
-                self.feature_type = result[0]
-
-        result = complet_result['body']['data']
+        result = self._get_feature_type(complet_result)
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
 
@@ -576,13 +555,6 @@ class GwInfo(QObject):
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
         dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
 
-        # Set title
-        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = tools_gw.get_config_value('admin_customform_param', 'value', 'config_param_system')
-        if row:
-            results = json.loads(row[0], object_pairs_hook=OrderedDict)
-            for result in results['custom_form_tab_labels']:
-                toolbox_cf.setItemText(int(result['index']), result['text'])
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
@@ -595,6 +567,7 @@ class GwInfo(QObject):
             global_vars.info_templates[template_name]['json'] = self.complet_result
 
         return self.complet_result, self.dlg_cf
+
 
 
     def _open_custom_form_with_template(self, feature_id, complet_result, tab_type=None, new_feature=None):
@@ -625,16 +598,7 @@ class GwInfo(QObject):
         # Get widget controls
         self._get_widget_controls(new_feature, True)
 
-        # Get table name
-        self.tablename = complet_result['body']['feature']['tableName']
-
-        # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result['body']['feature']['childType']
-
-        # Get tableParent and select layer
-        self.table_parent = str(complet_result['body']['feature']['tableParent'])
-        schema_name = str(complet_result['body']['feature']['schemaName'])
-        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
+        self._get_features(complet_result)
         if self.layer is None:
             tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
@@ -659,11 +623,6 @@ class GwInfo(QObject):
         # Actions
         self._get_actions()
 
-        if self.new_feature_id is not None:
-            self._enable_action(self.dlg_cf, "actionZoom", False)
-            self._enable_action(self.dlg_cf, "actionZoomOut", False)
-            self._enable_action(self.dlg_cf, "actionCentered", False)
-            self._enable_action(self.dlg_cf, "actionSetToArc", False)
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
@@ -671,19 +630,7 @@ class GwInfo(QObject):
         except KeyError:
             pass
 
-        # Get feature type as feature_type (node, arc, connec, gully)
-        self.feature_type = str(complet_result['body']['feature']['featureType'])
-        if str(self.feature_type) in ('', '[]'):
-            if 'feature_cat' in globals():
-                parent_layer = self.feature_cat.parent_layer
-            else:
-                parent_layer = str(complet_result['body']['feature']['tableParent'])
-            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = tools_db.get_row(sql)
-            if result:
-                self.feature_type = result[0]
-
-        result = complet_result['body']['data']
+        result = self._get_feature_type(complet_result)
 
         # Set values, no need to create the widgets
         # Fill the content of every widget using the lightweight JSON response
@@ -700,14 +647,6 @@ class GwInfo(QObject):
         dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
         dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
-
-        # Set title
-        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = tools_gw.get_config_value('admin_customform_param', 'value', 'config_param_system')
-        if row:
-            results = json.loads(row[0], object_pairs_hook=OrderedDict)
-            for result in results['custom_form_tab_labels']:
-                toolbox_cf.setItemText(int(result['index']), result['text'])
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
@@ -762,6 +701,17 @@ class GwInfo(QObject):
             tools_qt.set_tableview_config(self.tbl_event_cf)
             self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
             tools_qt.set_tableview_config(self.tbl_document)
+
+
+    def _get_features(self, complet_result):
+        # Get table name
+        self.tablename = complet_result['body']['feature']['tableName']
+        # Get feature type (Junction, manhole, valve, fountain...)
+        self.feature_type = complet_result['body']['feature']['childType']
+        # Get tableParent and select layer
+        self.table_parent = str(complet_result['body']['feature']['tableParent'])
+        schema_name = str(complet_result['body']['feature']['schemaName'])
+        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
 
 
     def _get_actions(self):
@@ -929,6 +879,37 @@ class GwInfo(QObject):
         return dlg_cf, fid
 
 
+    def _get_feature_type(self, complet_result):
+        """ Get feature type as feature_type (node, arc, connec, gully) """
+        self.feature_type = str(complet_result['body']['feature']['featureType'])
+        if str(self.feature_type) in ('', '[]'):
+            if 'feature_cat' in globals():
+                parent_layer = self.feature_cat.parent_layer
+            else:
+                parent_layer = str(complet_result['body']['feature']['tableParent'])
+            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
+            result = tools_db.get_row(sql)
+            if result:
+                self.feature_type = result[0]
+        result = complet_result['body']['data']
+        return result
+
+
+    def _set_dlg_title(self):
+        """ Sets the dialog title """
+
+        title = f"{self.complet_result['body']['form']['headerText']}"
+
+        # Set title
+        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+        row = tools_gw.get_config_value('admin_customform_param', 'value', 'config_param_system')
+        if row:
+            results = json.loads(row[0], object_pairs_hook=OrderedDict)
+            for result in results['custom_form_tab_labels']:
+                toolbox_cf.setItemText(int(result['index']), result['text'])
+        return title
+
+
     def _clear_dlg_templates(self):
         """ Clears all the widgets of the last info and disconnects the necessary signals """
 
@@ -1051,13 +1032,6 @@ class GwInfo(QObject):
             self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
         except Exception:
             pass
-
-
-    def _set_dlg_title(self):
-        """ Sets the dialog title """
-
-        title = f"{self.complet_result['body']['form']['headerText']}"
-        return title
 
 
     def _manage_json_result(self, json_result, template_name):
