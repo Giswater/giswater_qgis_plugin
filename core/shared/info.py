@@ -765,6 +765,8 @@ class GwInfo(QObject):
 
 
     def _get_actions(self):
+        """ Sets class variables for actions """
+
         self.action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         self.action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
         self.action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
@@ -785,6 +787,7 @@ class GwInfo(QObject):
 
 
     def _manage_icons(self):
+        """ Adds icons to actions and buttons """
         # Set actions icon
         tools_gw.add_icon(self.action_edit, "101")
         tools_gw.add_icon(self.action_copy_paste, "107b", "24x24")
@@ -826,6 +829,7 @@ class GwInfo(QObject):
 
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature):
+        """ Creates and populates all the widgets """
         layout_list = []
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
@@ -859,6 +863,8 @@ class GwInfo(QObject):
 
 
     def _manage_actions_signals(self, complet_result, list_points, new_feature, tab_type, result, is_template=False):
+        """ Connects signals to the actions """
+
         # Set variables
         id_name = complet_result['body']['feature']['idName']
         self.filter = str(id_name) + " = '" + str(self.feature_id) + "'"
