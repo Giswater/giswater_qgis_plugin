@@ -549,7 +549,7 @@ class GwInfo(QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result['body']['form']['headerText']}"
+        title = self._set_dlg_title()
 
         # Connect dialog signals
         if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
@@ -694,7 +694,7 @@ class GwInfo(QObject):
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result, True)
 
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
+        title = self._set_dlg_title()
 
         # Connect some signals
         dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
@@ -1051,6 +1051,13 @@ class GwInfo(QObject):
             self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
         except Exception:
             pass
+
+
+    def _set_dlg_title(self):
+        """ Sets the dialog title """
+
+        title = f"{self.complet_result['body']['form']['headerText']}"
+        return title
 
 
     def _manage_json_result(self, json_result, template_name):
