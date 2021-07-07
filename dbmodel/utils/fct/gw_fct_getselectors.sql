@@ -60,7 +60,9 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
-
+v_count_expl integer;
+rec_macro record;
+v_count_selector integer;
 
 BEGIN
 
@@ -153,23 +155,48 @@ BEGIN
 
 		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
-				
+			
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
+		IF v_tab.tabname ='tab_macroexploitation' THEN
+			FOR rec_macro IN (SELECT * FROM macroexploitation) LOOP
+				SELECT count(expl_id) as count INTO v_count_expl FROM exploitation WHERE macroexpl_id=rec_macro.macroexpl_id group by macroexpl_id;
+				SELECT count(*) INTO v_count_selector FROM selector_expl JOIN exploitation USING (expl_id) 
+				WHERE macroexpl_id=rec_macro.macroexpl_id AND cur_user=current_user;
 
+				IF v_count_expl = v_count_selector THEN
+					IF v_ids IS NULL THEN 
+						v_ids=rec_macro.macroexpl_id;
+					ELSE
+						v_ids=concat(v_ids,rec_macro.macroexpl_id);
+					END IF;
+				END IF;
+			END LOOP;
+
+			IF v_ids IS NULL THEN v_ids='0' END IF;
+
+			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+					FROM ' , v_table , ' m JOIN  exploitation USING (',v_table_id,') 
+					WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+					FROM ' , v_table , ' m JOIN  exploitation  USING (',v_table_id,')
+					WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
+					 v_fullfilter ,' ORDER BY orderby asc) a');
+
+		ELSE 
 		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
 					 v_fullfilter ,' ORDER BY orderby asc) a');
+		END IF;
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id, 
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
 		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-
-		raise notice 'v_finalquery %', v_finalquery;
 		EXECUTE  v_finalquery INTO v_formTabsAux;
 
 		-- Add tab name to json

@@ -215,3 +215,17 @@ VALUES ('basic_selector_mapzone_relation', '{"sectorfromexpl":"false","explfroms
 'If sectorfromexpl is true, sector selector is set automatically set to the sector which geometry overlaps the selected exploitation.
 If explfromsector is true, exploitation selector is set automatically set to the exploitation which geometry overlaps the selected sector.',
 'Selector variables', FALSE, 'utils','json') ON CONFLICT (parameter) DO NOTHING;;
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation',NULL);
+
+INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
+VALUES ('selector_basic', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation', 'role_epa', NULL, NULL, 4, 0);
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type, datatype)
+VALUES ('basic_selector_tab_macroexploitation', '{"table":"macroexploitation", "selector":"selector_expl", 
+"table_id":"macroexpl_id",  "selector_id":"expl_id",  "label":"macroexpl_id, '' - '', m.name", 
+"orderBy":"macroexpl_id", "manageAll":true, "query_filter":" AND macroexpl_id > 0"}', 
+'Variable to configura all options related to search for the specificic tab',
+'Selector variables', true, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
+

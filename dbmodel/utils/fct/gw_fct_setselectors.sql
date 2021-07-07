@@ -106,29 +106,60 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';	
 	END IF;
 
-	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'sectorfromexpl')::boolean FROM config_param_system 
-		WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE THEN
+	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'sectorfromexpl')::boolean 
+		FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_exploitation' THEN
+
+		
+		IF  v_value='True' THEN
+			IF v_isalone IS TRUE THEN
+				EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
+				EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
+			END IF;
+			EXECUTE 'INSERT INTO selector_sector (sector_id, cur_user) 
+			SELECT sector_id, current_user FROM exploitation e, sector s 
+			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			AND expl_id = '||v_id||' ON CONFLICT (sector_id,cur_user) DO NOTHING;';
+		ELSE
+			EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id IN
+			(SELECT sector_id FROM exploitation e, sector s 
+			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			AND expl_id = '||v_id||');';
+		END IF;
+
+	ELSIF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'sectorfromexpl')::boolean 
+	FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_macroexploitation' THEN
 
 		EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
 		IF  v_value='True' THEN
 			EXECUTE 'INSERT INTO selector_sector (sector_id, cur_user) 
-			SELECT sector_id, current_user FROM exploitation e, sector s 
+			SELECT DISTINCT sector_id, current_user 
+			FROM sector s, exploitation e
+			JOIN macroexploitation USING (macroexpl_id)
 			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
-			AND expl_id = '||v_id||';';
+			AND macroexpl_id = '||v_id||';';
 		END IF;
-
 	END IF;
 
-	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'explfromsector')::boolean FROM config_param_system 
-		WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE THEN
+	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'explfromsector')::boolean 
+		FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_sector' THEN
  
-		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 		IF  v_value='True' THEN
+			IF v_isalone IS TRUE THEN
+				EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
+				EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
+			END IF;
 			EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) 
 			SELECT expl_id, current_user FROM exploitation e, sector s 
 			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
-			AND sector_id = '||v_id||';';
+			AND sector_id = '||v_id||' ON CONFLICT (expl_id,cur_user) DO NOTHING;';
+		ELSE
+			EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user AND expl_id IN
+			(SELECT expl_id FROM exploitation e, sector s 
+			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			AND sector_id = '||v_id||');';
 		END IF;
+
+
 	END IF;
 
 	-- manage check all
@@ -142,17 +173,28 @@ BEGIN
 	ELSIF v_checkall IS FALSE THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 	ELSE
-
 		-- manage isalone
 		IF v_isalone OR v_checkall IS FALSE THEN
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 		END IF;
 
-		-- manage value
-		IF v_value THEN
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+		IF v_tabname='tab_macroexploitation' THEN
+			-- manage value
+			IF v_value THEN
+				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+				SELECT '|| v_columnname ||', current_user FROM exploitation WHERE '||v_tableid||' = '||v_id||';';
+			ELSE
+				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND 
+				' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM exploitation WHERE '||v_tableid||' = '||v_id||');';
+			END IF;
 		ELSE
-			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+			-- manage value
+			IF v_value THEN
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+			ELSE
+				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+			END IF;
 		END IF;
 
 	END IF;
@@ -161,8 +203,10 @@ BEGIN
 	IF v_tabname='tab_sector' THEN
 		SELECT row_to_json (a) 
 		INTO v_geometry
-		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-		FROM (SELECT the_geom FROM sector where sector_id=v_id) b) a;
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, 
+		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+		FROM (SELECT st_collect(the_geom) as the_geom FROM sector where sector_id IN
+		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
 		
 	ELSIF (SELECT the_geom FROM v_edit_arc LIMIT 1) IS NOT NULL or (v_checkall IS False and v_id is null) THEN
 		SELECT row_to_json (a) 
