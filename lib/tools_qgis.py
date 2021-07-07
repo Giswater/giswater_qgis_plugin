@@ -289,15 +289,16 @@ def get_layer_source_table_name(layer):
         return None
 
     uri_table = None
-
-    try:
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_fi = uri.split('.')[1][1:].find('"')
-        uri_table = uri.split('.')[1][1:pos_fi+1]
-    except Exception as e:
-        pass
-    finally:
-        return uri_table
+    uri = layer.dataProvider().dataSourceUri().lower()
+    pos_ini = uri.find('table=')
+    total = len(uri)
+    pos_end_schema = uri.rfind('.')
+    pos_fi = uri.find('" ')
+    if pos_ini != -1 and pos_fi != -1:
+        uri_table = uri[pos_end_schema + 2:pos_fi]
+    else:
+        uri_table = uri[pos_end_schema + 2:total-1]
+    return uri_table
 
 
 def get_layer_schema(layer):
