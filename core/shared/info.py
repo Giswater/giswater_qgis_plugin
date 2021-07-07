@@ -435,11 +435,11 @@ class GwInfo(QObject):
         if no_template:
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
-            self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
+            self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, new_feature)
         print(f"{time.time()}")
         # Set a property to the dialog (feature_id)
         self.dlg_cf.setProperty('gw_code', feature_id)
-        # Manage the number of open infos
+        # Manage the number of open dialogs of the same feature type
         global_vars.info_templates[template_name]['open'] += 1
 
         return self.complet_result, self.dlg_cf
@@ -567,6 +567,7 @@ class GwInfo(QObject):
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
             dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._clear_dlg_templates)
             dlg_cf.dlg_closed.connect(partial(self._reset_my_json, dlg_cf))
@@ -866,9 +867,9 @@ class GwInfo(QObject):
         fid = self.feature_id
         if is_template and layer:
             if layer.isEditable():
-                tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
+                tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
             else:
-                tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
+                tools_gw.enable_widgets(dlg_cf, self.complet_result['body']['data'], False)
         elif layer:
             if layer.isEditable():
                 tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
@@ -1527,6 +1528,7 @@ class GwInfo(QObject):
         self._manage_open_templates()
         self._roll_back()
         self.rubber_band.reset()
+        self.layer.removeSelection()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json(self.dlg_cf)
         tools_gw.close_docker()
