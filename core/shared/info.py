@@ -203,19 +203,11 @@ class GwInfo(QObject):
                 return False, None
 
         # Create the template if it doesn't exist
-        template_name = json_result['body']['feature']['childType']
-        if template_name not in global_vars.info_templates:
-            global_vars.info_templates[template_name] = {}
-            global_vars.info_templates[template_name]['dlg'] = None
-            global_vars.info_templates[template_name]['json'] = None
-            global_vars.info_templates[template_name]['open'] = 0
+        template_name = self._manage_new_template(json_result)
         # Manage the json result
         #   - new_result is always the last result
         #   - self.complet_result is the first result for that template
-        result_guardat = global_vars.info_templates[template_name]['json']
-        new_result = json_result
-        global_vars.test_last_json = json_result
-        self.complet_result = json_result if result_guardat is None else result_guardat
+        new_result = self._manage_json_result(json_result, template_name)
 
         try:
             template = self.complet_result['body']['form']['template']
@@ -928,6 +920,8 @@ class GwInfo(QObject):
 
 
     def _get_widget_controls(self, new_feature, is_template=False):
+        """ Sets class variables for most widgets """
+
         if is_template:
             self.tab_main = self.dlg_cf.tab_main
             self.tab_main.setCurrentIndex(0)
@@ -976,11 +970,14 @@ class GwInfo(QObject):
     def _clear_dlg_templates(self):
         """ Clears all the widgets of the last info and disconnects the necessary signals """
 
+        # Manage open templates
         self._manage_open_templates()
         if global_vars.info_templates[self.template_name]['open'] > 0:
             return
+
         dlg = global_vars.info_templates[self.template_name]['dlg']
-        # Empty out the text for every widget
+
+        # Clear widgets' text
         for field in global_vars.info_templates[self.template_name]['json']['body']['data']['fields']:
             tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
 
@@ -1004,8 +1001,8 @@ class GwInfo(QObject):
         dlg.findChild(QAction, "actionSection").triggered.disconnect()
         dlg.findChild(QAction, "actionHelp").triggered.disconnect()
 
-
         # Tabs
+        ########
         self.tab_main.currentChanged.disconnect()
 
         # Element tab
@@ -1092,6 +1089,23 @@ class GwInfo(QObject):
             self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
         except Exception:
             pass
+
+
+    def _manage_json_result(self, json_result, template_name):
+        result_guardat = global_vars.info_templates[template_name]['json']
+        new_result = json_result
+        self.complet_result = json_result if result_guardat is None else result_guardat
+        return new_result
+
+
+    def _manage_new_template(self, json_result):
+        template_name = json_result['body']['feature']['childType']
+        if template_name not in global_vars.info_templates:
+            global_vars.info_templates[template_name] = {}
+            global_vars.info_templates[template_name]['dlg'] = None
+            global_vars.info_templates[template_name]['json'] = None
+            global_vars.info_templates[template_name]['open'] = 0
+        return template_name
 
 
     def _manage_open_templates(self):
