@@ -138,6 +138,7 @@ BEGIN
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_form_fields 
+			LEFT JOIN typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
 			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			
 			WHERE formname = ',quote_nullable(p_formname),' AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ORDER BY orderby) a');
