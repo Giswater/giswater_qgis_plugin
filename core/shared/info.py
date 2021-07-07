@@ -1136,6 +1136,7 @@ class GwInfo(QObject):
         self._roll_back()
         self.rubber_band.reset()
         self.layer.removeSelection()
+        global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         tools_gw.close_docker()
 
 
