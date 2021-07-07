@@ -446,8 +446,10 @@ class GwInfo(QObject):
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         print(f"{time.time()}")
+
         self.dlg_cf.setProperty('gw_code', tools_qt.get_text(self.dlg_cf, f"data_code"))
         global_vars.info_templates[template_name]['open'] += 1
+
         return self.complet_result, self.dlg_cf
 
 
@@ -710,12 +712,12 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._clear_dlg_templates)
+            dlg_cf.dlg_closed.connect(partial(self._reset_my_json, dlg_cf))
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
         dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
 
-        dlg_cf.dlg_closed.connect(partial(self._reset_my_json, dlg_cf))
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -974,12 +976,12 @@ class GwInfo(QObject):
     def _clear_dlg_templates(self):
         """ Clears all the widgets of the last info and disconnects the necessary signals """
 
-        global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] -= 1
-        if global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] > 0:
+        self._manage_open_templates()
+        if global_vars.info_templates[self.template_name]['open'] > 0:
             return
-        dlg = global_vars.info_templates[self.complet_result['body']['feature']['childType']]['dlg']
+        dlg = global_vars.info_templates[self.template_name]['dlg']
         # Empty out the text for every widget
-        for field in global_vars.info_templates[self.complet_result['body']['feature']['childType']]['json']['body']['data']['fields']:
+        for field in global_vars.info_templates[self.template_name]['json']['body']['data']['fields']:
             tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
 
         # Disconnect signals so they don't stack up
@@ -1090,6 +1092,15 @@ class GwInfo(QObject):
             self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
         except Exception:
             pass
+
+
+    def _manage_open_templates(self):
+
+        dlgs_open = global_vars.info_templates[self.template_name]['open']
+        if dlgs_open - 1 >= 0:
+            global_vars.info_templates[self.template_name]['open'] -= 1
+        else:
+            global_vars.info_templates[self.template_name]['open'] = 0
 
 
     def _open_help(self, feature_type):
@@ -1543,11 +1554,11 @@ class GwInfo(QObject):
 
 
     def _manage_docker_close(self):
-
-        global_vars.info_templates[self.complet_result['body']['feature']['childType']]['open'] -= 1
+        self._manage_open_templates()
         self._roll_back()
         self.rubber_band.reset()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
+        self._reset_my_json(self.dlg_cf)
         tools_gw.close_docker()
 
 
@@ -2051,7 +2062,7 @@ class GwInfo(QObject):
         after_insert = False
 
         if _json == '' or str(_json) == '{}':
-            if global_vars.session_vars['dialog_docker']:
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
             tools_gw.close_dialog(dialog)
@@ -2152,9 +2163,10 @@ class GwInfo(QObject):
             return False
 
         if close_dlg:
-            if global_vars.session_vars['dialog_docker']:
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
-            tools_gw.close_dialog(dialog)
+            else:
+                tools_gw.close_dialog(dialog)
             return None
 
         return True
@@ -2288,7 +2300,10 @@ class GwInfo(QObject):
         """ Delete keys if exist, when widget is autoupdate """
 
         self.my_json = {}
-        global_vars.info_templates[self.template_name][f"my_json_{dialog.property('gw_code')}"] = {}
+        try:
+            global_vars.info_templates[self.template_name][f"my_json_{dialog.property('gw_code')}"] = {}
+        except Exception as e:
+            pass
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
