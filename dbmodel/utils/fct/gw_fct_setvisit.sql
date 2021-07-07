@@ -222,7 +222,7 @@ BEGIN
 		LOOP
 			-- Inserting data
 			v_querystring = concat('INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, hash, fextension)
-			 VALUES(',quote_nullable(v_id),', ',quote_nullable(v_event_id)', ',quote_nullable(NOW())', ',quote_nullable(CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)),',
+			 VALUES(',quote_nullable(v_id),', ',quote_nullable(v_event_id),', ',quote_nullable(NOW()),', ',quote_nullable(CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)),',
 			 ',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text),',',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'fextension'::text)::text),')');
 			v_debug_vars := json_build_object('v_id', v_id, 'v_event_id', v_event_id, 'v_addphotos', v_addphotos, 'v_addphotos', v_addphotos);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 30);
