@@ -2675,6 +2675,17 @@ def user_params_to_userconfig():
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
 
+def get_info_templates():
+    """ Returns a string array with the existing templates' names """
+
+    templates = ''
+    for key in global_vars.info_templates:
+        if global_vars.info_templates[key]['dlg'] is not None and global_vars.info_templates[key]['open'] < 1:
+            templates += f'"{key}", '
+    templates = f'[{templates[:-2]}]'
+    return templates
+
+  
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
@@ -2733,7 +2744,6 @@ def hide_widgets_form(dialog, dlg_name):
                 if lbl_widget:
                     lbl_widget.setVisible(False)
                 widget.setVisible(False)
-
 
 
 # region private functions

@@ -91,6 +91,7 @@ class GwVisit(QObject):
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
+
         self.dlg_add_visit.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
         self.dlg_add_visit.accepted.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -129,6 +130,7 @@ class GwVisit(QObject):
 
         # Reset geometry
         self.point_xy = {"x": None, "y": None}
+
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")

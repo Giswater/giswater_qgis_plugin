@@ -12,6 +12,7 @@ import urllib.parse as parse
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+import time
 
 from sip import isdeleted
 
@@ -153,6 +154,9 @@ class GwInfo(QObject):
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+            # If it's docker we don't want templates
+            if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']):
+                extras += f', "featureDialog":{tools_gw.get_info_templates()}'
             body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
@@ -163,14 +167,16 @@ class GwInfo(QObject):
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'
+            form = f'"featureDialog":{tools_gw.get_info_templates()}'
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            body = tools_gw.create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(form=form, feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
         if function_name is None:
             return False, None
 
         json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+
         if json_result in (None, False):
             return False, None
 
@@ -196,7 +202,13 @@ class GwInfo(QObject):
                 tools_qgis.show_message(msg, message_level=level)
                 return False, None
 
-        self.complet_result = json_result
+        # Create the template if it doesn't exist
+        template_name = self._manage_new_template(json_result)
+        # Manage the json result
+        #   - new_result is always the last result
+        #   - self.complet_result is the first result for that template
+        new_result = self._manage_json_result(json_result, template_name)
+
         try:
             template = self.complet_result['body']['form']['template']
         except Exception as e:
@@ -225,8 +237,8 @@ class GwInfo(QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
-            feature_id = self.complet_result['body']['feature']['id']
-            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
+            feature_id = new_result['body']['feature']['id']
+            result, dialog = self._open_custom_form(feature_id, new_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
             if feature_cat is not None:
                 self._manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -402,6 +414,44 @@ class GwInfo(QObject):
 
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
+        """
+        Opens a custom form
+            :param feature_id: the id of the node that will populate the form (Integer)
+            :param complet_result: The JSON used to create/populate the form (JSON)
+            :param tab_type:
+            :param sub_tag:
+            :param is_docker: Whether the form is docker or not (Boolean)
+            :param new_feature: Whether the form will create a new feature or not (Boolean)
+            :return: self.complt_result, self.dlg_cf
+        """
+
+        template_name = f"{complet_result['body']['feature']['childType']}"
+        self.feature_id = feature_id
+
+        dock = global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']
+        # Don't use template when inserting a new feature, there is no template saved, there is already an info open or is docker
+        no_template = new_feature or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0 or dock
+        if no_template:
+            self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
+        else:
+            self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, new_feature)
+
+        # Set a property to the dialog (feature_id)
+        self.dlg_cf.setProperty('gw_code', feature_id)
+        # Manage the number of open dialogs of the same feature type
+        global_vars.info_templates[template_name]['open'] += 1
+
+        return self.complet_result, self.dlg_cf
+
+
+    def _open_custom_form_without_template(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True,
+                                           new_feature=None):
+        """ Opens a custom form without using any template """
+
+        template_name = f"{complet_result['body']['feature']['childType']}"
+        self.template_name = template_name
+        global_vars.info_templates[template_name][f'my_json_{feature_id}'] = {}
+        global_vars.info_templates[template_name][f'last_json_{feature_id}'] = complet_result
 
         # Dialog
         self.dlg_cf = GwInfoFeatureUi(sub_tag)
@@ -421,36 +471,9 @@ class GwInfo(QObject):
                                     self.dlg_cf.height())
 
         # Get widget controls
-        self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
-        self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        tools_qt.set_tableview_config(self.tbl_element)
-        self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        tools_qt.set_tableview_config(self.tbl_relations)
-        self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        tools_qt.set_tableview_config(self.tbl_upstream)
-        self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        tools_qt.set_tableview_config(self.tbl_downstream)
-        self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        tools_qt.set_tableview_config(self.tbl_hydrometer)
-        self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
-        self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
-        self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        tools_qt.set_tableview_config(self.tbl_event_cf)
-        self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        tools_qt.set_tableview_config(self.tbl_document)
+        self._get_widget_controls(new_feature)
 
-        # Get table name
-        self.tablename = complet_result['body']['feature']['tableName']
-
-        # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result['body']['feature']['childType']
-
-        # Get tableParent and select layer
-        self.table_parent = str(complet_result['body']['feature']['tableParent'])
-        schema_name = str(complet_result['body']['feature']['schemaName'])
-        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
+        self._get_features(complet_result)
         if self.layer is None:
             tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
@@ -478,23 +501,7 @@ class GwInfo(QObject):
                 tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
 
         # Actions
-        action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
-        action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
-        action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
-        action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
-        action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
-        action_mapzone = self.dlg_cf.findChild(QAction, "actionMapZone")
-        action_set_to_arc = self.dlg_cf.findChild(QAction, "actionSetToArc")
-        action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
-        action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
-        action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
-        action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
-        action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
-        action_link = self.dlg_cf.findChild(QAction, "actionLink")
-        action_help = self.dlg_cf.findChild(QAction, "actionHelp")
-        action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
-        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
-        action_section = self.dlg_cf.findChild(QAction, "actionSection")
+        self._get_actions()
 
         if self.new_feature_id is not None:
             self._enable_action(self.dlg_cf, "actionZoom", False)
@@ -504,28 +511,248 @@ class GwInfo(QObject):
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
-            action_edit.setEnabled(self.complet_result['body']['feature']['permissions']['isEditable'])
+            self.action_edit.setEnabled(complet_result['body']['feature']['permissions']['isEditable'])
         except KeyError:
             pass
 
-        # Set actions icon
-        tools_gw.add_icon(action_edit, "101")
-        tools_gw.add_icon(action_copy_paste, "107b", "24x24")
-        tools_gw.add_icon(action_rotation, "107c", "24x24")
-        tools_gw.add_icon(action_catalog, "195")
-        tools_gw.add_icon(action_workcat, "193")
-        tools_gw.add_icon(action_mapzone, "213")
-        tools_gw.add_icon(action_set_to_arc, "212")
-        tools_gw.add_icon(action_get_arc_id, "209")
-        tools_gw.add_icon(action_get_parent_id, "210")
-        tools_gw.add_icon(action_zoom_in, "103")
-        tools_gw.add_icon(action_zoom_out, "107")
-        tools_gw.add_icon(action_centered, "104")
-        tools_gw.add_icon(action_link, "173")
-        tools_gw.add_icon(action_section, "207")
-        tools_gw.add_icon(action_help, "73")
-        tools_gw.add_icon(action_interpolate, "194")
+        # Add icons to actions & buttons
+        self._manage_icons()
 
+        result = self._get_feature_type(complet_result)
+        # Build and populate all the widgets
+        self._manage_dlg_widgets(complet_result, result, new_feature)
+
+        # Connect actions' signals
+        dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
+
+        btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
+        btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
+        title = self._set_dlg_title()
+
+        # Connect dialog signals
+        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
+            # Delete last form from memory
+            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
+            if last_info:
+                last_info.setParent(None)
+                del last_info
+
+            tools_gw.docker_dialog(dlg_cf)
+            global_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
+            global_vars.session_vars['dialog_docker'].setWindowTitle(title)
+            btn_cancel.clicked.connect(self._manage_docker_close)
+
+        else:
+            dlg_cf.dlg_closed.connect(self._roll_back)
+            dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
+            dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
+            dlg_cf.dlg_closed.connect(self._clear_dlg_templates)
+            dlg_cf.dlg_closed.connect(partial(self._reset_my_json, dlg_cf))
+            dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
+            btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
+        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
+        self.dlg_cf.setWindowTitle(title)
+
+        # Save the dialog as a template
+        if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']) and global_vars.info_templates[template_name]['dlg'] is None:
+            global_vars.info_templates[template_name]['dlg'] = self.dlg_cf
+            global_vars.info_templates[template_name]['json'] = self.complet_result
+
+        return self.complet_result, self.dlg_cf
+
+
+
+    def _open_custom_form_with_template(self, feature_id, complet_result, tab_type=None, new_feature=None):
+        """ Opens a custom form using the corresponding template """
+
+        template_name = f"{complet_result['body']['feature']['childType']}"
+        self.template_name = template_name
+        global_vars.info_templates[template_name][f'my_json_{feature_id}'] = {}
+        global_vars.info_templates[template_name][f'last_json_{feature_id}'] = complet_result
+
+        # Dialog
+        self.dlg_cf = global_vars.info_templates[template_name]['dlg']
+        tools_gw.load_settings(self.dlg_cf)
+
+        # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
+        # But if it has not been received, it is drawn
+        # Using variable exist_rb for check if alredy exist rubberband
+        try:
+            # noinspection PyUnusedLocal
+            exist_rb = complet_result['body']['returnManager']['style']['ruberband']
+        except KeyError:
+            tools_gw.draw_by_json(complet_result, self.rubber_band)
+
+        if feature_id:
+            self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 1, self.dlg_cf.pos().y() + 7, self.dlg_cf.width(),
+                                    self.dlg_cf.height())
+
+        # Get widget controls
+        self._get_widget_controls(new_feature, True)
+
+        self._get_features(complet_result)
+        if self.layer is None:
+            tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
+            return False, self.dlg_cf
+
+        # Remove unused tabs
+        tabs_to_show = []
+
+        # Get field id name and feature id
+        self.field_id = str(complet_result['body']['feature']['idName'])
+        self.feature_id = complet_result['body']['feature']['id']
+
+        list_points = tools_qgis.get_points_from_geometry(self.layer, tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id))
+
+        if 'visibleTabs' in self.complet_result['body']['form']:
+            for tab in self.complet_result['body']['form']['visibleTabs']:
+                tabs_to_show.append(tab['tabName'])
+
+        for x in range(self.tab_main.count() - 1, 0, -1):
+            if self.tab_main.widget(x).objectName() not in tabs_to_show:
+                tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
+
+        # Actions
+        self._get_actions()
+
+        self._show_actions(self.dlg_cf, 'tab_data')
+
+        try:
+            self.action_edit.setEnabled(self.complet_result['body']['feature']['permissions']['isEditable'])
+        except KeyError:
+            pass
+
+        result = self._get_feature_type(complet_result)
+
+        # Set values, no need to create the widgets
+        # Fill the content of every widget using the lightweight JSON response
+        for field in complet_result['body']['data']['fields']:
+            if complet_result['body']['data']['fields'][field] not in (None, "", "null"):
+                tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
+
+        dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result, True)
+
+        btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
+        title = self._set_dlg_title()
+
+        # Connect some signals
+        dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, global_vars.info_templates[template_name][f'my_json_{fid}'], complet_result))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
+        self.dlg_cf.setWindowTitle(title)
+
+        return self.complet_result, self.dlg_cf
+
+
+    def _get_widget_controls(self, new_feature, is_template=False):
+        """ Sets class variables for most widgets """
+
+        if is_template:
+            self.tab_main = self.dlg_cf.tab_main
+            self.tab_main.setCurrentIndex(0)
+            self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
+            self.tbl_element = self.dlg_cf.tbl_element
+            tools_qt.set_tableview_config(self.tbl_element)
+            self.tbl_relations = self.dlg_cf.tbl_relations
+            tools_qt.set_tableview_config(self.tbl_relations)
+            self.tbl_upstream = self.dlg_cf.tbl_upstream
+            tools_qt.set_tableview_config(self.tbl_upstream)
+            self.tbl_downstream = self.dlg_cf.tbl_downstream
+            tools_qt.set_tableview_config(self.tbl_downstream)
+            self.tbl_hydrometer = self.dlg_cf.tbl_hydrometer
+            tools_qt.set_tableview_config(self.tbl_hydrometer)
+            self.tbl_hydrometer_value = self.dlg_cf.tbl_hydrometer_value
+            tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
+                                          QTableView.CurrentChanged)
+            self.tbl_visit_cf = self.dlg_cf.tbl_visit_cf
+            self.tbl_event_cf = self.dlg_cf.tbl_event_cf
+            tools_qt.set_tableview_config(self.tbl_event_cf)
+            self.tbl_document = self.dlg_cf.tbl_document
+            tools_qt.set_tableview_config(self.tbl_document)
+        else:
+            self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
+            self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
+            self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
+            tools_qt.set_tableview_config(self.tbl_element)
+            self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
+            tools_qt.set_tableview_config(self.tbl_relations)
+            self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
+            tools_qt.set_tableview_config(self.tbl_upstream)
+            self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+            tools_qt.set_tableview_config(self.tbl_downstream)
+            self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
+            tools_qt.set_tableview_config(self.tbl_hydrometer)
+            self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
+            tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
+                                          QTableView.CurrentChanged)
+            self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
+            self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
+            tools_qt.set_tableview_config(self.tbl_event_cf)
+            self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
+            tools_qt.set_tableview_config(self.tbl_document)
+
+
+    def _get_features(self, complet_result):
+        # Get table name
+        self.tablename = complet_result['body']['feature']['tableName']
+        # Get feature type (Junction, manhole, valve, fountain...)
+        self.feature_type = complet_result['body']['feature']['childType']
+        # Get tableParent and select layer
+        self.table_parent = str(complet_result['body']['feature']['tableParent'])
+        schema_name = str(complet_result['body']['feature']['schemaName'])
+        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
+
+
+    def _get_actions(self):
+        """ Sets class variables for actions """
+
+        self.action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
+        self.action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
+        self.action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
+        self.action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
+        self.action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
+        self.action_mapzone = self.dlg_cf.findChild(QAction, "actionMapZone")
+        self.action_set_to_arc = self.dlg_cf.findChild(QAction, "actionSetToArc")
+        self.action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
+        self.action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
+        self.action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
+        self.action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
+        self.action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
+        self.action_link = self.dlg_cf.findChild(QAction, "actionLink")
+        self.action_help = self.dlg_cf.findChild(QAction, "actionHelp")
+        self.action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
+        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
+        self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
+
+
+    def _manage_icons(self):
+        """ Adds icons to actions and buttons """
+        # Set actions icon
+        tools_gw.add_icon(self.action_edit, "101")
+        tools_gw.add_icon(self.action_copy_paste, "107b", "24x24")
+        tools_gw.add_icon(self.action_rotation, "107c", "24x24")
+        tools_gw.add_icon(self.action_catalog, "195")
+        tools_gw.add_icon(self.action_workcat, "193")
+        tools_gw.add_icon(self.action_mapzone, "213")
+        tools_gw.add_icon(self.action_set_to_arc, "212")
+        tools_gw.add_icon(self.action_get_arc_id, "209")
+        tools_gw.add_icon(self.action_get_parent_id, "210")
+        tools_gw.add_icon(self.action_zoom_in, "103")
+        tools_gw.add_icon(self.action_zoom_out, "107")
+        tools_gw.add_icon(self.action_centered, "104")
+        tools_gw.add_icon(self.action_link, "173")
+        tools_gw.add_icon(self.action_section, "207")
+        tools_gw.add_icon(self.action_help, "73")
+        tools_gw.add_icon(self.action_interpolate, "194")
         # Set buttons icon
         # tab elements
         tools_gw.add_icon(self.dlg_cf.btn_insert, "111b", "24x24")
@@ -548,21 +775,10 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
 
-        # Get feature type as feature_type (node, arc, connec, gully)
-        self.feature_type = str(complet_result['body']['feature']['featureType'])
-        if str(self.feature_type) in ('', '[]'):
-            if 'feature_cat' in globals():
-                parent_layer = self.feature_cat.parent_layer
-            else:
-                parent_layer = str(complet_result['body']['feature']['tableParent'])
-            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = tools_db.get_row(sql)
-            if result:
-                self.feature_type = result[0]
 
-        result = complet_result['body']['data']
+    def _manage_dlg_widgets(self, complet_result, result, new_feature):
+        """ Creates and populates all the widgets """
         layout_list = []
-
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
@@ -579,12 +795,10 @@ class GwInfo(QObject):
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
-
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
-
         # Manage combo parents and children:
         for field in result['fields']:
             if field['isparent']:
@@ -592,7 +806,12 @@ class GwInfo(QObject):
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
                         widget.currentIndexChanged.connect(partial(
-                            self._get_combo_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
+                            self._get_combo_child, self.dlg_cf, widget, self.feature_type,
+                            self.tablename, self.field_id))
+
+
+    def _manage_actions_signals(self, complet_result, list_points, new_feature, tab_type, result, is_template=False):
+        """ Connects signals to the actions """
 
         # Set variables
         id_name = complet_result['body']['feature']['idName']
@@ -600,71 +819,84 @@ class GwInfo(QObject):
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
-        if layer:
+        if is_template and layer:
             if layer.isEditable():
                 tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dlg_cf, self.complet_result['body']['data'], False)
-
-
+        elif layer:
+            if layer.isEditable():
+                tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
+            else:
+                tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, action_edit, result, layer, fid, self.my_json, new_feature)
-        self.fct_start_editing = lambda: self._start_editing(dlg_cf, action_edit, complet_result['body']['data'], layer)
-        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
+        self.fct_block_action_edit = lambda: self._block_action_edit(dlg_cf, self.action_edit, result, layer, fid,
+                                                                     global_vars.info_templates[self.template_name][
+                                                                         f'my_json_{fid}'],
+                                                                     new_feature)
+        self.fct_start_editing = lambda: self._start_editing(dlg_cf, self.action_edit, complet_result['body']['data'],
+                                                             layer)
+        self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, self.action_edit, layer, fid,
+                                                           global_vars.info_templates[self.template_name][
+                                                               f'my_json_{fid}'], new_feature)
         self._connect_signals()
-
         self._enable_actions(dlg_cf, layer.isEditable())
-
-        action_edit.setChecked(layer.isEditable())
+        self.action_edit.setChecked(layer.isEditable())
         child_type = complet_result['body']['feature']['childType']
-        
         # Actions signals
-        action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, action_edit, fid, new_feature))
-        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
-        action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points, id_name))
-        action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points, id_name))
-        action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None, child_type))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id', child_type))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id', child_type))
-        action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
-        action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
-        action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
-        action_copy_paste.triggered.connect(partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
-        action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, action_rotation))
-        action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
-        action_section.triggered.connect(partial(self._open_section_form))
-        action_help.triggered.connect(partial(self._open_help, self.feature_type))
+        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature))
+        self.action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
+        self.action_workcat.triggered.connect(
+            partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
+                    id_name))
+        self.action_mapzone.triggered.connect(
+            partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
+                    id_name))
+        self.action_set_to_arc.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 'v_edit_arc', 'set_to_arc', None,
+                    child_type))
+        self.action_get_arc_id.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 'v_edit_arc', 'arc', 'data_arc_id',
+                    child_type))
+        self.action_get_parent_id.triggered.connect(
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_parent_id, 'v_edit_node', 'node',
+                    'data_parent_id',
+                    child_type))
+        self.action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
+        self.action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
+        self.action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
+        self.action_copy_paste.triggered.connect(
+            partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
+        self.action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, self.action_rotation))
+        self.action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
+        self.action_section.triggered.connect(partial(self._open_section_form))
+        self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
+        self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
+        return dlg_cf, fid
 
-        btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
-        btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result['body']['form']['headerText']}"
 
-        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
-            # Delete last form from memory
-            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
-            if last_info:
-                last_info.setParent(None)
-                del last_info
+    def _get_feature_type(self, complet_result):
+        """ Get feature type as feature_type (node, arc, connec, gully) """
+        self.feature_type = str(complet_result['body']['feature']['featureType'])
+        if str(self.feature_type) in ('', '[]'):
+            if 'feature_cat' in globals():
+                parent_layer = self.feature_cat.parent_layer
+            else:
+                parent_layer = str(complet_result['body']['feature']['tableParent'])
+            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
+            result = tools_db.get_row(sql)
+            if result:
+                self.feature_type = result[0]
+        result = complet_result['body']['data']
+        return result
 
-            tools_gw.docker_dialog(dlg_cf)
-            global_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
-            global_vars.session_vars['dialog_docker'].setWindowTitle(title)
-            btn_cancel.clicked.connect(self._manage_docker_close)
 
-        else:
-            dlg_cf.dlg_closed.connect(self._roll_back)
-            dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
-            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
-            dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
-            dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
-            btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
-        btn_accept.clicked.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
-        dlg_cf.key_enter.connect(partial(self._accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+    def _set_dlg_title(self):
+        """ Sets the dialog title """
 
-        dlg_cf.dlg_closed.connect(partial(self._reset_my_json))
+        title = f"{self.complet_result['body']['form']['headerText']}"
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -673,12 +905,157 @@ class GwInfo(QObject):
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
             for result in results['custom_form_tab_labels']:
                 toolbox_cf.setItemText(int(result['index']), result['text'])
+        return title
 
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(title)
 
-        return self.complet_result, self.dlg_cf
+    def _clear_dlg_templates(self):
+        """ Clears all the widgets of the last info and disconnects the necessary signals """
+
+        # Manage open templates
+        self._manage_open_templates()
+        if global_vars.info_templates[self.template_name]['open'] > 0:
+            return
+
+        dlg = global_vars.info_templates[self.template_name]['dlg']
+
+        # Clear widgets' text
+        for field in global_vars.info_templates[self.template_name]['json']['body']['data']['fields']:
+            tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
+
+        # Disconnect signals so they don't stack up
+        dlg.btn_accept.clicked.disconnect()
+        dlg.key_enter.disconnect()
+
+        dlg.findChild(QAction, "actionEdit").triggered.disconnect()
+        dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
+        dlg.findChild(QAction, "actionWorkcat").triggered.disconnect()
+        dlg.findChild(QAction, "actionMapZone").triggered.disconnect()
+        dlg.findChild(QAction, "actionSetToArc").triggered.disconnect()
+        dlg.findChild(QAction, "actionGetArcId").triggered.disconnect()
+        dlg.findChild(QAction, "actionGetParentId").triggered.disconnect()
+        dlg.findChild(QAction, "actionZoom").triggered.disconnect()
+        dlg.findChild(QAction, "actionCentered").triggered.disconnect()
+        dlg.findChild(QAction, "actionZoomOut").triggered.disconnect()
+        dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
+        dlg.findChild(QAction, "actionRotation").triggered.disconnect()
+        dlg.findChild(QAction, "actionLink").triggered.disconnect()
+        dlg.findChild(QAction, "actionSection").triggered.disconnect()
+        dlg.findChild(QAction, "actionHelp").triggered.disconnect()
+
+        # Tabs
+        ########
+        self.tab_main.currentChanged.disconnect()
+
+        # Element tab
+        try:
+            # self.tab_element_loaded = False
+            self.tbl_element.doubleClicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_element").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_delete").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_insert").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_new_element").clicked.disconnect()
+        except Exception:
+            pass
+        # Relations tab
+        try:
+            # self.tab_relations_loaded = False
+            self.tbl_relations.doubleClicked.disconnect()
+        except Exception:
+            pass
+        # Connections tab
+        try:
+            # self.tab_connections_loaded = False
+            dlg.tbl_upstream.doubleClicked.disconnect()
+            dlg.tbl_downstream.doubleClicked.disconnnect()
+        except Exception:
+            pass
+        # Hydrometer tab
+        try:
+            # self.tab_hydrometer_loaded = False
+            dlg.findChild(QLineEdit, "txt_hydrometer_id").textChanged.disconnect()
+            self.tbl_hydrometer.doubleClicked.disconnect()
+            dlg.findChild(QPushButton, "btn_link").clicked.disconnect()
+        except Exception:
+            pass
+        # Hydrometer values
+        try:
+            # self.tab_hydrometer_val_loaded = False
+            dlg.cmb_cat_period_id_filter.currentIndexChanged.disconnect()
+            dlg.cmb_hyd_customer_code.currentIndexChanged.disconnect()
+        except Exception:
+            pass
+        # Visit tab
+        try:
+            # self.tab_visit_loaded = False
+            self.tbl_visit_cf.clicked.disconnect()
+            if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
+                self.cmb_visit_class.currentIndexChanged.disconnect()
+            self.date_visit_to.dateChanged.disconnect()
+            self.date_visit_from.dateChanged.disconnect()
+            dlg.findChild(QPushButton, "btn_open_gallery_2").clicked.disconnect()
+        except Exception:
+            pass
+        # Event tab
+        try:
+            # self.tab_event_loaded = False
+            self.tbl_event_cf.doubleClicked.disconnect()
+            self.tbl_event_cf.clicked.disconnect()
+            dlg.findChild(QComboBox, "event_type").currentIndexChanged.disconnect()
+            dlg.findChild(QComboBox, "event_id").currentIndexChanged.disconnect()
+            self.date_event_to.dateChanged.disconnect()
+            self.date_event_from.dateChanged.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_new_visit").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_gallery").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit_doc").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_visit_event").clicked.disconnect()
+        except Exception:
+            pass
+        # Documents tab
+        try:
+            # self.tab_document_loaded = False
+            # self.tab_rpt_loaded = False
+            dlg.findChild(QComboBox, "doc_type").currentIndexChanged.disconnect()
+            self.date_document_to.dateChanged.disconnect()
+            self.date_document_from.dateChanged.disconnect()
+            self.tbl_document.doubleClicked.disconnect()
+            dlg.findChild(QPushButton, "btn_open_doc").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_delete").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_insert").clicked.disconnect()
+            dlg.findChild(QPushButton, "btn_doc_new").clicked.disconnect()
+        except Exception:
+            pass
+        # self.tab_plan_loaded = False
+        try:
+            self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
+        except Exception:
+            pass
+
+
+    def _manage_json_result(self, json_result, template_name):
+        result_guardat = global_vars.info_templates[template_name]['json']
+        new_result = json_result
+        self.complet_result = json_result if result_guardat is None else result_guardat
+        return new_result
+
+
+    def _manage_new_template(self, json_result):
+        template_name = json_result['body']['feature']['childType']
+        if template_name not in global_vars.info_templates:
+            global_vars.info_templates[template_name] = {}
+            global_vars.info_templates[template_name]['dlg'] = None
+            global_vars.info_templates[template_name]['json'] = None
+            global_vars.info_templates[template_name]['open'] = 0
+        return template_name
+
+
+    def _manage_open_templates(self):
+
+        dlgs_open = global_vars.info_templates[self.template_name]['open']
+        if dlgs_open - 1 >= 0:
+            global_vars.info_templates[self.template_name]['open'] -= 1
+        else:
+            global_vars.info_templates[self.template_name]['open'] = 0
 
 
     def _open_help(self, feature_type):
@@ -1133,10 +1510,12 @@ class GwInfo(QObject):
 
     def _manage_docker_close(self):
 
+        self._manage_open_templates()
         self._roll_back()
         self.rubber_band.reset()
         self.layer.removeSelection()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
+        self._reset_my_json(self.dlg_cf)
         tools_gw.close_docker()
 
 
@@ -1222,7 +1601,7 @@ class GwInfo(QObject):
                 if widget.hasFocus():
                     value = tools_qt.get_text(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                        self.my_json[str(widget.property('columnname'))] = str(value)
+                        global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = str(value)
                     widget.clearFocus()
         except RuntimeError:
             pass
@@ -1234,40 +1613,41 @@ class GwInfo(QObject):
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         if not action_edit.isChecked():
             self._get_last_value()
-            if str(self.my_json) == '{}':
+            if str(global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
                 tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
                 self._enable_actions(dialog, False)
                 return
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False)
+                self._manage_accept(dialog, action_edit, new_feature, global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'], False,
+                                    global_vars.info_templates[self.template_name][f'last_json_{self.feature_id}'])
             elif self.new_feature_id is not None:
                 if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
-            self._reset_my_json()
+            self._reset_my_json(dialog)
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
             self._enable_actions(dialog, True)
 
 
-    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json):
+    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json):
 
         if not action_edit.isChecked():
             tools_gw.close_dialog(dialog)
             return
 
-        self._manage_accept(dialog, action_edit, new_feature, my_json, True)
-        self._reset_my_json()
+        self._manage_accept(dialog, action_edit, new_feature, my_json, True, last_json)
+        self._reset_my_json(dialog)
 
 
-    def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
+    def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, last_json):
 
         self._get_last_value()
-        status = self._accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature)
+        status = self._accept(dialog, self.complet_result, my_json, last_json, close_dlg=close_dlg, new_feature=new_feature)
         if status:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
@@ -1285,9 +1665,10 @@ class GwInfo(QObject):
         else:
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._reset_my_json()
+                self._reset_my_json(dialog)
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-            self._reset_my_json()
+            self._reset_my_json(dialog)
+
             return save
 
 
@@ -1299,7 +1680,7 @@ class GwInfo(QObject):
         tools_gw.enable_all(dialog, self.complet_result['body']['data'])
         self._enable_actions(dialog, True)
         layer.startEditing()
-        QgsProject.instance().blockSignals(True)
+        QgsProject.instance().blockSignals(False)
 
 
     def _ask_for_save(self, action_edit, fid):
@@ -1472,7 +1853,7 @@ class GwInfo(QObject):
         new_feature = kwargs['new_feature']
 
         widget = tools_gw.add_checkbox(field)
-        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']))
         widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
@@ -1615,7 +1996,7 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
+    def _accept(self, dialog, complet_result, _json, last_json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
         """
         :param dialog:
         :param complet_result:
@@ -1626,6 +2007,7 @@ class GwInfo(QObject):
         :return: (boolean)
         """
 
+        self.feature_id = last_json['body']['feature']['id']
         QgsProject.instance().blockSignals(True)
 
         # Check if C++ object has been deleted
@@ -1635,7 +2017,7 @@ class GwInfo(QObject):
         after_insert = False
 
         if _json == '' or str(_json) == '{}':
-            if global_vars.session_vars['dialog_docker']:
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
             tools_gw.close_dialog(dialog)
@@ -1715,6 +2097,7 @@ class GwInfo(QObject):
         feature += f' "featureType":"{self.feature_type}" '
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
+
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
             QgsProject.instance().blockSignals(False)
@@ -1723,7 +2106,7 @@ class GwInfo(QObject):
         if clear_json:
             _json = {}
 
-        self._reset_my_json()
+        self._reset_my_json(dialog)
 
         if "Accepted" in json_result['status']:
             msg = "OK"
@@ -1735,9 +2118,10 @@ class GwInfo(QObject):
             return False
 
         if close_dlg:
-            if global_vars.session_vars['dialog_docker']:
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
-            tools_gw.close_dialog(dialog)
+            else:
+                tools_gw.close_dialog(dialog)
             return None
 
         return True
@@ -1861,15 +2245,20 @@ class GwInfo(QObject):
         """ Delete keys if exist, when widget is autoupdate """
 
         try:
-            self.my_json.pop(str(widget.property('columnname')), None)
+            # self.my_json.pop(str(widget.property('columnname')), None)
+            global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'].pop(str(widget.property('columnname')), None)
         except KeyError:
             pass
 
 
-    def _reset_my_json(self):
+    def _reset_my_json(self, dialog):
         """ Delete keys if exist, when widget is autoupdate """
 
         self.my_json = {}
+        try:
+            global_vars.info_templates[self.template_name][f"my_json_{dialog.property('gw_code')}"] = {}
+        except Exception as e:
+            pass
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -1884,7 +2273,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
-                widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.editingFinished.connect(partial(self._get_values, dialog, widget))
 
             widget.textChanged.connect(partial(self._enabled_accept, dialog))
             widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1905,7 +2294,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
-                widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.textChanged.connect(partial(self._get_values, dialog, widget))
 
             widget.textChanged.connect(partial(self._enabled_accept, dialog))
             widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1972,7 +2361,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.currentIndexChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -1987,7 +2376,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.dateChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -2002,7 +2391,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(self._get_values, dialog, widget))
 
         return widget
 
@@ -2017,8 +2406,16 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.stateChanged.connect(partial(self._get_values, dialog, widget))
         return widget
+
+
+    def _get_values(self, dialog, widget):
+        """ Function used by the widgets when its value changes. """
+
+        fid = dialog.property('gw_code')
+        my_json = global_vars.info_templates[self.template_name][f'my_json_{fid}']
+        tools_gw.get_values(dialog, widget, my_json)
 
 
     def _open_catalog(self, tab_type, feature_type, child_type):
@@ -3515,12 +3912,13 @@ class GwInfo(QObject):
             if widget.property('typeahead'):
                 tools_qt.set_completer_object(QCompleter(), QStringListModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
-                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+                global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
                 widget = tools_gw.fill_combo(widget, field)
                 tools_qt.set_combo_value(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
-                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+                global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = field['selectedId']
+
         self._enable_buttons()
         tools_gw.close_dialog(dialog)
 
