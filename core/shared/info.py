@@ -923,8 +923,14 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
 
         # Disconnect signals so they don't stack up
-        dlg.btn_accept.clicked.disconnect()
-        dlg.key_enter.disconnect()
+        try:
+            dlg.btn_accept.clicked.disconnect()
+        except:
+            pass
+        try:
+            dlg.key_enter.disconnect()
+        except:
+            pass
 
         dlg.findChild(QAction, "actionEdit").triggered.disconnect()
         dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
