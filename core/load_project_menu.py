@@ -302,7 +302,15 @@ class GwMenuLoad(QObject):
     def _reset_plugin(self):
         """ Called in reset plugin action """
 
-        self._reload_layers()
+        try:
+            self._reload_layers()
+        except NotImplementedError:
+            # Weird bug, sometimes fails to create the task...
+            try:
+                self._reload_layers()
+            except NotImplementedError:
+                tools_log.log_warning("Error reloading layers, try again...")
+            pass
 
 
     def _reload_layers(self):
