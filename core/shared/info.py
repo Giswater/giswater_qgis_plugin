@@ -923,35 +923,89 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dlg, f"{field['widgetname']}", None)
 
         # Disconnect signals so they don't stack up
+        self._disconnect_dlg_signals(dlg)
+
+        # Tabs
+        self._disconnect_tabs_signals(dlg)
+
+
+    def _disconnect_dlg_signals(self, dlg):
+        """ Disconnect all the necessary signals for buttons and actions """
+
         try:
             dlg.btn_accept.clicked.disconnect()
-        except:
+        except TypeError:
             pass
         try:
             dlg.key_enter.disconnect()
-        except:
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionEdit").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionWorkcat").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionMapZone").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionSetToArc").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionGetArcId").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionGetParentId").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionZoom").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionCentered").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionZoomOut").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionRotation").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionLink").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionSection").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionHelp").triggered.disconnect()
+        except TypeError:
             pass
 
-        dlg.findChild(QAction, "actionEdit").triggered.disconnect()
-        dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
-        dlg.findChild(QAction, "actionWorkcat").triggered.disconnect()
-        dlg.findChild(QAction, "actionMapZone").triggered.disconnect()
-        dlg.findChild(QAction, "actionSetToArc").triggered.disconnect()
-        dlg.findChild(QAction, "actionGetArcId").triggered.disconnect()
-        dlg.findChild(QAction, "actionGetParentId").triggered.disconnect()
-        dlg.findChild(QAction, "actionZoom").triggered.disconnect()
-        dlg.findChild(QAction, "actionCentered").triggered.disconnect()
-        dlg.findChild(QAction, "actionZoomOut").triggered.disconnect()
-        dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
-        dlg.findChild(QAction, "actionRotation").triggered.disconnect()
-        dlg.findChild(QAction, "actionLink").triggered.disconnect()
-        dlg.findChild(QAction, "actionSection").triggered.disconnect()
-        dlg.findChild(QAction, "actionHelp").triggered.disconnect()
 
-        # Tabs
-        ########
+    def _disconnect_tabs_signals(self, dlg):
+        """ Disconnect all the tabs' signals """
+
         self.tab_main.currentChanged.disconnect()
-
         # Element tab
         try:
             # self.tab_element_loaded = False
@@ -960,20 +1014,20 @@ class GwInfo(QObject):
             dlg.findChild(QPushButton, "btn_delete").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_insert").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_new_element").clicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Relations tab
         try:
             # self.tab_relations_loaded = False
             self.tbl_relations.doubleClicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Connections tab
         try:
             # self.tab_connections_loaded = False
             dlg.tbl_upstream.doubleClicked.disconnect()
             dlg.tbl_downstream.doubleClicked.disconnnect()
-        except Exception:
+        except TypeError:
             pass
         # Hydrometer tab
         try:
@@ -981,14 +1035,14 @@ class GwInfo(QObject):
             dlg.findChild(QLineEdit, "txt_hydrometer_id").textChanged.disconnect()
             self.tbl_hydrometer.doubleClicked.disconnect()
             dlg.findChild(QPushButton, "btn_link").clicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Hydrometer values
         try:
             # self.tab_hydrometer_val_loaded = False
             dlg.cmb_cat_period_id_filter.currentIndexChanged.disconnect()
             dlg.cmb_hyd_customer_code.currentIndexChanged.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Visit tab
         try:
@@ -999,7 +1053,7 @@ class GwInfo(QObject):
             self.date_visit_to.dateChanged.disconnect()
             self.date_visit_from.dateChanged.disconnect()
             dlg.findChild(QPushButton, "btn_open_gallery_2").clicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Event tab
         try:
@@ -1015,7 +1069,7 @@ class GwInfo(QObject):
             dlg.findChild(QPushButton, "btn_open_gallery").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_open_visit_doc").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_open_visit_event").clicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # Documents tab
         try:
@@ -1029,12 +1083,12 @@ class GwInfo(QObject):
             dlg.findChild(QPushButton, "btn_doc_delete").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_doc_insert").clicked.disconnect()
             dlg.findChild(QPushButton, "btn_doc_new").clicked.disconnect()
-        except Exception:
+        except TypeError:
             pass
         # self.tab_plan_loaded = False
         try:
             self._reset_grid_layout(dlg.findChild(QGridLayout, 'plan_layout'))
-        except Exception:
+        except TypeError:
             pass
 
 
