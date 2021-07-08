@@ -65,7 +65,8 @@ session_vars['last_focus'] = None       # An instance of the last focused dialog
 
 
 info_templates = {}                     # Stores all the needed variables for the info template.
-                                        # The first key is the feature_id, then has these keys => 'dlg', 'json', 'open', 'my_json_{node_code}'
+                                        # The first key is the feature_id, then has these keys:
+                                        # 'dlg', 'json', 'open', 'my_json_{feature_id}', 'last_json_{feature_id}'
 
 # endregion
 

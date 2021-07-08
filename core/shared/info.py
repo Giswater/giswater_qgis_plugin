@@ -428,7 +428,6 @@ class GwInfo(QObject):
         template_name = f"{complet_result['body']['feature']['childType']}"
         self.feature_id = feature_id
 
-        print(f"{time.time()}")
         dock = global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']
         # Don't use template when inserting a new feature, there is no template saved, there is already an info open or is docker
         no_template = new_feature or global_vars.info_templates[template_name]['dlg'] is None or global_vars.info_templates[template_name]['open'] > 0 or dock
@@ -436,7 +435,7 @@ class GwInfo(QObject):
             self.complet_result, self.dlg_cf = self._open_custom_form_without_template(feature_id, complet_result, tab_type, sub_tag, is_docker, new_feature)
         else:
             self.complet_result, self.dlg_cf = self._open_custom_form_with_template(feature_id, complet_result, tab_type, new_feature)
-        print(f"{time.time()}")
+
         # Set a property to the dialog (feature_id)
         self.dlg_cf.setProperty('gw_code', feature_id)
         # Manage the number of open dialogs of the same feature type
@@ -562,7 +561,6 @@ class GwInfo(QObject):
 
         # Save the dialog as a template
         if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']) and global_vars.info_templates[template_name]['dlg'] is None:
-            print(f"template guardat")
             global_vars.info_templates[template_name]['dlg'] = self.dlg_cf
             global_vars.info_templates[template_name]['json'] = self.complet_result
 
@@ -1511,7 +1509,7 @@ class GwInfo(QObject):
 
 
     def _manage_docker_close(self):
-        print(f"_manage_docker_close")
+
         self._manage_open_templates()
         self._roll_back()
         self.rubber_band.reset()
@@ -1519,7 +1517,6 @@ class GwInfo(QObject):
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json(self.dlg_cf)
         tools_gw.close_docker()
-        print(f"dlgs open ->{global_vars.info_templates[self.template_name]['open']}<-")
 
 
     def _manage_info_close(self, dialog):
@@ -1623,7 +1620,6 @@ class GwInfo(QObject):
                 return
             save = self._ask_for_save(action_edit, fid)
             if save:
-                print(f"_manage_edition save")
                 self._manage_accept(dialog, action_edit, new_feature, global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'], False,
                                     global_vars.info_templates[self.template_name][f'last_json_{self.feature_id}'])
             elif self.new_feature_id is not None:
@@ -1649,7 +1645,7 @@ class GwInfo(QObject):
 
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, last_json):
-        print(f"_manage_accept")
+
         self._get_last_value()
         status = self._accept(dialog, self.complet_result, my_json, last_json, close_dlg=close_dlg, new_feature=new_feature)
         if status:  # Commit succesfull and dialog keep opened
@@ -2014,8 +2010,6 @@ class GwInfo(QObject):
         self.feature_id = last_json['body']['feature']['id']
         QgsProject.instance().blockSignals(True)
 
-        print(f"my_json_{self.feature_id} -> {global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}']}")
-
         # Check if C++ object has been deleted
         if isdeleted(dialog):
             return False
@@ -2264,7 +2258,6 @@ class GwInfo(QObject):
         try:
             global_vars.info_templates[self.template_name][f"my_json_{dialog.property('gw_code')}"] = {}
         except Exception as e:
-            print(f"except expection {e}")
             pass
 
 
