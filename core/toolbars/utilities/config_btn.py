@@ -37,8 +37,7 @@ class GwConfigButton(GwAction):
 
     def _open_config(self):
 
-        # Get user and role
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
+        # Get user
         cur_user = tools_db.get_current_user()
 
         self.list_update = []
@@ -68,7 +67,7 @@ class GwConfigButton(GwAction):
 
         # Check user/role and remove tabs
         role_admin = tools_db.check_role_user("role_admin", cur_user)
-        if not role_admin and cur_user not in super_users:
+        if not role_admin:
             tools_qt.remove_tab(self.dlg_config.tab_main, "tab_admin")
 
         # Set Listeners
@@ -353,7 +352,7 @@ class GwConfigButton(GwAction):
     def _order_widgets(self, field, lbl, widget):
 
         layout = self.dlg_config.tab_main.findChild(QGridLayout, field['layoutname'])
-        if layout is not None:
+        if layout is not None and field['layoutorder'] is not None:
             layout.addWidget(lbl, field['layoutorder'], 0)
 
             if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':

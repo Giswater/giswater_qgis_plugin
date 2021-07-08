@@ -55,7 +55,7 @@ class GwSearch:
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
 
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
-        if docker_search:
+        if docker_search and dlg_mincut is None:
             return
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
@@ -349,7 +349,8 @@ class GwSearch:
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_info(msg)
+                self.manage_visit.get_visit(visit_id=item['sys_id'])
                 return
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             self._reset_rubber_band()
@@ -424,7 +425,7 @@ class GwSearch:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
 
-            # Get list of items from returned json from data base and make a list for completer
+            # Get list of items from returned json from database and make a list for completer
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
@@ -433,6 +434,9 @@ class GwSearch:
         if len(line_list) == 2:
             line_edit_add = line_list[1]
             value = tools_qt.get_text(self.dlg_search, line_edit_add)
+            if str(value) in display_list:
+                line_edit.setText(value)
+                return
             if str(value) == 'null':
                 return
 

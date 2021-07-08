@@ -51,7 +51,7 @@ class GwDateSelectorButton(GwAction):
 
 
     def _update_dates_into_db(self):
-        """ Insert or update dates into data base """
+        """ Insert or update dates into database """
 
         # Set project user
         self.current_user = global_vars.current_user

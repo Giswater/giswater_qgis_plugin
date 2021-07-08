@@ -17,7 +17,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log, tools_db, tools_qgis
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
 class GwCSVButton(GwAction):
@@ -53,17 +53,16 @@ class GwCSVButton(GwAction):
         self.dlg_csv = GwCsvUi()
         tools_gw.load_settings(self.dlg_csv)
 
-        # Get roles from BD
-        roles = self._get_rolenames()
         temp_tablename = 'temp_csv'
         tools_qt.fill_combo_unicodes(self.dlg_csv.cmb_unicode_list)
         self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
-                             'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
+                             'alias, config_csv.descript, functionname, orderby', 'config_csv')
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
+        self.dlg_csv.rb_space.setChecked(False)
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_csv))
@@ -73,8 +72,10 @@ class GwCSVButton(GwAction):
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self._get_function_name))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self._select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.chk_ignore_header.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_space.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self._get_function_name()
         self._load_settings_values()
 
@@ -89,15 +90,21 @@ class GwCSVButton(GwAction):
         self._update_info(self.dlg_csv)
 
 
-    def _populate_combos(self, combo, field_id, fields, table_name, roles):
+    def _populate_combos(self, combo, field_id, fields, table_name):
 
-        if roles is None:
-            return
+        # Get role
+        roles_dict = {"role_basic": "'role_basic'",
+                      "role_om": "'role_basic', 'role_om'",
+                      "role_edit": "'role_basic', 'role_om', 'role_edit'",
+                      "role_epa": "'role_basic', 'role_om', 'role_edit', 'role_epa'",
+                      "role_master": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master'",
+                      "role_admin": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master', 'role_admin'"}
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
-               f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
+               f" WHERE sys_role IN ({roles_dict[global_vars.project_vars['project_role']]}) AND active is True ORDER BY orderby")
+
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
@@ -110,14 +117,13 @@ class GwCSVButton(GwAction):
             self.dlg_csv.cmb_unicode_list.setEnabled(False)
             self.dlg_csv.rb_comma.setEnabled(False)
             self.dlg_csv.rb_semicolon.setEnabled(False)
+            self.dlg_csv.rb_space.setEnabled(False)
             self.dlg_csv.btn_file_csv.setEnabled(False)
             self.dlg_csv.tbl_csv.setEnabled(False)
             self.dlg_csv.btn_accept.setEnabled(False)
-            return
-
-
-        tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
-        self._update_info(self.dlg_csv)
+        else:
+            tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
+            self._update_info(self.dlg_csv)
 
 
     def _write_csv(self, dialog, temp_tablename):
@@ -162,14 +168,19 @@ class GwCSVButton(GwAction):
 
     def _update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
-
-        dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        try:
+            dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        except Exception as e:
+            tools_log.log_warning(str(e))
 
 
     def _get_function_name(self):
 
-        self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
-        tools_log.log_info(str(self.func_name))
+        try:
+            self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+            tools_log.log_info(str(self.func_name))
+        except Exception as e:
+            tools_log.log_warning(str(e))
 
 
     def _select_file_csv(self):
@@ -202,12 +213,13 @@ class GwCSVButton(GwAction):
         delimiter = self._get_delimiter(dialog)
         model = QStandardItemModel()
         _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
+        _ignoreheader = dialog.chk_ignore_header.isChecked()
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
         try:
             with open(path, "r", encoding=_unicode) as file_input:
-                self._read_csv_file(model, file_input, delimiter, _unicode)
+                self._read_csv_file(model, file_input, delimiter, _unicode, _ignoreheader)
         except Exception as e:
             tools_qgis.show_warning(str(e))
 
@@ -260,6 +272,8 @@ class GwCSVButton(GwAction):
             delimiter = ';'
         elif dialog.rb_comma.isChecked():
             delimiter = ','
+        elif dialog.rb_space.isChecked():
+            delimiter = ' '
         return delimiter
 
 
@@ -277,13 +291,13 @@ class GwCSVButton(GwAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        readheader = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 4)
+        ignoreheader = dialog.chk_ignore_header.isChecked()
         fields = []
         cont = 1
         for row in reader:
             field = {'fid': fid_aux}
-            if readheader is False:
-                readheader = True
+            if tools_os.set_boolean(ignoreheader) is True:
+                ignoreheader = False
                 continue
 
             for x in range(0, len(row)):
@@ -322,10 +336,13 @@ class GwCSVButton(GwAction):
         return path
 
 
-    def _read_csv_file(self, model, file_input, delimiter, _unicode):
+    def _read_csv_file(self, model, file_input, delimiter, _unicode, _ignoreheader):
 
         rows = csv.reader(file_input, delimiter=delimiter)
         for row in rows:
+            if tools_os.set_boolean(_ignoreheader) is True:
+                _ignoreheader = False
+                continue
             unicode_row = [x for x in row]
             items = [QStandardItem(field) for field in unicode_row]
             model.appendRow(items)
@@ -334,21 +351,17 @@ class GwCSVButton(GwAction):
     def _get_rolenames(self):
         """ Get list of rolenames of current user """
 
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
-        if global_vars.current_user in super_users:
-            roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
-        else:
-            sql = ("SELECT rolname FROM pg_roles "
-                   " WHERE pg_has_role(current_user, oid, 'member')")
-            rows = tools_db.get_rows(sql)
-            if not rows:
-                return None
+        sql = ("SELECT rolname FROM pg_roles "
+               " WHERE pg_has_role(current_user, oid, 'member')")
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return None
 
-            roles = "("
-            for i in range(0, len(rows)):
-                roles += "'" + str(rows[i][0]) + "', "
-            roles = roles[:-2]
-            roles += ")"
+        roles = "("
+        for i in range(0, len(rows)):
+            roles += "'" + str(rows[i][0]) + "', "
+        roles = roles[:-2]
+        roles += ")"
 
         return roles
 

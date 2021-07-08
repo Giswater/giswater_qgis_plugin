@@ -54,6 +54,7 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
             global_vars.session_vars['last_focus'] = tag
             return True
+
         return False
 
 

@@ -107,7 +107,8 @@ class GwToolBoxTask(GwTask):
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
                             value = tools_qt.get_combo_value(self.dialog, widget, 0)
-                            extras += f'"{param_name}":"{value}", '
+                            if value not in (None, ''):
+                                extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
                             value = tools_qt.is_checked(self.dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
@@ -176,7 +177,7 @@ class GwToolBoxTask(GwTask):
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
         # If sql function return null
         elif result is False:
-            msg = f"Data base return null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
     def cancel(self):

@@ -343,13 +343,14 @@ class GwFeatureReplaceButton(GwMaptool):
     def _replace_feature(self, dialog):
 
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
+
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
         featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
 
         # Check null values
-        if self.workcat_id_end_aux in (None, 'null') or feature_type_new in (None, 'null') or featurecat_id in (None, 'null'):
+        if feature_type_new in (None, 'null') or featurecat_id in (None, 'null'):
             message = "Mandatory fields are missing. Please, set values"
             tools_qgis.show_warning(message, parameter='Workcat id, New feature type and Catalog id')
             return
@@ -364,7 +365,8 @@ class GwFeatureReplaceButton(GwMaptool):
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
-            extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
+            if self.workcat_id_end_aux not in (None, 'null', ''):
+                extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
@@ -420,19 +422,21 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
+                   f"WHERE {self.feature_type_ws} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
         elif self.project_type == 'ud':
             self.dlg_replace.featurecat_id.clear()
             if self.feature_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} " \
-                      f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL ORDER BY id"
+                      f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL " \
+                      f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.feature_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate " \
-                      f"WHERE gully_type = '{feature_type_new}' OR gully_type IS NULL ORDER BY id"
+                      f"WHERE gully_type = '{feature_type_new}' OR gully_type IS NULL  " \
+                      f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 

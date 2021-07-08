@@ -90,8 +90,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     try:
         raw_parameter = parameter
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
+
+        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
+            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -207,11 +208,11 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None, hide_config_widgets=False):
     """ Open dialog """
 
     # Check database connection before opening dialog
-    if dlg_name != 'admin_credentials' and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin_ui') and not tools_db.check_db_connection():
         return
 
     # Manage translate
@@ -229,6 +230,9 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
         flags |= Qt.WindowStaysOnTopHint
 
     dlg.setWindowFlags(flags)
+
+    if hide_config_widgets:
+        hide_widgets_form(dlg, dlg_name)
 
     # Open dialog
     if issubclass(type(dlg), GwDialog):
@@ -448,6 +452,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(vlayer, qml)
+
+    # Set layer config
+    if tablename:
+        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
+        extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+        body = create_body(feature=feature, extras=extras)
+        execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -918,7 +929,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setProperty('is_mandatory', field['isMandatory'])
                 else:
                     widget.setProperty('is_mandatory', True)
-                widget.setText(field['value'])
+                if 'value' in field:
+                    widget.setText(field['value'])
+                    widget.setProperty('value', field['value'])
                 if 'widgetcontrols' in field and field['widgetcontrols']:
                     if 'regexpControl' in field['widgetcontrols']:
                         if field['widgetcontrols']['regexpControl'] is not None:
@@ -1068,6 +1081,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
     real_name = widget.objectName()
@@ -1127,16 +1141,16 @@ def add_spinbox(field):
     return widget
 
 
-def get_values(dialog, widget, _json=None):
+def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
-    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and (widget.isReadOnly() is False or ignore_editability):
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox and widget.isEnabled():
+    elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
         value = tools_qt.get_combo_value(dialog, widget, 0)
-    elif type(widget) is QCheckBox and widget.isEnabled():
+    elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
         value = tools_qt.is_checked(dialog, widget)
-    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+    elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
         value = tools_qt.get_calendar_date(dialog, widget)
 
     if str(value) == '' or value is None:
@@ -1168,6 +1182,7 @@ def add_textarea(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
 
     # Set height as a function of text lines
     font = widget.document().defaultFont()
@@ -1201,6 +1216,7 @@ def add_hyperlink(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
@@ -1320,6 +1336,7 @@ def add_lineedit(field):
         widget.setPlaceholderText(field['placeholder'])
     if 'value' in field:
         widget.setText(field['value'])
+        widget.setProperty('value', field['value'])
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
@@ -1785,7 +1802,7 @@ def get_project_type(schemaname=None):
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
-    elif schemaname is None:
+    elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
     # start process
@@ -1852,12 +1869,6 @@ def get_role_permissions(qgis_project_role):
                     role_om = tools_db.check_role_user("role_om")
                     if not role_om:
                         role_basic = tools_db.check_role_user("role_basic")
-
-    super_users = get_config_parser('system', 'super_users', "project", "giswater")
-
-    # Manage user 'postgres', 'gisadmin' and super_users
-    if global_vars.current_user in ('postgres', 'gisadmin', super_users):
-        role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'
@@ -2254,7 +2265,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
-    rows = tools_db.get_rows(sql, log_info=False)
+    rows = tools_db.get_rows(sql)
+
     if not rows:
         return
 
@@ -2344,6 +2356,7 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
 def load_tablename(dialog, table_object, feature_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
+    widget_name = None
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
@@ -2359,6 +2372,8 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         return None
     table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
+    if widget_name is not None:
+        set_tablemodel_config(dialog, widget_name, table_name)
     return expr
 
 
@@ -2625,6 +2640,11 @@ def user_params_to_userconfig():
 
         # For each parameter (inventory)
         for parameter in parameters:
+
+            # Manage if parameter need prefix and project_type is not defined
+            if parameter.startswith("_") and global_vars.project_vars['project_type'] is None:
+                continue
+
             _pre = False
             inv_param = parameter
             # If it needs a prefix
@@ -2665,6 +2685,67 @@ def get_info_templates():
     templates = f'[{templates[:-2]}]'
     return templates
 
+  
+def remove_deprecated_config_vars():
+    """ Removes all deprecated variables defined at giswater.config """
+
+    init_parser = configparser.ConfigParser()
+    session_parser = configparser.ConfigParser()
+    path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
+    project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
+
+    # Get deprecated vars for init
+    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    init_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not init_parser.has_section(section):
+                continue
+            option = var.split('.')[1].strip()
+            if option.startswith('_'):
+                for proj in project_types:
+                    init_parser.remove_option(section, f"{proj}{option}")
+            else:
+                init_parser.remove_option(section, option)
+    with open(path, 'w') as configfile:
+        init_parser.write(configfile)
+        configfile.close()
+
+    # Get deprecated vars for session
+    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    session_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not session_parser.has_section(section):
+                continue
+            option = var.split('.')[1].strip()
+            if option.startswith('_'):
+                for proj in project_types:
+                    session_parser.remove_option(section, f"{proj}{option}")
+            else:
+                session_parser.remove_option(section, option)
+    with open(path, 'w') as configfile:
+        session_parser.write(configfile)
+        configfile.close()
+
+
+def hide_widgets_form(dialog, dlg_name):
+
+    row = get_config_value(parameter=f'qgis_form_{dlg_name}_hidewidgets', columns='value::text', table='config_param_system')
+    if row:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.objectName() and widget.objectName() in row[0]:
+                lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
+                if lbl_widget:
+                    lbl_widget.setVisible(False)
+                widget.setVisible(False)
+
+
 # region private functions
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
@@ -2693,7 +2774,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     if section == "i18n_generator" or parameter == "dev_commit":
         return
     # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_type is not None:
+    if prefix and global_vars.project_vars['project_type'] is not None:
         parameter = f"_{parameter}"
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False, True,

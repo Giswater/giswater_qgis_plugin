@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from functools import partial
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
@@ -63,6 +64,13 @@ class Giswater(QObject):
         """
 
         try:
+
+            # Reset values for global_vars.project_vars
+            global_vars.project_vars['info_type'] = None
+            global_vars.project_vars['add_schema'] = None
+            global_vars.project_vars['main_schema'] = None
+            global_vars.project_vars['project_role'] = None
+            global_vars.project_vars['project_type'] = None
 
             # Remove Giswater dockers
             self._remove_dockers()
@@ -197,7 +205,7 @@ class Giswater(QObject):
 
         self.toolButton.setDefaultAction(self.action)
         self.update_sql = GwAdminButton()
-        self.action.triggered.connect(self.update_sql.init_sql)
+        self.action.triggered.connect(partial(self.update_sql.init_sql, True))
 
 
     def _unset_info_button(self):
@@ -314,7 +322,8 @@ class Giswater(QObject):
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
-        if len(own_toolbars) == 0:
+        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
+                global_vars.project_vars['project_type'] is None:
             return
 
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)

@@ -21,7 +21,8 @@ from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit,  QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
-    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox
+    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox, \
+    QToolButton
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -600,7 +601,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
                sort_order=Qt.AscendingOrder):
     """ Set a model with selected filter. Attach that model to selected table
     :param qtable: tableview where set the model (QTableView)
-    :param table_name: data base table name or view name (String)
+    :param table_name: database table name or view name (String)
     :param expr_filter: expression to filter the model (String)
     :param edit_strategy: (QSqlTableModel.OnFieldChange, QSqlTableModel.OnManualSubmit, QSqlTableModel.OnRowChange)
     :param sort_order: can be 0 or 1 (Qt.AscendingOrder or Qt.AscendingOrder)
@@ -755,6 +756,46 @@ def set_completer_rows(widget, rows):
     completer.setModel(model)
 
 
+def add_combo_on_tableview(qtable, rows, field, widget_pos, combo_values):
+    """ Set one column of a QtableView as QComboBox with values from database.
+    :param qtable: QTableView to fill
+    :param rows: List of items to set QComboBox (["..", "..."])
+    :param field: Field to set QComboBox (String)
+    :param widget_pos: Position of the column where we want to put the QComboBox (integer)
+    :param combo_values: List of items to populate QComboBox (["..", "..."])
+    :return:
+    """
+
+    for x in range(0, len(rows)):
+        combo = QComboBox()
+        row = rows[x]
+        # Populate QComboBox
+        fill_combo_values(combo, combo_values, 1)
+        # Set QCombobox to wanted item
+        set_combo_value(combo, str(row[field]), 1)
+        # Get index and put QComboBox into QTableView at index position
+        idx = qtable.model().index(x, widget_pos)
+        qtable.setIndexWidget(idx, combo)
+        # noinspection PyUnresolvedReferences
+        combo.currentIndexChanged.connect(partial(set_status, combo, qtable, x, widget_pos))
+
+
+def set_status(qtable, combo, pos_x, combo_pos, col_update):
+    """ Update values from QComboBox to QTableView
+    :param qtable: QTableView Where update values
+    :param combo: QComboBox from which we will take the value
+    :param pos_x: Position of the row where we want to update value (integer)
+    :param combo_pos: Position of the column where we want to put the QComboBox (integer)
+    :param col_update: Column to update into QTableView.Model() (integer)
+    :return:
+    """
+    elem = combo.itemData(combo.currentIndex())
+    i = qtable.model().index(pos_x, combo_pos)
+    qtable.model().setData(i, elem[0])
+    i = qtable.model().index(pos_x, col_update)
+    qtable.model().setData(i, elem[0])
+
+
 def document_open(qtable, field_name):
     """ Open selected document """
 
@@ -864,6 +905,17 @@ def show_details(detail_text, title=None, inf_text=None):
     msg_box.setStandardButtons(QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
     msg_box.exec_()
+
+
+def show_warning_open_file(text, inf_text, file_path, context_name=None):
+    """ Show warning message with a button to open @file_path """
+
+    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
+    button = QPushButton(widget)
+    button.setText(tr("Open file"))
+    button.clicked.connect(partial(tools_os.open_file, file_path))
+    widget.layout().addWidget(button)
+    global_vars.iface.messageBar().pushWidget(widget, 1)
 
 
 def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
@@ -1055,7 +1107,7 @@ def show_exception_message(title=None, msg="", window_title="Information about e
     set_widget_text(dlg_text, dlg_text.txt_infolog, msg)
     dlg_text.setWindowFlags(Qt.WindowStaysOnTopHint)
     if pattern is None:
-        pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name|Message\serror:"
+        pattern = "File\\sname:|Function\\sname:|Line\\snumber:|SQL:|SQL\\sfile:|Detail:|Context:|Description|Schema name|Message\\serror:"
     set_text_bold(dlg_text.txt_infolog, pattern)
 
 
@@ -1158,7 +1210,20 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
     return expr
 
 
+def create_datetime(object_name, allow_null=True, set_cal_popup=True, display_format='dd/MM/yyyy'):
+    """ Create a QgsDateTimeEdit widget """
+
+    widget = QgsDateTimeEdit()
+    widget.setObjectName(object_name)
+    widget.setAllowNull(allow_null)
+    widget.setCalendarPopup(set_cal_popup)
+    widget.setDisplayFormat(display_format)
+    btn_calendar = widget.findChild(QToolButton)
+    btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
+    return widget
+
 # region private functions
+
 
 def _add_translator(locale_path, log_info=False):
     """ Add translation file to the list of translation files to be used for translations """

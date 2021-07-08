@@ -507,7 +507,7 @@ class GwProfileButton(GwAction):
             i += 1
 
     def _fill_profile_variables(self, arcs, nodes, terrains):
-        """ Get parameters from data base. Fill self.nodes with parameters postgres """
+        """ Get parameters from database. Fill self.nodes with parameters postgres """
 
         # Get parameters and fill the nodes
         n = 0

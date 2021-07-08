@@ -114,9 +114,19 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "real_description", row['exec_descript'])
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
-        tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
-
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
+
+        # Manage assigend_to combo
+        index = self.dlg_mincut.assigned_to.findText(row['assigned_to_name'])
+        if index == -1:
+            sql = (f"SELECT id, name "
+                   f"FROM cat_users WHERE name = '{row['assigned_to_name']}'"
+                   f"ORDER BY name")
+
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1, combo_clear=False)
+
+        tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'selector_mincut_result'
         self._update_result_selector(result_mincut_id)
@@ -343,7 +353,7 @@ class GwMincut:
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
-               "FROM cat_users "
+               "FROM cat_users WHERE active is not False "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
@@ -608,7 +618,7 @@ class GwMincut:
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.mincutCanceled = True
 
-        # If id exists in data base on btn_cancel delete
+        # If id exists in database on btn_cancel delete
         if self.action == "get_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
             sql = (f"SELECT id FROM om_mincut"
@@ -719,6 +729,10 @@ class GwMincut:
 
 
     def _set_real_location(self):
+
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
 
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -1768,10 +1782,12 @@ class GwMincut:
 
         # Snapping
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
-        if not result.isValid():
-            return
 
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        self.iface.actionPan().trigger()
+
+        if not result.isValid():
+            return
 
         layer = self.snapper_manager.get_snapped_layer(result)
 
@@ -1988,7 +2004,8 @@ class GwMincut:
         if btn == Qt.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+            global_vars.iface.actionPan().trigger()
             return
 
         # Get clicked point

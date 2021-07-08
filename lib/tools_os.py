@@ -5,13 +5,17 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+import configparser
 import os
 import pathlib
 import sys
 import subprocess
+import urllib.parse as parse
 import webbrowser
 
 from qgis.PyQt.QtWidgets import QFileDialog
+
+from . import tools_log
 
 
 def get_datadir() -> pathlib.Path:
@@ -41,18 +45,27 @@ def open_file(file_path):
     """
 
     try:
-        if os.path.exists(file_path):
-            if sys.platform == "win32":
-                os.startfile(file_path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, file_path])
-        else:
+        # Parse a URL into components
+        url = parse.urlsplit(file_path)
+
+        # Open selected document
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
             webbrowser.open(file_path)
+        else:
+            if not os.path.exists(file_path):
+                message = "File not found"
+                return False, message
+            else:
+                if sys.platform == "win32":
+                    os.startfile(file_path)
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, file_path])
+        return True, None
     except Exception:
-        return False
-    finally:
-        return True
+        return False, None
+
 
 
 def get_relative_path(filepath, levels=1):
@@ -112,4 +125,34 @@ def get_folder_size(folder):
             size += os.path.getsize(filepath)
 
     return size
+
+
+def manage_pg_service(section):
+
+    service_file = os.environ.get('PGSERVICEFILE')
+    if service_file is None:
+        tools_log.log_warning(f"Environment variable 'PGSERVICEFILE' not set")
+        return None
+    if not os.path.exists(service_file):
+        tools_log.log_warning(f"File not found: {service_file}")
+        return None
+
+    config_parser = configparser.ConfigParser()
+    credentials = {'host': None, 'port': None, 'dbname': None, 'user': None, 'password': None, 'sslmode': None}
+    try:
+        config_parser.read(service_file)
+        if config_parser.has_section(section):
+            params = config_parser.items(section)
+            if not params:
+                tools_log.log_warning(f"No parameters found in section {section}")
+                return None
+            else:
+                for param in params:
+                    credentials[param[0]] = param[1]
+        else:
+            tools_log.log_warning(f"Section '{section}' not found in the file {service_file}")
+    except configparser.DuplicateSectionError as e:
+        tools_log.log_warning(e)
+    finally:
+        return credentials
 

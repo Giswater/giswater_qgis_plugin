@@ -352,6 +352,8 @@ class GwPsector:
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
+        if hasattr(self, 'dlg_psector_mng'):
+            self.dlg_plan_psector.rejected.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self._enable_layers))
 
@@ -629,7 +631,9 @@ class GwPsector:
                 if os.path.exists(path):
                     message = "Document PDF created in"
                     tools_qgis.show_info(message, parameter=path)
-                    tools_os.open_file(path)
+                    status, message = tools_os.open_file(path)
+                    if status is False and message is not None:
+                        tools_qgis.show_warning(message, parameter=path)
                 else:
                     message = "Cannot create file, check if its open"
                     tools_qgis.show_warning(message, parameter=path)
@@ -832,6 +836,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
                 tools_qgis.show_warning(message)
 
@@ -1468,7 +1473,9 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        tools_gw.close_dialog(self.dlg_psector_mng)
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'psector_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
 
 

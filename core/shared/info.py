@@ -36,7 +36,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os, tools_qt
 
 global is_inserting
 is_inserting = False
@@ -1667,8 +1667,8 @@ class GwInfo(QObject):
             if save:
                 self._reset_my_json(dialog)
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-
             self._reset_my_json(dialog)
+
             return save
 
 
@@ -2425,6 +2425,8 @@ class GwInfo(QObject):
         # Check feature_type
         if self.feature_type == 'connec':
             widget = f'{tab_type}_{self.feature_type}at_id'
+        elif self.feature_type == 'gully':
+            widget = f'{tab_type}_gratecat_id'
         else:
             widget = f'{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
@@ -2786,7 +2788,9 @@ class GwInfo(QObject):
         row = selected_list[0].row()
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
-            tools_os.open_file(url)
+            status, message = tools_os.open_file(url)
+            if status is False and message is not None:
+                tools_qgis.show_warning(message, parameter=url)
 
 
     def _fill_tbl_hydrometer(self, qtable, table_name):
@@ -2868,6 +2872,7 @@ class GwInfo(QObject):
         sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
         rows = tools_db.get_rows(sql)
         table_visit_node_dict = {}
+        if not rows: return
         for row in rows:
             table_visit_node_dict[row[0]] = str(row[1])
         self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
@@ -2878,7 +2883,7 @@ class GwInfo(QObject):
         """ Fill the table control to show documents """
 
         # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(widget)
         self.cmb_visit_class = self.dlg_cf.findChild(QComboBox, "cmb_visit_class")
         self.date_visit_to = self.dlg_cf.findChild(QDateEdit, "date_visit_to")
         self.date_visit_from = self.dlg_cf.findChild(QDateEdit, "date_visit_from")
@@ -2890,6 +2895,22 @@ class GwInfo(QObject):
 
         feature_key = f"{geom_type}_id"
         feature_type = geom_type.upper()
+
+        # Get selected dates
+        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            tools_qgis.show_warning(message)
+            return
+
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
+               " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
 
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
@@ -2905,27 +2926,11 @@ class GwInfo(QObject):
 
         btn_open_gallery.clicked.connect(partial(self._open_visit_files))
 
-        # Fill ComboBox cmb_visit_class
-        sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
-               " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
-               " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
-               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
-
-        # Get selected dates
-        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
-        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
-        if date_from > date_to:
-            message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
-            return
-
-        # Set model of selected widget
-            tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
-            tools_qt.fill_table(widget, table_name, filter_)
-            self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
-                                   column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+        # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
+        tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
+        tools_qt.fill_table(widget, table_name, filter_)
+        self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                               column_filter=feature_key, value_filter=self.feature_id, widget=widget)
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -3006,8 +3011,9 @@ class GwInfo(QObject):
         rows = tools_db.get_rows(sql, commit=True)
         for path in rows:
             # Open selected document
-            tools_os.open_file(path[0])
-
+            status, message = tools_os.open_file(path[0])
+            if status is False and message is not None:
+                tools_qgis.show_warning(message, parameter=path[0])
 
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
                           value_filter=None, widget=None):
@@ -3207,7 +3213,9 @@ class GwInfo(QObject):
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _tbl_event_clicked(self, table_name):
@@ -3412,7 +3420,9 @@ class GwInfo(QObject):
                     message = "File not found"
                     tools_qgis.show_warning(message, parameter=path)
                 else:
-                    tools_os.open_file(path)
+                    status, message = tools_os.open_file(path)
+                    if status is False and message is not None:
+                        tools_qgis.show_warning(message, parameter=path)
 
         else:
             # If more then one document is attached open dialog with list of documents
@@ -3465,7 +3475,9 @@ class GwInfo(QObject):
                 message = "File not found"
                 tools_qgis.show_warning(message, parameter=path)
             else:
-                tools_os.open_file(path)
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
@@ -3574,7 +3586,9 @@ class GwInfo(QObject):
         # Get document path (can be relative or absolute)
         row = selected_list[0].row()
         path = widget.model().record(row).value("path")
-        tools_os.open_file(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _manage_new_document(self, dialog, doc_id=None, feature=None):
@@ -3880,7 +3894,7 @@ class GwInfo(QObject):
         values = {}
         for widget in widgets:
             if widget.property('columnname') in (None, ''): continue
-            values = tools_gw.get_values(dialog, widget, values)
+            values = tools_gw.get_values(dialog, widget, values, ignore_editability=True)
         fields = json.dumps(values)
 
         # Call gw_fct_setcatalog
@@ -3905,6 +3919,7 @@ class GwInfo(QObject):
                 widget.setProperty('selectedId', field['selectedId'])
                 global_vars.info_templates[self.template_name][f'my_json_{self.feature_id}'][str(widget.property('columnname'))] = field['selectedId']
 
+        self._enable_buttons()
         tools_gw.close_dialog(dialog)
 
 
@@ -3976,7 +3991,7 @@ class GwInfo(QObject):
         """
 
         w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
-        dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
+        dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
         presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
         w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')

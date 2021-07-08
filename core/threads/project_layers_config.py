@@ -28,6 +28,8 @@ class GwProjectLayersConfig(GwTask):
         self.schema_name = params['schema_name']
         self.qgis_project_infotype = params['qgis_project_infotype']
         self.db_layers = params['db_layers']
+        self.body = None
+        self.json_result = None
 
 
     def run(self):
@@ -60,7 +62,7 @@ class GwProjectLayersConfig(GwTask):
 
         # If sql function return null
         if result is False:
-            msg = f"Data base return null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
         if self.exception:
@@ -120,7 +122,7 @@ class GwProjectLayersConfig(GwTask):
             layer_number = layer_number + 1
             self.setProgress((layer_number * 100) / total_layers)
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
+            feature = f'"tableName":"{layer_name}", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             self.body = self._create_body(feature=feature, extras=extras)
             self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)

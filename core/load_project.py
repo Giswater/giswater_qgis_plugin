@@ -43,6 +43,8 @@ class GwLoadProject(QObject):
         # Get variables from qgis project
         tools_qgis.get_project_variables()
 
+        tools_gw.remove_deprecated_config_vars()
+
         # Check if user has all config params
         tools_gw.user_params_to_userconfig()
 
@@ -78,10 +80,6 @@ class GwLoadProject(QObject):
         tools_qgis.user_parameters['log_sql'] = value
         value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value
-
-        # Log values of system user parameters located in 'giswater.config'
-        for parameter, value in tools_qgis.user_parameters.items():
-            tools_log.log_info(f"parameter '{parameter}': {value}")
 
         # Manage locale and corresponding 'i18n' file
         tools_qt.manage_translation(self.plugin_name)
@@ -119,11 +117,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Create a thread to listen selected database channels
-        global_vars.notify = GwNotify()
-        list_channels = ['desktop', global_vars.current_user]
-        global_vars.notify.start_listening(list_channels)
-
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
         if tools_os.set_boolean(open_search):
@@ -133,7 +126,15 @@ class GwLoadProject(QObject):
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
 
+        # Create a thread to listen selected database channels
+        global_vars.notify = GwNotify()
+        list_channels = ['desktop', global_vars.current_user]
+        global_vars.notify.start_listening(list_channels)
 
+        # Reset some session/init user variables as vdefault
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+            self._manage_reset_user_variables()
+        
         # Log it
         message = "Project read successfully"
         tools_log.log_info(message)
@@ -228,8 +229,9 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            self.schema_name = global_vars.project_vars['main_schema']
-            global_vars.schema_name = global_vars.project_vars['main_schema']
+            if global_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
+                self.schema_name = global_vars.project_vars['main_schema']
+                global_vars.schema_name = global_vars.project_vars['main_schema']
 
         return True
 
@@ -413,7 +415,7 @@ class GwLoadProject(QObject):
     def _check_schema(self, schemaname=None):
         """ Check if selected schema exists """
 
-        if schemaname is None:
+        if schemaname in (None, 'null', ''):
             schemaname = self.schema_name
 
         schemaname = schemaname.replace('"', '')
@@ -431,5 +433,11 @@ class GwLoadProject(QObject):
             plugin_toolbar.toolbar.setVisible(enable)
             for index_action in plugin_toolbar.list_actions:
                 self._enable_button(index_action, enable)
+
+
+    def _manage_reset_user_variables(self):
+
+        # Set dlg_selector_basic as tab_exploitation
+        tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
 
     # endregion
