@@ -663,11 +663,6 @@ class GwAdminButton:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-        else:
-            tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-            self.dlg_readsql.btn_info.setEnabled(False)
 
         # Load last schema name selected and project type
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
@@ -1736,11 +1731,6 @@ class GwAdminButton:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-            else:
-                tools_qt.enable_dialog(self.dlg_readsql, True, ['cmb_connection', 'btn_gis_create'])
-                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-                self.dlg_readsql.btn_info.setEnabled(False)
 
 
     def _set_last_connection(self, connection_name):
