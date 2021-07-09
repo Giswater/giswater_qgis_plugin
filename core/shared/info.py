@@ -527,7 +527,7 @@ class GwInfo(QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = self._set_dlg_title()
+        title = self._set_dlg_title(complet_result)
 
         # Connect dialog signals
         if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
@@ -644,7 +644,7 @@ class GwInfo(QObject):
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result, True)
 
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = self._set_dlg_title()
+        title = self._set_dlg_title(complet_result)
 
         # Connect some signals
         dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
@@ -898,10 +898,10 @@ class GwInfo(QObject):
         return result
 
 
-    def _set_dlg_title(self):
+    def _set_dlg_title(self, complet_result):
         """ Sets the dialog title """
 
-        title = f"{self.complet_result['body']['form']['headerText']}"
+        title = f"{complet_result['body']['form']['headerText']}"
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
