@@ -950,6 +950,14 @@ class GwInfo(QObject):
         except TypeError:
             pass
         try:
+            dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionRotation").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
             dlg.findChild(QAction, "actionCatalog").triggered.disconnect()
         except TypeError:
             pass
@@ -978,19 +986,11 @@ class GwInfo(QObject):
         except TypeError:
             pass
         try:
-            dlg.findChild(QAction, "actionCentered").triggered.disconnect()
-        except TypeError:
-            pass
-        try:
             dlg.findChild(QAction, "actionZoomOut").triggered.disconnect()
         except TypeError:
             pass
         try:
-            dlg.findChild(QAction, "actionCopyPaste").triggered.disconnect()
-        except TypeError:
-            pass
-        try:
-            dlg.findChild(QAction, "actionRotation").triggered.disconnect()
+            dlg.findChild(QAction, "actionCentered").triggered.disconnect()
         except TypeError:
             pass
         try:
@@ -998,11 +998,15 @@ class GwInfo(QObject):
         except TypeError:
             pass
         try:
-            dlg.findChild(QAction, "actionSection").triggered.disconnect()
+            dlg.findChild(QAction, "actionHelp").triggered.disconnect()
         except TypeError:
             pass
         try:
-            dlg.findChild(QAction, "actionHelp").triggered.disconnect()
+            dlg.findChild(QAction, "actionInterpolate").triggered.disconnect()
+        except TypeError:
+            pass
+        try:
+            dlg.findChild(QAction, "actionSection").triggered.disconnect()
         except TypeError:
             pass
 
