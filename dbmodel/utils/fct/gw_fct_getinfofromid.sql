@@ -737,13 +737,15 @@ BEGIN
 		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE '||concat(v_sourcetable,'_id')||'='||quote_literal(v_id);
 	END IF;
 	
-	EXECUTE v_querystring INTO v_formheader_value;
+	IF v_querystring IS NOT NULL THEN
+		EXECUTE v_querystring INTO v_formheader_value;
 	
-	-- define v_headertext
-	IF v_formheader_value IS NOT NULL THEN
-		v_headertext= concat(v_childtype,' - ', v_formheader_value);
-	ELSE
-		v_headertext=concat(v_formheader_new_text,' ',v_childtype, ' (',v_id,')');
+		-- define v_headertext
+		IF v_formheader_value IS NOT NULL THEN
+			v_headertext= concat(v_childtype,' - ', v_formheader_value);
+		ELSE
+			v_headertext=concat(v_formheader_new_text,' ',v_childtype, ' (',v_id,')');
+		END IF;
 	END IF;
 	
 
