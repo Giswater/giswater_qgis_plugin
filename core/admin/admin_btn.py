@@ -621,7 +621,7 @@ class GwAdminButton:
 
         # Check super_user
         super_user = tools_db.check_super_user(self.username)
-        if not super_user and self.form_enabled:
+        if not super_user:
             message = "You don't have permissions to administrate project schemas on this connection"
             self.form_enabled = False
 
