@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epadefault(p_data json)
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epatype(p_data json)
 RETURNS json AS 
 $BODY$
 
