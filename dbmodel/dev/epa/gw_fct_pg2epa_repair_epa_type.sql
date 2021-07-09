@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:
 
 
-CREATE OR REPLACE FUNCTION ud.gw_fct_pg2epa_repair_epatype(p_data json)
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epatype(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -15,8 +15,7 @@ $BODY$
 
 -- execute
 
-SELECT ud.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-
+SELECT ws.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
 ALTER TABLE ws.cat_feature_node DROP CONSTRAINT node_type_epa_table_check;
 
@@ -25,7 +24,7 @@ ALTER TABLE ws.cat_feature_node
 
 
 -- log
-SELECT * FROM ws.audit_check_data where fid = 214 AND criticity  > 1 order by id
+SELECT * FROM ws.awsit_check_data where fid = 214 AND criticity  > 1 order by id
 
 -- check ws
 SELECT * FROM 
@@ -80,7 +79,7 @@ BEGIN
 
 
 	-- Set search path to local schema
-	SET search_path = "ud", public;
+	SET search_path = "ws", public;
 	
 	--  get version
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
