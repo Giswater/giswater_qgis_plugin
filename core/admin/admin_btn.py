@@ -1525,6 +1525,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create project")
         if status:
             global_vars.dao.commit()
+            self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
                 if project_name is not None and is_utils is False:
