@@ -1731,7 +1731,7 @@ class GwInfo(QObject):
             save = self._ask_for_save(action_edit, fid)
             if save:
                 self._reset_my_json(dialog)
-                self._manage_accept(dialog, action_edit, new_feature, my_json, False)
+                self._manage_accept(dialog, action_edit, new_feature, my_json, False, global_vars.info_templates[self.template_name][f'last_json_{self.feature_id}'])
             self._reset_my_json(dialog)
 
             return save
@@ -2061,7 +2061,7 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def _accept(self, dialog, complet_result, _json, last_json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
+    def _accept(self, dialog, complet_result, _json, last_json=None, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
         """
         :param dialog:
         :param complet_result:
@@ -2072,6 +2072,8 @@ class GwInfo(QObject):
         :return: (boolean)
         """
 
+        if last_json is None:
+            last_json = global_vars.info_templates[self.template_name][f"last_json_{dialog.property('gw_code')}"]
         self.feature_id = last_json['body']['feature']['id']
         QgsProject.instance().blockSignals(True)
 
@@ -2336,7 +2338,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(partial(self._clean_my_json, widget))
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.editingFinished.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
+                    partial(self._accept, dialog, self.complet_result, _json, None, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(self._get_values, dialog, widget))
 
@@ -2357,7 +2359,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(partial(self._clean_my_json, widget))
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.textChanged.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
+                    partial(self._accept, dialog, self.complet_result, _json, None, widget, True, False, new_feature))
             else:
                 widget.textChanged.connect(partial(self._get_values, dialog, widget))
 
@@ -2424,7 +2426,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                    self._accept, dialog, self.complet_result, _json, None, None, True, False, new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(self._get_values, dialog, widget))
 
@@ -2439,7 +2441,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(self._clean_my_json, widget))
                 widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                    self._accept, dialog, self.complet_result, _json, None, None, True, False, new_feature))
             else:
                 widget.dateChanged.connect(partial(self._get_values, dialog, widget))
 
@@ -2454,7 +2456,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(self._clean_my_json, widget))
                 widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                    self._accept, dialog, self.complet_result, _json, None, None, True, False, new_feature))
             else:
                 widget.valueChanged.connect(partial(self._get_values, dialog, widget))
 
@@ -2469,7 +2471,7 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(self._clean_my_json, widget))
                 widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                    self._accept, dialog, self.complet_result, _json, None, None, True, False, new_feature))
             else:
                 widget.stateChanged.connect(partial(self._get_values, dialog, widget))
         return widget
