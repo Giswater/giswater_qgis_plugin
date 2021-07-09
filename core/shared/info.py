@@ -634,7 +634,12 @@ class GwInfo(QObject):
         # Fill the content of every widget using the lightweight JSON response
         for field in complet_result['body']['data']['fields']:
             if complet_result['body']['data']['fields'][field] not in (None, "", "null"):
-                tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", complet_result['body']['data']['fields'][field])
+                set_cb = False
+                cb = self.dlg_cf.findChild(QComboBox, f"data_{field}")
+                if cb is not None:
+                    set_cb = tools_qt.set_combo_value(cb, str(complet_result['body']['data']['fields'][field]), 0)
+                if not set_cb:
+                    tools_qt.set_widget_text(self.dlg_cf, f"data_{field}", f"{complet_result['body']['data']['fields'][field]}")
 
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result, True)
 

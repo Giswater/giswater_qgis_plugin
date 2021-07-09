@@ -227,8 +227,7 @@ def set_widget_text(dialog, widget, text):
             text = 0
         widget.setValue(float(text))
     elif type(widget) is QComboBox:
-        # set_selected_item(dialog, widget, text)
-        set_combo_value(widget, str(text), 0)
+        set_selected_item(dialog, widget, text)
     elif type(widget) is QTimeEdit:
         set_time(dialog, widget, text)
     elif type(widget) is QCheckBox:
@@ -375,7 +374,7 @@ def set_combo_value(combo, value, item1):
 
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if elem is not None and value == str(elem[item1]):
+        if value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
 
@@ -383,7 +382,7 @@ def set_combo_value(combo, value, item1):
     if value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
         # Control if the QComboBox has been previously filled
-        if combo.count() > 0 and combo.itemData(0) is not None:
+        if combo.count() > 0:
             for x in range(len(combo.itemData(0))):
                 new_elem.append("")
         else:
