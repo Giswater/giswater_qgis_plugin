@@ -91,6 +91,9 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     try:
         raw_parameter = parameter
 
+        if global_vars.project_vars['project_type'] is None and global_vars.dao_db_credentials is not None:
+            if global_vars.dao_db_credentials['schema']:
+                global_vars.project_vars['project_type'] = global_vars.dao_db_credentials['schema'].replace('"', '')
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
@@ -142,10 +145,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     value = f"{value}"  # Cast to str because parser only allow strings
     try:
         raw_parameter = parameter
-
-        if global_vars.project_vars['project_type'] is None and prefix:
-            global_vars.project_vars['project_type'] = get_project_type()
-
+        if global_vars.project_vars['project_type'] is None and global_vars.dao_db_credentials is not None:
+            if global_vars.dao_db_credentials['schema']:
+                global_vars.project_vars['project_type'] = global_vars.dao_db_credentials['schema'].replace('"', '')
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)

@@ -56,9 +56,9 @@ class GwAdminButton:
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                              "giswater"))
+                                                              "giswater", False))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                              "giswater"))
+                                                              "giswater", False))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -464,10 +464,10 @@ class GwAdminButton:
         if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
 
         else:
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
 
         self.project_types = self.project_types.split(',')
 
@@ -583,7 +583,7 @@ class GwAdminButton:
             self.form_enabled = False
             message = 'There is an error in the configuration of the pgservice file, ' \
                       'please check it or consult your administrator'
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -592,6 +592,7 @@ class GwAdminButton:
             return
 
         elif connection_status is False:
+            self.form_enabled = False
             msg = "Connection Failed. Please, check connection parameters"
             tools_qgis.show_message(msg, 1)
             tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
@@ -648,10 +649,11 @@ class GwAdminButton:
             sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
             tools_db.execute_sql(sql)
         elif self.form_enabled:
+            self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
 
         if self.form_enabled is False:
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1672,7 +1674,7 @@ class GwAdminButton:
             self.form_enabled = False
             message = 'There is an error in the configuration of the pgservice file, ' \
                       'please check it or consult your administrator'
-            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+            tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1723,9 +1725,9 @@ class GwAdminButton:
                 tools_db.execute_sql(sql)
             elif self.form_enabled:
                 message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
-
+                self.form_enabled = False
             if self.form_enabled is False:
-                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create'])
+                tools_qt.enable_dialog(self.dlg_readsql, False, ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name'])
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -2187,6 +2189,7 @@ class GwAdminButton:
                 if not status and self.dev_commit is False:
                     return False
         else:
+
             for file in filelist:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
@@ -2428,12 +2431,12 @@ class GwAdminButton:
             self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
             # Get values
-            self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev")
+            self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False)
             self.folder_path = self.folder_path.replace('"', '')
             self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project",
-                                                                  "dev")
+                                                                  "dev", False)
             self.text_replace_labels = self.text_replace_labels.split(',')
-            self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev")
+            self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev", False)
             self.xml_set_labels = self.xml_set_labels.split(',')
 
             if not os.path.exists(self.folder_path):
@@ -2459,7 +2462,7 @@ class GwAdminButton:
                     for text_replace in self.text_replace_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_text_replace', text_replace,
-                                                                       "project", "dev")
+                                                                       "project", "dev", False)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         # TODO:: Keep replace or remove it and declare 'qgis_project_text_replace' from 'config/dev.config' without '"'.
@@ -2470,7 +2473,7 @@ class GwAdminButton:
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
-                                                                       "dev")
+                                                                       "dev", False)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         # TODO:: Keep replace or remove it and declare 'qgis_project_xml_set' from 'config/dev.config' without '"'.
