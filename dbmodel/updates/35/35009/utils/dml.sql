@@ -217,10 +217,12 @@ If explfromsector is true, exploitation selector is set automatically set to the
 'Selector variables', FALSE, 'utils','json') ON CONFLICT (parameter) DO NOTHING;;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
-VALUES ('tabname_typevalue', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation',NULL);
+VALUES ('tabname_typevalue', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation',NULL)
+ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
-VALUES ('selector_basic', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation', 'role_epa', NULL, NULL, 4, 0);
+VALUES ('selector_basic', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation', 'role_epa', NULL, NULL, 4, 0)
+ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type, datatype)
 VALUES ('basic_selector_tab_macroexploitation', '{"table":"macroexploitation", "selector":"selector_expl", 
@@ -228,4 +230,3 @@ VALUES ('basic_selector_tab_macroexploitation', '{"table":"macroexploitation", "
 "orderBy":"macroexpl_id", "manageAll":true, "query_filter":" AND macroexpl_id > 0"}', 
 'Variable to configura all options related to search for the specificic tab',
 'Selector variables', true, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
-
