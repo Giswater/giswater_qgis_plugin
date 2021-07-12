@@ -134,7 +134,10 @@ class GwLoadProject(QObject):
         # Reset some session/init user variables as vdefault
         if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
             self._manage_reset_user_variables()
-        
+
+        # Set global_vars.epsg
+        global_vars.epsg = tools_qgis.get_epsg()
+
         # Log it
         message = "Project read successfully"
         tools_log.log_info(message)

@@ -153,6 +153,7 @@ class GwInfo(QObject):
             extras += f', "addSchema":"{qgis_project_add_schema}"'
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
+            extras += f', "epsg":"{global_vars.epsg}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             # If it's docker we don't want templates
             if not (global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']):

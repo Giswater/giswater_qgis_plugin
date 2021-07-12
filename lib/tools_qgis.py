@@ -910,6 +910,14 @@ def check_query_layer(layer):
         return False
 
 
+def get_epsg():
+
+    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = epsg.split(':')[1]
+
+    return epsg
+
+
 # region private functions
 
 def _get_vertex_from_point(feature):
