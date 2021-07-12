@@ -370,7 +370,7 @@ BEGIN
 
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_centroid(ST_envelope('||quote_ident(v_the_geom)||')) AS centroid, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable)||
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable)||
 		' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_geometry;
 	END IF;
