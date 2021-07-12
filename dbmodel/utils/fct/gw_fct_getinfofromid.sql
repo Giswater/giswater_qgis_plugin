@@ -801,7 +801,7 @@ BEGIN
 
 		-- return
 		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
-	       ',"body":{"form":{"headerText":"'||v_headertext||'"}'||
+	       ',"body":{"form":{"headerText":"'||v_headertext||'", "toolboxDataNames":'||v_toolboxData_result||'}'||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
 		      	      ',"editable":true'
