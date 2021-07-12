@@ -34,7 +34,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "activeLayer":"", 
 "featureDialog":["PIPE"],
-"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"], "mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.5907975402754}}}$$);
+"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"], "mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":25831, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.5907975402754}}}$$);
 
 
  SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "rolePermissions":"None", "activeLayer":"",
@@ -85,6 +85,7 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_featuredialog text;
+v_client_epsg integer;
 
 
 BEGIN
@@ -108,6 +109,9 @@ BEGIN
 	v_addschema = (p_data ->> 'data')::json->> 'addSchema';
 	v_infotype = (p_data ->> 'data')::json->> 'infoType';
 	v_iseditable = (p_data ->> 'data')::json->> 'editable';
+	v_client_epsg := (p_data ->> 'data')::json->> 'epsg';
+
+	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
 	
 	-- profilactic control of schema name
@@ -158,8 +162,8 @@ BEGIN
 	END IF;
 
 	-- Make point
-	SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
-	
+	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg),v_client_epsg) INTO v_point;
+		
 	-- Get feature
 	v_sql = concat('SELECT layer_id, 0 as orderby, addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' WHERE layer_id = ',quote_literal(v_activelayer),'::text 
 		AND (addparam->>''forceWhenActive'')::boolean IS TRUE

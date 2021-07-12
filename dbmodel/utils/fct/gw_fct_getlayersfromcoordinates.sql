@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
 "feature":{},
 "data":{"pointClickCoords":{"xcoord":419195.116315, "ycoord":4576615.43122},
     "visibleLayers":["ve_arc","ve_node","ve_connec", "ve_link", "ve_vnode"],
-    "srid":25831,
+    "epsg":25831,
     "zoomScale":500}}$$)
 */
 
@@ -58,6 +58,8 @@ v_device integer;
 v_infotype integer;
 v_epsg integer;
 v_icon text;
+v_client_epsg integer;
+
   
 BEGIN
   
@@ -77,6 +79,9 @@ BEGIN
 	v_visibleLayers := (p_data ->> 'data')::json->> 'visibleLayers';
 	v_zoomScale := (p_data ->> 'data')::json->> 'zoomScale';
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_client_epsg := (p_data ->> 'data')::json->> 'epsg';
+
+	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
 	-- Sensibility factor
 	IF v_device = 1 OR v_device = 2 THEN
@@ -107,10 +112,9 @@ BEGIN
 
 	v_visibleLayers = REPLACE (v_visibleLayers, '[', '{');
 	v_visibleLayers = REPLACE (v_visibleLayers, ']', '}');
-	raise notice '============== -> %',v_visibleLayers;
 
 	--   Make point
-	SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
+	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg),v_client_epsg) INTO v_point;
 
 	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
