@@ -13,6 +13,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, 
 
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os
+from ... import global_vars
 
 
 def set_layer_index(**kwargs):
@@ -234,6 +235,21 @@ def open_url(widget):
     status, message = tools_os.open_file(widget.text())
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=widget.text())
+
+
+def clear_templates_cf(**kwargs):
+    """ Removes all the custom form templates in order to update them """
+
+    delete = []
+    for template in global_vars.info_templates:
+        if global_vars.info_templates[template]['open'] <= 0:
+            delete.append(template)
+            continue
+        global_vars.info_templates[template]['dlg'].dlg_closed.connect(clear_templates_cf)
+
+    # Can't pop items directly because a Runtime Error (dictionary length changed during iteration)
+    for template in delete:
+        global_vars.info_templates.pop(template)
 
 
 # region unused functions atm
