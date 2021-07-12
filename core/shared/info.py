@@ -901,15 +901,13 @@ class GwInfo(QObject):
     def _set_dlg_title(self, complet_result):
         """ Sets the dialog title """
 
+        # Set title
         title = f"{complet_result['body']['form']['headerText']}"
 
-        # Set title
+        # Set toolbox labels
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = tools_gw.get_config_value('admin_customform_param', 'value', 'config_param_system')
-        if row:
-            results = json.loads(row[0], object_pairs_hook=OrderedDict)
-            for result in results['custom_form_tab_labels']:
-                toolbox_cf.setItemText(int(result['index']), result['text'])
+        toolbox_cf.setItemText(0, complet_result['body']['form']['toolboxDataNames']['index_0'])
+        toolbox_cf.setItemText(1, complet_result['body']['form']['toolboxDataNames']['index_1'])
         return title
 
 
