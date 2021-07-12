@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2582
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinfofromid(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getinfofromid(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromid(p_data json)
   RETURNS json AS
 $BODY$
@@ -138,6 +138,9 @@ v_headertext text;
 v_formheader_value text;
 v_formheader_field text;
 v_formheader_new_text text;
+v_toolboxData json;
+v_toolboxData_result json;
+v_record record;
 
 BEGIN
 	
@@ -782,7 +785,15 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_headertext);
-
+	v_toolboxData = (SELECT value::json->>'custom_form_tab_labels' FROM config_param_system WHERE parameter='admin_customform_param')::text;
+	
+	FOR v_record IN SELECT (a)->>'index' as index,(a)->>'text' as text  FROM json_array_elements(v_toolboxData) a
+	LOOP
+		v_toolboxData_result := gw_fct_json_object_set_key(v_toolboxData_result,concat('index_', v_record.index), v_record.text);
+	END LOOP;
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'toolboxDataNames', v_toolboxData_result);
+	
+	
 	IF v_onlydata THEN  -- when cat_feature has dialog on client and is not insert and is cat feature and is editable
 	
 		EXECUTE 'SELECT row_to_json(a) FROM (SELECT * FROM '||v_tablename||' WHERE '||v_idname||'::text = '||v_id||'::text)a'
