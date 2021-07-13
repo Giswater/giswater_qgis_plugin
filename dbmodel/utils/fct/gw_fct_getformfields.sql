@@ -185,7 +185,7 @@ BEGIN
 
 
 	-- combo no childs	
-	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE (a->>'widgettype' = 'combo' OR a->>'widgettype' = 'typeahead')  AND  a->>'parentId' IS NULL
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo'  AND  a->>'parentId' IS NULL
 	LOOP
 		-- Define the order by column
 		IF (aux_json->>'orderById')::boolean IS TRUE THEN
@@ -243,7 +243,7 @@ BEGIN
 	END LOOP;
 
 	-- combo childs
-	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE (a->>'widgettype' = 'combo' OR a->>'widgettype' = 'typeahead') AND  a->>'parentId' IS NOT NULL
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NOT NULL
 	LOOP
 		-- Get selected value from parent
 		IF p_tgop ='INSERT' THEN
