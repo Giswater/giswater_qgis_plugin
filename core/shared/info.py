@@ -490,8 +490,7 @@ class GwInfo(QObject):
         if new_feature:
             list_points = tools_qgis.get_points_from_geometry(self.layer, new_feature)
         else:
-            feature = tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id)
-            list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
+            list_points = f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, "y1": {complet_result["body"]["feature"]["geometry"]["y"]}'
 
         if 'visibleTabs' in complet_result['body']['form']:
             for tab in complet_result['body']['form']['visibleTabs']:
@@ -568,7 +567,6 @@ class GwInfo(QObject):
         return self.complet_result, self.dlg_cf
 
 
-
     def _open_custom_form_with_template(self, feature_id, complet_result, tab_type=None, new_feature=None):
         """ Opens a custom form using the corresponding template """
 
@@ -609,7 +607,7 @@ class GwInfo(QObject):
         self.field_id = str(complet_result['body']['feature']['idName'])
         self.feature_id = complet_result['body']['feature']['id']
 
-        list_points = tools_qgis.get_points_from_geometry(self.layer, tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id))
+        list_points = f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, "y1": {complet_result["body"]["feature"]["geometry"]["y"]}'
 
         if 'visibleTabs' in self.complet_result['body']['form']:
             for tab in self.complet_result['body']['form']['visibleTabs']:
