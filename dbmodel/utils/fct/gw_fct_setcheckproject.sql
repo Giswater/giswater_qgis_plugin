@@ -49,7 +49,7 @@ v_errortext text;
 v_result_id text;
 v_rectable record;
 v_version text;
-v_srid integer;
+v_epsg integer;
 v_result_layers_criticity3 json;
 v_result_layers_criticity2 json;
 v_return json;
@@ -82,13 +82,14 @@ query_text text;
 v_qgis_project_type text;
 v_logfoldervolume text;
 
+
 BEGIN 
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version order by id desc limit 1;
+	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
 	
 	-- Get input parameters
 	v_fid := (p_data ->> 'data')::json->> 'fid';
@@ -527,7 +528,7 @@ BEGIN
 		--list missing layers with criticity 3 and 2
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as pkey_field,
-		'''||v_srid||''' as srid,b.column_name as geom_field,''3'' as criticity, qgis_message, style as style_id, group_layer
+		'''||v_epsg||''' as srid,b.column_name as geom_field,''3'' as criticity, qgis_message, style as style_id, group_layer
 		FROM '||v_schemaname||'.audit_check_project 
 		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
@@ -540,7 +541,7 @@ BEGIN
 
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as pkey_field,
-		'''||v_srid||''' as srid,b.column_name as geom_field,''2'' as criticity, qgis_message, style as style_id, group_layer
+		'''||v_epsg||''' as srid,b.column_name as geom_field,''2'' as criticity, qgis_message, style as style_id, group_layer
 		FROM '||v_schemaname||'.audit_check_project 
 		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
@@ -622,7 +623,8 @@ BEGIN
 		--return definition for v_audit_check_result
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
-				',"data":{ "info":'||v_result_info||','||
+				',"data":{ "epsg":'||v_epsg||
+				         ',"info":'||v_result_info||','||
 						'"point":'||v_result_point||','||
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
@@ -632,7 +634,8 @@ BEGIN
 	ELSE
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
-				',"data":{ "info":{},'||
+				',"data":{ "epsg":'||v_epsg||
+				         ',"info":{},'||
 						'"point":{},'||
 						'"line":{},'||
 						'"polygon":{},'||
