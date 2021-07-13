@@ -23,6 +23,10 @@
 	"action":"restoreView"
 	SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+
+	"action":"addField"
+	SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_node], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
 	
 	*/
 
@@ -155,6 +159,22 @@
 				WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||';';
 
 			END LOOP;
+
+		ELSIF v_action='addField' THEN
+			--save view definition on the temp table and delete the view. Order of saving is the order defined in input array
+			FOREACH rec_view IN ARRAY(v_viewlist) LOOP
+
+				EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
+				SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
+				replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve'') FROM pg_views 
+				WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||'
+				AND definition not ilike ''%'||v_fieldname||'%'';';
+
+				EXECUTE 'SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+  				"data":{"viewName":["'||rec_view||'"], "action":"restoreView","hasChilds":"False"}}$$);';
+
+			END LOOP;
+
 
 		ELSIF v_action='restoreView' THEN
 			--recreate views saved on the temp table and delete its definition from temp table. Order of restoring is the order defined in input array
