@@ -264,7 +264,7 @@ BEGIN
 	
 	RAISE NOTICE '11 - Check to arc on valves, at least arc_id exists as closest arc (fid: 170)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve JOIN(
+	select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve LEFT JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1
 		union
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2)a USING (node_id)
