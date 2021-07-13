@@ -64,10 +64,6 @@ session_vars['docker_type'] = None      # An instance of current status of the d
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
 session_vars['last_focus'] = None       # An instance of the last focused dialog's tag
 
-info_templates = {}                     # Stores all the needed variables for the info template.
-                                        # The first key is the feature_id, then has these keys:
-                                        # 'dlg', 'json', 'open', 'my_json_{feature_id}', 'last_json_{feature_id}'
-
 # endregion
 
 # region Init Variables Functions

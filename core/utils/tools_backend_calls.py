@@ -237,21 +237,6 @@ def open_url(widget):
         tools_qgis.show_warning(message, parameter=widget.text())
 
 
-def clear_templates_cf(**kwargs):
-    """ Removes all the custom form templates in order to update them """
-
-    delete = []
-    for template in global_vars.info_templates:
-        if global_vars.info_templates[template]['open'] <= 0:
-            delete.append(template)
-            continue
-        global_vars.info_templates[template]['dlg'].dlg_closed.connect(clear_templates_cf)
-
-    # Can't pop items directly because a Runtime Error (dictionary length changed during iteration)
-    for template in delete:
-        global_vars.info_templates.pop(template)
-
-
 # region unused functions atm
 def show_message(**kwargs):
 
