@@ -11,3 +11,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/06/29
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"shutdown_date", "dataType":"date", "isUtils":"False"}}$$);
+
+--2021/07/13
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);

@@ -230,3 +230,23 @@ VALUES ('basic_selector_tab_macroexploitation', '{"table":"macroexploitation", "
 "orderBy":"macroexpl_id", "manageAll":true, "query_filter":" AND macroexpl_id > 0"}', 
 'Variable to configura all options related to search for the specificic tab',
 'Selector variables', true, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname)
+SELECT formname, formtype, 'asset_id', 'lyt_data_2',42, datatype, widgettype, 'asset_id',  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  true, tabname
+FROM ws_sample35_2.config_form_fields WHERE formname  in ('v_edit_node', 've_node', 'v_edit_arc', 've_arc',
+'v_edit_connec', 've_connec', 'v_edit_gully', 've_gully') and columnname='code' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  hidden, tabname)
+SELECT cat_feature.child_layer, formtype, 'asset_id','lyt_data_2',42, datatype, widgettype, 'asset id',  ismandatory, isparent, 
+iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
+dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  true, tabname
+FROM ws_sample35_2.config_form_fields, ws_sample35_2.cat_feature 
+WHERE formname = 'v_edit_node' and columnname='code' and active is true 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
