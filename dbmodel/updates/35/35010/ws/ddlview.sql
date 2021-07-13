@@ -1199,3 +1199,49 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+
+-- View: v_edit_inp_junction
+
+CREATE OR REPLACE VIEW v_edit_inp_junction AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    inp_junction.demand,
+    inp_junction.pattern_id,
+    n.the_geom,
+    inp_junction.peak_factor
+   FROM selector_sector,
+    v_edit_node n
+     JOIN inp_junction USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+    connec.elevation,
+    connec.depth,
+    connec.connecat_id,
+    connec.arc_id,
+    connec.sector_id,
+    connec.dma_id,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.expl_id,
+    connec.pjoint_type,
+    connec.pjoint_id,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    connec.the_geom,
+    inp_connec.peak_factor
+   FROM selector_sector,
+    v_connec connec
+     JOIN inp_connec USING (connec_id)
+  WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

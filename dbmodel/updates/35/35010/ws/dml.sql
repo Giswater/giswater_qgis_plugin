@@ -87,11 +87,23 @@ UPDATE sys_table SET notify_action =
 WHERE id ='inp_curve';
 
 --2021/07/13
-INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
 VALUES ('arc_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
 
-INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
 VALUES ('node_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
 
-INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
 VALUES ('connec_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_junction','form_feature', 'main', 'peak_factor',null,null,'double', 'text','peak_factor',null, false,
+false, true, false, null, null, null,null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_connec','form_feature', 'main', 'peak_factor',null,null,'double', 'text','peak_factor',null, false,
+false, true, false, null, null, null,null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

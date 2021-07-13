@@ -91,7 +91,7 @@ BEGIN
 		END IF;
 
         IF v_node_table = 'inp_junction' THEN
-            UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
+            UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor WHERE node_id=OLD.node_id;
         ELSIF v_node_table = 'inp_reservoir' THEN
             UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;  
         ELSIF v_node_table = 'inp_tank' THEN

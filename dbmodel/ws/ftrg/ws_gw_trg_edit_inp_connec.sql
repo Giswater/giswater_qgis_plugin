@@ -43,7 +43,7 @@ BEGIN
 		END IF;
 
         UPDATE inp_connec 
-		SET demand=NEW.demand, pattern_id=NEW.pattern_id 
+		SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor 
 		WHERE connec_id=OLD.connec_id;
      
         UPDATE connec

@@ -6,3 +6,4 @@
 - Create new function to find nodes with duplicated values of top_elev, ymax and elev
 - Create new function to find arcs with duplicated values of y and elev
 - Create new field asset_id on arc, node, connec and gully table
+- Create new field peak_factor on inp_connec, inp_junction
