@@ -85,3 +85,13 @@ WHERE id ='inp_pattern';
 UPDATE sys_table SET notify_action =
 '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","inp_curve_value","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump","v_edit_inp_curve_value"]}]'
 WHERE id ='inp_curve';
+
+--2021/07/13
+INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('arc_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+
+INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('node_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+
+INSERT INTO ws_sample35.sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('connec_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
