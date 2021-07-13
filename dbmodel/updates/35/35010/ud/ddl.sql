@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/06/24
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeseries", "column":"fname", "dataType":"character varying(254)", "isUtils":"False"}}$$);
+
+--2021/07/13
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);

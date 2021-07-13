@@ -166,7 +166,8 @@
 
 				EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 				SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
-				replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve'') FROM pg_views 
+				replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
+				''FROM (ve'', '','||v_fieldname||' FROM (ve'') FROM pg_views 
 				WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||'
 				AND definition not ilike ''%'||v_fieldname||'%'';';
 
