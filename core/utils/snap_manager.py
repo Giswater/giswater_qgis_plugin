@@ -41,6 +41,7 @@ class GwSnapManager(object):
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
+        global_vars.snappers.append(self)
 
 
     def set_snapping_layers(self):

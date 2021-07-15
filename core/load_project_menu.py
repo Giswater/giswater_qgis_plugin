@@ -12,11 +12,12 @@ from functools import partial
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProject
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
+from .utils.snap_manager import GwSnapManager
 from .. import global_vars
 from ..lib import tools_log, tools_qt, tools_qgis, tools_os, tools_db
 from .threads.project_layers_config import GwProjectLayersConfig
@@ -302,6 +303,8 @@ class GwMenuLoad(QObject):
     def _reset_plugin(self):
         """ Called in reset plugin action """
 
+        self._reset_snapping_managers()
+
         try:
             self._reload_layers()
         except NotImplementedError:
@@ -330,5 +333,14 @@ class GwMenuLoad(QObject):
         task_get_layers = GwProjectLayersConfig(description, params)
         QgsApplication.taskManager().addTask(task_get_layers)
         QgsApplication.taskManager().triggerTask(task_get_layers)
+
+
+    def _reset_snapping_managers(self):
+        """ Deactivates all snapping managers """
+
+        for i in range(0, len(global_vars.snappers)):
+            global_vars.snappers[i].restore_snap_options(global_vars.snappers[i].recover_snapping_options())
+            global_vars.snappers[i].set_snapping_status(False)
+            global_vars.snappers[i].vertex_marker.hide()
 
     # endregion

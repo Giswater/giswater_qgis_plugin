@@ -64,6 +64,8 @@ session_vars['docker_type'] = None      # An instance of current status of the d
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
 session_vars['last_focus'] = None       # An instance of the last focused dialog's tag
 
+snappers = []
+
 # endregion
 
 # region Init Variables Functions
