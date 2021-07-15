@@ -16,3 +16,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hyd
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"asset_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
+
+--2021/07/15
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"config", "dataType":"json", "isUtils":"False"}}$$);
+
+ALTER TABLE arc ALTER COLUMN verified DROP NOT NULL;
+
