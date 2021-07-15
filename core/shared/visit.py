@@ -579,7 +579,7 @@ class GwVisit(QObject):
     def _update_geom(self):
         """ Update geometry field """
 
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")

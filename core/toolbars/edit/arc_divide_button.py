@@ -152,7 +152,7 @@ class GwArcDivideButton(GwMaptool):
     def _move_node(self, node_id, point):
         """ Move selected node to the current point """
 
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         # Update node geometry
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"

@@ -386,7 +386,7 @@ class GwElement:
         expl_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"
