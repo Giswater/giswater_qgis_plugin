@@ -30,8 +30,8 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_type = None
         self.geom_view = None
         self.cat_table = None
-        self.feature_type_ws = None
-        self.feature_type_ud = None
+        self.feature_edit_type = None
+        self.feature_type_cat = None
 
 
     # region QgsMapTools inherited
@@ -85,11 +85,15 @@ class GwFeatureReplaceButton(GwMaptool):
                     self.feature_type = 'connec'
                 elif tablename == 'v_edit_gully':
                     self.feature_type = 'gully'
+                elif tablename == 'v_edit_arc':
+                    self.feature_type = 'arc'
 
                 self.geom_view = tablename
                 self.cat_table = 'cat_' + self.feature_type
-                self.feature_type_ws = self.feature_type + 'type_id'
-                self.feature_type_ud = self.feature_type + '_type'
+
+                self.feature_edit_type = self.feature_type + '_type'
+                self.feature_type_cat = self.feature_type + 'type_id'
+
                 self.feature_id = snapped_feat.attribute(self.feature_type + '_id')
                 self._init_replace_feature_form(snapped_feat)
 
@@ -115,6 +119,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.snapper_manager.config_snap_to_node(False)
         self.snapper_manager.config_snap_to_connec(False)
         self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_arc(False)
         self.snapper_manager.set_snap_mode()
 
         # Change cursor
@@ -189,11 +194,10 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
         # Get feature type from current feature
-        feature_type = None
-        if self.project_type == 'ws':
-            feature_type = feature.attribute(self.feature_type_ws)
-        elif self.project_type == 'ud':
-            feature_type = feature.attribute(self.feature_type_ud)
+        feature_type = feature.attribute(self.feature_edit_type)
+
+        if self.project_type == 'ud':
+
             feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
             if feature_type_new:
                 if self.feature_type in ('node', 'connec'):
@@ -422,7 +426,7 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
+                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
         elif self.project_type == 'ud':
