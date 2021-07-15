@@ -203,10 +203,10 @@ BEGIN
 			END LOOP;
 			
 			IF v_project_type = 'WS' THEN
-				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||'';
+				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' AND active IS TRUE ';
 				
 			ELSIF v_project_type = 'UD' AND v_formname!='upsert_catalog_gully'  THEN
-				v_query_result := v_query_result || ' AND ('|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' IS null)';
+				v_query_result := v_query_result || ' AND active IS TRUE AND ('|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' IS null)';
 			END IF;
 			
 		END IF;
