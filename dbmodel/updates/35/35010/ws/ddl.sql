@@ -19,10 +19,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", 
 --2021/07/13
 CREATE TABLE IF NOT EXISTS arc_add (
 arc_id character varying(16) PRIMARY KEY,
-rpt_qmax numeric(12,4),
-rpt_qmin numeric(12,4),
-rpt_vmax numeric(12,4),
-rpt_vmin numeric(12,4));
+rpt_qmax double precision,
+rpt_qmin double precision,
+rpt_vmax double precision,
+rpt_vmin double precision);
 
 CREATE TABLE IF NOT EXISTS node_add (
 node_id character varying(16) PRIMARY KEY,
