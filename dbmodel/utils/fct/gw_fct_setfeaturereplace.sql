@@ -450,16 +450,24 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- enable config parameter edit_arc_searchnodes AND connec proximity
-	UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
-	UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') WHERE parameter='edit_connec_proximity';
+	-- enable config parameters
+	IF v_feature_type='arc' THEN
+		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
+	ELSIF v_feature_type='connec' THEN
+		UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') WHERE parameter='edit_connec_proximity';
+	ELSIF v_feature_type='node' THEN
+		-- todo
+	ELSIF v_feature_type='gully' THEN
+		-- todo
+	END IF;
+	
 	
 	IF v_feature_type = 'connec' THEN
 		v_field_cat ='connecat_id';
 	ELSIF v_feature_type = 'arc' THEN
 		v_field_cat ='arccat_id';
 		INSERT INTO audit_log_data (fid, feature_type,feature_id, log_message) 
-		SELECT v_fid, 'ARC', arc_id, concat('{"description":"Pipe replacement", "workcat":"'||v_workcat_id_end||'", "sector":"',name,'", "length":',
+		SELECT v_fid, 'ARC', arc_id, concat('{"description":"Pipe replacement", "workcat":"'||quote_nullable(v_workcat_id_end)||'", "sector":"',name,'", "length":',
 		(st_length(arc.the_geom))::numeric(12,2),', "newCatalog":"',arccat_id,'", "oldCatalog":"',v_old_featurecat,'"}') 
 		FROM arc JOIN sector USING (sector_id) WHERE arc_id = v_id::text;
 	ELSIF v_feature_type = 'gully' THEN
