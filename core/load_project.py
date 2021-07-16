@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
@@ -137,6 +138,7 @@ class GwLoadProject(QObject):
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
+        QgsProject.instance().crsChanged.connect(tools_qgis.get_epsg)
 
         # Log it
         message = "Project read successfully"
