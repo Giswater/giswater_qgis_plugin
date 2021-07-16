@@ -88,13 +88,16 @@ WHERE id ='inp_curve';
 
 --2021/07/13
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
-VALUES ('arc_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+VALUES ('arc_add', 'Table for additional, uneditable fields related to feature','role_edit', 0)
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
-VALUES ('node_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+VALUES ('node_add', 'Table for additional, uneditable fields related to feature','role_edit', 0)
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
-VALUES ('connec_add', 'Table for additional, uneditable fields related to feature','role_edit', 0);
+VALUES ('connec_add', 'Table for additional, uneditable fields related to feature','role_edit', 0)
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id,dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
