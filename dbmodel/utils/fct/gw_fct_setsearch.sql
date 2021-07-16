@@ -187,7 +187,7 @@ BEGIN
 		v_idarg := v_combo->>'id';
 		v_name := v_combo->>'name';
 		v_edittext := ((p_data->>'data')::json)->>'net_code';
-		v_textarg := concat(v_edittext->>'text' ,'%');
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		-- built first part of query
 		IF v_searchtype = 'all' THEN -- feature search is for the whole system
