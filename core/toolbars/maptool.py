@@ -20,7 +20,7 @@ from ... import global_vars
 
 class GwMaptool(QgsMapTool):
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=4):
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -50,7 +50,7 @@ class GwMaptool(QgsMapTool):
 
         # Set default vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
-        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
+        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=icon_type)
 
         # Set default rubber band
         color = QColor(255, 100, 255)

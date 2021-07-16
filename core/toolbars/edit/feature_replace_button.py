@@ -15,16 +15,15 @@ from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_db
-from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptool):
     """ Button 44: Replace feature
     User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
         self.feature_type = None
@@ -51,7 +50,7 @@ class GwFeatureReplaceButton(GwMaptool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
@@ -68,7 +67,7 @@ class GwFeatureReplaceButton(GwMaptool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
             return
 
@@ -101,9 +100,8 @@ class GwFeatureReplaceButton(GwMaptool):
     def activate(self):
 
         # Set active and current layer
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
-        self.current_layer = self.layer_node
+        self.current_layer = self.iface.activeLayer()
+        self.iface.setActiveLayer(self.current_layer)
 
         # Check button
         self.action.setChecked(True)
