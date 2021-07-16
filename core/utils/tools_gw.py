@@ -1612,11 +1612,11 @@ def manage_json_geometry(json_result, sql=None):
     points = tools_qgis.get_geometry_vertex(list_coord)
 
     for point in points:
-        if str(global_vars.data_epsg) in ("2052") and str(25831) in ("102566"):
+        if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566':
             clear_list = list_coord.group(1)
             updated_list = list_coord.group(1).replace('-', '').replace(' ', ' -')
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(clear_list, updated_list)
-        else:
+        elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
             new_coords = tform.transform(point)
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.x()), str(new_coords.x()))
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.y()), str(new_coords.y()))
