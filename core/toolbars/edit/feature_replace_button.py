@@ -217,11 +217,15 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.feature_type}' "
+        sql = (f"SELECT DISTINCT(id), id FROM cat_feature WHERE lower(feature_type) = '{self.feature_type}' "
                f"AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_replace, "feature_type_new", rows)
+
+        rows.insert(0, ['', ''])
+        tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
+        if self.feature_type == 'arc':
+            tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
