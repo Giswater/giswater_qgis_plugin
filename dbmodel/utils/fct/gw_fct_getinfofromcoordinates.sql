@@ -162,7 +162,7 @@ BEGIN
 	END IF;
 
 	-- Make point
-	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg),v_client_epsg) INTO v_point;
+	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 		
 	-- Get feature
 	v_sql = concat('SELECT layer_id, 0 as orderby, addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' WHERE layer_id = ',quote_literal(v_activelayer),'::text 
