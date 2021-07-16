@@ -1600,8 +1600,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 def manage_json_geometry(json_result, sql=None):
 
     # Set QgsCoordinateReferenceSystem
-    data_epsg = QgsCoordinateReferenceSystem(global_vars.data_epsg)
-    project_epsg = QgsCoordinateReferenceSystem(global_vars.project_epsg)
+    data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+    project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
 
     tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
 

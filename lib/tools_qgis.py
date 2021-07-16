@@ -541,8 +541,8 @@ def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
                             (float(y2) - margin) * -1)
 
     elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
-        data_epsg = QgsCoordinateReferenceSystem(global_vars.data_epsg)
-        project_epsg = QgsCoordinateReferenceSystem(global_vars.project_epsg)
+        data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+        project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
         tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
 
         rect = tform.transform(rect)
