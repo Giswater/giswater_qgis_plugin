@@ -745,8 +745,8 @@ class GwInfo(QObject):
 
         # Set toolbox labels
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        toolbox_cf.setItemText(0, complet_result['body']['form']['toolboxDataNames']['index_0'])
-        toolbox_cf.setItemText(1, complet_result['body']['form']['toolboxDataNames']['index_1'])
+        toolbox_cf.setItemText(0, complet_result['body']['form']['tabDataLytNames']['index_0'])
+        toolbox_cf.setItemText(1, complet_result['body']['form']['tabDataLytNames']['index_1'])
         return title
 
 
