@@ -254,4 +254,4 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 UPDATE sys_function SET function_name='gw_fct_getcatfeaturevalues' WHERE id = 3028;
 UPDATE sys_function SET input_params='json' WHERE id IN (2228,2528,2526);
 
-UPDATE config_form_tabs SET label = 'Hydro' WHERE label = 'Hydrometer' AND forname = 'selector_basic';
+UPDATE config_form_tabs SET label = 'Hydro' WHERE label = 'Hydrometer' AND formname = 'selector_basic';

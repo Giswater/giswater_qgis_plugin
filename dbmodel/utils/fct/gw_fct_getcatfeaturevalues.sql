@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:3028
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getcatfeaturevalues(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcatfeaturevalues(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_getaddfeaturevalues ($${
+SELECT SCHEMA_NAME.gw_fct_getaddfeaturevalues ($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"featureType":""}, 
 "data":{"filterFields":{}, "pageInfo":{}}}$$)::text
@@ -28,7 +28,7 @@ v_result json;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Select version
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
