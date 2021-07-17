@@ -468,7 +468,7 @@ BEGIN
 		v_field_cat ='arccat_id';
 		INSERT INTO audit_log_data (fid, feature_type,feature_id, log_message) 
 		SELECT v_fid, 'ARC', arc_id, concat('{"description":"Pipe replacement", "workcat":"'||quote_nullable(v_workcat_id_end)||'", "sector":"',name,'", "length":',
-		(st_length(arc.the_geom))::numeric(12,2),', "newCatalog":"',arccat_id,'", "oldCatalog":"',v_old_featurecat,'"}') 
+		(st_length(arc.the_geom))::numeric(12,2),', "newCatalog":"',v_featurecat_id_new,'", "oldCatalog":"',v_old_featurecat,'"}') 
 		FROM arc JOIN sector USING (sector_id) WHERE arc_id = v_id::text;
 	ELSIF v_feature_type = 'gully' THEN
 		v_field_cat ='gratecat_id';
