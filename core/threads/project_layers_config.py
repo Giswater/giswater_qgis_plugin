@@ -122,9 +122,8 @@ class GwProjectLayersConfig(GwTask):
             layer_number = layer_number + 1
             self.setProgress((layer_number * 100) / total_layers)
 
-            feature = f'"tableName":"{layer_name}", "id":"", "isLayer":true'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
-            self.body = self._create_body(feature=feature, extras=extras)
+            feature = f'"tableName":"{layer_name}", "isLayer":true'
+            self.body = self._create_body(feature=feature)
             self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)
             if not self.json_result:
                 continue
@@ -254,7 +253,7 @@ class GwProjectLayersConfig(GwTask):
 
     def _create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
