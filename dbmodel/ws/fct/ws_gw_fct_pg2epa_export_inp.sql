@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2526
 
 DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_result_id character varying,  p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_export_inp('result_1', 'D:\dades\test.inp')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_export_inp($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1"}}$$)
 
 -- fid:141
 
@@ -26,7 +27,7 @@ column_number integer;
 id_last integer;
 num_col_rec record;
 num_column text;
-result_id_aux varchar;
+v_result varchar;
 title_aux varchar;
 v_fid integer=141;
 v_demandtype integer;
@@ -38,17 +39,21 @@ v_patternmethodval text;
 v_valvemodeval text;
 v_networkmodeval text;
 v_return json;
+v_client_epsg integer;
 
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+	-- get input parameters
+	v_result = (p_data->>'data')::json->>'resultId';
+	v_client_epsg = (p_data->>'client')::json->>'epsg'; 
+
 	--Delete previous
 	TRUNCATE temp_csv;
 
 	-- get parameters to put on header
-	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
@@ -64,7 +69,7 @@ BEGIN
 	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header',concat(';Created by Giswater'),v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Giswater version: ',(SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_fid);
-	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',p_result_id,v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',v_result,v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Export mode: ', v_networkmodeval, v_fid );
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Demand type: ', v_demandtypeval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Pattern method: ', v_patternmethodval, v_fid);
@@ -114,27 +119,22 @@ BEGIN
 		CASE WHEN rec_table.tablename='vi_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
 			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||' WHERE parameter!=''hydraulics'';';
+
+		WHEN rec_table.tablename = 'vi_coordinates' THEN
+			-- on the fly transformation of epsg
+			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_coordinates', 
+			node_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_coordinates;
+
+		WHEN rec_table.tablename = 'vi_vertices' THEN
+			-- on the fly transformation of epsg
+			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_vertices', 
+			arc_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_vertices;
 		ELSE
 			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||';';
 		END CASE;
   
-		--add formating - spaces
-		IF p_path IS NOT NULL THEN
-			FOR num_col_rec IN 1..num_column::integer
-			LOOP
-				IF num_col_rec < num_column::integer THEN
-					EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',22) WHERE source='''||rec_table.tablename||''';';
-				END IF;
-			END LOOP;
-		END IF;
 	END LOOP;
-
-	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
-	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 
-		FROM temp_csv WHERE fid = 141 and cur_user=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
-	END IF;
 
 	-- build return
 	select (array_to_json(array_agg(row_to_json(row))))::json 

@@ -31,6 +31,13 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
+
+SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"form":{"editable":"True"}, 
+		"feature":{"tableName":"v_edit_arc","id":"2001"},
+		"data":{}}$$)
+
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
@@ -62,8 +69,8 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"feature":{"tableName":"ve_arc", "id":"2001"},
 		"data":{"toolBar":"epa"}}$$)
 		
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"tableName":"v_ext_plot", "id":"", "isLayer":true},
-"data":{"filterFields":{}, "pageInfo":{}, "infoType":"full"}}$$);	
+SELECT SCHEMA_NAME.gw_fct_getinfofromid($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"tableName":"v_edit_arc", "id":"", "isLayer":true},
+"data":{"filterFields":{}, "pageInfo":{}}}$$);	
 
 */
 
@@ -76,7 +83,7 @@ v_id character varying;
 v_inputgeometry public.geometry;
 v_editable boolean = true;
 v_device integer;
-v_infotype integer;
+v_infotype integer = 1;
 v_forminfo json;   
 form_tabs json[];
 form_tablabel varchar[];
@@ -133,13 +140,12 @@ v_debug json;
 v_msgerr json;
 v_pkeyfield text;
 v_featuredialog text;
-v_onlydata boolean = false;
 v_headertext text;
 v_formheader_value text;
 v_formheader_field text;
 v_formheader_new_text text;
-v_toolboxData json;
-v_toolboxData_result json;
+v_tabdata_lytname json;
+v_tabdata_lytname_result json;
 v_record record;
 
 BEGIN
@@ -150,7 +156,6 @@ BEGIN
 
 	-- input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
-	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
@@ -202,8 +207,6 @@ BEGIN
 		v_toolbar := 'basic';
 	END IF;
 
-	v_infotype = 1;
-
 	IF v_id = '' THEN
 		v_id = NULL;
 	END IF;
@@ -232,6 +235,7 @@ BEGIN
 	ELSE
 		-- tablename is used as table parent.
 		v_table_parent = v_tablename;
+
 		IF v_id IS NOT NULL THEN 
 	
 			IF v_table_parent='v_edit_node' THEN
@@ -522,7 +526,7 @@ BEGIN
 	END IF;
 	
 	-- Check if it is parent table 
-    IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
+	IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
 
@@ -532,70 +536,23 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 250);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO tableparent_id_arg;
-                
-		-- Identify tableinfotype_id		
-		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
-			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
-			WHERE cat_feature.id= (SELECT custom_type FROM ',quote_ident(tableparent_id_arg),' WHERE nid::text=',quote_nullable(v_id),') 
-			AND infotype_id=',quote_nullable(v_infotype));
-		v_debug_vars := json_build_object('tableparent_id_arg', tableparent_id_arg, 'v_id', v_id, 'v_infotype', v_infotype);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 260);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_tablename;
 
-	-- parent, and epa toolbar
-	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar ='epa' THEN
-
-		parent_child_relation:=true;
-		v_tablename_original = v_tablename;
-
-		-- check parent_epa_view
-		v_querystring = concat('SELECT tableparentepa_id from config_info_layer WHERE layer_id=',quote_nullable(v_tablename));
+		-- get childtype
+		v_querystring = concat('SELECT id FROM cat_feature WHERE parent_layer = ',quote_nullable(v_tablename),' LIMIT 1');
 		v_debug_vars := json_build_object('v_tablename', v_tablename);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 270);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 320);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO tableparent_id_arg;
-	
-		-- Identify tableinfo
-		v_querystring = concat(' SELECT epatable FROM ',quote_ident(tableparent_id_arg),' WHERE nid::text=',quote_nullable(v_id));
-		v_debug_vars := json_build_object('tableparent_id_arg', tableparent_id_arg, 'v_id', v_id);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 280);
+		EXECUTE v_querystring INTO v_childtype;		
+
+	ELSE
+		-- get child type
+		v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ',quote_nullable(v_tablename),' LIMIT 1');
+		v_debug_vars := json_build_object('v_tablename', v_tablename);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 320);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_tablename;
+		EXECUTE v_querystring INTO v_childtype;
 
-		IF v_tablename IS NULL THEN
-
-			v_message  = '{"level":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
-
-			-- check parent_view
-			v_querystring = concat('SELECT tableparent_id from config_info_layer WHERE layer_id=',quote_nullable(v_tablename_original));
-			v_debug_vars := json_build_object('v_tablename_original', v_tablename_original);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 290);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO tableparent_id_arg;
-
-			-- Identify tableinfotype_id		
-			v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
-				JOIN config_info_layer_x_type ON child_layer.tableinfo_id
-				WHERE cat_feature.id= (SELECT custom_type FROM ',quote_ident(tableparent_id_arg),' WHERE nid::text=',quote_nullable(v_id),') 
-				AND infotype_id=',quote_nullable(v_infotype));
-			v_debug_vars := json_build_object('tableparent_id_arg', tableparent_id_arg, 'v_id', v_id, 'v_infotype', v_infotype);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 300);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_tablename;
-		END IF;
-
-	-- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
-	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE) THEN 
-		v_tablename= null;
 	END IF;
-
-	-- Get child type
-	v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ',quote_nullable(v_tablename),' LIMIT 1');
-	v_debug_vars := json_build_object('v_tablename', v_tablename);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 320);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_childtype;
 
 	v_childtype := COALESCE(v_childtype, ''); 
 	
@@ -624,6 +581,8 @@ BEGIN
 			INTO v_canvasmargin_text;
 		v_maxcanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'maxcanvasmargin')::json->>'mts')::numeric(12,2);
 		v_mincanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'mincanvasmargin')::json->>'mts')::numeric(12,2);
+
+		raise notice 'v_fielddddddddddds %', v_fields;
 
 		-- control of null values from config
 		IF v_maxcanvasmargin IS NULL then v_maxcanvasmargin=50; END IF;
@@ -680,44 +639,38 @@ BEGIN
 		v_featuredialog = concat('{',substring((v_featuredialog) from 2 for LENGTH(v_featuredialog)));
 		v_featuredialog = concat('}',substring(reverse(v_featuredialog) from 2 for LENGTH(v_featuredialog)));
 		v_featuredialog := reverse(v_featuredialog);
-		EXECUTE concat('SELECT true FROM cat_feature WHERE id = any(',quote_literal(v_featuredialog),'::text[]) AND child_layer = ',quote_literal(v_tablename))
-		INTO v_onlydata;
-		IF v_onlydata IS NULL THEN v_onlydata = false; end if;
-		
-		IF v_onlydata IS FALSE THEN
+	
+		-- call fields function
+		IF v_editable THEN
 
-			-- call fields function
-			IF v_editable THEN
-
-				-- getting id from URN
-				IF v_id IS NULL AND v_islayer is not true THEN
-					PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-					v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
-				END IF;
-
-				RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
-				-- call edit form function
-				v_querystring = concat('SELECT gw_fct_getfeatureupsert(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',
-				quote_nullable(v_inputgeometry::text),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_tg_op),', ',
-							quote_nullable(v_configtabledefined),', ',quote_nullable(v_idname),', ',quote_nullable(column_type),');');
-				v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_inputgeometry', v_inputgeometry, 'v_device', v_device, 'v_infotype', v_infotype, 'v_tg_op', v_tg_op, 
-								  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
-				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
-				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-				EXECUTE v_querystring INTO v_fields;
-							
-			ELSIF v_editable = FALSE OR v_islayer THEN 
-			
-				RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
-				-- call info form function
-				v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
-							', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
-				v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
-								  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
-				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 350);
-				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-				EXECUTE v_querystring INTO v_fields;
+			-- getting id from URN
+			IF v_id IS NULL AND v_islayer is not true THEN
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 			END IF;
+
+			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
+			-- call edit form function
+			v_querystring = concat('SELECT gw_fct_getfeatureupsert(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',
+			quote_nullable(v_inputgeometry::text),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_tg_op),', ',
+						quote_nullable(v_configtabledefined),', ',quote_nullable(v_idname),', ',quote_nullable(column_type),');');
+			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_inputgeometry', v_inputgeometry, 'v_device', v_device, 'v_infotype', v_infotype, 'v_tg_op', v_tg_op, 
+							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_fields;
+						
+		ELSIF v_editable = FALSE OR v_islayer THEN 
+			
+			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
+			-- call info form function
+			v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
+						', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
+			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
+							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 350);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_fields;
 		END IF;
 	END IF;
 
@@ -785,45 +738,26 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_headertext);
-	v_toolboxData = (SELECT value::json->>'custom_form_tab_labels' FROM config_param_system WHERE parameter='admin_customform_param')::text;
+	v_tabdata_lytname = (SELECT value::json->>'custom_form_tab_labels' FROM config_param_system WHERE parameter='admin_customform_param')::text;
 	
-	FOR v_record IN SELECT (a)->>'index' as index,(a)->>'text' as text  FROM json_array_elements(v_toolboxData) a
+	FOR v_record IN SELECT (a)->>'index' as index,(a)->>'text' as text  FROM json_array_elements(v_tabdata_lytname) a
 	LOOP
-		v_toolboxData_result := gw_fct_json_object_set_key(v_toolboxData_result,concat('index_', v_record.index), v_record.text);
+		v_tabdata_lytname_result := gw_fct_json_object_set_key(v_tabdata_lytname_result,concat('index_', v_record.index), v_record.text);
 	END LOOP;
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'toolboxDataNames', v_toolboxData_result);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
 	
-	
-	IF v_onlydata THEN  -- when cat_feature has dialog on client and is not insert and is cat feature and is editable
-	
-		EXECUTE 'SELECT row_to_json(a) FROM (SELECT * FROM '||v_tablename||' WHERE '||v_idname||'::text = '||v_id||'::text)a'
-		INTO v_fields;
+	--    Return
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
+      ',"body":{"form":' || v_forminfo ||
+	     ', "feature":'|| v_featureinfo ||
+	      ',"data":{"linkPath":' || v_linkpath ||
+	      	      ',"editable":' || v_editable ||
+		      ',"parentFields":' || v_parentfields ||
+		      ',"fields":' || v_fields || 
+		      '}'||
+		'}'||
+	'}')::json, 2582, null, null, null);
 
-		-- return
-		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
-	       ',"body":{"form":{"headerText":"'||v_headertext||'", "toolboxDataNames":'||v_toolboxData_result||'}'||
-		     ', "feature":'|| v_featureinfo ||
-		      ',"data":{"linkPath":' || v_linkpath ||
-		      	      ',"editable":true'
-			      ',"fields":' || v_fields || 
-			      '}'||
-			'}'||
-		'}')::json, 2582, null, null, null);
-
-	ELSE
-		--    Return
-		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
-	      ',"body":{"form":' || v_forminfo ||
-		     ', "feature":'|| v_featureinfo ||
-		      ',"data":{"linkPath":' || v_linkpath ||
-		      	      ',"editable":' || v_editable ||
-			      ',"parentFields":' || v_parentfields ||
-			      ',"fields":' || v_fields || 
-			      '}'||
-			'}'||
-		'}')::json, 2582, null, null, null);
-
-	END IF;
 
 	-- Exception handling
 	 EXCEPTION WHEN OTHERS THEN

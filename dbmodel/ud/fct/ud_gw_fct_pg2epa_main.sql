@@ -8,13 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(p_data);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(json);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 -- fid: 227
 
@@ -47,7 +47,7 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
-
+	
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
@@ -129,7 +129,7 @@ BEGIN
 	
 	RAISE NOTICE '7 - Try to dump subcatchments';
 	IF v_dumpsubcatch THEN
-		PERFORM gw_fct_pg2epa_dump_subcatch();
+		PERFORM gw_fct_pg2epa_dump_subcatch(p_data);
 	END IF;
 
 	RAISE NOTICE '8 - Set default values';
@@ -170,7 +170,7 @@ BEGIN
 	FROM temp_node;
 
 	RAISE NOTICE '13 - Create the inp file structure';	
-	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
+	SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 
 	-- manage return message
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);

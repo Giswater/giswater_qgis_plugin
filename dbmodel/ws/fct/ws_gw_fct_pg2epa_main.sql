@@ -14,7 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", , "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
 
 --fid: 227
 
@@ -316,7 +316,7 @@ BEGIN
 	FROM temp_arc;
 
 	RAISE NOTICE '25 - Getting inp file';	
-	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
+	SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 
 	-- manage return
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);

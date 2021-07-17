@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"basic",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
@@ -32,19 +32,25 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"epa",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "activeLayer":"", 
-"featureDialog":["PIPE"],
-"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"], "mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":25831, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.5907975402754}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", "featureDialog":["PIPE"],
+		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", 
+		"v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"],
+		"mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":25831, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.590797402754}}}$$);
 
-
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "rolePermissions":"None", "activeLayer":"",
-  "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", 
-  "featureDialog":["VALVE"],
-  "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+ SELECT gw_fct_getinfofromcoordinates($${
+		"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "activeLayer":"",
+		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", 
+		"featureDialog":["VALVE"],
+		"coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
    
 
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
-
+ SELECT gw_fct_getinfofromcoordinates($${
+		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", 
+		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], 
+		"addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 */
 
 DECLARE
@@ -73,7 +79,6 @@ v_version text;
 v_the_geom text;
 v_config_layer text;
 v_toolbar text;
-v_role text;
 v_errcontext text;
 v_addschema text; 
 v_projectrole text; 
@@ -104,12 +109,11 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_toolbar := ((p_data ->> 'data')::json->> 'toolBar');
-	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
 	v_projectrole = (p_data ->> 'data')::json->> 'projecRole';
 	v_addschema = (p_data ->> 'data')::json->> 'addSchema';
-	v_infotype = (p_data ->> 'data')::json->> 'infoType';
+	v_infotype = (p_data ->> 'client')::json->> 'infoType';
 	v_iseditable = (p_data ->> 'data')::json->> 'editable';
-	v_client_epsg := (p_data ->> 'data')::json->> 'epsg';
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
@@ -260,18 +264,15 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	IF v_iseditable THEN
+	-- Get editability of layer
+	v_querystring = concat('SELECT (CASE WHEN is_editable=TRUE AND layer_id = any(',quote_literal(v_visiblelayer),'::text[]) THEN ''True'' ELSE ''False'' END) 
+	FROM  ',quote_ident(v_config_layer),' WHERE layer_id=',quote_literal(v_layer.layer_id),';');
+	v_debug_vars := json_build_object('v_visiblelayer', v_visiblelayer, 'v_config_layer', v_config_layer, 'layer_id', v_layer.layer_id);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 70);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-		-- Get editability of layer
-		v_querystring = concat('SELECT (CASE WHEN is_editable=TRUE AND layer_id = any(',quote_literal(v_visiblelayer),'::text[]) THEN ''True'' ELSE ''False'' END) 
-		FROM  ',quote_ident(v_config_layer),' WHERE layer_id=',quote_literal(v_layer.layer_id),';');
-		v_debug_vars := json_build_object('v_visiblelayer', v_visiblelayer, 'v_config_layer', v_config_layer, 'layer_id', v_layer.layer_id);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 70);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
-		EXECUTE v_querystring INTO v_iseditable;
-	END IF;
-
+	EXECUTE v_querystring INTO v_iseditable;
+	
 	-- looking for additional schema 
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 
@@ -300,10 +301,14 @@ BEGIN
 	END IF;
     
 	PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_toolbar,'"}}')::json);
-	
+
+	v_return = concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, '", "featureDialog": ',v_featuredialog,
+	'},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'"}}');
+
+	RAISE NOTICE 'v_return %', v_return;
+
 	--   Call and return gw_fct_getinfofromid
-	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, '", "featureDialog": ',v_featuredialog,
-	'},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json), 2580, null, null, null);
+	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(v_return::json), 2580, null, null, null);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

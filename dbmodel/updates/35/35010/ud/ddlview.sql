@@ -1480,3 +1480,12 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.workcat_id_plan,
     v_node.asset_id
    FROM v_node;
+
+CREATE OR REPLACE VIEW vi_symbols AS 
+ SELECT v_edit_raingage.rg_id,
+    NULL::numeric(16,3) AS xcoord,
+    NULL::numeric(16,3) AS ycoord,
+    v_edit_raingage.the_geom
+   FROM v_edit_raingage;
+
+   

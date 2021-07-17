@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
 "form":{},
 "feature":{},
 "data":{"pointClickCoords":{"xcoord":419195.116315, "ycoord":4576615.43122},
@@ -79,7 +79,7 @@ BEGIN
 	v_visibleLayers := (p_data ->> 'data')::json->> 'visibleLayers';
 	v_zoomScale := (p_data ->> 'data')::json->> 'zoomScale';
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
-	v_client_epsg := (p_data ->> 'data')::json->> 'epsg';
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
