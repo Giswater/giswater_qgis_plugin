@@ -126,7 +126,6 @@ class GwInfoButton(GwMaptool):
         # Get layers under mouse clicked
         extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
         extras += f'"visibleLayers":{visible_layers}, '
-        extras += f'"epsg":{global_vars.project_epsg}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)

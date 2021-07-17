@@ -412,7 +412,7 @@ class GwEpaFileManager(GwTask):
     def _create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
         filter_fields = f'"filterFields":{{{filter_fields}}}'

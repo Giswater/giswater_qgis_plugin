@@ -153,7 +153,6 @@ class GwInfo(QObject):
             extras += f', "addSchema":"{qgis_project_add_schema}"'
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
-            extras += f', "epsg":"{global_vars.project_epsg}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
