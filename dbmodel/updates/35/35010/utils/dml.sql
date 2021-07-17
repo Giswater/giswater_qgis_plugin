@@ -221,7 +221,7 @@ VALUES ('tabname_typevalue', 'tab_macroexploitation', 'Macroexploitation', 'Macr
 ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
-VALUES ('selector_basic', 'tab_macroexploitation', 'Macroexploitation', 'Macroexploitation', 'role_epa', NULL, NULL, 4, 0)
+VALUES ('selector_basic', 'tab_macroexploitation', 'Macroexpl', 'Macroexploitation', 'role_epa', NULL, NULL, 4, 0)
 ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type, datatype)
@@ -253,3 +253,5 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE sys_function SET function_name='gw_fct_getcatfeaturevalues' WHERE id = 3028;
 UPDATE sys_function SET input_params='json' WHERE id IN (2228,2528,2526);
+
+UPDATE config_form_tabs SET label = 'Hydro' WHERE label = 'Hydrometer' AND forname = 'selector_basic';
