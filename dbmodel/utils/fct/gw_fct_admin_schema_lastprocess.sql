@@ -217,6 +217,12 @@ BEGIN
 		
 		-- generate child views 
 		UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
+		
+		-- delete previous definition (in order to prevent failures on delta files
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE"}}$$)::text;
+		
+		-- recreate views
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
 

@@ -250,3 +250,6 @@ dv_parent_id, dv_querytext_filterc, widgetfunction, linkedobject,  true, tabname
 FROM config_form_fields, cat_feature 
 WHERE formname = 'v_edit_node' and columnname='code' and active is true 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE sys_function SET function_name='gw_fct_getcatfeaturevalues' WHERE id = 3028;
+UPDATE sys_function SET input_param='json' WHERE id IN (2228,2528,2526);

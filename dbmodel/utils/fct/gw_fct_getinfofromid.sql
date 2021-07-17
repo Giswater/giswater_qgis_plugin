@@ -54,23 +54,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
 
-INFO EPA
--- epa not defined
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{"editable":"True"},
-		"feature":{"tableName":"ve_arc", "id":"2220"},
-		"data":{"toolBar":"epa"}}$$)
-
--- epa defined
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{"editable":"True"},
-		"feature":{"tableName":"ve_arc", "id":"2001"},
-		"data":{"toolBar":"epa"}}$$)
-		
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"tableName":"v_edit_arc", "id":"", "isLayer":true},
-"data":{"filterFields":{}, "pageInfo":{}}}$$);	
+SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "form":{}, "feature":{"tableName":"ve_node_air_valve"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "coordinates":{"x1":418957.8771109133, "y1":4576670.596288238}}}$$);
 
 */
 
@@ -159,10 +143,10 @@ BEGIN
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
-	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
+	v_editable = (p_data ->> 'form')::json->> 'editable';
+	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
-	v_editable = (p_data ->> 'data')::json->> 'editable';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
 
 	-- Get values from config
@@ -582,8 +566,6 @@ BEGIN
 		v_maxcanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'maxcanvasmargin')::json->>'mts')::numeric(12,2);
 		v_mincanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'mincanvasmargin')::json->>'mts')::numeric(12,2);
 
-		raise notice 'v_fielddddddddddds %', v_fields;
-
 		-- control of null values from config
 		IF v_maxcanvasmargin IS NULL then v_maxcanvasmargin=50; END IF;
 		IF v_mincanvasmargin IS NULL then v_mincanvasmargin=5; END IF;
@@ -635,10 +617,7 @@ BEGIN
 			v_formtype := 'default';
 		END IF;
 
-		-- set onlydata variable
-		v_featuredialog = concat('{',substring((v_featuredialog) from 2 for LENGTH(v_featuredialog)));
-		v_featuredialog = concat('}',substring(reverse(v_featuredialog) from 2 for LENGTH(v_featuredialog)));
-		v_featuredialog := reverse(v_featuredialog);
+		raise notice ' v_editable %', v_editable;
 	
 		-- call fields function
 		IF v_editable THEN
@@ -658,7 +637,13 @@ BEGIN
 							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 340);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			RAISE NOTICE 'v_querystring %', v_querystring;
+
 			EXECUTE v_querystring INTO v_fields;
+
+			RAISE NOTICE 'v_fields %', v_fields;
+
 						
 		ELSIF v_editable = FALSE OR v_islayer THEN 
 			
