@@ -252,4 +252,4 @@ WHERE formname = 'v_edit_node' and columnname='code' and active is true
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE sys_function SET function_name='gw_fct_getcatfeaturevalues' WHERE id = 3028;
-UPDATE sys_function SET input_param='json' WHERE id IN (2228,2528,2526);
+UPDATE sys_function SET input_params='json' WHERE id IN (2228,2528,2526);

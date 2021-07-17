@@ -522,11 +522,7 @@ BEGIN
 		EXECUTE v_querystring INTO tableparent_id_arg;
 
 		-- get childtype
-		v_querystring = concat('SELECT id FROM cat_feature WHERE parent_layer = ',quote_nullable(v_tablename),' LIMIT 1');
-		v_debug_vars := json_build_object('v_tablename', v_tablename);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 320);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_childtype;		
+		EXECUTE 'SELECT custom_type FROM vp_basic_'||v_featuretype||' WHERE nid = '||quote_literal(v_id) INTO v_childtype;
 
 	ELSE
 		-- get child type
