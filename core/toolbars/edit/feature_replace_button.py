@@ -194,6 +194,12 @@ class GwFeatureReplaceButton(GwMaptool):
         # Get feature type from current feature
         feature_type = feature.attribute(self.feature_edit_type)
 
+        # Avoid to replace obsolete or planned features
+        if feature.attribute('state') in (0,2):
+            message = "Current feature has state 0 or 2. Therefore it is not replaceable"
+            tools_qt.show_info_box(message, "Info")
+            return
+
         if self.project_type == 'ud':
 
             feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
@@ -222,8 +228,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         rows.insert(0, ['', ''])
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
-        if self.feature_type == 'arc':
-            tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
+        tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
