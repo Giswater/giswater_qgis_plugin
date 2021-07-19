@@ -2018,11 +2018,11 @@ class GwAdminButton:
             self.project_version = "Version not found"
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
-        # Set label schema name
-        if schema_name not in (None, '', 'null'):
-            self.lbl_schema_name.setText(str(schema_name))
-
-        if self.project_type:
+        if schema_name in (None, '', 'null'):
+            msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
+                   'PostGis version:' + str(self.postgis_version) + ' \n \n' + '')
+            self.software_version_info.setText(msg)
+        else:
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
                    'Schema name: ' + schema_name + '\n' + ''
@@ -2032,8 +2032,10 @@ class GwAdminButton:
 
             self.software_version_info.setText(msg)
 
+            # Set label schema name
+            self.lbl_schema_name.setText(str(schema_name))
+
         # Update windowTitle
-        connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
