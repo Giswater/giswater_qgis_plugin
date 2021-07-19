@@ -2617,6 +2617,12 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
+def set_epsg():
+
+    epsg = tools_qgis.get_epsg()
+    global_vars.project_epsg = epsg
+
+
 def open_dlg_help():
     """
     Opens the help page for the las focused dialog

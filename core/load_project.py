@@ -138,7 +138,7 @@ class GwLoadProject(QObject):
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
-        QgsProject.instance().crsChanged.connect(tools_qgis.get_epsg)
+        QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
 
         # Log it
         message = "Project read successfully"
