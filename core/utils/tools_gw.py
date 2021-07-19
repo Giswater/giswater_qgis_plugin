@@ -28,7 +28,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem
 from qgis.gui import QgsDateTimeEdit
 
 from ..models.cat_feature import GwCatFeature
@@ -91,9 +91,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     try:
         raw_parameter = parameter
 
-        if global_vars.project_vars['project_type'] is None and global_vars.dao_db_credentials is not None:
-            if global_vars.dao_db_credentials['schema']:
-                global_vars.project_vars['project_type'] = global_vars.dao_db_credentials['schema'].replace('"', '')
+        if global_vars.project_vars['project_type'] is None and prefix:
+            global_vars.project_vars['project_type'] = get_project_type()
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
@@ -145,9 +144,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     value = f"{value}"  # Cast to str because parser only allow strings
     try:
         raw_parameter = parameter
-        if global_vars.project_vars['project_type'] is None and global_vars.dao_db_credentials is not None:
-            if global_vars.dao_db_credentials['schema']:
-                global_vars.project_vars['project_type'] = global_vars.dao_db_credentials['schema'].replace('"', '')
+
+        if global_vars.project_vars['project_type'] is None and prefix:
+            global_vars.project_vars['project_type'] = get_project_type()
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
@@ -256,7 +255,10 @@ def close_dialog(dlg):
 def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
 
-    client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+    if global_vars.project_epsg is None:
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+    else:
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
     form = f'"form":{{{form}}}, '
     feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
@@ -484,7 +486,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
 
     text_result = None
     temp_layers_added = []
-    srid = global_vars.srid
+    srid = global_vars.data_epsg
     for k, v in list(data.items()):
         if str(k) == "info":
             text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
@@ -820,10 +822,10 @@ def manage_feature_cat():
     feature_cat = {}
 
     body = create_body()
-    result = execute_procedure('gw_fct_getaddfeaturevalues', body)
+    result = execute_procedure('gw_fct_getcatfeaturevalues', body)
     # If result ara none, probably the conection has broken so try again
     if not result:
-        result = execute_procedure('gw_fct_getaddfeaturevalues', body)
+        result = execute_procedure('gw_fct_getcatfeaturevalues', body)
         if not result:
             return None
 
@@ -1588,10 +1590,40 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql)
         return json_result
+    try:
+        if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
+            json_result = manage_json_geometry(json_result, sql)
+    except Exception as e:
+        pass
+
     if not is_thread:
         manage_json_response(json_result, sql, rubber_band)
+
     return json_result
 
+
+def manage_json_geometry(json_result, sql=None):
+
+    # Set QgsCoordinateReferenceSystem
+    data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+    project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
+
+    tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
+
+    list_coord = re.search('\((.*)\)', str(json_result['body']['feature']['geometry']['st_astext']))
+    points = tools_qgis.get_geometry_vertex(list_coord)
+
+    for point in points:
+        if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566':
+            clear_list = list_coord.group(1)
+            updated_list = list_coord.group(1).replace('-', '').replace(' ', ' -')
+            json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(clear_list, updated_list)
+        elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
+            new_coords = tform.transform(point)
+            json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.x()), str(new_coords.x()))
+            json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.y()), str(new_coords.y()))
+
+    return json_result
 
 def manage_json_response(complet_result, sql=None, rubber_band=None):
     if complet_result not in (None, False):
@@ -1671,7 +1703,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
         return_manager = json_result['body']['returnManager']
     except KeyError:
         return
-    srid = global_vars.srid
+    srid = global_vars.data_epsg
     try:
         margin = None
         opacity = 100

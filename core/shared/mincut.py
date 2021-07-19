@@ -1770,7 +1770,7 @@ class GwMincut:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
@@ -1845,7 +1845,7 @@ class GwMincut:
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
-                   f"{snapped_point.y()}), {global_vars.srid}),"
+                   f"{snapped_point.y()}), {global_vars.data_epsg}),"
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{element_id}'"
                    f" WHERE id = '{real_mincut_id}'")

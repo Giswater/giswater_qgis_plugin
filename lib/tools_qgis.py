@@ -17,7 +17,8 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
-    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
+    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
+    QgsCoordinateTransform, QgsProject
 from qgis.core import QgsVectorLayer
 
 from . import tools_log, tools_qt, tools_os
@@ -531,6 +532,21 @@ def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
     """ Generate an extension on the canvas according to the received coordinates """
 
     rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
+
+    if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566':
+
+        rect = QgsRectangle(float(float(x1) + margin) * -1,
+                            (float(y1) + margin) * -1,
+                            (float(x2) - margin) * -1,
+                            (float(y2) - margin) * -1)
+
+    elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
+        data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+        project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
+        tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
+
+        rect = tform.transform(rect)
+
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
 

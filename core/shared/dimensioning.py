@@ -82,10 +82,10 @@ class GwDimensioning:
         self.layer_dimensions.editingStopped.connect(partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
         # WIDGETS SIGNALS
-        self.dlg_dim.btn_accept.clicked.connect(partial(self._save_dimensioning, qgis_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning))
+        self.dlg_dim.btn_accept.clicked.connect(partial(self._save_dimensioning, qgis_feature, layer, action_snapping, action_orientation))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_dim))
-        self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
         self.dlg_dim.dlg_closed.connect(self.layer_node.removeSelection)
@@ -138,11 +138,13 @@ class GwDimensioning:
 
     # region private functions
 
-    def _cancel_dimensioning(self):
+    def _cancel_dimensioning(self, action_snapping, action_orientation):
 
         self.iface.actionRollbackEdits().trigger()
-        tools_gw.close_dialog(self.dlg_dim)
+        if action_snapping.isChecked(): action_snapping.trigger()
+        if action_orientation.isChecked(): action_orientation.trigger()
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
+        tools_gw.close_dialog(self.dlg_dim)
 
 
     def _save_dimensioning(self, qgis_feature, layer):

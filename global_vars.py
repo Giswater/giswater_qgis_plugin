@@ -19,7 +19,7 @@ plugin_name = None                      # An instance of plugin name
 user_folder_dir = None                  # An instance of configurable user variables directory path
 schema_name = None                      # An instance of schema name retrieved from qgis project connection with PostgreSql
 project_type = None                     # An instance of project type getting from "version" table from PostgreSql
-srid = None                             # An instance of srid parameter retrieved from qgis project layer "v_edit_node"
+data_epsg = None                        # An instance of srid parameter retrieved from qgis project layer "v_edit_node"
 logger = None                           # An instance of GwLogger class thats found in "/lib/tools_log.py"
 giswater_settings = None                # An instance of QGIS settings relating to Giswater variables such as toolbars and actions chekeables"
 qgis_settings = None                    # An instance of QGIS settings"
@@ -35,7 +35,8 @@ project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
-epsg = None                             # An instance of project epsg
+project_epsg = None                     # An instance of project epsg
+
 # endregion
 
 

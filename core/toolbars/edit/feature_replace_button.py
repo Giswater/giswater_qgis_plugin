@@ -15,23 +15,22 @@ from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_db
-from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptool):
     """ Button 44: Replace feature
     User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
         self.feature_type = None
         self.geom_view = None
         self.cat_table = None
-        self.feature_type_ws = None
-        self.feature_type_ud = None
+        self.feature_edit_type = None
+        self.feature_type_cat = None
 
 
     # region QgsMapTools inherited
@@ -51,7 +50,7 @@ class GwFeatureReplaceButton(GwMaptool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
@@ -68,7 +67,7 @@ class GwFeatureReplaceButton(GwMaptool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
             return
 
@@ -85,11 +84,15 @@ class GwFeatureReplaceButton(GwMaptool):
                     self.feature_type = 'connec'
                 elif tablename == 'v_edit_gully':
                     self.feature_type = 'gully'
+                elif tablename == 'v_edit_arc':
+                    self.feature_type = 'arc'
 
                 self.geom_view = tablename
                 self.cat_table = 'cat_' + self.feature_type
-                self.feature_type_ws = self.feature_type + 'type_id'
-                self.feature_type_ud = self.feature_type + '_type'
+
+                self.feature_edit_type = self.feature_type + '_type'
+                self.feature_type_cat = self.feature_type + 'type_id'
+
                 self.feature_id = snapped_feat.attribute(self.feature_type + '_id')
                 self._init_replace_feature_form(snapped_feat)
 
@@ -97,9 +100,8 @@ class GwFeatureReplaceButton(GwMaptool):
     def activate(self):
 
         # Set active and current layer
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
-        self.current_layer = self.layer_node
+        self.current_layer = self.iface.activeLayer()
+        self.iface.setActiveLayer(self.current_layer)
 
         # Check button
         self.action.setChecked(True)
@@ -115,6 +117,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.snapper_manager.config_snap_to_node(False)
         self.snapper_manager.config_snap_to_connec(False)
         self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_arc(False)
         self.snapper_manager.set_snap_mode()
 
         # Change cursor
@@ -124,7 +127,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on node to replace it with a new one"
+            message = "Click on feature to replace it with a new one"
             tools_qgis.show_info(message)
 
 
@@ -189,11 +192,16 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
         # Get feature type from current feature
-        feature_type = None
-        if self.project_type == 'ws':
-            feature_type = feature.attribute(self.feature_type_ws)
-        elif self.project_type == 'ud':
-            feature_type = feature.attribute(self.feature_type_ud)
+        feature_type = feature.attribute(self.feature_edit_type)
+
+        # Avoid to replace obsolete or planned features
+        if feature.attribute('state') in (0,2):
+            message = "Current feature has state 0 or 2. Therefore it is not replaceable"
+            tools_qt.show_info_box(message, "Info")
+            return
+
+        if self.project_type == 'ud':
+
             feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
             if feature_type_new:
                 if self.feature_type in ('node', 'connec'):
@@ -213,11 +221,14 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.feature_type}' "
+        sql = (f"SELECT DISTINCT(id), id FROM cat_feature WHERE lower(feature_type) = '{self.feature_type}' "
                f"AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_replace, "feature_type_new", rows)
+
+        rows.insert(0, ['', ''])
+        tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
+        tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
@@ -422,7 +433,7 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
+                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
         elif self.project_type == 'ud':

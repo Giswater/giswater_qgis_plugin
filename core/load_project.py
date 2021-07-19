@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
@@ -94,7 +95,7 @@ class GwLoadProject(QObject):
 
         # Get SRID from table node
         srid = tools_db.get_srid('v_edit_node', self.schema_name)
-        global_vars.srid = srid
+        global_vars.data_epsg = srid
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -135,8 +136,9 @@ class GwLoadProject(QObject):
         if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
             self._manage_reset_user_variables()
 
-        # Set global_vars.epsg
-        global_vars.epsg = tools_qgis.get_epsg()
+        # Set global_vars.project_epsg
+        global_vars.project_epsg = tools_qgis.get_epsg()
+        QgsProject.instance().crsChanged.connect(tools_qgis.get_epsg)
 
         # Log it
         message = "Project read successfully"
