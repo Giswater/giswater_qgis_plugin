@@ -77,8 +77,8 @@ def save_settings(dialog):
     try:
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 7}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 24}")
     except Exception:
         pass
 
