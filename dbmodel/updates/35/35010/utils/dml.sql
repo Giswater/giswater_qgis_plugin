@@ -255,3 +255,15 @@ UPDATE sys_function SET function_name='gw_fct_getcatfeaturevalues' WHERE id = 30
 UPDATE sys_function SET input_params='json' WHERE id IN (2228,2528,2526);
 
 UPDATE config_form_tabs SET label = 'Hydro' WHERE label = 'Hydrometer' AND formname = 'selector_basic';
+
+/*
+getting id's function & fprocess for official plugin giswater_tools
+TABLE config_function(id, function_name, returnmanager, layermanager, actions) 
+VALUES (3068,'gw_fct_check_importgpkg'
+VALUES (3070,'gw_fct_insert_importgpkg'
+
+TABLE sys_fprocess(fid, fprocess_name, project_type)
+VALUES (392, 'Import gpkg')
+*/
+
+
