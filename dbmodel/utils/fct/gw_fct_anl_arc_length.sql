@@ -72,7 +72,7 @@ BEGIN
 	INSERT INTO selector_audit (fid,cur_user) VALUES (v_fid, current_user);
 
 	-- get results
-	--points
+	--lines
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
 	FROM (
