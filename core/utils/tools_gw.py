@@ -344,7 +344,7 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
         points = tools_qgis.get_geometry_vertex(list_coord)
         tools_qgis.draw_polyline(points, rubber_band, color, width)
     if margin is not None:
-        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin, change_crs=False)
 
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):

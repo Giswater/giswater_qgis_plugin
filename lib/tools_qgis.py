@@ -528,19 +528,18 @@ def get_max_rectangle_from_coords(list_coord):
     return max_x, max_y, min_x, min_y
 
 
-def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
+def zoom_to_rectangle(x1, y1, x2, y2, margin=5, change_crs=True):
     """ Generate an extension on the canvas according to the received coordinates """
 
-    rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
 
-    if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566':
+    rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
+    if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566' and change_crs:
 
         rect = QgsRectangle(float(float(x1) + margin) * -1,
                             (float(y1) + margin) * -1,
                             (float(x2) - margin) * -1,
                             (float(y2) - margin) * -1)
-
-    elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
+    elif str(global_vars.data_epsg) != str(global_vars.project_epsg) and change_crs:
         data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
         project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
         tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
