@@ -11,7 +11,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+"form":{},"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"arcLength":"3"}}}$$)::JSON
 -- fid: v_fid

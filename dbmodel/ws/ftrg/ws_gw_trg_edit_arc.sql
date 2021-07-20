@@ -510,7 +510,7 @@ BEGIN
 		END IF;	
        			
 		-- The geom
-		IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
+		IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE OR NEW.node_1 IS NULL OR NEW.node_2 IS NULL THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 
