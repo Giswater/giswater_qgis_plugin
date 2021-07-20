@@ -92,10 +92,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 	
 		-- Node ID	
-		IF NEW.node_id IS NULL THEN 
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			NEW.node_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
+		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+		NEW.node_id:= (SELECT nextval('urn_id_seq'));
 			
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN

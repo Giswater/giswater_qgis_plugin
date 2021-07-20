@@ -78,10 +78,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- connec ID
-		IF NEW.connec_id IS NULL THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			NEW.connec_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
+		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+		NEW.connec_id:= (SELECT nextval('urn_id_seq'));
 		
 		-- connec Catalog ID
 		IF (NEW.connecat_id IS NULL) THEN

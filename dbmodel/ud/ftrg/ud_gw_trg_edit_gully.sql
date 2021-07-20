@@ -97,10 +97,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- gully ID
-		IF NEW.gully_id IS NULL THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			NEW.gully_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
+		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+		NEW.gully_id:= (SELECT nextval('urn_id_seq'));
 		
 		-- gully type 
 		IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
