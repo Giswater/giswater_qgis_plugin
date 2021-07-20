@@ -10,7 +10,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_log, tools_qgis, tools_qt
+from ...lib import tools_log, tools_qgis, tools_qt, tools_db
 
 
 class GwProjectLayersConfig(GwTask):
@@ -106,6 +106,12 @@ class GwProjectLayersConfig(GwTask):
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
 
+        # Check only once if function 'gw_fct_getinfofromid' exists
+        row = tools_db.check_function('gw_fct_getinfofromid')
+        if row in (None, ''):
+            tools_qgis.show_warning("Function not found in database", parameter='gw_fct_getinfofromid')
+            return False
+
         msg_failed = ""
         msg_key = ""
         total_layers = len(layers)
@@ -124,7 +130,8 @@ class GwProjectLayersConfig(GwTask):
 
             feature = f'"tableName":"{layer_name}", "isLayer":true'
             self.body = self._create_body(feature=feature)
-            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)
+            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
+                                                          is_thread=True, check_function=False)
             if not self.json_result:
                 continue
             if 'status' not in self.json_result:

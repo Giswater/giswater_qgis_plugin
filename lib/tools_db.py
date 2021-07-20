@@ -411,11 +411,11 @@ def check_function(function_name, schema_name=None, commit=True, aux_conn=None):
         schema_name = global_vars.schema_name
 
     schema_name = schema_name.replace('"', '')
-    sql = ("SELECT routine_name FROM information_schema.routines "
-           "WHERE lower(routine_schema) = %s "
-           "AND lower(routine_name) = %s")
-    params = [schema_name, function_name]
-    row = get_row(sql, params=params, commit=commit, aux_conn=aux_conn)
+    sql = (f"SELECT routine_name "
+           f"FROM information_schema.routines "
+           f"WHERE lower(routine_schema) = '{schema_name}' "
+           f"AND lower(routine_name) = '{function_name}'")
+    row = get_row(sql, commit=commit, aux_conn=aux_conn)
     return row
 
 

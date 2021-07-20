@@ -1531,7 +1531,7 @@ def get_actions_from_json(json_result, sql):
 
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
-                      json_loads=False, rubber_band=None, aux_conn=None, is_thread=False):
+                      json_loads=False, rubber_band=None, aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1542,10 +1542,11 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     """
 
     # Check if function exists
-    row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn)
-    if row in (None, ''):
-        tools_qgis.show_warning("Function not found in database", parameter=function_name)
-        return None
+    if check_function:
+        row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn)
+        if row in (None, ''):
+            tools_qgis.show_warning("Function not found in database", parameter=function_name)
+            return None
 
     # Execute function. If failed, always log it
     if schema_name:
@@ -1625,7 +1626,9 @@ def manage_json_geometry(json_result, sql=None):
 
     return json_result
 
+
 def manage_json_response(complet_result, sql=None, rubber_band=None):
+
     if complet_result not in (None, False):
         try:
             manage_json_return(complet_result, sql, rubber_band)
@@ -2021,6 +2024,7 @@ def manage_layer_manager(json_result, sql=None):
 
 def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
+
     try:
         class_object.feature_type = get_signal_change_tab(dialog)
     except AttributeError:
@@ -2625,7 +2629,7 @@ def set_epsg():
 
 def open_dlg_help():
     """
-    Opens the help page for the las focused dialog
+    Opens the help page for the last focused dialog
         :return:
     """
 
@@ -2636,7 +2640,6 @@ def open_dlg_help():
         return True
 
     parser.read(path)
-
     try:
         web_tag = parser.get('web_tag', global_vars.session_vars['last_focus'])
         webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
@@ -2800,6 +2803,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     """ Check if a parameter exists in the config/user_params.config
         If it doesn't exist, it creates it and assigns 'None' as a default value
     """
+
     if section == "i18n_generator" or parameter == "dev_commit":
         return
     # Check if the parameter needs the prefix or not
