@@ -45,8 +45,8 @@ class GwSearch:
         self.dlg_search = None
         self.is_mincut = False
 
-        self.rubber_band = QgsRubberBand(self.canvas)
-        self.aux_rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
     def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
@@ -200,8 +200,8 @@ class GwSearch:
 
     def _reset_rubber_band(self):
 
-        self.rubber_band.reset()
-        self.aux_rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.reset_rubberband(self.aux_rubber_band)
 
 
 
@@ -823,7 +823,7 @@ class GwSearch:
     def _open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
 
-        self.aux_rubber_band.reset()
+        tools_gw.reset_rubberband(self.aux_rubber_band)
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
@@ -961,7 +961,7 @@ class GwSearch:
 
     def _get_parameters(self, qtable, index):
 
-        self.aux_rubber_band.reset()
+        tools_gw.reset_rubberband(self.aux_rubber_band)
 
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_type')

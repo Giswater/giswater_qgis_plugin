@@ -31,7 +31,7 @@ class GwPrintButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.destroyed = False
         self.printer = None
-        self.rubber_band = QgsRubberBand(global_vars.canvas)
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
     def clicked_event(self):

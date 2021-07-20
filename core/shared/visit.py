@@ -62,7 +62,7 @@ class GwVisit(QObject):
         if feature_id => load related feature basing on feature_type in relation
         if single_tool notify that the tool is used called from another dialog."""
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         # parameter to set if the dialog is working as single tool or integrated in another tool
         global_vars.single_tool_mode = single_tool
@@ -457,7 +457,7 @@ class GwVisit(QObject):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
-        self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self._manage_accepted))
 

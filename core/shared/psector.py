@@ -36,7 +36,7 @@ class GwPsector:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
     def get_psector(self, psector_id=None, is_api=False):
@@ -910,7 +910,7 @@ class GwPsector:
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)

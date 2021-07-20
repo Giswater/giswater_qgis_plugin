@@ -57,7 +57,7 @@ class GwDimensioning:
 
         # when funcion is called from new feature
         if db_return is None:
-            rubber_band = QgsRubberBand(self.canvas, 0)
+            rubber_band = tools_gw.create_rubberband(self.canvas, 0)
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getdimensioning', body)

@@ -304,6 +304,7 @@ class GwMenuLoad(QObject):
         """ Called in reset plugin action """
 
         self._reset_snapping_managers()
+        self._reset_all_rubberbands()
 
         try:
             self._reload_layers()
@@ -342,5 +343,13 @@ class GwMenuLoad(QObject):
             global_vars.snappers[i].restore_snap_options(global_vars.snappers[i].recover_snapping_options())
             global_vars.snappers[i].set_snapping_status(False)
             global_vars.snappers[i].vertex_marker.hide()
+
+
+    def _reset_all_rubberbands(self):
+        """ Resets all active rubber bands """
+
+        for i in range(0, len(global_vars.active_rubberbands)):
+            global_vars.active_rubberbands[0].reset()
+            global_vars.active_rubberbands.pop(0)
 
     # endregion

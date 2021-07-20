@@ -33,7 +33,7 @@ class GwElement:
 
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
         """ Button 33: Add element """
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.new_element_id = new_element_id
 
         # Create the dialog and signals
@@ -127,7 +127,7 @@ class GwElement:
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, excluded_layers))
-        self.dlg_add_element.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
 
 
         self.dlg_add_element.element_id.textChanged.connect(

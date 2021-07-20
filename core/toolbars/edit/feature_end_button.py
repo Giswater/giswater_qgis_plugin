@@ -57,7 +57,7 @@ class GwFeatureEndButton(GwAction):
 
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         # Create the dialog and signals
         self.dlg_work_end = GwFeatureEndUi()
@@ -94,7 +94,7 @@ class GwFeatureEndButton(GwAction):
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
-        self.dlg_work_end.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_work_end.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_work_end.btn_accept.clicked.connect(partial(self._end_feature))
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self._manage_close, self.dlg_work_end, True, False))
         self.dlg_work_end.rejected.connect(partial(self._manage_close, self.dlg_work_end, True, True))

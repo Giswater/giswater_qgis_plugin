@@ -54,7 +54,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
 
 
     def canvasReleaseEvent(self, event):
@@ -106,7 +106,7 @@ class GwConnectLinkButton(GwMaptool):
                 self.dragging = False
 
                 # Refresh map canvas
-                self.rubber_band.reset()
+                tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
             tools_qgis.set_layer_index('v_edit_link')
@@ -143,7 +143,7 @@ class GwConnectLinkButton(GwMaptool):
         self.action.setChecked(True)
 
         # Rubber band
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
 
 
         # Store user snapping configuration
@@ -188,7 +188,7 @@ class GwConnectLinkButton(GwMaptool):
 
         # Refresh map canvas
         if layer.name() == 'Gully' or global_vars.project_type == 'ws':
-            self.rubber_band.reset()
+            tools_gw.reset_rubberband(self.rubber_band)
             self.refresh_map_canvas()
             self.iface.actionPan().trigger()
 
@@ -233,7 +233,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

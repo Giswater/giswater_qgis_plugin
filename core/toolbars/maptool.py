@@ -55,7 +55,7 @@ class GwMaptool(QgsMapTool):
         # Set default rubber band
         color = QColor(255, 100, 255)
         color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, 2)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, 2)
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)
         self.rubber_band.setWidth(1)

@@ -30,7 +30,7 @@ class GwInfoButton(GwMaptool):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-        self.rubber_band = QgsRubberBand(global_vars.canvas)
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
@@ -45,8 +45,8 @@ class GwInfoButton(GwMaptool):
 
         if event.key() == Qt.Key_Escape:
             for rb in self.rubberband_list:
-                rb.reset()
-            self.rubber_band.reset()
+                tools_gw.reset_rubberband(rb)
+            tools_gw.reset_rubberband(self.rubber_band)
             self.action.trigger()
             return
 
@@ -82,9 +82,9 @@ class GwInfoButton(GwMaptool):
 
         if hasattr(self, 'rubberband_list'):
             for rb in self.rubberband_list:
-                rb.reset()
+                tools_gw.reset_rubberband(rb)
         if hasattr(self, 'dlg_info_feature'):
-            self.rubber_band.reset()
+            tools_gw.reset_rubberband(self.rubber_band)
 
         super().deactivate()
 
@@ -177,9 +177,9 @@ class GwInfoButton(GwMaptool):
 
     def _identify_all(self, complet_list, rb_list):
 
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         for rb in rb_list:
-            rb.reset()
+            tools_gw.reset_rubberband(rb)
         for layer in complet_list['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
@@ -190,7 +190,7 @@ class GwInfoButton(GwMaptool):
                     x, y = polygon[i].split(' ')
                     point = QgsPointXY(float(x), float(y))
                     points.append(point)
-                rb = QgsRubberBand(self.canvas)
+                rb = tools_gw.create_rubberband(self.canvas)
                 polyline = QgsGeometry.fromPolylineXY(points)
                 rb.setToGeometry(polyline, None)
                 rb.setColor(QColor(255, 0, 0, 100))
@@ -203,14 +203,14 @@ class GwInfoButton(GwMaptool):
         """ Draw lines based on geometry """
 
         for rb in rb_list:
-            rb.reset()
+            tools_gw.reset_rubberband(rb)
         if feature['geometry'] is None:
             return
 
         list_coord = re.search('\((.*)\)', str(feature['geometry']))
         max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
         if reset_rb:
-            self.rubber_band.reset()
+            tools_gw.reset_rubberband(self.rubber_band)
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
             tools_qgis.draw_point(point, self.rubber_band)
@@ -222,7 +222,7 @@ class GwInfoButton(GwMaptool):
     def _get_info_from_selected_id(self, action, tab_type):
         """ Set active selected layer """
 
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         parent_menu = action.associatedWidgets()[0]
         layer = tools_qgis.get_layer_by_layername(parent_menu.title())
         if layer:
@@ -234,14 +234,14 @@ class GwInfoButton(GwMaptool):
             info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.property('feature_id'), tab_type=tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
-                self.previous_info_feature.rubber_band.reset()
+                tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
 
     def _get_info(self, event):
 
         for rb in self.rubberband_list:
-            rb.reset()
+            tools_gw.reset_rubberband(rb)
 
         if self.block_signal:
             self.block_signal = False
@@ -258,7 +258,7 @@ class GwInfoButton(GwMaptool):
             info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
-                self.previous_info_feature.rubber_band.reset()
+                tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
         elif event.button() == Qt.RightButton:

@@ -29,7 +29,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem
-from qgis.gui import QgsDateTimeEdit
+from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
@@ -336,7 +336,7 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
     max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
 
     if reset_rb:
-        rubber_band.reset()
+        reset_rubberband(rubber_band)
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
         point = QgsPointXY(float(max_x), float(max_y))
         tools_qgis.draw_point(point, rubber_band, color, width)
@@ -2619,6 +2619,28 @@ def restore_parent_layers_visibility(layers):
 
     for layer, visibility in layers.items():
         tools_qgis.set_layer_visible(layer, False, visibility)
+
+
+def create_rubberband(canvas, geometry_type=1):
+    """ Creates a rubberband and adds it to the global list """
+
+    rb = QgsRubberBand(canvas, geometry_type)
+    global_vars.active_rubberbands.append(rb)
+    return rb
+
+
+def reset_rubberband(rb, geometry_type=None):
+    """ Resets a rubberband and tries to remove it from the global list """
+
+    if geometry_type:
+        rb.reset(geometry_type)
+    else:
+        rb.reset()
+
+    try:
+        global_vars.active_rubberbands.remove(rb)
+    except ValueError:
+        pass
 
 
 def set_epsg():

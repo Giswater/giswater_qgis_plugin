@@ -61,7 +61,7 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.connected = False
-        self.rubber_band = QgsRubberBand(self.canvas, 0)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, 0)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
@@ -240,7 +240,7 @@ class GwInfo(QObject):
             manage_visit = GwVisit()
             manage_visit.get_visit(visit_id=visit_id, tag='info')
             dlg_add_visit = manage_visit.get_visit_dialog()
-            dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
+            dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
 
         else:
             tools_log.log_warning(f"template not managed: {template}")
@@ -507,7 +507,7 @@ class GwInfo(QObject):
 
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
-            dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
             dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._reset_my_json)
@@ -823,7 +823,7 @@ class GwInfo(QObject):
 
         rb_interpolate = []
         self.interpolate_result = None
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         dlg_interpolate = GwInterpolate()
         tools_gw.load_settings(dlg_interpolate)
 
@@ -883,7 +883,7 @@ class GwInfo(QObject):
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
-                rb = QgsRubberBand(global_vars.canvas, 0)
+                rb = tools_gw.create_rubberband(global_vars.canvas, 0)
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
@@ -1203,7 +1203,7 @@ class GwInfo(QObject):
     def _manage_docker_close(self):
 
         self._roll_back()
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         self.layer.removeSelection()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json()
@@ -1213,7 +1213,7 @@ class GwInfo(QObject):
     def _manage_info_close(self, dialog):
 
         self._roll_back()
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.save_settings(dialog)
         tools_gw.close_dialog(dialog)
 
