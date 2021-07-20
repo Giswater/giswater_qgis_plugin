@@ -305,6 +305,7 @@ class GwMenuLoad(QObject):
 
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
+        self.iface.actionPan().trigger()
 
         try:
             self._reload_layers()
