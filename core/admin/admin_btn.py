@@ -10,6 +10,7 @@ import os
 import random
 import re
 import sys
+import mmap
 from functools import partial
 from time import sleep
 
@@ -154,6 +155,21 @@ class GwAdminButton:
                 msg = "The 'Path' field is required for Import INP data."
                 tools_qt.show_info_box(msg, "Info")
                 return
+            # Check that the INP file works with the selected project_type
+            with open(self.file_inp, 'rb', 0) as file, \
+                    mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                msg = ""
+                # If we're creating a 'ud' project but the INP file is from epanet
+                if project_type == 'ud' and s.find(b'[PIPES]') != -1:
+                    msg = "The selected INP file does not match with a 'UD' project.\n" \
+                          "Please check it before continuing..."
+                # If we're creating a 'ws' project but the INP file is from swmm
+                if project_type == 'ws' and s.find(b'[CONDUITS]') != -1:
+                    msg = "The selected INP file does not match with a 'WS' project.\n" \
+                          "Please check it before continuing..."
+                if msg:
+                    tools_qt.show_info_box(msg, "Warning")
+                    return
 
         elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
 
