@@ -71,7 +71,7 @@ class GwLoadProject(QObject):
         self.schema_name = self.schema_name.replace('"', '')
         global_vars.schema_name = self.schema_name
 
-        # TEMP
+        # Setting global_vars
         global_vars.schema_name = self.schema_name
         global_vars.project_type = project_type
         global_vars.plugin_name = self.plugin_name
@@ -102,6 +102,12 @@ class GwLoadProject(QObject):
         if status is False:
             return
 
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
+        if tools_os.set_boolean(open_search):
+            dlg_search = GwSearchUi()
+            GwSearch().open_search(dlg_search, load_project=True)
+
         # Create menu
         load_project_menu = GwMenuLoad()
         load_project_menu.read_menu()
@@ -118,11 +124,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
-        if tools_os.set_boolean(open_search):
-            dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
