@@ -195,7 +195,7 @@ class GwFeatureReplaceButton(GwMaptool):
         feature_type = feature.attribute(self.feature_edit_type)
 
         # Avoid to replace obsolete or planned features
-        if feature.attribute('state') in (0,2):
+        if feature.attribute('state') in (0, 2):
             message = "Current feature has state 0 or 2. Therefore it is not replaceable"
             tools_qt.show_info_box(message, "Info")
             return

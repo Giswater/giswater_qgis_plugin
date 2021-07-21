@@ -587,18 +587,12 @@ class GwProfileButton(GwAction):
         ysup = [s1y, s2y, s3y]
 
         # draw first node bottom line
-        plt.plot(xinf, yinf,
-                 zorder=100,
-                 linestyle=self._get_stylesheet(node.data_type)[0],
-                 color=self._get_stylesheet(node.data_type)[1],
-                 linewidth=self._get_stylesheet(node.data_type)[2])
+        plt.plot(xinf, yinf, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
+                 color=self._get_stylesheet(node.data_type)[1], linewidth=self._get_stylesheet(node.data_type)[2])
 
         # draw first node upper line
-        plt.plot(xsup, ysup,
-                 zorder=100,
-                 linestyle=self._get_stylesheet(node.data_type)[0],
-                 color=self._get_stylesheet(node.data_type)[1],
-                 linewidth=self._get_stylesheet(node.data_type)[2])
+        plt.plot(xsup, ysup, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
+                 color=self._get_stylesheet(node.data_type)[1], linewidth=self._get_stylesheet(node.data_type)[2])
 
         self.first_top_x = 0
         self.first_top_y = node.top_elev
@@ -736,7 +730,7 @@ class GwProfileButton(GwAction):
 
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 date, fontsize=title_size*0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
+                 date, fontsize=title_size * 0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
 
 
     def _draw_nodes(self, node, prev_node, index):
@@ -898,11 +892,11 @@ class GwProfileButton(GwAction):
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Nodes between init and end
-        elif index < self.n-1:
+        elif index < self.n - 1:
 
             # defining variables
-            y2_prev = self.nodes[index-1].y2
-            elev2_prev = self.nodes[index-1].elev2
+            y2_prev = self.nodes[index - 1].y2
+            elev2_prev = self.nodes[index - 1].elev2
             y1 = self.nodes[0].y1
             elev1 = self.nodes[0].elev1
 
@@ -932,7 +926,7 @@ class GwProfileButton(GwAction):
                          color=text_color, fontweight=text_weight,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
         # Node end
-        elif index == self.n-1:
+        elif index == self.n - 1:
 
             # Fill y_max
             plt.annotate(

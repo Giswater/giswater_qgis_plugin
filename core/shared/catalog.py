@@ -81,7 +81,7 @@ class GwCatalog:
 
         # Set Listeners
         matcat_id.currentIndexChanged.connect(partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, child_type))
-        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,pnom, dnom, id, feature_type, child_type))
+        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
         dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
 
         # Set shortcut keys

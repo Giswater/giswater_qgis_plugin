@@ -63,5 +63,5 @@ class GwCreateSchemaUtilsTask(GwTask):
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
-        self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'], is_utils=True)
+        self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'], is_utils=True)
 

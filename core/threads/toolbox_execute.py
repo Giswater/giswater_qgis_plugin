@@ -96,7 +96,7 @@ class GwToolBoxTask(GwTask):
                             widget.setStyleSheet(None)
                             value = tools_qt.get_text(self.dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                            if value is '' and widget.property('ismandatory'):
+                            if value == '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):

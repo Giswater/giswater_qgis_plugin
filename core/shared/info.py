@@ -34,7 +34,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 global is_inserting
 is_inserting = False
@@ -254,7 +254,6 @@ class GwInfo(QObject):
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
-
         feature_id = tools_qt.get_text(dialog, widget)
         self.customForm = GwInfo(self.tab_type)
         complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
@@ -2699,15 +2698,17 @@ class GwInfo(QObject):
             if status is False and message is not None:
                 tools_qgis.show_warning(message, parameter=path[0])
 
+
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
                           value_filter=None, widget=None):
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
-        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
-               " FROM {}".format(str(table_name)))
+        sql = (f"SELECT MIN({mindate}), MAX({maxdate}) "
+               f"FROM {table_name}")
         if column_filter is not None and value_filter is not None:
-            sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
+            sql += f" WHERE {column_filter} = '{value_filter}'"
         row = tools_db.get_row(sql)
         if row:
             widget_fromdate.blockSignals(True)

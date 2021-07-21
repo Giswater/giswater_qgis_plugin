@@ -135,6 +135,6 @@ class GwCreateSchemaTask(GwTask):
             tools_qt.show_info_box(msg, "Info")
             self.admin._execute_import_data(self.params['project_name_schema'], self.params['project_type'])
         else:
-            self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'],
+            self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                               is_test=self.is_test)
 

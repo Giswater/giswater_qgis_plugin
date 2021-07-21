@@ -305,7 +305,7 @@ class GwCSVButton(GwAction):
                 field[f"csv{x + 1}"] = f"{value}"
             fields.append(field)
             cont += 1
-            progress = (100*cont)/row_count
+            progress = (100 * cont) / row_count
             dialog.progressBar.setValue(progress)
         dialog.progressBar.setValue(100)
         if not fields:
