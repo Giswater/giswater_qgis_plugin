@@ -972,7 +972,7 @@ class GwSearch:
 
         layer = tools_qgis.get_layer_by_tablename(f"v_edit_{feature_type}")
         if not layer: return
-        
+
         feature = tools_qt.get_feature_by_id(layer, feature_id, f"{feature_type}_id")
         try:
             width = {"arc": 5}

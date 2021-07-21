@@ -280,7 +280,7 @@ class GwElement:
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
-        
+
 
     # region private functions
 

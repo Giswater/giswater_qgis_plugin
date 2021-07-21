@@ -88,7 +88,7 @@ class GwInfoButton(GwMaptool):
         super().deactivate()
 
     # endregion
-    
+
     # region private functions
 
     def _create_point(self, event):

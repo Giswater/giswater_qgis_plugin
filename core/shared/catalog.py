@@ -161,8 +161,8 @@ class GwCatalog:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{feature_type}', 9)"
             row = tools_db.get_row(sql)
             self._fill_combo(widget_id, row[0]['catalog_id'][0])
-            
-    
+
+
     def _add_combobox(self, field):
         """ Add QComboBox to dialog """
 
@@ -174,8 +174,8 @@ class GwCatalog:
             tools_qt.set_combo_value(widget, field['selectedId'], 0)
 
         return widget
-    
-    
+
+
     def _fill_combo(self, widget, field):
         """
         Fill QComboBox
@@ -199,8 +199,8 @@ class GwCatalog:
                 records_sorted.insert(0, ['', ''])
             for record in records_sorted:
                 widget.addItem(str(record[1]), record)
-                
-    
+
+
     def _fill_geomcat_id(self, previous_dialog, widget_name):
         """ Fill the widget of the previous dialogue """
 

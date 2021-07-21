@@ -125,7 +125,7 @@ class GwPsector:
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = tools_db.get_rows(sql)
-        
+
         tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
 
         # Populate combo expl_id
@@ -1059,14 +1059,14 @@ class GwPsector:
         self.delete_psector_selector('selector_plan_psector')
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id)
-                
+
         if close_dlg:
             json_result = self.set_plan()
             if 'status' in json_result and json_result['status'] == 'Accepted':
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 
-            
+
     def set_plan(self):
 
         # TODO: Check this
@@ -1074,8 +1074,8 @@ class GwPsector:
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
         return json_result
-        
-        
+
+
     def price_selector(self, dialog, tableleft, tableright, field_id_right):
 
         # fill QTableView all_rows

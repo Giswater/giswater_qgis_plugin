@@ -55,7 +55,7 @@ class GwLoadProjectCheck:
                 fields += f'"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
-        
+
         # Execute function 'gw_fct_setcheckproject'
         result = self._execute_check_project_function(init_project, fields)
 
