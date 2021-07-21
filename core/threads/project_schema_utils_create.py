@@ -52,7 +52,8 @@ class GwCreateSchemaUtilsTask(GwTask):
 
         super().finished(result)
         self.setProgress(100)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         # Handle exception
         if self.exception is not None:

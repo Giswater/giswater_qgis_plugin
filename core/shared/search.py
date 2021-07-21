@@ -963,15 +963,14 @@ class GwSearch:
     def _get_parameters(self, qtable, index):
 
         tools_gw.reset_rubberband(self.aux_rubber_band)
-
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_type')
         feature_type = index.sibling(row, column_index).data().lower()
         column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_id')
         feature_id = index.sibling(row, column_index).data()
-
         layer = tools_qgis.get_layer_by_tablename(f"v_edit_{feature_type}")
-        if not layer: return
+        if not layer:
+            return
 
         feature = tools_qt.get_feature_by_id(layer, feature_id, f"{feature_type}_id")
         try:

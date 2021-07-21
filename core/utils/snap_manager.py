@@ -370,7 +370,9 @@ class GwSnapManager(object):
 
 
     def show_snap_message(self, msg, feature_type=None):
-        if msg is False: return
+
+        if msg is False:
+            return
         if global_vars.user_level['level'] not in (None, 'None'):
             if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
                 if msg is True:

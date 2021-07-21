@@ -162,6 +162,8 @@ class GwMenuLoad(QObject):
 
 
     # region private functions
+
+
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 

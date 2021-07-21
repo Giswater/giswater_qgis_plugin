@@ -139,7 +139,8 @@ class GwProfileButton(GwAction):
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
-        if links_distance in ("", "None", None): links_distance = 1
+        if links_distance in ("", "None", None):
+            links_distance = 1
 
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
@@ -149,7 +150,8 @@ class GwProfileButton(GwAction):
 
         # Execute query
         self.profile_json = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-        if self.profile_json is None or self.profile_json['status'] == 'Failed': return
+        if self.profile_json is None or self.profile_json['status'] == 'Failed':
+            return
 
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -193,7 +195,8 @@ class GwProfileButton(GwAction):
 
         # Get values from profile form
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
-        if links_distance in ("", "None", None): links_distance = 1
+        if links_distance in ("", "None", None):
+            links_distance = 1
         title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
@@ -204,7 +207,8 @@ class GwProfileButton(GwAction):
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setprofile', body)
-        if result is None or result['status'] == 'Failed': return
+        if result is None or result['status'] == 'Failed':
+            return
         message = f"{result['message']}"
         tools_qgis.show_info(message)
 
@@ -352,7 +356,8 @@ class GwProfileButton(GwAction):
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-                    if result is None or result['status'] == 'Failed': return
+                    if result is None or result['status'] == 'Failed':
+                        return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
                     # Manage level and message from query result

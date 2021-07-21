@@ -116,7 +116,8 @@ class GwCreateSchemaTask(GwTask):
         self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         # Handle exception
         if self.exception is not None:

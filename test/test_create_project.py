@@ -13,6 +13,7 @@ from ..core.admin.gis_file_create import GwGisFileCreate
 from .. import global_vars
 from ..lib import tools_db
 
+
 # dummy instance to replace qgis.utils.iface
 class GwQgisInterfaceDummy(object):
 

@@ -70,7 +70,8 @@ class GwAddChildLayerButton(GwAction):
                    f" ORDER BY child_layer")
 
             child_layers = tools_db.get_rows(sql)
-            if not child_layers: continue
+            if not child_layers:
+                continue
 
             # Create sub menu
             sub_menu = main_menu.addMenu(str(parent_layer[0]))

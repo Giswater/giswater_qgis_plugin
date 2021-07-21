@@ -1325,8 +1325,10 @@ class GwPsector:
 
 
     def show_status_warning(self):
+
         mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
-        if mode is None: return
+        if mode is None:
+            return
 
         mode = json.loads(mode[0])
         if mode['mode'] == 'obsolete':
@@ -1336,7 +1338,6 @@ class GwPsector:
                   "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
             tools_qt.show_details(msg, 'Message warning')
         elif mode['mode'] == 'onService':
-
             if tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status) == '0':
                 msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
                       "this psector will be executed. Planified features will turn on service and deleted features " \
@@ -1688,7 +1689,8 @@ class GwPsector:
         """ Check layers visibility and add it if it is not in the toc """
 
         layer = tools_qgis.get_layer_by_tablename(layer_name)
-        if layer is None: tools_gw.add_layer_database(layer_name, the_geom, field_id)
+        if layer is None:
+            tools_gw.add_layer_database(layer_name, the_geom, field_id)
         if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
             tools_qgis.set_layer_visible(layer, True, True)
 
@@ -1700,7 +1702,8 @@ class GwPsector:
         layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
                   'v_plan_psector_node']
         for layer_name in layers:
-            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully': continue
+            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully':
+                continue
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False

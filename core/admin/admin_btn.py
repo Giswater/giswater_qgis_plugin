@@ -1512,7 +1512,8 @@ class GwAdminButton:
                     available = False
                     break
 
-        if available: return True
+        if available:
+            return True
 
         list_schemas = [row[0] for row in rows if f"{project_name}" in f"{row[0]}"]
         new_name = self.bk_schema_name(list_schemas, f"{project_name}_bk_", 0)

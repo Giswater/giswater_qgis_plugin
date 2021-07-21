@@ -17,8 +17,9 @@ class GwDocker(QDockWidget):
 
 
     def __init__(self, subtag=None):
+
         super().__init__()
-        #TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
+        # TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
         try:
             self.setupUi(self)
         except Exception:
@@ -27,12 +28,15 @@ class GwDocker(QDockWidget):
 
 
     def closeEvent(self, event):
+
         self.dlg_closed.emit()
         return super().closeEvent(event)
 
 
     def event(self, event):
-        if (event.type() == QtCore.QEvent.WindowActivate or event.type() == QtCore.QEvent.Show) and self.isActiveWindow():
+
+        if (event.type() in QtCore.QEvent.WindowActivate or event.type() == QtCore.QEvent.Show) \
+                and self.isActiveWindow():
             if hasattr(self, "subtag") and self.subtag is not None:
                 tag = f'{self.widget().objectName()}_{self.subtag}'
             else:

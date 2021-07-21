@@ -90,7 +90,8 @@ class GwConfigButton(GwAction):
         tables_name = '"list_tables_name":"{'
         for layer in layers:
             # Check for query layer and/or bad layer
-            if not tools_qgis.check_query_layer(layer): continue
+            if not tools_qgis.check_query_layer(layer):
+                continue
             layers_name += f"{layer.name()}, "
             tables_name += f"{tools_qgis.get_layer_source_table_name(layer)}, "
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"'
