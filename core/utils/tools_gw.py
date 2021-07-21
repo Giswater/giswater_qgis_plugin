@@ -1598,8 +1598,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         return json_result
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
-            json_result = manage_json_geometry(json_result, sql)
-    except Exception as e:
+            json_result = manage_json_geometry(json_result)
+    except Exception:
         pass
 
     if not is_thread:
@@ -1608,7 +1608,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     return json_result
 
 
-def manage_json_geometry(json_result, sql=None):
+def manage_json_geometry(json_result):
 
     # Set QgsCoordinateReferenceSystem
     data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))

@@ -392,7 +392,6 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_gw.close_dialog(dialog)
                 return
 
-            feature_id = complet_result['body']['data']['featureId']
             message = "Feature replaced successfully"
             tools_qgis.show_info(message)
 

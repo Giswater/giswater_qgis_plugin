@@ -392,13 +392,12 @@ class GwInfo(QObject):
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        field_id = str(self.complet_result['body']['feature']['idName'])
         result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, self.my_json)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
+
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
-        # Open dialog
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
         return result, self.hydro_info_dlg

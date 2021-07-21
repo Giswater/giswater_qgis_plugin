@@ -415,6 +415,7 @@ class GwSearch:
                 self.result_data = result
 
         # Set label visible
+        display_list = []
         if result:
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
@@ -427,7 +428,6 @@ class GwSearch:
                 self.dlg_search.lbl_msg.setVisible(False)
 
             # Get list of items from returned json from database and make a list for completer
-            display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list))
@@ -436,7 +436,8 @@ class GwSearch:
             line_edit_add = line_list[1]
             value = tools_qt.get_text(self.dlg_search, line_edit_add)
             if str(value) in display_list:
-                line_edit.setText(value)
+                if line_edit:
+                    line_edit.setText(value)
                 return
             if str(value) == 'null':
                 return
@@ -522,9 +523,7 @@ class GwSearch:
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(self._reset_rubber_band)
-        field_id = str(result['body']['feature']['idName'])
         tools_gw.build_dialog_info(self.hydro_info_dlg, result)
-
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
@@ -534,7 +533,6 @@ class GwSearch:
         workcat_id = item['sys_id']
         field_id = item['filter_text']
         display_name = item['display_name']
-
         if workcat_id is None:
             return False
 
@@ -557,7 +555,6 @@ class GwSearch:
 
         search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
