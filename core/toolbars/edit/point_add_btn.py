@@ -81,7 +81,7 @@ class GwPointAddButton(GwAction):
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:
                         obj_action.setShortcutVisibleInContextMenu(True)
-                    except:
+                    except Exception:
                         pass
                     self.menu.addAction(obj_action)
                     obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
@@ -97,7 +97,7 @@ class GwPointAddButton(GwAction):
                             obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                         try:
                             obj_action.setShortcutVisibleInContextMenu(True)
-                        except:
+                        except Exception:
                             pass
                         self.menu.addAction(obj_action)
                         obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
@@ -112,7 +112,7 @@ class GwPointAddButton(GwAction):
                                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                             try:
                                 obj_action.setShortcutVisibleInContextMenu(True)
-                            except:
+                            except Exception:
                                 pass
                             self.menu.addAction(obj_action)
                             obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))

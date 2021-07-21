@@ -40,7 +40,7 @@ from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_os, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -67,7 +67,7 @@ def load_settings(dialog):
             if int(y) > screen_y:
                 y = int(screen_y)
             dialog.setGeometry(int(x), int(y), int(width), int(height))
-    except:
+    except Exception:
         pass
 
 
@@ -2281,7 +2281,7 @@ def manage_docker_options():
         global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dialog_docker'].position = pos
-    except:
+    except Exception:
         global_vars.session_vars['dialog_docker'].position = 2
 
 

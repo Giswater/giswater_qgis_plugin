@@ -284,7 +284,7 @@ class GwSnapManager(object):
                 x = map_point.x()
                 y = map_point.y()
             event_point = QPoint(int(x), int(y))
-        except:
+        except Exception:
             pass
         finally:
             return event_point
@@ -330,7 +330,7 @@ class GwSnapManager(object):
             snapped_feat = next(layer.getFeatures(feature_request))
             if select_feature and snapped_feat:
                 self._select_snapped_feature(result, feature_id)
-        except:
+        except Exception:
             pass
         finally:
             return snapped_feat

@@ -17,7 +17,6 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget
 from qgis.core import QgsPointXY, QgsGeometry
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from .info import GwInfo
@@ -184,12 +183,13 @@ class GwSearch:
                     self._write_to_csv(dialog, folder_path, all_rows)
             else:
                 self._write_to_csv(dialog, folder_path, all_rows)
-        except:
+        except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
 
 
     # region private functions
+
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
@@ -391,6 +391,7 @@ class GwSearch:
                 pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
             extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
+
         if line_list:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit

@@ -1261,7 +1261,7 @@ class GwMincut:
 
     def _insert_hydro(self):
         """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table 
+            Attach that model to selected table
         """
 
         # Check if user entered hydrometer_id
@@ -1410,7 +1410,7 @@ class GwMincut:
 
     def _insert_connec(self):
         """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table 
+            Attach that model to selected table
         """
 
         tools_qgis.disconnect_signal_selection_changed()
@@ -1606,7 +1606,7 @@ class GwMincut:
 
 
     def _accept_connec(self, dlg, element):
-        """ Slot function widget 'btn_accept' of 'connec' dialog 
+        """ Slot function widget 'btn_accept' of 'connec' dialog
             Insert into table 'om_mincut_connec' values of current mincut
         """
 
@@ -1637,7 +1637,7 @@ class GwMincut:
 
 
     def _accept_hydro(self, dlg, element):
-        """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
+        """ Slot function widget 'btn_accept' of 'hydrometer' dialog
             Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
@@ -1807,7 +1807,7 @@ class GwMincut:
         try:
             self.dlg_mincut.btn_cancel_task.hide()
             self.dlg_mincut.btn_cancel.show()
-        except:
+        except Exception:
             pass
 
         if not signal[0]:
@@ -1911,7 +1911,7 @@ class GwMincut:
         try:
             self.dlg_mincut.btn_cancel_task.hide()
             self.dlg_mincut.btn_cancel.show()
-        except:
+        except Exception:
             pass
 
         if not signal[0]:

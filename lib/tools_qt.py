@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -81,7 +81,7 @@ def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
                     widget.addItem(str(elem), user_data)
                 else:
                     widget.addItem(elem, user_data)
-            except:
+            except Exception:
                 widget.addItem(str(elem), user_data)
 
 
@@ -111,7 +111,8 @@ def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format=
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd'):
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in \
+            ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd'):
         date = widget.dateTime().toString(date_format)
     elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss'):
         date = widget.dateTime().toString(datetime_format)
@@ -138,7 +139,8 @@ def set_calendar(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01-01-2000', 'dd-MM-yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss','dd-MM-yyyy hh:mm:ss', 'yyyy-MM-dd hh:mm:ss')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in
+                ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss', 'dd-MM-yyyy hh:mm:ss', 'yyyy-MM-dd hh:mm:ss')):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
@@ -429,7 +431,7 @@ def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo
     try:
         if sort_combo:
             records_sorted = sorted(records, key=operator.itemgetter(sort_by))
-    except:
+    except Exception:
         pass
     finally:
         if add_empty:
@@ -851,7 +853,7 @@ def delete_rows_tableview(qtable):
             qtable.model().removeRow(index.row())
         status = qtable.model().submitAll()
         qtable.model().select()
-        
+
         # Return original editStrategy
         qtable.model().setEditStrategy(edit_strategy)
 
@@ -1106,7 +1108,8 @@ def show_exception_message(title=None, msg="", window_title="Information about e
     set_widget_text(dlg_text, dlg_text.txt_infolog, msg)
     dlg_text.setWindowFlags(Qt.WindowStaysOnTopHint)
     if pattern is None:
-        pattern = "File\\sname:|Function\\sname:|Line\\snumber:|SQL:|SQL\\sfile:|Detail:|Context:|Description|Schema name|Message\\serror:"
+        pattern = "File\\sname:|Function\\sname:|Line\\snumber:|SQL:|SQL\\sfile:|Detail:|Context:|Description|Schema " \
+                  "name|Message\\serror:"
     set_text_bold(dlg_text.txt_infolog, pattern)
 
 
@@ -1153,7 +1156,8 @@ def fill_combo_unicodes(combo):
     matches = ["utf8", "windows", "latin"]
     for item in list(aliases.items()):
         for x in matches:
-            if not f"{item[0]}".startswith(x): continue
+            if not f"{item[0]}".startswith(x):
+                continue
             unicode_list.append(str(item[0]))
 
     sorted_list = sorted(unicode_list, key=str.lower)

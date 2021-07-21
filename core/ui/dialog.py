@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QDialog, QWhatsThis, QApplication, QShortcut
+from qgis.PyQt.QtWidgets import QDialog, QShortcut
 from qgis.PyQt.QtGui import QKeySequence
 
 from ... import global_vars

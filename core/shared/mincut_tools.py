@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QTableView, QLineEdit, QCompleter, QAbstractItemView
+from qgis.PyQt.QtWidgets import QTableView, QLineEdit, QCompleter
 
 from ..shared.selector import GwSelector
 from ..ui.ui_manager import GwSelectorUi, GwMincutUi

@@ -18,7 +18,7 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
-    QgsCoordinateTransform, QgsProject
+    QgsCoordinateTransform
 from qgis.core import QgsVectorLayer
 
 from . import tools_log, tools_qt, tools_os
@@ -120,10 +120,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
-        if not check_query_layer(layer): continue
+        if not check_query_layer(layer):
+            continue
         if is_layer_visible(layer):
             table_name = get_layer_source_table_name(layer)
-            if not check_query_layer(layer): continue
+            if not check_query_layer(layer):
+                continue
             layers_name.append(table_name)
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
@@ -255,7 +257,7 @@ def get_layer_source(layer):
 
     if layer.providerType() != 'postgres':
         return layer_source
-    
+
     # Get dbname, host, port, user and password
     uri = layer.dataProvider().dataSourceUri()
 
@@ -289,7 +291,6 @@ def get_layer_source_table_name(layer):
     if layer is None:
         return None
 
-    uri_table = None
     uri = layer.dataProvider().dataSourceUri().lower()
     pos_ini = uri.find('table=')
     total = len(uri)
@@ -298,7 +299,8 @@ def get_layer_source_table_name(layer):
     if pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
     else:
-        uri_table = uri[pos_end_schema + 2:total-1]
+        uri_table = uri[pos_end_schema + 2:total - 1]
+
     return uri_table
 
 
@@ -389,9 +391,11 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
 def select_features_by_ids(feature_type, expr, layers=None):
     """ Select features of layers of group @feature_type applying @expr """
 
-    if layers is None: return
+    if layers is None:
+        return
 
-    if feature_type not in layers: return
+    if feature_type not in layers:
+        return
 
     # Build a list of feature id's and select them
     for layer in layers[feature_type]:
@@ -891,7 +895,8 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
 
     rubber_band.reset()
     layer = get_layer_by_tablename(layer_name)
-    if not layer: return
+    if not layer:
+        return
 
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
@@ -1044,4 +1049,3 @@ def _get_multi_coordinates(feature):
 
 
 # endregion
-

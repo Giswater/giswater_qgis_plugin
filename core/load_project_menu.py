@@ -12,12 +12,11 @@ from functools import partial
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
-from qgis.core import QgsApplication, QgsProject
+from qgis.core import QgsApplication
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
-from .utils.snap_manager import GwSnapManager
 from .. import global_vars
 from ..lib import tools_log, tools_qt, tools_qgis, tools_os, tools_db
 from .threads.project_layers_config import GwProjectLayersConfig

@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ..utils import tools_gw
 from ...lib import tools_qt
 
 

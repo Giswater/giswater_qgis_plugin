@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -112,7 +112,7 @@ def check_super_user(username=None):
     if not check_role(username):
         return False
 
-    sql = (f"SELECT usesuper FROM pg_user WHERE usename = '{username}';")
+    sql = f"SELECT usesuper FROM pg_user WHERE usename = '{username}'"
     row = get_row(sql)
     if row:
         return row[0]
@@ -122,12 +122,13 @@ def check_super_user(username=None):
 
 def check_postgis_version():
 
-    sql = f"select name FROM pg_available_extensions where name = 'postgis'"
+    sql = f"SELECT name FROM pg_available_extensions WHERE name = 'postgis'"
     row = get_row(sql)
     if row:
         return row[0]
     else:
         return False
+
 
 def get_current_user():
     """ Get current user connected to database """

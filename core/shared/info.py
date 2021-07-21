@@ -10,9 +10,7 @@ import os
 import re
 import urllib.parse as parse
 import webbrowser
-from collections import OrderedDict
 from functools import partial
-import time
 
 from sip import isdeleted
 
@@ -23,7 +21,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
@@ -965,7 +963,7 @@ class GwInfo(QObject):
                     global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
         try:
             global_vars.canvas.xyCoordinates.disconnect()
-        except:
+        except Exception:
             pass
 
 
@@ -1196,7 +1194,7 @@ class GwInfo(QObject):
             self.vertex_marker.hide()
             global_vars.canvas.xyCoordinates.disconnect()
             emit_point.canvasClicked.disconnect()
-        except:
+        except Exception:
             pass
 
 
