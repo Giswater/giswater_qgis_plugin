@@ -1725,7 +1725,7 @@ class GwVisit(QObject):
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit,  'visit'))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")

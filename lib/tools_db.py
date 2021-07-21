@@ -187,9 +187,9 @@ def set_database_connection():
 
     layer_source, not_version = get_layer_source_from_credentials('prefer')
     if layer_source:
-        if layer_source['service'] is None and (layer_source['db'] is None or layer_source['host'] is None or
-                                                layer_source['user'] is None or layer_source['password'] is None or
-                                                layer_source['port'] is None):
+        if layer_source['service'] is None and \
+                (layer_source['db'] is None or layer_source['host'] is None or layer_source['user'] is None
+                 or layer_source['password'] is None or layer_source['port'] is None):
             return False, not_version, layer_source
     else:
         return False, not_version, layer_source

@@ -848,16 +848,13 @@ class GwProfileButton(GwAction):
         text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
 
         # Fill top_elevation
-        plt.annotate(' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev -
-                         Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                     fontsize=6,
-                     color=text_color, fontweight=text_weight,
-                     rotation='vertical', horizontalalignment='center', verticalalignment='center')
+        s = ' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' '
+        xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
+        plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+                     horizontalalignment='center', verticalalignment='center')
         # Fill code
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.nodes[index].descript['code'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
+                 self.nodes[index].descript['code'], fontsize=7.5, color=text_color, fontweight=text_weight,
                  horizontalalignment='center', verticalalignment='center')
 
         # Node init
@@ -983,12 +980,10 @@ class GwProfileButton(GwAction):
             text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
 
             # Fill top_elevation
-            plt.annotate(' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' ',
-                         xy=(Decimal(start_point), self.min_top_elev -
-                             Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                         fontsize=6,
-                         color=text_color, fontweight=text_weight,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            s = ' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' '
+            xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
+            plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+                         horizontalalignment='center', verticalalignment='center')
 
             # Fill code
             plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * Decimal(5) + self.height_row / 2),
@@ -1256,7 +1251,7 @@ class GwProfileButton(GwAction):
             y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
 
             # set line
-            plt.plot(x1, y1,  color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
+            plt.plot(x1, y1, color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
 
             # set texts
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),

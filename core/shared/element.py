@@ -117,7 +117,7 @@ class GwElement:
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_element, table_object, cur_active_layer,  layers=self.layers)))
+            self.dlg_add_element, table_object, cur_active_layer, layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
@@ -127,7 +127,6 @@ class GwElement:
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, excluded_layers))
         self.dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-
 
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self._fill_dialog_element, self.dlg_add_element, table_object, None))
@@ -150,11 +149,10 @@ class GwElement:
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
-
-
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
+
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
@@ -176,7 +174,6 @@ class GwElement:
                " ORDER BY location_type")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
-
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
@@ -204,7 +201,6 @@ class GwElement:
         self._filter_elementcat_id()
 
         if self.new_element_id:
-            # Set default values
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
@@ -669,7 +665,7 @@ class GwElement:
         if not row:
             # Reset widgets
             widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id",
-                       "workcat_id",  "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
+                       "workcat_id", "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
                        "num_elements"]
             for widget_name in widgets:
                 tools_qt.set_widget_text(dialog, widget_name, "")

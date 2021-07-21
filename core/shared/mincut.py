@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
+from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint
 
