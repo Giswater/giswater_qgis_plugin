@@ -194,7 +194,7 @@ class GwEpaFileManager(GwTask):
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        self.body = self._create_body(extras=extras)
+        self.body = tools_gw.create_body(extras=extras)
 
         status = False
         while self.json_result is None and attempt < max_retries:
@@ -425,30 +425,13 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
-        form = f'"form":{{{form}}}, '
-        feature = f'"feature":{{{feature}}}, '
-        filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = f'"pageInfo":{{}}'
-        data = f'"data":{{{filter_fields}, {page_info}'
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
-
-
     def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
         extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
-        self.body = self._create_body(extras=extras)
+        self.body = tools_gw.create_body(extras=extras)
         self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
         self.rpt_result = self.json_result
         if self.json_result is None or not self.json_result:
