@@ -35,7 +35,7 @@ class GwDocker(QDockWidget):
 
     def event(self, event):
 
-        if (event.type() in QtCore.QEvent.WindowActivate or event.type() == QtCore.QEvent.Show) \
+        if (event.type() == QtCore.QEvent.WindowActivate or event.type() == QtCore.QEvent.Show) \
                 and self.isActiveWindow():
             if hasattr(self, "subtag") and self.subtag is not None:
                 tag = f'{self.widget().objectName()}_{self.subtag}'

@@ -150,4 +150,4 @@ class GwNotify(QObject):
         global_vars.session_vars['threads'].remove(self)
         self.task_finished.emit()
 
-    #endregion
+    # endregion

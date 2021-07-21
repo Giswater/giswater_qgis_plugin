@@ -1911,7 +1911,7 @@ class GwInfo(QObject):
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue')))
-                or (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
+                    or (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
             else:
