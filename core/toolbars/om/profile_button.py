@@ -468,7 +468,7 @@ class GwProfileButton(GwAction):
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
-       
+
     def _set_profile_variables(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 

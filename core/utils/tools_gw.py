@@ -857,7 +857,7 @@ def build_dialog_info(dialog, result, my_json=None):
 
     for order, field in enumerate(fields["fields"]):
         if 'hidden' in field and field['hidden']: continue
-        
+
         label = QLabel()
         label.setObjectName('lbl_' + field['label'])
         label.setText(field['label'].capitalize())
@@ -1123,7 +1123,7 @@ def add_spinbox(field):
         widget = QDoubleSpinBox()
         if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
             widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
-            
+
     if 'min' in field['widgetcontrols']['maxMinValues']:
         widget.setMinimum(field['widgetcontrols']['maxMinValues']['min'])
     if 'max' in field['widgetcontrols']['maxMinValues']:
@@ -2739,7 +2739,7 @@ def user_params_to_userconfig():
                         comment = value2.split('#')[1]
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
-  
+
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 

@@ -845,7 +845,7 @@ class GwMincut:
         if mincut_result_state == 1 or mincut_result_state == 2:
 
             sql += f", exec_start = '{forecast_start_real}'"
-            
+
             if mincut_result_state == 2:
                 sql += f", exec_end = '{forecast_end_real}'"
             if exec_from_plot != '':

@@ -362,7 +362,7 @@ class GwSnapManager(object):
                  3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
         colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
                   3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
-        
+
         vertex_marker.setIconType(icons[icon_type])
         vertex_marker.setColor(colors[color_type])
         vertex_marker.setIconSize(icon_size)

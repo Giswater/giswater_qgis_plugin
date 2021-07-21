@@ -118,7 +118,7 @@ class GwSelectManager(QgsMapTool):
         pass
 
     # endregion
-    
+
     # region private functions
 
     def _reset_selection(self):
