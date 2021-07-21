@@ -97,11 +97,12 @@ class GwEpaFileManager(GwTask):
         tools_gw.manage_json_response(self.json_result, sql, None)
 
         self.dlg_go2epa.btn_cancel.setEnabled(False)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         self._close_file()
 
-        # If sql function return null
+        # If PostgreSQL function returned null
         if self.complet_result is None:
             msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
             tools_log.log_warning(msg)
@@ -135,8 +136,12 @@ class GwEpaFileManager(GwTask):
             return
 
         if self.function_failed:
-            if "Failed" in self.complet_result['status']:
-                tools_gw.manage_json_exception(self.complet_result)
+            if self.json_result is None or not self.json_result:
+                tools_log.log_warning("Function failed finished")
+            if self.complet_result:
+                if 'status' in self.complet_result:
+                    if "Failed" in self.complet_result['status']:
+                        tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
                 if 'status' in self.rpt_result:
                     if "Failed" in self.rpt_result['status']:
@@ -181,23 +186,34 @@ class GwEpaFileManager(GwTask):
 
     def _exec_function_pg2epa(self):
 
+        max_retries = 3
+        attempt = 0
+        self.json_result = None
         self.setProgress(0)
+
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = self._create_body(extras=extras)
-        self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
-        self.complet_result = self.json_result
-        if self.json_result is None or not self.json_result:
-            self.function_failed = True
-            return False
 
-        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
-            tools_log.log_warning(self.json_result)
-            self.function_failed = True
-            return False
+        status = False
+        while self.json_result is None and attempt < max_retries:
+            attempt += 1
+            tools_log.log_warning(f"Attempt {attempt} of {max_retries}")
+            self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
+            self.complet_result = self.json_result
+            if self.json_result is None or not self.json_result:
+                tools_log.log_warning("Function failed")
+                self.function_failed = True
+            elif 'status' in self.json_result:
+                if self.json_result['status'] == 'Failed':
+                    tools_log.log_warning(self.json_result)
+                    self.function_failed = True
+                else:
+                    status = True
+                break
 
-        return True
+        return status
 
 
     def _export_inp(self):
