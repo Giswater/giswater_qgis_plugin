@@ -28,7 +28,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -255,10 +255,13 @@ def close_dialog(dlg):
 def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
 
+    info_types = {'full': 1}
+    info_type = info_types.get(global_vars.project_vars['info_type'])
+    lang = QgsApplication.locale().upper()
     if global_vars.project_epsg is None:
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":{info_type}, "lang":"{lang}"}}, '
     else:
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
+        client = f'$${{"client":{{"device":4, "infoType":{info_type}, "lang":"{lang}","epsg":{global_vars.project_epsg}}}, '
     form = f'"form":{{{form}}}, '
     feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
