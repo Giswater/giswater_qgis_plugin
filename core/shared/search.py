@@ -553,7 +553,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "session")
+        search_csv_path = tools_gw.get_config_parser('btn_search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -768,7 +768,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        tools_gw.set_config_parser('search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
+        tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         tools_qgis.show_info(message)
 
