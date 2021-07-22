@@ -15,10 +15,9 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
-
 from ...threads.connect_link import GwConnectLink
-
 from .... import global_vars
+
 
 class GwConnectLinkButton(GwMaptool):
     """ Button 20: Connect Link
@@ -28,10 +27,7 @@ class GwConnectLinkButton(GwMaptool):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-
         self.dragging = False
-
-        # Select rectangle
         self.select_rect = QRect()
 
 
@@ -54,7 +50,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
 
 
     def canvasReleaseEvent(self, event):
@@ -106,7 +102,7 @@ class GwConnectLinkButton(GwMaptool):
                 self.dragging = False
 
                 # Refresh map canvas
-                self.rubber_band.reset()
+                tools_gw.reset_rubberband(self.rubber_band)
 
             # Force reload dataProvider of layer
             tools_qgis.set_layer_index('v_edit_link')
@@ -143,8 +139,7 @@ class GwConnectLinkButton(GwMaptool):
         self.action.setChecked(True)
 
         # Rubber band
-        self.rubber_band.reset()
-
+        tools_gw.reset_rubberband(self.rubber_band)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -167,9 +162,12 @@ class GwConnectLinkButton(GwMaptool):
 
 
     def deactivate(self):
+
         super().deactivate()
 
+
     def manage_result(self, result, layer):
+
         if result is not False and result['status'] != 'Failed':
             self.dlg_dtext = GwDialogTextUi('connect_to_network')
             tools_gw.load_settings(self.dlg_dtext)
@@ -181,14 +179,13 @@ class GwConnectLinkButton(GwMaptool):
                 self.dlg_dtext.btn_close.clicked.connect(partial(self.manage_gully_result))
                 self.dlg_dtext.rejected.connect(partial(self.manage_gully_result))
             tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
-
             tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         layer.removeSelection()
 
         # Refresh map canvas
         if layer.name() == 'Gully' or global_vars.project_type == 'ws':
-            self.rubber_band.reset()
+            tools_gw.reset_rubberband(self.rubber_band)
             self.refresh_map_canvas()
             self.iface.actionPan().trigger()
 
@@ -219,6 +216,7 @@ class GwConnectLinkButton(GwMaptool):
 
     # endregion
 
+
     # region private functions
 
     def _set_rubber_band(self):
@@ -233,7 +231,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

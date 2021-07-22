@@ -33,10 +33,13 @@ class GwLoadProjectCheck:
         for layer in layers:
             if layer is None:
                 continue
-            if not tools_qgis.check_query_layer(layer): continue
-            if layer.providerType() != 'postgres': continue
+            if not tools_qgis.check_query_layer(layer):
+                continue
+            if layer.providerType() != 'postgres':
+                continue
             layer_source = tools_qgis.get_layer_source(layer)
-            if layer_source['schema'] is None: continue
+            if layer_source['schema'] is None:
+                continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name:
                 continue
@@ -55,7 +58,7 @@ class GwLoadProjectCheck:
                 fields += f'"fid":101, '
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
-        
+
         # Execute function 'gw_fct_setcheckproject'
         result = self._execute_check_project_function(init_project, fields)
 
@@ -167,8 +170,7 @@ class GwLoadProjectCheck:
                 label.setObjectName(f"lbl_{item['layer']}")
                 label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
 
-                critical_level = int(item['criticity']) if int(
-                    item['criticity']) > critical_level else critical_level
+                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
                 widget = QCheckBox()
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 widget.setObjectName(f"{item['layer']}")

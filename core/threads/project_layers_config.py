@@ -10,7 +10,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_log, tools_qgis, tools_qt
+from ...lib import tools_log, tools_qgis, tools_qt, tools_db
 
 
 class GwProjectLayersConfig(GwTask):
@@ -28,6 +28,8 @@ class GwProjectLayersConfig(GwTask):
         self.schema_name = params['schema_name']
         self.qgis_project_infotype = params['qgis_project_infotype']
         self.db_layers = params['db_layers']
+        self.body = None
+        self.json_result = None
 
 
     def run(self):
@@ -86,14 +88,17 @@ class GwProjectLayersConfig(GwTask):
                 schema = layer_source['schema']
                 if schema and schema.replace('"', '') == self.schema_name:
                     table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"
-                    if table_name not in self.available_layers: self.available_layers.append(table_name)
+                    if table_name not in self.available_layers:
+                        self.available_layers.append(table_name)
+
 
     def _set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
 
         for layer_name in layers_list:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
-            if layer is None: continue
+            if layer is None:
+                continue
             config = layer.editFormConfig()
             config.setSuppress(0)
             layer.setEditFormConfig(config)
@@ -103,6 +108,12 @@ class GwProjectLayersConfig(GwTask):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
+
+        # Check only once if function 'gw_fct_getinfofromid' exists
+        row = tools_db.check_function('gw_fct_getinfofromid')
+        if row in (None, ''):
+            tools_qgis.show_warning("Function not found in database", parameter='gw_fct_getinfofromid')
+            return False
 
         msg_failed = ""
         msg_key = ""
@@ -120,10 +131,10 @@ class GwProjectLayersConfig(GwTask):
             layer_number = layer_number + 1
             self.setProgress((layer_number * 100) / total_layers)
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
-            self.body = self._create_body(feature=feature, extras=extras)
-            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn, is_thread=True)
+            feature = f'"tableName":"{layer_name}", "isLayer":true'
+            self.body = self._create_body(feature=feature)
+            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
+                                                          is_thread=True, check_function=False)
             if not self.json_result:
                 continue
             if 'status' not in self.json_result:
@@ -251,7 +262,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
+        """ Create and return parameters as body to functions """
 
         client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '

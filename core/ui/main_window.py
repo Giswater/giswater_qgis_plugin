@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QMainWindow, QWhatsThis, QShortcut
+from qgis.PyQt.QtWidgets import QMainWindow, QShortcut
 from qgis.PyQt.QtGui import QKeySequence
 
 from ... import global_vars
@@ -53,6 +53,8 @@ class GwMainWindow(QMainWindow):
 
         if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
             global_vars.session_vars['last_focus'] = tag
+            return True
+
         return False
 
 

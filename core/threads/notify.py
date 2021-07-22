@@ -17,11 +17,10 @@ from ...lib import tools_log, tools_db
 
 
 class GwNotify(QObject):
-    # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
-    #                   re-LISTEN all channels
 
+    # :var conn_failed:
+    # some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to re-LISTEN all channels
     # Notify cannot use 'iface', directly or indirectly or open dialogs
-
     conn_failed = False
     list_channels = None
     task_start = pyqtSignal()
@@ -107,7 +106,8 @@ class GwNotify(QObject):
                 # the list and execute it. If there is one like it in the executed list, it means that of all those that
                 # were in the initial poll we have executed the last one and we do not want to execute the previous ones
                 notify = dao.conn.notifies.pop()
-                if notify in executed_notifies: continue
+                if notify in executed_notifies:
+                    continue
                 executed_notifies.append(notify)
 
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
@@ -136,6 +136,7 @@ class GwNotify(QObject):
             def show_message(self, **kwargs)
 
         """
+
         global_vars.session_vars['threads'].append(self)
         self.task_start.emit()
         for function in complet_result['functionAction']['functions']:
@@ -149,4 +150,4 @@ class GwNotify(QObject):
         global_vars.session_vars['threads'].remove(self)
         self.task_finished.emit()
 
-    #endregion
+    # endregion

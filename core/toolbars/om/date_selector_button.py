@@ -111,7 +111,7 @@ class GwDateSelectorButton(GwAction):
             else:
                 self.from_date = QDate.currentDate()
                 self.to_date = QDate.currentDate().addDays(1)
-        except:
+        except Exception:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
 

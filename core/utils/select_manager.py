@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsPointXY, QgsRectangle
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -39,7 +39,7 @@ class GwSelectManager(QgsMapTool):
 
         self.snapper_manager = GwSnapManager(self.iface)
 
-        self.rubber_band = QgsRubberBand(self.canvas, 2)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, 2)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
@@ -118,7 +118,7 @@ class GwSelectManager(QgsMapTool):
         pass
 
     # endregion
-    
+
     # region private functions
 
     def _reset_selection(self):
@@ -160,8 +160,8 @@ class GwSelectManager(QgsMapTool):
     def _reset_rubber_band(self):
 
         try:
-            self.rubber_band.reset(2)
-        except:
+            tools_gw.reset_rubberband(self.rubber_band, 2)
+        except Exception:
             pass
 
     # endregion

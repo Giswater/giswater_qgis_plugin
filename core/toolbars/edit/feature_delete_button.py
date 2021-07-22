@@ -13,7 +13,6 @@ from qgis.PyQt.QtWidgets import QCompleter
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
-from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
@@ -124,7 +123,7 @@ class GwFeatureDeleteButton(GwAction):
 
         try:
             self.canvas.selectionChanged.connect(partial(self._manage_selection))
-        except:
+        except Exception:
             pass
 
 

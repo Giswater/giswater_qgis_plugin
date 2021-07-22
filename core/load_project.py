@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
@@ -43,6 +44,8 @@ class GwLoadProject(QObject):
         # Get variables from qgis project
         tools_qgis.get_project_variables()
 
+        tools_gw.remove_deprecated_config_vars()
+
         # Check if user has all config params
         tools_gw.user_params_to_userconfig()
 
@@ -68,7 +71,7 @@ class GwLoadProject(QObject):
         self.schema_name = self.schema_name.replace('"', '')
         global_vars.schema_name = self.schema_name
 
-        # TEMP
+        # Setting global_vars
         global_vars.schema_name = self.schema_name
         global_vars.project_type = project_type
         global_vars.plugin_name = self.plugin_name
@@ -92,12 +95,18 @@ class GwLoadProject(QObject):
 
         # Get SRID from table node
         srid = tools_db.get_srid('v_edit_node', self.schema_name)
-        global_vars.srid = srid
+        global_vars.data_epsg = srid
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
         if status is False:
             return
+
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
+        if tools_os.set_boolean(open_search):
+            dlg_search = GwSearchUi()
+            GwSearch().open_search(dlg_search, load_project=True)
 
         # Create menu
         load_project_menu = GwMenuLoad()
@@ -115,11 +124,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
-        if tools_os.set_boolean(open_search):
-            dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
@@ -130,9 +134,13 @@ class GwLoadProject(QObject):
         global_vars.notify.start_listening(list_channels)
 
         # Reset some session/init user variables as vdefault
-        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init', prefix=False):
             self._manage_reset_user_variables()
-        
+
+        # Set global_vars.project_epsg
+        global_vars.project_epsg = tools_qgis.get_epsg()
+        QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
+
         # Log it
         message = "Project read successfully"
         tools_log.log_info(message)
@@ -227,8 +235,9 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            self.schema_name = global_vars.project_vars['main_schema']
-            global_vars.schema_name = global_vars.project_vars['main_schema']
+            if global_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
+                self.schema_name = global_vars.project_vars['main_schema']
+                global_vars.schema_name = global_vars.project_vars['main_schema']
 
         return True
 
@@ -252,7 +261,9 @@ class GwLoadProject(QObject):
 
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
-        if toolbar_names in (None, 'None'): return
+
+        if toolbar_names in (None, 'None'):
+            return
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         toolbars_order = toolbars_order.replace(' ', '').split(',')
@@ -268,7 +279,6 @@ class GwLoadProject(QObject):
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
-
                 if button_def not in (None, 'None'):
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
@@ -299,12 +309,10 @@ class GwLoadProject(QObject):
     def _create_toolbar(self, toolbar_id):
 
         list_actions = tools_gw.get_config_parser('toolbars', str(toolbar_id), "project", "giswater")
-
         if list_actions in (None, 'None'):
             return
 
         list_actions = list_actions.replace(' ', '').split(',')
-
         if type(list_actions) != list:
             list_actions = [list_actions]
 
@@ -357,7 +365,6 @@ class GwLoadProject(QObject):
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
-            # self._enable_toolbar("plan")
 
         elif restriction == 'role_master' or restriction == 'role_admin':
             self._enable_toolbar("om")

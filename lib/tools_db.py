@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -112,7 +112,7 @@ def check_super_user(username=None):
     if not check_role(username):
         return False
 
-    sql = (f"SELECT usesuper FROM pg_user WHERE usename = '{username}';")
+    sql = f"SELECT usesuper FROM pg_user WHERE usename = '{username}'"
     row = get_row(sql)
     if row:
         return row[0]
@@ -122,12 +122,13 @@ def check_super_user(username=None):
 
 def check_postgis_version():
 
-    sql = f"select name FROM pg_available_extensions where name = 'postgis'"
+    sql = f"SELECT name FROM pg_available_extensions WHERE name = 'postgis'"
     row = get_row(sql)
     if row:
         return row[0]
     else:
         return False
+
 
 def get_current_user():
     """ Get current user connected to database """
@@ -186,9 +187,9 @@ def set_database_connection():
 
     layer_source, not_version = get_layer_source_from_credentials('prefer')
     if layer_source:
-        if layer_source['service'] is None and (layer_source['db'] is None or layer_source['host'] is None or
-                                                layer_source['user'] is None or layer_source['password'] is None or
-                                                layer_source['port'] is None):
+        if layer_source['service'] is None and \
+                (layer_source['db'] is None or layer_source['host'] is None or layer_source['user'] is None
+                 or layer_source['password'] is None or layer_source['port'] is None):
             return False, not_version, layer_source
     else:
         return False, not_version, layer_source
@@ -411,11 +412,11 @@ def check_function(function_name, schema_name=None, commit=True, aux_conn=None):
         schema_name = global_vars.schema_name
 
     schema_name = schema_name.replace('"', '')
-    sql = ("SELECT routine_name FROM information_schema.routines "
-           "WHERE lower(routine_schema) = %s "
-           "AND lower(routine_name) = %s")
-    params = [schema_name, function_name]
-    row = get_row(sql, params=params, commit=commit, aux_conn=aux_conn)
+    sql = (f"SELECT routine_name "
+           f"FROM information_schema.routines "
+           f"WHERE lower(routine_schema) = '{schema_name}' "
+           f"AND lower(routine_name) = '{function_name}'")
+    row = get_row(sql, commit=commit, aux_conn=aux_conn)
     return row
 
 

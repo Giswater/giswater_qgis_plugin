@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import QSettings
 
 
 # region system variables (values are initialized on load project without changes during session)
-
 iface = None                            # An instance of interface that provides the hook by which you can manipulate the QGIS application at run time. Type "QgsInterface"
 canvas = None                           # An insance of QGIS canvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
 plugin_dir = None                       # An instance of plugin directory path
@@ -19,7 +18,7 @@ plugin_name = None                      # An instance of plugin name
 user_folder_dir = None                  # An instance of configurable user variables directory path
 schema_name = None                      # An instance of schema name retrieved from qgis project connection with PostgreSql
 project_type = None                     # An instance of project type getting from "version" table from PostgreSql
-srid = None                             # An instance of srid parameter retrieved from qgis project layer "v_edit_node"
+data_epsg = None                        # An instance of srid parameter retrieved from qgis project layer "v_edit_node"
 logger = None                           # An instance of GwLogger class thats found in "/lib/tools_log.py"
 giswater_settings = None                # An instance of QGIS settings relating to Giswater variables such as toolbars and actions chekeables"
 qgis_settings = None                    # An instance of QGIS settings"
@@ -35,7 +34,7 @@ project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
-
+project_epsg = None                     # An instance of project epsg
 # endregion
 
 
@@ -51,9 +50,7 @@ date_format = None                      # Display format of the dates allowed in
 # endregion
 
 
-
 # region Dynamic Variables (variables may change value during user's session)
-
 session_vars = {}
 session_vars['last_error'] = None       # An instance of the last database runtime error
 session_vars['last_error_msg'] = None   # An instance of the last database runtime error message used in threads
@@ -63,8 +60,10 @@ session_vars['info_docker'] = None      # An instance of current status of the i
 session_vars['docker_type'] = None      # An instance of current status of the docker form configured by user. Can be configured "qgis_info_docker" and "qgis_form_docker"
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
 session_vars['last_focus'] = None       # An instance of the last focused dialog's tag
-
+snappers = []                           # A list of all the snapper managers, used to disable them in 'Reset plugin' action
+active_rubberbands = []                 # A list of all active rubber bands, used to disable them in 'Reset plugin' action
 # endregion
+
 
 # region Init Variables Functions
 

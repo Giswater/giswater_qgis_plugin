@@ -12,12 +12,14 @@ from functools import partial
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.core import QgsApplication
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_log, tools_qt, tools_qgis, tools_os
+from ..lib import tools_log, tools_qt, tools_qgis, tools_os, tools_db
+from .threads.project_layers_config import GwProjectLayersConfig
 
 
 class GwMenuLoad(QObject):
@@ -113,6 +115,14 @@ class GwMenuLoad(QObject):
                                        prefix=False)
         action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
         action_help.triggered.connect(tools_gw.open_dlg_help)
+
+        action_reset_plugin = actions_menu.addAction(f"Reset plugin")
+        action_reset_plugin_shortcut = tools_gw.get_config_parser("system", f"reset_plugin_shortcut", "user", "init", prefix=False)
+        if not action_reset_plugin_shortcut:
+            tools_gw.set_config_parser("system", f"reset_plugin_shortcut", f"{action_reset_plugin_shortcut}", "user",
+                                       "init", prefix=False)
+        action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
+        action_reset_plugin.triggered.connect(self._reset_plugin)
         # endregion
 
         # region Adavanced
@@ -152,6 +162,8 @@ class GwMenuLoad(QObject):
 
 
     # region private functions
+
+
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 
@@ -287,5 +299,59 @@ class GwMenuLoad(QObject):
             tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
+
+
+    def _reset_plugin(self):
+        """ Called in reset plugin action """
+
+        self._reset_snapping_managers()
+        self._reset_all_rubberbands()
+        self.iface.actionPan().trigger()
+
+        try:
+            self._reload_layers()
+        except NotImplementedError:
+            # Weird bug, sometimes fails to create the task...
+            try:
+                self._reload_layers()
+            except NotImplementedError:
+                tools_log.log_warning("Error reloading layers, try again...")
+            pass
+
+
+    def _reload_layers(self):
+        """ Reloads all the layers """
+
+        schema_name = global_vars.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql, log_sql=True)
+        description = f"ConfigLayerFields"
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(task_get_layers)
+        QgsApplication.taskManager().triggerTask(task_get_layers)
+
+
+    def _reset_snapping_managers(self):
+        """ Deactivates all snapping managers """
+
+        for i in range(0, len(global_vars.snappers)):
+            global_vars.snappers[i].restore_snap_options(global_vars.snappers[i].recover_snapping_options())
+            global_vars.snappers[i].set_snapping_status(False)
+            global_vars.snappers[i].vertex_marker.hide()
+
+
+    def _reset_all_rubberbands(self):
+        """ Resets all active rubber bands """
+
+        for i in range(0, len(global_vars.active_rubberbands)):
+            global_vars.active_rubberbands[0].reset()
+            global_vars.active_rubberbands.pop(0)
 
     # endregion

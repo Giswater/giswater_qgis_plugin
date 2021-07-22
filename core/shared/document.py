@@ -10,7 +10,6 @@ import webbrowser
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
-from qgis.gui import QgsRubberBand
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
@@ -36,7 +35,7 @@ class GwDocument:
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
         """ Button 34: Add document """
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals
         self.dlg_add_doc = GwDocUi()
         tools_gw.load_settings(self.dlg_add_doc)
@@ -110,7 +109,7 @@ class GwDocument:
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
-        self.dlg_add_doc.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self._activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_doc, "path"))
@@ -130,7 +129,7 @@ class GwDocument:
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_doc,  table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 

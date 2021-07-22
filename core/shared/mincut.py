@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
+from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -845,7 +845,7 @@ class GwMincut:
         if mincut_result_state == 1 or mincut_result_state == 2:
 
             sql += f", exec_start = '{forecast_start_real}'"
-            
+
             if mincut_result_state == 2:
                 sql += f", exec_end = '{forecast_end_real}'"
             if exec_from_plot != '':
@@ -1261,7 +1261,7 @@ class GwMincut:
 
     def _insert_hydro(self):
         """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table 
+            Attach that model to selected table
         """
 
         # Check if user entered hydrometer_id
@@ -1410,7 +1410,7 @@ class GwMincut:
 
     def _insert_connec(self):
         """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table 
+            Attach that model to selected table
         """
 
         tools_qgis.disconnect_signal_selection_changed()
@@ -1606,7 +1606,7 @@ class GwMincut:
 
 
     def _accept_connec(self, dlg, element):
-        """ Slot function widget 'btn_accept' of 'connec' dialog 
+        """ Slot function widget 'btn_accept' of 'connec' dialog
             Insert into table 'om_mincut_connec' values of current mincut
         """
 
@@ -1637,7 +1637,7 @@ class GwMincut:
 
 
     def _accept_hydro(self, dlg, element):
-        """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
+        """ Slot function widget 'btn_accept' of 'hydrometer' dialog
             Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
@@ -1770,7 +1770,7 @@ class GwMincut:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
@@ -1807,7 +1807,7 @@ class GwMincut:
         try:
             self.dlg_mincut.btn_cancel_task.hide()
             self.dlg_mincut.btn_cancel.show()
-        except:
+        except Exception:
             pass
 
         if not signal[0]:
@@ -1845,7 +1845,7 @@ class GwMincut:
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
-                   f"{snapped_point.y()}), {global_vars.srid}),"
+                   f"{snapped_point.y()}), {global_vars.data_epsg}),"
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{element_id}'"
                    f" WHERE id = '{real_mincut_id}'")
@@ -1911,7 +1911,7 @@ class GwMincut:
         try:
             self.dlg_mincut.btn_cancel_task.hide()
             self.dlg_mincut.btn_cancel.show()
-        except:
+        except Exception:
             pass
 
         if not signal[0]:

@@ -126,7 +126,7 @@ def refresh_canvas(**kwargs):
         elif type(layers_name_list) == list:
             for layer_name in layers_name_list:
                 tools_qgis.set_layer_index(layer_name)
-    except:
+    except Exception:
         all_layers = tools_qgis.get_project_layers()
         for layer in all_layers:
             layer.triggerRepaint()

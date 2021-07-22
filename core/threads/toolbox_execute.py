@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDoubleSpinBox, QSpinBox, QWidget, QLineEdit
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsDateTimeEdit
@@ -97,7 +96,7 @@ class GwToolBoxTask(GwTask):
                             widget.setStyleSheet(None)
                             value = tools_qt.get_text(self.dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                            if value is '' and widget.property('ismandatory'):
+                            if value == '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
@@ -130,9 +129,12 @@ class GwToolBoxTask(GwTask):
             extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
         self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True, aux_conn=self.aux_conn, is_thread=True)
-        if self.isCanceled(): return False
-        if self.json_result['status'] == 'Failed': return False
-        if not self.json_result or self.json_result is None: return False
+        if self.isCanceled():
+            return False
+        if self.json_result['status'] == 'Failed':
+            return False
+        if not self.json_result or self.json_result is None:
+            return False
 
         try:
             # getting simbology capabilities
@@ -162,7 +164,8 @@ class GwToolBoxTask(GwTask):
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         if result is False and self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
@@ -180,6 +183,8 @@ class GwToolBoxTask(GwTask):
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
 
+
     def cancel(self):
+
         self.toolbox.remove_layers()
         super().cancel()

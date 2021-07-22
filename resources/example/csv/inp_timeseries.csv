@@ -1,3 +1,4 @@
+timser_id; timser_type, times_type; date/time; hour/value;value
 example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:00;1.15
 example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:10;1.25
 example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:20;1.35

@@ -84,7 +84,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = global_vars.srid
+        self.srid = global_vars.data_epsg
 
         # Check button
         self.action.setChecked(True)

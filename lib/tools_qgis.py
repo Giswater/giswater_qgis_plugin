@@ -17,7 +17,8 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
-    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
+    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
+    QgsCoordinateTransform
 from qgis.core import QgsVectorLayer
 
 from . import tools_log, tools_qt, tools_os
@@ -119,10 +120,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
-        if not check_query_layer(layer): continue
+        if not check_query_layer(layer):
+            continue
         if is_layer_visible(layer):
             table_name = get_layer_source_table_name(layer)
-            if not check_query_layer(layer): continue
+            if not check_query_layer(layer):
+                continue
             layers_name.append(table_name)
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
@@ -254,7 +257,7 @@ def get_layer_source(layer):
 
     if layer.providerType() != 'postgres':
         return layer_source
-    
+
     # Get dbname, host, port, user and password
     uri = layer.dataProvider().dataSourceUri()
 
@@ -288,7 +291,6 @@ def get_layer_source_table_name(layer):
     if layer is None:
         return None
 
-    uri_table = None
     uri = layer.dataProvider().dataSourceUri().lower()
     pos_ini = uri.find('table=')
     total = len(uri)
@@ -297,7 +299,8 @@ def get_layer_source_table_name(layer):
     if pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
     else:
-        uri_table = uri[pos_end_schema + 2:total-1]
+        uri_table = uri[pos_end_schema + 2:total - 1]
+
     return uri_table
 
 
@@ -388,9 +391,11 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
 def select_features_by_ids(feature_type, expr, layers=None):
     """ Select features of layers of group @feature_type applying @expr """
 
-    if layers is None: return
+    if layers is None:
+        return
 
-    if feature_type not in layers: return
+    if feature_type not in layers:
+        return
 
     # Build a list of feature id's and select them
     for layer in layers[feature_type]:
@@ -527,10 +532,24 @@ def get_max_rectangle_from_coords(list_coord):
     return max_x, max_y, min_x, min_y
 
 
-def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
+def zoom_to_rectangle(x1, y1, x2, y2, margin=5, change_crs=True):
     """ Generate an extension on the canvas according to the received coordinates """
 
+
     rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
+    if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566' and change_crs:
+
+        rect = QgsRectangle(float(float(x1) + margin) * -1,
+                            (float(y1) + margin) * -1,
+                            (float(x2) - margin) * -1,
+                            (float(y2) - margin) * -1)
+    elif str(global_vars.data_epsg) != str(global_vars.project_epsg) and change_crs:
+        data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+        project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
+        tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
+
+        rect = tform.transform(rect)
+
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
 
@@ -876,7 +895,8 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
 
     rubber_band.reset()
     layer = get_layer_by_tablename(layer_name)
-    if not layer: return
+    if not layer:
+        return
 
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
@@ -908,6 +928,14 @@ def check_query_layer(layer):
         return True
     except Exception:
         return False
+
+
+def get_epsg():
+
+    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = epsg.split(':')[1]
+
+    return epsg
 
 
 # region private functions
@@ -1021,4 +1049,3 @@ def _get_multi_coordinates(feature):
 
 
 # endregion
-

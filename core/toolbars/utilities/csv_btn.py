@@ -72,6 +72,7 @@ class GwCSVButton(GwAction):
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self._get_function_name))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self._select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.chk_ignore_header.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_space.clicked.connect(partial(self._preview_csv, self.dlg_csv))
@@ -212,12 +213,13 @@ class GwCSVButton(GwAction):
         delimiter = self._get_delimiter(dialog)
         model = QStandardItemModel()
         _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
+        _ignoreheader = dialog.chk_ignore_header.isChecked()
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
         try:
             with open(path, "r", encoding=_unicode) as file_input:
-                self._read_csv_file(model, file_input, delimiter, _unicode)
+                self._read_csv_file(model, file_input, delimiter, _unicode, _ignoreheader)
         except Exception as e:
             tools_qgis.show_warning(str(e))
 
@@ -303,10 +305,11 @@ class GwCSVButton(GwAction):
                 field[f"csv{x + 1}"] = f"{value}"
             fields.append(field)
             cont += 1
-            progress = (100*cont)/row_count
+            progress = (100 * cont) / row_count
             dialog.progressBar.setValue(progress)
         dialog.progressBar.setValue(100)
-        if not fields: return False
+        if not fields:
+            return False
 
         values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
@@ -334,10 +337,13 @@ class GwCSVButton(GwAction):
         return path
 
 
-    def _read_csv_file(self, model, file_input, delimiter, _unicode):
+    def _read_csv_file(self, model, file_input, delimiter, _unicode, _ignoreheader):
 
         rows = csv.reader(file_input, delimiter=delimiter)
         for row in rows:
+            if tools_os.set_boolean(_ignoreheader) is True:
+                _ignoreheader = False
+                continue
             unicode_row = [x for x in row]
             items = [QStandardItem(field) for field in unicode_row]
             model.appendRow(items)
