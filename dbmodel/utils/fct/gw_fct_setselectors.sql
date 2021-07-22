@@ -117,12 +117,12 @@ BEGIN
 			END IF;
 			EXECUTE 'INSERT INTO selector_sector (sector_id, cur_user) 
 			SELECT sector_id, current_user FROM exploitation e, sector s 
-			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			WHERE e.active IS TRUE AND st_dwithin(st_buffer(e.the_geom,0.5,''side=right''), s.the_geom,0) 
 			AND expl_id = '||v_id||' ON CONFLICT (sector_id,cur_user) DO NOTHING;';
 		ELSE
 			EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id IN
 			(SELECT sector_id FROM exploitation e, sector s 
-			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			WHERE e.active IS TRUE  AND st_dwithin(st_buffer(e.the_geom,0.5,''side=right''), s.the_geom,0) 
 			AND expl_id = '||v_id||');';
 		END IF;
 
@@ -135,7 +135,7 @@ BEGIN
 			SELECT DISTINCT sector_id, current_user 
 			FROM sector s, exploitation e
 			JOIN macroexploitation USING (macroexpl_id)
-			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			WHERE e.active IS TRUE  AND st_dwithin(st_buffer(e.the_geom,0.5,''side=right''), s.the_geom,0) 
 			AND macroexpl_id = '||v_id||';';
 		END IF;
 	END IF;
@@ -150,12 +150,12 @@ BEGIN
 			END IF;
 			EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) 
 			SELECT expl_id, current_user FROM exploitation e, sector s 
-			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			WHERE e.active IS TRUE AND st_dwithin(e.the_geom, st_buffer(s.the_geom,0.5,''side=right''),0) 
 			AND sector_id = '||v_id||' ON CONFLICT (expl_id,cur_user) DO NOTHING;';
 		ELSE
 			EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user AND expl_id IN
 			(SELECT expl_id FROM exploitation e, sector s 
-			WHERE e.active IS TRUE AND s.active IS TRUE AND st_dwithin(e.the_geom, s.the_geom,0) 
+			WHERE e.active IS TRUE AND st_dwithin(e.the_geom, st_buffer(s.the_geom,0.5,''side=right''),0) 
 			AND sector_id = '||v_id||');';
 		END IF;
 
