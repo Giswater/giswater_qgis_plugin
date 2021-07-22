@@ -1594,8 +1594,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
-        manage_json_exception(json_result, sql)
-        return json_result
+        manage_json_exception(json_result, sql, is_thread=is_thread)
+        return json_result,  global_vars.session_vars['last_error_msg']
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
             json_result = manage_json_geometry(json_result)
@@ -1643,7 +1643,7 @@ def manage_json_response(complet_result, sql=None, rubber_band=None):
             pass
 
 
-def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0):
+def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_thread=False):
     """ Manage exception in JSON database queries and show information to the user """
 
     try:
@@ -1690,6 +1690,10 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             if 'MSGERR' in json_result:
                 msg += f"Message error: {json_result['MSGERR']}"
             global_vars.session_vars['last_error_msg'] = msg
+
+            if is_thread:
+                return
+
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
             if len(global_vars.session_vars['threads']) == 0:
