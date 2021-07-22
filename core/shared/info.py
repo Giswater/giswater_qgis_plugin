@@ -127,7 +127,6 @@ class GwInfo(QObject):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-        extras += f', "rolePermissions":"{qgis_project_infotype}"'
 
         function_name = None
         body = None
