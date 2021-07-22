@@ -100,8 +100,9 @@ class GwFeatureReplaceButton(GwMaptool):
     def activate(self):
 
         # Set active and current layer
-        self.current_layer = self.iface.activeLayer()
-        self.iface.setActiveLayer(self.current_layer)
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
 
         # Check button
         self.action.setChecked(True)
@@ -127,7 +128,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on feature to replace it with a new one"
+            message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
             tools_qgis.show_info(message)
 
 
