@@ -104,7 +104,6 @@ class GwInfo(QObject):
         # Get project variables
         qgis_project_add_schema = global_vars.project_vars['add_schema']
         qgis_project_main_schema = global_vars.project_vars['main_schema']
-        qgis_project_infotype = global_vars.project_vars['info_type']
         qgis_project_role = global_vars.project_vars['project_role']
 
         self.new_feature = new_feature
@@ -150,7 +149,6 @@ class GwInfo(QObject):
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "mainSchema":"{qgis_project_main_schema}"'
             extras += f', "addSchema":"{qgis_project_add_schema}"'
-            extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = tools_gw.create_body(extras=extras)
