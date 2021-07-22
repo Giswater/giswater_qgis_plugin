@@ -85,7 +85,7 @@ class GwDimensioning:
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(
-            partial(self._save_dimensioning, qgis_feature, layer, action_snapping, action_orientation))
+            partial(self._save_dimensioning, qgis_feature, layer))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
