@@ -134,7 +134,7 @@ class GwLoadProject(QObject):
         global_vars.notify.start_listening(list_channels)
 
         # Reset some session/init user variables as vdefault
-        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init', prefix=False):
             self._manage_reset_user_variables()
 
         # Set global_vars.project_epsg
