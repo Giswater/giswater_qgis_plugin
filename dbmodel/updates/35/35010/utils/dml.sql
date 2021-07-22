@@ -229,7 +229,7 @@ VALUES ('basic_selector_tab_macroexploitation', '{"table":"macroexploitation", "
 "table_id":"macroexpl_id",  "selector_id":"expl_id",  "label":"macroexpl_id, '' - '', m.name", 
 "orderBy":"macroexpl_id", "manageAll":true, "query_filter":" AND macroexpl_id > 0"}', 
 'Variable to configura all options related to search for the specificic tab',
-'Selector variables', true, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
+'Selector variables', FALSE, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, 
 iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, 
