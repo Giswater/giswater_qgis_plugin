@@ -132,7 +132,7 @@ class GwProjectLayersConfig(GwTask):
             self.setProgress((layer_number * 100) / total_layers)
 
             feature = f'"tableName":"{layer_name}", "isLayer":true'
-            self.body = self._create_body(feature=feature)
+            self.body = tools_gw.create_body(feature=feature)
             self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
                                                           is_thread=True, check_function=False)
             if not self.json_result:
@@ -259,22 +259,5 @@ class GwProjectLayersConfig(GwTask):
         else:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
         layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-
-
-    def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions """
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-        form = '"form":{' + form + '}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
 
     # endregion

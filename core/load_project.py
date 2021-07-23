@@ -108,6 +108,9 @@ class GwLoadProject(QObject):
             dlg_search = GwSearchUi()
             GwSearch().open_search(dlg_search, load_project=True)
 
+        # Get feature cat
+        global_vars.feature_cat = tools_gw.manage_feature_cat()
+
         # Create menu
         load_project_menu = GwMenuLoad()
         load_project_menu.read_menu()
@@ -380,7 +383,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("plan")
 
         # Check if exist some feature_cat with active True on cat_feature table
-        self.feature_cat = tools_gw.manage_feature_cat()
+        self.feature_cat = global_vars.feature_cat
         if self.feature_cat is None:
             self._enable_button("01", False)
             self._enable_button("02", False)
