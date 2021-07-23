@@ -204,11 +204,11 @@ BEGIN
 
 		ELSIF v_feature_type='arc' THEN
 			IF v_project_type='WS' then
-				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
-				VALUES (v_id, v_code, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom);
+				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
+				VALUES (v_id, v_code, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
 			ELSE 
-				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
-				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom);
+				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
+				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
