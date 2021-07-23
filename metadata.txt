@@ -14,8 +14,11 @@ version=3.5.010
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 
-changelog=Version 3.5.009
-    - Bug fix in managing user permissions when opening main dialog
+changelog=Version 3.5.010
+    - Enhancement: manage epsg from QGIS project
+    - Enhancement: allow arcs on replace feature tool
+    - Minor bug fix: Manage software_version_info on admin form acoording project_schema_name
+
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
