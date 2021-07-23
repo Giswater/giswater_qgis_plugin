@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ..utils import tools_gw
 from ...lib import tools_qt
 
 
@@ -53,7 +52,8 @@ class GwCreateSchemaUtilsTask(GwTask):
 
         super().finished(result)
         self.setProgress(100)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         # Handle exception
         if self.exception is not None:
@@ -63,5 +63,5 @@ class GwCreateSchemaUtilsTask(GwTask):
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
-        self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'], is_utils=True)
+        self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'], is_utils=True)
 

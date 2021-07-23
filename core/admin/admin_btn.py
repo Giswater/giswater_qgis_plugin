@@ -146,7 +146,7 @@ class GwAdminButton:
         answer = tools_qt.show_question(msg, title)
         if not answer:
             return
-        
+
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if self.rdb_import_data.isChecked():
@@ -213,6 +213,7 @@ class GwAdminButton:
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
         """"""
+
         msg = "Are you sure to update the project schema to last version?"
         result = tools_qt.show_question(msg, "Info")
         if result:
@@ -1500,7 +1501,7 @@ class GwAdminButton:
             return False
 
         # Check is project name already exists
-        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata " 
+        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
                f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
 
@@ -1511,7 +1512,8 @@ class GwAdminButton:
                     available = False
                     break
 
-        if available: return True
+        if available:
+            return True
 
         list_schemas = [row[0] for row in rows if f"{project_name}" in f"{row[0]}"]
         new_name = self.bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
@@ -3393,7 +3395,7 @@ class GwAdminButton:
         description = f"Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
                   'project_name_schema': 'utils', 'project_locale': ws_project_result[1],
-                  'project_srid': ws_project_result[2], 'example_data': False, 'schema_version':None}
+                  'project_srid': ws_project_result[2], 'example_data': False, 'schema_version': None}
         self.task_create_schema = GwCreateSchemaUtilsTask(self, description, params)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)

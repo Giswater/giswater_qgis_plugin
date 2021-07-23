@@ -137,7 +137,7 @@ class GwLoadProject(QObject):
         global_vars.notify.start_listening(list_channels)
 
         # Reset some session/init user variables as vdefault
-        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init'):
+        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init', prefix=False):
             self._manage_reset_user_variables()
 
         # Set global_vars.project_epsg
@@ -264,7 +264,9 @@ class GwLoadProject(QObject):
 
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
-        if toolbar_names in (None, 'None'): return
+
+        if toolbar_names in (None, 'None'):
+            return
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         toolbars_order = toolbars_order.replace(' ', '').split(',')
@@ -279,13 +281,18 @@ class GwLoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
-
-                if button_def not in (None, 'None'):
-                    text = self.translate(f'{index_action}_text')
-                    icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
-                    self.buttons[index_action] = button
+                successful = False
+                count_trys = 0
+                while not successful or count_trys >= 10:
+                    button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
+                    if button_def not in (None, 'None'):
+                        text = self.translate(f'{index_action}_text')
+                        icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
+                        button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
+                        self.buttons[index_action] = button
+                        successful = True
+                    else:
+                        count_trys = count_trys + 1
 
         # Disable buttons which are project type exclusive
         project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
@@ -311,12 +318,10 @@ class GwLoadProject(QObject):
     def _create_toolbar(self, toolbar_id):
 
         list_actions = tools_gw.get_config_parser('toolbars', str(toolbar_id), "project", "giswater")
-
         if list_actions in (None, 'None'):
             return
 
         list_actions = list_actions.replace(' ', '').split(',')
-
         if type(list_actions) != list:
             list_actions = [list_actions]
 
@@ -369,7 +374,6 @@ class GwLoadProject(QObject):
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
-            # self._enable_toolbar("plan")
 
         elif restriction == 'role_master' or restriction == 'role_admin':
             self._enable_toolbar("om")

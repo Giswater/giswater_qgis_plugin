@@ -305,10 +305,11 @@ class GwCSVButton(GwAction):
                 field[f"csv{x + 1}"] = f"{value}"
             fields.append(field)
             cont += 1
-            progress = (100*cont)/row_count
+            progress = (100 * cont) / row_count
             dialog.progressBar.setValue(progress)
         dialog.progressBar.setValue(100)
-        if not fields: return False
+        if not fields:
+            return False
 
         values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)

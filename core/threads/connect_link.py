@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from .task import GwTask
-from ...lib import tools_qgis
 from ..utils import tools_gw
 
 

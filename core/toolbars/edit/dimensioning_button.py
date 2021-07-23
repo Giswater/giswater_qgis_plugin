@@ -9,7 +9,6 @@ from qgis.PyQt.QtCore import QSettings, Qt
 
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
-from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis
 
 
@@ -54,7 +53,7 @@ class GwDimensioningButton(GwMaptool):
             self.conf_supp = config.suppress()
             config.setSuppress(0)
             self.layer.setEditFormConfig(config)
-            
+
             self.iface.setActiveLayer(self.layer)
             tools_qgis.set_layer_visible(self.layer)
             self.layer.startEditing()

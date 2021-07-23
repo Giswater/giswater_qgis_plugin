@@ -25,7 +25,7 @@ class GwI18NGenerator:
 
     def init_dialog(self):
         """ Constructor """
-        
+
         self.dlg_qm = GwAdminTranslationUi()
         tools_gw.load_settings(self.dlg_qm)
         self._load_user_values()
@@ -42,6 +42,7 @@ class GwI18NGenerator:
 
 
     # region private functions
+
 
     def _check_connection(self):
         """ Check connection to database """
@@ -478,7 +479,7 @@ class GwI18NGenerator:
         tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
-        
+
 
     def _init_db(self, host, port, db, user, password):
         """ Initializes database connection """

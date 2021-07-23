@@ -139,7 +139,8 @@ class GwProfileButton(GwAction):
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
-        if links_distance in ("", "None", None): links_distance = 1
+        if links_distance in ("", "None", None):
+            links_distance = 1
 
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
@@ -149,7 +150,8 @@ class GwProfileButton(GwAction):
 
         # Execute query
         self.profile_json = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-        if self.profile_json is None or self.profile_json['status'] == 'Failed': return
+        if self.profile_json is None or self.profile_json['status'] == 'Failed':
+            return
 
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -193,7 +195,8 @@ class GwProfileButton(GwAction):
 
         # Get values from profile form
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
-        if links_distance in ("", "None", None): links_distance = 1
+        if links_distance in ("", "None", None):
+            links_distance = 1
         title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
@@ -204,7 +207,8 @@ class GwProfileButton(GwAction):
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setprofile', body)
-        if result is None or result['status'] == 'Failed': return
+        if result is None or result['status'] == 'Failed':
+            return
         message = f"{result['message']}"
         tools_qgis.show_info(message)
 
@@ -352,7 +356,8 @@ class GwProfileButton(GwAction):
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-                    if result is None or result['status'] == 'Failed': return
+                    if result is None or result['status'] == 'Failed':
+                        return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
                     # Manage level and message from query result
@@ -468,7 +473,7 @@ class GwProfileButton(GwAction):
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
-       
+
     def _set_profile_variables(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 
@@ -582,18 +587,12 @@ class GwProfileButton(GwAction):
         ysup = [s1y, s2y, s3y]
 
         # draw first node bottom line
-        plt.plot(xinf, yinf,
-                 zorder=100,
-                 linestyle=self._get_stylesheet(node.data_type)[0],
-                 color=self._get_stylesheet(node.data_type)[1],
-                 linewidth=self._get_stylesheet(node.data_type)[2])
+        plt.plot(xinf, yinf, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
+                 color=self._get_stylesheet(node.data_type)[1], linewidth=self._get_stylesheet(node.data_type)[2])
 
         # draw first node upper line
-        plt.plot(xsup, ysup,
-                 zorder=100,
-                 linestyle=self._get_stylesheet(node.data_type)[0],
-                 color=self._get_stylesheet(node.data_type)[1],
-                 linewidth=self._get_stylesheet(node.data_type)[2])
+        plt.plot(xsup, ysup, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
+                 color=self._get_stylesheet(node.data_type)[1], linewidth=self._get_stylesheet(node.data_type)[2])
 
         self.first_top_x = 0
         self.first_top_y = node.top_elev
@@ -731,7 +730,7 @@ class GwProfileButton(GwAction):
 
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 date, fontsize=title_size*0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
+                 date, fontsize=title_size * 0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
 
 
     def _draw_nodes(self, node, prev_node, index):
@@ -849,16 +848,13 @@ class GwProfileButton(GwAction):
         text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
 
         # Fill top_elevation
-        plt.annotate(' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev -
-                         Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                     fontsize=6,
-                     color=text_color, fontweight=text_weight,
-                     rotation='vertical', horizontalalignment='center', verticalalignment='center')
+        s = ' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' '
+        xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
+        plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+                     horizontalalignment='center', verticalalignment='center')
         # Fill code
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.nodes[index].descript['code'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
+                 self.nodes[index].descript['code'], fontsize=7.5, color=text_color, fontweight=text_weight,
                  horizontalalignment='center', verticalalignment='center')
 
         # Node init
@@ -893,11 +889,11 @@ class GwProfileButton(GwAction):
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Nodes between init and end
-        elif index < self.n-1:
+        elif index < self.n - 1:
 
             # defining variables
-            y2_prev = self.nodes[index-1].y2
-            elev2_prev = self.nodes[index-1].elev2
+            y2_prev = self.nodes[index - 1].y2
+            elev2_prev = self.nodes[index - 1].elev2
             y1 = self.nodes[0].y1
             elev1 = self.nodes[0].elev1
 
@@ -927,7 +923,7 @@ class GwProfileButton(GwAction):
                          color=text_color, fontweight=text_weight,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
         # Node end
-        elif index == self.n-1:
+        elif index == self.n - 1:
 
             # Fill y_max
             plt.annotate(
@@ -984,12 +980,10 @@ class GwProfileButton(GwAction):
             text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
 
             # Fill top_elevation
-            plt.annotate(' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' ',
-                         xy=(Decimal(start_point), self.min_top_elev -
-                             Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                         fontsize=6,
-                         color=text_color, fontweight=text_weight,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            s = ' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' '
+            xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
+            plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+                         horizontalalignment='center', verticalalignment='center')
 
             # Fill code
             plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * Decimal(5) + self.height_row / 2),
@@ -1257,7 +1251,7 @@ class GwProfileButton(GwAction):
             y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
 
             # set line
-            plt.plot(x1, y1,  color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
+            plt.plot(x1, y1, color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
 
             # set texts
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),

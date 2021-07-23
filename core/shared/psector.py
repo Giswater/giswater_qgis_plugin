@@ -17,9 +17,8 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget,  QDoubleSpinBox, QTextEdit, QPushButton
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
@@ -126,7 +125,7 @@ class GwPsector:
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = tools_db.get_rows(sql)
-        
+
         tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
 
         # Populate combo expl_id
@@ -477,7 +476,7 @@ class GwPsector:
                     if str(qtable.model().record(x).value('total_budget')) != 'NULL':
                         total += float(qtable.model().record(x).value('total_budget'))
             tools_qt.set_widget_text(dialog, 'lbl_total', str(total))
-        except:
+        except Exception:
             pass
 
 
@@ -1060,14 +1059,14 @@ class GwPsector:
         self.delete_psector_selector('selector_plan_psector')
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id)
-                
+
         if close_dlg:
             json_result = self.set_plan()
             if 'status' in json_result and json_result['status'] == 'Accepted':
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 
-            
+
     def set_plan(self):
 
         # TODO: Check this
@@ -1075,8 +1074,8 @@ class GwPsector:
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
         return json_result
-        
-        
+
+
     def price_selector(self, dialog, tableleft, tableright, field_id_right):
 
         # fill QTableView all_rows
@@ -1326,8 +1325,10 @@ class GwPsector:
 
 
     def show_status_warning(self):
+
         mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
-        if mode is None: return
+        if mode is None:
+            return
 
         mode = json.loads(mode[0])
         if mode['mode'] == 'obsolete':
@@ -1337,7 +1338,6 @@ class GwPsector:
                   "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
             tools_qt.show_details(msg, 'Message warning')
         elif mode['mode'] == 'onService':
-
             if tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status) == '0':
                 msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
                       "this psector will be executed. Planified features will turn on service and deleted features " \
@@ -1689,7 +1689,8 @@ class GwPsector:
         """ Check layers visibility and add it if it is not in the toc """
 
         layer = tools_qgis.get_layer_by_tablename(layer_name)
-        if layer is None: tools_gw.add_layer_database(layer_name, the_geom, field_id)
+        if layer is None:
+            tools_gw.add_layer_database(layer_name, the_geom, field_id)
         if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
             tools_qgis.set_layer_visible(layer, True, True)
 
@@ -1701,7 +1702,8 @@ class GwPsector:
         layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
                   'v_plan_psector_node']
         for layer_name in layers:
-            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully': continue
+            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully':
+                continue
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False

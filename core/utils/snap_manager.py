@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject, QgsPointXY,  QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
+from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
     QgsTolerance, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
@@ -284,7 +284,7 @@ class GwSnapManager(object):
                 x = map_point.x()
                 y = map_point.y()
             event_point = QPoint(int(x), int(y))
-        except:
+        except Exception:
             pass
         finally:
             return event_point
@@ -330,7 +330,7 @@ class GwSnapManager(object):
             snapped_feat = next(layer.getFeatures(feature_request))
             if select_feature and snapped_feat:
                 self._select_snapped_feature(result, feature_id)
-        except:
+        except Exception:
             pass
         finally:
             return snapped_feat
@@ -362,7 +362,7 @@ class GwSnapManager(object):
                  3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
         colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
                   3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
-        
+
         vertex_marker.setIconType(icons[icon_type])
         vertex_marker.setColor(colors[color_type])
         vertex_marker.setIconSize(icon_size)
@@ -370,7 +370,9 @@ class GwSnapManager(object):
 
 
     def show_snap_message(self, msg, feature_type=None):
-        if msg is False: return
+
+        if msg is False:
+            return
         if global_vars.user_level['level'] not in (None, 'None'):
             if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
                 if msg is True:

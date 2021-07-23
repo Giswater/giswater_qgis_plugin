@@ -10,7 +10,6 @@ import webbrowser
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
-from qgis.gui import QgsRubberBand
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
@@ -130,7 +129,7 @@ class GwDocument:
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_doc,  table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 

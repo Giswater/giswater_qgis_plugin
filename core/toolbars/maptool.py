@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -149,7 +149,7 @@ class GwMaptool(QgsMapTool):
             elif geom_type == "line":
                 geom_type = QgsWkbTypes.LineString
             self.rubber_band.reset(geom_type)
-        except:
+        except Exception:
             pass
 
 

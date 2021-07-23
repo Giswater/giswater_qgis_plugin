@@ -99,6 +99,7 @@ class GwGisFileCreate:
 
     # region private functions
 
+
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 

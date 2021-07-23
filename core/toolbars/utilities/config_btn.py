@@ -9,9 +9,9 @@ import json
 import operator
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
-    QTextEdit, QLineEdit
+    QTextEdit, QLineEdit, QCompleter
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
@@ -19,6 +19,7 @@ from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 from .... import global_vars
+
 
 class GwConfigButton(GwAction):
     """ Button 99: Config """
@@ -90,7 +91,8 @@ class GwConfigButton(GwAction):
         tables_name = '"list_tables_name":"{'
         for layer in layers:
             # Check for query layer and/or bad layer
-            if not tools_qgis.check_query_layer(layer): continue
+            if not tools_qgis.check_query_layer(layer):
+                continue
             layers_name += f"{layer.name()}, "
             tables_name += f"{tools_qgis.get_layer_source_table_name(layer)}, "
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"'
@@ -122,7 +124,6 @@ class GwConfigButton(GwAction):
         tools_gw.close_dialog(self.dlg_config)
 
 
-    # noinspection PyUnresolvedReferences
     def _build_dialog_options(self, row, tab):
 
         self.tab = tab
@@ -153,7 +154,6 @@ class GwConfigButton(GwAction):
                         widget.setText(field['value'])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
                         if field['widgettype'] == 'typeahead':
                             completer = QCompleter()
                             if 'dv_querytext' in field:
@@ -167,11 +167,13 @@ class GwConfigButton(GwAction):
                         widget.setText(field['value'])
                         widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
                     elif field['widgettype'] == 'combo':
                         widget = QComboBox()
                         self._fill_combo(widget, field)
                         widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
                     elif field['widgettype'] == 'check':
                         self.chk = QCheckBox()
                         self.chk.setObjectName(field['widgetname'])
@@ -185,6 +187,7 @@ class GwConfigButton(GwAction):
                             self.chk.setChecked(False)
                         self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                         self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
+
                     elif field['widgettype'] == 'datetime':
                         widget = QgsDateTimeEdit()
                         widget.setAllowNull(True)
@@ -202,6 +205,7 @@ class GwConfigButton(GwAction):
 
                         widget.dateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
                     elif field['widgettype'] == 'spinbox':
                         widget = QDoubleSpinBox()
                         if 'value' in field and field['value'] is not None:
@@ -209,8 +213,6 @@ class GwConfigButton(GwAction):
                             widget.setValue(value)
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    else:
-                        pass
 
                     if widget:
                         widget.setObjectName(field['widgetname'])

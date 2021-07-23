@@ -14,7 +14,6 @@ from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-from qgis.gui import QgsRubberBand
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwPrintUi

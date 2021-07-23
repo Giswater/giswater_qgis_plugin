@@ -14,7 +14,6 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from ..models.om_visit import GwOmVisit
@@ -447,7 +446,7 @@ class GwVisit(QObject):
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
             self.get_visit(visit_id=selected_object_id)
-            
+
         # Disconnect open visit from table_visit once there opened
         self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
         self.dlg_visit_manager.btn_open.clicked.disconnect()
@@ -548,7 +547,7 @@ class GwVisit(QObject):
         # Update geometry field (if user have selected a point)
         if self.point_xy['x'] is not None:
             self._update_geom()
-            
+
         layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
             layer.dataProvider().reloadData()
@@ -572,7 +571,8 @@ class GwVisit(QObject):
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
         complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
-        if complet_result is None: return
+        if complet_result is None:
+            return
         tools_log.log_info(f"execute_pgfunction: {complet_result}")
 
 
@@ -1467,7 +1467,7 @@ class GwVisit(QObject):
         om_event_parameter = GwConfigVisitParameter()
         om_event_parameter.id = event.parameter_id
         parameter_id = event.parameter_id
-        
+
         if not om_event_parameter.fetch():
             return
 
@@ -1725,7 +1725,7 @@ class GwVisit(QObject):
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit,  'visit'))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")

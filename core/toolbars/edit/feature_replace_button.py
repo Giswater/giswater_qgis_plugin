@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -100,8 +100,9 @@ class GwFeatureReplaceButton(GwMaptool):
     def activate(self):
 
         # Set active and current layer
-        self.current_layer = self.iface.activeLayer()
-        self.iface.setActiveLayer(self.current_layer)
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
 
         # Check button
         self.action.setChecked(True)
@@ -127,7 +128,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on feature to replace it with a new one"
+            message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
             tools_qgis.show_info(message)
 
 
@@ -195,7 +196,7 @@ class GwFeatureReplaceButton(GwMaptool):
         feature_type = feature.attribute(self.feature_edit_type)
 
         # Avoid to replace obsolete or planned features
-        if feature.attribute('state') in (0,2):
+        if feature.attribute('state') in (0, 2):
             message = "Current feature has state 0 or 2. Therefore it is not replaceable"
             tools_qt.show_info_box(message, "Info")
             return
@@ -392,7 +393,6 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_gw.close_dialog(dialog)
                 return
 
-            feature_id = complet_result['body']['data']['featureId']
             message = "Feature replaced successfully"
             tools_qgis.show_info(message)
 

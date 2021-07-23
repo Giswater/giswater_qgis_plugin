@@ -61,7 +61,7 @@ class GwFlowExitButton(GwMaptool):
 
         # Set snapping layers
         self.snapper_manager.set_snapping_layers()
-        
+
         # Set snapping to node
         self.snapper_manager.config_snap_to_node(False)
 
@@ -106,4 +106,4 @@ class GwFlowExitButton(GwMaptool):
             # Set action pan
             self.set_action_pan()
 
-     # endregion
+    # endregion

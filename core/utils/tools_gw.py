@@ -20,7 +20,7 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant,  QDate
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
@@ -35,12 +35,11 @@ from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
 from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
-
 from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_os, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -67,7 +66,7 @@ def load_settings(dialog):
             if int(y) > screen_y:
                 y = int(screen_y)
             dialog.setGeometry(int(x), int(y), int(width), int(height))
-    except:
+    except Exception:
         pass
 
 
@@ -428,7 +427,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         for layer in child_layers:
             if layer[0] != 'Load all':
                 vlayer = tools_qgis.get_layer_by_tablename(layer[0])
-                if vlayer: continue
+                if vlayer:
+                    continue
                 uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 group = layer[4] if layer[4] is not None else group
@@ -438,7 +438,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
                     style = execute_procedure('gw_fct_getstyle', body)
-                    if style is None or style['status'] == 'Failed': return
+                    if style is None or style['status'] == 'Failed':
+                        return
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
@@ -454,7 +455,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         if style_id not in (None, "-1"):
             body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
             style = execute_procedure('gw_fct_getstyle', body)
-            if style is None or style['status'] == 'Failed': return
+            if style is None or style['status'] == 'Failed':
+                return
             if 'styles' in style['body']:
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
@@ -494,7 +496,8 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
         if str(k) == "info":
             text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
         elif k in ('point', 'line', 'polygon'):
-            if 'features' not in data[k]: continue
+            if 'features' not in data[k]:
+                continue
             counter = len(data[k]['features'])
             if counter > 0:
                 counter = len(data[k]['features'])
@@ -573,7 +576,6 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
             dialog.btn_accept.disconnect()
             dialog.btn_accept.hide()
         except AttributeError:
-            # Control if btn_accept exist
             pass
 
         try:
@@ -859,8 +861,9 @@ def build_dialog_info(dialog, result, my_json=None):
     grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
 
     for order, field in enumerate(fields["fields"]):
-        if 'hidden' in field and field['hidden']: continue
-        
+        if 'hidden' in field and field['hidden']:
+            continue
+
         label = QLabel()
         label.setObjectName('lbl_' + field['label'])
         label.setText(field['label'].capitalize())
@@ -894,7 +897,8 @@ def build_dialog_info(dialog, result, my_json=None):
             widget = add_button(dialog, field)
         widget.setProperty('ismandatory', field['ismandatory'])
 
-        if 'layoutorder' in field: order = field['layoutorder']
+        if 'layoutorder' in field:
+            order = field['layoutorder']
         grid_layout.addWidget(label, order, 0)
         grid_layout.addWidget(widget, order, 1)
 
@@ -983,7 +987,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget = add_button(dialog, field, temp_layers_added, module)
                 widget = set_widget_size(widget, field)
 
-            if widget is None: continue
+            if widget is None:
+                continue
 
             # Set editable/readonly
             if type(widget) in (QLineEdit, QDoubleSpinBox):
@@ -1119,14 +1124,13 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
 def add_spinbox(field):
 
     widget = None
-
     if field['widgettype'] == 'spinbox':
         widget = QSpinBox()
     elif field['widgettype'] == 'doubleSpinbox':
         widget = QDoubleSpinBox()
         if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
             widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
-            
+
     if 'min' in field['widgetcontrols']['maxMinValues']:
         widget.setMinimum(field['widgetcontrols']['maxMinValues']['min'])
     if 'max' in field['widgetcontrols']['maxMinValues']:
@@ -1472,7 +1476,8 @@ def fill_child(dialog, widget, action, feature_type=''):
     combo_id = tools_qt.get_combo_value(dialog, widget)
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
     json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{feature_type}'")
-    if json_result is None: return
+    if json_result is None:
+        return
 
     for combo_child in json_result['fields']:
         if combo_child is not None:
@@ -1592,12 +1597,12 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
-        manage_json_exception(json_result, sql)
-        return json_result
+        manage_json_exception(json_result, sql, is_thread=is_thread)
+        return json_result,  global_vars.session_vars['last_error_msg']
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
-            json_result = manage_json_geometry(json_result, sql)
-    except Exception as e:
+            json_result = manage_json_geometry(json_result)
+    except Exception:
         pass
 
     if not is_thread:
@@ -1606,7 +1611,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     return json_result
 
 
-def manage_json_geometry(json_result, sql=None):
+def manage_json_geometry(json_result):
 
     # Set QgsCoordinateReferenceSystem
     data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
@@ -1641,7 +1646,7 @@ def manage_json_response(complet_result, sql=None, rubber_band=None):
             pass
 
 
-def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0):
+def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_thread=False):
     """ Manage exception in JSON database queries and show information to the user """
 
     try:
@@ -1688,6 +1693,10 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             if 'MSGERR' in json_result:
                 msg += f"Message error: {json_result['MSGERR']}"
             global_vars.session_vars['last_error_msg'] = msg
+
+            if is_thread:
+                return
+
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
             if len(global_vars.session_vars['threads']) == 0:
@@ -1784,7 +1793,8 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
                         style = execute_procedure('gw_fct_getstyle', body)
-                        if style is None or style['status'] == 'Failed': return
+                        if style is None or style['status'] == 'Failed':
+                            return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
@@ -2050,7 +2060,8 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     field_id = f"{class_object.feature_type}_id"
 
     ids = []
-    if class_object.layers is None: return
+    if class_object.layers is None:
+        return
 
     # Iterate over all layers of the group
     for layer in class_object.layers[class_object.feature_type]:
@@ -2284,7 +2295,7 @@ def manage_docker_options():
         global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dialog_docker'].position = pos
-    except:
+    except Exception:
         global_vars.session_vars['dialog_docker'].position = 2
 
 
@@ -2742,7 +2753,7 @@ def user_params_to_userconfig():
                         comment = value2.split('#')[1]
                         set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
-  
+
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 

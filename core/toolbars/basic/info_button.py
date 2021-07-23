@@ -13,7 +13,6 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
-from qgis.gui import QgsRubberBand
 
 from ...shared import info
 from ...shared.info import GwInfo
@@ -89,7 +88,7 @@ class GwInfoButton(GwMaptool):
         super().deactivate()
 
     # endregion
-    
+
     # region private functions
 
     def _create_point(self, event):

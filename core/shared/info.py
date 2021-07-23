@@ -10,9 +10,7 @@ import os
 import re
 import urllib.parse as parse
 import webbrowser
-from collections import OrderedDict
 from functools import partial
-import time
 
 from sip import isdeleted
 
@@ -23,7 +21,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
@@ -36,7 +34,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 global is_inserting
 is_inserting = False
@@ -253,7 +251,6 @@ class GwInfo(QObject):
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
-
         feature_id = tools_qt.get_text(dialog, widget)
         self.customForm = GwInfo(self.tab_type)
         complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
@@ -361,8 +358,10 @@ class GwInfo(QObject):
 
         result = complet_result['body']['data']
         for field in result['fields']:
-            if 'hidden' in field and field['hidden']: continue
-            if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
+            if 'hidden' in field and field['hidden']:
+                continue
+            if 'layoutname' in field and field['layoutname'] == 'lyt_none':
+                continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
@@ -390,13 +389,12 @@ class GwInfo(QObject):
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        field_id = str(self.complet_result['body']['feature']['idName'])
         result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, self.my_json)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
+
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
-        # Open dialog
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
         return result, self.hydro_info_dlg
@@ -715,11 +713,13 @@ class GwInfo(QObject):
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
+
         return dlg_cf, fid
 
 
     def _get_feature_type(self, complet_result):
         """ Get feature type as feature_type (node, arc, connec, gully) """
+
         self.feature_type = str(complet_result['body']['feature']['featureType'])
         if str(self.feature_type) in ('', '[]'):
             if 'feature_cat' in globals():
@@ -787,6 +787,7 @@ class GwInfo(QObject):
 
 
     def _connect_signals(self):
+
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
             # self.layer.editingStopped.connect(self.fct_stop_editing)
@@ -871,6 +872,7 @@ class GwInfo(QObject):
         event_point = self.snapper_manager.get_event_point(point=point)
         if not event_point:
             return
+
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
@@ -925,7 +927,7 @@ class GwInfo(QObject):
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
-            if widget and len(v) > 0 :
+            if widget and len(v) > 0:
                 text = tools_qt.get_text(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
@@ -942,7 +944,7 @@ class GwInfo(QObject):
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
-            if widget and len(v) > 0 :
+            if widget and len(v) > 0:
                 widget.setStyleSheet(None)
                 tools_qt.set_widget_text(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
@@ -962,7 +964,7 @@ class GwInfo(QObject):
                     global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
         try:
             global_vars.canvas.xyCoordinates.disconnect()
-        except:
+        except Exception:
             pass
 
 
@@ -1193,7 +1195,7 @@ class GwInfo(QObject):
             self.vertex_marker.hide()
             global_vars.canvas.xyCoordinates.disconnect()
             emit_point.canvasClicked.disconnect()
-        except:
+        except Exception:
             pass
 
 
@@ -1296,6 +1298,7 @@ class GwInfo(QObject):
 
 
     def _manage_edition(self, dialog, action_edit, fid, new_feature=None):
+
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
@@ -1453,6 +1456,7 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
@@ -1508,9 +1512,9 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
-
         completer = QCompleter()
         widget = self._manage_text(**kwargs)
         widget = tools_gw.set_typeahead(field, dialog, widget, completer)
@@ -1521,10 +1525,10 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_combo(field)
         widget = tools_gw.set_widget_size(widget, field)
         widget = self._set_auto_update_combobox(field, dialog, widget, new_feature)
@@ -1535,10 +1539,10 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_checkbox(field)
         widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
@@ -1549,10 +1553,10 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_calendar(dialog, field)
         widget = self._set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
@@ -1562,9 +1566,9 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
-
         widget = tools_gw.add_button(dialog, field, module=self)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
@@ -1828,7 +1832,8 @@ class GwInfo(QObject):
             # When we are inserting we want the activation of QAction to be governed by the database,
             # when we are editing, it will govern the editing state of the layer.
             global is_inserting
-            if not is_inserting: return
+            if not is_inserting:
+                return
 
             # Get index of selected tab
             index_tab = self.tab_main.currentIndex()
@@ -1902,8 +1907,8 @@ class GwInfo(QObject):
 
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
-            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
-                          (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
+            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue')))
+                    or (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
             else:
@@ -2545,7 +2550,8 @@ class GwInfo(QObject):
         sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
         rows = tools_db.get_rows(sql)
         table_visit_node_dict = {}
-        if not rows: return
+        if not rows:
+            return
         for row in rows:
             table_visit_node_dict[row[0]] = str(row[1])
         self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
@@ -2688,15 +2694,17 @@ class GwInfo(QObject):
             if status is False and message is not None:
                 tools_qgis.show_warning(message, parameter=path[0])
 
+
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
                           value_filter=None, widget=None):
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
-        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
-               " FROM {}".format(str(table_name)))
+        sql = (f"SELECT MIN({mindate}), MAX({maxdate}) "
+               f"FROM {table_name}")
         if column_filter is not None and value_filter is not None:
-            sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
+            sql += f" WHERE {column_filter} = '{value_filter}'"
         row = tools_db.get_row(sql)
         if row:
             widget_fromdate.blockSignals(True)
@@ -3518,6 +3526,7 @@ class GwInfo(QObject):
 
 
     def _get_catalog(self, form_name, table_name, feature_type, feature_id, list_points, id_name):
+
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         extras = f'"coordinates":{{{list_points}}}'
@@ -3566,7 +3575,8 @@ class GwInfo(QObject):
         # Get widgets values
         values = {}
         for widget in widgets:
-            if widget.property('columnname') in (None, ''): continue
+            if widget.property('columnname') in (None, ''):
+                continue
             values = tools_gw.get_values(dialog, widget, values, ignore_editability=True)
         fields = json.dumps(values)
 
@@ -3677,7 +3687,8 @@ class GwInfo(QObject):
                   f'"dqaId":"{dqa_id}"')
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
-        if json_result is None: return
+        if json_result is None:
+            return
 
         if 'status' in json_result and json_result['status'] == 'Accepted':
             if json_result['message']:

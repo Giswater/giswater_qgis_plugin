@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsPointXY, QgsRectangle
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -118,7 +118,7 @@ class GwSelectManager(QgsMapTool):
         pass
 
     # endregion
-    
+
     # region private functions
 
     def _reset_selection(self):
@@ -161,7 +161,7 @@ class GwSelectManager(QgsMapTool):
 
         try:
             tools_gw.reset_rubberband(self.rubber_band, 2)
-        except:
+        except Exception:
             pass
 
     # endregion

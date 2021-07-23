@@ -12,7 +12,6 @@ from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsRubberBand
 
 from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
@@ -246,7 +245,7 @@ class GwFeatureEndButton(GwAction):
             # When converting it into a tuple, if it only has one element, remove the "," that is added at the end
             if len(self.selected_list) == 1:
                 ids = f"{tuple(self.selected_list)}"[:-2] + ")"
-                
+
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN {ids} AND arc_state = '1'")
             row = tools_db.get_row(sql, log_sql=True)
