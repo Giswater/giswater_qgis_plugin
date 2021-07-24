@@ -261,8 +261,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.sector_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1010", "function":"1220","debug_msg":"'||NEW.node_id::text||'"}}$$);';
+				NEW.sector_id = 0;
 			END IF;            
 		END IF;
 		
@@ -293,8 +292,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.dma_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1014", "function":"1220","debug_msg":"'||NEW.node_id::text||'"}}$$);';
+				NEW.dma_id = 0;
 			END IF;            
 		END IF;
 		
