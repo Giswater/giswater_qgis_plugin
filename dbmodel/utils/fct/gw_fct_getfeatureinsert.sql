@@ -36,6 +36,7 @@ v_epsg integer;
 v_client_epsg integer;
 v_version json;
 
+
 BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
@@ -54,11 +55,14 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row' iNTO v_version;
 	v_epsg = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);	
 
-	-- set geometry column
+	-- set geometry column (in this case is not need to transform using the client_epsg because qgis client sends the original geometry data 
+	--because gets it not from canvas also from the specified feature (wichs has data on epsg from source)
 	IF v_x2 IS NULL THEN
-		v_input_geometry:= ST_Transform(ST_SetSRID(ST_MakePoint(v_x1, v_y1),v_client_epsg), v_epsg);
+		v_input_geometry:= ST_SetSRID(ST_MakePoint(v_x1, v_y1),v_epsg);
+		--v_input_geometry:= ST_Transform(ST_SetSRID(ST_MakePoint(v_x1, v_y1),v_client_epsg), v_epsg);
 	ELSIF v_x2 IS NOT NULL THEN
-		v_input_geometry:= ST_Transform(ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),v_client_epsg), v_epsg);
+		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),v_epsg);
+		--v_input_geometry:= ST_Transform(ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),v_client_epsg), v_epsg);
 	END IF;
 	
 	-- Call gw_fct_getinfofromid
