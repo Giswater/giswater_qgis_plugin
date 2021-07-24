@@ -253,9 +253,11 @@ BEGIN
 			UPDATE cat_feature SET active = false WHERE system_id NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL'); -- ud projects
 		END IF;
 		
-		
 		-- hidden lastupdate and lastupdate_user columns
 		update config_form_fields SET hidden = true WHERE columnname IN ('lastupdate', 'lastupdate_user', 'publish', 'uncertain');
+		
+		-- disable edit_noderotation_update_dsbl
+		UPDATE sys_param_user SET ismandatory = true, vdefault ='TRUE' WHERE id = 'edit_noderotation_update_dsbl';
 		
 	ELSIF v_isnew IS FALSE THEN
 		
