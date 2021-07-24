@@ -235,7 +235,7 @@ BEGIN
 
 					-- Control of same node initial and final
 					IF (v_noderecord1.node_id = v_noderecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
-						v_message = (SELECT concat('Error[1040]:',error_message, v_noderecord1.node_id,'. ',hint_message) FROM sys_message WHERE id=1040);
+						v_message = (SELECT concat('ERROR-1040:',error_message, v_noderecord1.node_id,'. ',hint_message) FROM sys_message WHERE id=1040);
 						v_status = false;
 					END IF;
 
@@ -307,7 +307,7 @@ BEGIN
 					IF ((v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NULL)) AND v_arc_insert_automatic_endpoint THEN
 
 					ELSE
-						v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) 
+						v_message = (SELECT concat('ERROR-1042:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) 
 						FROM sys_message WHERE id=1042);
 						v_status = false;
 					END IF;
@@ -319,14 +319,14 @@ BEGIN
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1044]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1044);
+					v_message = (SELECT concat('ERROR-1044:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1044);
 					v_status = false;
 				END IF;
 				
 			ELSIF upper(v_catfeature.feature_type) ='GULLY' THEN
 				v_numnodes := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(p_reduced_geometry, gully.the_geom, v_gully_proximity) AND gully.gully_id != p_id AND gully.state!=0);		
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1045]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1045);
+					v_message = (SELECT concat('ERROR-1045:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
 				END IF;
 			END IF;
