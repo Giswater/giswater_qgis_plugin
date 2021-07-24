@@ -43,6 +43,7 @@ v_epaquerytext2 text;
 v_schemaname text;
 v_connec_id varchar;
 v_linkrec record;
+v_message text;
 
 BEGIN
 
@@ -74,9 +75,11 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
+						"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
 					ELSE
-						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it is not allowed');
+
+						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1097;
+						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (106, NEW.node_id, v_message);
 					END IF;
 				END IF;		
 
@@ -91,10 +94,10 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
+						"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
 					ELSE
-						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4,
-						NEW.node_id, 'Node with state 2 over another node with state=2 on same alternative it is not allowed');
+						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1097;
+						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (106, NEW.node_id, v_message);
 					END IF;
 				END IF;		
 			END IF;

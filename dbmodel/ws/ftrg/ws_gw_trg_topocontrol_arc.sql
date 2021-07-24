@@ -24,6 +24,8 @@ v_arc_searchnodes double precision;
 v_user_statetopocontrol boolean;
 v_node2 text;
 v_nodecat text;
+v_message text;
+
 	
 BEGIN 
 
@@ -177,9 +179,9 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
 			ELSE
-				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
+				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
+				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
 			END IF;
-			
 		ELSE
 			-- Update coordinates
 			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
@@ -218,7 +220,8 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
 		ELSE
-			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
+			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
 		END IF;
 		
 	--Not existing nodes but accepted insertion
@@ -228,9 +231,10 @@ BEGIN
 	ELSE		
 		IF v_dsbl_error IS NOT TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1042", "function":"1344","debug_msg":"'||nodeRecord1.node_id'"}}$$);';
+				"data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
 		ELSE
-			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
+			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
 		END IF;
 	END IF;
 	
