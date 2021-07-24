@@ -1595,7 +1595,10 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql, is_thread=is_thread)
-        return json_result,  global_vars.session_vars['last_error_msg']
+        if is_thread:
+            return json_result,  global_vars.session_vars['last_error_msg']
+        else:
+            return json_result
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
             json_result = manage_json_geometry(json_result)

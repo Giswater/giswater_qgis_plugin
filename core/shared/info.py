@@ -176,27 +176,13 @@ class GwInfo(QObject):
         if json_result in (None, False):
             return False, None
 
-        # When insert feature failed
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            return False, None
-
-        # When something is wrong
-        if 'message' in json_result and json_result['message']:
+        # Manage status failed
+        if json_result['status'] == 'Failed':
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
             tools_qgis.show_message(json_result['message']['text'], level)
             return False, None
-
-        # Control fail when insert new feature
-        if 'status' in json_result['body']['data']['fields']:
-            if json_result['body']['data']['fields']['status'].lower() == 'failed':
-                msg = json_result['body']['data']['fields']['message']['text']
-                level = 1
-                if 'level' in json_result['body']['data']['fields']['message']:
-                    level = int(json_result['body']['data']['fields']['message']['level'])
-                tools_qgis.show_message(msg, message_level=level)
-                return False, None
 
         self.complet_result = json_result
         try:
