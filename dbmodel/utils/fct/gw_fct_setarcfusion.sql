@@ -101,7 +101,7 @@ BEGIN
         VALUES (214, 1, concat('Fusion arcs using node: ', v_exists_node_id,'.'));
 
         -- Find arcs sharing node
-        SELECT COUNT(*) INTO v_count FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id;
+        SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id AND state > 0;
 
         -- Accepted if there are just two distinct arcs
         IF v_count = 2 THEN
