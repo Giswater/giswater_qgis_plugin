@@ -66,6 +66,8 @@ v_autoupdate_dma boolean;
 v_pjoint_id text;
 v_pjoint_type text;
 v_expl_id integer;
+v_dsbl_error boolean;
+v_message text;
 
 BEGIN
 
@@ -73,12 +75,10 @@ BEGIN
 	v_mantable:= TG_ARGV[0];
 	
 	v_link_searchbuffer=0.1; 	
-
-	-- control of project type
-	SELECT project_type INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
-
-	-- control autoupdate_dma
+	
+	-- getting system values
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
+	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -124,8 +124,13 @@ BEGIN
 			END IF;
 			
 			IF v_connect IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3070;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+				END IF;
 			END IF;		
 		END IF;
 
@@ -141,8 +146,13 @@ BEGIN
 		-- for ws projects control of link related to nodarc
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3072;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+				END IF;		
 			END IF;
 		END IF;
 		
@@ -200,8 +210,13 @@ BEGIN
 
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
+			IF v_dsbl_error IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
+			ELSE
+				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3074;
+				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+			END IF;
 		END IF;	
 		--for links related to state 0  features look again for final feature if its null
 		IF NEW.state = 0 THEN
@@ -448,32 +463,45 @@ BEGIN
 		
 		-- control of null exit_type
 		IF v_end_point IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
+			IF v_dsbl_error IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
+			ELSE
+				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 2015;
+				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+			END IF;
 		END IF;
-
 
 		-- psector control (only possible link with feature state=2 on connec/gully 2 on same psector
 		IF v_connect.state=2 AND v_end_state=2 THEN
 			IF v_projectype = 'WS' THEN
 				IF (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = NEW.exit_id) NOT IN 	
 				   (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id) THEN
-					RAISE EXCEPTION 'cagasgasg';
 				END IF;
 			ELSIF v_projectype = 'UD' THEN
 				IF NEW.feature_type = 'CONNEC' THEN
 					IF (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = NEW.exit_id
 					    UNION SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = NEW.exit_id) NOT IN 	
 					   (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id) THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3178", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';					
+						IF v_dsbl_error IS NOT TRUE THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+						ELSE
+							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
+							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+						END IF;				   
 					END IF;
 				ELSIF NEW.feature_type = 'GULLY' THEN
 					IF (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = NEW.exit_id
 					    UNION SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = NEW.exit_id) NOT IN 	
 					   (SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id) THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3178", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+						IF v_dsbl_error IS NOT TRUE THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+						ELSE
+							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
+							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+						END IF;
 					END IF;
 				END IF;
 			END IF;			
@@ -491,9 +519,15 @@ BEGIN
 				SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id;
 			END IF;
 
-			IF v_count > 1 THEN	
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
+			IF v_count > 1 THEN
+
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3082;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+				END IF;
 			END IF;
 		END IF;		
 	END IF;
@@ -502,15 +536,29 @@ BEGIN
 	IF TG_OP ='INSERT' THEN
 	
 		-- exception control. It's no possible to create another link when already exists for the connect
-		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND state > 0) IS NOT NULL THEN
+		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND state > 0 LIMIT 1) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3076", "function":"1116","debug_msg":""}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3076;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+				END IF;
+		
 			ELSIF NEW.feature_type = 'GULLY' THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3078", "function":"1116","debug_msg":""}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3078;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+				END IF;
 			END IF;		
 		END IF;
+
+		-- profilactic control in order to do not crash the mandatory column of expl_id
+		IF v_expl_id is null then v_expl_id = NEW.expl_id; END IF;
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
 		state, the_geom, vnode_topelev)
