@@ -10,37 +10,43 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_gully_proximity()
 RETURNS trigger AS 
 $BODY$
 DECLARE 
-    v_numConnecs numeric;
-    v_gully_proximity double precision;
-    v_gully_proximity_control boolean;
-    
+v_numConnecs numeric;
+v_gully_proximity double precision;
+v_gully_proximity_control boolean;
+v_dsbl_error boolean;
+v_message text;
+
+
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    -- Get gully tolerance from config table
+	-- Get gully tolerance from config table
+	SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='edit_gully_proximity';
+	SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='edit_gully_proximity';
+	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 
-    SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='edit_gully_proximity';
-    SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='edit_gully_proximity';
+	IF TG_OP = 'INSERT' THEN
+		-- Existing gullys  
+		v_numConnecs:= (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
 
-    IF TG_OP = 'INSERT' THEN
-        -- Existing gullys  
-        v_numConnecs:= (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
+	ELSIF TG_OP = 'UPDATE' THEN
+		-- Existing gullys  
+		v_numConnecs := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
+	END IF;
 
-    ELSIF TG_OP = 'UPDATE' THEN
-        -- Existing gullys  
-       v_numConnecs := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
-    END IF;
+	-- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error
+	IF (v_numConnecs > 0) AND (v_gully_proximity_control IS TRUE) THEN
+		IF v_dsbl_error IS NOT TRUE THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1044", "function":"2814","debug_msg":"'||NEW.gully_id||'"}}$$);';
+		ELSE 
+			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1044;
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (393, NEW.gully_id, v_message);		
+		END IF;
+	END IF;
 
-    -- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error
-    IF (v_numConnecs > 0) AND (v_gully_proximity_control IS TRUE) THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1044", "function":"2814","debug_msg":"'||NEW.gully_id||'"}}$$);';
-    END IF;
-
-    RETURN NEW;
-
-     
+	RETURN NEW;     
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
