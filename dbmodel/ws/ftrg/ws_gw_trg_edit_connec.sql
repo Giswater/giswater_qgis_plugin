@@ -37,6 +37,8 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
+v_message text;
+v_dsbl_error boolean;
 
 BEGIN
 
@@ -50,11 +52,12 @@ BEGIN
 	
 	v_type_man_table:=v_man_table;
 	
-	--Get data from config table
+	--get system and user variables
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
@@ -68,8 +71,14 @@ BEGIN
 		-- check arc exploitation
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
 			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3144", "function":"1304","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+
+				IF v_dsbl_error IS NOT TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3144", "function":"1304","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				ELSE
+					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3144;
+					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.connec_id, v_message);				
+				END IF;
 			END IF;
 		END IF;
 	END IF;
