@@ -489,7 +489,7 @@ class GwInfo(QObject):
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
             dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
+            dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._reset_my_json)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
@@ -1189,10 +1189,17 @@ class GwInfo(QObject):
 
         self._roll_back()
         tools_gw.reset_rubberband(self.rubber_band)
-        self.layer.removeSelection()
+        self._remove_layer_selection()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json()
         tools_gw.close_docker()
+
+
+    def _remove_layer_selection(self):
+        try:
+            self.layer.removeSelection()
+        except RuntimeError:
+            pass
 
 
     def _manage_info_close(self, dialog):
@@ -1386,6 +1393,8 @@ class GwInfo(QObject):
         try:
             self.layer.rollBack()
         except AttributeError:
+            pass
+        except RuntimeError:
             pass
 
 

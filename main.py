@@ -11,13 +11,15 @@ from functools import partial
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu, QApplication
 
 from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .lib import tools_qgis, tools_os, tools_log
+from .core.ui.dialog import GwDialog
+from .core.ui.main_window import GwMainWindow
 
 
 class Giswater(QObject):
@@ -74,6 +76,9 @@ class Giswater(QObject):
 
             # Remove Giswater dockers
             self._remove_dockers()
+
+            # Close all open dialogs
+            self._close_open_dialogs()
 
             # Force action pan
             self.iface.actionPan().trigger()
@@ -357,5 +362,20 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
+
+
+    def _close_open_dialogs(self):
+        """ Close Giswater open dialogs """
+
+        # Get all widgets
+        allwidgets = QApplication.allWidgets()
+
+        # Only keep Giswater widgets that are currently open
+        windows = [x for x in allwidgets if
+                   not x.isHidden() and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
+
+        # Close them
+        for window in windows:
+            tools_gw.close_dialog(window)
 
     # endregion
