@@ -17,8 +17,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_table",
 
 
 -- 2021/01/14
-CREATE INDEX anl_arc_arc_id ON anl_arc USING btree (arc_id);
-CREATE INDEX anl_connec_connec_id ON anl_connec USING btree (connec_id);
-CREATE INDEX anl_polygon_pol_id ON anl_polygon USING btree (pol_id);
-CREATE INDEX anl_arc_x_node_arc_id ON anl_arc_x_node USING btree (arc_id);
-CREATE INDEX anl_arc_x_node_node_id ON anl_arc_x_node USING btree (node_id);
+CREATE INDEX IF NOT EXISTS anl_arc_arc_id ON anl_arc USING btree (arc_id);
+CREATE INDEX IF NOT EXISTS anl_connec_connec_id ON anl_connec USING btree (connec_id);
+CREATE INDEX IF NOT EXISTS anl_polygon_pol_id ON anl_polygon USING btree (pol_id);
+CREATE INDEX IF NOT EXISTS anl_arc_x_node_arc_id ON anl_arc_x_node USING btree (arc_id);
+CREATE INDEX IF NOT EXISTS anl_arc_x_node_node_id ON anl_arc_x_node USING btree (node_id);
