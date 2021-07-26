@@ -292,7 +292,13 @@ class GwLoadProject(QObject):
                         count_trys = count_trys + 1
 
         # Disable buttons which are project type exclusive
-        project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
+        successful = False
+        count_trys = 0
+        while not successful or count_trys >= 10:
+            project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
+            if project_exclusive not in (None, "None"):
+                successful = True
+
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
