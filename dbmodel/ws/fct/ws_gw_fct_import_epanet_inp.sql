@@ -414,16 +414,16 @@ BEGIN
 		FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 		LOOP
 			--identifing the number of fields of the editable view
-			FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+			FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ws_inp2'
 			LOOP	
+				-- profilactic control for postgis specific datatypes
+				IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
 
 				IF v_rec_view.rid=1 THEN
 					--insert of fields which are concatenation 
 					v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
-					
 				ELSE
 					v_query_fields = concat (v_query_fields,' , csv',v_rec_view.rid,'::',v_rec_view.data_type);
-					
 				END IF;
 
 			END LOOP;
@@ -726,7 +726,6 @@ BEGIN
 		{"message":'||to_json(v_error_context)||'},
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

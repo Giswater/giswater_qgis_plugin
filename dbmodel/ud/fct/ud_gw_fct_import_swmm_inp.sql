@@ -362,6 +362,9 @@ BEGIN
 			FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
 			WHERE table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 			LOOP
+				-- profilactic control for postgis specific datatypes
+				IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
+
 				IF v_rec_view.rid=1 THEN
 					v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
 				ELSE
