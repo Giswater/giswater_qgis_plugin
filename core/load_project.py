@@ -283,7 +283,7 @@ class GwLoadProject(QObject):
             for index_action in plugin_toolbar.list_actions:
                 successful = False
                 count_trys = 0
-                while not successful or count_trys >= 10:
+                while not successful and count_trys < 10:
                     button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
                     if button_def not in (None, 'None'):
                         text = self.translate(f'{index_action}_text')
@@ -291,17 +291,17 @@ class GwLoadProject(QObject):
                         button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                         self.buttons[index_action] = button
                         successful = True
-                    else:
-                        count_trys = count_trys + 1
+                    count_trys = count_trys + 1
 
         # Disable buttons which are project type exclusive
+        project_exclusive = None
         successful = False
         count_trys = 0
-        while not successful or count_trys >= 10:
+        while not successful and count_trys < 10:
             project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
             if project_exclusive not in (None, "None"):
                 successful = True
-
+            count_trys = count_trys + 1
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
