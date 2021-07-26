@@ -520,10 +520,21 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 250);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO tableparent_id_arg;
-
+		
 		-- get childtype
 		EXECUTE 'SELECT custom_type FROM vp_basic_'||v_featuretype||' WHERE nid = '||quote_literal(v_id) INTO v_childtype;
-
+		
+		-- Identify tableinfotype_id		
+		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
+			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
+			WHERE cat_feature.id= (SELECT custom_type FROM ',quote_ident(tableparent_id_arg),' WHERE nid::text=',quote_nullable(v_id),') 
+			AND infotype_id=',quote_nullable(v_infotype));
+		v_debug_vars := json_build_object('tableparent_id_arg', tableparent_id_arg, 'v_id', v_id, 'v_infotype', v_infotype);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 260);
+		
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_tablename;
+		
 	ELSE
 		-- get child type
 		v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ',quote_nullable(v_tablename),' LIMIT 1');
