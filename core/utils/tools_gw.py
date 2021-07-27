@@ -258,10 +258,14 @@ def create_body(form='', feature='', filter_fields='', extras=None):
     info_types = {'full': 1}
     info_type = info_types.get(global_vars.project_vars['info_type'])
     lang = QgsApplication.locale().upper()
-    if global_vars.project_epsg is None:
-        client = f'$${{"client":{{"device":4, "infoType":{info_type}, "lang":"{lang}"}}, '
-    else:
-        client = f'$${{"client":{{"device":4, "infoType":{info_type}, "lang":"{lang}","epsg":{global_vars.project_epsg}}}, '
+
+    client = f'$${{"client":{{"device":4, "lang":"{lang}"'
+    if info_type is not None:
+        client += f', "infoType":{info_type}'
+    if global_vars.project_epsg is not None:
+        client += f', "epsg":{global_vars.project_epsg}'
+    client += f'}}, '
+
     form = f'"form":{{{form}}}, '
     feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
