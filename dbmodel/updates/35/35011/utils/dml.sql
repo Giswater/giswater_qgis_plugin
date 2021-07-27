@@ -14,3 +14,6 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (394, 'Check topocontrol for link', 'utils')
 ON CONFLICT (fid) DO NOTHING;
+
+--2021/07/277
+UPDATE config_form_fields SET dv_querytext='SELECT id AS id, a.descript AS idval FROM v_ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL' WHERE formtype='form_feature' AND columnname like 'streetname%';
