@@ -44,9 +44,16 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- transforming streetaxis name into id
+		-- transforming streetaxis name into id (must be name or descript)
 		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+		IF v_streetaxis IS NULL THEN
+			v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname LIMIT 1);
+		END IF;
+		
 		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+		IF v_streetaxis2 IS NULL THEN
+			v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname2 LIMIT 1);
+		END IF;
 		
 		-- managing matcat
 		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.connecat_id) IS NOT NULL THEN
