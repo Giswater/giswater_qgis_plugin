@@ -14,7 +14,9 @@ version=3.4.036
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 changelog=Version 3.4.036
-   - 
+   - Allow workcat_id null on upsert element
+   - Manage combo assigend_to on mincut form
+   - Manage open visit form from search button without sys_geomery
 
 
 # Tags are comma separated with spaces allowed
