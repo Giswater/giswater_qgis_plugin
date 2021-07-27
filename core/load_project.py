@@ -37,13 +37,19 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
+        tools_log.log_info("Project read")
+
         # Get variables from qgis project
         tools_qgis.get_project_variables()
 
+        # Initialize parsers of configuration files: init, session, giswater, user_params
+        tools_gw.initialize_parsers()
+
+        # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
         # Check if user has all config params
-        tools_gw.user_params_to_userconfig()
+        tools_gw.user_params_to_userconfig(global_vars.parser_user_params)
 
         self._get_user_variables()
 
