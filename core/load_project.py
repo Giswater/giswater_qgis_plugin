@@ -136,10 +136,6 @@ class GwLoadProject(QObject):
         tools_log.log_info(message)
 
 
-    def translate(self, message):
-        return tools_qt.tr(message)
-
-
     # region private functions
 
 
@@ -275,7 +271,7 @@ class GwLoadProject(QObject):
                 while not successful and count_trys < 10:
                     button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
                     if button_def not in (None, 'None'):
-                        text = self.translate(f'{index_action}_text')
+                        text = tools_qt.tr(f'{index_action}_text')
                         icon_path = icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                         button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                         self.buttons[index_action] = button
@@ -321,7 +317,7 @@ class GwLoadProject(QObject):
         if type(list_actions) != list:
             list_actions = [list_actions]
 
-        toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
+        toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
         # If the toolbar is ToC, add it to the Layers docker toolbar, if not, create a new toolbar
