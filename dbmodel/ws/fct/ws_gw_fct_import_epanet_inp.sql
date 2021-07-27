@@ -412,7 +412,8 @@ BEGIN
 			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 			LOOP
 				--identifing the number of fields of the editable view
-				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ws_inp2'
+				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
+				where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 				LOOP	
 					-- profilactic control for postgis specific datatypes
 					IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
@@ -425,7 +426,7 @@ BEGIN
 					END IF;
 
 				END LOOP;
-				
+
 				--inserting values on editable view
 				v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source='||quote_literal(v_rec_table.target)||'
 				AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
