@@ -295,8 +295,9 @@ class GwLoadProject(QObject):
 
         # Hide buttons from buttons_to_hide
         buttons_to_hide = self._get_buttons_to_hide()
-        for button_id in buttons_to_hide:
-            self._hide_button(button_id)
+        if buttons_to_hide is not None:
+            for button_id in buttons_to_hide:
+                self._hide_button(button_id)
 
         # Disable and hide all plugin_toolbars and actions
         self._enable_toolbars(False)
