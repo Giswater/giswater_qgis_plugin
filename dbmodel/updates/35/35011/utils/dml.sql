@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/07/24
