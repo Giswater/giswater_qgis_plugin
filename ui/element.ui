@@ -392,14 +392,8 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="2">
-             <widget class="QComboBox" name="location_type"/>
-            </item>
-            <item row="8" column="2">
-             <widget class="QComboBox" name="ownercat_id"/>
-            </item>
-            <item row="8" column="1">
-             <widget class="QLabel" name="lbl_owner">
+            <item row="9" column="1">
+             <widget class="QLabel" name="lbl_location_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
