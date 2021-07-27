@@ -29,12 +29,8 @@ class GwLoadProject(QObject):
 
         super().__init__()
         self.iface = global_vars.iface
-        self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
         self.buttons = {}
 
 
@@ -60,21 +56,16 @@ class GwLoadProject(QObject):
             return
 
         # Get water software from table 'sys_version'
-        project_type = tools_gw.get_project_type()
-        if project_type is None:
+        global_vars.project_type = tools_gw.get_project_type()
+        if global_vars.project_type is None:
             return
 
         # Manage schema name
         tools_db.get_current_user()
         layer_source = tools_qgis.get_layer_source(self.layer_node)
-        self.schema_name = layer_source['schema']
-        self.schema_name = self.schema_name.replace('"', '')
-        global_vars.schema_name = self.schema_name
-
-        # Setting global_vars
-        global_vars.schema_name = self.schema_name
-        global_vars.project_type = project_type
-        global_vars.plugin_name = self.plugin_name
+        schema_name = layer_source['schema']
+        if schema_name:
+            global_vars.schema_name = schema_name.replace('"', '')
 
         # Check for developers options
         value = tools_gw.get_config_parser('system', 'log_sql', "user", "init", False)
@@ -83,19 +74,19 @@ class GwLoadProject(QObject):
         tools_qgis.user_parameters['show_message_durations'] = value
 
         # Manage locale and corresponding 'i18n' file
-        tools_qt.manage_translation(self.plugin_name)
+        global_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
+        tools_qt.manage_translation(global_vars.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
         tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
-        self.schema_exists = self._check_schema(self.schema_name)
-        if not self.schema_exists:
-            tools_qgis.show_warning("Selected schema not found", parameter=self.schema_name)
+        schema_exists = self._check_schema(global_vars.schema_name)
+        if not schema_exists:
+            tools_qgis.show_warning("Selected schema not found", parameter=global_vars.schema_name)
 
         # Get SRID from table node
-        srid = tools_db.get_srid('v_edit_node', self.schema_name)
-        global_vars.data_epsg = srid
+        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -115,18 +106,14 @@ class GwLoadProject(QObject):
         load_project_menu = GwMenuLoad()
         load_project_menu.read_menu()
 
-        # Initialize toolbars
-        self._get_buttons_to_hide()
-
         # Manage snapping layers
         self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
-        self._manage_toolbars(project_type)
+        self._manage_toolbars()
 
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
-
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
@@ -239,7 +226,6 @@ class GwLoadProject(QObject):
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
             if global_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
-                self.schema_name = global_vars.project_vars['main_schema']
                 global_vars.schema_name = global_vars.project_vars['main_schema']
 
         return True
@@ -248,23 +234,25 @@ class GwLoadProject(QObject):
     def _get_buttons_to_hide(self):
         """ Get all buttons to hide """
 
+        buttons_to_hide = None
         try:
             row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
             if not row or row in (None, 'None'):
-                return
+                return None
 
-            self.buttons_to_hide = [int(x) for x in row.split(',')]
+            buttons_to_hide = [int(x) for x in row.split(',')]
 
         except Exception as e:
             tools_log.log_warning(f"{type(e).__name__}: {e}")
+        finally:
+            return buttons_to_hide
 
 
-    def _manage_toolbars(self, project_type):
-        """ Manage actions of the custom plugin toolbars. project_type in ('ws', 'ud') """
+    def _manage_toolbars(self):
+        """ Manage actions of the custom plugin toolbars """
 
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
-
         if toolbar_names in (None, 'None'):
             return
 
@@ -276,6 +264,7 @@ class GwLoadProject(QObject):
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar
+        icon_folder = global_vars.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
@@ -287,7 +276,7 @@ class GwLoadProject(QObject):
                     button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
                     if button_def not in (None, 'None'):
                         text = self.translate(f'{index_action}_text')
-                        icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
+                        icon_path = icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                         button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                         self.buttons[index_action] = button
                         successful = True
@@ -298,7 +287,7 @@ class GwLoadProject(QObject):
         successful = False
         count_trys = 0
         while not successful and count_trys < 10:
-            project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
+            project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
             if project_exclusive not in (None, "None"):
                 successful = True
             count_trys = count_trys + 1
@@ -309,7 +298,8 @@ class GwLoadProject(QObject):
                 self._hide_button(index)
 
         # Hide buttons from buttons_to_hide
-        for button_id in self.buttons_to_hide:
+        buttons_to_hide = self._get_buttons_to_hide()
+        for button_id in buttons_to_hide:
             self._hide_button(button_id)
 
         # Disable and hide all plugin_toolbars and actions
