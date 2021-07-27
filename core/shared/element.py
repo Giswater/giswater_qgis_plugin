@@ -238,7 +238,7 @@ class GwElement:
         element_type = tools_qt.get_text(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
-               f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
+               f" AND ('{element_type}' = ANY(featurecat_id::text[]) OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, add_empty=True)
