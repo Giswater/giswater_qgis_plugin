@@ -26,10 +26,6 @@ class GwAddChildLayerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        tools_qgis.get_project_variables()
-        self.qgis_project_infotype = global_vars.project_vars['info_type']
-        self.qgis_project_add_schema = global_vars.project_vars['add_schema']
-        self.available_layers = None
         self._config_layers()
 
 
@@ -149,10 +145,10 @@ class GwAddChildLayerButton(GwAction):
         rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
         params = {"project_type": self.project_type, "schema_name": self.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": self.qgis_project_infotype}
-        self.task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(self.task_get_layers)
-        QgsApplication.taskManager().triggerTask(self.task_get_layers)
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(task_get_layers)
+        QgsApplication.taskManager().triggerTask(task_get_layers)
 
         return True
 
@@ -224,7 +220,7 @@ class GwAddChildLayerButton(GwAction):
             return
 
         extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
-        extras += f'"addSchema":"{self.qgis_project_add_schema}"'
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(extras=extras)
         complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
         if complet_result:

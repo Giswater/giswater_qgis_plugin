@@ -40,7 +40,7 @@ class GwLoadProject(QObject):
         tools_log.log_info("Project read")
 
         # Get variables from qgis project
-        tools_qgis.get_project_variables()
+        self._get_project_variables()
 
         # Initialize parsers of configuration files: init, session, giswater, user_params
         tools_gw.initialize_parsers()
@@ -143,6 +143,16 @@ class GwLoadProject(QObject):
 
 
     # region private functions
+
+    def _get_project_variables(self):
+        """ Manage QGIS project variables """
+
+        global_vars.project_vars = {}
+        global_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
+        global_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
+        global_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
+        global_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
+        global_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
 
 
     def _get_user_variables(self):
