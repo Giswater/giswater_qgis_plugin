@@ -81,7 +81,7 @@ class GwLoadProject(QObject):
         tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
-        schema_exists = self._check_schema(global_vars.schema_name)
+        schema_exists = tools_db.check_schema(global_vars.schema_name)
         if not schema_exists:
             tools_qgis.show_warning("Selected schema not found", parameter=global_vars.schema_name)
 
@@ -419,19 +419,6 @@ class GwLoadProject(QObject):
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
-
-
-    def _check_schema(self, schemaname=None):
-        """ Check if selected schema exists """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
-        params = [schemaname]
-        row = tools_db.get_row(sql, params=params)
-        return row
 
 
     def _enable_toolbar(self, toolbar_id, enable=True):

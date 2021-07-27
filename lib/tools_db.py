@@ -28,15 +28,28 @@ def create_list_for_completer(sql):
     return list_items
 
 
+def check_schema(schemaname=None):
+    """ Check if selected schema exists """
+
+    if schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    schemaname = schemaname.replace('"', '')
+    sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
+    params = [schemaname]
+    row = get_row(sql, params=params)
+    return row
+
+
 def check_table(tablename, schemaname=None):
     """ Check if selected table exists in selected schema """
 
-    if schemaname in (None, 'null'):
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
-        if schemaname in (None, 'null'):
+        if schemaname in (None, 'null', ''):
             get_layer_source_from_credentials('prefer')
             schemaname = global_vars.schema_name
-            if schemaname in (None, 'null'):
+            if schemaname in (None, 'null', ''):
                 return None
 
     schemaname = schemaname.replace('"', '')
@@ -104,8 +117,8 @@ def check_role_user(role_name, username=None):
 
 
 def check_super_user(username=None):
+    """ Returns True if @username is a superuser """
 
-    # Check @username exists
     if username is None:
         username = global_vars.current_user
 
@@ -161,7 +174,7 @@ def get_columns_list(tablename, schemaname=None):
 
 
 def get_srid(tablename, schemaname=None):
-    """ Find SRID of selected schema """
+    """ Find SRID of selected @tablename """
 
     if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
