@@ -80,16 +80,9 @@ BEGIN
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- transforming streetaxis name into id (must be name or descript)
-		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
-		IF v_streetaxis IS NULL THEN
-			v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname LIMIT 1);
-		END IF;
-		
-		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
-		IF v_streetaxis2 IS NULL THEN
-			v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname2 LIMIT 1);
-		END IF;
+		-- transforming streetaxis name into id
+		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname LIMIT 1);
+		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE muni_id = NEW.muni_id AND descript = NEW.streetname2 LIMIT 1);
 
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
 			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN
