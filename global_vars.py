@@ -11,30 +11,29 @@ from qgis.PyQt.QtCore import QSettings
 
 
 # region system variables (values are initialized on load project without changes during session)
-iface = None                            # An instance of interface that provides the hook by which you can manipulate the QGIS application at run time. Type "QgsInterface"
-canvas = None                           # An insance of QGIS canvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
-plugin_dir = None                       # An instance of plugin directory path
-plugin_name = None                      # An instance of plugin name
-user_folder_dir = None                  # An instance of configurable user variables directory path
-schema_name = None                      # An instance of schema name retrieved from qgis project connection with PostgreSql
-project_type = None                     # An instance of project type getting from "version" table from PostgreSql
-data_epsg = None                        # An instance of srid parameter retrieved from qgis project layer "v_edit_node"
-logger = None                           # An instance of GwLogger class thats found in "/lib/tools_log.py"
-giswater_settings = None                # An instance of QGIS settings relating to Giswater variables such as toolbars and actions chekeables"
-qgis_settings = None                    # An instance of QGIS settings"
-current_user = None                     # An instance of user credential used to establish the connection with PostgreSql
-qgis_db_credentials = None              # An instance of QSqlDatabase (QPSQL) used to manage QTableView widgets
-dao = None                              # An instance of GwPgDao class thats found in "/lib/tools_db.py"
-dao_db_credentials = None               # An instance of credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
-pg_version = None                       # An instance of PostgreSql version of current connection
-notify = None                           # An instance of GwNotify
-project_vars = {}                       # An instance of project variables from QgsProject relating to Giswater
+iface = None                            # Instance of class QGisInterface. Provides the hook to manipulate QGIS application at runtime
+canvas = None                           # Instance of class QgsMapCanvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
+plugin_dir = None                       # Plugin folder path
+plugin_name = None                      # Plugin name
+user_folder_dir = None                  # User folder path
+schema_name = None                      # Schema name retrieved from QGIS project connection with PostgreSql
+project_type = None                     # Project type get from table "version"
+data_epsg = None                        # SRID retrieved from QGIS project layer "v_edit_node"
+project_epsg = None                     # EPSG of QGIS project
+logger = None                           # Instance of class GwLogger. Found in "/lib/tools_log.py"
+giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
+qgis_settings = None                    # Instance of class QSettings. General QGIS settings
+current_user = None                     # Current user connected with PostgreSql
+qgis_db_credentials = None              # Instance of class QSqlDatabase (QPSQL) used to manage QTableView widgets
+dao = None                              # Instance of class GwPgDao. Found in "/lib/tools_db.py"
+dao_db_credentials = None               # Credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
+notify = None                           # Instance of class GwNotify. Found in "/core/threads/notify.py"
+project_vars = {}                       # Project variables from QgsProject related to Giswater
 project_vars['info_type'] = None        # gwInfoType
 project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
-project_epsg = None                     # An instance of project epsg
 # endregion
 
 

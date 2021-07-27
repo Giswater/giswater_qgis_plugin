@@ -232,13 +232,13 @@ def check_db_connection():
 def get_pg_version():
     """ Get PostgreSQL version (integer value) """
 
-    global_vars.pg_version = None
+    pg_version = None
     sql = "SELECT current_setting('server_version_num');"
     row = get_row(sql)
     if row:
-        global_vars.pg_version = row[0]
+        pg_version = row[0]
 
-    return global_vars.pg_version
+    return pg_version
 
 
 def connect_to_database(host, port, db, user, pwd, sslmode):
