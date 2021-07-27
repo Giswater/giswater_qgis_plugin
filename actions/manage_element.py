@@ -229,7 +229,7 @@ class ManageElement(ParentManage):
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
-               f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
+               f" AND ('{element_type}' = ANY(featurecat_id::text[]) OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
