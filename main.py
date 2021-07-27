@@ -166,6 +166,7 @@ class Giswater(QObject):
         tools_log.min_log_level = min_log_level
         log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
         tools_log.set_logger(self.plugin_name, log_limit_characters)
+        tools_log.log_info("Initialize plugin")
 
         # Define signals
         self._set_signals()
