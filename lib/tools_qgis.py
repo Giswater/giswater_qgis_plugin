@@ -349,7 +349,6 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
 
     # Iterate over all layers
     layer = None
-    get_project_variables()
     if schema_name is None:
         if 'main_schema' in global_vars.project_vars:
             schema_name = global_vars.project_vars['main_schema']
