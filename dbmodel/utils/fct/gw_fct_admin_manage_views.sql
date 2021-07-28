@@ -37,7 +37,6 @@
 	v_version text;
 	v_project_type text;
 	v_error_context text;
-	v_aSCHEMA_NAMEit_result text;
 	v_level integer;
 	v_status text;
 	v_message text;
