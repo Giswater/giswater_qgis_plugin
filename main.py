@@ -41,12 +41,9 @@ class Giswater(QObject):
         self.dict_toolbars = {}
         self.dict_actions = {}
         self.actions_not_checkable = None
-        self.available_layers = []
         self.btn_add_layers = None
-        self.update_sql = None
         self.action = None
         self.action_info = None
-        self.toolButton = None
 
 
     def initGui(self):
@@ -202,8 +199,8 @@ class Giswater(QObject):
         """
 
         # Create instance class and add button into QGIS toolbar
-        self.toolButton = QToolButton()
-        self.action_info = self.iface.addToolBarWidget(self.toolButton)
+        main_toolbutton = QToolButton()
+        self.action_info = self.iface.addToolBarWidget(main_toolbutton)
 
         # Set icon button if exists
         icon_path = self.icon_folder + '36.png'
@@ -213,9 +210,9 @@ class Giswater(QObject):
         else:
             self.action = QAction("Show info", self.iface.mainWindow())
 
-        self.toolButton.setDefaultAction(self.action)
-        self.update_sql = GwAdminButton()
-        self.action.triggered.connect(partial(self.update_sql.init_sql, True))
+        main_toolbutton.setDefaultAction(self.action)
+        admin_button = GwAdminButton()
+        self.action.triggered.connect(partial(admin_button.init_sql, True))
 
 
     def _unset_info_button(self):
