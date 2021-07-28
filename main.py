@@ -156,6 +156,9 @@ class Giswater(QObject):
         global_vars.init_giswater_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
 
+        # Initialize parsers of configuration files: init, session, giswater, user_params
+        tools_gw.initialize_parsers()
+
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':

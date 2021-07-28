@@ -73,38 +73,34 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
-    try:
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 7}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 24}")
-    except Exception:
-        pass
+    set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
+    set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+    set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 7}")
+    set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 24}")
 
 
 def initialize_parsers():
     """ Initialize parsers of configuration files: init, session, giswater, user_params """
 
-    global_vars.parser_init = _get_parser_from_filename("init")
-    global_vars.parser_session = _get_parser_from_filename("session")
-    global_vars.parser_giswater = _get_parser_from_filename("giswater")
-    global_vars.parser_user_params = _get_parser_from_filename("user_params")
+    for config in global_vars.list_configs:
+        filepath, parser = _get_parser_from_filename(config)
+        global_vars.configs[config][0] = filepath
+        global_vars.configs[config][1] = parser
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, log_warning=True,
                       get_comment=False, chk_user_params=True, get_none=False) -> str:
     """ Load a simple parser value """
 
-    if config_type in "user":
-        path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-    elif config_type in "project":
-        path_folder = global_vars.plugin_dir
-    else:
+    if config_type not in ("user", "project"):
         tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
         return None
 
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+    parser = global_vars.configs[file_name][1]
+
     value = None
-    path = f"{path_folder}{os.sep}config{os.sep}{file_name}.config"
     if not os.path.exists(path):
         tools_log.log_info(f"File not found: {path}")
         if chk_user_params and config_type in "user":
@@ -112,18 +108,13 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
             set_config_parser(section, parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
         return value
 
-    parser = None
-    if file_name == "init":
-        parser = global_vars.parser_init
-    elif file_name == 'session':
-        parser = global_vars.parser_session
-    elif file_name == 'giswater':
-        parser = global_vars.parser_giswater
-    elif file_name == 'user_params':
-        parser = global_vars.parser_user_params
-
     if parser is None:
-        tools_log.log_info(f"Parsing file: {path}")
+        tools_log.log_info(f"Creating parser for file: {path}")
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
+
+    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+    if global_vars.project_loaded and file_name in ('init', 'session'):
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
@@ -157,15 +148,13 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
                       comment=None, prefix=True, chk_user_params=True):
     """ Save simple parser value """
 
-    value = f"{value}"  # Cast to str because parser only allow strings
+    # Cast to str because parser only allow strings
+    value = f"{value}"
     try:
-        raw_parameter = parameter
-
         if global_vars.project_vars['project_type'] is None and prefix:
             global_vars.project_vars['project_type'] = get_project_type()
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
         elif config_type in "project":
@@ -178,7 +167,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
         path = config_folder + f"{file_name}.config"
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
+
         # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
@@ -194,13 +185,14 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
             parser.set(section, parameter, value)
             # Check if the parameter exists in the inventory, if not creates it
             if chk_user_params and config_type in "user":
-                _check_user_params(section, raw_parameter, file_name, prefix)
+                _check_user_params(section, parameter, file_name, prefix)
         else:
             parser.set(section, parameter)  # This is just for writing comments
 
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
+
     except Exception as e:
         tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
         return
@@ -2790,6 +2782,10 @@ def remove_deprecated_config_vars():
 
     # Get deprecated vars for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     init_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
     if vars is not None:
@@ -2810,6 +2806,10 @@ def remove_deprecated_config_vars():
 
     # Get deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     session_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
     if vars is not None:
@@ -2893,19 +2893,19 @@ def _get_parser_from_filename(filename):
     elif filename in ('giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:
-        return None
+        return None, None
 
     parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{folder}{os.sep}config{os.sep}{filename}.config"
-    if not os.path.exists(path):
-        tools_log.log_warning(f"File not found: {path}")
-        return None
+    filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
+    if not os.path.exists(filepath):
+        tools_log.log_warning(f"File not found: {filepath}")
+        return None, None
 
-    if not parser.read(path):
-        tools_log.log_warning(f"Error parsing file: {path}")
-        return None
+    if not parser.read(filepath):
+        tools_log.log_warning(f"Error parsing file: {filepath}")
+        return None, None
 
-    return parser
+    return filepath, parser
 
 
 # endregion
