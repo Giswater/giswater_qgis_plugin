@@ -33,14 +33,8 @@ class Giswater(QObject):
         """
 
         super(Giswater, self).__init__()
-
-        # Initialize instance attributes
         self.iface = iface
-        self.srid = None
         self.load_project = None
-        self.dict_toolbars = {}
-        self.dict_actions = {}
-        self.actions_not_checkable = None
         self.btn_add_layers = None
         self.action = None
         self.action_info = None
@@ -174,12 +168,6 @@ class Giswater(QObject):
         # Set main information button (always visible)
         self._set_info_button()
 
-        # Manage section 'actions_list' of config file
-        self._manage_section_actions_list()
-
-        # Manage section 'toolbars' of config file
-        self._manage_section_toolbars()
-
 
     def _set_signals(self):
         """ Define iface event signals on Project Read / New Project / Save Project """
@@ -245,53 +233,6 @@ class Giswater(QObject):
         menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
         if menu_giswater not in (None, "None"):
             menu_giswater.deleteLater()
-
-
-    def _manage_section_actions_list(self):
-        """ Manage section 'actions_list' of config file """
-
-        # Dynamically get parameters defined in section 'actions_list' from qgis variables into 'list_keys'
-        section = 'actions_not_checkable'
-        global_vars.giswater_settings.beginGroup(section)
-        list_keys = global_vars.giswater_settings.allKeys()
-        global_vars.giswater_settings.endGroup()
-
-        # Get value for every key and append into 'self.dict_actions' dictionary
-        for key in list_keys:
-            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
-            if list_values:
-                self.dict_actions[key] = list_values
-            else:
-                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
-
-        # Get list of actions not checkable (normally because they open a form)
-        aux = []
-        for list_actions in self.dict_actions.values():
-            for elem in list_actions:
-                aux.append(elem)
-
-        self.actions_not_checkable = sorted(aux)
-
-
-    def _manage_section_toolbars(self):
-        """ Manage section 'toolbars' of config file """
-
-        # Dynamically get parameters defined in section 'toolbars' from qgis variables into 'list_keys'
-        section = 'toolbars'
-        global_vars.giswater_settings.beginGroup(section)
-        list_keys = global_vars.giswater_settings.allKeys()
-        global_vars.giswater_settings.endGroup()
-
-        # Get value for every key and append into 'self.dict_toolbars' dictionary
-        for key in list_keys:
-            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
-            if list_values:
-                # Check if list_values has only one value
-                if type(list_values) is str:
-                    list_values = [list_values]
-                self.dict_toolbars[key] = list_values
-            else:
-                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
     def _project_new(self):
