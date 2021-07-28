@@ -414,8 +414,11 @@ class GwDocument:
         files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_qt.tr(message))
 
         file_text = ""
-        for file in files_path:
-            file_text += f"{file}\n\n"
+        if len(files_path) == 1:
+            file_text += f"{files_path[0]}"
+        else:
+            for file in files_path:
+                file_text += f"{file}\n\n"
         if files_path:
             tools_qt.set_widget_text(dialog, widget, str(file_text))
         return files_path
