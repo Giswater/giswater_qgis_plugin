@@ -28,13 +28,16 @@
 	SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_node], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
 	
+	"action":"renameView"
+	SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["ve_node_junction], "newViewName":"ve_node_junction2", "action":"renameView","hasChilds":"False"}}$$);
 	*/
 
 	DECLARE 
 	v_version text;
 	v_project_type text;
 	v_error_context text;
-	v_audit_result text;
+	v_aSCHEMA_NAMEit_result text;
 	v_level integer;
 	v_status text;
 	v_message text;
@@ -166,8 +169,8 @@
 
 				EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 				SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
-				replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
-				''FROM (ve'', '','||v_fieldname||' FROM (ve'') FROM pg_views 
+				replace(replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
+				''FROM (ve'', '','||v_fieldname||' FROM (ve''),''FROM ((ve'', '','||v_fieldname||' FROM ((ve'') FROM pg_views 
 				WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||'
 				AND definition not ilike ''%'||v_fieldname||'%'';';
 
