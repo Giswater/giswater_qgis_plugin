@@ -265,7 +265,7 @@ class GwLoadProject(QObject):
             tools_log.log_info("Parameter 'toolbar_names' is None")
             return
 
-        toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init', prefix=False)
+        toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
             tools_log.log_info("Parameter 'toolbars_order' is None")
             return

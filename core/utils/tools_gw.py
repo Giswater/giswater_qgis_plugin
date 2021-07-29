@@ -101,13 +101,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     parser = global_vars.configs[file_name][1]
 
     value = None
-    if not os.path.exists(path):
-        tools_log.log_info(f"File not found: {path}")
-        if chk_user_params and config_type in "user":
-            value = _check_user_params(section, parameter, file_name, prefix=prefix)
-            set_config_parser(section, parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-        return value
-
     if parser is None:
         tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
