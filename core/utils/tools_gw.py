@@ -148,31 +148,29 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
                       comment=None, prefix=True, chk_user_params=True):
     """ Save simple parser value """
 
-    # Cast to str because parser only allow strings
-    value = f"{value}"
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
+
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+
     try:
+
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
+
         if global_vars.project_vars['project_type'] is None and prefix:
             global_vars.project_vars['project_type'] = get_project_type()
         if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
             parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return
-
-        config_folder = path_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + f"{file_name}.config"
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        parser.read(path)
 
         # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
+
+        # Cast to str because parser only allow strings
+        value = f"{value}"
         if value is not None:
             # Add the comment to the value if there is one
             if comment is not None:
