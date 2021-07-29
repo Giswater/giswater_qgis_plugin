@@ -229,7 +229,7 @@ class GwElement:
             self._fill_dialog_element(self.dlg_add_element, 'element', None)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False, hide_config_widgets=True)
+        tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', hide_config_widgets=True)
         return self.dlg_add_element
 
 

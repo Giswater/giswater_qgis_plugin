@@ -193,7 +193,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         tools_qt.fill_combo_box(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change')
 
 
     def _filter_catalog(self):

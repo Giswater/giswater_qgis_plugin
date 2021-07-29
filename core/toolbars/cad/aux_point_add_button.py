@@ -157,7 +157,7 @@ class GwAuxPointAddButton(GwMaptool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
 
 
     def _get_values(self, point_1, point_2):

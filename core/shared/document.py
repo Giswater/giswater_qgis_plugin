@@ -152,7 +152,7 @@ class GwDocument:
         tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
 
         return self.dlg_add_doc
 

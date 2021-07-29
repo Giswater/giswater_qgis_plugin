@@ -3213,7 +3213,7 @@ class GwAdminButton:
         sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
         tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
 
-        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
 
 
     def _set_user_sslmode(self):

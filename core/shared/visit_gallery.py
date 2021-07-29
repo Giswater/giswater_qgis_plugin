@@ -126,7 +126,7 @@ class GwVisitGallery:
             self.btn_next.setDisabled(True)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery')
 
 
     # region private functions
@@ -245,7 +245,7 @@ class GwVisitGallery:
         self.btn_slideNext.clicked.connect(self._slide_next)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom')
 
         # Controling start index
         if handeler_index != i:

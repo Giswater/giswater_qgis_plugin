@@ -209,7 +209,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None, hide_config_widgets=False):
+def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False):
     """ Open dialog """
 
     # Check database connection before opening dialog
