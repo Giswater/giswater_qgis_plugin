@@ -2255,6 +2255,7 @@ class GwAdminButton:
     def _read_files(self, filelist, filedir):
         """"""
 
+        f = None
         if "changelog.txt" in filelist:
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
@@ -2266,7 +2267,9 @@ class GwAdminButton:
             except Exception as e:
                 tools_log.log_warning("Error _read_files: " + str(e))
                 return False
-
+            finally:
+                if f:
+                    f.close()
         return True
 
 
