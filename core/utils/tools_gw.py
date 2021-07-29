@@ -2717,9 +2717,10 @@ def create_sqlite_conn(file_name):
     return status, cursor
 
 
-def user_params_to_userconfig(parser):
+def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
+    parser = global_vars.configs['user_params'][1]
     if parser is None:
         return
 
@@ -2889,7 +2890,7 @@ def _get_parser_from_filename(filename):
     """ Get parser of file @filename.config """
 
     if filename in ('init', 'session'):
-        folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
+        folder = global_vars.user_folder_dir
     elif filename in ('dev', 'giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:
@@ -2899,11 +2900,11 @@ def _get_parser_from_filename(filename):
     filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
     if not os.path.exists(filepath):
         tools_log.log_warning(f"File not found: {filepath}")
-        return None, None
+        return filepath, None
 
     if not parser.read(filepath):
         tools_log.log_warning(f"Error parsing file: {filepath}")
-        return None, None
+        return filepath, None
 
     return filepath, parser
 

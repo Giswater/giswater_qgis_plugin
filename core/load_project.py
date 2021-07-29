@@ -47,7 +47,7 @@ class GwLoadProject(QObject):
         tools_gw.remove_deprecated_config_vars()
 
         # Check if user has all config params
-        tools_gw.user_params_to_userconfig(global_vars.configs['user_params'][1])
+        tools_gw.user_params_to_userconfig()
 
         self._get_user_variables()
 
