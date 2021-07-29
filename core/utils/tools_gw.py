@@ -101,6 +101,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     parser = global_vars.configs[file_name][1]
 
     value = None
+    raw_parameter = parameter
     if parser is None:
         tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
@@ -118,8 +119,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     if not parser.has_section(section) or not parser.has_option(section, parameter):
         if chk_user_params and config_type in "user":
-            value = _check_user_params(section, parameter, file_name, prefix=prefix)
-            set_config_parser(section, parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
         return value
     value = parser[section][parameter]
 
@@ -132,7 +133,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     # Check if the parameter exists in the inventory, if not creates it
     if chk_user_params and config_type in "user":
-        _check_user_params(section, parameter, file_name, prefix)
+        _check_user_params(section, raw_parameter, file_name, prefix)
 
     return value
 
@@ -149,6 +150,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     path = global_vars.configs[file_name][0]
 
     try:
+        raw_parameter = parameter
 
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
@@ -176,7 +178,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
             parser.set(section, parameter, value)
             # Check if the parameter exists in the inventory, if not creates it
             if chk_user_params and config_type in "user":
-                _check_user_params(section, parameter, file_name, prefix)
+                _check_user_params(section, raw_parameter, file_name, prefix)
         else:
             parser.set(section, parameter)  # This is just for writing comments
 
