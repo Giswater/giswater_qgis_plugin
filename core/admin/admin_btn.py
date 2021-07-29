@@ -58,9 +58,9 @@ class GwAdminButton:
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):

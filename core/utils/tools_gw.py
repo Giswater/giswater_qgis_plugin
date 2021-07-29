@@ -82,8 +82,8 @@ def save_settings(dialog):
         pass
 
 
-def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, log_warning=True,
-                      get_comment=False, chk_user_params=True, get_none=False) -> str:
+def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
+                      chk_user_params=True, get_none=False) -> str:
     """ Load a simple parser value """
 
     value = None
@@ -172,7 +172,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
                 value += f" #{comment}"
             # If the previous value had an inline comment, don't remove it
             else:
-                prev = get_config_parser(section, parameter, config_type, file_name, False, False, True, False)
+                prev = get_config_parser(section, parameter, config_type, file_name, False, True, False)
                 if prev is not None and "#" in prev:
                     value += f" #{prev.split('#')[1]}"
             parser.set(section, parameter, value)
@@ -2745,15 +2745,15 @@ def user_params_to_userconfig():
 
             # If it's a normal value
             # Get value[section][parameter] of the user config file
-            value = get_config_parser(section_name, parameter, "user", file_name, _pre, False, True, False, True)
+            value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
             # If this value (user config file) is None (doesn't exist, isn't set, etc.)
             if value is None:
                 # Read the default value for that parameter
-                value = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False, True)
+                value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
                 # Set value[section][parameter] in the user config file
                 set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
             else:
-                value2 = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False, True)
+                value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
                 if value2 is not None:
                     # If there's an inline comment in the inventory but there isn't one in the user config file, add it
                     if "#" not in value and "#" in value2:
@@ -2854,8 +2854,8 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     if prefix and global_vars.project_vars['project_type'] is not None:
         parameter = f"_{parameter}"
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
-    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False, True,
-                              chk_user_params=False, get_none=True)
+    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
+                                    chk_user_params=False, get_none=True)
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
