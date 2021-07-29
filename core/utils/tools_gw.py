@@ -2890,7 +2890,7 @@ def _get_parser_from_filename(filename):
 
     if filename in ('init', 'session'):
         folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-    elif filename in ('giswater', 'user_params'):
+    elif filename in ('dev', 'giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:
         return None, None
