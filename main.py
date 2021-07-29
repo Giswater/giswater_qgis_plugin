@@ -44,10 +44,9 @@ class Giswater(QObject):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
         # Initialize plugin
-        self._init_plugin()
-
-        # Force project read (to work with PluginReloader)
-        self._project_read(False, False)
+        if self._init_plugin():
+            # Force project read (to work with PluginReloader)
+            self._project_read(False, False)
 
 
     def unload(self, hide_gw_button=True):
@@ -127,46 +126,79 @@ class Giswater(QObject):
         """ Plugin main initialization function """
 
         # Initialize plugin global variables
-        self.plugin_dir = os.path.dirname(__file__)
-        global_vars.plugin_dir = self.plugin_dir
+        plugin_dir = os.path.dirname(__file__)
+        global_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', self.plugin_dir)
-        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir)
+        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
+        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
+        major_version = tools_qgis.get_major_version(plugin_dir=plugin_dir)
         user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
-        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, user_folder_dir)
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
+
+        # Create log file
+        min_log_level = 20
+        log_limit_characters = None
+        tools_log.set_logger(self.plugin_name, min_log_level, log_limit_characters)
+        tools_log.log_info("Initialize plugin")
 
         # Check if config file exists
-        setting_file = os.path.join(self.plugin_dir, 'config', 'giswater.config')
+        setting_file = os.path.join(plugin_dir, 'config', 'giswater.config')
         if not os.path.exists(setting_file):
             message = f"Config file not found at: {setting_file}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            return
+            tools_qgis.show_warning(message)
+            return False
 
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
         global_vars.init_giswater_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
 
+        # Check if user config folder exists
+        self._manage_user_config_folder(global_vars.user_folder_dir)
+
         # Initialize parsers of configuration files: init, session, giswater, user_params
         tools_gw.initialize_parsers()
+
+        # Check if user has config files 'init' and 'session' and its parameters
+        tools_gw.user_params_to_userconfig()
+
+        # Set logger parameters min_log_level and log_limit_characters
+        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
+        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
+        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
-        # Set logger (no database connection yet)
-        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
-        tools_log.min_log_level = min_log_level
-        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
-        tools_log.set_logger(self.plugin_name, log_limit_characters)
-        tools_log.log_info("Initialize plugin")
-
         # Define signals
         self._set_signals()
 
         # Set main information button (always visible)
         self._set_info_button()
+
+        return True
+
+
+    def _manage_user_config_folder(self, user_folder_dir):
+        """ Check if user config folder exists. If not create empty files init.config and session.config """
+
+        try:
+            config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+            if not os.path.exists(config_folder):
+                tools_log.log_info(f"Creating user config folder: {config_folder}")
+                os.makedirs(config_folder)
+
+            # Check if config files exists. If not create them empty
+            filepath = f"{config_folder}{os.sep}init.config"
+            if not os.path.exists(filepath):
+                open(filepath, 'a').close()
+            filepath = f"{config_folder}{os.sep}session.config"
+            if not os.path.exists(filepath):
+                open(filepath, 'a').close()
+
+        except Exception as e:
+            tools_log.log_warning(f"manage_user_config_folder: {e}")
 
 
     def _set_signals(self):

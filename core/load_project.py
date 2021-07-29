@@ -46,9 +46,6 @@ class GwLoadProject(QObject):
         # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
-        # Check if user has all config params
-        tools_gw.user_params_to_userconfig()
-
         self._get_user_variables()
 
         # Check if loaded project is valid for Giswater
