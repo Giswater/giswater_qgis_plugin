@@ -61,6 +61,7 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_value text;
+v_reports_fields json;
 
 BEGIN
 
@@ -166,7 +167,7 @@ BEGIN
 	EXECUTE v_querystring INTO v_epa_fields;
 				
 		v_epa_fields = REPLACE (v_epa_fields::text, '"value":""', concat('"value":"', v_epa_user, '"'));
-
+	
 	-- get master toolbox parameters
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
@@ -187,10 +188,19 @@ BEGIN
 			 JOIN config_toolbox USING (id)
 			 WHERE alias LIKE ''%', v_filter ,'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
+			 
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_admin_fields;
+
+	-- get reports toolbox parameters
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT listname, alias
+			 FROM config_form_list
+			 WHERE listtype = ''report'' ORDER BY listname) a');
+			
+	EXECUTE v_querystring INTO v_reports_fields;
 
 	-- refactor dvquerytext			
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
@@ -286,6 +296,7 @@ BEGIN
 	v_epa_fields := COALESCE(v_epa_fields, '[]');
 	v_master_fields := COALESCE(v_master_fields, '[]');
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
+	v_reports_fields := COALESCE(v_reports_fields, '[]');
 
 	v_expl := COALESCE(v_expl, '');
 	v_state := COALESCE(v_state, '');
@@ -293,15 +304,16 @@ BEGIN
 	v_rpt_result := COALESCE(v_rpt_result, '');
 	v_nodetype := COALESCE(v_nodetype, '');
 	v_nodecat := COALESCE(v_nodecat, '');
-	
+
 	-- make return
 	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
-		     ',"data":{"fields":{ "om":' || v_om_fields ||
-				      ' , "edit":' || v_edit_fields ||
-				      ' , "epa":' || v_epa_fields ||
-				      ' , "master":' || v_master_fields ||
-				      ' , "admin":' || v_admin_fields ||'}}}}';
+		     ',"data":{"processes":{"fields":{ "om":' || v_om_fields ||
+						 ' , "edit":' || v_edit_fields ||
+						 ' , "epa":' || v_epa_fields ||
+						 ' , "master":' || v_master_fields ||
+						 ' , "admin":' || v_admin_fields ||'}}'||
+				', "reports":{"fields":{"edit":'||v_reports_fields||'}}}}}';
 
 	-- manage variables ($)
 	v_return = REPLACE (v_return::text, '$userExploitation', v_expl);
@@ -322,3 +334,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
