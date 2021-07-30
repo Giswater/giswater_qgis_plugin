@@ -40,12 +40,6 @@ class GwLoadProject(QObject):
         tools_log.log_info("Project read")
         global_vars.project_loaded = False
 
-        # Get variables from qgis project
-        self._get_project_variables()
-
-        # Removes all deprecated variables defined at giswater.config
-        tools_gw.remove_deprecated_config_vars()
-
         self._get_user_variables()
 
         # Check if loaded project is valid for Giswater
@@ -56,10 +50,19 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
+        # Removes all deprecated variables defined at giswater.config
+        tools_gw.remove_deprecated_config_vars()
+
+        # Get variables from qgis project
+        self._get_project_variables()
+
         # Get water software from table 'sys_version'
         global_vars.project_type = tools_gw.get_project_type()
         if global_vars.project_type is None:
             return
+
+        # Check if user has config files 'init' and 'session' and its parameters
+        tools_gw.user_params_to_userconfig()
 
         # Manage schema name
         tools_db.get_current_user()
