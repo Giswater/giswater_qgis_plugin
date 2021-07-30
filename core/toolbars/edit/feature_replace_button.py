@@ -163,7 +163,7 @@ class GwFeatureReplaceButton(GwMaptool):
         ag = QActionGroup(self.iface.mainWindow())
 
         actions = ['ARC', 'NODE', 'CONNEC']
-        if global_vars.project_vars['project_type'] in ('UD', 'ud'):
+        if global_vars.project_type in ('UD', 'ud'):
             actions.append('GULLY')
 
         for action in actions:

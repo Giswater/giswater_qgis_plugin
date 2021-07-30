@@ -168,6 +168,9 @@ class Giswater(QObject):
         tools_log.set_logger(self.plugin_name, log_limit_characters)
         tools_log.log_info("Initialize plugin")
 
+        # Check if user has config params (only params without prefix)
+        tools_gw.user_params_to_userconfig()
+
         # Define signals
         self._set_signals()
 
@@ -330,7 +333,7 @@ class Giswater(QObject):
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
-                global_vars.project_vars['project_type'] is None:
+                global_vars.project_type is None:
             return
 
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)

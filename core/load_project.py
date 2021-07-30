@@ -37,13 +37,7 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
-        # Get variables from qgis project
-        tools_qgis.get_project_variables()
-
         tools_gw.remove_deprecated_config_vars()
-
-        # Check if user has all config params
-        tools_gw.user_params_to_userconfig()
 
         self._get_user_variables()
 
@@ -55,10 +49,16 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
+        # Get variables from qgis project
+        tools_qgis.get_project_variables()
+
         # Get water software from table 'sys_version'
         global_vars.project_type = tools_gw.get_project_type()
         if global_vars.project_type is None:
             return
+
+        # Check if user has all config params
+        tools_gw.user_params_to_userconfig()
 
         # Manage schema name
         tools_db.get_current_user()
