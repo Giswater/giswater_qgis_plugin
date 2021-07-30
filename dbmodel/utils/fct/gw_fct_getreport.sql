@@ -149,7 +149,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-SELECT SCHEMA_NAME.gw_fct_getreport($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"filter":[{"filterName":"arccat","filterValue":"PVC63-PN10"},{"filterName":"length","filterValue":"20","filterValue":"20"}], "listName":"arc_length_x_arccat"}}$$);
-
