@@ -132,22 +132,22 @@ BEGIN
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
 			END IF;
-			
-			IF v_querytext ILIKE '%WHERE%' THEN
-				IF v_querytext ILIKE '%GROUP BY%' THEN
-					v_querytext = replace(v_querytext, 'GROUP BY',concat(' AND ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
-
-				ELSE 
-					v_querytext = replace(v_querytext, 'WHERE ',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' AND '));
-	
-				END IF;
-			ELSE
-				IF v_querytext ILIKE '%GROUP BY%' THEN
-					v_querytext = replace(v_querytext, 'GROUP BY',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
-				ELSE 
-					v_querytext = concat(v_querytext, ' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue));
-				END IF;
-			END IF; 
+			IF v_filtername != '' AND v_filtervalue != '' THEN
+				IF v_querytext ILIKE '%WHERE%' THEN
+					IF v_querytext ILIKE '%GROUP BY%' THEN
+						v_querytext = replace(v_querytext, 'GROUP BY',concat(' AND ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
+					ELSE 
+						v_querytext = replace(v_querytext, 'WHERE ',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' AND '));
+		
+					END IF;
+				ELSE
+					IF v_querytext ILIKE '%GROUP BY%' THEN
+						v_querytext = replace(v_querytext, 'GROUP BY',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
+					ELSE 
+						v_querytext = concat(v_querytext, ' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue));
+					END IF;
+				END IF; 
+			END IF;
 			i=i+1;
 		END LOOP;
 	END IF;
