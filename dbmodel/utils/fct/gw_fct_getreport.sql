@@ -135,7 +135,8 @@ BEGIN
 			
 			IF v_querytext ILIKE '%WHERE%' THEN
 				IF v_querytext ILIKE '%GROUP BY%' THEN
-					v_querytext = replace(v_querytext, 'GROUP BY',concat(' AND ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));;
+					v_querytext = replace(v_querytext, 'GROUP BY',concat(' AND ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
+
 				ELSE 
 					v_querytext = replace(v_querytext, 'WHERE ',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' AND '));
 	
