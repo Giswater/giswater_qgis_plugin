@@ -1330,7 +1330,7 @@ def set_data_type(field, widget):
 
 def set_widget_size(widget, field):
 
-    if field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
+    if 'widgetcontrols' in field and field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
         if field['widgetcontrols']['widgetdim']:
             widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
             widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
@@ -1432,8 +1432,8 @@ def fill_combo(widget, field):
             elem = [field['comboIds'][i], field['comboNames'][i]]
             combolist.append(elem)
     else:
-        msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-              f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+        msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
+              f"AND widgettype='{field['widgettype']}'"
         tools_qgis.show_message(msg, 2)
     # Populate combo
     for record in combolist:

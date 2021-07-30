@@ -219,6 +219,10 @@ class GwCsvUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('print.ui', 'utilities')
 class GwPrintUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('toolbox_reports.ui', 'utilities')
+class GwToolboxReportsUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 # region TOC
