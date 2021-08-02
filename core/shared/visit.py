@@ -450,6 +450,17 @@ class GwVisit(QObject):
         # Disconnect open visit from table_visit once there opened
         self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
         self.dlg_visit_manager.btn_open.clicked.disconnect()
+        self.dlg_add_visit.rejected.connect(partial(self._reconnect_table_signals, table_object))
+        self.dlg_add_visit.accepted.connect(partial(self._reconnect_table_signals, table_object))
+
+
+    def _reconnect_table_signals(self, table_object):
+        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
+        self.dlg_visit_manager.btn_open.clicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
 
 
     def _set_signals(self):
