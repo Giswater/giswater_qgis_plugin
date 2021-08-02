@@ -11,5 +11,3 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_param_user SET value ='1' WHERE value ='EPA TABLES' AND parameter = 'inp_options_valve_mode';
 UPDATE config_param_user SET value ='2' WHERE value ='INVENTORY VALUES' AND parameter = 'inp_options_valve_mode';
 UPDATE config_param_user SET value ='3' WHERE value ='MINCUT RESULTS' AND parameter = 'inp_options_valve_mode';
-
-UPDATE inp_pump SET pump_type = 1 WHERE pump_type IS NULL;

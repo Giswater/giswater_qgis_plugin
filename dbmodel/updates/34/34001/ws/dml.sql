@@ -53,4 +53,6 @@ WHERE id = 'qgis_qml_pointlayer_path';
 UPDATE audit_cat_param_user SET vdefault = '{"dma":"c:\users\user\dmapol.qml", "dqa":"c:\users\user\dqapol.qml", "sector":"c:\users\user\sectorpol.qml", "cat_presszone":"c:\users\user\presszonepol.qml","minsector":"c:\users\user\minsectorpol.qml"}'
 WHERE id = 'qgis_qml_polygonlayer_path';
 
+UPDATE inp_pump SET pump_type = 1 WHERE pump_type IS NULL;
+
 
