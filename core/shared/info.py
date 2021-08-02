@@ -1679,7 +1679,7 @@ class GwInfo(QObject):
                     tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
-        tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
+        tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
 
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):

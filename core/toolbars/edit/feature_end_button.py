@@ -133,7 +133,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
 
     # region private functions

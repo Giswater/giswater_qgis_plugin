@@ -58,9 +58,9 @@ class GwAdminButton:
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -650,7 +650,11 @@ class GwAdminButton:
             self.form_enabled = False
 
         elif self.form_enabled:
-            if str(self.plugin_version) > str(self.project_version):
+            schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+            if schema_name == 'null':
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
+            elif str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is lower than plugin version, please update schema)')
@@ -2022,25 +2026,23 @@ class GwAdminButton:
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        # TODO: Make just one SQL query
-        self.project_type = tools_gw.get_project_type(schemaname=schema_name)
-        self.project_epsg = self._get_project_epsg(schemaname=schema_name)
-        self.project_version = self._get_project_version(schemaname=schema_name)
-        self.project_language = self._get_project_language(schemaname=schema_name)
-
         self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
 
-        if schema_name is None:
-            schema_name = 'Nothing to select'
-            self.project_version = "Version not found"
+        if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
-        if schema_name in (None, '', 'null'):
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + '')
             self.software_version_info.setText(msg)
+
         else:
+            # TODO: Make just one SQL query
+            self.project_type = tools_gw.get_project_type(schemaname=schema_name)
+            self.project_epsg = self._get_project_epsg(schemaname=schema_name)
+            self.project_version = self._get_project_version(schemaname=schema_name)
+            self.project_language = self._get_project_language(schemaname=schema_name)
+
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
                    'Schema name: ' + schema_name + '\n' + ''
@@ -2057,8 +2059,9 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if schema_name == 'Nothing to select' or schema_name == '' and self.form_enabled:
+        if schema_name == 'null' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         elif str(self.plugin_version) > str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
@@ -2255,6 +2258,7 @@ class GwAdminButton:
     def _read_files(self, filelist, filedir):
         """"""
 
+        f = None
         if "changelog.txt" in filelist:
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
@@ -2266,7 +2270,9 @@ class GwAdminButton:
             except Exception as e:
                 tools_log.log_warning("Error _read_files: " + str(e))
                 return False
-
+            finally:
+                if f:
+                    f.close()
         return True
 
 
@@ -3210,7 +3216,7 @@ class GwAdminButton:
         sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
         tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
 
-        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
 
 
     def _set_user_sslmode(self):

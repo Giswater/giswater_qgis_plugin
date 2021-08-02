@@ -148,7 +148,7 @@ class GwMincutTools:
         selector_vars = {}
         mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 
-        tools_gw.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_selector, dlg_name='selector')
 
 
     def _populate_combos(self):

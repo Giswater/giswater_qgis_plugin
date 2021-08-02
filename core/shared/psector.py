@@ -438,7 +438,7 @@ class GwPsector:
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
 
     def fill_widget(self, dialog, widget, row):
@@ -514,7 +514,7 @@ class GwPsector:
         self.populate_cmb_templates()
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport')
 
 
     def populate_cmb_templates(self):
