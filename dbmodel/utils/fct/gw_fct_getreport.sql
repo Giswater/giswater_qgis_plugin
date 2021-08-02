@@ -143,6 +143,8 @@ BEGIN
 				ELSE
 					IF v_querytext ILIKE '%GROUP BY%' THEN
 						v_querytext = replace(v_querytext, 'GROUP BY',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
+					ELSIF v_querytext ILIKE '%ORDER BY%' THEN
+						v_querytext = replace(v_querytext, 'ORDER BY', concat(' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue), 'ORDER BY '));
 					ELSE 
 						v_querytext = concat(v_querytext, ' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue));
 					END IF;
