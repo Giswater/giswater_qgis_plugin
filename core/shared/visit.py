@@ -863,7 +863,8 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
-            self.feature_type = self.feature_type_parameter.lower()
+            if self.it_is_new_visit:
+                self.feature_type = self.feature_type_parameter.lower()
             self._manage_tabs_enabled(True)
 
 
@@ -1162,9 +1163,9 @@ class GwVisit(QObject):
             where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.feature_type:
             if where is None:
-                where = f"WHERE UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where = f"WHERE UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
             else:
-                where += f"AND UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
 
         sql += where
         sql += f"ORDER BY id"
