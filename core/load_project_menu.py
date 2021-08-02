@@ -29,9 +29,6 @@ class GwMenuLoad(QObject):
 
         super().__init__()
         self.iface = global_vars.iface
-        self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
-        self.user_folder_dir = global_vars.user_folder_dir
 
 
     def read_menu(self):
@@ -166,7 +163,7 @@ class GwMenuLoad(QObject):
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 
-        path = os.path.realpath(self.user_folder_dir)
+        path = os.path.realpath(global_vars.user_folder_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
@@ -207,7 +204,7 @@ class GwMenuLoad(QObject):
 
         try:
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            config_folder = f"{self.user_folder_dir}{os.sep}config{os.sep}"
+            config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
             path = config_folder + f"session.config"
@@ -237,13 +234,13 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
+        files = [f for f in os.listdir(f"{global_vars.user_folder_dir}{os.sep}config")]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
             project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            parser.read(f"{self.user_folder_dir}{os.sep}config{os.sep}{file}")
+            parser.read(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
             for section in parser.sections():
