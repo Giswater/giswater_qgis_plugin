@@ -2374,14 +2374,17 @@ class GwAdminButton:
             # Insert inp values into database
             self._insert_inp_into_db(self.file_inp)
 
+            # Get the debugMode. If it's None it will be False
+            debug_mode = tools_gw.get_config_parser('system', 'import_inp_debug_mode', "user", "init") or False
+
             # Execute import data
             if project_type.lower() == 'ws':
                 function_name = 'gw_fct_import_epanet_inp'
-                extras = '"parameters":{}'
+                extras = '"parameters":{"debugMode":"' + debug_mode + '"}'
             elif project_type.lower() == 'ud':
                 function_name = 'gw_fct_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
+                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '", "debugMode":"' + debug_mode + '"}'
             else:
                 self.error_count = self.error_count + 1
                 return
