@@ -146,9 +146,9 @@ class GwAddChildLayerButton(GwAction):
         description = f"ConfigLayerFields"
         params = {"project_type": self.project_type, "schema_name": self.schema_name, "db_layers": rows,
                   "qgis_project_infotype": global_vars.project_vars['info_type']}
-        task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(task_get_layers)
-        QgsApplication.taskManager().triggerTask(task_get_layers)
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
         return True
 

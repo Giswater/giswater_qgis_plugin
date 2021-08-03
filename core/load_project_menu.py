@@ -306,21 +306,11 @@ class GwMenuLoad(QObject):
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
         self.iface.actionPan().trigger()
-        self._reload_layers()  # Keep this last to maximize reliability, it might crash QGIS otherwise
+        self._reload_layers()
 
 
     def _reload_layers(self):
         """ Reloads all the layers """
-
-        task_get_layers = self._create_task_reload_layers()
-        QgsApplication.taskManager().addTask(task_get_layers)
-        tools_log.log_debug(f"Task get_layers added to the task manager.")
-        QgsApplication.taskManager().triggerTask(task_get_layers)
-        tools_log.log_debug(f"Task get_layers triggered.")
-
-
-    def _create_task_reload_layers(self):
-        """ Creates the task for reloading all the layers """
 
         schema_name = global_vars.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
@@ -329,12 +319,13 @@ class GwMenuLoad(QObject):
                f"WHERE child_layer IN ("
                f"     SELECT table_name FROM information_schema.tables"
                f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql, log_sql=True)
+        rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
         params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
                   "qgis_project_infotype": global_vars.project_vars['info_type']}
-        task_get_layers = GwProjectLayersConfig(description, params)
-        return task_get_layers
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
 
     def _reset_snapping_managers(self):
