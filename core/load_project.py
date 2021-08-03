@@ -37,8 +37,9 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
-        tools_log.log_info("Project read")
         global_vars.project_loaded = False
+        if show_warning:
+            tools_log.log_info("Project read started")
 
         self._get_user_variables()
 
@@ -137,7 +138,7 @@ class GwLoadProject(QObject):
 
         # Log it
         global_vars.project_loaded = True
-        message = "Project read successfully"
+        message = "Project read finished"
         tools_log.log_info(message)
 
 
@@ -395,8 +396,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("plan")
 
         # Check if exist some feature_cat with active True on cat_feature table
-        self.feature_cat = global_vars.feature_cat
-        if self.feature_cat is None:
+        if global_vars.feature_cat is None:
             self._enable_button("01", False)
             self._enable_button("02", False)
 
