@@ -112,8 +112,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
-    # if global_vars.project_type is None and prefix:
-    #     global_vars.project_type = get_project_type()
     if config_type == 'user' and prefix and global_vars.project_type is not None:
         parameter = f"{global_vars.project_type}_{parameter}"
 
@@ -121,7 +119,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if chk_user_params and config_type in "user":
             value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
             set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-        # return value
     else:
         value = parser[section][parameter]
 
@@ -151,13 +148,11 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     path = global_vars.configs[file_name][0]
 
     try:
-        raw_parameter = parameter
 
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
-        # if global_vars.project_type is None and prefix:
-        #     global_vars.project_type = get_project_type()
+        raw_parameter = parameter
         if config_type == 'user' and prefix and global_vars.project_type is not None:
             parameter = f"{global_vars.project_type}_{parameter}"
 
@@ -1335,7 +1330,7 @@ def set_data_type(field, widget):
 
 def set_widget_size(widget, field):
 
-    if field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
+    if 'widgetcontrols' in field and field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
         if field['widgetcontrols']['widgetdim']:
             widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
             widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
@@ -1437,8 +1432,8 @@ def fill_combo(widget, field):
             elem = [field['comboIds'][i], field['comboNames'][i]]
             combolist.append(elem)
     else:
-        msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-              f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+        msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
+              f"AND widgettype='{field['widgettype']}'"
         tools_qgis.show_message(msg, 2)
     # Populate combo
     for record in combolist:
@@ -2877,7 +2872,6 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
                                     get_comment=True, chk_user_params=False)
-
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,

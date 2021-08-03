@@ -230,10 +230,11 @@ class GwVisit(QObject):
 
         if self.it_is_new_visit is False:
             # Disable widgets when the visit is not new
-            self.dlg_add_visit.btn_feature_insert.setEnabled(False)
-            self.dlg_add_visit.btn_feature_delete.setEnabled(False)
-            self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
-            self.dlg_add_visit.tab_feature.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_insert.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_delete.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
+            # self.dlg_add_visit.tab_feature.setEnabled(False)
+            self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
             visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
@@ -450,6 +451,17 @@ class GwVisit(QObject):
         # Disconnect open visit from table_visit once there opened
         self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
         self.dlg_visit_manager.btn_open.clicked.disconnect()
+        self.dlg_add_visit.rejected.connect(partial(self._reconnect_table_signals, table_object))
+        self.dlg_add_visit.accepted.connect(partial(self._reconnect_table_signals, table_object))
+
+
+    def _reconnect_table_signals(self, table_object):
+        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
+        self.dlg_visit_manager.btn_open.clicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
 
 
     def _set_signals(self):
@@ -851,7 +863,8 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
-            self.feature_type = self.feature_type_parameter.lower()
+            if self.it_is_new_visit:
+                self.feature_type = self.feature_type_parameter.lower()
             self._manage_tabs_enabled(True)
 
 
@@ -1150,9 +1163,9 @@ class GwVisit(QObject):
             where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.feature_type:
             if where is None:
-                where = f"WHERE UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where = f"WHERE UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
             else:
-                where += f"AND UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
 
         sql += where
         sql += f"ORDER BY id"
