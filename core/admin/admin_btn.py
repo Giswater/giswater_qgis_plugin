@@ -1373,7 +1373,7 @@ class GwAdminButton:
         complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
-        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
+        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
 
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
