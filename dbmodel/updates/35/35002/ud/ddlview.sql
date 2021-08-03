@@ -187,10 +187,6 @@ UNION
      LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
      JOIN value_state ON v_gully.state = value_state.id;
 
-
-	DROP VIEW IF EXISTS v_edit_man_connec;
-	DROP VIEW IF EXISTS v_edit_man_gully;
-
   
 --SAVE VIEWS AND REMOVE 1ST FIELD
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
