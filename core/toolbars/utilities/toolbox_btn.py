@@ -164,7 +164,9 @@ class GwToolBoxButton(GwAction):
             tools_gw.load_settings(self.dlg_reports)
 
             # Set listeners
-            self.dlg_reports.btn_export.clicked.connect(self._export_reports)
+            self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, None, None))  # WIP!!
+            self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
+            self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
             extras = f'"filterText":null, "listName":"{self.function_selected}"'
             body = tools_gw.create_body(extras=extras)
