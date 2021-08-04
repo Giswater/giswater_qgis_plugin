@@ -77,7 +77,7 @@ BEGIN
 	v_function := (p_data ->> 'data')::json->> 'function';
 
 	-- get project type
-        SELECT lower(project_type) INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
+  SELECT lower(project_type) INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- convert v_function to alias
 	IF v_function IS NOT NULL THEN
@@ -194,13 +194,15 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_admin_fields;
 
-	-- get reports toolbox parameters
-	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			 SELECT listname, alias
-			 FROM config_form_list
-			 WHERE listtype = ''report'' ORDER BY listname) a');
-			
-	EXECUTE v_querystring INTO v_reports_fields;
+	IF v_function IS NULL THEN
+		-- get reports toolbox parameters
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT listname, alias
+				 FROM config_form_list
+				 WHERE listtype = ''report'' AND  alias LIKE ''%', v_filter ,'%'' ORDER BY listname) a');
+				
+		EXECUTE v_querystring INTO v_reports_fields;
+	END IF;
 
 	-- refactor dvquerytext			
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
