@@ -6,12 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 
 from .task import GwTask
 from ..utils import tools_gw
-from ... import global_vars
-from ...lib import tools_db, tools_qt
+from ...lib import tools_db, tools_qt, tools_log
 
 
 class GwAutoMincutTask(GwTask):
@@ -20,7 +18,7 @@ class GwAutoMincutTask(GwTask):
 
     def __init__(self, description, mincut_class, element_id):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.mincut_class = mincut_class
         self.element_id = element_id
         self.exception = None
@@ -28,12 +26,10 @@ class GwAutoMincutTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-        global_vars.session_vars['threads'].append(self)
-        self.mincut_class.dlg_mincut.btn_cancel_task.show()
-        self.mincut_class.dlg_mincut.btn_cancel.hide()
+
+        super().run()
 
         try:
-
             real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, 'result_mincut_id')
             if self.mincut_class.is_new:
                 self.mincut_class.set_id_val()
@@ -53,10 +49,13 @@ class GwAutoMincutTask(GwTask):
             use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, 'chk_use_planified')
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
-            body = tools_gw.create_body(extras=extras)
+            self.body = tools_gw.create_body(extras=extras)
+            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', self.body, aux_conn=self.aux_conn, is_thread=True)
+            if self.isCanceled():
+                return False
+            if not self.complet_result or self.complet_result['status'] == 'Failed':
+                return False
 
-            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
-            if self.isCanceled(): return False
             return True
 
         except KeyError as e:
@@ -65,12 +64,27 @@ class GwAutoMincutTask(GwTask):
 
 
     def finished(self, result):
-        self.mincut_class.dlg_mincut.btn_cancel_task.hide()
-        self.mincut_class.dlg_mincut.btn_cancel.show()
-        global_vars.session_vars['threads'].remove(self)
-        
-        # Handle exception
-        if self.exception is not None:
+
+        super().finished(result)
+
+        sql = f"SELECT gw_fct_setmincut("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.complet_result, sql, None)
+
+        # If user cancel task
+        if self.isCanceled():
+            self.task_finished.emit([False, self.complet_result])
+
+        # If sql function return null
+        elif self.complet_result is None:
+            self.task_finished.emit([False, self.complet_result])
+            msg = f"Error. Database returned null. Check postgres function 'gw_fct_setmincut'"
+            tools_log.log_warning(msg)
+
+        # Handle python exception
+        elif self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
@@ -79,10 +93,10 @@ class GwAutoMincutTask(GwTask):
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished but postgres function failed
-        elif self.complet_result in (False, None) or ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
+        elif 'status' in self.complet_result and self.complet_result['status'] == 'Failed':
             self.task_finished.emit([False, self.complet_result])
+            tools_gw.manage_json_exception(self.complet_result)
 
         # Task finished with Accepted result
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
-

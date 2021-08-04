@@ -13,6 +13,7 @@ from ..core.admin.gis_file_create import GwGisFileCreate
 from .. import global_vars
 from ..lib import tools_db
 
+
 # dummy instance to replace qgis.utils.iface
 class GwQgisInterfaceDummy(object):
 
@@ -142,11 +143,11 @@ class GwTestQgis:
         export_passwd = True
         roletype = 'admin'
         sample = True
-        get_database_parameters = False
         gis = GwGisFileCreate(self.test_giswater.plugin_dir)
-        gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
+        layer_source = {'host': "host", 'port': "port", 'db': "db",
+                        'user': "user", 'password': "password", "srid": "25831"}
         gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
-            roletype, sample, get_database_parameters)
+            roletype, sample, layer_source=layer_source)
 
         print("Finish create_gis_project")
 

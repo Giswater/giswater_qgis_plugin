@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -20,7 +20,7 @@ from ... import global_vars
 
 class GwMaptool(QgsMapTool):
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=4):
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -50,12 +50,12 @@ class GwMaptool(QgsMapTool):
 
         # Set default vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
-        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
+        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=icon_type)
 
         # Set default rubber band
         color = QColor(255, 100, 255)
         color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, 2)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, 2)
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)
         self.rubber_band.setWidth(1)
@@ -94,7 +94,8 @@ class GwMaptool(QgsMapTool):
     def deactivate(self):
 
         # Uncheck button
-        self.action.setChecked(False)
+        if hasattr(self.action, "setChecked"):  # If the maptool is activated through the giswater menu, it breaks
+            self.action.setChecked(False)
 
         # Restore previous snapping
         self.snapper_manager.restore_snap_options(self.previous_snapping)
@@ -149,7 +150,7 @@ class GwMaptool(QgsMapTool):
             elif geom_type == "line":
                 geom_type = QgsWkbTypes.LineString
             self.rubber_band.reset(geom_type)
-        except:
+        except Exception:
             pass
 
 

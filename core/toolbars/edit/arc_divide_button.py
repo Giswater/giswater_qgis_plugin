@@ -66,8 +66,7 @@ class GwArcDivideButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the disconnected node by clicking on it, move the pointer to desired location inside a" \
-                      " pipe and click again"
+            message = "Click on disconnected node, move the pointer to the desired location on pipe to break it"
             tools_qgis.show_info(message)
 
 
@@ -153,7 +152,7 @@ class GwArcDivideButton(GwMaptool):
     def _move_node(self, node_id, point):
         """ Move selected node to the current point """
 
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         # Update node geometry
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"

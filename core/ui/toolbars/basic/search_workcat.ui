@@ -55,7 +55,7 @@
      </property>
      <widget class="QWidget" name="tab_init">
       <attribute name="title">
-       <string>Initiated</string>
+       <string>Installed</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="2" column="0">
@@ -82,7 +82,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Active</string>
+            <string>Activate</string>
            </property>
           </widget>
          </item>
@@ -107,14 +107,14 @@
           </font>
          </property>
          <property name="text">
-          <string>Features initiated with the selected workcat</string>
+          <string>Features installed with the selected workcat</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="lbl_init">
          <property name="text">
-          <string>Init - Feature_id</string>
+          <string>Filter by: code</string>
          </property>
         </widget>
        </item>
@@ -175,7 +175,7 @@
      </widget>
      <widget class="QWidget" name="tab_ended">
       <attribute name="title">
-       <string>Ended</string>
+       <string>Removed</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="3" column="0">
@@ -187,7 +187,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Features ended with the selected workcat</string>
+          <string>Features removed with the selected workcat</string>
          </property>
         </widget>
        </item>
@@ -201,7 +201,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="lbl_end">
          <property name="text">
-          <string>End - Feature_id</string>
+          <string>Filter by: code</string>
          </property>
         </widget>
        </item>
@@ -216,7 +216,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Active</string>
+            <string>Activate</string>
            </property>
           </widget>
          </item>

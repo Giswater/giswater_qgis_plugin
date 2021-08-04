@@ -14,7 +14,6 @@ from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-from qgis.gui import QgsRubberBand
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwPrintUi
@@ -31,7 +30,7 @@ class GwPrintButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.destroyed = False
         self.printer = None
-        self.rubber_band = QgsRubberBand(global_vars.canvas)
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
     def clicked_event(self):
@@ -326,8 +325,8 @@ class GwPrintButton(GwAction):
             widget = tools_gw.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             if 'widgetfunction' in field:
-                if field['widgetfunction'] is not None:
-                    function_name = field['widgetfunction']
+                if field['widgetfunction']['functionName'] is not None:
+                    function_name = field['widgetfunction']['functionName']
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
 
         return label, widget

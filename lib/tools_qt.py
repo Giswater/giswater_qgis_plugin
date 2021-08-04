@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -20,7 +20,7 @@ from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringLis
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
-    QDateEdit,  QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
+    QDateEdit, QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
     QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox, \
     QToolButton
 from qgis.core import QgsExpression, QgsProject
@@ -81,7 +81,7 @@ def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
                     widget.addItem(str(elem), user_data)
                 else:
                     widget.addItem(elem, user_data)
-            except:
+            except Exception:
                 widget.addItem(str(elem), user_data)
 
 
@@ -111,7 +111,8 @@ def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format=
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd'):
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in \
+            ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd'):
         date = widget.dateTime().toString(date_format)
     elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss'):
         date = widget.dateTime().toString(datetime_format)
@@ -125,8 +126,12 @@ def set_calendar(dialog, widget, date, default_current_date=True):
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
+
+    if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+        widget.setDisplayFormat(global_vars.date_format)
     if type(widget) is QDateEdit \
-            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in
+                ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd')):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -134,7 +139,8 @@ def set_calendar(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01-01-2000', 'dd-MM-yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in
+                ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss', 'dd-MM-yyyy hh:mm:ss', 'yyyy-MM-dd hh:mm:ss')):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
@@ -205,12 +211,12 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
 
 def set_widget_text(dialog, widget, text):
 
-    if type(widget) is str or type(widget) is str:
+    if type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
 
-    if type(widget) in (QLabel, QLineEdit, QTextEdit):
+    if type(widget) in (QLabel, QLineEdit, QTextEdit, QPushButton):
         if str(text) == 'None':
             text = ""
         widget.setText(f"{text}")
@@ -332,32 +338,13 @@ def set_autocompleter(combobox, list_items=None):
     if list_items is None:
         list_items = [combobox.itemText(i) for i in range(combobox.count())]
     proxy_model = QSortFilterProxyModel()
-    set_model_by_list(list_items, combobox, proxy_model)
+    _set_model_by_list(list_items, combobox, proxy_model)
     combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
 
 
 def filter_by_list(widget, proxy_model):
     """ Create the model """
     proxy_model.setFilterFixedString(widget.currentText())
-
-
-def set_model_by_list(string_list, widget, proxy_model):
-    """ Set the model according to the list """
-
-    model = QStringListModel()
-    model.setStringList(string_list)
-    proxy_model.setSourceModel(model)
-    proxy_model.setFilterKeyColumn(0)
-    proxy_model_aux = QSortFilterProxyModel()
-    proxy_model_aux.setSourceModel(model)
-    proxy_model_aux.setFilterKeyColumn(0)
-    widget.setModel(proxy_model_aux)
-    widget.setModelColumn(0)
-    completer = QCompleter()
-    completer.setModel(proxy_model)
-    completer.setCompletionColumn(0)
-    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-    widget.setCompleter(completer)
 
 
 def get_combo_value(dialog, widget, index=0, add_quote=False):
@@ -444,7 +431,7 @@ def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo
     try:
         if sort_combo:
             records_sorted = sorted(records, key=operator.itemgetter(sort_by))
-    except:
+    except Exception:
         pass
     finally:
         if add_empty:
@@ -465,6 +452,7 @@ def set_combo_item_unselectable_by_id(qcombo, list_id=[]):
 
 def set_combo_item_selectable_by_id(qcombo, list_id=[]):
     """ Make items of QComboBox selectable """
+
     for x in range(0, qcombo.count()):
         if x in list_id:
             index = qcombo.model().index(x, 0)
@@ -479,6 +467,7 @@ def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
         :param column: column where to look up the values in the list (int)
         :param opt: 0 -> item not selectable // (1 | 32) -> item selectable (int)
     """
+
     for x in range(0, qcombo.count()):
         elem = qcombo.itemData(x)
         if str(elem[column]) in list_id:
@@ -569,6 +558,7 @@ def set_completer_object(completer, model, widget, list_items, max_visible=10):
 
 
 def set_action_checked(action, enabled, dialog=None):
+
     if type(action) is str and dialog is not None:
         action = dialog.findChild(QAction, action)
     try:
@@ -612,7 +602,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
                sort_order=Qt.AscendingOrder):
     """ Set a model with selected filter. Attach that model to selected table
     :param qtable: tableview where set the model (QTableView)
-    :param table_name: data base table name or view name (String)
+    :param table_name: database table name or view name (String)
     :param expr_filter: expression to filter the model (String)
     :param edit_strategy: (QSqlTableModel.OnFieldChange, QSqlTableModel.OnManualSubmit, QSqlTableModel.OnRowChange)
     :param sort_order: can be 0 or 1 (Qt.AscendingOrder or Qt.AscendingOrder)
@@ -863,7 +853,7 @@ def delete_rows_tableview(qtable):
             qtable.model().removeRow(index.row())
         status = qtable.model().submitAll()
         qtable.model().select()
-        
+
         # Return original editStrategy
         qtable.model().setEditStrategy(edit_strategy)
 
@@ -929,8 +919,13 @@ def show_warning_open_file(text, inf_text, file_path, context_name=None):
     global_vars.iface.messageBar().pushWidget(widget, 1)
 
 
-def show_question(text, title=None, inf_text=None, context_name=None, parameter=None):
+def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
     """ Ask question to the user """
+
+    # Expert mode does not ask and accept all actions
+    if global_vars.user_level['level'] not in (None, 'None') and not force_action:
+        if global_vars.user_level['level'] not in global_vars.user_level['showquestion']:
+            return True
 
     msg_box = QMessageBox()
     msg = tr(text, context_name)
@@ -1061,7 +1056,10 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
             show_exception_msg = False
 
     try:
+
         stack_level += stack_level_increase
+        if stack_level >= len(inspect.stack()):
+            stack_level = len(inspect.stack()) - 1
         module_path = inspect.stack()[stack_level][1]
         file_name = tools_os.get_relative_path(module_path, 2)
         function_line = inspect.stack()[stack_level][2]
@@ -1079,6 +1077,8 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
         if sql:
             msg += f"SQL:\n {sql}\n\n"
         msg += f"Schema name: {schema_name}"
+
+        global_vars.session_vars['last_error_msg'] = msg
 
         # Show exception message in dialog and log it
         if show_exception_msg:
@@ -1099,6 +1099,7 @@ def show_exception_message(title=None, msg="", window_title="Information about e
     if len(global_vars.session_vars['threads']) > 0:
         return
 
+    global_vars.session_vars['last_error_msg'] = None
     dlg_text.btn_accept.setVisible(False)
     dlg_text.btn_close.clicked.connect(lambda: dlg_text.close())
     dlg_text.setWindowTitle(window_title)
@@ -1107,7 +1108,8 @@ def show_exception_message(title=None, msg="", window_title="Information about e
     set_widget_text(dlg_text, dlg_text.txt_infolog, msg)
     dlg_text.setWindowFlags(Qt.WindowStaysOnTopHint)
     if pattern is None:
-        pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
+        pattern = "File\\sname:|Function\\sname:|Line\\snumber:|SQL:|SQL\\sfile:|Detail:|Context:|Description|Schema " \
+                  "name|Message\\serror:"
     set_text_bold(dlg_text.txt_infolog, pattern)
 
 
@@ -1151,11 +1153,14 @@ def fill_combo_unicodes(combo):
     """ Populate combo with full list of codes """
 
     unicode_list = []
-    sorted_list = None
+    matches = ["utf8", "windows", "latin"]
     for item in list(aliases.items()):
-        unicode_list.append(str(item[0]))
-        sorted_list = sorted(unicode_list, key=str.lower)
+        for x in matches:
+            if not f"{item[0]}".startswith(x):
+                continue
+            unicode_list.append(str(item[0]))
 
+    sorted_list = sorted(unicode_list, key=str.lower)
     if sorted_list:
         set_autocompleter(combo, sorted_list)
 
@@ -1337,6 +1342,25 @@ def _translate_tooltip(context_name, widget, idx=None, aux_context='ui_message')
                 widget.setToolTip(widget.title())
             else:
                 widget.setToolTip(widget.text())
+
+
+def _set_model_by_list(string_list, widget, proxy_model):
+    """ Set the model according to the list """
+
+    model = QStringListModel()
+    model.setStringList(string_list)
+    proxy_model.setSourceModel(model)
+    proxy_model.setFilterKeyColumn(0)
+    proxy_model_aux = QSortFilterProxyModel()
+    proxy_model_aux.setSourceModel(model)
+    proxy_model_aux.setFilterKeyColumn(0)
+    widget.setModel(proxy_model_aux)
+    widget.setModelColumn(0)
+    completer = QCompleter()
+    completer.setModel(proxy_model)
+    completer.setCompletionColumn(0)
+    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+    widget.setCompleter(completer)
 
 
 # endregion

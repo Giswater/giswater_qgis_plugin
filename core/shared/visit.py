@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import sys
-import subprocess
-import webbrowser
 from datetime import datetime
 from functools import partial
 
@@ -17,7 +14,6 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from ..models.om_visit import GwOmVisit
@@ -31,7 +27,7 @@ from ..ui.ui_manager import GwVisitUi, GwVisitEventUi, GwVisitEventRehabUi, GwVi
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 
 class GwVisit(QObject):
@@ -65,7 +61,7 @@ class GwVisit(QObject):
         if feature_id => load related feature basing on feature_type in relation
         if single_tool notify that the tool is used called from another dialog."""
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         # parameter to set if the dialog is working as single tool or integrated in another tool
         global_vars.single_tool_mode = single_tool
@@ -87,13 +83,14 @@ class GwVisit(QObject):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
         self.dlg_add_visit = GwVisitUi(tag)
-
+        tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
         for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
+
         self.dlg_add_visit.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
         self.dlg_add_visit.accepted.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -132,6 +129,7 @@ class GwVisit(QObject):
 
         # Reset geometry
         self.point_xy = {"x": None, "y": None}
+
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")
@@ -232,10 +230,11 @@ class GwVisit(QObject):
 
         if self.it_is_new_visit is False:
             # Disable widgets when the visit is not new
-            self.dlg_add_visit.btn_feature_insert.setEnabled(False)
-            self.dlg_add_visit.btn_feature_delete.setEnabled(False)
-            self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
-            self.dlg_add_visit.tab_feature.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_insert.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_delete.setEnabled(False)
+            # self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
+            # self.dlg_add_visit.tab_feature.setEnabled(False)
+            self.dlg_add_visit.tab_feature.tabBar().setEnabled(False)
 
             # Zoom to selected geometry or relations
             visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
@@ -272,7 +271,7 @@ class GwVisit(QObject):
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}")
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, table_object)
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
@@ -283,7 +282,7 @@ class GwVisit(QObject):
             table_object = "v_ui_om_visitman_x_" + str(feature_type)
             expr_filter = f"{feature_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, table_object, expr_filter)
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
@@ -342,29 +341,30 @@ class GwVisit(QObject):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
 
             # Attach model to table view
         if widget:
             widget.setModel(model)
         else:
-            self.controller.log_info("set_model_to_table: widget not found")
+            tools_log.log_info("set_model_to_table: widget not found")
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
+        feature_type = 'node'
         if feature_key == 'node_id':
             feature_type = 'node'
-        if feature_key == 'connec_id':
+        elif feature_key == 'connec_id':
             feature_type = 'connec'
-        if feature_key == 'arc_id':
+        elif feature_key == 'arc_id':
             feature_type = 'arc'
-        if feature_key == 'gully_id':
+        elif feature_key == 'gully_id':
             feature_type = 'gully'
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
                " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type + ""
                " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type + ".class_id"
                " WHERE " + str(feature_key) + " IS NOT NULL AND " + str(feature_key) + " = '" + str(id) + "'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.set_combo_value(cmb_visitclass, rows, 1)
         tools_qt.fill_combo_values(cmb_visitclass, str(current_visit_class), 0)
 
@@ -441,21 +441,34 @@ class GwVisit(QObject):
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'visit_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
             self.get_visit(visit_id=selected_object_id)
-            
+
         # Disconnect open visit from table_visit once there opened
         self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
         self.dlg_visit_manager.btn_open.clicked.disconnect()
+        self.dlg_add_visit.rejected.connect(partial(self._reconnect_table_signals, table_object))
+        self.dlg_add_visit.accepted.connect(partial(self._reconnect_table_signals, table_object))
+
+
+    def _reconnect_table_signals(self, table_object):
+        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
+        self.dlg_visit_manager.btn_open.clicked.connect(
+            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                    table_object))
 
 
     def _set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
-        self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self._manage_accepted))
 
@@ -480,11 +493,11 @@ class GwVisit(QObject):
         self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_visit.tbl_visit_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+            self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
 
     def _add_feature_clicked(self):
@@ -546,10 +559,10 @@ class GwVisit(QObject):
         # Update geometry field (if user have selected a point)
         if self.point_xy['x'] is not None:
             self._update_geom()
-            
+
         layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
 
         # If new visit, execute PG function
         if self.it_is_new_visit:
@@ -560,7 +573,7 @@ class GwVisit(QObject):
 
         layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
 
 
@@ -570,13 +583,15 @@ class GwVisit(QObject):
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
         complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
+        if complet_result is None:
+            return
         tools_log.log_info(f"execute_pgfunction: {complet_result}")
 
 
     def _update_geom(self):
         """ Update geometry field """
 
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")
@@ -632,19 +647,19 @@ class GwVisit(QObject):
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = f"{self.schema_name}.v_ui_om_event"
+        table_name = "v_ui_om_event"
         message = tools_qt.fill_table(self.tbl_event, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
-        self._set_configuration(dialog, self.tbl_event, table_name)
+        tools_gw.set_tablemodel_config(dialog, self.tbl_event, table_name)
         self._manage_events_changed()
 
         # D) load all related documents in the relative table
-        table_name = f"{self.schema_name}.v_ui_doc_x_visit"
+        table_name = "v_ui_doc_x_visit"
         message = tools_qt.fill_table(self.tbl_document, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
-        self._set_configuration(dialog, self.tbl_document, table_name)
+        tools_gw.set_tablemodel_config(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
         self._set_feature_type_by_visit_id()
@@ -848,7 +863,8 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
-            self.feature_type = self.feature_type_parameter.lower()
+            if self.it_is_new_visit:
+                self.feature_type = self.feature_type_parameter.lower()
             self._manage_tabs_enabled(True)
 
 
@@ -919,14 +935,12 @@ class GwVisit(QObject):
         except Exception as e:
             tools_log.log_info(f"manage_feature_type_selected exception: {e}")
         finally:
-
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
                  self.dlg_add_visit, widget_table, False, False, None, None))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
-
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.feature_type) + "_id")
@@ -941,11 +955,10 @@ class GwVisit(QObject):
             return
 
         # configure model visibility
-        table_name = f"v_edit_{self.feature_type}"
-        self._set_configuration(dialog, "tbl_visit_x_arc", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_node", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_connec", table_name)
-        self._set_configuration(dialog, "tbl_visit_x_gully", table_name)
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_arc", "v_edit_arc")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_node", "v_edit_node")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_connec", "v_edit_connec")
+        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_gully", "v_edit_gully")
 
 
     def _event_feature_type_selected(self, dialog, feature_type=None):
@@ -1150,9 +1163,9 @@ class GwVisit(QObject):
             where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.feature_type:
             if where is None:
-                where = f"WHERE UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where = f"WHERE UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
             else:
-                where += f"AND UPPER(feature_type) = '{self.feature_type.upper()}' "
+                where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
 
         sql += where
         sql += f"ORDER BY id"
@@ -1309,15 +1322,9 @@ class GwVisit(QObject):
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _populate_tbl_docs_x_event(self, event_id=0):
@@ -1473,7 +1480,7 @@ class GwVisit(QObject):
         om_event_parameter = GwConfigVisitParameter()
         om_event_parameter.id = event.parameter_id
         parameter_id = event.parameter_id
-        
+
         if not om_event_parameter.fetch():
             return
 
@@ -1676,43 +1683,6 @@ class GwVisit(QObject):
         self.dlg_add_visit.tbl_document.model().select()
 
 
-    def _set_configuration(self, dialog, widget, table_name):
-        """ Configuration of tables. Set visibility and width of columns """
-
-        widget = tools_qt.get_widget(dialog, widget)
-        if not widget:
-            return
-
-        # Set width and alias of visible columns
-        columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, visible"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = tools_db.get_rows(sql, log_info=False)
-        if not rows:
-            return
-
-        for row in rows:
-            if not row['visible']:
-                columns_to_delete.append(row['columnindex'])
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['columnindex'], width)
-                widget.model().setHeaderData(
-                    row['columnindex'], Qt.Horizontal, row['alias'])
-
-        # Set order
-        widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
-        # Delete columns
-        for column in columns_to_delete:
-            widget.hideColumn(column)
-
-
     def _populate_position_id(self):
 
         self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
@@ -1768,7 +1738,7 @@ class GwVisit(QObject):
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
+                partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")

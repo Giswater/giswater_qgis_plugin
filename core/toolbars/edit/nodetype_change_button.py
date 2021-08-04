@@ -68,7 +68,7 @@ class GwNodeTypeChangeButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be changed"
+            message = "Click on node to change it's type"
             tools_qgis.show_info(message)
 
 
@@ -85,7 +85,7 @@ class GwNodeTypeChangeButton(GwMaptool):
 
         # Get feature_type
         child_type = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        if child_type is 'null':
+        if child_type == 'null':
             msg = "New node type is null. Please, select a valid value."
             tools_qt.show_info_box(msg, "Info")
             return
@@ -177,7 +177,7 @@ class GwNodeTypeChangeButton(GwMaptool):
             self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
+            sql = "SELECT DISTINCT(id), id FROM cat_node  WHERE active IS TRUE OR active IS NULL ORDER BY id"
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
@@ -193,7 +193,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         tools_qt.fill_combo_box(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change')
 
 
     def _filter_catalog(self):
@@ -204,7 +204,8 @@ class GwNodeTypeChangeButton(GwMaptool):
             return
 
         # Populate catalog_id
-        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
+        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' " \
+              f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 

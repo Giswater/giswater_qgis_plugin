@@ -10,13 +10,12 @@ from functools import partial
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox
-from qgis.gui import QgsRubberBand
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_db
+from ...lib import tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwElement:
@@ -33,7 +32,7 @@ class GwElement:
 
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
         """ Button 33: Add element """
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.new_element_id = new_element_id
 
         # Create the dialog and signals
@@ -93,6 +92,7 @@ class GwElement:
             layer.selectByIds([feature.id()])
 
         self._check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
+        self._check_date(self.dlg_add_element.enddate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = tools_qgis.get_layer_by_tablename("v_edit_element")
@@ -117,7 +117,7 @@ class GwElement:
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_element, table_object, cur_active_layer,  layers=self.layers)))
+            self.dlg_add_element, table_object, cur_active_layer, layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
@@ -126,8 +126,7 @@ class GwElement:
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, excluded_layers))
-        self.dlg_add_element.rejected.connect(lambda: self.rubber_band.reset())
-
+        self.dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
 
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self._fill_dialog_element, self.dlg_add_element, table_object, None))
@@ -144,17 +143,16 @@ class GwElement:
         self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
-
-
+            self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
+
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
@@ -176,7 +174,6 @@ class GwElement:
                " ORDER BY location_type")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
-
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
@@ -204,7 +201,6 @@ class GwElement:
         self._filter_elementcat_id()
 
         if self.new_element_id:
-            # Set default values
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
@@ -233,7 +229,7 @@ class GwElement:
             self._fill_dialog_element(self.dlg_add_element, 'element', None)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', hide_config_widgets=True)
         return self.dlg_add_element
 
 
@@ -242,7 +238,7 @@ class GwElement:
         element_type = tools_qt.get_text(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
-               f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
+               f" AND ('{element_type}' = ANY(featurecat_id::text[]) OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, add_empty=True)
@@ -280,7 +276,7 @@ class GwElement:
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
-        
+
 
     # region private functions
 
@@ -298,10 +294,16 @@ class GwElement:
         self._manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self._manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
         self._manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
-        self._manage_combo(self.dlg_add_element.builtdate, 'edit_builtdate_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
+
+        builtdate_vdef = tools_gw.get_config_value('edit_builtdate_vdefault')
+        enddate_vdef = tools_gw.get_config_value('edit_enddate_vdefault')
+        if builtdate_vdef:
+            self.dlg_add_element.builtdate.setText(builtdate_vdef[0].replace('/', '-'))
+        if enddate_vdef:
+            self.dlg_add_element.enddate.setText(enddate_vdef[0].replace('/', '-'))
 
 
     def _manage_combo(self, combo, parameter):
@@ -349,6 +351,7 @@ class GwElement:
         location_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.location_type)
         buildercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.buildercat_id)
         builtdate = tools_qt.get_text(self.dlg_add_element, "builtdate", return_string_null=False)
+        enddate = tools_qt.get_text(self.dlg_add_element, "enddate", return_string_null=False)
         workcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id)
         workcat_id_end = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
         comment = tools_qt.get_text(self.dlg_add_element, "comment", return_string_null=False)
@@ -378,34 +381,36 @@ class GwElement:
         expl_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = global_vars.srid
+        srid = global_vars.data_epsg
 
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"
                f" FROM {table_object}"
                f" WHERE element_id = '{element_id}'")
-        row = tools_db.get_row(sql, log_sql=True)
-
+        row = tools_db.get_row(sql, log_info=False)
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
                        ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
-                              f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
-                              f"'{link}', '{undelete}'")
+                              f"'{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, "
+                              f"$${link}$$, '{undelete}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
                        ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
 
                 sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', "
-                              f"'{state_type}', '{expl_id}', '{rotation}', '{comment}', '{observ}', '{link}', "
+                              f"'{state_type}', '{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, $${link}$$, "
                               f"'{undelete}'")
-
             if builtdate:
                 sql_values += f", '{builtdate}'"
+            else:
+                sql_values += ", null"
+            if enddate:
+                sql_values += f", '{enddate}'"
             else:
                 sql_values += ", null"
             if ownercat_id:
@@ -423,8 +428,7 @@ class GwElement:
             if workcat_id:
                 sql_values += f", '{workcat_id}'"
             else:
-                tools_qt.set_stylesheet(self.dlg_add_element.workcat_id)
-                return
+                sql_values += ", null"
             if workcat_id_end:
                 sql_values += f", '{workcat_id_end}'"
             else:
@@ -439,7 +443,7 @@ class GwElement:
             else:
                 sql_values += ", null"
             if code:
-                sql_values += f", '{code}'"
+                sql_values += f", $${code}$$"
             else:
                 sql_values += ", null"
             if element_id == '':
@@ -451,7 +455,6 @@ class GwElement:
             else:
                 sql_values += ");\n"
             sql += sql_values
-
         # If object already exist perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
@@ -461,12 +464,16 @@ class GwElement:
             sql = (f"UPDATE element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
                    f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
-                   f", comment = '{comment}', observ = '{observ}'"
-                   f", link = '{link}', undelete = '{undelete}'")
+                   f", comment = $${comment}$$, observ = $${observ}$$"
+                   f", link = $${link}$$, undelete = '{undelete}'")
             if builtdate:
                 sql += f", builtdate = '{builtdate}'"
             else:
                 sql += ", builtdate = null"
+            if enddate:
+                sql += f", enddate = '{enddate}'"
+            else:
+                sql += ", enddate = null"
             if ownercat_id:
                 sql += f", ownercat_id = '{ownercat_id}'"
             else:
@@ -484,7 +491,7 @@ class GwElement:
             else:
                 sql += ", workcat_id = null"
             if code:
-                sql += f", code = '{code}'"
+                sql += f", code = $${code}$$"
             else:
                 sql += ", code = null"
             if workcat_id_end:
@@ -499,7 +506,6 @@ class GwElement:
                 sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
-
         # Manage records in tables @table_object_x_@feature_type
         sql += (f"\nDELETE FROM element_x_node"
                 f" WHERE element_id = '{element_id}';")
@@ -552,7 +558,9 @@ class GwElement:
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'element_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         self.get_element(new_element_id=False, selected_object_id=selected_object_id)
 
@@ -656,7 +664,7 @@ class GwElement:
         if not row:
             # Reset widgets
             widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id",
-                       "workcat_id",  "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
+                       "workcat_id", "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
                        "num_elements"]
             for widget_name in widgets:
                 tools_qt.set_widget_text(dialog, widget_name, "")
@@ -664,7 +672,10 @@ class GwElement:
             self._set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
             self._set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                                            field_id='expl_id', field_name='name')
-            tools_gw.set_calendar_from_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+            self.dlg_add_element.builtdate.setText(
+                tools_gw.get_config_value('edit_builtdate_vdefault')[0].replace('/', '-'))
+            self.dlg_add_element.enddate.setText(
+                tools_gw.get_config_value('edit_enddate_vdefault')[0].replace('/', '-'))
             self._set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
                                            field_id='id', field_name='id')
             if single_tool_mode is not None:
@@ -695,6 +706,7 @@ class GwElement:
             tools_qt.set_widget_text(dialog, widget_name, f"{row[widget_name]}")
 
         tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
+        tools_qt.set_widget_text(dialog, "enddate", row['enddate'])
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
 

@@ -10,7 +10,6 @@ import re
 import subprocess
 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -25,7 +24,7 @@ class GwEpaFileManager(GwTask):
 
     def __init__(self, description, go2epa):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.go2epa = go2epa
         self.exception = None
         self.error_msg = None
@@ -33,9 +32,12 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        self.json_result = None
+        self.rpt_result = None
         self.file_rpt = None
         self.fid = 140
         self.set_variables_from_go2epa()
+        self.funtion_name = None
 
 
     def set_variables_from_go2epa(self):
@@ -56,6 +58,8 @@ class GwEpaFileManager(GwTask):
 
     def run(self):
 
+        super().run()
+
         # Initialize instance variables
         self.exception = None
         self.error_msg = None
@@ -63,11 +67,10 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
-        global_vars.session_vars['threads'].append(self)
 
         status = True
-
         if not self._exec_function_pg2epa():
+            self.funtion_name = 'gw_fct_pg2epa_main'
             return False
 
         if self.go2epa_export_inp:
@@ -77,19 +80,34 @@ class GwEpaFileManager(GwTask):
             status = self._execute_epa()
 
         if status and self.import_result:
+            self.funtion_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
         return status
 
 
     def finished(self, result):
-        global_vars.session_vars['threads'].remove(self)
+
+        super().finished(result)
+
+        sql = f"SELECT {self.funtion_name}("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
+
         self.dlg_go2epa.btn_cancel.setEnabled(False)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         self._close_file()
 
-        if result:
+        # If PostgreSQL function returned null
+        if self.complet_result is None:
+            msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
+            tools_log.log_warning(msg)
+
+        elif result:
 
             if self.go2epa_export_inp and self.complet_result:
                 if 'status' in self.complet_result:
@@ -118,7 +136,16 @@ class GwEpaFileManager(GwTask):
             return
 
         if self.function_failed:
-            tools_gw.manage_json_exception(self.complet_result)
+            if self.json_result is None or not self.json_result:
+                tools_log.log_warning("Function failed finished")
+            if self.complet_result:
+                if 'status' in self.complet_result:
+                    if "Failed" in self.complet_result['status']:
+                        tools_gw.manage_json_exception(self.complet_result)
+            if self.rpt_result:
+                if 'status' in self.rpt_result:
+                    if "Failed" in self.rpt_result['status']:
+                        tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
@@ -132,7 +159,7 @@ class GwEpaFileManager(GwTask):
 
         # If Database exception, show dialog after task has finished
         if global_vars.session_vars['last_error']:
-            tools_qt.dlg_text.show()
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
 
 
     def cancel(self):
@@ -157,26 +184,36 @@ class GwEpaFileManager(GwTask):
 
     # region private functions
 
-
     def _exec_function_pg2epa(self):
 
+        max_retries = 3
+        attempt = 0
+        self.json_result = None
         self.setProgress(0)
+
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body)
-        self.complet_result = json_result
-        if json_result is None or not json_result:
-            self.function_failed = True
-            return False
+        self.body = tools_gw.create_body(extras=extras)
 
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            tools_log.log_warning(json_result)
-            self.function_failed = True
-            return False
+        status = False
+        while self.json_result is None and attempt < max_retries:
+            attempt += 1
+            tools_log.log_warning(f"Attempt {attempt} of {max_retries}")
+            self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
+            self.complet_result = self.json_result
+            if self.json_result is None or not self.json_result:
+                tools_log.log_warning("Function failed")
+                self.function_failed = True
+            elif 'status' in self.json_result:
+                if self.json_result['status'] == 'Failed':
+                    tools_log.log_warning(self.json_result)
+                    self.function_failed = True
+                else:
+                    status = True
+                break
 
-        return True
+        return status
 
 
     def _export_inp(self):
@@ -252,7 +289,7 @@ class GwEpaFileManager(GwTask):
 
 
     def _import_rpt(self):
-        """import result file"""
+        """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
 
@@ -388,38 +425,21 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-        form = f'"form":{{{form}}}, '
-        feature = f'"feature":{{{feature}}}, '
-        filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = f'"pageInfo":{{}}'
-        data = f'"data":{{{filter_fields}, {page_info}'
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
-
-
     def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
         extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
-        body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', body)
-        self.rpt_result = json_result
-        if json_result is None or not json_result:
+        self.body = tools_gw.create_body(extras=extras)
+        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
+        self.rpt_result = self.json_result
+        if self.json_result is None or not self.json_result:
             self.function_failed = True
             return False
 
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            tools_log.log_warning(json_result)
+        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+            tools_log.log_warning(self.json_result)
             self.function_failed = True
             return False
 

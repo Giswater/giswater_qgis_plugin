@@ -12,12 +12,14 @@ from functools import partial
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.core import QgsApplication
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_log, tools_qt, tools_qgis
+from ..lib import tools_log, tools_qt, tools_qgis, tools_os, tools_db
+from .threads.project_layers_config import GwProjectLayersConfig
 
 
 class GwMenuLoad(QObject):
@@ -27,10 +29,6 @@ class GwMenuLoad(QObject):
 
         super().__init__()
         self.iface = global_vars.iface
-        self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
-        self.user_folder_dir = global_vars.user_folder_dir
-        self.list_values = []
 
 
     def read_menu(self):
@@ -56,7 +54,17 @@ class GwMenuLoad(QObject):
             toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
             toolbars_menu.addMenu(toolbar_submenu)
             buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
+
+            project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                                                           "project", "giswater")
+            if project_exclusive not in (None, 'None'):
+                project_exclusive = project_exclusive.replace(' ', '').split(',')
+
             for index_action in buttons_toolbar:
+
+                if index_action in project_exclusive:
+                    continue
+
                 icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
                 button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
@@ -71,8 +79,7 @@ class GwMenuLoad(QObject):
 
                 action_function = getattr(buttons, button_def)(icon_path, button_def, text, None, ag)
                 action = toolbar_submenu.addAction(icon, f"{text}")
-                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init",
-                                                          prefix=False, log_warning=False)
+                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
                 if shortcut_key:
                     action.setShortcuts(QKeySequence(f"{shortcut_key}"))
                     global_vars.shortcut_keys.append(shortcut_key)
@@ -85,7 +92,7 @@ class GwMenuLoad(QObject):
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
 
-        action_set_log_sql = actions_menu.addAction(f"Enable log sql")
+        action_set_log_sql = actions_menu.addAction(f"Toggle log sql")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
             tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
@@ -96,6 +103,22 @@ class GwMenuLoad(QObject):
         action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
 
         action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+
+        action_help = actions_menu.addAction(f"Get help")
+        action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
+        if not action_help_shortcut:
+            tools_gw.set_config_parser("system", f"help_shortcut", f"{action_help_shortcut}", "user", "init",
+                                       prefix=False)
+        action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
+        action_help.triggered.connect(tools_gw.open_dlg_help)
+
+        action_reset_plugin = actions_menu.addAction(f"Reset plugin")
+        action_reset_plugin_shortcut = tools_gw.get_config_parser("system", f"reset_plugin_shortcut", "user", "init", prefix=False)
+        if not action_reset_plugin_shortcut:
+            tools_gw.set_config_parser("system", f"reset_plugin_shortcut", f"{action_reset_plugin_shortcut}", "user",
+                                       "init", prefix=False)
+        action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
+        action_reset_plugin.triggered.connect(self._reset_plugin)
         # endregion
 
         # region Adavanced
@@ -107,9 +130,15 @@ class GwMenuLoad(QObject):
         # endregion
 
         # region Open user folder
+
+        log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+        size = tools_os.get_folder_size(log_folder)
+        log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
+
         folder_icon = QIcon(
             f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}102.png")
-        action_open_path = self.main_menu.addAction(f"Open folder")
+        action_open_path = self.main_menu.addAction(f"Open folder  ({log_folder_volume})")
+
         action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)
         # endregion
@@ -129,16 +158,21 @@ class GwMenuLoad(QObject):
 
 
     # region private functions
+
+
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 
-        path = os.path.realpath(self.user_folder_dir)
-        os.startfile(path)
+        path = os.path.realpath(global_vars.user_folder_dir)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
 
 
     def _open_manage_file(self):
         """ Manage files dialog:: """
 
+        tools_qgis.set_cursor_wait()
         self.dlg_manage_menu = GwLoadMenuUi()
 
         # Manage widgets
@@ -151,7 +185,17 @@ class GwMenuLoad(QObject):
         # Listeners
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
 
+        tools_qgis.restore_cursor()
+
+        message = "Changes on this page are dangerous and can break Giswater plugin in various ways. \n" \
+                  "You will need to restart QGIS to apply changes. Do you want continue?"
+        title = "Advanced Menu"
+        answer = tools_qt.show_question(message, title)
+        if not answer:
+            return
+
         # Open dialog
+        self.dlg_manage_menu.setWindowTitle(f'Advanced Menu')
         self.dlg_manage_menu.open()
 
 
@@ -160,7 +204,7 @@ class GwMenuLoad(QObject):
 
         try:
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            config_folder = f"{self.user_folder_dir}{os.sep}config{os.sep}"
+            config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
             path = config_folder + f"session.config"
@@ -181,51 +225,44 @@ class GwMenuLoad(QObject):
             return
 
 
-    def _get_config_file_values(self, file_name):
-        """ Populates a variable with a list of values parsed from a configuration file. """
-
-        # Get values
-        self.list_values = []
-        values = {}
-        path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
-        project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
-        if not os.path.exists(path):
-            return None
-
-        parser = configparser.ConfigParser()
-        parser.read(path)
-        for section in parser.sections():
-            for parameter in parser[section]:
-                if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
-                    continue
-                values["Section"] = section
-                values["Parameter"] = parameter
-                values["Value"] = parser[section][parameter]
-                self.list_values.append(values)
-                values = {}
-
-
     def _fill_tbl_config_files(self):
         """ Fills a UI table with the local list of values variable. """
 
         self.tree_config_files.resize(500, 200)
-        self.tree_config_files.setColumnCount(3)
-        self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
+        self.tree_config_files.setColumnCount(4)
+        self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value", "Description"])
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
+        files = [f for f in os.listdir(f"{global_vars.user_folder_dir}{os.sep}config")]
         for file in files:
-            self._get_config_file_values(file)
             item = QTreeWidgetItem([f"{file}"])
 
-            row_count = len(self.list_values)
-            for row in range(row_count):
-                item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}",
-                                              f"{self.list_values[row]['Parameter']}",
-                                              f"{self.list_values[row]['Value']}"])
-                # item_child.itemDoubleClicked.connect(partial(self._onDoubleClick))
-                item.addChild(item_child)
+            project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
+            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+            parser.read(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}{file}")
+
+            # For each section we create a sub-item and add all the parameters to that sub-item
+            for section in parser.sections():
+                subitem = QTreeWidgetItem([f"{section}"])
+                item.addChild(subitem)
+                for parameter in parser[section]:
+                    if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
+                        continue
+                    value = parser[section][parameter]
+                    values = {}
+                    values["Section"] = ""
+                    values["Parameter"] = parameter
+                    values["Value"] = value.split("#")[0].strip() if value is not None and "#" in value else value
+                    values["Description"] = value.split("#")[1].strip() if value is not None and "#" in value else ""
+                    if value is None:
+                        values["Value"] = ""
+
+                    item_child = QTreeWidgetItem([f"{values['Section']}",
+                                                  f"{values['Parameter']}",
+                                                  f"{values['Value']}",
+                                                  f"{values['Description']}"])
+                    subitem.addChild(item_child)
 
             self.tree_config_files.addTopLevelItem(item)
 
@@ -233,30 +270,84 @@ class GwMenuLoad(QObject):
     def _set_config_value(self, item, column):
 
         if column == 2:
-            file_name = item.parent().text(0).replace(".config", "")
-            section = item.text(0)
+            file_name = item.parent().parent().text(0).replace(".config", "")
+            section = item.parent().text(0)
             parameter = item.text(1)
             value = item.text(2)
-            tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False)
+            tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
 
 
     def _double_click_event(self, item, column):
 
         tmp = item.flags()
-        if column == 2:
+        if column == 2 and item.text(2):
             item.setFlags(tmp | Qt.ItemIsEditable)
 
 
     def _set_log_sql(self):
 
-        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init")
+        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init", False, get_none=True)
         if log_sql in ("False", "None"):
             message = "Variable log_sql from user config file has been enabled."
-            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init")
+            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init", prefix=False)
         else:
             message = "Variable log_sql from user config file has been disabled."
-            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init")
+            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
+
+
+    def _reset_plugin(self):
+        """ Called in reset plugin action """
+
+        self._reset_snapping_managers()
+        self._reset_all_rubberbands()
+        self.iface.actionPan().trigger()
+        self._reload_layers()  # Keep this last to maximize reliability, it might crash QGIS otherwise
+
+
+    def _reload_layers(self):
+        """ Reloads all the layers """
+
+        task_get_layers = self._create_task_reload_layers()
+        QgsApplication.taskManager().addTask(task_get_layers)
+        tools_log.log_debug(f"Task get_layers added to the task manager.")
+        QgsApplication.taskManager().triggerTask(task_get_layers)
+        tools_log.log_debug(f"Task get_layers triggered.")
+
+
+    def _create_task_reload_layers(self):
+        """ Creates the task for reloading all the layers """
+
+        schema_name = global_vars.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql, log_sql=True)
+        description = f"ConfigLayerFields"
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        task_get_layers = GwProjectLayersConfig(description, params)
+        return task_get_layers
+
+
+    def _reset_snapping_managers(self):
+        """ Deactivates all snapping managers """
+
+        for i in range(0, len(global_vars.snappers)):
+            global_vars.snappers[i].restore_snap_options(global_vars.snappers[i].recover_snapping_options())
+            global_vars.snappers[i].set_snapping_status(False)
+            global_vars.snappers[i].vertex_marker.hide()
+
+
+    def _reset_all_rubberbands(self):
+        """ Resets all active rubber bands """
+
+        for i in range(0, len(global_vars.active_rubberbands)):
+            global_vars.active_rubberbands[0].reset()
+            global_vars.active_rubberbands.pop(0)
 
     # endregion

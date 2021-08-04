@@ -5,15 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
-import configparser
-import os
-import webbrowser
-
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QMainWindow, QWhatsThis
+from qgis.PyQt.QtWidgets import QMainWindow, QShortcut
+from qgis.PyQt.QtGui import QKeySequence
 
 from ... import global_vars
+from ..utils import tools_gw
 
 
 class GwMainWindow(QMainWindow):
@@ -23,14 +20,20 @@ class GwMainWindow(QMainWindow):
     key_enter = QtCore.pyqtSignal()
 
     def __init__(self, subtag=None):
+
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
+        # Connect the help shortcut
+        action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
+        sh = QShortcut(QKeySequence(f"{action_help_shortcut}"), self)
+        sh.activated.connect(tools_gw.open_dlg_help)
         # Enable event filter
         self.installEventFilter(self)
 
 
     def closeEvent(self, event):
+
         try:
             self.dlg_closed.emit()
             return super().closeEvent(event)
@@ -42,30 +45,20 @@ class GwMainWindow(QMainWindow):
 
     def eventFilter(self, object, event):
 
-        if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
-            QWhatsThis.leaveWhatsThisMode()
-            parser = configparser.ConfigParser()
-            path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
-            if not os.path.exists(path):
-                print(f"File not found: {path}")
-                webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
-                return True
+        if hasattr(self, "subtag") and self.subtag is not None:
+            tag = f'{self.objectName()}_{self.subtag}'
+        else:
+            tag = str(self.objectName())
 
-            parser.read(path)
-            if self.subtag is not None:
-                tag = f'{self.objectName()}_{self.subtag}'
-            else:
-                tag = str(self.objectName())
-            try:
-                web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
-            except Exception:
-                webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
+        if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
+            global_vars.session_vars['last_focus'] = tag
             return True
+
         return False
 
 
     def keyPressEvent(self, event):
+
         try:
             if event.key() == QtCore.Qt.Key_Escape:
                 self.key_escape.emit()
@@ -76,3 +69,4 @@ class GwMainWindow(QMainWindow):
         except RuntimeError:
             # Multiples signals are emited when we use key_scape in order to close dialog
             pass
+

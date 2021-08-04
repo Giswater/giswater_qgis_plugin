@@ -8,8 +8,8 @@ or (at your option) any later version.
 import os
 import shutil
 
-from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 from ..utils import tools_gw
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 
 
 class GwGisFileCreate:
@@ -17,21 +17,16 @@ class GwGisFileCreate:
     def __init__(self, plugin_dir):
 
         self.plugin_dir = plugin_dir
-        self.host = None
-        self.port = None
-        self.db = None
-        self.user = None
-        self.password = None
+        self.layer_source = None
         self.srid = None
-        self.sslmode = None
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', chk_sample=False, get_database_parameters=True):
+                             export_passwd=False, roletype='admin', layer_source=None):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
-        
+
         # Get folder with QGS templates
         gis_extension = "qgs"
         gis_folder = self.plugin_dir + os.sep + "resources" + os.sep + "templates" + os.sep + "qgisproject"
@@ -43,10 +38,6 @@ class GwGisFileCreate:
             gis_locale_path = gis_folder + os.sep + "en_US"
 
         # Check if template_path and folder_path exists
-        # Set default project for type sample
-        if chk_sample:
-            roletype = 'admin_sample'
-
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
             tools_qgis.show_warning("Template GIS file not found", parameter=template_path, duration=20)
@@ -71,12 +62,13 @@ class GwGisFileCreate:
                 return False, qgs_path
 
         # Create destination file from template file
-        tools_log.log_info("Creating GIS file... " + qgs_path)
+        tools_log.log_info(f"Creating GIS file... {qgs_path}")
         shutil.copyfile(template_path, qgs_path)
 
-        if get_database_parameters:
-            # Get database parameters from layer source
-            status = self._get_database_parameters(schema)
+        # Get database parameters from layer source
+        self.layer_source = layer_source
+        if self.layer_source is None:
+            status, self.layer_source = self._get_database_parameters(schema)
             if not status:
                 return False, None
 
@@ -84,27 +76,11 @@ class GwGisFileCreate:
         with open(qgs_path) as f:
             content = f.read()
 
-        # Connect to sqlite database
-        sqlite_conn, self.cursor = tools_gw.create_sqlite_conn("srid")
-
-        # Replace spatialrefsys and extent parameters
-        content = self._replace_spatial_parameters(self.srid, content, sqlite_conn)
+        # Replace spatialrefsys, extent parameters, connection parameters and schema name
+        content = self._replace_spatial_parameters(self.layer_source['srid'], content)
         content = self._replace_extent_parameters(schema, content)
-
-        # Replace SCHEMA_NAME for schemaName parameter. SRID_VALUE for srid parameter
+        content = self._replace_connection_parameters(content, export_passwd)
         content = content.replace("SCHEMA_NAME", schema)
-        content = content.replace("SRID_VALUE", str(self.srid))
-
-        # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __PORT__ for port parameter
-        content = content.replace("__DBNAME__", self.db)
-        content = content.replace("__HOST__", self.host)
-        content = content.replace("__SSLMODE__", self.sslmode)
-
-        # Manage username and password
-        credentials = self.port
-        if export_passwd:
-            credentials = self.port + " username=" + self.user + " password=" + self.password
-        content = content.replace("__PORT__", credentials)
 
         # Write contents and show message
         try:
@@ -112,7 +88,7 @@ class GwGisFileCreate:
                 f.write(content)
             tools_qgis.show_info("GIS file generated successfully", parameter=qgs_path)
             message = "Do you want to open GIS project?"
-            answer = tools_qt.show_question(message, "GIS file generated successfully")
+            answer = tools_qt.show_question(message, "GIS file generated successfully", force_action=True)
             if answer:
                 return True, qgs_path
             return False, qgs_path
@@ -121,35 +97,25 @@ class GwGisFileCreate:
             tools_qgis.show_warning(message, parameter=qgs_path)
 
 
-    def set_database_parameters(self, host, port, db, user, password, srid, sslmode):
-
-        self.host = host
-        self.port = port
-        self.db = db
-        self.user = user
-        self.password = password
-        self.srid = srid
-        self.sslmode = sslmode
-
-
     # region private functions
+
 
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 
-        layer_source, not_version = tools_db.get_layer_source_from_credentials('disable')
+        layer_source, not_version = tools_db.get_layer_source_from_credentials('prefer')
         if layer_source is None:
             tools_qgis.show_warning("Error getting database parameters")
-            return False
-
-        self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'],
-                                     layer_source['user'], layer_source['password'],
-                                     tools_db.get_srid('v_edit_node', schema), layer_source['sslmode'])
-
-        return True
+            return False, None
+        else:
+            layer_source['srid'] = tools_db.get_srid('v_edit_node', schema)
+            return True, layer_source
 
 
-    def _replace_spatial_parameters(self, srid, content, sqlite_conn):
+    def _replace_spatial_parameters(self, srid, content):
+
+        # Connect to sqlite database
+        sqlite_conn, cursor = tools_gw.create_sqlite_conn("srid")
 
         aux = content
         if sqlite_conn:
@@ -157,8 +123,8 @@ class GwGisFileCreate:
                    f"projection_acronym, is_geo "
                    f"FROM srs "
                    f"WHERE srid = '{srid}'")
-            self.cursor.execute(sql)
-            row = self.cursor.fetchone()
+            cursor.execute(sql)
+            row = cursor.fetchone()
 
         else:
             sql = (f"SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
@@ -214,5 +180,32 @@ class GwGisFileCreate:
             aux = aux.replace("__YMAX__", str(valor))
 
         return aux
+
+
+    def _replace_connection_parameters(self, content, export_passwd):
+
+        if self.layer_source['service']:
+            datasource = f"service='{self.layer_source['service']}'"
+
+        else:
+
+            datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
+                          f"port={self.layer_source['port']}")
+
+            content = content.replace("__DBNAME__", self.layer_source['db'])
+            content = content.replace("__HOST__", self.layer_source['host'])
+            credentials = self.layer_source['port']
+            if export_passwd:
+                username = self.layer_source['user']
+                password = self.layer_source['password']
+                credentials = f"{self.layer_source['port']} username={username} password={password}"
+                datasource += f" username={username} password={password}"
+
+            content = content.replace("__PORT__", credentials)
+
+        content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
+        content = content.replace("__DATASOURCE__", datasource)
+
+        return content
 
     # endregion

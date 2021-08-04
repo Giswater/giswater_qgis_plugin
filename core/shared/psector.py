@@ -17,15 +17,14 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget,  QDoubleSpinBox, QTextEdit, QPushButton
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
 from ..utils import tools_gw
-from ...lib import tools_db, tools_qgis, tools_qt, tools_log
+from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
 
 
 class GwPsector:
@@ -36,7 +35,7 @@ class GwPsector:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
     def get_psector(self, psector_id=None, is_api=False):
@@ -126,7 +125,7 @@ class GwPsector:
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = tools_db.get_rows(sql)
-        
+
         tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
 
         # Populate combo expl_id
@@ -219,7 +218,7 @@ class GwPsector:
                    f"WHERE expl_id = {row['expl_id']}")
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
-
+            tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
@@ -260,20 +259,20 @@ class GwPsector:
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
             self.qtbl_node.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
+                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 10))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(partial(
-                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -352,6 +351,8 @@ class GwPsector:
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
+        if hasattr(self, 'dlg_psector_mng'):
+            self.dlg_plan_psector.rejected.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self._enable_layers))
 
@@ -437,7 +438,7 @@ class GwPsector:
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
 
     def fill_widget(self, dialog, widget, row):
@@ -475,7 +476,7 @@ class GwPsector:
                     if str(qtable.model().record(x).value('total_budget')) != 'NULL':
                         total += float(qtable.model().record(x).value('total_budget'))
             tools_qt.set_widget_text(dialog, 'lbl_total', str(total))
-        except:
+        except Exception:
             pass
 
 
@@ -513,7 +514,7 @@ class GwPsector:
         self.populate_cmb_templates()
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport')
 
 
     def populate_cmb_templates(self):
@@ -629,7 +630,9 @@ class GwPsector:
                 if os.path.exists(path):
                     message = "Document PDF created in"
                     tools_qgis.show_info(message, parameter=path)
-                    os.startfile(path)
+                    status, message = tools_os.open_file(path)
+                    if status is False and message is not None:
+                        tools_qgis.show_warning(message, parameter=path)
                 else:
                     message = "Cannot create file, check if its open"
                     tools_qgis.show_warning(message, parameter=path)
@@ -832,6 +835,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
                 tools_qgis.show_warning(message)
 
@@ -905,7 +909,7 @@ class GwPsector:
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
@@ -997,8 +1001,6 @@ class GwPsector:
                         if value is None or value == 'null':
                             sql += column_name + " = null, "
                         else:
-                            if type(value) is not bool:
-                                value = value.replace(",", ".")
                             sql += f"{column_name} = $${value}$$, "
 
                 sql = sql[:len(sql) - 2]
@@ -1057,14 +1059,14 @@ class GwPsector:
         self.delete_psector_selector('selector_plan_psector')
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id)
-                
+
         if close_dlg:
             json_result = self.set_plan()
             if 'status' in json_result and json_result['status'] == 'Accepted':
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 
-            
+
     def set_plan(self):
 
         # TODO: Check this
@@ -1072,8 +1074,8 @@ class GwPsector:
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
         return json_result
-        
-        
+
+
     def price_selector(self, dialog, tableleft, tableright, field_id_right):
 
         # fill QTableView all_rows
@@ -1323,8 +1325,10 @@ class GwPsector:
 
 
     def show_status_warning(self):
+
         mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
-        if mode is None: return
+        if mode is None:
+            return
 
         mode = json.loads(mode[0])
         if mode['mode'] == 'obsolete':
@@ -1334,7 +1338,6 @@ class GwPsector:
                   "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
             tools_qt.show_details(msg, 'Message warning')
         elif mode['mode'] == 'onService':
-
             if tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status) == '0':
                 msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
                       "this psector will be executed. Planified features will turn on service and deleted features " \
@@ -1470,7 +1473,9 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        tools_gw.close_dialog(self.dlg_psector_mng)
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'psector_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
 
 
@@ -1508,7 +1513,7 @@ class GwPsector:
             feature = f'"id":[{inf_text}], "featureType":"PSECTOR"'
             body = tools_gw.create_body(feature=feature)
             result = tools_gw.execute_procedure('gw_fct_getcheckdelete', body)
-            if result['status'] == "Accepted":
+            if result is not None and result['status'] == "Accepted":
                 if result['message']:
                     answer = tools_qt.show_question(result['message']['text'])
                     if answer:
@@ -1684,7 +1689,8 @@ class GwPsector:
         """ Check layers visibility and add it if it is not in the toc """
 
         layer = tools_qgis.get_layer_by_tablename(layer_name)
-        if layer is None: tools_gw.add_layer_database(layer_name, the_geom, field_id)
+        if layer is None:
+            tools_gw.add_layer_database(layer_name, the_geom, field_id)
         if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
             tools_qgis.set_layer_visible(layer, True, True)
 
@@ -1696,7 +1702,8 @@ class GwPsector:
         layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
                   'v_plan_psector_node']
         for layer_name in layers:
-            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully': continue
+            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully':
+                continue
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False

@@ -15,9 +15,8 @@ from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget
 from qgis.core import QgsPointXY, QgsGeometry
-from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from .info import GwInfo
@@ -45,13 +44,18 @@ class GwSearch:
         self.dlg_search = None
         self.is_mincut = False
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
     def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
 
         # If search is open, dont let user open another one
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
+
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        if docker_search and dlg_mincut is None:
+            return
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
 
@@ -179,12 +183,13 @@ class GwSearch:
                     self._write_to_csv(dialog, folder_path, all_rows)
             else:
                 self._write_to_csv(dialog, folder_path, all_rows)
-        except:
+        except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
 
 
     # region private functions
+
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
@@ -195,7 +200,9 @@ class GwSearch:
 
     def _reset_rubber_band(self):
 
-        self.rubber_band.reset()
+        tools_gw.reset_rubberband(self.rubber_band)
+        tools_gw.reset_rubberband(self.aux_rubber_band)
+
 
 
     def _close_search(self):
@@ -275,7 +282,7 @@ class GwSearch:
                 margin = 50
 
             tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
-            self.rubber_band.reset()
+            self._reset_rubber_band()
 
         # Tab 'address' (streets)
         elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
@@ -316,7 +323,7 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 25))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self._workcat_open_table_items(item)
@@ -332,7 +339,7 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            self.rubber_band.reset()
+            self._reset_rubber_band()
             self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
@@ -342,10 +349,11 @@ class GwSearch:
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_info(msg)
+                self.manage_visit.get_visit(visit_id=item['sys_id'])
                 return
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-            self.rubber_band.reset()
+            self._reset_rubber_band()
             point = QgsPointXY(float(max_x), float(max_y))
             tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
@@ -383,6 +391,7 @@ class GwSearch:
                 pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
             extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
+
         if line_list:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit
@@ -406,6 +415,7 @@ class GwSearch:
                 self.result_data = result
 
         # Set label visible
+        display_list = []
         if result:
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
@@ -417,8 +427,7 @@ class GwSearch:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
 
-            # Get list of items from returned json from data base and make a list for completer
-            display_list = []
+            # Get list of items from returned json from database and make a list for completer
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list))
@@ -426,6 +435,10 @@ class GwSearch:
         if len(line_list) == 2:
             line_edit_add = line_list[1]
             value = tools_qt.get_text(self.dlg_search, line_edit_add)
+            if str(value) in display_list:
+                if line_edit:
+                    line_edit.setText(value)
+                return
             if str(value) == 'null':
                 return
 
@@ -509,10 +522,8 @@ class GwSearch:
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
-        field_id = str(result['body']['feature']['idName'])
+        self.hydro_info_dlg.rejected.connect(self._reset_rubber_band)
         tools_gw.build_dialog_info(self.hydro_info_dlg, result)
-
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
@@ -522,7 +533,6 @@ class GwSearch:
         workcat_id = item['sys_id']
         field_id = item['filter_text']
         display_name = item['display_name']
-
         if workcat_id is None:
             return False
 
@@ -543,10 +553,8 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "session")
+        search_csv_path = tools_gw.get_config_parser('btn_search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
-        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -580,7 +588,7 @@ class GwSearch:
             partial(self._get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self._restore_selectors, current_selectors))
         self.items_dialog.rejected.connect(partial(tools_gw.close_dialog, self.items_dialog))
-        self.items_dialog.rejected.connect(self.rubber_band.reset)
+        self.items_dialog.rejected.connect(self._reset_rubber_band)
         self.items_dialog.btn_state1.clicked.connect(
             partial(self._force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(
@@ -596,8 +604,9 @@ class GwSearch:
             self._workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
             self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self._open_feature_form, self.items_dialog.tbl_psm))
-        self.items_dialog.tbl_psm_end.doubleClicked.connect(
-            partial(self._open_feature_form, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm.clicked.connect(partial(self._get_parameters, self.items_dialog.tbl_psm))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self._open_feature_form, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm_end.clicked.connect(partial(self._get_parameters, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self._workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
@@ -620,6 +629,10 @@ class GwSearch:
         tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
         title = self.items_dialog.windowTitle()
         self.items_dialog.setWindowTitle(f"{title} - {display_name}")
+        text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_init, False, False)
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"{text} {field_id}")
+        text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_end, False, False)
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
@@ -755,7 +768,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        tools_gw.set_config_parser('search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
+        tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         tools_qgis.show_info(message)
 
@@ -808,6 +821,7 @@ class GwSearch:
     def _open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
 
+        tools_gw.reset_rubberband(self.aux_rubber_band)
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
@@ -942,4 +956,27 @@ class GwSearch:
 
         dialog.tbl_document.model().select()
 
+
+    def _get_parameters(self, qtable, index):
+
+        tools_gw.reset_rubberband(self.aux_rubber_band)
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_type')
+        feature_type = index.sibling(row, column_index).data().lower()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, 'feature_id')
+        feature_id = index.sibling(row, column_index).data()
+        layer = tools_qgis.get_layer_by_tablename(f"v_edit_{feature_type}")
+        if not layer:
+            return
+
+        feature = tools_qt.get_feature_by_id(layer, feature_id, f"{feature_type}_id")
+        try:
+            width = {"arc": 5}
+            geometry = feature.geometry()
+            self.aux_rubber_band.setToGeometry(geometry, None)
+            self.aux_rubber_band.setColor(QColor(255, 0, 0, 125))
+            self.aux_rubber_band.setWidth(width.get(feature_type, 10))
+            self.aux_rubber_band.show()
+        except AttributeError:
+            pass
     # endregions

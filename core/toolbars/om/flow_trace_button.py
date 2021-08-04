@@ -62,14 +62,14 @@ class GwFlowTraceButton(GwMaptool):
         self.snapper_manager.set_snapping_layers()
 
         # Set snapping to node
-        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_node(False)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select a node and click on it, the upstream nodes are computed"
+            message = "Click on node to computed its upstream network"
             tools_qgis.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)

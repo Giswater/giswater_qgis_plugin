@@ -1,22 +1,25 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
 
+from functools import partial
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu, QApplication
 
 from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .lib import tools_qgis, tools_os, tools_log
+from .core.ui.dialog import GwDialog
+from .core.ui.main_window import GwMainWindow
 
 
 class Giswater(QObject):
@@ -64,8 +67,18 @@ class Giswater(QObject):
 
         try:
 
+            # Reset values for global_vars.project_vars
+            global_vars.project_vars['info_type'] = None
+            global_vars.project_vars['add_schema'] = None
+            global_vars.project_vars['main_schema'] = None
+            global_vars.project_vars['project_role'] = None
+            global_vars.project_vars['project_type'] = None
+
             # Remove Giswater dockers
             self._remove_dockers()
+
+            # Close all open dialogs
+            self._close_open_dialogs()
 
             # Force action pan
             self.iface.actionPan().trigger()
@@ -91,10 +104,12 @@ class Giswater(QObject):
             # Unlisten notify channel and stop thread
             if hasattr(global_vars, 'notify'):
                 list_channels = ['desktop', global_vars.current_user]
-                global_vars.notify.stop_listening(list_channels)
+                if global_vars.notify:
+                    global_vars.notify.stop_listening(list_channels)
 
             # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
             if self.load_project:
+                global_vars.project_type = None
                 if self.load_project.buttons != {}:
                     for button in list(self.load_project.buttons.values()):
                         self.iface.removePluginMenu(self.plugin_name, button.action)
@@ -115,6 +130,7 @@ class Giswater(QObject):
 
 
     # region private functions
+
 
     def _init_plugin(self):
         """ Plugin main initialization function """
@@ -141,14 +157,19 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project", "giswater")
+        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
         # Set logger (no database connection yet)
-        min_log_level = int(tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init'))
+        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
         tools_log.min_log_level = min_log_level
-        tools_log.set_logger(self.plugin_name)
+        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
+        tools_log.set_logger(self.plugin_name, log_limit_characters)
+        tools_log.log_info("Initialize plugin")
+
+        # Check if user has config params (only params without prefix)
+        tools_gw.user_params_to_userconfig()
 
         # Define signals
         self._set_signals()
@@ -194,7 +215,7 @@ class Giswater(QObject):
 
         self.toolButton.setDefaultAction(self.action)
         self.update_sql = GwAdminButton()
-        self.action.triggered.connect(self.update_sql.init_sql)
+        self.action.triggered.connect(partial(self.update_sql.init_sql, True))
 
 
     def _unset_info_button(self):
@@ -311,7 +332,8 @@ class Giswater(QObject):
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
-        if len(own_toolbars) == 0:
+        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
+                global_vars.project_type is None:
             return
 
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
@@ -327,6 +349,7 @@ class Giswater(QObject):
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
         if docker_search:
             self.iface.removeDockWidget(docker_search)
+            docker_search.deleteLater()
 
         # Get 'Docker' docker form from qgis iface and remove it if exists
         docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
@@ -343,5 +366,20 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
+
+
+    def _close_open_dialogs(self):
+        """ Close Giswater open dialogs """
+
+        # Get all widgets
+        allwidgets = QApplication.allWidgets()
+
+        # Only keep Giswater widgets that are currently open
+        windows = [x for x in allwidgets if
+                   not x.isHidden() and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
+
+        # Close them
+        for window in windows:
+            tools_gw.close_dialog(window)
 
     # endregion

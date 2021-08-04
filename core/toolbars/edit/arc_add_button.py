@@ -52,9 +52,10 @@ class GwArcAddButton(GwAction):
 
     def _check_reload(self):
         """ Check for reload button """
-        super_users = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
-        super_users = tools_os.set_boolean(super_users)
-        if super_users:
+
+        reload_cat_feature = tools_gw.get_config_parser('system', 'reload_cat_feature', 'project', 'giswater')
+        reload_cat_feature = tools_os.set_boolean(reload_cat_feature)
+        if reload_cat_feature:
             self._fill_arc_menu()
 
 
@@ -70,7 +71,7 @@ class GwArcAddButton(GwAction):
         action_group = self.action.property('action_group')
 
         # Get list of different arc types
-        features_cat = tools_gw.manage_feature_cat()
+        features_cat = global_vars.feature_cat
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
@@ -82,7 +83,7 @@ class GwArcAddButton(GwAction):
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:
                         obj_action.setShortcutVisibleInContextMenu(True)
-                    except:
+                    except Exception:
                         pass
                     self.menu.addAction(obj_action)
                     obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))

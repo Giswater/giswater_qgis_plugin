@@ -61,16 +61,16 @@ class GwFlowExitButton(GwMaptool):
 
         # Set snapping layers
         self.snapper_manager.set_snapping_layers()
-        
+
         # Set snapping to node
-        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_node(False)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select a node and click on it, the downstream nodes are computed"
+            message = "Click on node to computed its downstream network"
             tools_qgis.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
@@ -106,4 +106,4 @@ class GwFlowExitButton(GwMaptool):
             # Set action pan
             self.set_action_pan()
 
-     # endregion
+    # endregion

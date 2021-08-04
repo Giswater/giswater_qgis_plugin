@@ -9,12 +9,14 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsVectorLayer, QgsRectangle
+from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
+from ...threads.connect_link import GwConnectLink
+from .... import global_vars
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -25,10 +27,7 @@ class GwConnectLinkButton(GwMaptool):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-
         self.dragging = False
-
-        # Select rectangle
         self.select_rect = QRect()
 
 
@@ -51,7 +50,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
 
 
     def canvasReleaseEvent(self, event):
@@ -91,7 +90,6 @@ class GwConnectLinkButton(GwMaptool):
 
             # Multiple selection
             else:
-
                 # Set valid values for rectangle's width and height
                 if self.select_rect.width() == 1:
                     self.select_rect.setLeft(self.select_rect.left() + 1)
@@ -104,43 +102,35 @@ class GwConnectLinkButton(GwMaptool):
                 self.dragging = False
 
                 # Refresh map canvas
-                self.rubber_band.reset()
+                tools_gw.reset_rubberband(self.rubber_band)
+
+            # Force reload dataProvider of layer
+            tools_qgis.set_layer_index('v_edit_link')
+            tools_qgis.set_layer_index('v_edit_vnode')
 
         elif event.button() == Qt.RightButton:
-
             # Check selected records
-            number_features = 0
-            layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
-            if layer:
-                number_features += layer.selectedFeatureCount()
+            number_connec_features = 0
 
-            if number_features > 0:
+            layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
+            if layer_connec:
+                number_connec_features += layer_connec.selectedFeatureCount()
+            if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_features))
+                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
                 if answer:
                     # Create link
-                    self._link_selected_features('connec', layer)
-                    self.cancel_map_tool()
+                    self.connect_link_task = GwConnectLink("Connect link", self, 'connec', layer_connec)
+                    QgsApplication.taskManager().addTask(self.connect_link_task)
+                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
+                else:
+                    self.manage_gully_result()
+            else:
+                self.manage_gully_result()
 
-            layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-            if layer:
-                # Check selected records
-                number_features = 0
-                number_features += layer.selectedFeatureCount()
-
-                if number_features > 0:
-                    message = "Number of features selected in the group of"
-                    title = "Interpolate value - Do you want to update values"
-                    answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
-                    if answer:
-                        # Create link
-                        self._link_selected_features('gully', layer)
-                        self.cancel_map_tool()
-
-        # Force reload dataProvider of layer
-        tools_qgis.set_layer_index('v_edit_link')
-        tools_qgis.set_layer_index('v_edit_vnode')
+            if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
+                self.cancel_map_tool()
 
 
     def activate(self):
@@ -149,8 +139,7 @@ class GwConnectLinkButton(GwMaptool):
         self.action.setChecked(True)
 
         # Rubber band
-        self.rubber_band.reset()
-
+        tools_gw.reset_rubberband(self.rubber_band)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -159,8 +148,8 @@ class GwConnectLinkButton(GwMaptool):
         self.snapper_manager.set_snapping_status()
 
         # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(False)
 
         # Change cursor
         cursor = tools_gw.get_cursor_multiple_selection()
@@ -168,60 +157,67 @@ class GwConnectLinkButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
+            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
             tools_qgis.show_info(message)
 
 
     def deactivate(self):
+
         super().deactivate()
+
+
+    def manage_result(self, result, layer):
+
+        if result is not False and result['status'] != 'Failed':
+            self.dlg_dtext = GwDialogTextUi('connect_to_network')
+            tools_gw.load_settings(self.dlg_dtext)
+            self.dlg_dtext.btn_accept.hide()
+            self.dlg_dtext.setWindowTitle('Connect to network')
+            self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+            self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+            if layer.name() == 'Connec' and global_vars.project_type == 'ud':
+                self.dlg_dtext.btn_close.clicked.connect(partial(self.manage_gully_result))
+                self.dlg_dtext.rejected.connect(partial(self.manage_gully_result))
+            tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
+            tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+
+        layer.removeSelection()
+
+        # Refresh map canvas
+        if layer.name() == 'Gully' or global_vars.project_type == 'ws':
+            tools_gw.reset_rubberband(self.rubber_band)
+            self.refresh_map_canvas()
+            self.iface.actionPan().trigger()
+
+        # Force reload dataProvider of layer
+        tools_qgis.set_layer_index('v_edit_link')
+        tools_qgis.set_layer_index('v_edit_vnode')
+
+
+    def manage_gully_result(self):
+
+        layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
+        if layer_gully:
+            # Check selected records
+            number_features = 0
+            number_features += layer_gully.selectedFeatureCount()
+            if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
+                message = "Number of features selected in the group of"
+                title = "Interpolate value - Do you want to update values"
+                answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
+                if answer:
+                    # Create link
+                    self.connect_link_task = GwConnectLink("Connect link", self, 'gully', layer_gully)
+                    QgsApplication.taskManager().addTask(self.connect_link_task)
+                    QgsApplication.taskManager().triggerTask(self.connect_link_task)
+
+            if number_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible() is False:
+                self.cancel_map_tool()
 
     # endregion
 
+
     # region private functions
-
-    def _link_selected_features(self, feature_type, layer):
-        """ Link selected @feature_type to the pipe """
-
-        # Check features selected
-        number_features = layer.selectedFeatureCount()
-        if number_features == 0:
-            message = "You have to select at least one feature!"
-            tools_qgis.show_warning(message)
-            return
-
-        # Get selected features from layers of selected @feature_type
-        aux = "["
-        field_id = feature_type + "_id"
-
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            for feature in features:
-                feature_id = feature.attribute(field_id)
-                aux += str(feature_id) + ", "
-            list_feature_id = aux[:-2] + "]"
-            feature_id = f'"id":"{list_feature_id}"'
-            extras = f'"feature_type":"{feature_type.upper()}"'
-            body = tools_gw.create_body(feature=feature_id, extras=extras)
-            # Execute SQL function and show result to the user
-            result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body)
-            if result:
-                self.dlg_dtext = GwDialogTextUi('connect_to_network')
-                tools_gw.load_settings(self.dlg_dtext)
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.setWindowTitle('Connect to network')
-                self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-                self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
-                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
-
-            layer.removeSelection()
-
-        # Refresh map canvas
-        self.rubber_band.reset()
-        self.refresh_map_canvas()
-        self.iface.actionPan().trigger()
-
 
     def _set_rubber_band(self):
 
@@ -235,7 +231,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset(2)
+        tools_gw.reset_rubberband(self.rubber_band, 2)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

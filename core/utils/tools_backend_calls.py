@@ -432,8 +432,8 @@ def refresh_attribute_table(**kwargs):
                 kwargs = {"layer": layer, "field": field['columnname'], "hidden": field['hidden']}
                 set_column_visibility(**kwargs)
 
-            # Set multiline fields according table config_form_fields.widgetcontrols['setQgisMultiline']
-            if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+            # Set multiline fields according table config_form_fields.widgetcontrols['setMultiline']
+            if field['widgetcontrols'] is not None and 'setMultiline' in field['widgetcontrols'] and field['widgetcontrols']['setMultiline']:
                 kwargs = {"layer": layer, "field": field, "fieldIndex": field_idx}
                 set_column_multiline(**kwargs)
             # Set alias column
@@ -460,9 +460,6 @@ def refresh_attribute_table(**kwargs):
                 # Set values into valueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                 layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
-            elif field['widgettype'] == 'text':
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
             elif field['widgettype'] == 'check':
                 config = {'CheckedState': 'true', 'UncheckedState': 'false'}
                 editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
@@ -475,9 +472,7 @@ def refresh_attribute_table(**kwargs):
                           'field_iso_format': False}
                 editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                 layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
-            else:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
+
 
 
 def refresh_canvas(**kwargs):
@@ -496,7 +491,7 @@ def refresh_canvas(**kwargs):
         elif type(layers_name_list) == list:
             for layer_name in layers_name_list:
                 tools_qgis.set_layer_index(layer_name)
-    except:
+    except Exception:
         all_layers = tools_qgis.get_project_layers()
         for layer in all_layers:
             layer.triggerRepaint()
@@ -526,7 +521,7 @@ def set_column_visibility(**kwargs):
 
 
 def set_column_multiline(**kwargs):
-    """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
+    """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
 
     try:
         field = kwargs["field"]
@@ -539,9 +534,9 @@ def set_column_multiline(**kwargs):
         return
 
     if field['widgettype'] == 'text':
-        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols'] and field['widgetcontrols']['setMultiline']:
             editor_widget_setup = QgsEditorWidgetSetup(
-                'TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                'TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
@@ -601,7 +596,9 @@ def load_qml(**kwargs):
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
             widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
-    tools_os.open_url(widget)
+    status, message = tools_os.open_file(widget.text())
+    if status is False and message is not None:
+        tools_qgis.show_warning(message, parameter=widget.text())
 
 
 # region private functions

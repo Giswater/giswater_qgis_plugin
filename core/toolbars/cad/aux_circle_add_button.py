@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -83,7 +83,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select an element and click it to set radius"
+            message = "Click on feature or any place on the map and set radius of a circle"
             tools_qgis.show_info(message)
 
         # Store user snapping configuration
@@ -169,7 +169,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 provider.addFeatures([feature])
 
             self.layer_circle.commitChanges()
-            self.layer_circle.dataProvider().forceReload()
+            self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
 
         else:

@@ -84,7 +84,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = global_vars.srid
+        self.srid = global_vars.data_epsg
 
         # Check button
         self.action.setChecked(True)
@@ -94,7 +94,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click two points over canvas and draw a line"
+            message = "Click on 2 places on the map, creating a line, then set the location of a point"
             tools_qgis.show_info(message)
 
         # Store user snapping configuration
@@ -157,7 +157,7 @@ class GwAuxPointAddButton(GwMaptool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
 
 
     def _get_values(self, point_1, point_2):
@@ -192,7 +192,7 @@ class GwAuxPointAddButton(GwMaptool):
                    f"{self.dist_y}, {self.direction}, {self.delete_prev})")
             tools_db.execute_sql(sql)
             self.layer_points.commitChanges()
-            self.layer_points.dataProvider().forceReload()
+            self.layer_points.dataProvider().reloadData()
             self.layer_points.triggerRepaint()
 
         else:

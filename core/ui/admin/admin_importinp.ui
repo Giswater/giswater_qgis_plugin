@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_importinp</class>
- <widget class="QDialog" name="dlg_main_importinp">
+ <class>dlg_admin_importinp</class>
+ <widget class="QDialog" name="dlg_admin_importinp">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -21,11 +21,12 @@ min_log_level = 20
 class GwLogger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
-                 remove_previous=False):
+                 remove_previous=False, log_limit_characters=None):
 
         # Create logger
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(int(log_level))
+        self.log_limit_characters = log_limit_characters
 
         # Define log folder in users folder
         main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -123,6 +124,8 @@ class GwLogger(object):
             if int(log_level) < int(valor):
                 return
 
+            if stack_level >= len(inspect.stack()):
+                stack_level = len(inspect.stack()) - 1
             module_path = inspect.stack()[stack_level][1]
             file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
@@ -130,6 +133,8 @@ class GwLogger(object):
             header = "{" + file_name + " | Line " + str(function_line) + " (" + str(function_name) + ")}"
             text = header
             if msg:
+                if self.log_limit_characters and len(msg) > int(self.log_limit_characters):
+                    msg = msg[:int(self.log_limit_characters)]
                 text += f"\n{msg}"
             self.logger_file.log(log_level, text)
 
@@ -137,12 +142,13 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name):
+def set_logger(logger_name, log_limit_characters=None):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:
         log_suffix = '%Y%m%d'
-        global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix))
+        global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix),
+            log_limit_characters=log_limit_characters)
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.logger.min_message_level = values.get(int(min_log_level), 0)
 

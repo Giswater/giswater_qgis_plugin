@@ -15,11 +15,10 @@ from random import randrange
 from qgis.PyQt.QtCore import Qt, QTimer, QSettings
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
-    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
-    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, QgsSnappingUtils, QgsTolerance, \
+    QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, QgsLineSymbol, QgsRendererCategory, \
+    QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.core import QgsExpression, QgsVectorLayer
-
 
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
@@ -29,6 +28,7 @@ user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context
 
 
 def get_feature_by_expr(layer, expr_filter):
+
     # Check filter and existence of fields
     expr = QgsExpression(expr_filter)
     if expr.hasParserError():
@@ -136,10 +136,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
-        if not check_query_layer(layer): continue
+        if not check_query_layer(layer):
+            continue
         if is_layer_visible(layer):
             table_name = get_layer_source_table_name(layer)
-            if not check_query_layer(layer): continue
+            if not check_query_layer(layer):
+                continue
             layers_name.append(table_name)
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
@@ -263,28 +265,35 @@ def get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
     # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None,
-                    'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None, 'host': None, 'port': None,
+                    'user': None, 'password': None, 'sslmode': None}
 
     if layer is None:
         return layer_source
 
     if layer.providerType() != 'postgres':
         return layer_source
-    
+
     # Get dbname, host, port, user and password
     uri = layer.dataProvider().dataSourceUri()
-
-    # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
-                    'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
     # split with quoted substrings preservation
     splt = shlex.split(uri)
 
-    splt_dct = dict([tuple(v.split('=')) for v in splt if '=' in v])
-    splt_dct['db'] = splt_dct['dbname']
-    splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+    list_uri = []
+    for v in splt:
+        if '=' in v:
+            elem_uri = tuple(v.split('='))
+            if len(elem_uri) == 2:
+                list_uri.append(elem_uri)
+
+    splt_dct = dict(list_uri)
+    if 'service' in splt_dct:
+        splt_dct['service'] = splt_dct['service']
+    if 'dbname' in splt_dct:
+        splt_dct['db'] = splt_dct['dbname']
+    if 'table' in splt_dct:
+        splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
 
     for key in layer_source.keys():
         layer_source[key] = splt_dct.get(key)
@@ -298,13 +307,15 @@ def get_layer_source_table_name(layer):
     if layer is None:
         return None
 
-    uri_table = None
     uri = layer.dataProvider().dataSourceUri().lower()
     pos_ini = uri.find('table=')
+    total = len(uri)
     pos_end_schema = uri.rfind('.')
     pos_fi = uri.find('" ')
     if pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
+    else:
+        uri_table = uri[pos_end_schema + 2:total - 1]
 
     return uri_table
 
@@ -354,9 +365,12 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
 
     # Iterate over all layers
     layer = None
-    get_project_variables()
     if schema_name is None:
-        schema_name = global_vars.project_vars['main_schema']
+        if 'main_schema' in global_vars.project_vars:
+            schema_name = global_vars.project_vars['main_schema']
+        else:
+            tools_log.log_warning("Key not found", parameter='main_schema')
+
     for cur_layer in layers:
         uri_table = get_layer_source_table_name(cur_layer)
         table_schema = get_layer_schema(cur_layer)
@@ -392,9 +406,11 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
 def select_features_by_ids(feature_type, expr, layers=None):
     """ Select features of layers of group @feature_type applying @expr """
 
-    if layers is None: return
+    if layers is None:
+        return
 
-    if feature_type not in layers: return
+    if feature_type not in layers:
+        return
 
     # Build a list of feature id's and select them
     for layer in layers[feature_type]:
@@ -531,10 +547,24 @@ def get_max_rectangle_from_coords(list_coord):
     return max_x, max_y, min_x, min_y
 
 
-def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
+def zoom_to_rectangle(x1, y1, x2, y2, margin=5, change_crs=True):
     """ Generate an extension on the canvas according to the received coordinates """
 
+
     rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
+    if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566' and change_crs:
+
+        rect = QgsRectangle(float(float(x1) + margin) * -1,
+                            (float(y1) + margin) * -1,
+                            (float(x2) - margin) * -1,
+                            (float(y2) - margin) * -1)
+    elif str(global_vars.data_epsg) != str(global_vars.project_epsg) and change_crs:
+        data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
+        project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
+        tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
+
+        rect = tform.transform(rect)
+
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
 
@@ -724,7 +754,7 @@ def set_layer_index(layer_name):
 
     layer = get_layer_by_tablename(layer_name)
     if layer:
-        layer.dataProvider().forceReload()
+        layer.dataProvider().reloadData()
         layer.triggerRepaint()
 
 
@@ -857,27 +887,21 @@ def get_geometry_from_json(feature):
 
 def get_locale():
 
-    # Get locale of QGIS application
-    override = QSettings().value('locale/overrideFlag')
-
-    locale = None
-    if tools_os.set_boolean(override):
-        try:
+    locale = "en_US"
+    try:
+        # Get locale of QGIS application
+        override = QSettings().value('locale/overrideFlag')
+        if tools_os.set_boolean(override):
             locale = QSettings().value('locale/globalLocale')
-        except AttributeError as e:
-            locale = "en_US"
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-    else:
-        try:
+        else:
             locale = QSettings().value('locale/userLocale')
-        except AttributeError as e:
-            locale = "en_US"
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-    if locale is None:
+    except AttributeError as e:
         locale = "en_US"
-
-    return locale
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
+    finally:
+        if locale is None:
+            locale = "en_US"
+        return locale
 
 
 def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
@@ -886,7 +910,8 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
 
     rubber_band.reset()
     layer = get_layer_by_tablename(layer_name)
-    if not layer: return
+    if not layer:
+        return
 
     row = index.row()
     column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
@@ -908,6 +933,7 @@ def check_query_layer(layer):
         :param layer: Layer to be checked (QgsVectorLayer)
         :return: True/False (Boolean)
     """
+
     try:
         # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
         table_uri = layer.dataProvider().dataSourceUri()
@@ -917,6 +943,15 @@ def check_query_layer(layer):
         return True
     except Exception:
         return False
+
+
+def get_epsg():
+
+    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = epsg.split(':')[1]
+
+    return epsg
+
 
 # region private functions
 
@@ -1029,4 +1064,3 @@ def _get_multi_coordinates(feature):
 
 
 # endregion
-

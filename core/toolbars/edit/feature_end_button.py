@@ -12,7 +12,6 @@ from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsRubberBand
 
 from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
@@ -57,7 +56,7 @@ class GwFeatureEndButton(GwAction):
 
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         # Create the dialog and signals
         self.dlg_work_end = GwFeatureEndUi()
@@ -94,7 +93,7 @@ class GwFeatureEndButton(GwAction):
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
-        self.dlg_work_end.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_work_end.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_work_end.btn_accept.clicked.connect(partial(self._end_feature))
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self._manage_close, self.dlg_work_end, True, False))
         self.dlg_work_end.rejected.connect(partial(self._manage_close, self.dlg_work_end, True, True))
@@ -115,13 +114,13 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
 
         # Set values
         self._fill_fields()
@@ -134,7 +133,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
 
     # region private functions
@@ -174,7 +173,7 @@ class GwFeatureEndButton(GwAction):
 
         sql = "SELECT id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
+        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, True)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
@@ -237,11 +236,6 @@ class GwFeatureEndButton(GwAction):
         self.workcatdate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.builtdate)
         self.description = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.descript, False, False)
 
-        if self.workcat_id_end in ('null', None):
-            message = "Please select a workcat id end"
-            tools_qgis.show_warning(message)
-            return
-
         self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
 
         row = None
@@ -251,7 +245,7 @@ class GwFeatureEndButton(GwAction):
             # When converting it into a tuple, if it only has one element, remove the "," that is added at the end
             if len(self.selected_list) == 1:
                 ids = f"{tuple(self.selected_list)}"[:-2] + ")"
-                
+
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN {ids} AND arc_state = '1'")
             row = tools_db.get_row(sql, log_sql=True)
@@ -319,8 +313,10 @@ class GwFeatureEndButton(GwAction):
         id_list = "[" + id_list[:-2] + "]"
 
         feature = f'"featureType":"{feature_type}", "featureId":{id_list}'
-        extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
+        extras = f'"state_type":"{self.statetype_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
+        if self.workcat_id_end not in (None, 'null', ''):
+            extras += f', "workcat_id_end":"{self.workcat_id_end}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         tools_gw.execute_procedure('gw_fct_setendfeature', body)
 
@@ -351,8 +347,7 @@ class GwFeatureEndButton(GwAction):
         if not row:
             return
 
-        arc_type = row[0].lower()
-        arc_table = "v_edit_man_" + arc_type
+        arc_table = "v_edit_arc"
         layer_arc = tools_qgis.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "

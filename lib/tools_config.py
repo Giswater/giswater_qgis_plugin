@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
@@ -53,13 +53,15 @@ def manage_init_config_file():
     # Open file
     config_parser.read(project_config_file)
 
+
 # region private functions
+
 
 def _save_config_parser():
     """ Save user settings file """
 
     try:
-        with open(global_vars.user_folder_dir, 'w') as configfile:
+        with open(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}init.config", 'w') as configfile:
             config_parser.write(configfile)
             configfile.close()
     except Exception as e:

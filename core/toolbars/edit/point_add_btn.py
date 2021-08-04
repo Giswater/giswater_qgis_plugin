@@ -52,9 +52,9 @@ class GwPointAddButton(GwAction):
 
     def _check_reload(self):
         """ Check for reload button """
-        super_users = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
-        super_users = tools_os.set_boolean(super_users)
-        if super_users:
+        check_reload = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
+        check_reload = tools_os.set_boolean(check_reload)
+        if check_reload:
             self._fill_point_menu()
 
 
@@ -70,7 +70,7 @@ class GwPointAddButton(GwAction):
         action_group = self.action.property('action_group')
 
         # Get list of different connec, gully and node types
-        features_cat = tools_gw.manage_feature_cat()
+        features_cat = global_vars.feature_cat
         project_type = tools_gw.get_project_type()
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
@@ -81,7 +81,7 @@ class GwPointAddButton(GwAction):
                         obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                     try:
                         obj_action.setShortcutVisibleInContextMenu(True)
-                    except:
+                    except Exception:
                         pass
                     self.menu.addAction(obj_action)
                     obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
@@ -97,7 +97,7 @@ class GwPointAddButton(GwAction):
                             obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                         try:
                             obj_action.setShortcutVisibleInContextMenu(True)
-                        except:
+                        except Exception:
                             pass
                         self.menu.addAction(obj_action)
                         obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
@@ -112,7 +112,7 @@ class GwPointAddButton(GwAction):
                                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                             try:
                                 obj_action.setShortcutVisibleInContextMenu(True)
-                            except:
+                            except Exception:
                                 pass
                             self.menu.addAction(obj_action)
                             obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))

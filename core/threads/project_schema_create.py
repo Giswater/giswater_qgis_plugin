@@ -6,11 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 
 from .task import GwTask
 from ..utils import tools_gw
-from ... import global_vars
 from ...lib import tools_qt
 
 
@@ -21,7 +19,7 @@ class GwCreateSchemaTask(GwTask):
 
     def __init__(self, admin, description, params):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.admin = admin
         self.params = params
 
@@ -29,7 +27,8 @@ class GwCreateSchemaTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-        global_vars.session_vars['threads'].append(self)
+
+        super().run()
         self.admin.dlg_readsql_create_project.btn_cancel_task.show()
         self.admin.dlg_readsql_create_project.btn_accept.hide()
         self.is_test = self.params['is_test']
@@ -42,39 +41,33 @@ class GwCreateSchemaTask(GwTask):
 
         self.finish_execution = {'import_data': False}
         try:
-            # # Common execution
+            # Common execution
             status = self.admin._load_base(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(10)
             status = self.admin._update_30to31(new_project=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(20)
             status = self.admin._load_views(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(30)
             status = self.admin._load_trg(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(40)
             status = self.admin._update_31to39(new_project=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
-                return False
-
-            if not self.is_test:
-                self.setProgress(50)
-            status = self.admin._api(new_api=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
@@ -85,7 +78,7 @@ class GwCreateSchemaTask(GwTask):
                 status = self.admin._execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                           project_locale, project_srid)
 
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             # Custom execution
@@ -96,18 +89,18 @@ class GwCreateSchemaTask(GwTask):
                     self.setProgress(100)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
                 if not self.is_test:
                     self.setProgress(80)
             elif self.admin.rdb_sample_dev.isChecked():
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
                 self.admin._load_dev_data(project_type=project_type)
                 if not self.is_test:
                     self.setProgress(80)
             elif self.admin.rdb_data.isChecked():
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
             return True
 
@@ -116,12 +109,15 @@ class GwCreateSchemaTask(GwTask):
             self.exception = e
             return False
 
+
     def finished(self, result):
+
+        super().finished(result)
         self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
-        global_vars.session_vars['threads'].remove(self)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
 
         # Handle exception
         if self.exception is not None:
@@ -132,16 +128,13 @@ class GwCreateSchemaTask(GwTask):
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
         if self.finish_execution['import_data']:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data')
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data', prefix=False)
             msg = ("The base schema have been correctly executed."
                    "\nNow will start the import process. It is experimental and it may crash."
                    "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
             tools_qt.show_info_box(msg, "Info")
             self.admin._execute_import_data(self.params['project_name_schema'], self.params['project_type'])
         else:
-            self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'],
+            self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                               is_test=self.is_test)
 
-
-    def cancel(self):
-        super().cancel()

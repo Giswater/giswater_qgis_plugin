@@ -46,7 +46,7 @@ class GwGo2EpaSelectorButton(GwAction):
 
         # Set values from widgets of type QComboBox
         sql = ("SELECT DISTINCT(result_id), result_id "
-               "FROM v_ui_rpt_cat_result ORDER BY result_id")
+               "FROM v_ui_rpt_cat_result WHERE status = 'COMPLETED' ORDER BY result_id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_result_id, rows)
         rows = tools_db.get_rows(sql, add_empty_row=True)

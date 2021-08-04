@@ -1,0 +1,17 @@
+curve_name;xval;yval;curve_type;exp_id(optative)
+example_pump1;1;4;PUMP1
+example_pump1;10;3;PUMP1
+example_pump1;100;2;PUMP1
+example_pump1;1000;1;PUMP1
+example_pump2;1;4;PUMP2
+example_pump2;10;3;PUMP2
+example_pump2;100;2;PUMP2
+example_pump2;1000;1;PUMP2
+example_shape1;0;0;SHAPE
+example_shape1;0.5;0.5;SHAPE
+example_shape1;1;0.2;SHAPE
+example_storage1;0;100;STORAGE
+example_storage1;1;100;STORAGE
+example_storage1;2;100;STORAGE
+example_storage1;3;100;STORAGE
+example_storage1;4;100;STORAGE

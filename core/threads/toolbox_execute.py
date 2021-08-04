@@ -5,10 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDoubleSpinBox, QSpinBox, QWidget, QLineEdit
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 from qgis.gui import QgsDateTimeEdit
 
 from .task import GwTask
@@ -24,31 +22,33 @@ class GwToolBoxTask(GwTask):
 
     def __init__(self, toolbox, description, dialog, combo, result):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.toolbox = toolbox
         self.dialog = dialog
         self.combo = combo
         self.result = result
         self.json_result = None
         self.exception = None
+        self.function_name = None
 
 
     def run(self):
+
+        super().run()
         extras = ''
         feature_field = ''
-        global_vars.session_vars['threads'].append(self)
 
         # Get function name
         function = None
-        function_name = None
+
         for group, function in list(self.result['fields'].items()):
             if len(function) != 0:
                 self.toolbox.save_settings_values(self.dialog, function)
                 self.toolbox.save_parametric_values(self.dialog, function)
-                function_name = function[0]['functionname']
+                self.function_name = function[0]['functionname']
                 break
 
-        if function_name is None:
+        if self.function_name is None:
             return False
 
         if function[0]['input_params']['featureType']:
@@ -59,7 +59,6 @@ class GwToolBoxTask(GwTask):
                 layer = self.toolbox.set_selected_layer(self.dialog, self.combo)
                 if not layer:
                     return False
-
 
             selection_mode = self.toolbox.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
@@ -97,7 +96,7 @@ class GwToolBoxTask(GwTask):
                             widget.setStyleSheet(None)
                             value = tools_qt.get_text(self.dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                            if value is '' and widget.property('ismandatory'):
+                            if value == '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
@@ -107,7 +106,8 @@ class GwToolBoxTask(GwTask):
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
                             value = tools_qt.get_combo_value(self.dialog, widget, 0)
-                            extras += f'"{param_name}":"{value}", '
+                            if value not in (None, ''):
+                                extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
                             value = tools_qt.is_checked(self.dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
@@ -117,6 +117,7 @@ class GwToolBoxTask(GwTask):
                                 extras += f'"{param_name}":null, '
                             else:
                                 extras += f'"{param_name}":"{value}", '
+
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
             tools_log.log_info(message, parameter='')
@@ -126,11 +127,14 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2] + '}'
         else:
             extras += '}'
-        body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True)
-        if self.isCanceled(): return False
-        if self.json_result['status'] == 'Failed': return False
-        if not self.json_result or self.json_result is None: return False
+        self.body = tools_gw.create_body(feature=feature_field, extras=extras)
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True, aux_conn=self.aux_conn, is_thread=True)
+        if self.isCanceled():
+            return False
+        if self.json_result['status'] == 'Failed':
+            return False
+        if not self.json_result or self.json_result is None:
+            return False
 
         try:
             # getting simbology capabilities
@@ -149,21 +153,38 @@ class GwToolBoxTask(GwTask):
 
     def finished(self, result):
 
-        global_vars.session_vars['threads'].remove(self)
+        super().finished(result)
+
+        sql = f"SELECT {self.function_name}("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
+
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
-        if self.isCanceled(): return
+        if self.isCanceled():
+            return
+
         if result is False and self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+        # If database fail
+        elif result is False and global_vars.session_vars['last_error_msg'] is not None:
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
         elif result:
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
+        # If sql function return null
+        elif result is False:
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
+            tools_log.log_warning(msg)
 
 
     def cancel(self):
+
         self.toolbox.remove_layers()
         super().cancel()

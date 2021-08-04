@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
 from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDimensioningUi
@@ -57,7 +57,7 @@ class GwDimensioning:
 
         # when funcion is called from new feature
         if db_return is None:
-            rubber_band = QgsRubberBand(self.canvas, 0)
+            rubber_band = tools_gw.create_rubberband(self.canvas, 0)
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getdimensioning', body)
@@ -78,20 +78,21 @@ class GwDimensioning:
         tools_gw.add_icon(action_orientation, "133")
 
         # LAYER SIGNALS
-        self.layer_dimensions.editingStarted.connect(lambda: action_snapping.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: action_snapping.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(lambda: action_orientation.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: action_orientation.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
-        self.layer_dimensions.editingStopped.connect(partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
+        self.layer_dimensions.editingStarted.connect(
+            partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
+        self.layer_dimensions.editingStopped.connect(
+            partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
         # WIDGETS SIGNALS
-        self.dlg_dim.btn_accept.clicked.connect(partial(self._save_dimensioning, qgis_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning))
+        self.dlg_dim.btn_accept.clicked.connect(
+            partial(self._save_dimensioning, qgis_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_dim))
-        self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
+        self.dlg_dim.dlg_closed.connect(self.layer_node.removeSelection)
+        self.dlg_dim.dlg_closed.connect(self.layer_connec.removeSelection)
 
         self._create_map_tips()
 
@@ -130,25 +131,27 @@ class GwDimensioning:
         if self.layer_dimensions:
             self.iface.setActiveLayer(self.layer_dimensions)
             if self.layer_dimensions.isEditable():
-                action_snapping.setEnabled(True)
-                action_orientation.setEnabled(True)
                 tools_gw.enable_all(self.dlg_dim, db_return['body']['data'])
             else:
-                action_snapping.setEnabled(False)
-                action_orientation.setEnabled(False)
                 tools_gw.enable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
+
     # region private functions
 
-    def _cancel_dimensioning(self):
+
+    def _cancel_dimensioning(self, action_snapping, action_orientation):
 
         self.iface.actionRollbackEdits().trigger()
-        tools_gw.close_dialog(self.dlg_dim)
+        if action_snapping.isChecked():
+            action_snapping.trigger()
+        if action_orientation.isChecked():
+            action_orientation.trigger()
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
+        tools_gw.close_dialog(self.dlg_dim)
 
 
     def _save_dimensioning(self, qgis_feature, layer):
@@ -204,7 +207,7 @@ class GwDimensioning:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
             pass
-        
+
         try:
             emit_point.canvasClicked.disconnect()
         except TypeError:
@@ -229,9 +232,10 @@ class GwDimensioning:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+
+        self.snapper_manager.config_snap_to_node(False)
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(False)
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -330,9 +334,10 @@ class GwDimensioning:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+
+        self.snapper_manager.config_snap_to_node(False)
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(False)
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
@@ -466,7 +471,8 @@ class GwDimensioning:
             widget = tools_gw.add_tableview(db_return, field)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1,
+                                                    isQStandardItemModel=True)
             tools_qt.set_tableview_config(widget)
         widget.setObjectName(widget.property('columnname'))
 

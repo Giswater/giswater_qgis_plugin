@@ -6,12 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
+
 from .task import GwTask
 from ..utils import tools_gw
-from ... import global_vars
-from ...lib import tools_log, tools_db, tools_qgis, tools_qt
-
+from ...lib import tools_log, tools_qgis, tools_qt, tools_db
 
 
 class GwProjectLayersConfig(GwTask):
@@ -19,26 +18,25 @@ class GwProjectLayersConfig(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description):
+    def __init__(self, description, params):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.exception = None
         self.message = None
         self.available_layers = None
-        self.get_layers = True
-        self.project_type = None
-        self.schema_name = None
-        self.qgis_project_infotype = None
+        self.project_type = params['project_type']
+        self.schema_name = params['schema_name']
+        self.qgis_project_infotype = params['qgis_project_infotype']
+        self.db_layers = params['db_layers']
+        self.body = None
+        self.json_result = None
 
 
     def run(self):
-        global_vars.session_vars['threads'].append(self)
-        tools_log.log_info(f"Task started: {self.description()}")
 
+        super().run()
         self.setProgress(0)
-        if self.get_layers:
-            # tools_log.log_info("get_layers_to_config")
-            self._get_layers_to_config()
+        self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
 
@@ -46,29 +44,31 @@ class GwProjectLayersConfig(GwTask):
 
 
     def finished(self, result):
-        global_vars.session_vars['threads'].remove(self)
-        if result:
-            tools_log.log_info(f"Task finished: {self.description()}")
+
+        super().finished(result)
+
+        sql = f"SELECT gw_fct_getinfofromid("
+        if self.body:
+            sql += f"{self.body}"
+        sql += f");"
+        tools_gw.manage_json_response(self.json_result, sql, None)
+
+        # If user cancel task
+        if self.isCanceled():
             return
+
+        if result:
+            return
+
+        # If sql function return null
+        if result is False:
+            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
+            tools_log.log_warning(msg)
 
         if self.exception:
             tools_log.log_info(f"Task aborted: {self.description()}")
             tools_log.log_warning(f"Exception: {self.exception}")
             raise self.exception
-
-
-    def cancel(self):
-
-        tools_log.log_info(f"Task cancelled: {self.description()}")
-        super().cancel()
-
-
-    def set_params(self, project_type, schema_name, qgis_project_infotype, get_layers=True):
-
-        self.project_type = project_type
-        self.schema_name = schema_name
-        self.qgis_project_infotype = qgis_project_infotype
-        self.get_layers = get_layers
 
 
     # region private functions
@@ -77,15 +77,7 @@ class GwProjectLayersConfig(GwTask):
     def _get_layers_to_config(self):
         """ Get available layers to be configured """
 
-        schema_name = self.schema_name.replace('"', '')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-               f"UNION "
-               f"SELECT DISTINCT(child_layer) FROM cat_feature "
-               f"WHERE child_layer IN ("
-               f"     SELECT table_name FROM information_schema.tables"
-               f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql)
-        self.available_layers = [layer[0] for layer in rows]
+        self.available_layers = [layer[0] for layer in self.db_layers]
 
         self._set_form_suppress(self.available_layers)
         all_layers_toc = tools_qgis.get_project_layers()
@@ -96,7 +88,8 @@ class GwProjectLayersConfig(GwTask):
                 schema = layer_source['schema']
                 if schema and schema.replace('"', '') == self.schema_name:
                     table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"
-                    self.available_layers.append(table_name)
+                    if table_name not in self.available_layers:
+                        self.available_layers.append(table_name)
 
 
     def _set_form_suppress(self, layers_list):
@@ -104,7 +97,8 @@ class GwProjectLayersConfig(GwTask):
 
         for layer_name in layers_list:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
-            if layer is None: continue
+            if layer is None:
+                continue
             config = layer.editFormConfig()
             config.setSuppress(0)
             layer.setEditFormConfig(config)
@@ -115,7 +109,11 @@ class GwProjectLayersConfig(GwTask):
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
 
-        tools_log.log_info("Start set_layer_config")
+        # Check only once if function 'gw_fct_getinfofromid' exists
+        row = tools_db.check_function('gw_fct_getinfofromid')
+        if row in (None, ''):
+            tools_qgis.show_warning("Function not found in database", parameter='gw_fct_getinfofromid')
+            return False
 
         msg_failed = ""
         msg_key = ""
@@ -133,23 +131,24 @@ class GwProjectLayersConfig(GwTask):
             layer_number = layer_number + 1
             self.setProgress((layer_number * 100) / total_layers)
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self._create_body(feature=feature, extras=extras)
-            complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
-            if not complet_result or complet_result['status'] == 'Failed':
+            feature = f'"tableName":"{layer_name}", "isLayer":true'
+            self.body = tools_gw.create_body(feature=feature)
+            self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
+                                                          is_thread=True, check_function=False)
+            if not self.json_result:
                 continue
-
-            # tools_log.log_info(str(complet_result))
-            if 'body' not in complet_result:
+            if 'status' not in self.json_result:
+                continue
+            if self.json_result['status'] == 'Failed':
+                continue
+            if 'body' not in self.json_result:
                 tools_log.log_info("Not 'body'")
                 continue
-            if 'data' not in complet_result['body']:
+            if 'data' not in self.json_result['body']:
                 tools_log.log_info("Not 'data'")
                 continue
 
-            # tools_log.log_info(complet_result['body']['data']['fields'])
-            for field in complet_result['body']['data']['fields']:
+            for field in self.json_result['body']['data']['fields']:
                 valuemap_values = {}
 
                 # Get column index
@@ -162,10 +161,6 @@ class GwProjectLayersConfig(GwTask):
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(field_index, field['label'])
-
-                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
-                if field['widgettype'] == 'text':
-                    self._set_column_multiline(layer, field, field_index)
 
                 # widgetcontrols
                 if 'widgetcontrols' in field:
@@ -210,17 +205,22 @@ class GwProjectLayersConfig(GwTask):
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                else:
+                elif field['widgettype'] == 'textarea':
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
+                if field['widgettype'] == 'text':
+                    self._set_column_multiline(layer, field, field_index)
 
         if msg_failed != "":
             tools_qt.show_exception_message("Execute failed.", msg_failed)
 
         if msg_key != "":
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg_key)
-
-        tools_log.log_info("Finish set_layer_config")
 
 
     def _set_read_only(self, layer, field, field_index):
@@ -252,29 +252,12 @@ class GwProjectLayersConfig(GwTask):
 
 
     def _set_column_multiline(self, layer, field, field_index):
-        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
+        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
 
-        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
         else:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
         layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-
-
-    def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-        form = '"form":{' + form + '}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
 
     # endregion

@@ -42,7 +42,7 @@ class GwSelector:
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-            tools_gw.open_dialog(dlg_selector, dlg_name='selector', maximize_button=False)
+            tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
         # Save the name of current tab used by the user
         dlg_selector.rejected.connect(partial(
@@ -254,10 +254,11 @@ class GwSelector:
 
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
-        if json_result['status'] == 'Failed': return
-        if str(tab_name) == 'tab_exploitation':
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        if str(tab_name) not in ('tab_state', 'tab_hydrometer'):
             try:
-                # Zoom to exploitation
+                # Zoom to feature
                 x1 = json_result['body']['data']['geometry']['x1']
                 y1 = json_result['body']['data']['geometry']['y1']
                 x2 = json_result['body']['data']['geometry']['x2']

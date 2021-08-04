@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_sysfields</class>
- <widget class="QDialog" name="dlg_main_sysfields">
+ <class>dlg_admin_sysfields</class>
+ <widget class="QDialog" name="dlg_admin_sysfields">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -206,6 +206,13 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <layout class="QGridLayout" name="gridLayout_7">
+                <item row="4" column="0">
+                 <widget class="QLabel" name="lbl_stylesheet">
+                  <property name="text">
+                   <string>Stylesheet:</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="3" column="1">
                  <widget class="QLineEdit" name="placeholder"/>
                 </item>
@@ -223,16 +230,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_stylesheet">
-                  <property name="text">
-                   <string>Stylesheet:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QPlainTextEdit" name="tooltip"/>
-                </item>
                 <item row="4" column="1">
                  <widget class="QPlainTextEdit" name="stylesheet">
                   <property name="toolTip">
@@ -240,28 +237,17 @@
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_widgetdim">
-                  <property name="text">
-                   <string>Widgetdim:</string>
-                  </property>
-                 </widget>
+                <item row="2" column="1">
+                 <widget class="QPlainTextEdit" name="tooltip"/>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QLineEdit" name="widgetdim">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="1">
                  <widget class="QPlainTextEdit" name="widgetcontrols">
                   <property name="toolTip">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;minValue&amp;quot;:0.001, &amp;quot;maxValue&amp;quot;:100}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="0">
+                <item row="5" column="0">
                  <widget class="QLabel" name="lbl_widgetcontrols">
                   <property name="text">
                    <string>Widgetcontrols:</string>

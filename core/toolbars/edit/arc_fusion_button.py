@@ -63,7 +63,7 @@ class GwArcFusionButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be removed"
+            message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(message)
 
 
@@ -82,7 +82,9 @@ class GwArcFusionButton(GwMaptool):
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
         feature_id = f'"id":["{self.node_id}"]'
-        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
+        extras = f'"enddate":"{enddate_str}"'
+        if workcat_id_end not in (None, 'null', ''):
+            extras += f', "workcat_id_end":"{workcat_id_end}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
@@ -125,7 +127,7 @@ class GwArcFusionButton(GwMaptool):
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, False)
+            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, True)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
@@ -134,6 +136,7 @@ class GwArcFusionButton(GwMaptool):
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+            self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
             tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 

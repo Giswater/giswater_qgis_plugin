@@ -34,6 +34,8 @@ class GwCatalog:
         feature = f'"feature_type":"{child_type}"'
         body = tools_gw.create_body(form, feature)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None:
+            return
 
         group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
@@ -79,7 +81,7 @@ class GwCatalog:
 
         # Set Listeners
         matcat_id.currentIndexChanged.connect(partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, child_type))
-        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,pnom, dnom, id, feature_type, child_type))
+        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
         dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
 
         # Set shortcut keys
@@ -109,6 +111,9 @@ class GwCatalog:
 
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None:
+            return
+
         if json_result['status'] == "Failed":
             tools_log.log_warning(json_result)
             return False
@@ -130,6 +135,9 @@ class GwCatalog:
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None:
+            return
+
         for field in json_result['body']['data']['fields']:
             if field['columnname'] in ('pnom', 'shape'):
                 self._fill_combo(pnom, field)
@@ -156,8 +164,8 @@ class GwCatalog:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{feature_type}', 9)"
             row = tools_db.get_row(sql)
             self._fill_combo(widget_id, row[0]['catalog_id'][0])
-            
-    
+
+
     def _add_combobox(self, field):
         """ Add QComboBox to dialog """
 
@@ -169,8 +177,8 @@ class GwCatalog:
             tools_qt.set_combo_value(widget, field['selectedId'], 0)
 
         return widget
-    
-    
+
+
     def _fill_combo(self, widget, field):
         """
         Fill QComboBox
@@ -194,8 +202,8 @@ class GwCatalog:
                 records_sorted.insert(0, ['', ''])
             for record in records_sorted:
                 widget.addItem(str(record[1]), record)
-                
-    
+
+
     def _fill_geomcat_id(self, previous_dialog, widget_name):
         """ Fill the widget of the previous dialogue """
 

@@ -10,12 +10,11 @@ import webbrowser
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
-from qgis.gui import QgsRubberBand
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
 from ... import global_vars
-from ...lib import tools_qt, tools_db, tools_qgis
+from ...lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwDocument:
@@ -36,7 +35,7 @@ class GwDocument:
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
         """ Button 34: Add document """
 
-        self.rubber_band = QgsRubberBand(self.canvas)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals
         self.dlg_add_doc = GwDocUi()
         tools_gw.load_settings(self.dlg_add_doc)
@@ -110,7 +109,7 @@ class GwDocument:
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
-        self.dlg_add_doc.rejected.connect(lambda: self.rubber_band.reset())
+        self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self._activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_doc, "path"))
@@ -130,18 +129,18 @@ class GwDocument:
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_doc,  table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
              self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+            self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
@@ -153,7 +152,7 @@ class GwDocument:
         tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
 
         return self.dlg_add_doc
 
@@ -377,7 +376,9 @@ class GwDocument:
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        dialog.close()
+        keep_open_form = tools_gw.get_config_parser('dialogs', 'doc_manager_keep_open', "user", "init", prefix=True)
+        if tools_os.set_boolean(keep_open_form, False) is not True:
+            dialog.close()
 
         self.get_document(row=widget.model().record(row))
         tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
@@ -413,8 +414,11 @@ class GwDocument:
         files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_qt.tr(message))
 
         file_text = ""
-        for file in files_path:
-            file_text += f"{file}\n\n"
+        if len(files_path) == 1:
+            file_text += f"{files_path[0]}"
+        else:
+            for file in files_path:
+                file_text += f"{file}\n\n"
         if files_path:
             tools_qt.set_widget_text(dialog, widget, str(file_text))
         return files_path

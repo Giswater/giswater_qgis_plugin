@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject, QgsPointXY,  QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
+from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
     QgsTolerance, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
@@ -41,6 +41,7 @@ class GwSnapManager(object):
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
+        global_vars.snappers.append(self)
 
 
     def set_snapping_layers(self):
@@ -98,8 +99,10 @@ class GwSnapManager(object):
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
-    def config_snap_to_arc(self):
+    def config_snap_to_arc(self, msg=True):
         """ Set snapping to 'arc' """
+
+        self.show_snap_message(msg, 'arc')
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
@@ -114,8 +117,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_node(self):
+    def config_snap_to_node(self, msg=True):
         """ Set snapping to 'node' """
+
+        self.show_snap_message(msg, 'node')
 
         QgsProject.instance().blockSignals(True)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
@@ -129,8 +134,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_connec(self):
+    def config_snap_to_connec(self, msg=True):
         """ Set snapping to 'connec' """
+
+        self.show_snap_message(msg, 'connec')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
@@ -145,8 +152,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_gully(self):
+    def config_snap_to_gully(self, msg=True):
         """ Set snapping to 'gully' """
+
+        self.show_snap_message(msg, 'gully')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
@@ -274,8 +283,8 @@ class GwSnapManager(object):
                 map_point = self.canvas.getCoordinateTransform().transform(point)
                 x = map_point.x()
                 y = map_point.y()
-            event_point = QPoint(x, y)
-        except:
+            event_point = QPoint(int(x), int(y))
+        except Exception:
             pass
         finally:
             return event_point
@@ -321,7 +330,7 @@ class GwSnapManager(object):
             snapped_feat = next(layer.getFeatures(feature_request))
             if select_feature and snapped_feat:
                 self._select_snapped_feature(result, feature_id)
-        except:
+        except Exception:
             pass
         finally:
             return snapped_feat
@@ -352,12 +361,25 @@ class GwSnapManager(object):
         icons = {0: QgsVertexMarker.ICON_NONE, 1: QgsVertexMarker.ICON_CROSS, 2: QgsVertexMarker.ICON_X,
                  3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
         colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
-                 3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
-        
+                  3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
+
         vertex_marker.setIconType(icons[icon_type])
         vertex_marker.setColor(colors[color_type])
         vertex_marker.setIconSize(icon_size)
         vertex_marker.setPenWidth(pen_width)
+
+
+    def show_snap_message(self, msg, feature_type=None):
+
+        if msg is False:
+            return
+        if global_vars.user_level['level'] not in (None, 'None'):
+            if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
+                if msg is True:
+                    msg = f'Snap to'
+                    tools_qgis.show_info(msg, 1, parameter=feature_type)
+                elif type(msg) is str:
+                    tools_qgis.show_info(msg, 1)
 
 
     # region private functions
@@ -399,5 +421,6 @@ class GwSnapManager(object):
 
         layer = result.layer()
         layer.select([feature_id])
+
 
     # endregion
