@@ -15,8 +15,6 @@ from qgis.core import QgsMessageLog
 from .. import global_vars
 from . import tools_qt, tools_os
 
-min_log_level = 20
-
 
 class GwLogger(object):
 
@@ -26,6 +24,7 @@ class GwLogger(object):
         # Create logger
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(int(log_level))
+        self.min_log_level = int(log_level)
         self.log_limit_characters = log_limit_characters
 
         # Define log folder in users folder
@@ -58,6 +57,15 @@ class GwLogger(object):
 
         # Add file handler
         self.add_file_handler()
+
+
+    def set_logger_parameters(self, min_log_level, log_limit_characters):
+        """ Set logger parameters min_log_level and log_limit_characters """
+
+        if isinstance(min_log_level, int):
+            self.min_log_level = min_log_level
+        if isinstance(log_limit_characters, int):
+            self.log_limit_characters = log_limit_characters
 
 
     def add_file_handler(self):
@@ -120,8 +128,7 @@ class GwLogger(object):
         try:
 
             # Check session parameter 'min_log_level' to know if we need to log message in logger file
-            valor = min_log_level
-            if int(log_level) < int(valor):
+            if log_level < self.min_log_level:
                 return
 
             if stack_level >= len(inspect.stack()):
@@ -142,7 +149,7 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name, log_limit_characters=None):
+def set_logger(logger_name, min_log_level=20, log_limit_characters=None):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:

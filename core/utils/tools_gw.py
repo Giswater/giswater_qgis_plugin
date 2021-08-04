@@ -88,87 +88,89 @@ def save_settings(dialog):
         pass
 
 
+def initialize_parsers():
+    """ Initialize parsers of configuration files: init, session, giswater, user_params """
+
+    for config in global_vars.list_configs:
+        filepath, parser = _get_parser_from_filename(config)
+        global_vars.configs[config][0] = filepath
+        global_vars.configs[config][1] = parser
+
+
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
                       chk_user_params=True, get_none=False) -> str:
     """ Load a simple parser value """
 
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
+
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+    parser = global_vars.configs[file_name][1]
+
     value = None
-    try:
-        raw_parameter = parameter
-
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
+    raw_parameter = parameter
+    if parser is None:
+        tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return None
-
-        path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
-        if not os.path.exists(path):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            return value
-
         parser.read(path)
-        if not parser.has_section(section) or not parser.has_option(section, parameter):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            # return value
-        else:
-            value = parser[section][parameter]
 
-        # If there is a value and you don't want to get the comment, it only gets the value part
-        if value is not None and not get_comment:
-            value = value.split('#')[0].strip()
+    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+    if global_vars.project_loaded and file_name in ('init', 'session'):
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
 
-        if not get_none and str(value) in "None":
-            value = None
+    if config_type == 'user' and prefix and global_vars.project_type is not None:
+        parameter = f"{global_vars.project_type}_{parameter}"
 
-        # Check if the parameter exists in the inventory, if not creates it
+    if not parser.has_section(section) or not parser.has_option(section, parameter):
         if chk_user_params and config_type in "user":
-            _check_user_params(section, raw_parameter, file_name, prefix)
+            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+    else:
+        value = parser[section][parameter]
 
-    except Exception as e:
-        tools_log.log_warning(str(e))
-        tools_log.log_warning(global_vars.project_vars)
+    # If there is a value and you don't want to get the comment, it only gets the value part
+    if value is not None and not get_comment:
+        value = value.split('#')[0].strip()
+
+    if not get_none and str(value) in "None":
         value = None
-    finally:
-        return value
+
+    # Check if the parameter exists in the inventory, if not creates it
+    if chk_user_params and config_type in "user":
+        _check_user_params(section, raw_parameter, file_name, prefix)
+
+    return value
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
                       comment=None, prefix=True, chk_user_params=True):
     """ Save simple parser value """
 
-    value = f"{value}"  # Cast to str because parser only allow strings
-    try:
-        raw_parameter = parameter
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
 
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+
+    try:
+
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
+
+        raw_parameter = parameter
         if config_type == 'user' and prefix and global_vars.project_type is not None:
             parameter = f"{global_vars.project_type}_{parameter}"
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return
 
-        config_folder = path_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + f"{file_name}.config"
-        parser.read(path)
         # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
+
+        # Cast to str because parser only allow strings
+        value = f"{value}"
         if value is not None:
             # Add the comment to the value if there is one
             if comment is not None:
@@ -188,6 +190,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
+
     except Exception as e:
         tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
         return
@@ -2719,14 +2722,19 @@ def create_sqlite_conn(file_name):
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
-    inv_sections = _get_user_params_sections()
+    parser = global_vars.configs['user_params'][1]
+    if parser is None:
+        return
+
+    # Get the sections of the user params inventory
+    inv_sections = parser.sections()
 
     # For each section (inventory)
     for section in inv_sections:
 
         file_name = section.split('.')[0]
         section_name = section.split('.')[1]
-        parameters = _get_user_params_parameters(section)
+        parameters = parser.options(section)
 
         # For each parameter (inventory)
         for parameter in parameters:
@@ -2743,12 +2751,14 @@ def user_params_to_userconfig():
                 parameter = inv_param[1:]
             # If it's just a comment line
             if parameter.startswith("#"):
+                # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
                 set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
                 continue
 
             # If it's a normal value
             # Get value[section][parameter] of the user config file
             value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
+
             # If this value (user config file) is None (doesn't exist, isn't set, etc.)
             if value is None:
                 # Read the default value for that parameter
@@ -2775,6 +2785,10 @@ def remove_deprecated_config_vars():
 
     # Get deprecated vars for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     init_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
     if vars is not None:
@@ -2788,12 +2802,17 @@ def remove_deprecated_config_vars():
                     init_parser.remove_option(section, f"{proj}{option}")
             else:
                 init_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         init_parser.write(configfile)
         configfile.close()
 
     # Get deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     session_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
     if vars is not None:
@@ -2807,6 +2826,7 @@ def remove_deprecated_config_vars():
                     session_parser.remove_option(section, f"{proj}{option}")
             else:
                 session_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         session_parser.write(configfile)
         configfile.close()
@@ -2853,12 +2873,14 @@ def _check_user_params(section, parameter, file_name, prefix=False):
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
+
     # Check if the parameter needs the prefix or not
     if prefix and global_vars.project_type is not None:
         parameter = f"_{parameter}"
+
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
-                                    chk_user_params=False)
+                                    get_comment=True, chk_user_params=False)
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
@@ -2867,24 +2889,27 @@ def _check_user_params(section, parameter, file_name, prefix=False):
         return check_value
 
 
-def _get_user_params_sections():
-    """ Get the sections of the user params inventory """
+def _get_parser_from_filename(filename):
+    """ Get parser of file @filename.config """
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    return parser.sections()
-
-
-def _get_user_params_parameters(section: str):
-    """ Get the parameters of a section from the user params inventory """
-
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    if parser.has_section(section):
-        return parser.options(section)
+    if filename in ('init', 'session'):
+        folder = global_vars.user_folder_dir
+    elif filename in ('dev', 'giswater', 'user_params'):
+        folder = global_vars.plugin_dir
     else:
-        return None
+        return None, None
+
+    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+    filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
+    if not os.path.exists(filepath):
+        tools_log.log_warning(f"File not found: {filepath}")
+        return filepath, None
+
+    if not parser.read(filepath):
+        tools_log.log_warning(f"Error parsing file: {filepath}")
+        return filepath, None
+
+    return filepath, parser
+
 
 # endregion

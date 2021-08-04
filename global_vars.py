@@ -16,6 +16,20 @@ canvas = None                           # Instance of class QgsMapCanvas. Contai
 plugin_dir = None                       # Plugin folder path
 plugin_name = None                      # Plugin name
 user_folder_dir = None                  # User folder path
+list_configs = [                        # List of configuration files
+    'init',
+    'session',
+    'dev',
+    'giswater',
+    'user_params']
+project_loaded = False                  # True when selected project has been loaded
+configs = {}                            # Dictionary of configuration files. Value is an array of 2 columns:
+                                        # [0]-> Filepath. [1]-> Instance of class ConfigParser
+configs['init'] = [None, None]          # User configuration file: init.config (located in user config folder)
+configs['session'] = [None, None]       # Session configuration file: session.config (located in user config folder)
+configs['dev'] = [None, None]           # Developer configuration file: dev.config (located in plugin config folder)
+configs['giswater'] = [None, None]      # Plugin configuration file: giswater.config (located in plugin config folder)
+configs['user_params'] = [None, None]   # Settings configuration file: user_params.config (plugin config folder)
 schema_name = None                      # Schema name retrieved from QGIS project connection with PostgreSql
 project_type = None                     # Project type get from table "version"
 data_epsg = None                        # SRID retrieved from QGIS project layer "v_edit_node"

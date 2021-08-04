@@ -37,7 +37,9 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
-        tools_gw.remove_deprecated_config_vars()
+        global_vars.project_loaded = False
+        if show_warning:
+            tools_log.log_info("Project read started")
 
         self._get_user_variables()
 
@@ -49,15 +51,18 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
+        # Removes all deprecated variables defined at giswater.config
+        tools_gw.remove_deprecated_config_vars()
+
         # Get variables from qgis project
-        tools_qgis.get_project_variables()
+        self._get_project_variables()
 
         # Get water software from table 'sys_version'
         global_vars.project_type = tools_gw.get_project_type()
         if global_vars.project_type is None:
             return
 
-        # Check if user has all config params
+        # Check if user has config files 'init' and 'session' and its parameters
         tools_gw.user_params_to_userconfig()
 
         # Manage schema name
@@ -132,11 +137,22 @@ class GwLoadProject(QObject):
         QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
 
         # Log it
-        message = "Project read successfully"
+        global_vars.project_loaded = True
+        message = "Project read finished"
         tools_log.log_info(message)
 
 
     # region private functions
+
+    def _get_project_variables(self):
+        """ Manage QGIS project variables """
+
+        global_vars.project_vars = {}
+        global_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
+        global_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
+        global_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
+        global_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
+        global_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
 
 
     def _get_user_variables(self):
@@ -250,12 +266,16 @@ class GwLoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
         if toolbar_names in (None, 'None'):
+            tools_log.log_info("Parameter 'toolbar_names' is None")
             return
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
-        toolbars_order = toolbars_order.replace(' ', '').split(',')
+        if toolbars_order in (None, 'None'):
+            tools_log.log_info("Parameter 'toolbars_order' is None")
+            return
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
+        toolbars_order = toolbars_order.replace(' ', '').split(',')
         for tb in toolbars_order:
             self._create_toolbar(tb)
 
@@ -376,8 +396,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("plan")
 
         # Check if exist some feature_cat with active True on cat_feature table
-        self.feature_cat = global_vars.feature_cat
-        if self.feature_cat is None:
+        if global_vars.feature_cat is None:
             self._enable_button("01", False)
             self._enable_button("02", False)
 
