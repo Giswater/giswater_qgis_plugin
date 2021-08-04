@@ -80,20 +80,27 @@
 
 		IF v_haschilds IS TRUE THEN
 			p_data = replace(p_data::text,'"hasChilds":"True"','"hasChilds":"False"');
-			--execute over child views in order to  execute fct for each one of them separately
-			FOREACH rec_view IN ARRAY(SELECT string_to_array(string_agg(a.child_layer::text,','),',') FROM (
-			SELECT  child_layer from cat_feature WHERE parent_layer = ANY(v_viewlist)
-			UNION SELECT DISTINCT parent_layer from cat_feature WHERE parent_layer = ANY(v_viewlist) order by 1 desc)a) LOOP
-				
-				IF v_lastview IS NULL THEN 
-					p_data = replace(p_data::text,json_array_elements_text(v_viewname::json),rec_view);
-				ELSE
-					p_data = replace(p_data::text,v_lastview,rec_view);
-				END IF;
-				--execute function for each child view
+
+			IF (SELECT a.child_layer FROM (SELECT  child_layer from cat_feature WHERE parent_layer = ANY(v_viewlist)
+			UNION SELECT DISTINCT parent_layer from cat_feature WHERE parent_layer = ANY(v_viewlist))a LIMIT 1) IS NOT NULL THEN
+
+				--execute over child views in order to  execute fct for each one of them separately
+				FOREACH rec_view IN ARRAY(SELECT string_to_array(string_agg(a.child_layer::text,','),',') FROM (
+				SELECT  child_layer from cat_feature WHERE parent_layer = ANY(v_viewlist)
+				UNION SELECT DISTINCT parent_layer from cat_feature WHERE parent_layer = ANY(v_viewlist) order by 1 desc)a) LOOP
+					
+					IF v_lastview IS NULL THEN 
+						p_data = replace(p_data::text,json_array_elements_text(v_viewname::json),rec_view);
+					ELSE
+						p_data = replace(p_data::text,v_lastview,rec_view);
+					END IF;
+					--execute function for each child view
+					EXECUTE 'SELECT gw_fct_admin_manage_views($$'||p_data||'$$)';
+					v_lastview = rec_view;
+				END LOOP;
+			ELSE 
 				EXECUTE 'SELECT gw_fct_admin_manage_views($$'||p_data||'$$)';
-				v_lastview = rec_view;
-			END LOOP;
+			END IF;
 
 		END IF;
 
