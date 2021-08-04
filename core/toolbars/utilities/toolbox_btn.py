@@ -5,13 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import csv
 import os
 from functools import partial
 import json
 
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
-    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem
+    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -164,7 +166,8 @@ class GwToolBoxButton(GwAction):
             tools_gw.load_settings(self.dlg_reports)
 
             # Set listeners
-            self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, None, None))  # WIP!!
+            self.dlg_reports.btn_export_path.clicked.connect(self._select_file_report)
+            self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, self.dlg_reports.tbl_reports, self.dlg_reports.txt_export_path))
             self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
             self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
@@ -585,9 +588,25 @@ class GwToolBoxButton(GwAction):
             self.toolbox_task.cancel()
 
 
+    def _select_file_report(self):
+        """ Select CSV file """
+
+        file_report = tools_qt.get_text(self.dlg_reports, 'txt_export_path')
+        # Set default value if necessary
+        if file_report is None or file_report == '':
+            file_report = global_vars.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(file_report)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = tools_qt.tr("Save report file")
+        file_report, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+        tools_qt.set_widget_text(self.dlg_reports, self.dlg_reports.txt_export_path, file_report)
+
+
     def _export_reports(self, dialog, table, path):
 
-        return
         folder_path = tools_qt.get_text(dialog, path)
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
@@ -596,36 +615,22 @@ class GwToolBoxButton(GwAction):
         path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
-        if qtable_1:
-            model_1 = qtable_1.model()
+        if table:
+            model = table.model()
         else:
             return
-
-        model_2 = None
-        if qtable_2:
-            model_2 = qtable_2.model()
 
         # Convert qtable values into list
         all_rows = []
         headers = []
-        for i in range(0, model_1.columnCount()):
-            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+        for i in range(0, model.columnCount()):
+            headers.append(str(model.headerData(i, Qt.Horizontal)))
         all_rows.append(headers)
-        for rows in range(0, model_1.rowCount()):
+        for rows in range(0, model.rowCount()):
             row = []
-            for col in range(0, model_1.columnCount()):
-                row.append(str(model_1.data(model_1.index(rows, col))))
+            for col in range(0, model.columnCount()):
+                row.append(str(model.data(model.index(rows, col))))
             all_rows.append(row)
-        if qtable_2 is not None:
-            headers = []
-            for i in range(0, model_2.columnCount()):
-                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
-            all_rows.append(headers)
-            for rows in range(0, model_2.rowCount()):
-                row = []
-                for col in range(0, model_2.columnCount()):
-                    row.append(str(model_2.data(model_2.index(rows, col))))
-                all_rows.append(row)
 
         # Write list into csv file
         try:
@@ -633,11 +638,20 @@ class GwToolBoxButton(GwAction):
                 msg = "Are you sure you want to overwrite this file?"
                 answer = tools_qt.show_question(msg, "Overwrite")
                 if answer:
-                    self._write_to_csv(dialog, folder_path, all_rows)
+                    self._write_to_csv(folder_path, all_rows)
             else:
-                self._write_to_csv(dialog, folder_path, all_rows)
+                self._write_to_csv(folder_path, all_rows)
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
+
+
+    def _write_to_csv(self, folder_path=None, all_rows=None):
+
+        with open(folder_path, "w") as output:
+            writer = csv.writer(output, lineterminator='\n')
+            writer.writerows(all_rows)
+        message = "The csv file has been successfully exported"
+        tools_qgis.show_info(message)
 
     # endregion
