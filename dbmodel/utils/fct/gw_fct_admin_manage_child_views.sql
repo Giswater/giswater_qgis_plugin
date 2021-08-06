@@ -92,7 +92,6 @@ BEGIN
 		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
-			EXECUTE 'DELETE FROM config_form_fields WHERE formname = '||quote_literal(v_childview);
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 
 		END LOOP;
@@ -457,7 +456,9 @@ BEGIN
 	END IF;
 	
 	-- manage permissions
-	PERFORM gw_fct_admin_role_permissions();
+    IF v_action <> 'MULTI-DELETE' THEN
+        PERFORM gw_fct_admin_role_permissions();
+    END IF;
 
 	--  Return
 	RETURN ('{"status":"'||v_return_status||'", "message":{"level":0, "text":"'||v_return_msg||'"} '||
@@ -465,9 +466,10 @@ BEGIN
 		',"data":{}}'||
 		'}')::json;
 
-	EXCEPTION WHEN OTHERS THEN
+	/*EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+    */
 
 END;
 $BODY$
