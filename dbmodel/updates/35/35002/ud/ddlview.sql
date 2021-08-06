@@ -187,13 +187,18 @@ UNION
      LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
      JOIN value_state ON v_gully.state = value_state.id;
 
-  
---SAVE VIEWS AND REMOVE 1ST FIELD
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_vnode", "v_ui_arc_x_relations","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", 
-    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec", "v_edit_man_connec", "v_edit_man_gully",
-    "v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"], "action":"saveView","hasChilds":"False"}}$$);
+    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec"], "action":"saveView","hasChilds":"False"}}$$);
 
+      SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"], "action":"saveView","hasChilds":"False"}}$$);
+
+    
      SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
 
@@ -213,8 +218,14 @@ UNION
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
-
+    
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "action":"restoreView","hasChilds":"False"}}$$);
 --DELETE 2ND FIELD
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+    
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
 
@@ -235,7 +246,7 @@ UNION
     "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
     
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["vp_basic_gully", "v_anl_flow_gully","v_ui_node_x_connection_upstream","vp_basic_connec","v_rtc_period_hydrometer",
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully","vp_basic_gully", "v_anl_flow_gully","v_ui_node_x_connection_upstream","vp_basic_connec","v_rtc_period_hydrometer",
     "v_rtc_period_dma", "v_rtc_period_node", "v_edit_man_connec", "v_edit_man_gully",
     "v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_edit_vnode","v_arc_x_vnode","v_ui_arc_x_relations","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"],
     "action":"restoreView","hasChilds":"False"}}$$);

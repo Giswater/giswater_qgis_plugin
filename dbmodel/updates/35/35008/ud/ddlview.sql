@@ -42,8 +42,9 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
 --SAVE VIEWS
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_vnode", "v_vnode","v_ui_arc_x_relations","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", 
-"v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_ui_workcat_x_feature", "v_web_parent_gully"], "action":"saveView","hasChilds":"False"}}$$);
- 
+"v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_ui_workcat_x_feature", "v_web_parent_gully", "v_edit_man_gully"], "action":"saveView","hasChilds":"False"}}$$);
+
+
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "action":"saveView","hasChilds":"True"}}$$);
     
@@ -63,5 +64,5 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
     
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_ui_workcat_x_feature", "v_anl_flow_gully","vp_basic_gully","v_ui_node_x_connection_upstream",
+"data":{"viewName":[ "v_edit_man_gully","v_ui_workcat_x_feature", "v_anl_flow_gully","vp_basic_gully","v_ui_node_x_connection_upstream",
 "v_rtc_period_pjoint","v_ui_workcat_x_feature_end","v_edit_link", "v_arc_x_vnode","v_ui_arc_x_relations","v_vnode", "v_web_parent_gully"], "action":"restoreView","hasChilds":"False"}}$$);
