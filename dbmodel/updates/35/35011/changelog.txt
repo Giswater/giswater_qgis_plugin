@@ -2,3 +2,5 @@
 *************
 - New sys process 393: Check gully duplicated
 - New sys process 394: Check wrong topology for links
+- Create new function to execute report queries
+- Create new table config_report for configuration of personalized reports

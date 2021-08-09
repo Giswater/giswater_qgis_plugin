@@ -197,9 +197,9 @@ BEGIN
 	IF v_function IS NULL THEN
 		-- get reports toolbox parameters
 		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-				 SELECT listname, alias
-				 FROM config_form_list
-				 WHERE listtype = ''report'' AND  alias LIKE ''%', v_filter ,'%'' ORDER BY listname) a');
+				 SELECT id as listname, alias
+				 FROM config_report
+				 WHERE alias LIKE ''%', v_filter ,'%'' ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_fields;
 	END IF;
