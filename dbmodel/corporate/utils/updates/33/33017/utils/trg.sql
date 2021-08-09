@@ -8,9 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON SCHEMA_NAME.raster_dem;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON raster_dem;
 CREATE TRIGGER gw_trg_manage_raster_dem
-AFTER INSERT OR DELETE ON SCHEMA_NAME.raster_dem
+AFTER INSERT OR DELETE ON raster_dem
 FOR EACH ROW
-EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_manage_raster_dem();
+EXECUTE PROCEDURE gw_trg_manage_raster_dem();
 
