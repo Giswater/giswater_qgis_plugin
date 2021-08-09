@@ -4,81 +4,39 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3068
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getreport(p_data json)
   RETURNS json AS
 $BODY$
 	
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_fct_getreport($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"isToolbox":false, "function":2522, "filterText":"Import inp epanet file"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"filterText":"Import inp epanet file"}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_getreport($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"filterText":null, "listName":"arc_length_x_arccat"}}$$);
+"data":{"filterText":null, "listId":"1"}}$$);
 
 */
 
 DECLARE
 
-v_list text;
+v_list_id integer;
 v_fields json;
-v_widgetfields json;
 i integer;
 v_filterparam json;
 v_filterdvquery json;
 v_comboid json;
 v_comboidval json;
 v_filterlist json[];
-v_fieldslist json[];
 v_filter json;
 rec_filter text;
 v_filterinput text[];
 v_filtername text;
 v_filtervalue text;
 v_filtersign text;
+v_querytext text;
 
 v_version text;
-v_role text;
-v_projectype text;
-
-v_om_fields json;
-v_edit_fields json;
-v_epa_fields json;
-v_master_fields json;
-v_admin_fields json;
-v_isepa boolean = false;
-v_epa_user text;
-rec record;
-v_querytext text;
-v_querytext_mod text;
-v_queryresult text;
-v_expl text;
-v_state text;
-v_inp_result text; 
-v_rpt_result text;
-v_return json;
-v_return2 text;
-v_nodetype text;
-v_nodecat text;
-
-v_arrayresult text[];
-v_selectedid text;
-v_rec_replace json;
-v_errcontext text;
-v_querystring text;
-v_debug_vars json;
-v_debug json;
-v_msgerr json;
-v_value text;
-
-v_message text;
 v_error_context text;
 
 BEGIN
@@ -91,17 +49,17 @@ BEGIN
 		INTO v_version;
 
 	-- get input parameter
-	v_list := json_extract_path_text(p_data,'data','listName');
+	v_list_id := json_extract_path_text(p_data,'data','listId');
 	v_filter := json_extract_path_text(p_data,'data','filter');
 
 	SELECT array_agg(a) AS list FROM   json_array_elements_text(v_filter) a
 	INTO v_filterinput;
 
 	--filter widgets
-	IF (SELECT filterparam FROM config_form_list WHERE listname = v_list) IS NOT NULL THEN
-		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_form_list WHERE listname = v_list) LOOP
+	IF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
+		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
-			SELECT filterparam::jsonb->>i into v_filterparam FROM config_form_list WHERE listname = v_list;
+			SELECT filterparam::jsonb->>i into v_filterparam FROM config_report WHERE id = v_list_id;
 
 				EXECUTE 'SELECT json_agg(t.id) FROM ('||json_extract_path_text(v_filterparam,'dvquerytext')||') t'
 				INTO v_comboid;
@@ -120,7 +78,7 @@ BEGIN
 	--list data
 	--execute query 
 	SELECT CASE WHEN vdefault IS NOT NULL THEN  concat(query_text, ' ORDER BY ',json_extract_path_text(vdefault,'orderBy'),' ',json_extract_path_text(vdefault,'orderType')) 
-	ELSE  query_text END AS query INTO v_querytext FROM config_form_list WHERE listname = v_list;
+	ELSE  query_text END AS query INTO v_querytext FROM config_report WHERE id = v_list_id;
 
 	IF v_filterinput IS NOT NULL THEN
 		i=1;
@@ -154,6 +112,7 @@ BEGIN
 		END LOOP;
 	END IF;
 	
+	raise notice 'v_querytext,%',v_querytext;
 	EXECUTE 'SELECT json_agg(t) FROM ('||v_querytext||') t'
 	INTO v_fields ;
 
@@ -165,9 +124,9 @@ BEGIN
 	    	
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
-		      --',"form":'||(p_data->>'form')::json||
-		     -- ',"feature":'||(p_data->>'feature')::json||
-		      ',"data":' || v_fields ||'}'||		     
+		      ',"form":{}'||
+		      ',"feature":{}'||
+		      ',"data":' || v_fields ||'}'||
 	       '}')::json;
 	       
 

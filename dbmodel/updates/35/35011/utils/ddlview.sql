@@ -6,11 +6,3 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-
-
-CREATE TABLE IF NOT EXISTS config_report(
-id serial PRIMARY KEY,
-alias text,
-query_text text,
-vdefault json  DEFAULT '{"orderBy":"1", "orderType": "DESC"}'::json,
-filterparam json);
