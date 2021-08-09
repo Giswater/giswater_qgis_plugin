@@ -171,7 +171,7 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
             self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
-            extras = f'"filterText":null, "listName":"{self.function_selected}"'
+            extras = f'"filterText":null, "listId":"{self.function_selected}"'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
             if not json_result or json_result['status'] == 'Failed':
@@ -300,7 +300,7 @@ class GwToolBoxButton(GwAction):
                 continue
             _json = {"filterName":f"{widget.objectName()}", "filterValue":f"{value}"}
             filters.append(_json)
-        extras = f'"filter":{json.dumps(filters)}, "listName":"{self.function_selected}"'
+        extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
         if not json_result or json_result['status'] == 'Failed':
@@ -649,7 +649,7 @@ class GwToolBoxButton(GwAction):
     def _write_to_csv(self, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
-            writer = csv.writer(output, lineterminator='\n')
+            writer = csv.writer(output, delimiter=';', lineterminator='\n')
             writer.writerows(all_rows)
         message = "The csv file has been successfully exported"
         tools_qgis.show_info(message)
