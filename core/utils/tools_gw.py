@@ -1549,6 +1549,44 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
+def exec_pg_function(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
+                     json_loads=False, rubber_band=None, aux_conn=None, is_thread=False, check_function=True):
+    """ Manage execution of database function @function_name
+        If execution failed, try to execute it again up to the value indicated in parameter 'max_retries'
+    """
+
+    # Define dictionary with results
+    dict_result= {}
+    status = False
+    function_failed = False
+    json_result = None
+    complet_result = None
+
+    attempt = 0
+    while json_result is None and attempt < global_vars.max_retries:
+        attempt += 1
+        tools_log.log_warning(f"Attempt {attempt} of {global_vars.max_retries}")
+        json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql,
+            log_result, json_loads, rubber_band, aux_conn, is_thread, check_function)
+        complet_result = json_result
+        if json_result is None or not json_result:
+            function_failed = True
+        elif 'status' in json_result:
+            if json_result['status'] == 'Failed':
+                tools_log.log_warning(json_result)
+                function_failed = True
+            else:
+                status = True
+            break
+
+    dict_result['status'] = status
+    dict_result['function_failed'] = function_failed
+    dict_result['json_result'] = json_result
+    dict_result['complet_result'] = complet_result
+
+    return dict_result
+
+
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
                       json_loads=False, rubber_band=None, aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
