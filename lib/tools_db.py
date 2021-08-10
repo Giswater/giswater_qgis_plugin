@@ -377,7 +377,7 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_info(sql, stack_level_increase=1, tab_name="backend")
     result = global_vars.dao.execute_sql(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not result:
@@ -398,7 +398,7 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_info(sql, stack_level_increase=1, tab_name="backend")
     value = global_vars.dao.execute_returning(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not value:
@@ -556,7 +556,7 @@ def _get_sql(sql, log_sql=False, params=None):
     if params:
         sql = global_vars.dao.mogrify(sql, params)
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=2)
+        tools_log.log_info(sql, stack_level_increase=2, tab_name="backend")
 
     return sql
 

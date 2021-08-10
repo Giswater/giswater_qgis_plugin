@@ -1605,9 +1605,11 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return None
 
-    # Execute function. If failed, always log it
+    # Manage schema_name and parameters
     if schema_name:
         sql = f"SELECT {schema_name}.{function_name}("
+    elif schema_name is None and global_vars.schema_name:
+        sql = f"SELECT {global_vars.schema_name}.{function_name}("
     else:
         sql = f"SELECT {function_name}("
     if parameters:
@@ -1619,9 +1621,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 
+    # Execute database function
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
-
-    # Control null
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
