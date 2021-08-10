@@ -1107,6 +1107,7 @@ def add_button(**kwargs):
     """
 
     field = kwargs['field']
+    module = tools_backend_calls  # HARDCODED?? Potser si ja que ara totes les funcions que es criden des de botons estan a tools_backend_calls
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
@@ -1159,7 +1160,7 @@ def add_button(**kwargs):
     kwargs['message_level'] = 1
     kwargs['function_name'] = function_name
     kwargs['func_params'] = func_params
-    widget.clicked.connect(partial(getattr(tools_backend_calls, function_name), **kwargs))
+    # widget.clicked.connect(partial(getattr(tools_backend_calls, function_name), **kwargs))
     if function_name:
         widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
