@@ -186,8 +186,6 @@ class GwEpaFileManager(GwTask):
 
     def _exec_function_pg2epa(self):
 
-        max_retries = 3
-        attempt = 0
         self.json_result = None
         self.setProgress(0)
 
@@ -195,25 +193,12 @@ class GwEpaFileManager(GwTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = tools_gw.create_body(extras=extras)
+        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, is_thread=True, log_sql=True)
+        self.function_failed = dict_result['function_failed']
+        self.json_result = dict_result['json_result']
+        self.complet_result = dict_result['complet_result']
 
-        status = False
-        while self.json_result is None and attempt < max_retries:
-            attempt += 1
-            tools_log.log_warning(f"Attempt {attempt} of {max_retries}")
-            self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
-            self.complet_result = self.json_result
-            if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed")
-                self.function_failed = True
-            elif 'status' in self.json_result:
-                if self.json_result['status'] == 'Failed':
-                    tools_log.log_warning(self.json_result)
-                    self.function_failed = True
-                else:
-                    status = True
-                break
-
-        return status
+        return dict_result['status']
 
 
     def _export_inp(self):
