@@ -104,6 +104,7 @@ class GwToolBoxButton(GwAction):
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
 
+
     # region private functions
 
     def _open_toolbox(self):
@@ -119,12 +120,10 @@ class GwToolBoxButton(GwAction):
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
 
-
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
         if json_result or json_result['status'] != 'Failed':
-
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
@@ -136,6 +135,7 @@ class GwToolBoxButton(GwAction):
             tools_gw.docker_dialog(self.dlg_toolbox)
         else:
             tools_gw.open_dialog(self.dlg_toolbox)
+
 
     def _filter_functions(self, text):
 
@@ -300,6 +300,7 @@ class GwToolBoxButton(GwAction):
                 continue
             _json = {"filterName":f"{widget.objectName()}", "filterValue":f"{value}"}
             filters.append(_json)
+
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
@@ -311,7 +312,6 @@ class GwToolBoxButton(GwAction):
             if field['widgettype'] == 'list' and 'value' in field and field['value'] is not None:
                 numrows = len(field['value'])
                 numcols = len(field['value'][0])
-
                 self.dlg_reports.tbl_reports.setColumnCount(numcols)
                 self.dlg_reports.tbl_reports.setRowCount(numrows)
 
@@ -325,8 +325,8 @@ class GwToolBoxButton(GwAction):
                 for row in range(numrows):
                     for column in range(numcols):
                         column_name = dict_keys[column]
-                        self.dlg_reports.tbl_reports.setItem(row, column,
-                                                             QTableWidgetItem((f"{field['value'][row][column_name]}")))
+                        item = f"{field['value'][row][column_name]}"
+                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
             elif field['widgettype'] == 'list' and 'value' in field and field['value'] is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
@@ -441,6 +441,7 @@ class GwToolBoxButton(GwAction):
 
                 status = True
                 break
+
         return status
 
 
@@ -508,9 +509,9 @@ class GwToolBoxButton(GwAction):
         font.setPointSize(8)
         main_parent.setFont(font)
 
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-        path_icon_blue = self.icon_folder + os.sep + '36.png'
-        path_icon_red = self.icon_folder + os.sep + '100.png'
+        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        path_icon_blue = icon_folder + os.sep + '36.png'
+        path_icon_red = icon_folder + os.sep + '100.png'
         if os.path.exists(path_icon_blue):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
@@ -561,7 +562,6 @@ class GwToolBoxButton(GwAction):
                 font.setPointSize(8)
                 label.setFont(font)
                 parent1.appendRow([label, func_name])
-
                 if os.path.exists(path_icon_blue):
                     icon = QIcon(path_icon_blue)
                     label.setIcon(icon)
@@ -584,6 +584,7 @@ class GwToolBoxButton(GwAction):
 
 
     def _cancel_task(self):
+
         if hasattr(self, 'toolbox_task'):
             self.toolbox_task.cancel()
 
