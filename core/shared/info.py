@@ -200,7 +200,8 @@ class GwInfo(QObject):
             if self.lyr_dim:
                 self.dimensioning = GwDimensioning()
                 feature_id = self.complet_result['body']['feature']['id']
-                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
+                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
+                    feature_id, self.rubber_band)
                 return result, dialog
 
         elif template == 'info_feature':
@@ -211,7 +212,8 @@ class GwInfo(QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result['body']['feature']['id']
-            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
+            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
+                new_feature=new_feature)
             if feature_cat is not None:
                 self._manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -420,7 +422,7 @@ class GwInfo(QObject):
 
         self._get_features(complet_result)
         if self.layer is None:
-            tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
+            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
             return False, self.dlg_cf
 
         # Remove unused tabs
@@ -431,10 +433,15 @@ class GwInfo(QObject):
         self.feature_id = complet_result['body']['feature']['id']
 
         # Get the start point and end point of the feature
+        list_points = None
         if new_feature:
             list_points = tools_qgis.get_points_from_geometry(self.layer, new_feature)
         else:
-            list_points = f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, "y1": {complet_result["body"]["feature"]["geometry"]["y"]}'
+            try:
+                list_points = (f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, '
+                               f'"y1": {complet_result["body"]["feature"]["geometry"]["y"]}')
+            except:
+                pass
 
         if 'visibleTabs' in complet_result['body']['form']:
             for tab in complet_result['body']['form']['visibleTabs']:
@@ -455,8 +462,9 @@ class GwInfo(QObject):
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
-            self.action_edit.setEnabled(complet_result['body']['feature']['permissions']['isEditable'])
-        except KeyError:
+            is_enabled = complet_result['body']['feature']['permissions']['isEditable']
+            self.action_edit.setEnabled(is_enabled)
+        except Exception:
             pass
 
         # Add icons to actions & buttons
@@ -726,11 +734,15 @@ class GwInfo(QObject):
         # Set title
         title = f"{complet_result['body']['form']['headerText']}"
 
-        # Set toolbox labels
-        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        toolbox_cf.setItemText(0, complet_result['body']['form']['tabDataLytNames']['index_0'])
-        toolbox_cf.setItemText(1, complet_result['body']['form']['tabDataLytNames']['index_1'])
-        return title
+        try:
+            # Set toolbox labels
+            toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+            toolbox_cf.setItemText(0, complet_result['body']['form']['tabDataLytNames']['index_0'])
+            toolbox_cf.setItemText(1, complet_result['body']['form']['tabDataLytNames']['index_1'])
+        except Exception:
+            pass
+        finally:
+            return title
 
 
     def _open_help(self, feature_type):
@@ -776,8 +788,9 @@ class GwInfo(QObject):
 
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
-            # self.layer.editingStopped.connect(self.fct_stop_editing)
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').triggered.connect(self.fct_block_action_edit)
+            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
+            if action_toggle_editing:
+                action_toggle_editing.triggered.connect(self.fct_block_action_edit)
             self.connected = True
 
 
@@ -794,7 +807,9 @@ class GwInfo(QObject):
             pass
 
         try:
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
+            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
+            if action_toggle_editing:
+                action_toggle_editing.triggered.disconnect(self.fct_block_action_edit)
         except Exception:
             pass
 
@@ -811,12 +826,13 @@ class GwInfo(QObject):
         dlg_interpolate = GwInterpolate()
         tools_gw.load_settings(dlg_interpolate)
 
-        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, 'Interpolate tool. \n'
-                                'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
-                                'edit_node_interpolate on table config_param_user')
+        msg = ('Interpolate tool.\n'
+               'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
+               'edit_node_interpolate on table config_param_user')
+        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, msg)
 
-        dlg_interpolate.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
-                                   "interpolation\nNode1: \nNode2:")
+        msg = "Please, use the cursor to select two nodes to proceed with the interpolation\nNode1: \nNode2:"
+        dlg_interpolate.lbl_text.setText(msg)
 
         dlg_interpolate.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_interpolate))
         dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
@@ -1196,6 +1212,7 @@ class GwInfo(QObject):
 
 
     def _remove_layer_selection(self):
+
         try:
             self.layer.removeSelection()
         except RuntimeError:
@@ -2316,8 +2333,7 @@ class GwInfo(QObject):
         message = "Are you sure you want to delete these records?"
         answer = tools_qt.show_question(message, "Delete records", list_object_id)
         if answer:
-            sql = ("DELETE FROM " + table_name + ""
-                   " WHERE id::integer IN (" + list_id + ")")
+            sql = f"DELETE FROM {table_name} WHERE id::integer IN ({list_id})"
             tools_db.execute_sql(sql, log_sql=False)
             widget.model().select()
 
@@ -2609,6 +2625,7 @@ class GwInfo(QObject):
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
         """ Get values selected by the user and sets a new filter for its table model """
+
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
@@ -2617,6 +2634,7 @@ class GwInfo(QObject):
             message = "Selected date interval is not valid"
             tools_qgis.show_warning(message)
             return
+
         if type(table_name) is dict:
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
