@@ -171,6 +171,10 @@ class Giswater(QObject):
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
+        # Set init parameter 'max_retries'
+        max_retries = int(tools_gw.get_config_parser('system', 'max_retries', 'user', 'init', False))
+        global_vars.max_retries = max_retries
+
         # Define signals
         self._set_signals()
 
