@@ -1609,10 +1609,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql, is_thread=is_thread)
-        if is_thread:
-            return json_result,  global_vars.session_vars['last_error_msg']
-        else:
-            return json_result
+        return json_result
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
             json_result = manage_json_geometry(json_result)
@@ -1732,6 +1729,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
         return_manager = json_result['body']['returnManager']
     except KeyError:
         return
+
     srid = global_vars.data_epsg
     try:
         margin = None
@@ -1741,7 +1739,6 @@ def manage_json_return(json_result, sql, rubber_band=None):
             margin = return_manager['zoom']['margin']
 
         if 'style' in return_manager and 'ruberband' in return_manager['style']:
-            # Set default values
             width = 3
             color = QColor(255, 0, 0, 125)
             if 'transparency' in return_manager['style']['ruberband']:
