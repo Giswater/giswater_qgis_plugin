@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "checkAll":"True", "addSchema":"None"}}$$);
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ud"}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"503", "isAlone":"True", "value":"True", "addSchema":"ud"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
 
 
@@ -43,6 +43,7 @@ v_table text;
 v_tableid text;
 v_checkall boolean;
 v_geometry text;
+v_useatlas boolean;
 
 BEGIN
 
@@ -62,10 +63,12 @@ BEGIN
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
 	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
 	v_data = p_data->>'data';
-
-	-- profilactic control of selector type
+	
+	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
+	IF v_useatlas IS null then v_useatlas = true; END IF;
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -241,7 +244,7 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}}');
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "useAtlas":"',v_useatlas,'", "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	
