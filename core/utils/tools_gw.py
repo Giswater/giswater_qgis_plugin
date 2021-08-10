@@ -2065,13 +2065,14 @@ def manage_layer_manager(json_result, sql=None):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
+                    segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
                     layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
-                        layer_settings.setType(2)
+                        layer_settings.setTypeFlag(segment_flag)
                         layer_settings.setTolerance(15)
                         layer_settings.setEnabled(True)
                     else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
                     snapping_config = snapper_manager.get_snapping_options()
                     snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
