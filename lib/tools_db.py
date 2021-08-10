@@ -542,9 +542,15 @@ def get_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
-                      global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
-                      global_vars.dao_db_credentials['password'])
+    if global_vars.dao_db_credentials['service']:
+        uri.setConnection(global_vars.dao_db_credentials['service'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+    else:
+        uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+
     return uri
 
 # region private functions
