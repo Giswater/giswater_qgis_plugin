@@ -2088,7 +2088,7 @@ def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
-        class_object.feature_type = get_signal_change_tab(dialog)
+        class_object.feature_type = get_signal_change_tab(dialog, excluded_layers=class_object.excluded_layers)
     except AttributeError:
         # In case the dialog has no tab
         pass

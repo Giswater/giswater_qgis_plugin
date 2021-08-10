@@ -342,6 +342,9 @@ class GwPsector:
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
+        # Exclude the layer v_edit_element for adding relations
+        self.excluded_layers = ['v_edit_element']
+
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
