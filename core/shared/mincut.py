@@ -1280,7 +1280,7 @@ class GwMincut:
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
                f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
-        row = tools_db.get_row(sql, log_sql=False)
+        row = tools_db.get_row(sql)
         if not row:
             message = "Selected hydrometer_id not found"
             tools_qt.show_info_box(message, parameter=hydrometer_cc)
@@ -1894,7 +1894,7 @@ class GwMincut:
         # Get elemet_id from current mincut
         result_mincut_id = self.dlg_mincut.result_mincut_id.text()
         sql = f"SELECT anl_feature_id FROM om_mincut WHERE id = {result_mincut_id}"
-        row = tools_db.get_row(sql, log_sql=True)
+        row = tools_db.get_row(sql)
         if row:
             # Create task to manage Mincut execution
             element_id = row['anl_feature_id']

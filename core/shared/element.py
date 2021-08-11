@@ -659,7 +659,7 @@ class GwElement:
         sql = (f"SELECT * "
                f" FROM {table_object}"
                f" WHERE {table_object}_id = '{object_id}'")
-        row = tools_db.get_row(sql, log_info=False, log_sql=True)
+        row = tools_db.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
         if not row:

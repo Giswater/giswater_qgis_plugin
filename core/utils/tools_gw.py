@@ -1565,7 +1565,7 @@ def exec_pg_function(function_name, parameters=None, schema_name=None, commit=Tr
     attempt = 0
     while json_result is None and attempt < global_vars.max_retries:
         attempt += 1
-        tools_log.log_warning(f"Attempt {attempt} of {global_vars.max_retries}")
+        tools_log.log_info(f"Attempt {attempt} of {global_vars.max_retries}")
         json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql,
             log_result, json_loads, rubber_band, aux_conn, is_thread, check_function)
         complet_result = json_result
@@ -2528,7 +2528,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
-    row = tools_db.get_row(sql, log_sql=False)
+    row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
         if row[0]:

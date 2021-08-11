@@ -2282,7 +2282,7 @@ class GwInfo(QObject):
                " FROM " + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = tools_db.get_row(sql, log_info=False, log_sql=False)
+        row = tools_db.get_row(sql, log_info=False)
 
         # If object already exist show warning message
         if row:
@@ -2701,7 +2701,7 @@ class GwInfo(QObject):
 
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE visit_id = '{self.visit_id}'")
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         for path in rows:
             # Open selected document
             status, message = tools_os.open_file(path[0])
@@ -2932,7 +2932,7 @@ class GwInfo(QObject):
 
         sql = (f"SELECT gallery, document FROM {table_name}"
                f" WHERE event_id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
-        row = tools_db.get_row(sql, log_sql=False)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
