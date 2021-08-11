@@ -302,11 +302,9 @@ BEGIN
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
 
-			IF v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
-				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-				"feature":{"catFeature":"'||v_cat_feature||'"}, 
-				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-			END IF;
+            EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+            "feature":{"catFeature":"'||v_cat_feature||'"}, 
+            "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			
 		END LOOP;
 		
@@ -435,11 +433,9 @@ BEGIN
 			v_return_msg = 'Process finished successfully';
 			END IF;
 
-			IF v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
-				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-				"feature":{"catFeature":"'||v_cat_feature||'"}, 
-				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-			END IF;
+            EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+            "feature":{"catFeature":"'||v_cat_feature||'"}, 
+            "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			
 			--create trigger on view 
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||
