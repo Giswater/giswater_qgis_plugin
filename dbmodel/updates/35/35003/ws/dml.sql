@@ -204,13 +204,13 @@ update config_form_fields set widgetcontrols='{"setMultiline":true}' WHERE formn
 
 
 INSERT INTO inp_controls (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_controls_x_arc_
+SELECT arc.sector_id, text, active FROM _inp_controls_x_arc_
 JOIN arc USING(arc_id);
 
 INSERT INTO inp_rules (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_rules_x_arc_
+SELECT arc.sector_id, text, active FROM _inp_rules_x_arc_
 JOIN arc USING(arc_id);
 
 INSERT INTO inp_rules (sector_id, text, active)
-SELECT sector_id, text, active FROM _inp_rules_x_node_
+SELECT node.sector_id, text, active FROM _inp_rules_x_node_
 JOIN node USING(node_id);

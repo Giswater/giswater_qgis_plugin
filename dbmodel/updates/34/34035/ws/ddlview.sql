@@ -369,7 +369,7 @@ CREATE OR REPLACE VIEW v_om_mincut_hydrometer AS
     connec.code AS connec_code
    FROM selector_mincut_result,
     om_mincut_hydrometer
-     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id = ext_rtc_hydrometer.id
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
      JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
      JOIN connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id

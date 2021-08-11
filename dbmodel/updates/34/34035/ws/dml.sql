@@ -26,7 +26,8 @@ UPDATE config_param_system set standardvalue = 'True' WHERE parameter = 'admin_r
 
 INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, 
 iseditable, isautoupdate, layoutname, hidden)
-VALUES ('new_dma','form_catalog','dma_id',2, 'string', 'text', 'Dma id',false, false,true,false,'lyt_data_1',false); 
+VALUES ('new_dma','form_catalog','dma_id',2, 'string', 'text', 'Dma id',false, false,true,false,'lyt_data_1',false)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING; 
 
 UPDATE config_form_fields SET layoutorder=3 WHERE formname='new_dma' AND columnname='name';
 
