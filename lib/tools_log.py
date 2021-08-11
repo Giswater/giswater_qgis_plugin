@@ -19,13 +19,16 @@ from . import tools_qt, tools_os
 class GwLogger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
-                 remove_previous=False, log_limit_characters=None):
+                 remove_previous=False, log_limit_characters=None, tab_name=None):
 
         # Create logger
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(int(log_level))
         self.min_log_level = int(log_level)
         self.log_limit_characters = log_limit_characters
+        self.tab_name = tab_name
+        if self.tab_name is None:
+            self.tab_name = global_vars.plugin_name
 
         # Define log folder in users folder
         main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -44,7 +47,7 @@ class GwLogger(object):
         filepath += ".log"
 
         self.log_folder = log_folder
-        log_info(f"Log file: {filepath}", logger_file=False)
+        log_info(f"Log file: {filepath}", logger_file=False, tab_name=self.tab_name)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
         self.filepath = filepath
@@ -149,13 +152,13 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name, min_log_level=20, log_limit_characters=None):
+def set_logger(logger_name, min_log_level=20, log_limit_characters=None, tab_name=None):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:
         log_suffix = '%Y%m%d'
         global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix),
-            log_limit_characters=log_limit_characters)
+            log_limit_characters=log_limit_characters, tab_name=tab_name)
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.logger.min_message_level = values.get(int(min_log_level), 0)
 
@@ -205,7 +208,7 @@ def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=N
             msg += f": {parameter}"
 
     if tab_name is None:
-        tab_name = global_vars.plugin_name
+        tab_name = global_vars.logger.tab_name
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if global_vars.logger and message_level >= global_vars.logger.min_message_level:
