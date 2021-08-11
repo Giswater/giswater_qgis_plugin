@@ -2528,7 +2528,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
-    row = tools_db.get_row(sql, log_sql=False)
+    row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
         if row[0]:

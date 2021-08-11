@@ -1800,7 +1800,7 @@ class GwAdminButton:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
@@ -2579,13 +2579,13 @@ class GwAdminButton:
         body = body.replace('""', 'null')
 
         # Execute query
-        json_result = tools_gw.execute_procedure('gw_fct_admin_manage_child_views', body,
-                                                 schema_name=schema_name, commit=True)
+        json_result = tools_gw.execute_procedure('gw_fct_admin_manage_child_views', body, schema_name)
         self._manage_json_message(json_result, title="Create child view")
 
 
     def _update_sys_fields(self):
         """"""
+
         # Create the dialog and signals
         self.dlg_manage_sys_fields = GwAdminSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
@@ -2970,8 +2970,7 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
                 return
@@ -3012,8 +3011,7 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Field update in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
                 return
@@ -3029,8 +3027,7 @@ class GwAdminButton:
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Delete function")
 
         # Close dialog

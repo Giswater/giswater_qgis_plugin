@@ -41,7 +41,7 @@ class GwVisitGallery:
         # Get all pictures for event_id | visit_id
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         num = len(rows)
         for m in range(0, num):
             self.img_path_list1D.append(rows[m][0])

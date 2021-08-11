@@ -248,7 +248,7 @@ class GwFeatureEndButton(GwAction):
 
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN {ids} AND arc_state = '1'")
-            row = tools_db.get_row(sql, log_sql=True)
+            row = tools_db.get_row(sql)
 
         if row:
             self.dlg_work = GwFeatureEndConnecUi()
@@ -445,6 +445,7 @@ class GwFeatureEndButton(GwAction):
 
     def _close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
+
         tools_gw.close_dialog(dlg)
         tools_gw.open_dialog(self.dlg_work_end)
 
@@ -458,8 +459,8 @@ class GwFeatureEndButton(GwAction):
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
-                   "WHERE  fid = 128 AND cur_user = current_user")
-            rows = tools_db.get_rows(sql, log_sql=False)
+                   "WHERE fid = 128 AND cur_user = current_user")
+            rows = tools_db.get_rows(sql)
             ids_ = ""
             if rows:
                 for row in rows:
