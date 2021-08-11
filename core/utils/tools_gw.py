@@ -1628,6 +1628,10 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         tools_log.log_warning(sql)
         return None
 
+    # Log result
+    if log_sql:
+        tools_log.log_db(row[0])
+
     # Get json result
     if json_loads:
         # If content of row[0] is not a to json, cast it

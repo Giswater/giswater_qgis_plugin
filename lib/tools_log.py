@@ -194,6 +194,20 @@ def log_error(text=None, context_name=None, parameter=None, logger_file=True, st
         global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
 
 
+def log_db(text=None, color="black", bold='b', message_level=0, logger_file=True, stack_level_increase=0):
+    """ Write information message into QGIS Log Messages Panel (tab DB) """
+
+    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
+    tab_name = global_vars.logger.tab_db
+    msg = f'<font color="{color}"><{bold}>{text}</font>'
+    if global_vars.logger and message_level >= global_vars.logger.min_message_level:
+        QgsMessageLog.logMessage(msg, tab_name, message_level)
+
+    # Log same message into logger file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text, stack_level_increase=stack_level_increase)
+
+
 def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
     """
     Write message into QGIS Log Messages Panel with selected message level
