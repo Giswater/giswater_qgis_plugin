@@ -138,7 +138,7 @@ class Giswater(QObject):
         # Create log file
         min_log_level = 20
         log_limit_characters = None
-        tools_log.set_logger(self.plugin_name, min_log_level, log_limit_characters, "GiswaterPy")
+        tools_log.set_logger(self.plugin_name, min_log_level, log_limit_characters)
         tools_log.log_info("Initialize plugin")
 
         # Check if config file exists
