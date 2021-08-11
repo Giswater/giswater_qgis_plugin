@@ -92,7 +92,7 @@ class GwMenuLoad(QObject):
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
 
-        action_set_log_sql = actions_menu.addAction(f"Toggle log sql")
+        action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
             tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",

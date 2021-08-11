@@ -109,7 +109,6 @@ def refresh_attribute_table(**kwargs):
                 layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
 
 
-
 def refresh_canvas(**kwargs):
     """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
 
@@ -230,7 +229,8 @@ def load_qml(**kwargs):
 
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
-            widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
+        widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget)) """
+
     status, message = tools_os.open_file(widget.text())
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=widget.text())
