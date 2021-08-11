@@ -2503,7 +2503,7 @@ class GwInfo(QObject):
 
         table_hydro_value = "v_ui_hydroval_x_connec"
 
-        # Populate combo filter hydrometer value
+        # Populate combo filter hydrometer peridod
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
                f"FROM ext_cat_period as t1 "
                f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
@@ -2513,6 +2513,7 @@ class GwInfo(QObject):
             return False
         tools_qt.fill_combo_values(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
+        # Populate combo filter hydrometer peridod
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '" + str(self.feature_id) + "' "
