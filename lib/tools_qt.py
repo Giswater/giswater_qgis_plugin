@@ -617,6 +617,8 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
+    if expr_filter:
+        qtable.model().setFilter(expr_filter)
     model.select()
 
     # Check for errors
@@ -625,8 +627,6 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
 
     # Attach model to tableview
     qtable.setModel(model)
-    if expr_filter:
-        qtable.model().setFilter(expr_filter)
 
 
 def add_layer_to_toc(layer, group=None):
