@@ -91,7 +91,7 @@ BEGIN
 
 		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
-			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
+			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 
 		END LOOP;
