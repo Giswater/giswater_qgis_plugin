@@ -362,19 +362,21 @@ BEGIN
 		' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_geometry;
 	END IF;
-
+	
 	-- Get geometry for elements without geometry
-	IF v_project_type = 'WS' THEN
-		select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from 
-		(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id) 
-				UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
-				UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;		
-	ELSIF v_project_type = 'UD' THEN
-		select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from 
-		(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id) 
-				UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
-				UNION SELECT the_geom, element_id FROM gully JOIN element_x_gully USING (gully_id)
-				UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;		
+	IF v_the_geom is not null AND v_sourcetable = 'element' THEN
+		IF v_project_type = 'WS' THEN
+			select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from 
+			(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id) 
+					UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
+					UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;		
+		ELSIF v_project_type = 'UD' THEN
+			select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from 
+			(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id) 
+					UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
+					UNION SELECT the_geom, element_id FROM gully JOIN element_x_gully USING (gully_id)
+					UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;		
+		END IF;
 	END IF;
 
 	IF v_tablename != v_sourcetable THEN
