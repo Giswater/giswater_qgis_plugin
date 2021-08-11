@@ -30,3 +30,5 @@ VALUES (101, 'Connecs by exploitation','SELECT connec_id, code, customer_code FR
 "dvquerytext":"Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"}]');
 
 ALTER SEQUENCE config_report_id_seq RESTART 900;
+
+DELETE FROM config_toolbox WHERE id=2522;
