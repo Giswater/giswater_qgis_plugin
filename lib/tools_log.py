@@ -9,6 +9,7 @@ import logging
 import inspect
 import os
 import time
+import json
 
 from qgis.core import QgsMessageLog
 
@@ -194,14 +195,16 @@ def log_error(text=None, context_name=None, parameter=None, logger_file=True, st
         global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
 
 
-def log_db(text=None, color="black", bold='b', message_level=0, logger_file=True, stack_level_increase=0):
+def log_db(text=None, color="black", bold='', message_level=0, logger_file=True, stack_level_increase=0):
     """ Write information message into QGIS Log Messages Panel (tab DB) """
 
-    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
-    tab_name = global_vars.logger.tab_db
+    if type(text) is dict:
+        text = json.dumps(text)
     msg = f'<font color="{color}"><{bold}>{text}</font>'
+
+    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if global_vars.logger and message_level >= global_vars.logger.min_message_level:
-        QgsMessageLog.logMessage(msg, tab_name, message_level)
+        QgsMessageLog.logMessage(msg, global_vars.logger.tab_db, message_level)
 
     # Log same message into logger file
     if global_vars.logger and logger_file:

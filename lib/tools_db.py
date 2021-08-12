@@ -562,7 +562,7 @@ def _get_sql(sql, log_sql=False, params=None):
     if params:
         sql = global_vars.dao.mogrify(sql, params)
     if log_sql:
-        tools_log.log_db(sql, bold='', stack_level_increase=2)
+        tools_log.log_db(sql, bold='b', stack_level_increase=2)
 
     return sql
 
