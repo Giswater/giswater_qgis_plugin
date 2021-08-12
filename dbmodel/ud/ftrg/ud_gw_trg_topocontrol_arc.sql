@@ -218,17 +218,18 @@ BEGIN
 			END IF;
 
 			-- calculate sys_elev_1 & sys_elev_2 when USE top_elevation values from node and depth values from arc
-			IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
+			IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) AND (nodeRecord1.top_elev IS NULL AND nodeRecord1.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
 				sys_elev1_aux = nodeRecord1.sys_elev;
-				sys_y1_aux = null;
+		
 			ELSE
 				sys_y1_aux:= (CASE WHEN NEW.custom_y1 IS NOT NULL THEN NEW.custom_y1
 						   WHEN NEW.y1 IS NOT NULL THEN NEW.y1
 						   ELSE nodeRecord1.sys_ymax END);
 				sys_elev1_aux := nodeRecord1.sys_top_elev - sys_y1_aux;
+				
 			END IF;
 
-			IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
+			IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) AND (nodeRecord2.top_elev IS NULL AND nodeRecord2.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
 				sys_elev2_aux = nodeRecord2.sys_elev;
 				sys_y2_aux = null;
 			ELSE
@@ -236,6 +237,7 @@ BEGIN
 						   WHEN NEW.y2 IS NOT NULL THEN NEW.y2
 						   ELSE nodeRecord2.sys_ymax END);
 				sys_elev2_aux := nodeRecord2.sys_top_elev - sys_y2_aux;
+				
 			END IF;
 
 			-- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc 
@@ -264,8 +266,8 @@ BEGIN
 				IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL)
 				OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
 					sys_elev1_aux = NEW.custom_elev1;
-				ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)
-				OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
+				ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)	OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) 
+				OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
 					sys_elev1_aux = NEW.elev1;
 				END IF;
 
@@ -303,7 +305,6 @@ BEGIN
 					NEW.sys_elev1 := NEW.sys_elev2;
 					NEW.sys_elev2 := y_aux;
 				ELSE 
-
 					NEW.sys_elev1 := sys_elev1_aux;
 					NEW.sys_elev2 := sys_elev2_aux;
 				
