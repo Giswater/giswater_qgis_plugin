@@ -133,7 +133,7 @@ raise notice 'p_formname -->%',p_formname ;
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
 		
-			SELECT '||v_label||', columnname, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, widgettype,
+			SELECT '||v_label||', columnname, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			widgetfunction, '||v_device||' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, isfilter
@@ -148,7 +148,7 @@ raise notice 'p_formname -->%',p_formname ;
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
 				(SELECT concat(unit, ''. '', descript) AS label, identif AS columnname, ''label'' AS widgettype,
-				concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
+				concat (tabname,''_'',identif) AS widgetname, ''string'' AS datatype, 
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , 
@@ -157,7 +157,7 @@ raise notice 'p_formname -->%',p_formname ;
 				FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
 				SELECT label, columnname, widgettype,
-				concat ('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, datatype,
+				concat(tabname,''_'',columnname) AS widgetname, datatype,
 				tooltip, placeholder, iseditable, layoutorder+100 as layoutorder, ''lyt_plan_1'' as layoutname,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,
 				NULL AS widgetfunction, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
