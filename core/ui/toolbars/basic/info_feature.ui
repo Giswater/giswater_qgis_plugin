@@ -14,11 +14,11 @@
    <string>Junction</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
      <layout class="QGridLayout" name="lyt_top_1"/>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QTabWidget" name="tab_main">
       <property name="font">
        <font>
@@ -34,7 +34,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -51,8 +51,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>761</width>
-             <height>382</height>
+             <width>753</width>
+             <height>349</height>
             </rect>
            </property>
            <attribute name="label">
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>761</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -95,13 +95,13 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="1" column="0">
-         <layout class="QGridLayout" name="lyt_elements_2"/>
+         <layout class="QGridLayout" name="lyt_element_2"/>
         </item>
         <item row="0" column="0">
-         <layout class="QGridLayout" name="lyt_elements_1"/>
+         <layout class="QGridLayout" name="lyt_element_1"/>
         </item>
         <item row="2" column="0">
-         <layout class="QGridLayout" name="lyt_elements_3"/>
+         <layout class="QGridLayout" name="lyt_element_3"/>
         </item>
        </layout>
       </widget>
@@ -111,13 +111,13 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="0">
-         <layout class="QGridLayout" name="lyt_relations_2"/>
+         <layout class="QGridLayout" name="lyt_relation_2"/>
         </item>
         <item row="0" column="0">
-         <layout class="QGridLayout" name="lyt_relations_1"/>
+         <layout class="QGridLayout" name="lyt_relation_1"/>
         </item>
         <item row="2" column="0">
-         <layout class="QGridLayout" name="lyt_relations_3"/>
+         <layout class="QGridLayout" name="lyt_relation_3"/>
         </item>
        </layout>
       </widget>
@@ -590,72 +590,14 @@
         <string>Document</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="3" column="0">
-         <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0" columnstretch="0,0,0">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-          <property name="verticalSpacing">
-           <number>6</number>
-          </property>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>To:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QDateEdit" name="date_document_from">
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDateEdit" name="date_document_to">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="doc_type"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>From:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Type:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="0" column="0">
-         <layout class="QGridLayout" name="lyt_documents_1"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <layout class="QGridLayout" name="lyt_documents_3"/>
+         <layout class="QGridLayout" name="lyt_document_1"/>
         </item>
         <item row="1" column="0">
-         <layout class="QGridLayout" name="lyt_documents_2"/>
+         <layout class="QGridLayout" name="lyt_document_2"/>
+        </item>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_document_3"/>
         </item>
        </layout>
       </widget>
@@ -687,13 +629,13 @@
       </widget>
      </widget>
     </item>
-    <item>
+    <item row="2" column="0">
      <layout class="QGridLayout" name="lyt_bot_1"/>
     </item>
-    <item>
+    <item row="3" column="0">
      <layout class="QGridLayout" name="lyt_bot_2"/>
     </item>
-    <item>
+    <item row="4" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <spacer name="horizontalSpacer">
