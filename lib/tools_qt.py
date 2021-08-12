@@ -617,8 +617,8 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
-    if expr_filter:
-        qtable.model().setFilter(expr_filter)
+    if expr_filter is not None:
+        model.setFilter(expr_filter)
     model.select()
 
     # Check for errors
