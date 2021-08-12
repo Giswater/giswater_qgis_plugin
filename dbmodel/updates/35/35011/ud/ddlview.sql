@@ -654,4 +654,4 @@ SELECT * FROM (SELECT link.link_id,
     a.vnode_topelev
     FROM query_text a
     JOIN (SELECT link_id, max(link_class) link_class FROM query_text GROUP BY link_id) b USING (link_id)
-    WHERE a.link_class = b.link_class
+    WHERE a.link_class = b.link_class;
