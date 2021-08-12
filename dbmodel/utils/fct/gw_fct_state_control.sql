@@ -22,18 +22,21 @@ v_num_feature integer;
 v_downgrade_force boolean;
 v_state_type integer;
 v_psector_list text;
+v_schemaname text;
+v_channel text;
 
 rec_feature record;
 
 BEGIN 
 
-    SET search_path="SCHEMA_NAME", public;
+	SET search_path="SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_downgrade_force:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	
-    -- control for downgrade features to state(0)
-    IF tg_op_aux = 'UPDATE' THEN
+	-- control for downgrade features to state(0)
+	IF tg_op_aux = 'UPDATE' THEN
 		IF feature_type_aux='NODE' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM node WHERE node_id=feature_id_aux;
 			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
@@ -196,7 +199,7 @@ BEGIN
 				END IF;
 			END IF;	
 		END IF;
-    END IF;
+	END IF;
 
 	-- control of insert/update nodes with state(2)
 	IF feature_type_aux='NODE' THEN
@@ -204,8 +207,9 @@ BEGIN
 	ELSIF feature_type_aux='ARC' THEN
 		SELECT state INTO v_old_state FROM arc WHERE arc_id=feature_id_aux;
 	END IF;
-	
+
 	IF tg_op_aux = 'INSERT' THEN
+	
 		IF state_aux=2 THEN
 		
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
@@ -226,16 +230,28 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';
 			END IF;
+
+			-- force visible psector vdefault
+			IF (SELECT psector_id FROM selector_psector WHERE cur_user = current_user AND psector_id = v_psector_vdefault) IS NULL THEN
+				-- insert selector
+				INSERT INTO selector_psector VALUES (v_psector_vdefault, current_user);
+				-- message to user 
+				v_channel = replace(current_user,'.','_');
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"showMessage", "parameters":{"type":"textWindow", "level":1, "text":"Current psector have been selected"}},
+				{"name":"getSelectors","parameters":{"tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');			
+				
+			END IF;
 		END IF;
 	
 	ELSIF tg_op_aux = 'UPDATE' THEN
+	
 		IF state_aux=2 AND v_old_state<2 THEN
 		
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
 			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":1, "duration":10, "text":"Current psector have been selected"}},
+				{"name":"get_selector","parameters":{"current_tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 			END IF;
 
 			-- check user's variable
@@ -245,10 +261,19 @@ BEGIN
 				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
+			-- force visible psector vdefault
+			IF (SELECT psector_id FROM selector_psector WHERE cur_user = current_user AND psector_id = v_psector_vdefault) IS NULL THEN
+				-- insert selector
+				INSERT INTO selector_psector VALUES (v_psector_vdefault, current_user);	
+				-- message to user 
+				v_channel = replace(current_user,'.','_');
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":1, "duration":10, "text":"Current psector have been selected"}},
+				{"name":"get_selector","parameters":{"current_tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');		
+			END IF;
+
 			-- TODO: check for nodes in order to disconnect arcs
 			-- TODO: check for arcs in order to disconnect links and vnodes
 
-			
 		ELSIF state_aux<2 AND v_old_state=2 THEN
 
 			-- check user's role
@@ -266,3 +291,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+  
