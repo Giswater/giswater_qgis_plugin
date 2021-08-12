@@ -23,10 +23,7 @@ MAIN CHANGES
 - It's forbidden to connec links on vnode without arcs.
 - Connect_to_network works also with node/connec/gully as endpoints (deprecated)
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["3201","3200"]},
-"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
@@ -69,32 +66,43 @@ v_message text;
 v_version text;
 v_autoupdate_dma boolean;
 v_autoupdate_fluid boolean;
+v_forcedarcs text;
 
 BEGIN
 	
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-    SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
-    IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
+	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
+	IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
 
-    -- select project type
-    SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	-- select project type
+	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- control autoupdate_dma
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 
-    -- Get parameters from input json
-    v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
-    v_feature_text = ((p_data ->>'feature')::json->>'id'::text);
+	-- get parameters from input json
+	v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
+	v_feature_text = ((p_data ->>'feature')::json->>'id'::text);
+	v_forcedarcs = (p_data->>'data')::json->>'forcedArcs';
+	
+	-- create query text for forced arcs
+	if v_forcedarcs is null then
+		v_forcedarcs= '';
+	else
+		v_forcedarcs = replace(ARRAY(SELECT json_array_elements_text(((p_data::json->>'data')::json->>'forcedArcs')::json))::text, '{','(');
+		v_forcedarcs = concat (' AND arc_id::integer IN ', replace (v_forcedarcs, '}',')'));
+	end if;
 
-    IF v_feature_text ILIKE '[%]' THEN
+	-- get values from feature array 
+	IF v_feature_text ILIKE '[%]' THEN
 		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 		
-    ELSE 
+	ELSE 
 		EXECUTE v_feature_text INTO v_feature_text;
 		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 
-    END IF;
+	END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 217 AND cur_user=current_user;
@@ -104,11 +112,11 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, '-------------------------------------------------------------');
 	
 
-    -- Main loop
-    IF v_feature_array IS NOT NULL THEN
+	-- Main loop
+	IF v_feature_array IS NOT NULL THEN
 	
-	FOREACH v_connect_id IN ARRAY v_feature_array
-	LOOP	
+	    FOREACH v_connect_id IN ARRAY v_feature_array
+	    LOOP	
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (217, null, 4, concat('Connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
@@ -140,14 +148,16 @@ BEGIN
 		IF v_connect.arc_id IS NULL THEN
 
 			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
-				WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state > 0)
-				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
+				EXECUTE 'WITH index_query AS(
+				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT arc_id FROM index_query ORDER BY distance limit 1'
+				INTO v_connect.arc_id;
 			
 			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
-				WITH index_query AS(
-				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0)
-				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
+				EXECUTE 'WITH index_query AS(
+				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT arc_id FROM index_query ORDER BY distance limit 1'
+				INTO v_connect.arc_id;			
 			END IF;
 		END IF;
 			
@@ -316,9 +326,9 @@ BEGIN
 		v_arc := null;
 		v_vnode := null;
 
-	END LOOP;
+	    END LOOP;
 
-    END IF;
+	END IF;
    
 	--  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	--"data":{"message":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
@@ -330,16 +340,15 @@ BEGIN
 	WHERE cur_user="current_user"() AND fid = 217 ORDER BY criticity desc, id asc) row;
 	
 	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Process done successfully';
-    ELSE
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Process done successfully';
+	ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-
-    END IF;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+	END IF;
 
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
@@ -349,7 +358,7 @@ BEGIN
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
 	--  Return
-     RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||

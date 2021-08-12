@@ -4,3 +4,6 @@
 - New sys process 394: Check wrong topology for links
 - Create new function to execute report queries
 - Create new table config_report for configuration of personalized reports
+- Bug fix on v_edit_link when planned links
+- Force visible current psector when user is editing on planned mode
+- Enhance arcdivide function forcing new closest arc on network always will be some child arc created

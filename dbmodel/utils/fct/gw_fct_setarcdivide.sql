@@ -517,18 +517,17 @@ BEGIN
 							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
 						END IF;
 
-
 						-- reconnect operative links
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
+							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 						END IF;
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
+							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
@@ -538,7 +537,8 @@ BEGIN
 						FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
 						WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
 						LOOP
-							SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+							SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
+							AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
 							UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 							v_arc_closest = null;
 						END LOOP;
@@ -562,6 +562,7 @@ BEGIN
 								UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
 							END IF;							
 						END LOOP;
+						
 						IF v_project_type = 'WS' THEN
 							--reconfigure mapzones
 							IF v_new_node_graf IS NOT NULL THEN
@@ -733,7 +734,8 @@ BEGIN
 							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
 							WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
 							LOOP
-								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
+								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
 								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
 							END LOOP;
@@ -784,7 +786,8 @@ BEGIN
 							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
 							WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
 							LOOP
-								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id AND arc_id !=v_arc_id LIMIT 1; 
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
+								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 	
 								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
