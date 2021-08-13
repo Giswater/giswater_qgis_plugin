@@ -12,7 +12,7 @@ import webbrowser
 
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
-from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
 
@@ -40,14 +40,14 @@ def add_object(**kwargs):
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
     qtable_name = func_params['targetwidget']
-    qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+    qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
     filter_sign = '='
     if button.property('widgetcontrols') is not None and 'filterSign' in button.property('widgetcontrols'):
         if button.property('widgetcontrols')['filterSign'] is not None:
             filter_sign = button.property('widgetcontrols')['filterSign']
 
     # Get values from dialog
-    object_id = tools_qt.get_text(dialog, f"{tab_name}_{func_params['sourcewidget']}")
+    object_id = tools_qt.get_text(dialog, f"{func_params['sourcewidget']}")
     if object_id == 'null':
         message = "You need to insert data"
         tools_qgis.show_warning(message, parameter=func_params['sourcewidget'])
@@ -57,13 +57,13 @@ def add_object(**kwargs):
     view_object = f"v_ui_{func_params['sourceview']}"
     sql = ("SELECT * FROM " + view_object + ""
            " WHERE id = '" + object_id + "'")
-    row = tools_db.get_row(sql)
+    row = tools_db.get_row(sql, log_sql=True)
     if not row:
         tools_qgis.show_warning("Object id not found", parameter=object_id)
         return
 
     # Check if this object is already associated to current feature
-    field_object_id = func_params['sourcewidget']
+    field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
     tablename = func_params['sourceview'] + "_x_" + feature_type
     sql = ("SELECT * FROM " + str(tablename) + ""
            " WHERE " + str(field_id) + " = '" + str(feature_id) + "'"
@@ -86,13 +86,13 @@ def add_object(**kwargs):
                 current_date = QDate.currentDate()
                 date_to.setDate(current_date)
 
-
         linkedobject = ""
         if qtable.property('linkedobject') is not None:
             linkedobject = qtable.property('linkedobject')
 
         filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"{filter_sign}"}}'
         _fill_tbl(complet_result, dialog, qtable.objectName(), linkedobject, filter_fields)
+
 
 def delete_object(**kwargs):
     """ Delete selected objects (elements or documents) of the @widget
