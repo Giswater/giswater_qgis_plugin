@@ -1413,7 +1413,7 @@ class GwAdminButton:
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
         result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body,
-                                            schema_name=self.schema_name, commit=False, log_sql=True)
+                                            schema_name=self.schema_name, log_sql=True)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
