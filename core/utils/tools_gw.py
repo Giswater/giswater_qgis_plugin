@@ -1549,7 +1549,7 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def exec_pg_function(function_name, parameters=None, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
+def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
         is_thread=False, check_function=True):
     """ Manage execution of database function @function_name
         If execution failed, try to execute it again up to the value indicated in parameter 'max_retries'
@@ -1566,7 +1566,7 @@ def exec_pg_function(function_name, parameters=None, schema_name=None, log_sql=F
     while json_result is None and attempt < global_vars.max_retries:
         attempt += 1
         tools_log.log_info(f"Attempt {attempt} of {global_vars.max_retries}")
-        json_result = execute_procedure(function_name, parameters, schema_name, log_sql, rubber_band, aux_conn,
+        json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
             is_thread, check_function)
         complet_result = json_result
         if json_result is None or not json_result:
@@ -1587,11 +1587,12 @@ def exec_pg_function(function_name, parameters=None, schema_name=None, log_sql=F
     return dict_result
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
-        is_thread=False, check_function=True):
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, rubber_band=None,
+        aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
+    :param commit: Commit sql (bool)
     :param log_sql: Show query in qgis log (bool)
     :param aux_conn: Auxiliar connection to database used by threads (psycopg2.connection)
     :return: Response of the function executed (json)
@@ -1599,7 +1600,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, log_sql=
 
     # Check if function exists
     if check_function:
-        row = tools_db.check_function(function_name, schema_name, aux_conn=aux_conn)
+        row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn)
         if row in (None, ''):
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return None
@@ -1621,7 +1622,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, log_sql=
         log_sql = tools_os.set_boolean(dev_log_sql)
 
     # Execute database function
-    row = tools_db.get_row(sql, log_sql=log_sql, aux_conn=aux_conn)
+    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)

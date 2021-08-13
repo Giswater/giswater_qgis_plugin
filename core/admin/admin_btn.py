@@ -1412,8 +1412,8 @@ class GwAdminButton:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body,
-                                            schema_name=self.schema_name, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False,
+            log_sql=True)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
@@ -2318,8 +2318,7 @@ class GwAdminButton:
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = tools_gw.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body,
-                                            schema_name=schema, commit=False)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False)
         if not result or result['status'] == 'Failed':
             return
         self.task1.setProgress(100)
