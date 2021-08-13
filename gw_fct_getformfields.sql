@@ -125,7 +125,7 @@ raise notice 'p_formname -->%',p_formname ;
 			SELECT ',v_label,', columnname, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			CASE WHEN json_extract_path_text(widgetfunction,''parameters'',''sourcewidget'') IS NOT NULL THEN 
 			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
-			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget''))))::json
+			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''sourcewidget''))))::json
 			ELSE widgetfunction END AS widgetfunction,
 		 ',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
@@ -149,7 +149,7 @@ raise notice 'p_formname -->%',p_formname ;
 			SELECT ',v_label,', columnname, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			CASE WHEN json_extract_path_text(widgetfunction,''parameters'',''sourcewidget'') IS NOT NULL THEN 
 			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
-			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget''))))::json
+			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''sourcewidget''))))::json
 			ELSE widgetfunction END AS widgetfunction, 
 			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
