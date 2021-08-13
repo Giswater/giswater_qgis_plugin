@@ -161,7 +161,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
 
-    SELECT epsg INTO v_srid FROM sys_version LIMIT 1;
+    SELECT epsg INTO v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -331,7 +331,7 @@ BEGIN
 			END IF;
 		END LOOP;
 	END IF;
-
+	raise notice '00 -> %',v_query_result;
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
 	IF v_text IS NOT NULL THEN

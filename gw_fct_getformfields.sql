@@ -58,6 +58,11 @@ v_clause text;
 v_device text;
 v_debug boolean;
 v_debug_var text;
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug_sql json;
+v_msgerr json;
        
 BEGIN
 	raise notice '11 p_formname -->%',p_formname ;
@@ -73,7 +78,7 @@ BEGIN
 	INTO v_version;
 
 	-- get project type
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
 
 	IF v_debug = TRUE THEN
@@ -98,8 +103,9 @@ BEGIN
 	-- setting device
 	IF p_device IN (1,2,3) THEN
 		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
-		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
-		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     
+		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2'' 
+		     THEN ''footer'' ELSE ''body'' END) AS "position",
+		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';    
 	ELSE 
 		v_device = '';
 	END IF;
@@ -220,10 +226,19 @@ raise notice 'p_formname -->%',p_formname ;
 		END IF;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
-
-		--removing the not used keys
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+		
+		-- for typeahead widgets
+		IF aux_json->>'widgettype' = 'typeahead' and (aux_json->>'queryText') IS NOT NULL THEN
+		
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'getDataAction', 'dataset'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectAction', 'setWidgetValue'::text);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', 3);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'dataset', combo_json);
+		ELSE
+			--removing the not used keys
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+		END IF;
 
 	END LOOP;
 
@@ -322,6 +337,11 @@ raise notice 'p_formname -->%',p_formname ;
 	 
 	-- Return
 	RETURN fields_array;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$
