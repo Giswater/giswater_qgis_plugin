@@ -101,6 +101,9 @@ BEGIN
 	-- topology control
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
+		-- temporary disable linktonetwork
+		UPDATE config_param_user SET value='TRUE' WHERE parameter = 'edit_connec_disable_linktonetwork' AND cur_user = current_user;
+
 		-- control of relationship with connec / gully
 		SELECT * INTO v_connect FROM connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), connec.the_geom, v_link_searchbuffer) 
 		ORDER BY CASE WHEN state=1 THEN 1 WHEN state=2 THEN 2 WHEN state=0 THEN 3 END, st_distance(ST_StartPoint(NEW.the_geom), connec.the_geom) LIMIT 1;
@@ -573,6 +576,9 @@ BEGIN
 		END IF;
 		
 		RETURN NEW;
+
+		-- enable linktonetwork
+		UPDATE config_param_user SET value='FALSE' WHERE parameter = 'edit_connec_disable_linktonetwork' AND cur_user = current_user;
 		
 	ELSIF TG_OP = 'UPDATE' THEN 
 				
@@ -663,6 +669,9 @@ BEGIN
 			END IF;
 			
 		END IF;
+
+		-- enable linktonetwork
+		UPDATE config_param_user SET value='FALSE' WHERE parameter = 'edit_connec_disable_linktonetwork' AND cur_user = current_user;
 
 		RETURN NEW;
 						

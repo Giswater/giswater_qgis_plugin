@@ -32,3 +32,8 @@ VALUES (101, 'Connecs by exploitation','SELECT connec_id, code, customer_code FR
 ALTER SEQUENCE config_report_id_seq RESTART 900;
 
 DELETE FROM config_toolbox WHERE id=2522;
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefault) 
+VALUES ('edit_connec_disable_linktonetwork', 'hidden', 'Variable used on code to disable temporary linktonetowork, useful to increase performance and to prevent some conflicts',
+'role_epa', TRUE, 'FALSE')
+ON CONFLICT (id) DO NOTHING;

@@ -39,6 +39,7 @@ v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_message text;
 v_dsbl_error boolean;
+v_disable_linktonetwork boolean;
 
 BEGIN
 
@@ -52,12 +53,13 @@ BEGIN
 	
 	v_type_man_table:=v_man_table;
 	
-	--get system and user variables
+	-- get system and user variables
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
+	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
@@ -573,12 +575,14 @@ BEGIN
 				-- when arc_id comes from connec table
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 				
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL THEN
+				-- if connec already has link (using vnode)
+				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+
+				-- if variable to trigger link is enabled
+				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
@@ -710,41 +714,38 @@ BEGIN
 			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
 			pol_id=NEW.pol_id
 			WHERE connec_id=OLD.connec_id;	
-			
 		END IF;
 
 		-- man addfields update
-			IF v_customfeature IS NOT NULL THEN
-				FOR v_addfields IN SELECT * FROM sys_addfields
-				WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-				LOOP
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM sys_addfields
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
+			LOOP
 
-					EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
-						USING NEW
-						INTO v_new_value_param;
-		 
-					EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
-						USING OLD
-						INTO v_old_value_param;
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+	 
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING OLD
+					INTO v_old_value_param;
 
-					IF v_new_value_param IS NOT NULL THEN 
+				IF v_new_value_param IS NOT NULL THEN 
 
-						EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
-							ON CONFLICT (feature_id, parameter_id)
-							DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
-							USING NEW.connec_id , v_addfields.id, v_new_value_param;	
+					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+						ON CONFLICT (feature_id, parameter_id)
+						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+						USING NEW.connec_id , v_addfields.id, v_new_value_param;	
 
-					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
 
-						EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
-							USING NEW.connec_id , v_addfields.id;
-					END IF;
-				
-				END LOOP;
+					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+						USING NEW.connec_id , v_addfields.id;
+				END IF;
+			END LOOP;
 		END IF;
 
 		RETURN NEW;
-
 
 	ELSIF TG_OP = 'DELETE' THEN
 	

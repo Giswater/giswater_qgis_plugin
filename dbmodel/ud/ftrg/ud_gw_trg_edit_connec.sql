@@ -26,6 +26,8 @@ v_streetaxis2 text;
 v_matfromcat boolean = false;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
+v_disable_linktonetwork boolean;
+
 
 BEGIN
 
@@ -38,10 +40,13 @@ BEGIN
 		v_customfeature:=NULL;
 	END IF;
 
+	--get system and user variables
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
+	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid'
+	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
+
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	
-	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
@@ -470,12 +475,14 @@ BEGIN
 				-- when arc_id comes from connec table			
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 				
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
+				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL 
+				AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE
+				AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';

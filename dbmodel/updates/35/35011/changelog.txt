@@ -8,3 +8,4 @@
 - Force visible current psector when user is editing on planned mode
 - Enhance arcdivide function forcing new closest arc on network always will be some child arc created
 - Bug fix on ud elevations when elev where used on node and y on arc
+- New hidden variable used on code to disable temporary linktonetowork

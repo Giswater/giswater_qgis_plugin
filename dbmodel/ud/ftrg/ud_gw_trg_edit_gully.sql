@@ -52,6 +52,8 @@ v_streetaxis2 text;
 v_autorotation_disabled boolean;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
+v_disable_linktonetwork boolean;
+
     
 BEGIN
 
@@ -63,11 +65,13 @@ BEGIN
 		v_customfeature:=NULL;
 	END IF;
 
-	-- get values
+	-- get system and user variables
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
+
 
 	IF v_unitsfactor IS NULL THEN
 		v_doublegeometry = FALSE;
@@ -565,12 +569,14 @@ BEGIN
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL THEN				
+				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL 
+				AND v_disable_linktonetwork IS NOT TRUE THEN				
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
 				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE
+				AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';

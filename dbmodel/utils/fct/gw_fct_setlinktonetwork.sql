@@ -155,7 +155,7 @@ BEGIN
 			
 			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 				EXECUTE 'WITH index_query AS(
-				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;			
 			END IF;
@@ -257,23 +257,23 @@ BEGIN
 			IF v_feature_type ='CONNEC' THEN
 			
 				IF v_autoupdate_dma IS FALSE THEN
-                    UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
-                    WHERE connec_id = v_connect_id;
+					UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
+					pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+					WHERE connec_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values (except dma).'));
 				ELSE
-                    UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
-                    WHERE connec_id = v_connect_id;
+					UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
+					pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+					WHERE connec_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;
 				IF v_autoupdate_fluid IS TRUE THEN
 					UPDATE connec SET fluid_type = v_arc.fluid_type 
-                    WHERE connec_id = v_connect_id;
+					WHERE connec_id = v_connect_id;
 				END IF; 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
@@ -291,23 +291,23 @@ BEGIN
 			ELSIF v_feature_type ='GULLY' THEN 
 			
 				IF v_autoupdate_dma IS FALSE THEN
-                    UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
-                    WHERE gully_id = v_connect_id;
+					 UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, 
+					 pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+					 WHERE gully_id = v_connect_id;
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values (except dma).'));
 				ELSE
-                    UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-                    pjoint_type=v_pjointtype, pjoint_id=v_pjointid
-                    WHERE gully_id = v_connect_id;
+					UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
+					pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+					WHERE gully_id = v_connect_id;
 					
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;
 				IF v_autoupdate_fluid IS TRUE THEN
 					UPDATE gully SET fluid_type = v_arc.fluid_type 
-                    WHERE gully_id = v_connect_id;
+					WHERE gully_id = v_connect_id;
 				END IF; 
 
 				-- Update state_type if edit_connect_update_statetype is TRUE
