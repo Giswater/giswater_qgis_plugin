@@ -81,10 +81,10 @@ BEGIN
 			-- check inconsistency on inp_connec: More than one connec with same vnode and different pattern on inp_connec table
 			IF v_patternmethod = 23 THEN
 
-				v_count  = (SELECT count(pjoint_id) FROM inp_connec join connec USING (connec_id) group by pjoint_id, pattern_id having count(pjoint_id) > 1 
-					    AND count(pattern_id) < count(pjoint_id) order by 1);
+				v_count = (SELECT count(pjoint_id) FROM v_edit_inp_connec group by pjoint_id, pattern_id having count(pjoint_id) > 1 
+				AND count(pattern_id) < count(pjoint_id) order by 1 limit 1);
 
-				IF v_count > 0 THEN
+				IF v_count > 0 THEN			
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-162: There are ',v_count,' connec with same vnode and different pattern on inp_connec table'));
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
