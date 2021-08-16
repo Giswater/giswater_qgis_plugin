@@ -18,6 +18,43 @@
     <item row="0" column="0">
      <layout class="QGridLayout" name="lyt_top_1"/>
     </item>
+    <item row="2" column="0">
+     <layout class="QGridLayout" name="lyt_bot_1"/>
+    </item>
+    <item row="3" column="0">
+     <layout class="QGridLayout" name="lyt_bot_2"/>
+    </item>
+    <item row="4" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_accept">
+        <property name="text">
+         <string>Accept</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="tab_main">
       <property name="font">
@@ -158,49 +195,14 @@
         <string>Hydrometer values</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="lyt_hydrometer_val_1"/>
+        </item>
         <item row="1" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Cat period filter :</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="cmb_cat_period_id_filter"/>
-          </item>
-          <item>
-           <widget class="QLabel" name="lbl_cus_code">
-            <property name="text">
-             <string>Customer code:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="cmb_hyd_customer_code"/>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <layout class="QGridLayout" name="lyt_hydrometer_val_2"/>
         </item>
         <item row="2" column="0">
-         <widget class="QTableView" name="tbl_hydrometer_value">
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="lyt_hydrometer_val_3"/>
         </item>
        </layout>
       </widget>
@@ -209,111 +211,14 @@
         <string>Visit</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="0" column="0" colspan="3">
-         <layout class="QGridLayout" name="gridLayout_16">
-          <item row="1" column="1">
-           <widget class="QDateEdit" name="date_visit_to">
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>From:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>To:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QDateEdit" name="date_visit_from">
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="cmb_visit_class"/>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Visit class:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="lyt_visit_1"/>
         </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="btn_open_gallery_2">
-          <property name="maximumSize">
-           <size>
-            <width>24</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>../icons/136.png</normaloff>../icons/136.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>22</width>
-            <height>22</height>
-           </size>
-          </property>
-         </widget>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="lyt_visit_2"/>
         </item>
-        <item row="1" column="0" colspan="3">
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="0" colspan="3">
-         <widget class="QTableView" name="tbl_visit_cf"/>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_visit_3"/>
         </item>
        </layout>
       </widget>
@@ -322,205 +227,14 @@
         <string>Event</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_14">
-        <item row="3" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
-          <item>
-           <widget class="QPushButton" name="btn_open_visit">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_new_visit">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_gallery">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_visit_doc">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_visit_event">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="1" column="0">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="lyt_event_2"/>
         </item>
         <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout_15">
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>To:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>From:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Parameter type:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Parameter:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QDateEdit" name="date_event_from">
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDateEdit" name="date_event_to">
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="event_type"/>
-          </item>
-          <item row="1" column="3">
-           <widget class="QComboBox" name="event_id"/>
-          </item>
-         </layout>
+         <layout class="QGridLayout" name="lyt_event_1"/>
         </item>
-        <item row="4" column="0">
-         <widget class="QTableView" name="tbl_event_cf">
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_event_3"/>
         </item>
        </layout>
       </widget>
@@ -567,43 +281,6 @@
        </layout>
       </widget>
      </widget>
-    </item>
-    <item row="2" column="0">
-     <layout class="QGridLayout" name="lyt_bot_1"/>
-    </item>
-    <item row="3" column="0">
-     <layout class="QGridLayout" name="lyt_bot_2"/>
-    </item>
-    <item row="4" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_accept">
-        <property name="text">
-         <string>Accept</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Cancel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
