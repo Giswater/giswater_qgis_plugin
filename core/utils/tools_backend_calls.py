@@ -107,7 +107,7 @@ def delete_object(**kwargs):
     feature_type = complet_result['body']['feature']['featureType']
 
     qtable_name = func_params['targetwidget']
-    qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+    qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
 
     tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
 
@@ -250,8 +250,8 @@ def open_selected_element(**kwargs):
         function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
         at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-    qtable = kwargs['qtable']
     func_params = kwargs['func_params']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
     if len(selected_list) == 0:
