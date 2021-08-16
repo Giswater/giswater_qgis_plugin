@@ -126,6 +126,9 @@ raise notice 'p_formname -->%',p_formname ;
 			CASE WHEN json_extract_path_text(widgetfunction,''parameters'',''sourcewidget'') IS NOT NULL THEN 
 			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
 			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''sourcewidget''))))::json
+			WHEN json_extract_path_text(widgetfunction,''parameters'',''columnfind'') IS NOT NULL THEN 
+			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
+			''{parameters, columnfind}'', to_jsonb(concat(json_extract_path_text(widgetfunction,''parameters'',''columnfind''))))::json
 			ELSE widgetfunction END AS widgetfunction,
 		 ',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
@@ -150,6 +153,9 @@ raise notice 'p_formname -->%',p_formname ;
 			CASE WHEN json_extract_path_text(widgetfunction,''parameters'',''sourcewidget'') IS NOT NULL THEN 
 			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
 			''{parameters, sourcewidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''sourcewidget''))))::json
+			WHEN json_extract_path_text(widgetfunction,''parameters'',''columnfind'') IS NOT NULL THEN 
+			jsonb_set(jsonb_set(widgetfunction::jsonb,''{parameters, targetwidget}'', to_jsonb(concat(tabname,''_'',json_extract_path_text(widgetfunction,''parameters'',''targetwidget'')))),
+			''{parameters, columnfind}'', to_jsonb(concat(json_extract_path_text(widgetfunction,''parameters'',''columnfind''))))::json
 			ELSE widgetfunction END AS widgetfunction, 
 			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
@@ -360,7 +366,7 @@ raise notice 'p_formname -->%',p_formname ;
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 		END IF;
-		
+
 	END LOOP;
 
 	-- for the rest of widgets removing not used keys
