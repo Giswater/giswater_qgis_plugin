@@ -12,7 +12,7 @@ version=3.5.010
 
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
-# End of mandatory metadata
+# End of mandatory metadata.
 
 changelog=Version 3.5.010
     - Enhancement: manage epsg from QGIS project
