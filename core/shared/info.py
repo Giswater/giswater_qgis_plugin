@@ -572,18 +572,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_section, "207")
         tools_gw.add_icon(self.action_help, "73")
         tools_gw.add_icon(self.action_interpolate, "194")
-        # Set buttons icon
-        # tab hydrometer
-        tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
-        # tab visit
-        tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
-        # tab event
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b", "24x24")
-
 
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature):
@@ -602,14 +590,14 @@ class GwInfo(QObject):
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
                 # Layouts where the label goes above the widget
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_document_2', 'lyt_rpt_2', 'lyt_relation_2'):
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_document_1', 'lyt_rpt_2', 'lyt_relation_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 1, field['layoutorder'])
                     else:
                         layout.addWidget(widget, 1, field['layoutorder'])
                 # Layouts where the widget has no label
-                elif field['layoutname'] in ('lyt_rpt_1', 'lyt_element_1', 'lyt_document_1'):
+                elif field['layoutname'] in ('lyt_rpt_1', 'lyt_element_1'):
                     # layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 0, field['layoutorder']*2)
