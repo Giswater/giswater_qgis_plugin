@@ -34,7 +34,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--set custom feature custom view inserts
-	v_customfeature= TG_ARGV[0];
+	v_customfeature = TG_ARGV[0];
 
 	IF v_customfeature='parent' THEN
 		v_customfeature:=NULL;
