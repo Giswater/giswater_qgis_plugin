@@ -212,8 +212,8 @@ def open_selected_path(**kwargs):
         function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
         at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-    qtable = kwargs['qtable']
     func_params = kwargs['func_params']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
