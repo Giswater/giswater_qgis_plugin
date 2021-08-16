@@ -91,6 +91,7 @@ class GwFeatureEndButton(GwAction):
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_work_end.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -479,6 +480,7 @@ class GwFeatureEndButton(GwAction):
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
         self._set_edit_arc_downgrade_force('False')
+        tools_gw.remove_selection(True, layers=self.layers)
         self.canvas.refresh()
 
 
