@@ -22,10 +22,13 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('ve_arc_pipe', 'form_feature', 'visit', 'hspacer_lyt_document_1', 'lyt_visit_2', 1, 'hspacer', false, false, true, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'visit', 'open_gallery', 'lyt_visit_2', 2, 'button', 'Open gallery', false, false, true, false,  '{"icon":"136"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_visit", "parameters":{"sourcewidget":"visit_id", "targetwidget":"tbl_visits", "sourceview":"visit"}}', false, 'tbl_visit_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'visit', 'open_gallery', 'lyt_visit_2', 2, 'button', 'Open gallery', false, false, true, false,  '{"icon":"136b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_visit", "parameters":{"sourcewidget":"visit_id", "targetwidget":"tbl_visits", "sourceview":"visit"}}', false, 'tbl_visit_x_arc');
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'visit', 'tbl_visits', 'lyt_visit_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_path", "parameters":{"columnfind":"path"}}', 'tbl_visit_x_arc');
+
+
+
 
 
 -- TAB EVENT
@@ -42,8 +45,25 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'event', 'parameter_id', 'lyt_event_1', 4, 'string', 'combo',  'Parameter:', false, false, true, false, true, 'SELECT id as id, id as idval FROM config_visit_parameter WHERE feature_type IN (''ARC'', ''ALL'') ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_visit_x_arc');
 
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'open_visit', 'lyt_event_2', 1, 'button', 'Open visit', false, false, true, false, '{"icon":"65", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_visit_manager", "parameters":{}}', false, 'tbl_visit_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'new_visit', 'lyt_event_2', 2, 'button', 'New visit', false, false, true, false, '{"icon":"64", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "new_visit", "parameters":{}}', false, 'tbl_visit_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'hspacer_lyt_event_2', 'lyt_event_2', 10, 'hspacer', false, false, true, false);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetfunction, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'open_gallery', 'lyt_event_2', 11, 'button', 'Open gallery', false, false, true, false, '{"icon":"136b", "size":"24x24"}', '{"functionName": "manage_visit", "parameters":{"sourcewidget":"visit_id", "targetwidget":"tbl_event", "sourceview":"visit"}}', false, 'tbl_visit_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'open_visit_doc', 'lyt_event_2', 12, 'button', 'Open visit document', false, false, true, false, '{"icon":"170b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_visit_document", "parameters":{}}', false, 'tbl_visit_x_arc');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'open_visit_event', 'lyt_event_2', 13, 'button', 'Open visit event', false, false, true, false, '{"icon":"134b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_visit_event", "parameters":{}}', false, 'tbl_visit_x_arc');
 
--- TAB PLAN
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'event', 'tbl_events', 'lyt_event_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_visit_event", "parameters":{"columnfind":["visit_id", "event_id"]}}', 'tbl_visit_x_arc');
+
+
+
+
 -- TAB DOCUMENTS
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_document_1', 'lyt_document_1','lytDocuments1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_document_2', 'lyt_document_2','lytDocuments2');
@@ -57,15 +77,15 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'document', 'doc_id', 'lyt_document_2', 0, 'string', 'typeahead', 'Doc id:', false, false, true, false, 'SELECT id as id, id as idval FROM doc WHERE id IS NOT NULL ','{"saveValue": false, "filterSign":"ILIKE"}', '{"functionName": "filter_table"}', false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'insert_document', 'lyt_document_2', 2, 'button', 'Insert document', false, false, true, false,  '{"icon":"111"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "add_object", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'insert_document', 'lyt_document_2', 2, 'button', 'Insert document', false, false, true, false,  '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "add_object", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'delete_document', 'lyt_document_2', 3, 'button', 'Delete document', false, false, true, false,  '{"icon":"112"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "delete_object", "parameters":{"columnfind":"feature_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'delete_document', 'lyt_document_2', 3, 'button', 'Delete document', false, false, true, false,  '{"icon":"112b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "delete_object", "parameters":{"columnfind":"feature_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'new_document', 'lyt_document_2', 4, 'button', 'New document', false, false, true, false,  '{"icon":"131"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_document", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'new_document', 'lyt_document_2', 4, 'button', 'New document', false, false, true, false,  '{"icon":"131b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_document", "parameters":{"sourcewidget":"doc_id", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('ve_arc_pipe', 'form_feature', 'document', 'hspacer_lyt_document_1', 'lyt_document_2', 10, 'hspacer', false, false, true, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'open_doc', 'lyt_document_2', 11, 'button', 'Open document', false, false, true, false,  '{"icon":"170"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_selected_path", "parameters":{"columnfind":"path", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'document', 'open_doc', 'lyt_document_2', 11, 'button', 'Open document', false, false, true, false,  '{"icon":"170b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_selected_path", "parameters":{"columnfind":"path", "targetwidget":"tbl_documents", "sourceview":"doc"}}', false, 'tbl_doc_x_arc');
 
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetfunction, linkedobject)
@@ -92,13 +112,15 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'element', 'element_id', 'lyt_element_1', 1, 'string', 'typeahead', 'Element id:', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ','{"saveValue": false, "filterSign":"ILIKE"}', '{"functionName": "filter_table"}', false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'insert_element', 'lyt_element_1', 2, 'button', 'Insert element', false, false, true, false,  '{"icon":"111"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "add_object", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'insert_element', 'lyt_element_1', 2, 'button', 'Insert element', false, false, true, false,  '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "add_object", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'delete_element', 'lyt_element_1', 3, 'button', 'Delete element', false, false, true, false,  '{"icon":"112"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "delete_object", "parameters":{"columnfind":"feature_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'delete_element', 'lyt_element_1', 3, 'button', 'Delete element', false, false, true, false,  '{"icon":"112b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "delete_object", "parameters":{"columnfind":"feature_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'new_element', 'lyt_element_1', 4, 'button', 'New element', false, false, true, false,  '{"icon":"131"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_element", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'new_element', 'lyt_element_1', 4, 'button', 'New element', false, false, true, false,  '{"icon":"131b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "manage_element", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'open_element', 'lyt_element_1', 11, 'button', 'Open element', false, false, true, false,  '{"icon":"134"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_selected_element", "parameters":{"columnfind":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
+    VALUES ('ve_arc_pipe', 'form_feature', 'element', 'open_element', 'lyt_element_1', 11, 'button', 'Open element', false, false, true, false,  '{"icon":"134b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_selected_element", "parameters":{"columnfind":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
+
+
 
 
 -- TAB REALATIONS -- FET
@@ -109,6 +131,13 @@ INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
     VALUES ('tbl_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations WHERE rid IS NOT NULL', 4);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'relation', 'tbl_relations', 'lyt_relation_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}','{"functionName": "open_selected_feature", "parameters":{"columnfind":"feature_id", "tablefind":"sys_table_id"}}', false, 'tbl_relations');
+
+
+
+
+
+
+
 
 
 -- TAB RPT

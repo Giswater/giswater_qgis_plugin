@@ -590,7 +590,7 @@ class GwInfo(QObject):
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
                 # Layouts where the label goes above the widget
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_document_1', 'lyt_rpt_2', 'lyt_relation_2'):
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_document_1', 'lyt_rpt_2', 'lyt_relation_2', 'lyt_event_1'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 1, field['layoutorder'])
@@ -2171,17 +2171,18 @@ class GwInfo(QObject):
             self.tab_hydrometer_val_loaded = True
         # Tab 'Visit'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
-            self._fill_tab_visit(self.feature_type)
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
             self.tab_visit_loaded = True
         # Tab 'Event'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
-            self._fill_tab_event(self.feature_type)
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
             self.tab_event_loaded = True
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
-            # self._fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             self._init_tab(self.complet_result)
