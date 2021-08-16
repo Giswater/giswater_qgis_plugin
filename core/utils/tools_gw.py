@@ -1052,14 +1052,18 @@ def add_widget(dialog, field, lbl, widget):
         return
     row = int(field['layoutorder'])
     col = 0
-    if not isinstance(widget, QTableView):
+    if lbl is None:
+        col = row
+        row = 0
+    elif not isinstance(widget, QTableView):
         layout.addWidget(lbl, row, col)
         col = 1
     if type(widget) is QSpacerItem:
         layout.addItem(widget, row, col)
     else:
         layout.addWidget(widget, row, col)
-    layout.setColumnStretch(col, 1)
+    if lbl is not None:
+        layout.setColumnStretch(col, 1)
 
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
