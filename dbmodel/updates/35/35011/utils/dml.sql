@@ -37,3 +37,6 @@ INSERT INTO sys_param_user (id, formname, descript, sys_role, ismandatory, vdefa
 VALUES ('edit_connec_disable_linktonetwork', 'hidden', 'Variable used on code to disable temporary linktonetowork, useful to increase performance and to prevent some conflicts',
 'role_epa', TRUE, 'FALSE')
 ON CONFLICT (id) DO NOTHING;
+
+--2021/08/16
+INSERT INTO sys_function VALUES (3068, 'gw_fct_setendfeature','utils','function','json','json','Set features to obsolete','role_edit', NULL);

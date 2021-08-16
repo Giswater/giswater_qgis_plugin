@@ -24,6 +24,7 @@ v_state_type integer;
 v_psector_list text;
 v_schemaname text;
 v_channel text;
+v_result text;
 
 rec_feature record;
 
@@ -52,16 +53,24 @@ BEGIN
 
 				-- arcs control
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 1;
+
 				IF v_num_feature > 0 THEN 
+
+					v_result = 'SELECT array_agg(arc_id) FROM arc WHERE (node_1='|| quote_literal(feature_id_aux)||' OR node_2='|| quote_literal(feature_id_aux)||') AND arc.state = 1;';
+
+					EXECUTE v_result INTO v_result;
+
+					v_result=concat(feature_id_aux,' has associated arcs ',v_result);				
+
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||v_result||'"}}$$);';
 				END IF;
 
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2;
 				IF v_num_feature > 0 THEN 
 					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_arc 
 					JOIN plan_psector USING (psector_id) where arc_id IN 
-					(SELECT arc.arc_id FROM arc WHERE (node_1='1070' OR node_2='1070') AND arc.state = 2); 
+					(SELECT arc.arc_id FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2); 
 					
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'"}}$$);';
@@ -78,8 +87,9 @@ BEGIN
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
 			
 				-- arcs control
-				SELECT count(arc.arc_id) INTO v_num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
+				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF v_num_feature > 0 THEN 
+					
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						

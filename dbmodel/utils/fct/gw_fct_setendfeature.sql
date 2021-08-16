@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3022
+--FUNCTION CODE: 3068
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setendfeature(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setendfeature(p_data json)
@@ -26,8 +26,8 @@ v_error_context text;
 v_num_feature integer;
 v_psector_list text;
 v_psector_id text;
-v_id_list text[];
-rec_id text;
+v_id_list integer[];
+rec_id integer;
 v_result_info text;
 v_projecttype text;
 v_state_type integer;
@@ -37,6 +37,8 @@ v_audit_result text;
 v_status text;
 v_level integer;
 v_message text;
+v_result text;
+
 BEGIN
 
 	--  Set search path to local schema
@@ -46,8 +48,8 @@ BEGIN
 	EXECUTE 'SELECT value FROM config_param_system WHERE parameter=''admin_version'''
 	INTO v_version;
       
-    SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-    --set current process as users parameter
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+	--set current process as users parameter
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
 	INSERT INTO config_param_user (value, parameter, cur_user)
@@ -60,57 +62,66 @@ BEGIN
 	v_workcat_id_end =  (p_data ->> 'data')::json->> 'workcat_id_end';
 	v_enddate =  ((p_data ->> 'data')::json->> 'enddate')::date;
 
-	select array_agg(quote_literal(a)) into v_id_list from json_array_elements_text(v_id::json) a;
+	select array_agg(a) into v_id_list from json_array_elements_text(v_id::json) a;
 
-	IF 	v_featuretype = 'arc' THEN 
+	IF v_featuretype = 'arc' THEN 
 	
 		FOREACH rec_id IN ARRAY(v_id_list)
 		LOOP
 			--remove links related to arc
 			EXECUTE 'DELETE FROM link 
-			WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = '|| rec_id||');';
+			WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = '|| quote_literal(rec_id)||');';
 			
-			EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
+			EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
 
 			IF v_projecttype = 'UD' THEN
 				--remove links related to arc
 				EXECUTE 'DELETE FROM link 
-				WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.arc_id = '|| rec_id||');';
+				WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.arc_id = '|| quote_literal(rec_id)||');';
 				
-				EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
+				EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
 			END IF;
 			
 		END LOOP;
 		
 	
 	ELSIF v_featuretype = 'node' THEN
-	--check if node is involved into psector
+	
 		FOREACH rec_id IN ARRAY(v_id_list)
 		LOOP
-			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| rec_id||' OR node_2='|| rec_id||') AND arc.state = 2;'
+			--check if node is involved into psector
+			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2;'
 			INTO v_num_feature;
 
 			IF v_num_feature > 0 THEN
 				
 				EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
 				FROM plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
-				(SELECT arc.arc_id FROM arc WHERE (node_1='||rec_id||' OR node_2='|| rec_id||') AND arc.state = 2);'
+				(SELECT arc.arc_id FROM arc WHERE (node_1='||quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2);'
 				INTO v_psector_list, v_psector_id;
 
 				IF v_psector_id IS NOT NULL THEN 
-					EXECUTE 'DELETE FROM plan_psector_x_node WHERE node_id = '||rec_id||' AND psector_id IN ('||v_psector_id||');';
+					EXECUTE 'DELETE FROM plan_psector_x_node WHERE node_id = '||quote_literal(rec_id)||' AND psector_id IN ('||v_psector_id||');';
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3142", "function":"3022","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
+					"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
 				END IF;
 			END IF;
+
+			--check if node is related to on service arcs
+			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;'
+			INTO v_num_feature;		
 	
-			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| rec_id||' OR node_2='|| rec_id||') AND arc.state = 1;'
-			INTO v_num_feature;
-			
 			IF v_num_feature > 0 THEN
+			
+				v_result = 'SELECT array_agg(arc_id) FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;';
+
+				EXECUTE v_result INTO v_result;
+
+				v_result=concat(rec_id,' has associated arcs ',v_result);				
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1072", "function":"3022","debug_msg":"'||rec_id||'"}}$$);' INTO v_audit_result;
+				"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'"}}$$);' INTO v_audit_result;
 			END IF;
 		END LOOP;
 	END IF;
@@ -120,10 +131,10 @@ BEGIN
 			IF v_workcat_id_end IS NOT NULL THEN 
 				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
 				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
+				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
 			ELSE 
 				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
-				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
+				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
 			END IF;
 		END LOOP;
 	END IF;
@@ -151,7 +162,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||				
 			'}}'||
-	    '}')::json, 3022, null, null, null);
+	    '}')::json, 3068, null, null, null);
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
