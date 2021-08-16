@@ -32,17 +32,43 @@ BEGIN
 	IF (SELECT count(*) FROM selector_inp_demand WHERE cur_user = current_user) > 0 THEN
 
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
+		
+		-- moving node demands to temp_demand
+		INSERT INTO temp_demand (feature_id, demand, pattern_id)
+		SELECT DISTINCT ON (feature_id) feature_id, d.demand, d.pattern_id 
+		FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND d.demand > 0 
+		AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user);
+
+		-- moving connec demands to temp_demand
+		INSERT INTO temp_demand (feature_id, demand, pattern_id)
+		SELECT n.node_id, sum(d.demand), d.pattern_id 
+		FROM  inp_demand d ,temp_node n
+		JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
+		WHERE c.connec_id = d.feature_id AND d.demand > 0 
+		AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user)
+		GROUP BY n.node_id, d.pattern_id;
 
 		-- update demands
 		IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
-			-- EPANET stantdard 
+			-- EPANET standard 
 			
-		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined
+		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined,  moving to temp_demand in order to do not lose base demand (because EPANET does)
 
-			-- moving to temp_node in order to do not lose base demand (because EPANET does)
+			-- moving node demands to temp_demand
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
 			SELECT DISTINCT ON (feature_id) feature_id, n.demand, n.pattern_id 
-			FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user);
+			FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 
+			AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user);
+
+			-- moving connec demands to temp_demand
+			INSERT INTO temp_demand (feature_id, demand, pattern_id)
+			SELECT n.node_id, sum(d.demand), d.pattern_id 
+			FROM  inp_demand d ,temp_node n
+			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
+			WHERE c.connec_id = d.feature_id AND d.demand > 0 
+			AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user)
+			GROUP BY n.node_id, d.pattern_id;
+
 		END IF;
 		
 		-- move patterns used demands scenario table
