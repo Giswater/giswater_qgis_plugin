@@ -638,8 +638,8 @@ BEGIN
 		END IF;
 
 
-		-- double geometry rotation update
-		IF v_doublegeometry AND ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
+		-- calculate rotation
+		IF v_doublegeometry AND (ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE) OR (NEW.gratecat_id != OLD.gratecat_id) THEN
 			WITH index_query AS(
 			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
 			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
