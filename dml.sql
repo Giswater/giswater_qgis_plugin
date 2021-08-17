@@ -4,7 +4,7 @@ INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tablevi
 
 
 
--- TAB CONNECTIONS
+-- TAB CONNECTIONS -- UD
 -- TAB HYDROMETER
 -- TAB HYDROMETER VALUES
 -- TAB VISIT
