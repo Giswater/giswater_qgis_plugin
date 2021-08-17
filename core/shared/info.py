@@ -1811,8 +1811,13 @@ class GwInfo(QObject):
         self._reset_my_json()
 
         if "Accepted" in json_result['status']:
-            msg = "OK"
-            tools_qgis.show_message(msg, message_level=3)
+            msg_text = json_result['message']['text']
+            if msg_text is None:
+                msg_text = 'Feature upserted'
+            msg_level = json_result['message']['level']
+            if msg_level is None:
+                msg_level = 1
+            tools_qgis.show_message(msg_text, message_level=msg_level)
             self._reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
