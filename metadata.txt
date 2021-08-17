@@ -14,8 +14,12 @@ version=3.5.011
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
 
-changelog=Version 3.5.009
-    - Bug fix in managing user permissions when opening main dialog
+changelog=Version 3.5.011
+    - Bug fix on manage list of element_types for populate combo location on manage element form
+    - Bug fix on manage line break when add new document
+    - Enhancement on manage admin form when dont have any schema created on current connection
+    - Add section Report on toolbox form
+    - Add new tab 'backend' in Log Message Panel
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
