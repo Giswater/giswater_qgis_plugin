@@ -85,7 +85,7 @@ BEGIN
 			SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
 			WHERE status::boolean is true
 			LOOP
-				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||v_id||
+				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id)
 				INTO v_value;
 					
 				-- looking for mapzones
@@ -170,7 +170,7 @@ BEGIN
 	END IF;
 
 	-- Control NULL's
-	v_version := COALESCE(v_version, '[]');
+	v_version := COALESCE(v_version, '');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version ||'","body":{"data":{}}}')::json, 3006, null, null, null);
@@ -178,7 +178,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '}, "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
