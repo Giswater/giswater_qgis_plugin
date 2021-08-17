@@ -302,6 +302,7 @@ class GwMenuLoad(QObject):
 
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
+        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
         self.iface.actionPan().trigger()
         self._reload_layers()
 
