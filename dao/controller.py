@@ -603,12 +603,16 @@ class DaoController(object):
         msg = self.tr(text, context_name)
         if parameter:
             msg += ": " + str(parameter)
+        if len(msg) > 750:
+            msg = msg[:750]
         msg_box.setText(msg)
         if title:
             title = self.tr(title, context_name)
             msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)
+            if len(inf_text) > 500:
+                inf_text = inf_text[:500]
             msg_box.setInformativeText(inf_text)
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)
@@ -628,6 +632,8 @@ class DaoController(object):
             msg = self.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)
+        if len(msg) > 750:
+            msg = msg[:750]
 
         msg_box = QMessageBox()
         msg_box.setText(msg)
@@ -637,6 +643,8 @@ class DaoController(object):
             msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)
+            if len(inf_text) > 500:
+                inf_text = inf_text[:500]
             msg_box.setInformativeText(inf_text)
         msg_box.setDefaultButton(QMessageBox.No)
         msg_box.exec_()
