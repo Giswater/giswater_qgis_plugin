@@ -22,7 +22,6 @@ SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${
 
 DECLARE
 v_projecttype text;
-v_version text;
 v_featuretype text;
 v_tablename text;
 v_id text;
@@ -35,7 +34,9 @@ v_type text;
 v_expl integer;
 v_mapzone text;
 v_count integer;
+v_count_2 integer;
 v_mapzone_id integer;
+v_mapzone_id_2 integer;
 v_nodeheader text;
 v_message json;
 v_geomparamupdate integer;
@@ -43,6 +44,7 @@ v_useplanpsector boolean;
 v_updatemapzone float;
 v_oppositenode text;
 v_value integer;
+v_geometry text;
 
 BEGIN
 
@@ -50,7 +52,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- get project type
-	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- Get input parameters:
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
@@ -64,6 +66,7 @@ BEGIN
 
 		-- getting exploitation
 		v_expl = (SELECT expl_id FROM node WHERE node_id = v_id::text);
+		
 		-- getting system variable
 		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger');		
 		
@@ -85,25 +88,32 @@ BEGIN
 			SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
 			WHERE status::boolean is true
 			LOOP
-				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id)
-				INTO v_value;
+
+				-- getting current mapzone
+				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id) INTO v_value;
 					
-				-- looking for mapzones
+				-- looking for mapzones number (including 0 on both sides of valve)
 				EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-				(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a '
+				(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1)) a '
 				INTO v_count;
-					
+				
 				IF v_closedstatus IS TRUE OR (v_closedstatus IS FALSE AND v_count = 2) THEN
 
-					-- count mapzones
-					EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a WHERE '||lower(v_mapzone)||'_id::integer > 0 '
-					INTO v_count;
-
-					-- getting mapzone id
-					EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM node WHERE node_id IN (SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text) 
-					AND '||lower(v_mapzone)||'_id::integer > 0 LIMIT 1' 
+					-- getting mapzone id (indistinct side of valve) --> always with value
+					EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM arc WHERE arc_id IN (SELECT arc_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT arc_id FROM arc WHERE node_1 = '||v_id||'::text) 
+					AND '||lower(v_mapzone)||'_id::integer > 0 AND state = 1 LIMIT 1' 
 					INTO v_mapzone_id;
+
+					-- getting id of opposite mapzone (if exists)
+					v_querytext = 'SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
+					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1)
+					AND '||lower(v_mapzone)||'_id::text != '||quote_literal(v_mapzone_id);
+					EXECUTE v_querytext INTO v_mapzone_id_2;
+
+					-- looking for mapzones number (excluding 0 on both sides of valve)
+					EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
+					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1) AND '||lower(v_mapzone)||'_id::integer > 0) a '
+					INTO v_count_2;
 
 					-- getting nodeheader id
 					IF v_mapzone_id IS NOT NULL THEN
@@ -112,35 +122,52 @@ BEGIN
 					END IF;
 
 					-- execute grafanalytics function from nodeheader				
-					IF v_mapzone_id::integer > 0 THEN
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":true, 
-						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
-						ELSE
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "checkData":false, "updateFeature":true, 
-						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
-					END IF;
-										
+					v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":"true", 
+					"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
+
+					RAISE NOTICE 'v_querytext %', v_querytext;
+				
 					PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
+
+					-- harmonize the geom of both mapzones which has conflict
+					IF v_count_2 = 2 AND v_closedstatus IS FALSE THEN
+
+						EXECUTE 'SELECT the_geom FROM (SELECT '||lower(v_mapzone)||'_id, the_geom, st_area(the_geom) a FROM '||lower(v_mapzone)||
+						') q WHERE a > 0 AND '||lower(v_mapzone)||'_id::integer IN ('||v_mapzone_id||','||v_mapzone_id_2||')
+						ORDER BY a DESC LIMIT 1'
+						INTO v_geometry;
+																	
+						EXECUTE 'UPDATE '||lower(v_mapzone)||' SET the_geom = '||quote_literal(v_geometry)||'::geometry WHERE '||lower(v_mapzone)||'_id::integer  IN ('||v_mapzone_id||','||v_mapzone_id_2||')'; 
+					END IF;
 
 					-- return message 
 					IF v_closedstatus IS TRUE THEN
 						v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected on mapzones. Take a look on map for check it"}';
+
 					ELSIF v_closedstatus IS FALSE THEN
+
 						IF v_count= 1 THEN
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. If there were disconnected elements, it have been reconnected to mapzone"}';
+							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Nothing happens because both sides of valve has same mapzone"}';
+
 						ELSIF v_count =  2 THEN
-							v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
+							IF v_count_2 = 2 THEN			
+								v_message = concat('{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. THERE IS CONFLICT againts ',v_mapzone,' ( ',
+								v_mapzone_id,' , ',v_mapzone_id_2,' )"}');											
+							ELSIF  v_count_2 = 1 THEN
+								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
+							END IF;
 						END IF;
 					END IF;
 
 					IF v_closedstatus IS TRUE THEN
 					
 						-- looking for dry side using catching opposite node
-						EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 UNION SELECT node_1 
-						FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 LIMIT 1'
+						EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 AND arc.state = 1 UNION SELECT node_1 
+						FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 AND arc.state = 1 LIMIT 1'
 						INTO v_oppositenode;
 
 						IF v_oppositenode IS NOT NULL THEN
+						
 							-- execute grafanalytics_mapzones using dry side in order to check some header
 							v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_oppositenode||'", "checkData":false, "updateFeature":true, 
 							"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
@@ -169,17 +196,8 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- Control NULL's
-	v_version := COALESCE(v_version, '');
-
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version ||'","body":{"data":{}}}')::json, 3006, null, null, null);
-
-
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	RETURN (v_message::json);
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

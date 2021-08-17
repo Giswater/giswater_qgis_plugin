@@ -319,6 +319,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatetattributes::text)));
+		
 		IF v_floodfromnode IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood from mode is ENABLED. Graphic log (disconnected arcs & connecs) have been disabled. Used node:',v_floodfromnode,'.'));
 		END IF;	
@@ -365,7 +366,7 @@ BEGIN
 			END IF;
 
 			-- reset mapzone geometry
-			IF lower(v_table) != 'sector' THEN
+			IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' THEN
 				v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
 				WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
 				EXECUTE v_querytext;
@@ -863,7 +864,6 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	IF v_updatetattributes THEN -- only disconnected features to make a simple log
-
 
 		IF v_floodfromnode IS NULL THEN
 			v_result = null;
