@@ -31,10 +31,9 @@ SELECT SCHEMA_NAME.gw_fct_setfields('
  "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}')
 
 -- MAPZONES
-SELECT SCHEMA_NAME.gw_fct_setfields($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"node", "tableName":"ve_node_shutoff_valve", "id":"1110"},"data":{"fields":{"closed":"TRUE"}}}$$)
+SELECT gw_fct_setfields($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "form":{}, 
+"feature":{"id":"1295", "tableName":"ve_node_valvula", "featureType":"node" }, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"closed": "False"}, "afterInsert":"False"}}$$)
+
 */
 
 DECLARE

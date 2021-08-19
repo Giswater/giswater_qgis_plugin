@@ -39,21 +39,25 @@ TO EXECUTE
 ----------
 select * from exploitation
 
--- QUERY SAMPLE
-----------------
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation":[1], "floodFromNode":"113766", "checkData":false, 
-"updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[], "forceClosed":[]}}}')
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
+----------------
+-- QUERY SAMPLE
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[502],  "checkData":false, 
-"updateFeature":true, "updateMapZone":4, "geomParamUpdate":20,"debug":false}}}');
+
+hieracy
+-------
+if floodfromnode exits 
+	if exploitation exists
+		if exploitation exists
 
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "nodeHeader":"113952","exploitation":[1], "macroExploitation":[1], 
-"checkData":false, "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
+-- CUSTOM SAMPLE
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
+"updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 ----------------
+
 
 --SECTOR
 SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
@@ -171,12 +175,14 @@ BEGIN
 
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
+	
 	v_floodfromnode = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodFromNode');
+	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
+
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
@@ -186,7 +192,7 @@ BEGIN
 	v_manageconflict := (SELECT value::json->>'manageConflict' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status')::boolean;
 
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
-
+	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -262,7 +268,6 @@ BEGIN
 	END IF;
 
 	IF v_audit_result IS NULL THEN
-
 	
 		-- reset graf & audit_log tables
 		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
@@ -283,8 +288,9 @@ BEGIN
 		-- save expl selector 
 		DELETE FROM temp_table WHERE fid=289 AND cur_user=current_user;
 		INSERT INTO temp_table (fid, text_column)  
-		SELECT 289, (array_agg(expl_id)) FROM selector_expl WHERE cur_user=current_user;			
-		
+		SELECT 289, (array_agg(expl_id)) FROM selector_expl WHERE cur_user=current_user;
+
+				
 		-- reset expl selector
 		IF v_expl IS NOT NULL THEN
 			DELETE FROM selector_expl WHERE cur_user=current_user;
@@ -299,7 +305,6 @@ BEGIN
 		END IF;
 
 		IF v_usepsector IS NOT TRUE THEN
-		
 			-- save psector selector 
 			DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
 			INSERT INTO temp_table (fid, text_column)
@@ -483,7 +488,6 @@ BEGIN
 					IF v_floodfromnode IS NULL THEN
 						v_querytext = 'SELECT * FROM ('||v_text||' AND checkf=0 LIMIT 1)a';
 						IF v_querytext IS NOT NULL THEN
-							--RAISE NOTICE 'v_querytext %', v_querytext;
 							EXECUTE v_querytext INTO v_feature;
 						END IF;
 
@@ -521,6 +525,7 @@ BEGIN
 						UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 						
 						GET DIAGNOSTICS v_affectrow = row_count;
+						
 						EXIT WHEN v_affectrow = 0;
 						EXIT WHEN v_count = 2000;
 
@@ -553,6 +558,8 @@ BEGIN
 						VALUES (v_fid, 1, concat('INFO: ', v_class ,' for node: ',v_featureid ,' have been processed. ARCS (', v_count1, '), NODES (', v_count2, '), CONNECS (', v_count3,')'));
 					END IF;
 				END LOOP;
+
+				RAISE NOTICE 'Finish engine....';
 
 				-- update feature atributes
 				IF v_updatetattributes THEN
@@ -677,7 +684,6 @@ BEGIN
 					VALUES (v_fid, 1, concat('SELECT * FROM anl_node WHERE fid = (XX) AND cur_user=current_user;'));
 				END IF;
 
-
 				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
 				EXECUTE 'SELECT array_agg(distinct n.'||v_field||') FROM v_edit_node n JOIN 
 					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
@@ -685,9 +691,11 @@ BEGIN
 					WHERE n.'||v_field||' != mpz.'||v_field
 					INTO v_conflict;
 
-				-- in case of EXECUTE RETURNS some value, if means it exists conflict
 				IF v_conflict IS NOT NULL THEN
-				
+
+					/*
+					TODO:
+					
 					-- show log
 					EXECUTE 'INSERT INTO audit_check_data (fid,  criticity, error_message)
 					SELECT '||v_fid||', 3, concat(''OVERLAPED '||v_class||'''''s, '' , mpz.name ,'' AND '',mpz2.name,'' has conflict'') FROM v_edit_node n
@@ -697,25 +705,20 @@ BEGIN
 					JOIN '||v_table||' mpz2 ON n.'||v_field||'= mpz2.'||v_field||'
 					WHERE n.'||v_field||' != mpz.'||v_field||'';
 
-					IF v_manageconflict IS FALSE THEN
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
+					VALUES (v_fid, 1, 'INFO: For more information, please configure your system (utils_grafanalytics_status.manageConflictOnExpl = true)');
 
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (v_fid, 1, 'INFO: For more information, please configure your system (utils_grafanalytics_status.manageConflictOnExpl = true and define one conflict mapzone for each exploitation)');
+					v_querytext = (SELECT string_agg(a::text,', ') FROM (SELECT unnest(v_conflict))a);
 
-					ELSE
-						v_querytext = (SELECT string_agg(a::text,', ') FROM (SELECT unnest(v_conflict))a);
+					-- update features
+					EXECUTE 'UPDATE arc SET '||v_field||' = -1 WHERE '||v_field||'::integer IN ('||v_querytext||')';
+					EXECUTE 'UPDATE node SET '||v_field||' = -1 WHERE '||v_field||'::integer IN ('||v_querytext||')';
+					EXECUTE 'UPDATE connec SET '||v_field||' = -1 WHERE '||v_field||'::integer IN ('||v_querytext||')';
 
-						-- update features
-						EXECUTE 'UPDATE arc a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
-						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
+					Remove lines 145-149 of setmapzones trigger function
 
-						EXECUTE 'UPDATE node a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
-						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
-
-						EXECUTE 'UPDATE connec a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
-						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
-					END IF;
-
+					
+					*/
 				END IF;
 
 				-- update geometry of mapzones
@@ -731,7 +734,7 @@ BEGIN
 							v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 							ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 							)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||
-							quote_ident(v_fieldmp)||'::text != 0::text';
+							quote_ident(v_fieldmp)||'::integer > 0::text';
 							
 					EXECUTE v_querytext;
 
@@ -741,7 +744,7 @@ BEGIN
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc arc 
-							where arc.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
+							where arc.state > 0 AND '||quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||')a 
 							WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
@@ -763,12 +766,12 @@ BEGIN
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 								(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc
-								where arc.state > 0 AND  '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
+								where arc.state > 0 AND  '||quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
 								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								group by '||quote_ident(v_field)||'
 								UNION
 								SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
-								WHERE v_edit_connec.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' 
+								WHERE v_edit_connec.state > 0 AND '||quote_ident(v_field)||'::integer > 0
 								AND v_edit_connec.'||quote_ident(v_field)||' IN
 								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
@@ -803,13 +806,13 @@ BEGIN
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc 
-							where arc.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
+							where arc.state > 0 AND '||quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||'
 							UNION
 							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
 							as geom FROM connec c, v_edit_link link
-							WHERE c.'||quote_ident(v_field)||'::text != ''0'' 
+							WHERE c.'||quote_ident(v_field)||'::integer > 0 
 							AND c.state > 0
 							AND c.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
@@ -882,6 +885,9 @@ BEGIN
 			v_result := COALESCE(v_result, '{}'); 
 			v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 
 
+			-- todo: on conflict arcs
+			
+
 			-- disconnected connecs
 			v_result = null;
 			
@@ -897,6 +903,7 @@ BEGIN
 
 			v_result := COALESCE(v_result, '{}'); 
 			v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "features":',v_result, '}'); 
+			
 		END IF;
 
 	ELSE -- all features in order to make a more complex log

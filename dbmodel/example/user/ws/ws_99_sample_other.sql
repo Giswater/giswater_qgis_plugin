@@ -553,6 +553,14 @@ INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (363,'2078',0.9,'2020-01-0
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.02,'2020-01-01 03:05:00');
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.03,'2020-01-01 03:10:00');
 
+
+--2021/08/19
+INSERT INTO dma VALUES (-1, 'Conflict',0,null,'DMA used on grafanalytics algorithm when two ore more DMA has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
+INSERT INTO dqa VALUES (-1, 'Conflict',0, null, 'DQA used on grafanalytics algorithm when two ore more DQA has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
+INSERT INTO presszone VALUES (-1, 'Conflict', 0, 'PRESSZONE used on grafanalytics algorithm when two ore more PRESSZONE has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
+INSERT INTO sector VALUES (-1, 'Conflict', 0, 'SECTOR used on grafanalytics algorithm when two ore more SECTOR has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
+
+
 -- 2020/12/07
 UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},
 "tank":{"distVirtualReservoir":0.01}, 
@@ -572,14 +580,6 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_grafanalytics_status';
-
-INSERT INTO presszone (presszone_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO presszone (presszone_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO dma (dma_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO dma (dma_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO sector (sector_id, name, grafconfig) VALUES (11,'Conflict mapzone', '{"status":"useWhenConflict"}');
 
 UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
 
