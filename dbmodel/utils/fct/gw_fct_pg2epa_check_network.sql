@@ -51,6 +51,7 @@ v_max float;
 v_version text;
 v_networkstats json;
 v_sumlength numeric (12,2);
+v_linkoffsets text;
 
 BEGIN
 	-- Search path
@@ -63,6 +64,9 @@ BEGIN
 	-- get project type
 	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_version = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
+	
+	-- get options data
+	SELECT value INTO v_linkoffsets FROM config_param_user WHERE parameter = 'inp_options_link_offsets' AND cur_user = current_user;
 	
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -391,6 +395,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Total length (Km) : ',v_sumlength,'.'));
 		
+		IF v_linkoffsets  = 'ELEVATION' THEN
+			SELECT min((elevmax1-elevmax2)/length), max((elevmax1-elevmax2)/length) INTO v_min, v_max FROM temp_arc;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+			concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
+		END IF;
+		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
@@ -480,9 +490,10 @@ BEGIN
 	    '}')::json, 2680, null, null, null);
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

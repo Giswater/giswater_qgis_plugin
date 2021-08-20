@@ -263,6 +263,24 @@ BEGIN
 
 	
 	RAISE NOTICE '11 - Check to arc on valves, at least arc_id exists as closest arc (fid: 170)';
+
+	-- to_arc missed values (368)
+	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
+		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL AND valv_type != 'TCV';
+	ELSE 
+		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL;
+	END IF;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '368', concat(
+		'ERROR-368: There is/are ',v_count,' valve(s) with missed values on mandatory column to_arc.'), v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 1, '368', 'INFO: Valve to_arc missed values checked. No mandatory values missed.');
+	END IF;
+	
+	-- to_arc wrong values (170)
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 	select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve LEFT JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1
@@ -273,11 +291,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 170 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '170',concat('ERROR-170: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '170',concat('ERROR-170: There is/are ', v_count,' valve(s) with wrong to_arc value according with the two closest arcs.'),v_count);
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '170',
-		'INFO: to_arc values checked for valves. It exists and it''s one of  closest arcs.', v_count);
+		'INFO: Valve to_arc wrong values checked. No inconsistencies have been detected (values acording closest arcs).', v_count);
 	END IF;
 
 
@@ -305,23 +323,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '274', 'INFO: Valve status checked. No mandatory values missed.',v_count);
-	END IF;
-
-	-- to_arc (368)
-	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
-		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL AND valv_type != 'TCV';
-	ELSE 
-		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL;
-	END IF;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '368', concat(
-		'ERROR-368: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc.'), v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id, 1, '368', 'INFO: Valve to_arc values checked. No mandatory values missed.');
+		VALUES (v_fid, v_result_id, 1, '274','INFO: Valve status checked. No mandatory values missed.',v_count);
 	END IF;
 
 	-- pressure (275)
@@ -371,7 +373,22 @@ BEGIN
 	END IF;		
 	
 
-	RAISE NOTICE '14 - Check to arc on pumps, at least arc_id exists as closest arc (fid: 171)';
+	RAISE NOTICE '14 - Check to arc on pumps, at least arc_id exists as closest arc';
+	
+	-- to_arc missed values(395)
+	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE to_arc IS NULL;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '395', concat(
+		'ERROR-395: There is/are ',v_count,' Pump(s) with missed values on mandatory column to_arc.'), v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 1, '395', 'INFO: Pump to_arc missed values checked. No mandatory values missed.');
+	END IF;
+	
+	-- to_arc wrong values (171)
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump' FROM v_edit_inp_pump WHERE node_id NOT IN(
 		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
@@ -381,12 +398,12 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '171', concat('ERROR-171: There is/are ', v_count,' pump(s) without to_arc value according with closest arcs. Take a look on temporal table to know details.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '171', concat('ERROR-171: There is/are ', v_count,' pump(s) with wrong to_arc value according with closest arcs.'),v_count);
 
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '171',
-		'INFO: to_arc values checked for pumps. It exists and it''s one of the closest arcs.',v_count);
+		'INFO: Pump to_arc wrong values checked. have been detected (values acording closest arcs).', v_count);
 	END IF;
 	
 	
@@ -414,7 +431,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'280', 'INFO: Pumps checked. No mandatory values for curve_id missed.',v_count);
 	END IF;	
-
 
 	--pump additional(281)
 	SELECT count(*) INTO v_count FROM inp_pump_additional JOIN v_edit_inp_pump USING (node_id) WHERE inp_pump_additional.curve_id IS NULL;
@@ -461,7 +477,7 @@ BEGIN
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.2 meters missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.05 meters missed.',v_count);
 	END IF;
 	
 	
@@ -494,15 +510,17 @@ BEGIN
 	END IF;
 
 
-	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN (SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
+	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN 
+	(SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 2, '283',concat(
-		'WARNING-283: There is/are ',v_count,' register(s) on node''s catalog without dint defined. If this registers acts as shortipe on the epanet exportation dint is needed.'), v_count);
+		'WARNING-283: There is/are ',v_count,
+		' register(s) on node''s catalog acting as [SHORTPIPE or VALVE or PUMP] with dint not defined.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for node''s catalog checked. No values missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
 	END IF;
 	
 		
@@ -756,9 +774,9 @@ BEGIN
 		'}')::json, 2430, null, null, null);
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

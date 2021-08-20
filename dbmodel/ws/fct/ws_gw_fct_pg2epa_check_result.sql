@@ -197,10 +197,8 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
 
-
 		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
-		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump
-				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
+		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM v_edit_inp_pump)a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('ERROR-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
@@ -209,7 +207,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
 		END IF;
 
-
+		
 		RAISE NOTICE '2 - Check nod2arc length control';	
 		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_arc WHERE  arc_type='NODE2ARC' AND result_id =  v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
@@ -249,31 +247,8 @@ BEGIN
 				'INFO: Roughness values have been checked againts head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.'));
 		END IF;
 
-
-		RAISE NOTICE '4 - Check curves 3p';
-		IF v_buildupmode = 1 THEN
-
-			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND result_id =  v_result_id AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1';
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' pump_type = 1 with null values on curve_id column. Default user value for curve of pumptype = 1 ( ',
-				_curvedefault,' ) have been chosen.'));					
-				v_count=0;
-			END IF;	
-		ELSE
-			SELECT count(*) INTO v_count FROM temp_arc WHERE result_id =  v_result_id AND epa_type='PUMP' AND addparam::json->>'curve_id' = '';
-
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-280: There is/are ',v_count,' pump''s with null values at least on curve_id.'));
-				v_count=0;
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, 'INFO: Pumps checked. No curve_id mandatory values missed.');
-			END IF;
-		END IF;
 			
-		RAISE NOTICE '5 - Check for network mode';
+		RAISE NOTICE '4 - Check for network mode';
 		IF v_networkmode = 3 THEN
 
 			-- vnode over nodarc for case of use vnode treaming arcs on network model
@@ -300,7 +275,7 @@ BEGIN
 		END IF;
 
 
-		RAISE NOTICE '6 - Check for demand type';	
+		RAISE NOTICE '5 - Check for demand type';	
 		IF v_demandtype IN (1,2) THEN
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -358,7 +333,7 @@ BEGIN
 
 		END IF;
 
-		RAISE NOTICE '7 - Check for dma-period values';
+		RAISE NOTICE '6 - Check for dma-period values';
 		IF v_demandtype IN (1,2,3) THEN
 	
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -383,7 +358,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE '8 - Check for losses strategy values';	
+		RAISE NOTICE '7 - Check for losses strategy values';	
 		IF  v_demandtype = 4 THEN -- dma needs effc on ext_rtc_dma_period
 
 			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE effc IS NOT NULL;
@@ -411,7 +386,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE '9 - Check for UNDEFINED elements on temp table (297)';
+		RAISE NOTICE '8 - Check for UNDEFINED elements on temp table (297)';
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 		SELECT 297, node_id, nodecat_id, the_geom, 'epa_type UNDEFINED' FROM temp_node WHERE  epa_type = 'UNDEFINED';
 		
@@ -437,7 +412,7 @@ BEGIN
 		END IF;
 
 
-		RAISE NOTICE '10 - Check for pattern method';
+		RAISE NOTICE '9 - Check for pattern method';
 		IF v_patternmethod IN (41,43,51,53) THEN -- dma needs pattern
 			
 			-- check mandatory values for ext_rtc_dma_period table
@@ -500,27 +475,13 @@ BEGIN
 			END IF;
 		END IF;
 		
-		RAISE NOTICE '11 - Check for valve/shortipe diameter control';	
-
-		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
-		
-		IF  v_count > 0 THEN 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-375: There are ', v_count , ' epanet shortpipe and valves without diameter. Neighbourg value have been setted. Please fill dint column on cat_node table'));
-		ELSE 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: There aren''t any shortpipe and valves without diameter defined on dint column in cat_node table'));
-		END IF;
-
-
-		RAISE NOTICE '12 - Info about roughness and diameter for shortpipes';	
+		RAISE NOTICE '10 - Info about roughness and diameter for shortpipes';	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
 
 	END IF;
 	
 	RAISE NOTICE '11 - Check if there are features with sector_id = 0';
-
 	v_querytext = 'SELECT a.feature , count(*)  FROM  (
 				SELECT arc_id, ''ARC'' as feature FROM v_edit_arc WHERE sector_id = 0 UNION
 				SELECT node_id, ''NODE'' FROM v_edit_node WHERE sector_id = 0)a GROUP BY feature ';
