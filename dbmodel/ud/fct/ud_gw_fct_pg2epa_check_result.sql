@@ -183,6 +183,20 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
 		END IF;
+		
+		-- check area
+		SELECT (sum(st_area(the_geom)/10000))::integer, (sum(area))::integer  INTO v_count, v_count_2 FROM v_edit_inp_subcatchment WHERE area IS NOT NULL;
+		IF v_count > v_count_2*2 AND v_count < v_count_2*10 OR (v_count_2 > v_count*2 AND v_count_2 < v_count*10) THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-369: Total area informed (',v_count_2,' ha.) has important difference from total shape area (',v_count,' ha.).'));
+			v_count=0;
+		ELSIF v_count > v_count_2*10 OR v_count_2 > v_count*10 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: Total area informed (',v_count_2,' ha.) has big difference from total shape area (',v_count,' ha.).'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: Total area informed (',v_count_2,' ha.) is similar than total shape area (',v_count,' ha.).'));
+		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where rg_id is null;
 		IF v_count > 0 THEN
