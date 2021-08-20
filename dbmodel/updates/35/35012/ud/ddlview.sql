@@ -5,21 +5,53 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ud_sample, public, pg_catalog;
 
 
 --2021/08/19
-CREATE OR REPLACE VIEW vi_lid_controls AS 
-SELECT inp_lid_control.lidco_id,
-inp_typevalue.id AS lidco_type,
-inp_lid_control.value_2 AS other1,
-inp_lid_control.value_3 AS other2,
-inp_lid_control.value_4 AS other3,
-inp_lid_control.value_5 AS other4,
-inp_lid_control.value_6 AS other5,
-inp_lid_control.value_7 AS other6,
-inp_lid_control.value_8 AS other7
-FROM inp_lid_control
-LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_control.lidco_type::text
-WHERE inp_typevalue.typevalue::text = 'inp_value_lidcontrol'::text
-ORDER BY inp_lid_control.id;
+DROP TABLE IF EXISTS inp_gully;
+CREATE TABLE inp_gully(
+gully_id character varying(16) PRIMARY KEY,
+status int2,
+efficiency double precision);
+
+CREATE OR REPLACE VIEW v_edit_inp_gully as
+SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gratecat_id, units, groove, arc_id, s.sector_id, expl_id, state, state_type, the_geom, pjoint_id, pjoint_type, status, efficiency FROM selector_sector s, v_edit_gully g
+JOIN inp_gully USING (gully_id)
+WHERE g.sector_id  = s.sector_id AND cur_user = current_user;
+
+INSERT INTO inp_gully
+SELECT  gully_id FROM gully
+ON CONFLICT (gully_id) DO NOTHING;
+
+DROP TABLE IF EXISTS temp_gully;
+CREATE TABLE temp_gully (
+gully_id character varying(16),
+gully_type character varying(30),
+gratecat_id character varying(30),
+sector_id integer,
+state smallint,
+state_type smallint,
+annotation character varying(254),
+the_geom geometry(LineString,25831),
+efficiency double precision,
+pjoint_id character varying(30),
+x1 double precision,
+y1 double precision,
+z1 double precision,
+x2 double precision,
+y2 double precision,
+z2 double precision,
+connec_length double precision,
+grate_length double precision,
+grate_width double precision,
+grate_area double precision,
+effarea double precision,
+nbarl double precision,
+nbarw double precision,
+nbard double precision,
+aparam double precision,
+bparam double precision);
+
+CREATE OR REPLACE VIEW vi_gully AS 
+SELECT * FROM temp_gully;
