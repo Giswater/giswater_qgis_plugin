@@ -396,9 +396,10 @@ BEGIN
 		concat('Total length (Km) : ',v_sumlength,'.'));
 		
 		IF v_linkoffsets  = 'ELEVATION' THEN
-			SELECT min((elevmax1-elevmax2)/length), max((elevmax1-elevmax2)/length) INTO v_min, v_max FROM temp_arc;
+			SELECT min(((elevmax1-elevmax2)/length)::numeric(12,4)), max(((elevmax1-elevmax2)/length)::numeric(12,4)) 
+			INTO v_min, v_max FROM temp_arc;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
-			concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
+			concat('Data analysis for conduit slope. Values from [',v_min,'] to [',v_max,'] have been found.'));
 		END IF;
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';

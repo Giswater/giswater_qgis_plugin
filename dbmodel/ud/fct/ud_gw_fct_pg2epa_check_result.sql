@@ -142,7 +142,7 @@ BEGIN
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-3, v_fid, v_result_id, 1, '-------');
 
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-2, v_fid, v_result_id, 0, 'NETWORK STATS');
-	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-1, v_fid, v_result_id, 0, '--------------------');
+	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-1, v_fid, v_result_id, 0, '---------------------');
 
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
