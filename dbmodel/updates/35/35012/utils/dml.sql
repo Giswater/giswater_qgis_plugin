@@ -10,6 +10,14 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/08/19
-INSERT INTO config_function VALUES (2160, 'gw_fct_setfields', NULL, NULL, '[{"funcName": "refresh_canvas", "params": {}}]');
+INSERT INTO config_function VALUES (2160, 'gw_fct_setfields', NULL, NULL, '[{"funcName": "refresh_canvas", "params": {}}]')
+ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (395, 'Check to_arc missed values for pumps', 'ws');
+--2021/08/20
+INSERT INTO sys_fprocess VALUES (395, 'Check to_arc missed values for pumps', 'ws')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json' 'Function to trim arcs using gullies', 'role_epa')
+ON CONFLICT (id) DO NOTHING;
+
+
