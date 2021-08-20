@@ -10,11 +10,14 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/03/17
 
+ALTER TABLE arc_add DROP CONSTRAINT IF EXISTS arc_add_arc_id_fkey;
 ALTER TABLE arc_add ADD CONSTRAINT arc_add_arc_id_fkey FOREIGN KEY (arc_id)
 REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
+ALTER TABLE node_add DROP CONSTRAINT IF EXISTS node_add_node_id_fkey;
 ALTER TABLE node_add ADD CONSTRAINT node_add_node_id_fkey FOREIGN KEY (node_id)
 REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
+ALTER TABLE connec_add DROP CONSTRAINT IF EXISTS connec_add_connec_id_fkey;
 ALTER TABLE connec_add ADD CONSTRAINT connec_add_connec_id_fkey FOREIGN KEY (connec_id)
 REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
