@@ -125,28 +125,6 @@ BEGIN
 						
 					PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
 
-					-- when mapzones has conflict
-					IF v_count_2 = 2 AND v_closedstatus IS FALSE THEN
-
-						-- getting id of opposite mapzone (if exists)
-						v_querytext = 'SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-						(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1)
-						AND '||lower(v_mapzone)||'_id::text != '||quote_literal(v_mapzone_id);
-						EXECUTE v_querytext INTO v_mapzone_id_2;
-			
-						EXECUTE 'SELECT the_geom FROM (SELECT '||lower(v_mapzone)||'_id, the_geom, st_area(the_geom) a FROM '||lower(v_mapzone)||
-						') q WHERE a > 0 AND '||lower(v_mapzone)||'_id::integer IN ('||v_mapzone_id||','||v_mapzone_id_2||')
-						ORDER BY a DESC LIMIT 1'
-						INTO v_geometry;
-																	
-						EXECUTE 'UPDATE '||lower(v_mapzone)||' SET the_geom = NULL WHERE '||lower(v_mapzone)||'_id::integer  IN ('||v_mapzone_id||','||v_mapzone_id_2||')'; 
-
-						EXECUTE 'UPDATE arc SET '||lower(v_mapzone)||'_id = -1 WHERE '||lower(v_mapzone)||'_id::integer  IN ('||v_mapzone_id||','||v_mapzone_id_2||')'; 
-						EXECUTE 'UPDATE node SET '||lower(v_mapzone)||'_id = -1 WHERE '||lower(v_mapzone)||'_id::integer  IN ('||v_mapzone_id||','||v_mapzone_id_2||')'; 
-						EXECUTE 'UPDATE connec SET '||lower(v_mapzone)||'_id = -1 WHERE '||lower(v_mapzone)||'_id::integer  IN ('||v_mapzone_id||','||v_mapzone_id_2||')'; 
-						
-					END IF;
-
 					-- return message 
 					IF v_closedstatus IS TRUE THEN
 
@@ -175,9 +153,9 @@ BEGIN
 							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Nothing happens because both sides of valve has same mapzone"}';
 
 						ELSIF v_count =  2 THEN
+						
 							IF v_count_2 = 2 THEN			
-								v_message = concat('{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. THERE IS CONFLICT againts ',v_mapzone,' ( ',
-								v_mapzone_id,' , ',v_mapzone_id_2,' )"}');											
+								v_message = concat('{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
 							ELSIF  v_count_2 = 1 THEN
 								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
 							END IF;

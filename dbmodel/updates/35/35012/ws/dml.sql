@@ -15,5 +15,5 @@ INSERT INTO dqa VALUES (-1, 'Conflict');
 INSERT INTO presszone VALUES (-1, 'Conflict');
 INSERT INTO sector VALUES (-1, 'Conflict');
 
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys('value'::json, 'manageConflict') WHERE parameter = 'utils_grafanalytics_status';
 
-REMOVE REFERENCES FOR CONFLICT ON OTHER PARTS OF CODE

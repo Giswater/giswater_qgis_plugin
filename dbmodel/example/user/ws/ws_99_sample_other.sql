@@ -560,6 +560,8 @@ INSERT INTO dqa VALUES (-1, 'Conflict',0, null, 'DQA used on grafanalytics algor
 INSERT INTO presszone VALUES (-1, 'Conflict', 0, 'PRESSZONE used on grafanalytics algorithm when two ore more PRESSZONE has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
 INSERT INTO sector VALUES (-1, 'Conflict', 0, 'SECTOR used on grafanalytics algorithm when two ore more SECTOR has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed');
 
+INSERT INTO dma VALUES (6, 'Source-3', 1, null, null, null, null, null, null, null, null, null, '{"use":[{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
+
 
 -- 2020/12/07
 UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},
