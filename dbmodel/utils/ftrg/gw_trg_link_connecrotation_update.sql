@@ -35,203 +35,177 @@ BEGIN
     
     IF TG_OP='INSERT' THEN
 
-	IF NEW.feature_type='CONNEC' THEN
-		FOR rec_connec IN SELECT * FROM v_edit_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC'
-		LOOP
-		
-			-- init variables
-			ang_aux=0;
-			count=0;
-		
-			FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_connec.connec_id
+		IF NEW.feature_type='CONNEC' THEN
+			FOR rec_connec IN SELECT * FROM v_edit_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC'
 			LOOP
-				IF rec_link.feature_id=rec_connec.connec_id THEN
-					azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
-					IF azm_aux > 3.14159 THEN
-						azm_aux = azm_aux-3.14159;
+			
+				-- init variables
+				ang_aux=0;
+				count=0;
+			
+				FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_connec.connec_id
+				LOOP
+					IF rec_link.feature_id=rec_connec.connec_id THEN
+						azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
+						IF azm_aux > 3.14159 THEN
+							azm_aux = azm_aux-3.14159;
+						END IF;
+						ang_aux=ang_aux+azm_aux;
+						count=count+1;
 					END IF;
-					ang_aux=ang_aux+azm_aux;
-					count=count+1;
-				END IF;
-			END LOOP;
+				END LOOP;
 
-			label_side_aux= degrees(ST_Azimuth(rec_connec.the_geom,ST_EndPoint(link.the_geom)))
-						from v_edit_connec 
-						join link on link.feature_id=rec_connec.connec_id 
-						--join vnode on vnode.vnode_id=link.exit_id::integer
-						 WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC';
-
-
-			ang_aux=ang_aux/count;	
-
-			
-			label_rotation_aux=(ang_aux*(180/3.14159)-90);
-
-			IF label_side_aux>=0 and label_side_aux<=180 THEN
-				label_side=3;
-			ELSE
-				label_side=5;
-
-			END IF;
-
-			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE connec SET label_rotation=label_rotation_aux, label_x=label_side WHERE connec_id=rec_connec.connec_id;
-				
-			
-		END LOOP;
-	
-	ELSIF NEW.feature_type='GULLY' THEN
-			FOR rec_gully IN SELECT * FROM v_edit_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY'
-		LOOP
-		
-			-- init variables
-			ang_aux=0;
-			count=0;
-		
-			FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_gully.gully_id
-			LOOP
-				IF rec_link.feature_id=rec_gully.gully_id THEN
-					azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
-					IF azm_aux > 3.14159 THEN
-						azm_aux = azm_aux-3.14159;
-					END IF;
-					ang_aux=ang_aux+azm_aux;
-					count=count+1;
-				
-				END IF;
-
-			END LOOP;
-
-			label_side_aux= degrees(ST_Azimuth(rec_gully.the_geom,ST_EndPoint(link.the_geom)))
-						from v_edit_gully
-						join link on link.feature_id=rec_gully.gully_id 
-						--join vnode on vnode.vnode_id=link.exit_id::integer
-						 WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY';
-
-			ang_aux=ang_aux/count;	
-
-			
-			label_rotation_aux=(ang_aux*(180/3.14159)-90);
-
-			If label_side_aux>=0 and label_side_aux<=180 THEN
-				label_side=3;
-			ELSE
-				label_side=5;
-			END IF;
-
-			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE gully set label_rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;	
-		
-			
-		END LOOP;
-	END IF;
-
-	RETURN NEW;
-
-
-    ELSIF TG_OP='UPDATE' THEN
-
-    IF NEW.feature_type='CONNEC' THEN
-
-		FOR rec_connec IN SELECT * FROM v_edit_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC'
-		LOOP
-		
-			-- init variables
-			ang_aux=0;
-			count=0;
-		
-			FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_connec.connec_id
-			LOOP
-				IF rec_link.feature_id=rec_connec.connec_id THEN
-					azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
-					IF azm_aux > 3.14159 THEN
-						azm_aux = azm_aux-3.14159;
-					END IF;
-					ang_aux=ang_aux+azm_aux;
-					count=count+1;
-				
-				END IF;
-
-			END LOOP;
-		
-			ang_aux=ang_aux/count;	
-
-			label_side_aux= degrees(ST_Azimuth(rec_connec.the_geom,ST_EndPoint(link.the_geom)))
+				label_side_aux= degrees(ST_Azimuth(rec_connec.the_geom,ST_EndPoint(link.the_geom)))
 							from v_edit_connec 
 							join link on link.feature_id=rec_connec.connec_id 
 							--join vnode on vnode.vnode_id=link.exit_id::integer
-							 WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC';
+							 WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC' LIMIT 1;
+				ang_aux=ang_aux/count;	
+				label_rotation_aux=(ang_aux*(180/3.14159)-90);
 
-			label_rotation_aux=(ang_aux*(180/3.14159)-90);
-
-
-			IF label_side_aux>=0 and label_side_aux<=180 THEN
-				label_side=3;
-			ELSE
-				label_side=5;
-
-			END IF;
-			
-			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE connec set label_rotation=label_rotation_aux,label_x=label_side  where connec_id=rec_connec.connec_id;	
-
-		
-		END LOOP;
-
-	ELSIF NEW.feature_type='GULLY' THEN
-
-		FOR rec_gully IN SELECT * FROM v_edit_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY'
-		LOOP
-		
-			-- init variables
-			ang_aux=0;
-			count=0;
-		
-			FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_gully.gully_id
-			LOOP
-				IF rec_link.feature_id=rec_gully.gully_id THEN
-					azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
-					IF azm_aux > 3.14159 THEN
-						azm_aux = azm_aux-3.14159;
-					END IF;
-					ang_aux=ang_aux+azm_aux;
-					count=count+1;
-				
+				IF label_side_aux>=0 and label_side_aux<=180 THEN
+					label_side=3;
+				ELSE
+					label_side=5;
 				END IF;
 
+				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
+				UPDATE connec SET label_rotation=label_rotation_aux, label_x=label_side WHERE connec_id=rec_connec.connec_id;
+					
 			END LOOP;
 		
-			ang_aux=ang_aux/count;	
+		ELSIF NEW.feature_type='GULLY' THEN
+				FOR rec_gully IN SELECT * FROM v_edit_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY'
+			LOOP
+			
+				-- init variables
+				ang_aux=0;
+				count=0;
+			
+				FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_gully.gully_id
+				LOOP
+					IF rec_link.feature_id=rec_gully.gully_id THEN
+						azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
+						IF azm_aux > 3.14159 THEN
+							azm_aux = azm_aux-3.14159;
+						END IF;
+						ang_aux=ang_aux+azm_aux;
+						count=count+1;
+					END IF;
+				END LOOP;
 
-			label_side_aux= degrees(ST_Azimuth(rec_gully.the_geom,ST_EndPoint(link.the_geom)))
-							from v_edit_gully 
+				label_side_aux= degrees(ST_Azimuth(rec_gully.the_geom,ST_EndPoint(link.the_geom)))
+							from v_edit_gully
 							join link on link.feature_id=rec_gully.gully_id 
 							--join vnode on vnode.vnode_id=link.exit_id::integer
-							 WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY';
+							 WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY' LIMIT 1;
+				ang_aux=ang_aux/count;	
+				label_rotation_aux=(ang_aux*(180/3.14159)-90);
 
-			label_rotation_aux=(ang_aux*(180/3.14159)-90);
+				If label_side_aux>=0 and label_side_aux<=180 THEN
+					label_side=3;
+				ELSE
+					label_side=5;
+				END IF;
 
+				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
+				UPDATE gully set label_rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;	
+				
+			END LOOP;
+		END IF;
 
-			If label_side_aux>=0 and label_side_aux<=180 THEN
-				label_side=3;
-			ELSE
-				label_side=5;
-			END IF;
+		RETURN NEW;
 
-			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE GULLY set label_rotation=label_rotation_aux,label_x=label_side  where gully_id=rec_gully.gully_id;			
+		ELSIF TG_OP='UPDATE' THEN
 
-		
-		END LOOP;
-	END IF;
+		IF NEW.feature_type='CONNEC' THEN
 
-	RETURN NEW;
+			FOR rec_connec IN SELECT * FROM v_edit_connec WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC'
+			LOOP
+			
+				-- init variables
+				ang_aux=0;
+				count=0;
+			
+				FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_connec.connec_id
+				LOOP
+					IF rec_link.feature_id=rec_connec.connec_id THEN
+						azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
+						IF azm_aux > 3.14159 THEN
+							azm_aux = azm_aux-3.14159;
+						END IF;
+						ang_aux=ang_aux+azm_aux;
+						count=count+1;
+					END IF;
+				END LOOP;
+			
+				ang_aux=ang_aux/count;	
+				label_side_aux= degrees(ST_Azimuth(rec_connec.the_geom,ST_EndPoint(link.the_geom)))
+								from v_edit_connec 
+								join link on link.feature_id=rec_connec.connec_id 
+								--join vnode on vnode.vnode_id=link.exit_id::integer
+								 WHERE NEW.feature_id = connec_id and NEW.feature_type='CONNEC' LIMIT 1;
+				label_rotation_aux=(ang_aux*(180/3.14159)-90);
 
-    END IF;
+				IF label_side_aux>=0 and label_side_aux<=180 THEN
+					label_side=3;
+				ELSE
+					label_side=5;
+				END IF;
+				
+				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
+				UPDATE connec set label_rotation=label_rotation_aux,label_x=label_side  where connec_id=rec_connec.connec_id;	
+
+			END LOOP;
+
+		ELSIF NEW.feature_type='GULLY' THEN
+
+			FOR rec_gully IN SELECT * FROM v_edit_gully WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY'
+			LOOP
+			
+				-- init variables
+				ang_aux=0;
+				count=0;
+			
+				FOR rec_link IN SELECT link_id, feature_type, feature_id, the_geom FROM link WHERE link.feature_id = rec_gully.gully_id
+				LOOP
+					IF rec_link.feature_id=rec_gully.gully_id THEN
+						azm_aux=st_azimuth(st_startpoint(rec_link.the_geom), ST_LineInterpolatePoint(rec_link.the_geom,0.01)); 
+						IF azm_aux > 3.14159 THEN
+							azm_aux = azm_aux-3.14159;
+						END IF;
+						ang_aux=ang_aux+azm_aux;
+						count=count+1;
+					END IF;
+				END LOOP;
+			
+				ang_aux=ang_aux/count;	
+				label_side_aux= degrees(ST_Azimuth(rec_gully.the_geom,ST_EndPoint(link.the_geom)))
+								from v_edit_gully 
+								join link on link.feature_id=rec_gully.gully_id 
+								--join vnode on vnode.vnode_id=link.exit_id::integer
+								 WHERE NEW.feature_id = gully_id and NEW.feature_type='GULLY' LIMIT 1;
+				label_rotation_aux=(ang_aux*(180/3.14159)-90);
+
+				If label_side_aux>=0 and label_side_aux<=180 THEN
+					label_side=3;
+				ELSE
+					label_side=5;
+				END IF;
+
+				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
+				UPDATE GULLY set label_rotation=label_rotation_aux,label_x=label_side  where gully_id=rec_gully.gully_id;			
+			
+			END LOOP;
+		END IF;
+
+		RETURN NEW;
+
+		END IF;
 	
-  END IF;
+	END IF;
   
-  RETURN NEW;
+	RETURN NEW;
     
 END; 
 $BODY$
