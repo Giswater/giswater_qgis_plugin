@@ -533,13 +533,13 @@ BEGIN
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-373: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-373: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-373: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-373: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
