@@ -11,9 +11,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/08/19
 INSERT INTO dma VALUES (-1, 'Conflict');
+ON CONFLICT (dma_id) DO NOTHING;
 INSERT INTO dqa VALUES (-1, 'Conflict');
-INSERT INTO presszone VALUES (-1, 'Conflict');
+ON CONFLICT (dqa_id) DO NOTHING;
+INSERT INTO presszone VALUES ('-1', 'Conflict');
+ON CONFLICT (presszone_id) DO NOTHING;
 INSERT INTO sector VALUES (-1, 'Conflict');
+ON CONFLICT (sector_id) DO NOTHING;
 
-UPDATE config_param_system SET value = gw_fct_json_object_delete_keys('value'::json, 'manageConflict') WHERE parameter = 'utils_grafanalytics_status';
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'manageConflict') WHERE parameter = 'utils_grafanalytics_status';
 
