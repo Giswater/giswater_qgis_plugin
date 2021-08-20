@@ -646,7 +646,7 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
+		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for connec features checked. No inconsistencies aganints epa table found.');
 	END IF;	
 
 	RAISE NOTICE '25 - check matcat_id for arcs (371)';
