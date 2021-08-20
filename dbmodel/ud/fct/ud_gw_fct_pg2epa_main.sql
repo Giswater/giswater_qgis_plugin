@@ -21,6 +21,8 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 */
 
 DECLARE
+
+v_networkmode integer = 1;
 v_return json;
 v_result text;
 v_usenetworkgeom boolean;
@@ -51,6 +53,7 @@ BEGIN
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -124,6 +127,27 @@ BEGIN
 		
 		RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
 		PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
+
+		RAISE NOTICE '8 - Trim arcs with vnode';
+		IF v_networkmode = 2 THEN
+		
+			-- profilactic control on temp_table
+			TRUNCATE temp_table;
+
+			-- execute vnodetrim arcs
+			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
+			
+			-- setting first message again on user's pannel
+			IF v_response = 0 THEN
+				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
+			ELSE
+				v_message = concat ('WARNING-159: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
+				v_response, ' nodarc nodes have been renamed using vnode_id');
+			END IF;
+		ELSE
+			-- setting first message on user's pannel
+			v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
+		END IF;
 
 	END IF;
 	
