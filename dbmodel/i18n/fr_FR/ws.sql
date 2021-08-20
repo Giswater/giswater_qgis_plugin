@@ -86,12 +86,12 @@ INSERT INTO node_type  VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'i
 INSERT INTO node_type  VALUES ('ADAPTATION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 2, true, 'Adaptation junction', NULL);
 INSERT INTO node_type  VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', true, true, 2, true, 'Bypass-register', NULL);
 INSERT INTO node_type  VALUES ('COURBE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 2, true, 'Curve', NULL);
-INSERT INTO node_type  VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', true, true, 2, true, 'Control register', NULL);
+INSERT INTO node_type  VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'JUNCTION', 'man_register', 'inp_valve', true, true, 2, true, 'Control register', NULL);
 INSERT INTO node_type  VALUES ('FIN_LIGNE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 1, true, 'End of the line', NULL);
 INSERT INTO node_type  VALUES ('VASE_EXPANSION', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', true, true, 2, true, 'Expansiontank', NULL);
-INSERT INTO node_type  VALUES ('FILTRE', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', true, true, 2, true, 'Filter', NULL);
-INSERT INTO node_type  VALUES ('PUIT', 'WATERWELL', 'JUNCTION', 'man_waterwell', 'inp_junction', true, true, 2, true, 'Waterwell', NULL);
-INSERT INTO node_type  VALUES ('SOURCE', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', true, true, 2, true, 'Source', NULL);
+INSERT INTO node_type  VALUES ('FILTRE', 'FILTER', 'JUNCTION', 'man_filter', 'inp_shortpipe', true, true, 2, true, 'Filter', NULL);
+INSERT INTO node_type  VALUES ('PUIT', 'WATERWELL', 'RESERVOIR', 'man_waterwell', 'inp_junction', true, true, 2, true, 'Waterwell', NULL);
+INSERT INTO node_type  VALUES ('SOURCE', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', true, true, 2, true, 'Source', NULL);
 INSERT INTO node_type  VALUES ('USINE_RETRAITEMENT', 'WTP', 'RESERVOIR', 'man_wtp', 'inp_junction', true, true, 2, true, 'Water treatment point', NULL);
 INSERT INTO node_type  VALUES ('VALVE_AIR', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', true, true, 2, true, 'Air valve', NULL);
 INSERT INTO node_type  VALUES ('VALVE_VERIF', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', true, true, 2, true, 'Check valve', NULL);

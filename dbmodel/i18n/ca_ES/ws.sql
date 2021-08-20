@@ -63,7 +63,7 @@ INSERT INTO node_type VALUES ('VALVULA_VENTOSA', 'VALVE', 'JUNCTION', 'man_valve
 INSERT INTO node_type VALUES ('VALVULA_REDUCTORA', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula reductora');
 INSERT INTO node_type VALUES ('GREEN_VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Green valve');
 INSERT INTO node_type VALUES ('CORBA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Corba');
-INSERT INTO node_type VALUES ('FILTRE', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Filtre');
+INSERT INTO node_type VALUES ('FILTRE', 'FILTER', 'JUNCTION', 'man_filter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Filtre');
 INSERT INTO node_type VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 1, TRUE, 'Final de línia');
 INSERT INTO node_type VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula controladora de fluxe');
 INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula genèrica');
@@ -81,10 +81,10 @@ INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_
 INSERT INTO node_type VALUES ('POU', 'WATERWELL', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou');
 INSERT INTO node_type VALUES ('FONT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tap');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unió on 4 conductes convergeixen');
-INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captació');
-INSERT INTO node_type VALUES ('POU_CAPTACIO', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou de captació');
+INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captació');
+INSERT INTO node_type VALUES ('POU_CAPTACIO', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou de captació');
 INSERT INTO node_type VALUES ('REGISTRE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre');
-INSERT INTO node_type VALUES ('REGISTRE_CONTROL', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Registre de control');
+INSERT INTO node_type VALUES ('REGISTRE_CONTROL', 'REGISTER', 'JUNCTION', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Registre de control');
 INSERT INTO node_type VALUES ('REGISTRE_BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre de bypass');
 INSERT INTO node_type VALUES ('VALVULA_REGISTRE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre de vàlvula');
 INSERT INTO node_type VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Escomesa topològica');
