@@ -35,8 +35,8 @@ class GwAuxPointAddButton(GwMaptool):
 
     def cancel(self):
 
-        tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
-                                   f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser('cadtools', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser('cadtools', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
         tools_gw.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
@@ -152,9 +152,9 @@ class GwAuxPointAddButton(GwMaptool):
         self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
-        if tools_gw.get_config_parser('cadtools', "rb_left", "user", "init") == 'True':
+        if tools_gw.get_config_parser('cadtools', "rb_left", "user", "session") in ("True", True):
             self.dlg_create_point.rb_left.setChecked(True)
-        else:
+        elif tools_gw.get_config_parser('cadtools', "rb_right", "user", "session") in ("True", True):
             self.dlg_create_point.rb_right.setChecked(True)
 
         tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
@@ -163,6 +163,7 @@ class GwAuxPointAddButton(GwMaptool):
     def _get_values(self, point_1, point_2):
 
         tools_gw.set_config_parser('cadtools', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser('cadtools', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
