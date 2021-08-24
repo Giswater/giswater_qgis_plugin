@@ -29,9 +29,6 @@ class GwMenuLoad(QObject):
 
         super().__init__()
         self.iface = global_vars.iface
-        self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
-        self.user_folder_dir = global_vars.user_folder_dir
 
 
     def read_menu(self):
@@ -82,8 +79,7 @@ class GwMenuLoad(QObject):
 
                 action_function = getattr(buttons, button_def)(icon_path, button_def, text, None, ag)
                 action = toolbar_submenu.addAction(icon, f"{text}")
-                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init",
-                                                          prefix=False, log_warning=False)
+                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
                 if shortcut_key:
                     action.setShortcuts(QKeySequence(f"{shortcut_key}"))
                     global_vars.shortcut_keys.append(shortcut_key)
@@ -96,7 +92,7 @@ class GwMenuLoad(QObject):
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
 
-        action_set_log_sql = actions_menu.addAction(f"Toggle log sql")
+        action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
             tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
@@ -167,7 +163,7 @@ class GwMenuLoad(QObject):
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 
-        path = os.path.realpath(self.user_folder_dir)
+        path = os.path.realpath(global_vars.user_folder_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
@@ -208,7 +204,7 @@ class GwMenuLoad(QObject):
 
         try:
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            config_folder = f"{self.user_folder_dir}{os.sep}config{os.sep}"
+            config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
             path = config_folder + f"session.config"
@@ -238,13 +234,13 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
+        files = [f for f in os.listdir(f"{global_vars.user_folder_dir}{os.sep}config")]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
             project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            parser.read(f"{self.user_folder_dir}{os.sep}config{os.sep}{file}")
+            parser.read(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
             for section in parser.sections():
@@ -306,17 +302,9 @@ class GwMenuLoad(QObject):
 
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
+        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
         self.iface.actionPan().trigger()
-
-        try:
-            self._reload_layers()
-        except NotImplementedError:
-            # Weird bug, sometimes fails to create the task...
-            try:
-                self._reload_layers()
-            except NotImplementedError:
-                tools_log.log_warning("Error reloading layers, try again...")
-            pass
+        self._reload_layers()
 
 
     def _reload_layers(self):
@@ -329,13 +317,13 @@ class GwMenuLoad(QObject):
                f"WHERE child_layer IN ("
                f"     SELECT table_name FROM information_schema.tables"
                f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql, log_sql=True)
+        rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
         params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
                   "qgis_project_infotype": global_vars.project_vars['info_type']}
-        task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(task_get_layers)
-        QgsApplication.taskManager().triggerTask(task_get_layers)
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
 
     def _reset_snapping_managers(self):

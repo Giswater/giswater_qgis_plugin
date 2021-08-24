@@ -9,13 +9,12 @@ import logging
 import inspect
 import os
 import time
+import json
 
 from qgis.core import QgsMessageLog
 
 from .. import global_vars
 from . import tools_qt, tools_os
-
-min_log_level = 20
 
 
 class GwLogger(object):
@@ -26,7 +25,10 @@ class GwLogger(object):
         # Create logger
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(int(log_level))
+        self.min_log_level = int(log_level)
         self.log_limit_characters = log_limit_characters
+        self.tab_python = f"{global_vars.plugin_name.capitalize()} PY"
+        self.tab_db = f"{global_vars.plugin_name.capitalize()} DB"
 
         # Define log folder in users folder
         main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -45,7 +47,7 @@ class GwLogger(object):
         filepath += ".log"
 
         self.log_folder = log_folder
-        log_info(f"Log file: {filepath}", logger_file=False)
+        log_info(f"Log file: {filepath}", logger_file=False, tab_name=self.tab_python)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
         self.filepath = filepath
@@ -58,6 +60,15 @@ class GwLogger(object):
 
         # Add file handler
         self.add_file_handler()
+
+
+    def set_logger_parameters(self, min_log_level, log_limit_characters):
+        """ Set logger parameters min_log_level and log_limit_characters """
+
+        if isinstance(min_log_level, int):
+            self.min_log_level = min_log_level
+        if isinstance(log_limit_characters, int):
+            self.log_limit_characters = log_limit_characters
 
 
     def add_file_handler(self):
@@ -120,8 +131,7 @@ class GwLogger(object):
         try:
 
             # Check session parameter 'min_log_level' to know if we need to log message in logger file
-            valor = min_log_level
-            if int(log_level) < int(valor):
+            if log_level < self.min_log_level:
                 return
 
             if stack_level >= len(inspect.stack()):
@@ -142,7 +152,7 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name, log_limit_characters=None):
+def set_logger(logger_name, min_log_level=20, log_limit_characters=None):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:
@@ -185,6 +195,22 @@ def log_error(text=None, context_name=None, parameter=None, logger_file=True, st
         global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
 
 
+def log_db(text=None, color="black", bold='', message_level=0, logger_file=True, stack_level_increase=0):
+    """ Write information message into QGIS Log Messages Panel (tab DB) """
+
+    if type(text) is dict:
+        text = json.dumps(text)
+    msg = f'<font color="{color}"><{bold}>{text}</font>'
+
+    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
+    if global_vars.logger and message_level >= global_vars.logger.min_message_level:
+        QgsMessageLog.logMessage(msg, global_vars.logger.tab_db, message_level)
+
+    # Log same message into logger file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text, stack_level_increase=stack_level_increase)
+
+
 def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
     """
     Write message into QGIS Log Messages Panel with selected message level
@@ -198,7 +224,7 @@ def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=N
             msg += f": {parameter}"
 
     if tab_name is None:
-        tab_name = global_vars.plugin_name
+        tab_name = global_vars.logger.tab_python
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if global_vars.logger and message_level >= global_vars.logger.min_message_level:

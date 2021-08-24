@@ -186,34 +186,19 @@ class GwEpaFileManager(GwTask):
 
     def _exec_function_pg2epa(self):
 
-        max_retries = 3
-        attempt = 0
         self.json_result = None
         self.setProgress(0)
 
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        self.body = self._create_body(extras=extras)
+        self.body = tools_gw.create_body(extras=extras)
+        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, is_thread=True, log_sql=True)
+        self.function_failed = dict_result['function_failed']
+        self.json_result = dict_result['json_result']
+        self.complet_result = dict_result['complet_result']
 
-        status = False
-        while self.json_result is None and attempt < max_retries:
-            attempt += 1
-            tools_log.log_warning(f"Attempt {attempt} of {max_retries}")
-            self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
-            self.complet_result = self.json_result
-            if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed")
-                self.function_failed = True
-            elif 'status' in self.json_result:
-                if self.json_result['status'] == 'Failed':
-                    tools_log.log_warning(self.json_result)
-                    self.function_failed = True
-                else:
-                    status = True
-                break
-
-        return status
+        return dict_result['status']
 
 
     def _export_inp(self):
@@ -425,30 +410,13 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def _create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
-        form = f'"form":{{{form}}}, '
-        feature = f'"feature":{{{feature}}}, '
-        filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = f'"pageInfo":{{}}'
-        data = f'"data":{{{filter_fields}, {page_info}'
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
-
-
     def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
         extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
-        self.body = self._create_body(extras=extras)
+        self.body = tools_gw.create_body(extras=extras)
         self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
         self.rpt_result = self.json_result
         if self.json_result is None or not self.json_result:

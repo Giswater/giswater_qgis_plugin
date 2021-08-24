@@ -27,8 +27,8 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
-    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem
+    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -73,105 +73,111 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
+    x, y = dialog.pos().x(), dialog.pos().y()
+    if isinstance(dialog, GwMainWindow):
+        x, y = x + 7, y + 24
+    elif isinstance(dialog, GwDialog):
+        x, y = x + 8, y + 31
+
     try:
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 7}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 24}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
     except Exception:
         pass
 
 
-def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, log_warning=True,
-                      get_comment=False, chk_user_params=True, get_none=False) -> str:
+def initialize_parsers():
+    """ Initialize parsers of configuration files: init, session, giswater, user_params """
+
+    for config in global_vars.list_configs:
+        filepath, parser = _get_parser_from_filename(config)
+        global_vars.configs[config][0] = filepath
+        global_vars.configs[config][1] = parser
+
+
+def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
+                      chk_user_params=True, get_none=False) -> str:
     """ Load a simple parser value """
 
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
+
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+    parser = global_vars.configs[file_name][1]
+
     value = None
-    try:
-        raw_parameter = parameter
-
-        if global_vars.project_vars['project_type'] is None and prefix:
-            global_vars.project_vars['project_type'] = get_project_type()
-        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
-            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
+    raw_parameter = parameter
+    if parser is None:
+        tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return None
-
-        path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
-        if not os.path.exists(path):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            return value
-
         parser.read(path)
-        if not parser.has_section(section) or not parser.has_option(section, parameter):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            return value
+
+    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+    if global_vars.project_loaded and file_name in ('init', 'session'):
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
+
+    if config_type == 'user' and prefix and global_vars.project_type is not None:
+        parameter = f"{global_vars.project_type}_{parameter}"
+
+    if not parser.has_section(section) or not parser.has_option(section, parameter):
+        if chk_user_params and config_type in "user":
+            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+    else:
         value = parser[section][parameter]
 
-        # If there is a value and you don't want to get the comment, it only gets the value part
-        if value is not None and not get_comment:
-            value = value.split('#')[0].strip()
+    # If there is a value and you don't want to get the comment, it only gets the value part
+    if value is not None and not get_comment:
+        value = value.split('#')[0].strip()
 
-        if not get_none and str(value) in "None":
-            value = None
-
-        # Check if the parameter exists in the inventory, if not creates it
-        if chk_user_params and config_type in "user":
-            _check_user_params(section, raw_parameter, file_name, prefix)
-
-    except Exception as e:
-        tools_log.log_warning(str(e))
+    if not get_none and str(value) in "None":
         value = None
-    finally:
-        return value
+
+    # Check if the parameter exists in the inventory, if not creates it
+    if chk_user_params and config_type in "user":
+        _check_user_params(section, raw_parameter, file_name, prefix)
+
+    return value
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
                       comment=None, prefix=True, chk_user_params=True):
     """ Save simple parser value """
 
-    value = f"{value}"  # Cast to str because parser only allow strings
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
+
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+
     try:
-        raw_parameter = parameter
 
-        if global_vars.project_vars['project_type'] is None and prefix:
-            global_vars.project_vars['project_type'] = get_project_type()
-        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
-            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return
-
-        config_folder = path_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + f"{file_name}.config"
         parser.read(path)
+
+        raw_parameter = parameter
+        if config_type == 'user' and prefix and global_vars.project_type is not None:
+            parameter = f"{global_vars.project_type}_{parameter}"
+
         # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
+
+        # Cast to str because parser only allow strings
+        value = f"{value}"
         if value is not None:
             # Add the comment to the value if there is one
             if comment is not None:
                 value += f" #{comment}"
             # If the previous value had an inline comment, don't remove it
             else:
-                prev = get_config_parser(section, parameter, config_type, file_name, False, False, True, False)
+                prev = get_config_parser(section, parameter, config_type, file_name, False, True, False)
                 if prev is not None and "#" in prev:
                     value += f" #{prev.split('#')[1]}"
             parser.set(section, parameter, value)
@@ -184,6 +190,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
+
     except Exception as e:
         tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
         return
@@ -208,7 +215,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None, hide_config_widgets=False):
+def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False):
     """ Open dialog """
 
     # Check database connection before opening dialog
@@ -254,10 +261,17 @@ def close_dialog(dlg):
 def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
 
-    if global_vars.project_epsg is None:
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-    else:
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES","epsg":{global_vars.project_epsg}}}, '
+    info_types = {'full': 1}
+    info_type = info_types.get(global_vars.project_vars['info_type'])
+    lang = QgsApplication.locale().upper()
+
+    client = f'$${{"client":{{"device":4, "lang":"{lang}"'
+    if info_type is not None:
+        client += f', "infoType":{info_type}'
+    if global_vars.project_epsg is not None:
+        client += f', "epsg":{global_vars.project_epsg}'
+    client += f'}}, '
+
     form = f'"form":{{{form}}}, '
     feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
@@ -1325,7 +1339,7 @@ def set_data_type(field, widget):
 
 def set_widget_size(widget, field):
 
-    if field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
+    if 'widgetcontrols' in field and field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
         if field['widgetcontrols']['widgetdim']:
             widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
             widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
@@ -1427,8 +1441,8 @@ def fill_combo(widget, field):
             elem = [field['comboIds'][i], field['comboNames'][i]]
             combolist.append(elem)
     else:
-        msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-              f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+        msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
+              f"AND widgettype='{field['widgettype']}'"
         tools_qgis.show_message(msg, 2)
     # Populate combo
     for record in combolist:
@@ -1535,8 +1549,46 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
-                      json_loads=False, rubber_band=None, aux_conn=None, is_thread=False, check_function=True):
+def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
+        is_thread=False, check_function=True):
+    """ Manage execution of database function @function_name
+        If execution failed, try to execute it again up to the value indicated in parameter 'max_retries'
+    """
+
+    # Define dictionary with results
+    dict_result= {}
+    status = False
+    function_failed = False
+    json_result = None
+    complet_result = None
+
+    attempt = 0
+    while json_result is None and attempt < global_vars.max_retries:
+        attempt += 1
+        tools_log.log_info(f"Attempt {attempt} of {global_vars.max_retries}")
+        json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
+            is_thread, check_function)
+        complet_result = json_result
+        if json_result is None or not json_result:
+            function_failed = True
+        elif 'status' in json_result:
+            if json_result['status'] == 'Failed':
+                tools_log.log_warning(json_result)
+                function_failed = True
+            else:
+                status = True
+            break
+
+    dict_result['status'] = status
+    dict_result['function_failed'] = function_failed
+    dict_result['json_result'] = json_result
+    dict_result['complet_result'] = complet_result
+
+    return dict_result
+
+
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, rubber_band=None,
+        aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1553,9 +1605,11 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return None
 
-    # Execute function. If failed, always log it
+    # Manage schema_name and parameters
     if schema_name:
         sql = f"SELECT {schema_name}.{function_name}("
+    elif schema_name is None and global_vars.schema_name:
+        sql = f"SELECT {global_vars.schema_name}.{function_name}("
     else:
         sql = f"SELECT {function_name}("
     if parameters:
@@ -1567,24 +1621,17 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 
+    # Execute database function
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
-
-    # Control null
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
         return None
 
     # Get json result
-    if json_loads:
-        # If content of row[0] is not a to json, cast it
-        json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-    else:
-        json_result = row[0]
-
-    # Log result
-    if log_result:
-        tools_log.log_info(json_result, stack_level_increase=1)
+    json_result = row[0]
+    if log_sql:
+        tools_log.log_db(json_result)
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
@@ -1718,6 +1765,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
         return_manager = json_result['body']['returnManager']
     except KeyError:
         return
+
     srid = global_vars.data_epsg
     try:
         margin = None
@@ -1727,7 +1775,6 @@ def manage_json_return(json_result, sql, rubber_band=None):
             margin = return_manager['zoom']['margin']
 
         if 'style' in return_manager and 'ruberband' in return_manager['style']:
-            # Set default values
             width = 3
             color = QColor(255, 0, 0, 125)
             if 'transparency' in return_manager['style']['ruberband']:
@@ -2016,13 +2063,14 @@ def manage_layer_manager(json_result, sql=None):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
+                    segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
                     layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
-                        layer_settings.setType(2)
+                        layer_settings.setTypeFlag(segment_flag)
                         layer_settings.setTolerance(15)
                         layer_settings.setEnabled(True)
                     else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
                     snapping_config = snapper_manager.get_snapping_options()
                     snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
@@ -2039,7 +2087,7 @@ def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
-        class_object.feature_type = get_signal_change_tab(dialog)
+        class_object.feature_type = get_signal_change_tab(dialog, excluded_layers=class_object.excluded_layers)
     except AttributeError:
         # In case the dialog has no tab
         pass
@@ -2477,7 +2525,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
-    row = tools_db.get_row(sql, log_sql=False)
+    row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
         if row[0]:
@@ -2708,20 +2756,25 @@ def create_sqlite_conn(file_name):
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
-    inv_sections = _get_user_params_sections()
+    parser = global_vars.configs['user_params'][1]
+    if parser is None:
+        return
+
+    # Get the sections of the user params inventory
+    inv_sections = parser.sections()
 
     # For each section (inventory)
     for section in inv_sections:
 
         file_name = section.split('.')[0]
         section_name = section.split('.')[1]
-        parameters = _get_user_params_parameters(section)
+        parameters = parser.options(section)
 
         # For each parameter (inventory)
         for parameter in parameters:
 
             # Manage if parameter need prefix and project_type is not defined
-            if parameter.startswith("_") and global_vars.project_vars['project_type'] is None:
+            if parameter.startswith("_") and global_vars.project_type is None:
                 continue
 
             _pre = False
@@ -2732,20 +2785,22 @@ def user_params_to_userconfig():
                 parameter = inv_param[1:]
             # If it's just a comment line
             if parameter.startswith("#"):
+                # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
                 set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
                 continue
 
             # If it's a normal value
             # Get value[section][parameter] of the user config file
-            value = get_config_parser(section_name, parameter, "user", file_name, _pre, False, True, False, True)
+            value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
+
             # If this value (user config file) is None (doesn't exist, isn't set, etc.)
             if value is None:
                 # Read the default value for that parameter
-                value = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False, True)
+                value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
                 # Set value[section][parameter] in the user config file
                 set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
             else:
-                value2 = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False, True)
+                value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
                 if value2 is not None:
                     # If there's an inline comment in the inventory but there isn't one in the user config file, add it
                     if "#" not in value and "#" in value2:
@@ -2764,6 +2819,10 @@ def remove_deprecated_config_vars():
 
     # Get deprecated vars for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     init_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
     if vars is not None:
@@ -2777,12 +2836,17 @@ def remove_deprecated_config_vars():
                     init_parser.remove_option(section, f"{proj}{option}")
             else:
                 init_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         init_parser.write(configfile)
         configfile.close()
 
     # Get deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     session_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
     if vars is not None:
@@ -2796,6 +2860,7 @@ def remove_deprecated_config_vars():
                     session_parser.remove_option(section, f"{proj}{option}")
             else:
                 session_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         session_parser.write(configfile)
         configfile.close()
@@ -2842,12 +2907,14 @@ def _check_user_params(section, parameter, file_name, prefix=False):
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
+
     # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_vars['project_type'] is not None:
+    if prefix and global_vars.project_type is not None:
         parameter = f"_{parameter}"
+
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
-    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False, True,
-                              chk_user_params=False, get_none=True)
+    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
+                                    get_comment=True, chk_user_params=False)
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
@@ -2856,24 +2923,27 @@ def _check_user_params(section, parameter, file_name, prefix=False):
         return check_value
 
 
-def _get_user_params_sections():
-    """ Get the sections of the user params inventory """
+def _get_parser_from_filename(filename):
+    """ Get parser of file @filename.config """
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    return parser.sections()
-
-
-def _get_user_params_parameters(section: str):
-    """ Get the parameters of a section from the user params inventory """
-
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    if parser.has_section(section):
-        return parser.options(section)
+    if filename in ('init', 'session'):
+        folder = global_vars.user_folder_dir
+    elif filename in ('dev', 'giswater', 'user_params'):
+        folder = global_vars.plugin_dir
     else:
-        return None
+        return None, None
+
+    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+    filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
+    if not os.path.exists(filepath):
+        tools_log.log_warning(f"File not found: {filepath}")
+        return filepath, None
+
+    if not parser.read(filepath):
+        tools_log.log_warning(f"Error parsing file: {filepath}")
+        return filepath, None
+
+    return filepath, parser
+
 
 # endregion

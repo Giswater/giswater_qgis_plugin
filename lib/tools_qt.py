@@ -617,6 +617,8 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
+    if expr_filter is not None:
+        model.setFilter(expr_filter)
     model.select()
 
     # Check for errors
@@ -625,8 +627,6 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
 
     # Attach model to tableview
     qtable.setModel(model)
-    if expr_filter:
-        qtable.model().setFilter(expr_filter)
 
 
 def add_layer_to_toc(layer, group=None):
@@ -931,12 +931,16 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
     msg = tr(text, context_name)
     if parameter:
         msg += ": " + str(parameter)
+    if len(msg) > 750:
+        msg = msg[:750] + "\n[...]"
     msg_box.setText(msg)
     if title:
         title = tr(title, context_name)
         msg_box.setWindowTitle(title)
     if inf_text:
         inf_text = tr(inf_text, context_name)
+        if len(inf_text) > 500:
+            inf_text = inf_text[:500] + "\n[...]"
         msg_box.setInformativeText(inf_text)
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
@@ -958,6 +962,8 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
             msg += ": " + str(parameter)
 
     msg_box = QMessageBox()
+    if len(msg) > 750:
+        msg = msg[:750] + "\n[...]"
     msg_box.setText(msg)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     if title:
@@ -965,6 +971,8 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
         msg_box.setWindowTitle(title)
     if inf_text:
         inf_text = tr(inf_text, context_name)
+        if len(inf_text) > 500:
+            inf_text = inf_text[:500] + "\n[...]"
         msg_box.setInformativeText(inf_text)
     msg_box.setDefaultButton(QMessageBox.No)
     msg_box.exec_()

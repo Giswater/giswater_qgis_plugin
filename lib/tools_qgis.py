@@ -198,17 +198,6 @@ def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir
     return build_version
 
 
-def get_project_variables():
-    """ Manage QGIS project variables """
-
-    global_vars.project_vars = {}
-    global_vars.project_vars['info_type'] = get_project_variable('gwInfoType')
-    global_vars.project_vars['add_schema'] = get_project_variable('gwAddSchema')
-    global_vars.project_vars['main_schema'] = get_project_variable('gwMainSchema')
-    global_vars.project_vars['project_role'] = get_project_variable('gwProjectRole')
-    global_vars.project_vars['project_type'] = get_project_variable('gwProjectType')
-
-
 def enable_python_console():
     """ Enable Python console and Log Messages panel """
 
@@ -349,7 +338,6 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
 
     # Iterate over all layers
     layer = None
-    get_project_variables()
     if schema_name is None:
         if 'main_schema' in global_vars.project_vars:
             schema_name = global_vars.project_vars['main_schema']

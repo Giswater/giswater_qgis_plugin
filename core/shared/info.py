@@ -102,7 +102,6 @@ class GwInfo(QObject):
         # Get project variables
         qgis_project_add_schema = global_vars.project_vars['add_schema']
         qgis_project_main_schema = global_vars.project_vars['main_schema']
-        qgis_project_infotype = global_vars.project_vars['info_type']
         qgis_project_role = global_vars.project_vars['project_role']
 
         self.new_feature = new_feature
@@ -125,7 +124,6 @@ class GwInfo(QObject):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-        extras += f', "rolePermissions":"{qgis_project_infotype}"'
 
         function_name = None
         body = None
@@ -149,7 +147,6 @@ class GwInfo(QObject):
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "mainSchema":"{qgis_project_main_schema}"'
             extras += f', "addSchema":"{qgis_project_add_schema}"'
-            extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = tools_gw.create_body(extras=extras)
@@ -177,7 +174,7 @@ class GwInfo(QObject):
             return False, None
 
         # Manage status failed
-        if json_result['status'] == 'Failed':
+        if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
@@ -203,7 +200,8 @@ class GwInfo(QObject):
             if self.lyr_dim:
                 self.dimensioning = GwDimensioning()
                 feature_id = self.complet_result['body']['feature']['id']
-                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
+                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
+                    feature_id, self.rubber_band)
                 return result, dialog
 
         elif template == 'info_feature':
@@ -214,7 +212,8 @@ class GwInfo(QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result['body']['feature']['id']
-            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
+            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
+                new_feature=new_feature)
             if feature_cat is not None:
                 self._manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -423,7 +422,7 @@ class GwInfo(QObject):
 
         self._get_features(complet_result)
         if self.layer is None:
-            tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
+            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
             return False, self.dlg_cf
 
         # Remove unused tabs
@@ -434,10 +433,15 @@ class GwInfo(QObject):
         self.feature_id = complet_result['body']['feature']['id']
 
         # Get the start point and end point of the feature
+        list_points = None
         if new_feature:
             list_points = tools_qgis.get_points_from_geometry(self.layer, new_feature)
         else:
-            list_points = f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, "y1": {complet_result["body"]["feature"]["geometry"]["y"]}'
+            try:
+                list_points = (f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, '
+                               f'"y1": {complet_result["body"]["feature"]["geometry"]["y"]}')
+            except:
+                pass
 
         if 'visibleTabs' in complet_result['body']['form']:
             for tab in complet_result['body']['form']['visibleTabs']:
@@ -458,8 +462,9 @@ class GwInfo(QObject):
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
-            self.action_edit.setEnabled(complet_result['body']['feature']['permissions']['isEditable'])
-        except KeyError:
+            is_enabled = complet_result['body']['feature']['permissions']['isEditable']
+            self.action_edit.setEnabled(is_enabled)
+        except Exception:
             pass
 
         # Add icons to actions & buttons
@@ -492,7 +497,7 @@ class GwInfo(QObject):
         else:
             dlg_cf.dlg_closed.connect(self._roll_back)
             dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-            dlg_cf.dlg_closed.connect(lambda: self.layer.removeSelection())
+            dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._reset_my_json)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
@@ -729,11 +734,15 @@ class GwInfo(QObject):
         # Set title
         title = f"{complet_result['body']['form']['headerText']}"
 
-        # Set toolbox labels
-        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        toolbox_cf.setItemText(0, complet_result['body']['form']['tabDataLytNames']['index_0'])
-        toolbox_cf.setItemText(1, complet_result['body']['form']['tabDataLytNames']['index_1'])
-        return title
+        try:
+            # Set toolbox labels
+            toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+            toolbox_cf.setItemText(0, complet_result['body']['form']['tabDataLytNames']['index_0'])
+            toolbox_cf.setItemText(1, complet_result['body']['form']['tabDataLytNames']['index_1'])
+        except Exception:
+            pass
+        finally:
+            return title
 
 
     def _open_help(self, feature_type):
@@ -779,8 +788,9 @@ class GwInfo(QObject):
 
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
-            # self.layer.editingStopped.connect(self.fct_stop_editing)
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').triggered.connect(self.fct_block_action_edit)
+            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
+            if action_toggle_editing:
+                action_toggle_editing.triggered.connect(self.fct_block_action_edit)
             self.connected = True
 
 
@@ -797,7 +807,9 @@ class GwInfo(QObject):
             pass
 
         try:
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
+            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
+            if action_toggle_editing:
+                action_toggle_editing.triggered.disconnect(self.fct_block_action_edit)
         except Exception:
             pass
 
@@ -814,12 +826,13 @@ class GwInfo(QObject):
         dlg_interpolate = GwInterpolate()
         tools_gw.load_settings(dlg_interpolate)
 
-        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, 'Interpolate tool. \n'
-                                'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
-                                'edit_node_interpolate on table config_param_user')
+        msg = ('Interpolate tool.\n'
+               'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
+               'edit_node_interpolate on table config_param_user')
+        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, msg)
 
-        dlg_interpolate.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
-                                   "interpolation\nNode1: \nNode2:")
+        msg = "Please, use the cursor to select two nodes to proceed with the interpolation\nNode1: \nNode2:"
+        dlg_interpolate.lbl_text.setText(msg)
 
         dlg_interpolate.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_interpolate))
         dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
@@ -1192,10 +1205,18 @@ class GwInfo(QObject):
 
         self._roll_back()
         tools_gw.reset_rubberband(self.rubber_band)
-        self.layer.removeSelection()
+        self._remove_layer_selection()
         global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json()
         tools_gw.close_docker()
+
+
+    def _remove_layer_selection(self):
+
+        try:
+            self.layer.removeSelection()
+        except RuntimeError:
+            pass
 
 
     def _manage_info_close(self, dialog):
@@ -1389,6 +1410,8 @@ class GwInfo(QObject):
         try:
             self.layer.rollBack()
         except AttributeError:
+            pass
+        except RuntimeError:
             pass
 
 
@@ -1673,7 +1696,7 @@ class GwInfo(QObject):
                     tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
-        tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
+        tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
 
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
@@ -2264,7 +2287,7 @@ class GwInfo(QObject):
                " FROM " + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = tools_db.get_row(sql, log_info=False, log_sql=False)
+        row = tools_db.get_row(sql, log_info=False)
 
         # If object already exist show warning message
         if row:
@@ -2315,8 +2338,7 @@ class GwInfo(QObject):
         message = "Are you sure you want to delete these records?"
         answer = tools_qt.show_question(message, "Delete records", list_object_id)
         if answer:
-            sql = ("DELETE FROM " + table_name + ""
-                   " WHERE id::integer IN (" + list_id + ")")
+            sql = f"DELETE FROM {table_name} WHERE id::integer IN ({list_id})"
             tools_db.execute_sql(sql, log_sql=False)
             widget.model().select()
 
@@ -2486,16 +2508,18 @@ class GwInfo(QObject):
 
         table_hydro_value = "v_ui_hydroval_x_connec"
 
-        # Populate combo filter hydrometer value
+        # Populate combo filter hydrometer peridod
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
-               f"FROM ext_cat_period as t1 "
-               f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
+               f"FROM ext_cat_period AS t1 "
+               f"JOIN (SELECT * FROM v_ui_hydroval_x_connec WHERE connec_id = '" + str(self.feature_id) + "' "
+			   f") AS t2 on t1.id = t2.cat_period_id "
                f"ORDER BY t2.cat_period_id DESC")
         rows = tools_db.get_rows(sql)
         if not rows:
             return False
         tools_qt.fill_combo_values(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
+        # Populate combo filter hydrometer peridod
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '" + str(self.feature_id) + "' "
@@ -2608,6 +2632,7 @@ class GwInfo(QObject):
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
         """ Get values selected by the user and sets a new filter for its table model """
+
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
@@ -2616,6 +2641,7 @@ class GwInfo(QObject):
             message = "Selected date interval is not valid"
             tools_qgis.show_warning(message)
             return
+
         if type(table_name) is dict:
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
@@ -2681,7 +2707,7 @@ class GwInfo(QObject):
 
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE visit_id = '{self.visit_id}'")
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         for path in rows:
             # Open selected document
             status, message = tools_os.open_file(path[0])
@@ -2912,7 +2938,7 @@ class GwInfo(QObject):
 
         sql = (f"SELECT gallery, document FROM {table_name}"
                f" WHERE event_id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
-        row = tools_db.get_row(sql, log_sql=False)
+        row = tools_db.get_row(sql)
         if not row:
             return
 

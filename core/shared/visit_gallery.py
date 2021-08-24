@@ -41,7 +41,7 @@ class GwVisitGallery:
         # Get all pictures for event_id | visit_id
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         num = len(rows)
         for m in range(0, num):
             self.img_path_list1D.append(rows[m][0])
@@ -126,7 +126,7 @@ class GwVisitGallery:
             self.btn_next.setDisabled(True)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery')
 
 
     # region private functions
@@ -245,7 +245,7 @@ class GwVisitGallery:
         self.btn_slideNext.clicked.connect(self._slide_next)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom')
 
         # Controling start index
         if handeler_index != i:

@@ -131,10 +131,10 @@ def manage_pg_service(section):
 
     service_file = os.environ.get('PGSERVICEFILE')
     if service_file is None:
-        tools_log.log_warning(f"Environment variable 'PGSERVICEFILE' not set")
         return None
+
     if not os.path.exists(service_file):
-        tools_log.log_warning(f"File not found: {service_file}")
+        tools_log.log_warning(f"File defined in environment variable 'PGSERVICEFILE' not found: {service_file}")
         return None
 
     config_parser = configparser.ConfigParser()

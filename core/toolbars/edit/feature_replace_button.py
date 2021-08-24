@@ -8,13 +8,15 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, Qt
+from qgis.PyQt.QtCore import QDate, Qt, QObject
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_db
+from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptool):
@@ -31,6 +33,18 @@ class GwFeatureReplaceButton(GwMaptool):
         self.cat_table = None
         self.feature_edit_type = None
         self.feature_type_cat = None
+
+        # Create a menu and add all the actions
+        if toolbar is not None:
+            toolbar.removeAction(self.action)
+
+        self.menu = QMenu()
+        self.menu.setObjectName("GW_replace_menu")
+        self._fill_replace_menu()
+
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
 
 
     # region QgsMapTools inherited
@@ -100,9 +114,7 @@ class GwFeatureReplaceButton(GwMaptool):
     def activate(self):
 
         # Set active and current layer
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
-        self.current_layer = self.layer_node
+        self._set_active_layer("NODE")
 
         # Check button
         self.action.setChecked(True)
@@ -138,6 +150,40 @@ class GwFeatureReplaceButton(GwMaptool):
     # endregion
 
     # region private functions
+
+    def _fill_replace_menu(self):
+        """ Fill replace feature menu """
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+        ag = QActionGroup(self.iface.mainWindow())
+
+        actions = ['ARC', 'NODE', 'CONNEC']
+        if global_vars.project_type in ('UD', 'ud'):
+            actions.append('GULLY')
+
+        for action in actions:
+            obj_action = QAction(f"{action}", ag)
+            self.menu.addAction(obj_action)
+            obj_action.triggered.connect(partial(super().clicked_event))
+            obj_action.triggered.connect(partial(self._set_active_layer, action))
+
+
+    def _set_active_layer(self, name):
+        """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
+
+        layers = {"ARC": "v_edit_arc", "NODE": "v_edit_node",
+                  "CONNEC": "v_edit_connec", "GULLY": "v_edit_gully"}
+        layer = layers.get(name.upper())
+        # self.force_active_layer = False
+        self.layer_node = tools_qgis.get_layer_by_tablename(layer)
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
+
 
     def _manage_dates(self, date_value):
         """ Manage dates """
@@ -236,7 +282,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_replace, maximize_button=False)
+        tools_gw.open_dialog(self.dlg_replace)
 
 
     def _open_catalog(self, feature_type):

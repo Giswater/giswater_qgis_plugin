@@ -28,9 +28,6 @@ class GwPrintButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.destroyed = False
-        self.printer = None
-        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
     def clicked_event(self):
@@ -42,7 +39,11 @@ class GwPrintButton(GwAction):
 
     def _open_print(self):
 
+        self.destroyed = False
+        self.printer = None
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
         self.my_json = {}
+
         composers_list = self._get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."

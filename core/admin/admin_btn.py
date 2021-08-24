@@ -58,9 +58,9 @@ class GwAdminButton:
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                              "giswater", False))
+                                                                       "giswater", False))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -650,7 +650,11 @@ class GwAdminButton:
             self.form_enabled = False
 
         elif self.form_enabled:
-            if str(self.plugin_version) > str(self.project_version):
+            schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+            if schema_name == 'null':
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
+            elif str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is lower than plugin version, please update schema)')
@@ -1369,7 +1373,7 @@ class GwAdminButton:
         complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
-        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
+        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
 
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
@@ -1408,8 +1412,8 @@ class GwAdminButton:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body,
-                                            schema_name=self.schema_name, commit=False, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False,
+            log_sql=True)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
@@ -1796,7 +1800,7 @@ class GwAdminButton:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = tools_db.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
@@ -2022,25 +2026,23 @@ class GwAdminButton:
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        # TODO: Make just one SQL query
-        self.project_type = tools_gw.get_project_type(schemaname=schema_name)
-        self.project_epsg = self._get_project_epsg(schemaname=schema_name)
-        self.project_version = self._get_project_version(schemaname=schema_name)
-        self.project_language = self._get_project_language(schemaname=schema_name)
-
         self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
 
-        if schema_name is None:
-            schema_name = 'Nothing to select'
-            self.project_version = "Version not found"
+        if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
-        if schema_name in (None, '', 'null'):
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + '')
             self.software_version_info.setText(msg)
+
         else:
+            # TODO: Make just one SQL query
+            self.project_type = tools_gw.get_project_type(schemaname=schema_name)
+            self.project_epsg = self._get_project_epsg(schemaname=schema_name)
+            self.project_version = self._get_project_version(schemaname=schema_name)
+            self.project_language = self._get_project_language(schemaname=schema_name)
+
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
                    'Schema name: ' + schema_name + '\n' + ''
@@ -2057,8 +2059,9 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if schema_name == 'Nothing to select' or schema_name == '' and self.form_enabled:
+        if schema_name == 'null' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         elif str(self.plugin_version) > str(self.project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
@@ -2255,6 +2258,7 @@ class GwAdminButton:
     def _read_files(self, filelist, filedir):
         """"""
 
+        f = None
         if "changelog.txt" in filelist:
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
@@ -2266,7 +2270,9 @@ class GwAdminButton:
             except Exception as e:
                 tools_log.log_warning("Error _read_files: " + str(e))
                 return False
-
+            finally:
+                if f:
+                    f.close()
         return True
 
 
@@ -2312,8 +2318,7 @@ class GwAdminButton:
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = tools_gw.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body,
-                                            schema_name=schema, commit=False)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False)
         if not result or result['status'] == 'Failed':
             return
         self.task1.setProgress(100)
@@ -2368,14 +2373,17 @@ class GwAdminButton:
             # Insert inp values into database
             self._insert_inp_into_db(self.file_inp)
 
+            # Get the debugMode. If it's None it will be False
+            debug_mode = tools_gw.get_config_parser('system', 'import_inp_debug_mode', "user", "init") or False
+
             # Execute import data
             if project_type.lower() == 'ws':
                 function_name = 'gw_fct_import_epanet_inp'
-                extras = '"parameters":{}'
+                extras = '"parameters":{"debugMode":"' + debug_mode + '"}'
             elif project_type.lower() == 'ud':
                 function_name = 'gw_fct_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
+                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '", "debugMode":"' + debug_mode + '"}'
             else:
                 self.error_count = self.error_count + 1
                 return
@@ -2570,13 +2578,13 @@ class GwAdminButton:
         body = body.replace('""', 'null')
 
         # Execute query
-        json_result = tools_gw.execute_procedure('gw_fct_admin_manage_child_views', body,
-                                                 schema_name=schema_name, commit=True)
+        json_result = tools_gw.execute_procedure('gw_fct_admin_manage_child_views', body, schema_name)
         self._manage_json_message(json_result, title="Create child view")
 
 
     def _update_sys_fields(self):
         """"""
+
         # Create the dialog and signals
         self.dlg_manage_sys_fields = GwAdminSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
@@ -2961,8 +2969,7 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
                 return
@@ -3003,8 +3010,7 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Field update in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
                 return
@@ -3020,8 +3026,7 @@ class GwAdminButton:
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body,
-                                                     schema_name=schema_name, commit=True)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Delete function")
 
         # Close dialog
@@ -3210,7 +3215,7 @@ class GwAdminButton:
         sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
         tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
 
-        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
 
 
     def _set_user_sslmode(self):

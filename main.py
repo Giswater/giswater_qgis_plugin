@@ -11,13 +11,15 @@ from functools import partial
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu, QApplication
 
 from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .lib import tools_qgis, tools_os, tools_log
+from .core.ui.dialog import GwDialog
+from .core.ui.main_window import GwMainWindow
 
 
 class Giswater(QObject):
@@ -31,30 +33,20 @@ class Giswater(QObject):
         """
 
         super(Giswater, self).__init__()
-
-        # Initialize instance attributes
         self.iface = iface
-        self.srid = None
         self.load_project = None
-        self.dict_toolbars = {}
-        self.dict_actions = {}
-        self.actions_not_checkable = None
-        self.available_layers = []
         self.btn_add_layers = None
-        self.update_sql = None
         self.action = None
         self.action_info = None
-        self.toolButton = None
 
 
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
         # Initialize plugin
-        self._init_plugin()
-
-        # Force project read (to work with PluginReloader)
-        self._project_read(False, False)
+        if self._init_plugin():
+            # Force project read (to work with PluginReloader)
+            self._project_read(False, False)
 
 
     def unload(self, hide_gw_button=True):
@@ -74,6 +66,9 @@ class Giswater(QObject):
 
             # Remove Giswater dockers
             self._remove_dockers()
+
+            # Close all open dialogs
+            self._close_open_dialogs()
 
             # Force action pan
             self.iface.actionPan().trigger()
@@ -131,36 +126,54 @@ class Giswater(QObject):
         """ Plugin main initialization function """
 
         # Initialize plugin global variables
-        self.plugin_dir = os.path.dirname(__file__)
-        global_vars.plugin_dir = self.plugin_dir
+        plugin_dir = os.path.dirname(__file__)
+        global_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', self.plugin_dir)
-        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir)
+        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
+        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
+        major_version = tools_qgis.get_major_version(plugin_dir=plugin_dir)
         user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
-        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, user_folder_dir)
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
+
+        # Create log file
+        min_log_level = 20
+        log_limit_characters = None
+        tools_log.set_logger(self.plugin_name, min_log_level, log_limit_characters)
+        tools_log.log_info("Initialize plugin")
 
         # Check if config file exists
-        setting_file = os.path.join(self.plugin_dir, 'config', 'giswater.config')
+        setting_file = os.path.join(plugin_dir, 'config', 'giswater.config')
         if not os.path.exists(setting_file):
             message = f"Config file not found at: {setting_file}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            return
+            tools_qgis.show_warning(message)
+            return False
 
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
         global_vars.init_giswater_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
+
+        # Check if user config folder exists
+        self._manage_user_config_folder(global_vars.user_folder_dir)
+
+        # Initialize parsers of configuration files: init, session, giswater, user_params
+        tools_gw.initialize_parsers()
+
+        # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
+        tools_gw.user_params_to_userconfig()
+
+        # Set logger parameters min_log_level and log_limit_characters
+        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
+        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
+        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
-        # Set logger (no database connection yet)
-        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
-        tools_log.min_log_level = min_log_level
-        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
-        tools_log.set_logger(self.plugin_name, log_limit_characters)
+        # Set init parameter 'max_retries'
+        max_retries = int(tools_gw.get_config_parser('system', 'max_retries', 'user', 'init', False))
+        global_vars.max_retries = max_retries
 
         # Define signals
         self._set_signals()
@@ -168,11 +181,28 @@ class Giswater(QObject):
         # Set main information button (always visible)
         self._set_info_button()
 
-        # Manage section 'actions_list' of config file
-        self._manage_section_actions_list()
+        return True
 
-        # Manage section 'toolbars' of config file
-        self._manage_section_toolbars()
+
+    def _manage_user_config_folder(self, user_folder_dir):
+        """ Check if user config folder exists. If not create empty files init.config and session.config """
+
+        try:
+            config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+            if not os.path.exists(config_folder):
+                tools_log.log_info(f"Creating user config folder: {config_folder}")
+                os.makedirs(config_folder)
+
+            # Check if config files exists. If not create them empty
+            filepath = f"{config_folder}{os.sep}init.config"
+            if not os.path.exists(filepath):
+                open(filepath, 'a').close()
+            filepath = f"{config_folder}{os.sep}session.config"
+            if not os.path.exists(filepath):
+                open(filepath, 'a').close()
+
+        except Exception as e:
+            tools_log.log_warning(f"manage_user_config_folder: {e}")
 
 
     def _set_signals(self):
@@ -193,8 +223,8 @@ class Giswater(QObject):
         """
 
         # Create instance class and add button into QGIS toolbar
-        self.toolButton = QToolButton()
-        self.action_info = self.iface.addToolBarWidget(self.toolButton)
+        main_toolbutton = QToolButton()
+        self.action_info = self.iface.addToolBarWidget(main_toolbutton)
 
         # Set icon button if exists
         icon_path = self.icon_folder + '36.png'
@@ -204,9 +234,9 @@ class Giswater(QObject):
         else:
             self.action = QAction("Show info", self.iface.mainWindow())
 
-        self.toolButton.setDefaultAction(self.action)
-        self.update_sql = GwAdminButton()
-        self.action.triggered.connect(partial(self.update_sql.init_sql, True))
+        main_toolbutton.setDefaultAction(self.action)
+        admin_button = GwAdminButton()
+        self.action.triggered.connect(partial(admin_button.init_sql, True))
 
 
     def _unset_info_button(self):
@@ -239,53 +269,6 @@ class Giswater(QObject):
         menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
         if menu_giswater not in (None, "None"):
             menu_giswater.deleteLater()
-
-
-    def _manage_section_actions_list(self):
-        """ Manage section 'actions_list' of config file """
-
-        # Dynamically get parameters defined in section 'actions_list' from qgis variables into 'list_keys'
-        section = 'actions_not_checkable'
-        global_vars.giswater_settings.beginGroup(section)
-        list_keys = global_vars.giswater_settings.allKeys()
-        global_vars.giswater_settings.endGroup()
-
-        # Get value for every key and append into 'self.dict_actions' dictionary
-        for key in list_keys:
-            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
-            if list_values:
-                self.dict_actions[key] = list_values
-            else:
-                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
-
-        # Get list of actions not checkable (normally because they open a form)
-        aux = []
-        for list_actions in self.dict_actions.values():
-            for elem in list_actions:
-                aux.append(elem)
-
-        self.actions_not_checkable = sorted(aux)
-
-
-    def _manage_section_toolbars(self):
-        """ Manage section 'toolbars' of config file """
-
-        # Dynamically get parameters defined in section 'toolbars' from qgis variables into 'list_keys'
-        section = 'toolbars'
-        global_vars.giswater_settings.beginGroup(section)
-        list_keys = global_vars.giswater_settings.allKeys()
-        global_vars.giswater_settings.endGroup()
-
-        # Get value for every key and append into 'self.dict_toolbars' dictionary
-        for key in list_keys:
-            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
-            if list_values:
-                # Check if list_values has only one value
-                if type(list_values) is str:
-                    list_values = [list_values]
-                self.dict_toolbars[key] = list_values
-            else:
-                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
     def _project_new(self):
@@ -324,7 +307,7 @@ class Giswater(QObject):
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
-                global_vars.project_vars['project_type'] is None:
+                global_vars.project_type is None:
             return
 
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
@@ -357,5 +340,20 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
+
+
+    def _close_open_dialogs(self):
+        """ Close Giswater open dialogs """
+
+        # Get all widgets
+        allwidgets = QApplication.allWidgets()
+
+        # Only keep Giswater widgets that are currently open
+        windows = [x for x in allwidgets if
+                   not x.isHidden() and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
+
+        # Close them
+        for window in windows:
+            tools_gw.close_dialog(window)
 
     # endregion

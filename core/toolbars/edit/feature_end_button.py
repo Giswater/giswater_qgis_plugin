@@ -91,6 +91,7 @@ class GwFeatureEndButton(GwAction):
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_work_end.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -133,7 +134,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
 
     # region private functions
@@ -248,7 +249,7 @@ class GwFeatureEndButton(GwAction):
 
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN {ids} AND arc_state = '1'")
-            row = tools_db.get_row(sql, log_sql=True)
+            row = tools_db.get_row(sql)
 
         if row:
             self.dlg_work = GwFeatureEndConnecUi()
@@ -445,6 +446,7 @@ class GwFeatureEndButton(GwAction):
 
     def _close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
+
         tools_gw.close_dialog(dlg)
         tools_gw.open_dialog(self.dlg_work_end)
 
@@ -458,8 +460,8 @@ class GwFeatureEndButton(GwAction):
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
-                   "WHERE  fid = 128 AND cur_user = current_user")
-            rows = tools_db.get_rows(sql, log_sql=False)
+                   "WHERE fid = 128 AND cur_user = current_user")
+            rows = tools_db.get_rows(sql)
             ids_ = ""
             if rows:
                 for row in rows:
@@ -478,6 +480,7 @@ class GwFeatureEndButton(GwAction):
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
         self._set_edit_arc_downgrade_force('False')
+        tools_gw.remove_selection(True, layers=self.layers)
         self.canvas.refresh()
 
 

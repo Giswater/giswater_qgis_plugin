@@ -28,15 +28,28 @@ def create_list_for_completer(sql):
     return list_items
 
 
+def check_schema(schemaname=None):
+    """ Check if selected schema exists """
+
+    if schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    schemaname = schemaname.replace('"', '')
+    sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
+    params = [schemaname]
+    row = get_row(sql, params=params)
+    return row
+
+
 def check_table(tablename, schemaname=None):
     """ Check if selected table exists in selected schema """
 
-    if schemaname in (None, 'null'):
+    if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
-        if schemaname in (None, 'null'):
+        if schemaname in (None, 'null', ''):
             get_layer_source_from_credentials('prefer')
             schemaname = global_vars.schema_name
-            if schemaname in (None, 'null'):
+            if schemaname in (None, 'null', ''):
                 return None
 
     schemaname = schemaname.replace('"', '')
@@ -104,8 +117,8 @@ def check_role_user(role_name, username=None):
 
 
 def check_super_user(username=None):
+    """ Returns True if @username is a superuser """
 
-    # Check @username exists
     if username is None:
         username = global_vars.current_user
 
@@ -161,7 +174,7 @@ def get_columns_list(tablename, schemaname=None):
 
 
 def get_srid(tablename, schemaname=None):
-    """ Find SRID of selected schema """
+    """ Find SRID of selected @tablename """
 
     if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
@@ -219,13 +232,13 @@ def check_db_connection():
 def get_pg_version():
     """ Get PostgreSQL version (integer value) """
 
-    global_vars.pg_version = None
+    pg_version = None
     sql = "SELECT current_setting('server_version_num');"
     row = get_row(sql)
     if row:
-        global_vars.pg_version = row[0]
+        pg_version = row[0]
 
-    return global_vars.pg_version
+    return pg_version
 
 
 def connect_to_database(host, port, db, user, pwd, sslmode):
@@ -364,7 +377,7 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_db(sql, stack_level_increase=1)
     result = global_vars.dao.execute_sql(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not result:
@@ -385,7 +398,7 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_db(sql, stack_level_increase=1)
     value = global_vars.dao.execute_returning(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not value:
@@ -529,9 +542,15 @@ def get_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
-                      global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
-                      global_vars.dao_db_credentials['password'])
+    if global_vars.dao_db_credentials['service']:
+        uri.setConnection(global_vars.dao_db_credentials['service'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+    else:
+        uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+
     return uri
 
 # region private functions
@@ -543,7 +562,7 @@ def _get_sql(sql, log_sql=False, params=None):
     if params:
         sql = global_vars.dao.mogrify(sql, params)
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=2)
+        tools_log.log_db(sql, bold='b', stack_level_increase=2)
 
     return sql
 

@@ -197,10 +197,6 @@ class GwTable(object):
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute UPSERT sentence """
 
-        # Check PostgreSQL version
-        if not global_vars.pg_version:
-            tools_db.get_pg_version()
-
         # Set SQL for INSERT
         sql = "INSERT INTO " + tablename + "(" + unique_field + ", "
 

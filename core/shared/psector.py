@@ -342,6 +342,9 @@ class GwPsector:
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
+        # Exclude the layer v_edit_element for adding relations
+        self.excluded_layers = ['v_edit_element']
+
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
@@ -438,7 +441,7 @@ class GwPsector:
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
 
 
     def fill_widget(self, dialog, widget, row):
@@ -514,7 +517,7 @@ class GwPsector:
         self.populate_cmb_templates()
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport')
 
 
     def populate_cmb_templates(self):

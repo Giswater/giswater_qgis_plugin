@@ -42,7 +42,7 @@ class GwSelector:
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-            tools_gw.open_dialog(dlg_selector, dlg_name='selector', maximize_button=False)
+            tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
         # Save the name of current tab used by the user
         dlg_selector.rejected.connect(partial(
