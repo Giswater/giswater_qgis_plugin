@@ -49,8 +49,15 @@ class GwGo2EpaSelectorButton(GwAction):
                "FROM v_ui_rpt_cat_result WHERE status = 'COMPLETED' ORDER BY result_id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_result_id, rows)
+        tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id,
+                                 tools_gw.get_config_parser('btn_go2epa_selector', 'rpt_selector_result', 'user',
+                                                            'session'), 0)
+
         rows = tools_db.get_rows(sql, add_empty_row=True)
         tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+        tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id,
+                                 tools_gw.get_config_parser('btn_go2epa_selector', 'rpt_selector_compare', 'user',
+                                                            'session'), 0)
 
         if self.project_type == 'ws':
 
@@ -59,6 +66,13 @@ class GwGo2EpaSelectorButton(GwAction):
             rows = tools_db.get_rows(sql, add_empty_row=True)
             tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_show, rows)
             tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+
+            tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_time_to_show,
+                                     tools_gw.get_config_parser('btn_go2epa_selector', 'time_to_show', 'user',
+                                                                'session', prefix=False), 0)
+            tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_time_to_compare,
+                                     tools_gw.get_config_parser('btn_go2epa_selector', 'time_to_compare', 'user',
+                                                                'session', prefix=False), 0)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self._populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
@@ -83,6 +97,13 @@ class GwGo2EpaSelectorButton(GwAction):
                 rows = tools_db.get_rows(sql, add_empty_row=True)
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_time, rows)
 
+                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_sel_date,
+                                         tools_gw.get_config_parser('btn_go2epa_selector', 'sel_date', 'user',
+                                                                    'session', prefix=False), 0)
+                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_sel_time,
+                                         tools_gw.get_config_parser('btn_go2epa_selector', 'sel_time', 'user',
+                                                                    'session', prefix=False), 0)
+
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(
                 partial(self._populate_date_time, self.dlg_go2epa_result.cmb_sel_date))
 
@@ -106,6 +127,13 @@ class GwGo2EpaSelectorButton(GwAction):
                        f"ORDER BY resulttime")
                 rows = tools_db.get_rows(sql, add_empty_row=True)
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_com_time, rows)
+
+                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_com_date,
+                                         tools_gw.get_config_parser('btn_go2epa_selector', 'com_date', 'user',
+                                                                    'session', prefix=False), 0)
+                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_com_time,
+                                         tools_gw.get_config_parser('btn_go2epa_selector', 'com_time', 'user',
+                                                                    'session', prefix=False), 0)
 
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self._populate_date_time, self.dlg_go2epa_result.cmb_com_date))
@@ -144,15 +172,20 @@ class GwGo2EpaSelectorButton(GwAction):
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
         rpt_selector_compare_id = tools_qt.get_combo_value(
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
             tools_db.execute_sql(sql)
 
+            tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{rpt_selector_result_id}')
+
         if rpt_selector_compare_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
             tools_db.execute_sql(sql)
+
+            tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_compare', f'{rpt_selector_compare_id}')
 
         if self.project_type == 'ws':
             time_to_show = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
@@ -161,24 +194,37 @@ class GwGo2EpaSelectorButton(GwAction):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
                 tools_db.execute_sql(sql)
+
+                tools_gw.set_config_parser('btn_go2epa_selector', 'time_to_show', f'{time_to_show}', prefix=False)
+
             if time_to_compare not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_compare_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_compare}', '{user}');\n")
                 tools_db.execute_sql(sql)
 
+                tools_gw.set_config_parser('btn_go2epa_selector', 'time_to_compare', f'{time_to_compare}', prefix=False)
+
         elif self.project_type == 'ud':
-            date_to_show = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
-            time_to_show = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
-            date_to_compare = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
-            time_to_compare = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
-            if date_to_show not in (None, -1, ''):
+            sel_date = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
+            sel_time = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
+            com_date = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
+            com_time = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
+
+            if sel_date not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
+                       f" VALUES ('{sel_date}', '{sel_time}', '{user}');\n")
                 tools_db.execute_sql(sql)
-            if date_to_compare not in (None, -1, ''):
+
+                tools_gw.set_config_parser('btn_go2epa_selector', 'sel_date', f'{sel_date}', prefix=False)
+                tools_gw.set_config_parser('btn_go2epa_selector', 'sel_time', f'{sel_time}', prefix=False)
+
+            if com_date not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{date_to_compare}', '{time_to_compare}', '{user}');\n")
+                       f" VALUES ('{com_date}', '{com_time}', '{user}');\n")
                 tools_db.execute_sql(sql)
+
+                tools_gw.set_config_parser('btn_go2epa_selector', 'com_date', f'{com_date}', prefix=False)
+                tools_gw.set_config_parser('btn_go2epa_selector', 'com_time', f'{com_time}', prefix=False)
 
         # Show message to user
         message = "Values has been updated"
