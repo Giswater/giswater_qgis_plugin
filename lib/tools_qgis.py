@@ -48,8 +48,10 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
         dev_duration = user_parameters['show_message_durations']
     # If is set, use this value
     if dev_duration not in (None, "None"):
-        duration = int(dev_duration)
-
+        if message_level == 1 and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
     msg = None
     if text:
         msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
