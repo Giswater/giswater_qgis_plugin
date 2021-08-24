@@ -69,7 +69,7 @@ BEGIN
 	END IF;
 
 	-- check demand scenario compatibility
-	IF (SELECT count(*) FROM selector_inp_demand WHERE cur_user = current_user) > 0 THEN
+	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
 		IF v_patternmethod IN (21,22,23,24) THEN
 

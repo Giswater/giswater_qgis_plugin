@@ -21,3 +21,52 @@ ON CONFLICT (sector_id) DO NOTHING;
 
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'manageConflict') WHERE parameter = 'utils_grafanalytics_status';
 
+--2021/08/24
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_pipe', 'Table to manage scenario for pipes', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_pipe', 'View to manage scenario for pipes', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_shortpipe', 'Table to manage scenario for shortpipes', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_shortpipe', 'View to manage scenario for shortpipes', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_valve', 'Table to manage scenario for valves', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_valve', 'View to manage scenario for valves', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_pump', 'Table to manage scenario for pump', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_pump', 'View to manage scenario for pump', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_tank', 'Table to manage scenario for tank', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_tank', 'View to manage scenario for tank', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_dscenario_reservoir', 'Table to manage scenario for reservoir', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_dscenario_reservoir', 'View to manage scenario for reservoir', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+

@@ -1,3 +1,4 @@
 3.5.012
 *************
 - New mapzones conflict (-1)
+- Enhance dscenario management working with not only demands, adding pipes, shortpipes, valves, pumps, tanks and reservoir
