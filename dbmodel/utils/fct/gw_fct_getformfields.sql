@@ -382,13 +382,13 @@ BEGIN
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'widgetfunction');
 	END LOOP;
 
-	/*
+	
 	-- Remove stylesheet when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'stylesheet' is null
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'stylesheet');
 	END LOOP;
-	*/
+	
 
 	-- Remove tooltip when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'tooltip' is null
