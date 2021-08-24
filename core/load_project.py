@@ -293,6 +293,7 @@ class GwLoadProject(QObject):
                     if button_def not in (None, 'None'):
                         text = tools_qt.tr(f'{index_action}_text')
                         icon_path = icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
+
                         button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                         self.buttons[index_action] = button
                         successful = True
@@ -304,6 +305,7 @@ class GwLoadProject(QObject):
         count_trys = 0
         while not successful and count_trys < 10:
             project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
+
             if project_exclusive not in (None, "None"):
                 successful = True
             count_trys = count_trys + 1
