@@ -14,11 +14,6 @@ version=3.5.011
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata.
 
-changelog=Version 3.5.010
-    - Enhancement: manage epsg from QGIS project
-    - Enhancement: allow arcs on replace feature tool
-    - Minor bug fix: Manage software_version_info on admin form acoording project_schema_name
-
 changelog=Version 3.5.011
     - Bug fix on manage list of element_types for populate combo location on manage element form
     - Bug fix on manage line break when add new document
