@@ -138,8 +138,17 @@ class GwLoadProject(QObject):
 
         # Log it
         global_vars.project_loaded = True
-        message = "Project read finished"
-        tools_log.log_info(message)
+
+        plugin_version = tools_qgis.get_plugin_metadata('version', 0, os.path.dirname(__file__) + os.sep + '..' + os.sep)
+        project_version = tools_gw.get_project_version(schemaname=schema_name)
+
+        if project_version == plugin_version:
+            message = "Project read finished"
+            tools_log.log_info(message)
+        else:
+            message = f"Project read finished with diferent versions on plugin metadata ({plugin_version}) and PostgreSQL sys_version table ({project_version})."
+            tools_log.log_warning(message)
+            tools_qgis.show_warning(message)
 
 
     # region private functions

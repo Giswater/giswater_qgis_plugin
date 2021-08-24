@@ -59,8 +59,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    if len(global_vars.session_vars['threads']) == 0:
-        global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+    global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:

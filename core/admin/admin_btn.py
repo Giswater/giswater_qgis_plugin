@@ -2040,7 +2040,7 @@ class GwAdminButton:
             # TODO: Make just one SQL query
             self.project_type = tools_gw.get_project_type(schemaname=schema_name)
             self.project_epsg = self._get_project_epsg(schemaname=schema_name)
-            self.project_version = self._get_project_version(schemaname=schema_name)
+            self.project_version = tools_gw.get_project_version(schemaname=schema_name)
             self.project_language = self._get_project_language(schemaname=schema_name)
 
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
@@ -3235,32 +3235,6 @@ class GwAdminButton:
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
         tools_db.execute_sql(sql)
-
-
-    def _get_project_version(self, schemaname=None):
-        """ Get project version from table 'version' """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        project_version = None
-        tablename = "sys_version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = tools_db.get_row(sql)
-            if row:
-                project_version = row[0]
-        else:
-            tablename = "version"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = tools_db.get_row(sql)
-                if row:
-                    project_version = row[0]
-
-        return project_version
 
 
     def _get_project_language(self, schemaname=None):
