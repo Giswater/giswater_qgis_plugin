@@ -33,7 +33,7 @@ class GwToolBoxButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
-        self.no_clickable_items = ['Giswater', 'Processes', 'Reports']
+        self.no_clickable_items = ['Processes', 'Reports']
         self.temp_layers_added = []
 
 
@@ -109,7 +109,7 @@ class GwToolBoxButton(GwAction):
 
     def _open_toolbox(self):
 
-        self.no_clickable_items = ['Giswater', 'Processes', 'Reports']
+        self.no_clickable_items = ['Processes', 'Reports']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
         if not row:
@@ -504,21 +504,13 @@ class GwToolBoxButton(GwAction):
         model = QStandardItemModel()
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
-        main_parent = QStandardItem('{}'.format('Giswater'))
-        font = main_parent.font()
-        font.setPointSize(8)
-        main_parent.setFont(font)
 
         icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
         path_icon_blue = icon_folder + os.sep + '36.png'
         path_icon_red = icon_folder + os.sep + '100.png'
-        if os.path.exists(path_icon_blue):
-            icon = QIcon(path_icon_blue)
-            main_parent.setIcon(icon)
 
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
-        main_parent.appendRow(section_processes)
         for group, functions in result['processes']['fields'].items():
             parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
             self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
@@ -550,7 +542,6 @@ class GwToolBoxButton(GwAction):
 
         # Section Reports
         reports_processes = QStandardItem('{}'.format('Reports'))
-        main_parent.appendRow(reports_processes)
         for group, functions in result['reports']['fields'].items():
             parent1 = QStandardItem(f'{group}   [{len(functions)} Reports functions]')
             self.no_clickable_items.append(f'{group}   [{len(functions)} Reports functions]')
@@ -568,9 +559,20 @@ class GwToolBoxButton(GwAction):
 
             reports_processes.appendRow(parent1)
 
-        model.appendRow(main_parent)
-        index = model.indexFromItem(main_parent)
-        trv_widget.expand(index)
+        if os.path.exists(path_icon_blue):
+            icon = QIcon(path_icon_blue)
+            section_processes.setIcon(icon)
+            reports_processes.setIcon(icon)
+
+        model.appendRow(section_processes)
+        model.appendRow(reports_processes)
+
+        section_index = model.indexFromItem(section_processes)
+        reports_index = model.indexFromItem(reports_processes)
+
+        trv_widget.expand(section_index)
+        trv_widget.expand(reports_index)
+
         if expand:
             trv_widget.expandAll()
 
