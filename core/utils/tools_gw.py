@@ -708,7 +708,7 @@ def enable_all(dialog, result):
 
 def set_stylesheet(field, widget, wtype='label'):
 
-    if field['stylesheet'] is not None:
+    if 'stylesheet' in field and field['stylesheet'] is not None:
         if wtype in field['stylesheet']:
             widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
     return widget

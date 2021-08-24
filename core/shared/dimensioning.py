@@ -432,7 +432,7 @@ class GwDimensioning:
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
                 label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
