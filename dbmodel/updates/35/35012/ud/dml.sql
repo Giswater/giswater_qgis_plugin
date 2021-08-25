@@ -18,23 +18,26 @@ VALUES ('inp_options_networkmode', 'epaoptions', 'Export geometry mode (1-standa
 FALSE, 'text','combo', TRUE, 'lyt_general_1',TRUE, '{"from":"5.0.022", "to":null,"language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json' 'Function to trim arcs using gullies', 'role_epa')
+INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json', 'Function to trim arcs using gullies', 'role_epa')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3072, 'gw_trg_edit_inp_gully', 'ud', 'trigger function', null, null, 'role_epa')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (inp_gully)
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('inp_gully', 'Table to manage gullies on epa', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (temp_gully);
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('temp_gully', 'Table to manage gullies on epa exportaiton process', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (v_edit_inp_gully);
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_edit_inp_gully', 'Editable view to manage gullies on epa', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (vi_gully);
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_fprocess VALUES (141,'vi_gully', '[GULLY]', NULL, 99)
+ON CONFLICT (fid, tablename, target) DO NOTHING;
 
-INSERT INTO config_fprocess (141,'vi_gully', '[GULLY]', NULL, 99);
-ON CONFLICT (fid, tablename) DO NOTHING;
+UPDATE sys_table SET id = 'inp_demand' WHERE id = 'inp_dscenario_demand';
+UPDATE sys_table SET id = 'v_edit_inp_demand' WHERE id = 'v_edit_inp_dscenario_demand';

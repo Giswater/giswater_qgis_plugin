@@ -13,27 +13,27 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
-  ON inp_pipe
+  ON inp_dscenario_pipe
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_pipe');
+  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_pipe');
 
 
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
-  ON inp_shortpipe
+  ON inp_dscenario_shortpipe
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_shortpipe');
+  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_shortpipe');
 
 
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
-  ON inp_pump
+  ON inp_dscenario_pump
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_pump');
+  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_pump');
 
 
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
-  ON inp_valve
+  ON inp_dscenario_valve
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_valve');
+  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_valve');

@@ -10,13 +10,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/08/19
-INSERT INTO dma VALUES (-1, 'Conflict');
+INSERT INTO dma VALUES (-1, 'Conflict',0,null,'DMA used on grafanalytics algorithm when two ore more DMA has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed')
 ON CONFLICT (dma_id) DO NOTHING;
-INSERT INTO dqa VALUES (-1, 'Conflict');
+INSERT INTO dqa VALUES (-1, 'Conflict',0, null, 'DQA used on grafanalytics algorithm when two ore more DQA has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed')
 ON CONFLICT (dqa_id) DO NOTHING;
-INSERT INTO presszone VALUES ('-1', 'Conflict');
+INSERT INTO presszone VALUES (-1, 'Conflict', 0, 'PRESSZONE used on grafanalytics algorithm when two ore more PRESSZONE has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed')
 ON CONFLICT (presszone_id) DO NOTHING;
-INSERT INTO sector VALUES (-1, 'Conflict');
+INSERT INTO sector VALUES (-1, 'Conflict', 0, 'SECTOR used on grafanalytics algorithm when two ore more SECTOR has conflict in terms of some interconnection. Usually opened valve which maybe need to be closed')
 ON CONFLICT (sector_id) DO NOTHING;
 
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'manageConflict') WHERE parameter = 'utils_grafanalytics_status';

@@ -80,7 +80,7 @@ BEGIN
 		INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
-		INSERT INTO inp_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
+		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
       	    
 	  ELSIF v_view='vi_patterns' THEN 
 		INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,

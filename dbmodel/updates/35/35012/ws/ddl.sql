@@ -20,7 +20,7 @@ CREATE TABLE inp_dscenario_shortpipe (
   status character varying(12),
   CONSTRAINT inp_dscenario_shortpipe_pkey PRIMARY KEY (node_id),
   CONSTRAINT inp_dscenario_shortpipe_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES SCHEMA_NAME.node (node_id) MATCH SIMPLE
+      REFERENCES node (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_shortpipe_status_check CHECK (status::text = ANY (ARRAY['CLOSED'::character varying, 'CV'::character varying, 'OPEN'::character varying]::text[]))
 );
@@ -32,7 +32,7 @@ CREATE TABLE inp_dscenario_pipe (
   minorloss numeric(12,6),
   status character varying(12),
   roughness numeric(12,4) NOT NULL,
-  dint numeric(12,3) NOT NULL
+  dint numeric(12,3) NOT NULL,
   CONSTRAINT inp_dscenario_pipe_pkey PRIMARY KEY (arc_id, dscenario_id),
   CONSTRAINT inp_dscenario_pipe_arc_id_fkey FOREIGN KEY (arc_id)
       REFERENCES arc (arc_id) MATCH SIMPLE
@@ -93,9 +93,6 @@ CREATE TABLE inp_dscenario_valve(
   CONSTRAINT inp_dscenario_valve_node_id_fkey FOREIGN KEY (node_id)
       REFERENCES node (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_valve_to_arc_fkey FOREIGN KEY (to_arc)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_valve_status_check CHECK (status::text = ANY (ARRAY['ACTIVE'::character varying, 'CLOSED'::character varying, 'OPEN'::character varying]::text[])),
   CONSTRAINT inp_dscenario_valve_valv_type_check CHECK (valv_type::text = ANY (ARRAY['FCV'::character varying, 'GPV'::character varying, 'PBV'::character varying, 'PRV'::character varying, 'PSV'::character varying, 'TCV'::character varying]::text[]))
 );
@@ -117,7 +114,6 @@ CREATE TABLE inp_dscenario_tank (
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-  
-  
-ALTER TABLE inp_rules RENAME inp_rules_x_sector_pkey TO inp_rules_pkey;
-ALTER TABLE inp_rules RENAME inp_rules_x_sector_id_fkey TO inp_rules_fkey;
+
+ALTER TABLE inp_rules RENAME CONSTRAINT inp_rules_x_sector_pkey TO inp_rules_pkey;
+ALTER TABLE inp_rules RENAME CONSTRAINT inp_rules_x_sector_id_fkey TO inp_rules_sector_id_fkey;

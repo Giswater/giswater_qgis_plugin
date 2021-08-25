@@ -162,7 +162,7 @@ BEGIN
 			DELETE FROM inp_valve_importinp ;
 			
 			DELETE FROM inp_tags;
-			DELETE FROM inp_demand;
+			DELETE FROM inp_dscenario_demand;
 			DELETE FROM inp_pattern;
 			DELETE FROM inp_pattern_value;
 			DELETE FROM inp_curve;

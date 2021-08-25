@@ -38,13 +38,13 @@ BEGIN
 		-- moving node demands to temp_demand
 		INSERT INTO temp_demand (feature_id, demand, pattern_id)
 		SELECT DISTINCT ON (feature_id) feature_id, d.demand, d.pattern_id 
-		FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND d.demand > 0 
+		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand > 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		-- moving connec demands to temp_demand
 		INSERT INTO temp_demand (feature_id, demand, pattern_id)
 		SELECT n.node_id, sum(d.demand), d.pattern_id 
-		FROM  inp_demand d ,temp_node n
+		FROM  inp_dscenario_demand d ,temp_node n
 		JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand > 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario))
@@ -59,13 +59,13 @@ BEGIN
 			-- moving node demands to temp_demand
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
 			SELECT DISTINCT ON (feature_id) feature_id, n.demand, n.pattern_id 
-			FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 
+			FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 
 			AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 			-- moving connec demands to temp_demand
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
 			SELECT n.node_id, sum(d.demand), d.pattern_id 
-			FROM  inp_demand d ,temp_node n
+			FROM  inp_dscenario_demand d ,temp_node n
 			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
 			WHERE c.connec_id = d.feature_id AND d.demand > 0 
 			AND dscenario_id IN (SELECT unnest(v_userscenario))
@@ -80,7 +80,7 @@ BEGIN
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 			from inp_pattern_value p 
 			WHERE 
-			pattern_id IN (SELECT distinct (pattern_id) FROM inp_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id) AND 
+			pattern_id IN (SELECT distinct (pattern_id) FROM inp_dscenario_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id) AND 
 			pattern_id NOT IN (SELECT distinct (pattern_id) FROM temp_node WHERE pattern_id IS NOT NULL)
 			order by pattern_id, id;	
 

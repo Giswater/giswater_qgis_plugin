@@ -128,6 +128,8 @@ BEGIN
 		RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
 		PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
 
+		/*
+
 		RAISE NOTICE '8 - Trim arcs with vnode';
 		IF v_networkmode = 2 THEN
 		
@@ -148,6 +150,8 @@ BEGIN
 			-- setting first message on user's pannel
 			v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
 		END IF;
+		
+		*/
 
 	END IF;
 	

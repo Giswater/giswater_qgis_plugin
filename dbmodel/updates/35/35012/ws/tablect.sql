@@ -9,10 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
---2021/08/19
-INSERT INTO config_function VALUES (2160, 'gw_fct_setfields', NULL, NULL, '[{"funcName": "refresh_canvas", "params": {}}]')
-ON CONFLICT (id) DO NOTHING;
-
---2021/08/20
-INSERT INTO sys_fprocess VALUES (395, 'Check to_arc missed values for pumps', 'ws')
-ON CONFLICT (fid) DO NOTHING;
+--2021/08/25
+ALTER TABLE inp_pump DROP CONSTRAINT IF EXISTS inp_pump_to_arc_fkey;
+ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_to_arc_fkey FOREIGN KEY (to_arc)
+REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
