@@ -19,5 +19,3 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json' 'Function to trim arcs using gullies', 'role_epa')
 ON CONFLICT (id) DO NOTHING;
-
-

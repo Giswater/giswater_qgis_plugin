@@ -422,7 +422,7 @@ BEGIN
 			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
 		END IF;
         
-        -- use automatic rotation only on INSERT. On update it's only posible manual rotation update 
+		-- use automatic rotation only on INSERT. On update it's only posible manual rotation update 
 		IF v_autorotation_disabled IS NULL OR v_autorotation_disabled IS FALSE THEN
 			NEW.rotation = v_rotation*180/pi();
 		END IF;
@@ -496,8 +496,7 @@ BEGIN
 			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
 			NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 			NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
-			 NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
-
+			NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
 
 		IF NEW.state=1 THEN
 			-- Control of automatic insert of link and vnode
@@ -534,7 +533,9 @@ BEGIN
 						USING NEW.gully_id, v_addfields.id, v_new_value_param;
 				END IF;	
 			END LOOP;
-		END IF;		
+		END IF;
+
+		INSERT INTO inp_gully (NEW.gully_id);
 
 		RETURN NEW;
 
