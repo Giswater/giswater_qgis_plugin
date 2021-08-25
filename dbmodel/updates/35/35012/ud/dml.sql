@@ -12,10 +12,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', '1D SWMM');
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', '1D/2D SWMM-IBER');
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, vdefault, 
+INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, dv_querytext, isenabled, layoutorder, project_type, isparent, vdefault, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, epaversion)
-VALUES ('inp_options_networkmode', 'epaoptions', 'Export geometry mode (1-standard, 2-trim arcs with gullies)', 'role_epa', 'Network geometry generator:', TRUE, 0, 'ud', FALSE, '1', 
-FALSE, 'text','combo', TRUE, 'lyt_general_1',TRUE, '{"from":"5.0.022", "to":null,"language":"english"}') 
+VALUES ('inp_options_networkmode', 'epaoptions', 'Export geometry mode: 1D SWMM , 1D/2D coupled model (SWMM-IBER)', 'role_epa', 'Network geometry generator:',
+'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''', TRUE, 0, 'ud', FALSE, '1', FALSE, 'text','combo', TRUE, 
+'lyt_general_1',TRUE, '{"from":"5.0.022", "to":null,"language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json', 'Function to trim arcs using gullies', 'role_epa')
