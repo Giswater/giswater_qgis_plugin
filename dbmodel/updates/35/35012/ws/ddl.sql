@@ -32,7 +32,7 @@ CREATE TABLE inp_dscenario_pipe (
   minorloss numeric(12,6),
   status character varying(12),
   roughness numeric(12,4) NOT NULL,
-  dint numeric(12,3) NOT NULL
+  dint numeric(12,3) NOT NULL,
   CONSTRAINT inp_dscenario_pipe_pkey PRIMARY KEY (arc_id, dscenario_id),
   CONSTRAINT inp_dscenario_pipe_arc_id_fkey FOREIGN KEY (arc_id)
       REFERENCES arc (arc_id) MATCH SIMPLE
