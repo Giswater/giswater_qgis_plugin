@@ -223,13 +223,36 @@ class GwEpaFileManager(GwTask):
 
         tools_log.log_info(f"Write inp file........: {folder_path}")
 
-        file1 = open(folder_path, "w")
+        # Generate generic INP file
+        file_inp = open(folder_path, "w")
+        read = True
         for row in all_rows:
-            if 'text' in row and row['text'] is not None:
+            # Use regexp to check which targets to read (everyone except GULLY)
+            if bool(re.match('\[(.*?)\]', row['text'])) and 'GULLY' in row['text']:
+                read = False
+            elif bool(re.match('\[(.*?)\]', row['text'])):
+                read = True
+            if 'text' in row and row['text'] is not None and read:
                 line = row['text'].rstrip() + "\n"
-                file1.write(line)
+                file_inp.write(line)
 
-        self._close_file(file1)
+        self._close_file(file_inp)
+
+        # Generate gully file
+        # Replace extension .inp to .gul
+        file_gully = open(folder_path.replace('.inp', '.gul'), "w")
+        read = True
+        for row in all_rows:
+            # Use regexp to check which targets to read (only TITLE and GULLY)
+            if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or 'GULLY' in row['text']):
+                read = True
+            elif bool(re.match('\[(.*?)\]', row['text'])):
+                read = False
+            if 'text' in row and row['text'] is not None and read:
+                line = row['text'].rstrip() + "\n"
+                file_gully.write(line)
+
+        self._close_file(file_gully)
 
 
     def _execute_epa(self):
