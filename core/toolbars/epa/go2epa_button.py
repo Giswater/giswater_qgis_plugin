@@ -202,7 +202,7 @@ class GwGo2EpaButton(GwAction):
             if not tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
                 if not os.path.exists(file_inp):
                     msg = "File INP not found"
-                    tools_qgis.show_warning(msg, parameter=str(file_rpt))
+                    tools_qgis.show_warning(msg, parameter=str(file_inp))
                     return False
 
 
