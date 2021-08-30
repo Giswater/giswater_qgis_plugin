@@ -2879,7 +2879,31 @@ def hide_widgets_form(dialog, dlg_name):
                 widget.setVisible(False)
 
 
+def get_project_version(schemaname=None):
+    """ Get project version from table 'version' """
+
+    if schemaname in (None, 'null', ''):
+        schemaname = self.schema_name
+
+    project_version = None
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tablename = "version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if not exists:
+            return None
+
+    sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_version = row[0]
+
+    return project_version
+
+
 # region private functions
+
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
@@ -2944,31 +2968,5 @@ def _get_parser_from_filename(filename):
         return filepath, None
 
     return filepath, parser
-
-
-def get_project_version(schemaname=None):
-    """ Get project version from table 'version' """
-
-    if schemaname in (None, 'null', ''):
-        schemaname = self.schema_name
-
-    project_version = None
-    tablename = "sys_version"
-    exists = tools_db.check_table(tablename, schemaname)
-    if exists:
-        sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-        row = tools_db.get_row(sql)
-        if row:
-            project_version = row[0]
-    else:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = tools_db.get_row(sql)
-            if row:
-                project_version = row[0]
-
-    return project_version
 
 # endregion
