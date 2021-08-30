@@ -86,10 +86,6 @@ BEGIN
 	-- last proccess
 	IF v_isnew IS TRUE THEN
 			
-		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
-		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:')
-		ON CONFLICT (parameter) DO NOTHING;
-			
 		-- inserting version table
 		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
 		(select postgis_version()), v_language, v_epsg);

@@ -14,7 +14,6 @@ $BODY$
 PERFORM SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_point,'"}}')::json);
 SELECT SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"a"}}')::json);
 
-UPDATE config_param_system SET value = '{"status":true}' WHERE parameter = 'admin_transaction_db'
 UPDATE config_param_user SET value = 'true' WHERE parameter = 'debug_mode';
 
 */
@@ -30,7 +29,6 @@ v_variables text;
 v_debug boolean;
 v_schemaname text = 'SCHEMA_NAME';
 v_fullmessage text;
-v_systranstaction_db boolean;
 v_tableversion text = 'sys_version';
 v_columntype text = 'project_type';
 	
@@ -46,9 +44,6 @@ BEGIN
 	v_message = lower(((p_data ->>'data')::json->>'msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
-	-- get system parameters
-	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'admin_transaction_db')::boolean;
-
 	-- get parameters from user
 	v_debug = (SELECT value::boolean FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user=current_user);
 
@@ -62,18 +57,9 @@ BEGIN
 	   	RAISE NOTICE ' % ', v_fullmessage;
 		
 		-- sending notify
-		IF v_systranstaction_db THEN
-		
-			-- using additional db for transactions
-			--INSERT INTO notify (channel, cur_user, message) VALUES (replace(current_user,'.','_'), current_user, v_message);
-			
-			INSERT INTO audit (fid, log_message) VALUES (998, v_message);
-
-		ELSE 
-			-- using normal notify with personal channel
-			PERFORM pg_notify(replace(current_user,'.','_'), '{"functionAction":{"functions":[{"name":"debug", "parameters":{"message":'||v_fullmessage||
-			'}]},"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
-		END IF;
+		-- using normal notify with personal channel
+		PERFORM pg_notify(replace(current_user,'.','_'), '{"functionAction":{"functions":[{"name":"debug", "parameters":{"message":'||v_fullmessage||
+		'}]},"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 	END IF;
 			
 	--    Control nulls

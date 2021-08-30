@@ -222,8 +222,7 @@ BEGIN
 	
 		IF state_aux=2 THEN
 		
-			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
+			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
@@ -258,8 +257,7 @@ BEGIN
 		IF state_aux=2 AND v_old_state<2 THEN
 		
 			-- check user's role
-			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
+			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) THEN
 				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":1, "duration":10, "text":"Current psector have been selected"}},
 				{"name":"get_selector","parameters":{"current_tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 			END IF;
@@ -287,8 +285,7 @@ BEGIN
 		ELSIF state_aux<2 AND v_old_state=2 THEN
 
 			-- check user's role
-			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
+			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')))  THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
