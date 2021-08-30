@@ -117,3 +117,9 @@ CREATE TABLE inp_dscenario_tank (
 
 ALTER TABLE inp_rules RENAME CONSTRAINT inp_rules_x_sector_pkey TO inp_rules_pkey;
 ALTER TABLE inp_rules RENAME CONSTRAINT inp_rules_x_sector_id_fkey TO inp_rules_sector_id_fkey;
+
+
+--2021/08/30
+ALTER TABLE selector_inp_dscenario ALTER COLUMN cur_user SET DEFAULT "current_user"();
+ALTER TABLE selector_mincut_result ALTER COLUMN cur_user SET DEFAULT "current_user"();
+
