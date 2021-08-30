@@ -42,3 +42,7 @@ ON CONFLICT (fid, tablename, target) DO NOTHING;
 
 UPDATE sys_table SET id = 'inp_demand' WHERE id = 'inp_dscenario_demand';
 UPDATE sys_table SET id = 'v_edit_inp_demand' WHERE id = 'v_edit_inp_dscenario_demand';
+
+--2021/08/30
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["v_edit_inp_lid_usage"]}]'
+WHERE id='inp_lid_control';
