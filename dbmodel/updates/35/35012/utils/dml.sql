@@ -19,3 +19,9 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json', 'Function to trim arcs using gullies', 'role_epa')
 ON CONFLICT (id) DO NOTHING;
+
+--2021/08/30
+UPDATE config_param_system SET project_type='utils' WHERE parameter IN ('edit_state_topocontrol', 'edit_review_node_tolerance', 'qgis_form_element_hidewidgets',
+'utils_grafanalytics_dynamic_symbology', 'utils_grafanalytics_status');
+
+UPDATE sys_param_user SET project_type='utils' WHERE parameter IN ('inp_options_debug');

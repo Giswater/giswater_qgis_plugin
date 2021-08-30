@@ -46,3 +46,5 @@ UPDATE sys_table SET id = 'v_edit_inp_demand' WHERE id = 'v_edit_inp_dscenario_d
 --2021/08/30
 UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["v_edit_inp_lid_usage"]}]'
 WHERE id='inp_lid_control';
+
+DELETE FROM sys_param_user WHERE project_type='ws';

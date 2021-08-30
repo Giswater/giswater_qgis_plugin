@@ -70,3 +70,6 @@ INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_cr
 VALUES ('v_edit_inp_dscenario_reservoir', 'View to manage scenario for reservoir', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
+--2021/08/30
+DELETE FROM config_param_system WHERE project_type='ud';
+DELETE FROM sys_param_user WHERE project_type='ud';
