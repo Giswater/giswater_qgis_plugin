@@ -60,10 +60,10 @@ class GwDimensioningButton(GwMaptool):
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            self.snapper_manager.config_snap_to_arc(False)
-            self.snapper_manager.config_snap_to_connec(False)
-            self.snapper_manager.config_snap_to_gully(False)
-            self.snapper_manager.config_snap_to_node(False)
+            self.snapper_manager.config_snap_to_arc()
+            self.snapper_manager.config_snap_to_connec()
+            self.snapper_manager.config_snap_to_gully()
+            self.snapper_manager.config_snap_to_node()
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool

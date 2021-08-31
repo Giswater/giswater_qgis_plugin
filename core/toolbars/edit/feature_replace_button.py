@@ -127,16 +127,14 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node(False)
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
-        self.snapper_manager.config_snap_to_arc(False)
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+        self.snapper_manager.config_snap_to_arc()
         self.snapper_manager.set_snap_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
-
-        self.project_type = tools_gw.get_project_type()
 
         # Show help message when action is activated
         if self.show_help:

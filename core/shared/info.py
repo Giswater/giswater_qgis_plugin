@@ -261,10 +261,10 @@ class GwInfo(QObject):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_arc(False)
-        self.snapper_manager.config_snap_to_node(False)
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_arc()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
         self.iface.actionAddFeature().toggled.connect(self._action_is_checked)
 
@@ -324,9 +324,9 @@ class GwInfo(QObject):
 
         # if we are doing info over connec or over node
         if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc(False)
+            self.snapper_manager.config_snap_to_arc()
         elif option == 'node':
-            self.snapper_manager.config_snap_to_node(False)
+            self.snapper_manager.config_snap_to_node()
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self._mouse_moved, layer))
         emit_point = QgsMapToolEmitPoint(self.canvas)
