@@ -30,7 +30,6 @@ class GwGo2EpaButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.iterations = 0
         self.project_type = global_vars.project_type
         self.epa_options_list = []
 
@@ -42,6 +41,7 @@ class GwGo2EpaButton(GwAction):
 
     def check_result_id(self):
         """ Check if selected @result_id already exists """
+
         self.dlg_go2epa.txt_result_name.setStyleSheet(None)
         result_id = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
@@ -165,6 +165,7 @@ class GwGo2EpaButton(GwAction):
 
 
     def _set_signals(self):
+
         self.dlg_go2epa.btn_cancel.clicked.connect(self._cancel_task)
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self._go2epa_select_file_inp)
@@ -172,7 +173,7 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.btn_accept.clicked.connect(self._go2epa_accept)
         self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.btn_options.clicked.connect(self._epa_options)
+        self.dlg_go2epa.btn_options.clicked.connect(self._go2epa_options)
 
 
     def _check_inp_chk(self, file_inp):
@@ -182,6 +183,8 @@ class GwGo2EpaButton(GwAction):
             tools_qgis.show_warning(msg, parameter=str(file_inp))
             return False
 
+        return True
+
 
     def _check_rpt(self):
 
@@ -190,7 +193,7 @@ class GwGo2EpaButton(GwAction):
 
         # Control execute epa software
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
-            if self._check_inp_chk(file_inp) is False:
+            if not self._check_inp_chk(file_inp):
                 return False
 
             if file_rpt is None:
@@ -203,6 +206,8 @@ class GwGo2EpaButton(GwAction):
                     msg = "File INP not found"
                     tools_qgis.show_warning(msg, parameter=str(file_inp))
                     return False
+
+        return True
 
 
     def _check_fields(self):
@@ -222,16 +227,16 @@ class GwGo2EpaButton(GwAction):
             return False
 
         # Control export INP
-        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
-            if self._check_inp_chk(file_inp) is False:
+        if export_checked:
+            if not self._check_inp_chk(file_inp):
                 return False
 
         # Control execute epa software
-        if self._check_rpt() is False:
+        if not self._check_rpt():
             return False
 
         # Control import result
-        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
+        if import_result_checked:
             if file_rpt is None:
                 msg = "Select valid RPT file"
                 tools_qgis.show_warning(msg, parameter=str(file_rpt))
@@ -242,7 +247,7 @@ class GwGo2EpaButton(GwAction):
                     tools_qgis.show_warning(msg, parameter=str(file_rpt))
                     return False
             else:
-                if self._check_rpt() is False:
+                if not self._check_rpt():
                     return False
 
         # Control result name
@@ -257,11 +262,17 @@ class GwGo2EpaButton(GwAction):
         sql = (f"SELECT result_id FROM rpt_cat_result "
                f"WHERE result_id = '{result_name}' LIMIT 1")
         row = tools_db.get_row(sql)
-        if row:
-            msg = "Result name already exists, do you want overwrite?"
-            answer = tools_qt.show_question(msg, title="Alert")
-            if not answer:
+        if import_result_checked and not export_checked and not exec_checked:
+            if not row:
+                msg = "Result name not found. It's not possible to import RPT file into database"
+                tools_qt.show_info_box(msg, "Import RPT file")
                 return False
+        else:
+            if row:
+                msg = "Result name already exists, do you want overwrite?"
+                answer = tools_qt.show_question(msg, title="Alert")
+                if not answer:
+                    return False
 
         return True
 
@@ -329,13 +340,6 @@ class GwGo2EpaButton(GwAction):
         self._multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
         tools_gw.open_dialog(dlg_psector_sel)
-
-
-    def _epa_options(self):
-        """ Open dialog epa_options.ui.ui """
-
-        self._go2epa_options()
-        return
 
 
     def _ud_hydrology_selector(self):
@@ -502,6 +506,7 @@ class GwGo2EpaButton(GwAction):
 
 
     def _cancel_task(self):
+
         if hasattr(self, 'go2epa_task'):
             self.go2epa_task.cancel()
 
@@ -610,6 +615,7 @@ class GwGo2EpaButton(GwAction):
         :param idx: The index of the clicked column
         :return:
         """
+
         oder_by = {0: "ASC", 1: "DESC"}
         sort_order = qtable.horizontalHeader().sortIndicatorOrder()
         col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
