@@ -5,3 +5,4 @@
 - Rename some inp_demand tables to harmonize with new dscenario management names
 - Add new exportation method for ud (1D-SWMM or 1D/2D Coupled model)
 - Add function vodetrimarcs for UD exportation, relate to 1D/2D coupled model
+- Profilactic delete of legacy values on man_addfields_value on setcheckproject function
