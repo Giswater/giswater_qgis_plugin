@@ -138,8 +138,8 @@ class GwLoadProject(QObject):
 
         global_vars.project_loaded = True
 
-        plugin_version = tools_qgis.get_plugin_metadata('version', 0, os.path.dirname(__file__) + os.sep + '..' + os.sep)
-        project_version = tools_gw.get_project_version(schemaname=schema_name)
+        plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
+        project_version = tools_gw.get_project_version(schema_name)
         if project_version == plugin_version:
             message = "Project read finished"
             tools_log.log_info(message)
@@ -288,35 +288,36 @@ class GwLoadProject(QObject):
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar
-        icon_folder = global_vars.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
+        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 successful = False
-                count_trys = 0
-                while not successful and count_trys < 10:
+                attempt = 0
+                while not successful and attempt < 10:
                     button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
                     if button_def not in (None, 'None'):
-                        text = tools_qt.tr(f'{index_action}_text')
-                        icon_path = icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-
-                        button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
-                        self.buttons[index_action] = button
+                        # Check if the class associated to the button definition exists
+                        if hasattr(buttons, button_def):
+                            text = tools_qt.tr(f'{index_action}_text')
+                            icon_path = f"{icon_folder}{plugin_toolbar.toolbar_id}{os.sep}{index_action}.png"
+                            button_class = getattr(buttons, button_def)
+                            button = button_class(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
+                            self.buttons[index_action] = button
                         successful = True
-                    count_trys = count_trys + 1
+                    attempt = attempt + 1
 
         # Disable buttons which are project type exclusive
         project_exclusive = None
         successful = False
-        count_trys = 0
-        while not successful and count_trys < 10:
+        attempt = 0
+        while not successful and attempt < 10:
             project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
-
             if project_exclusive not in (None, "None"):
                 successful = True
-            count_trys = count_trys + 1
+            attempt = attempt + 1
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
