@@ -142,7 +142,7 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir):
     """ Get @parameter from metadata.txt file """
 
     # Check if metadata file exists
@@ -185,14 +185,14 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
+def get_major_version(plugin_dir, default_version='3.5'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
     return major_version
 
 
-def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir):
+def get_build_version(plugin_dir, default_version='35001'):
     """ Get plugin build version from metadata.txt file """
 
     build_version = get_plugin_metadata('version', default_version, plugin_dir).replace(".", "")
