@@ -20,6 +20,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..shared.document import GwDocument
 from ..shared.element import GwElement
 from ..shared.info import GwInfo
+from ..shared.visit import GwVisit
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
@@ -144,6 +145,18 @@ def delete_object(**kwargs):
                " WHERE id::integer IN (" + list_id + ")")
         tools_db.execute_sql(sql, log_sql=False)
         _reload_table(**kwargs)
+
+
+def open_visit_manager(**kwargs):
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    func_params = kwargs['func_params']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+
+    manage_visit = GwVisit()
+    # manage_visit.visit_added.connect(_update_visit_table)
+    manage_visit.manage_visits(feature_type, feature_id)
 
 
 def manage_document(doc_id, **kwargs):
