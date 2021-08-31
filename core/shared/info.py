@@ -857,8 +857,6 @@ class GwInfo(QObject):
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
-
-        self.snapper_manager.show_snap_message(False)
         global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
         ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate))
 
