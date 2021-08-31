@@ -12,10 +12,11 @@ $BODY$
 
 /*example
 current petition from client:
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5}}$$);
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5}}$$);
 
-SELECT * FROM arc join node using(node_1) where node.code = 2194
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5, "scale":{ "eh":1000, "ev":1000}}}$$);
 
+----------- 
 further petitions from client:
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500}, "papersize":{"id":0, "customDim":{"xdim":300, "ydim":200}},
@@ -245,14 +246,15 @@ BEGIN
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-			gis_length::float as reverse_cost FROM v_edit_arc'', '||v_init||','||v_end||'))a
-			USING (arc_id)';
+			gis_length::float as reverse_cost FROM v_edit_arc WHERE state > 0'', '||v_init||','||v_end||'))a
+			USING (arc_id)
+			WHERE b.state > 0';
 
 		-- insert node values on anl_node table
 		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
 			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-			gis_length::float as reverse_cost FROM v_edit_arc'', '||v_init||','||v_end||'))a
+			gis_length::float as reverse_cost FROM v_edit_arc WHERE state > 0'', '||v_init||','||v_end||'))a
 			USING (node_id)';
 
 		-- looking for null values (in case of exists links graf will be disabled as below)
