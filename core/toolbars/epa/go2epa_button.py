@@ -31,8 +31,7 @@ class GwGo2EpaButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.iterations = 0
-        self.project_type = tools_gw.get_project_type()
-        self.plugin_dir = global_vars.plugin_dir
+        self.project_type = global_vars.project_type
         self.epa_options_list = []
 
 
@@ -492,7 +491,6 @@ class GwGo2EpaButton(GwAction):
                 msg = "You need to select some sector"
                 tools_qt.show_info_box(msg)
                 return
-
 
         self.dlg_go2epa.btn_cancel.setEnabled(True)
 

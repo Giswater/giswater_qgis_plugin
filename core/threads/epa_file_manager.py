@@ -26,18 +26,22 @@ class GwEpaFileManager(GwTask):
 
         super().__init__(description)
         self.go2epa = go2epa
+        self.json_result = None
+        self.rpt_result = None
+        self.fid = 140
+        self.funtion_name = None
+        self.initialize_variables()
+        self.set_variables_from_go2epa()
+
+
+    def initialize_variables(self):
+
         self.exception = None
         self.error_msg = None
         self.message = None
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
-        self.json_result = None
-        self.rpt_result = None
-        self.file_rpt = None
-        self.fid = 140
-        self.set_variables_from_go2epa()
-        self.funtion_name = None
 
 
     def set_variables_from_go2epa(self):
@@ -48,10 +52,8 @@ class GwEpaFileManager(GwTask):
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
         self.go2epa_export_inp = self.go2epa.export_inp
-        self.exec_epa = self.go2epa.exec_epa
-        self.import_result = self.go2epa.import_result
-        self.project_type = self.go2epa.project_type
-        self.plugin_dir = self.go2epa.plugin_dir
+        self.go2epa_execute_epa = self.go2epa.exec_epa
+        self.go2epa_import_result = self.go2epa.import_result
         self.net_geom = self.go2epa.net_geom
         self.export_subcatch = self.go2epa.export_subcatch
 
@@ -60,26 +62,21 @@ class GwEpaFileManager(GwTask):
 
         super().run()
 
-        # Initialize instance variables
-        self.exception = None
-        self.error_msg = None
-        self.message = None
-        self.common_msg = ""
-        self.function_failed = False
-        self.complet_result = None
-
+        self.initialize_variables()
         status = True
-        if not self._exec_function_pg2epa():
-            self.funtion_name = 'gw_fct_pg2epa_main'
-            return False
+        if self.go2epa_export_inp or self.go2epa_execute_epa:
+            status = self._exec_function_pg2epa()
+            if not status:
+                self.funtion_name = 'gw_fct_pg2epa_main'
+                return False
 
         if self.go2epa_export_inp:
             status = self._export_inp()
 
-        if status and self.exec_epa:
+        if status and self.go2epa_execute_epa:
             status = self._execute_epa()
 
-        if status and self.import_result:
+        if status and self.go2epa_import_result:
             self.funtion_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
@@ -103,7 +100,7 @@ class GwEpaFileManager(GwTask):
         self._close_file()
 
         # If PostgreSQL function returned null
-        if self.complet_result is None:
+        if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
             msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
             tools_log.log_warning(msg)
 
@@ -118,7 +115,7 @@ class GwEpaFileManager(GwTask):
                                                         'INP results', True, True, 1, False, close=False,
                                                         call_set_tabs_enabled=False)
 
-            if self.import_result and self.rpt_result:
+            if self.go2epa_import_result and self.rpt_result:
                 if 'status' in self.rpt_result:
                     if self.rpt_result['status'] == "Accepted":
                         if 'body' in self.rpt_result:
@@ -278,10 +275,10 @@ class GwEpaFileManager(GwTask):
 
         # Set file to execute
         opener = None
-        if self.project_type in 'ws':
-            opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet20012.exe"
-        elif self.project_type in 'ud':
-            opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm50022.exe"
+        if global_vars.project_type in 'ws':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet20012.exe"
+        elif global_vars.project_type in 'ud':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm50022.exe"
 
         if opener is None:
             return False
