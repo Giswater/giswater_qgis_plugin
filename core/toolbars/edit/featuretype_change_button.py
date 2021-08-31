@@ -18,12 +18,12 @@ from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
-class GwNodeTypeChangeButton(GwMaptool):
-    """ Button 28: Change node type
-    User select one node. A form is opened showing current node_type.type
-            Combo to select new node_type.type
-            Combo to select new node_type.id
-            Combo to select new cat_node.id
+class GwFeatureTypeChangeButton(GwMaptool):
+    """ Button 24: Change feature type
+    User select from drop-down button feature type: ARC, NODE, CONNEC.
+    Snap to this feature type is activated.
+    User selects a feature of that type from the map.
+    A form is opened showing current feature_type.type and combos to replace it
     """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
