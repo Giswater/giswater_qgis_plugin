@@ -262,8 +262,6 @@ UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=21 WHERE colu
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=22 WHERE columnname = 'undelete' AND formname like '%_valve';
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=23 WHERE columnname = 'inventory' AND formname like '%_valve';
 
-UPDATE ext_streetaxis SET muni_id = 2 WHERE expl_id  = 2;
-
 -- hidden
 UPDATE config_form_fields SET hidden = true WHERE columnname 
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
