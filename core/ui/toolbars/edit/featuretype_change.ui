@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Change node type</string>
+   <string>Change feature type</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">
@@ -158,7 +158,7 @@
      <item>
       <widget class="QLineEdit" name="feature_type">
        <property name="text">
-        <string>node_type</string>
+        <string/>
        </property>
       </widget>
      </item>
