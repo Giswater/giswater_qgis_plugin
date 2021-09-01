@@ -27,7 +27,6 @@ from .edit.arc_add_button import GwArcAddButton
 from .edit.feature_replace_button import GwFeatureReplaceButton
 from .edit.arc_divide_button import GwArcDivideButton
 from .edit.arc_fusion_button import GwArcFusionButton
-from .edit.nodetype_change_button import GwNodeTypeChangeButton
 from .edit.featuretype_change_button import GwFeatureTypeChangeButton
 from .edit.connect_link_button import GwConnectLinkButton
 from .edit.feature_end_button import GwFeatureEndButton
