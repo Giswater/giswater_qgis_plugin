@@ -8,14 +8,16 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 from qgis.core import QgsFeatureRequest
 
 from ..maptool import GwMaptool
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
-from ...ui.ui_manager import GwNodeTypeChangeUi
+from ...ui.ui_manager import GwFeatureTypeChangeUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
+from .... import global_vars
 
 
 class GwFeatureTypeChangeButton(GwMaptool):
@@ -29,6 +31,23 @@ class GwFeatureTypeChangeButton(GwMaptool):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.project_type = None
+        self.feature_type = None
+        self.geom_view = None
+        self.cat_table = None
+        self.feature_id = None
+
+        # Create a menu and add all the actions
+        if toolbar is not None:
+            toolbar.removeAction(self.action)
+
+        self.menu = QMenu()
+        self.menu.setObjectName("GW_change_menu")
+        self._fill_change_menu()
+
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
 
 
     # region QgsMapTools inherited
@@ -41,12 +60,32 @@ class GwFeatureTypeChangeButton(GwMaptool):
             return
 
 
+    def canvasMoveEvent(self, event):
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping layers 'v_edit_'
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename and 'v_edit' in tablename:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
     def canvasReleaseEvent(self, event):
 
-        self._nodetype_change(event)
+        self._featuretype_change(event)
 
 
     def activate(self):
+
+        self.project_type = tools_gw.get_project_type()
+
+        # Set active and current layer
+        self._set_active_layer("NODE")
 
         # Check button
         self.action.setChecked(True)
@@ -54,19 +93,23 @@ class GwFeatureTypeChangeButton(GwMaptool):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Clear snapping
+        # Disable snapping
         self.snapper_manager.set_snapping_status()
-        self.current_layer = self.iface.activeLayer()
-        # Set active layer to 'v_edit_node'
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.set_snapping_layers()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+        self.snapper_manager.config_snap_to_arc()
+        self.snapper_manager.set_snap_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on node to change it's type"
+            message = "Click on feature to change its type"
             tools_qgis.show_info(message)
 
 
@@ -79,45 +122,78 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
     # region private functions
 
+    def _fill_change_menu(self):
+        """ Fill change feature type menu """
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+        ag = QActionGroup(self.iface.mainWindow())
+
+        actions = ['ARC', 'NODE', 'CONNEC']
+        if global_vars.project_type.lower() == 'ud':
+            actions.append('GULLY')
+
+        for action in actions:
+            obj_action = QAction(f"{action}", ag)
+            self.menu.addAction(obj_action)
+            obj_action.triggered.connect(partial(super().clicked_event))
+            obj_action.triggered.connect(partial(self._set_active_layer, action))
+
+
+    def _set_active_layer(self, name):
+        """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
+
+        layers = {"ARC": "v_edit_arc", "NODE": "v_edit_node",
+                  "CONNEC": "v_edit_connec", "GULLY": "v_edit_gully"}
+        tablename = layers.get(name.upper())
+        self.current_layer = tools_qgis.get_layer_by_tablename(tablename)
+        self.iface.setActiveLayer(self.current_layer)
+
+
     def _open_catalog(self, feature_type):
 
         # Get feature_type
-        child_type = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        child_type = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
         if child_type == 'null':
-            msg = "New node type is null. Please, select a valid value."
+            msg = "New feature type is null. Please, select a valid value"
             tools_qt.show_info_box(msg, "Info")
             return
 
         self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_chg_node_type, 'node_nodecat_id', feature_type, child_type)
+        self.catalog.open_catalog(self.dlg_change, 'featurecat_id', feature_type, child_type)
 
 
     def _edit_change_elem_type_accept(self):
-        """ Update current type of node and save changes in database """
+        """ Update current type of feature and save changes in database """
 
         project_type = tools_gw.get_project_type()
-        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        node_nodecat_id = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
+        feature_type_new = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
+        featurecat_id = tools_qt.get_text(self.dlg_change, self.dlg_change.featurecat_id)
 
-        layer = False
-        if node_node_type_new != "null":
+        if feature_type_new != "null":
 
-            if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (
+            if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
                     project_type == 'ud'):
-                # Update field 'nodecat_id'
-                sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
-                       f"WHERE node_id = '{self.node_id}'")
-                tools_db.execute_sql(sql)
 
+                fieldname = f"{self.feature_type}cat_id"
+                if self.feature_type == "connec":
+                    fieldname = f"connecat_id"
+                elif self.feature_type == "gully":
+                    fieldname = f"gratecat_id"
+                sql = (f"UPDATE {self.geom_view} "
+                       f"SET {fieldname} = '{featurecat_id}' "
+                       f"WHERE {self.feature_type}_id = '{self.feature_id}'")
+                tools_db.execute_sql(sql)
                 if project_type == 'ud':
-                    sql = (f"UPDATE v_edit_node SET node_type = '{node_node_type_new}' "
-                           f"WHERE node_id = '{self.node_id}'")
+                    sql = (f"UPDATE {self.geom_view} "
+                           f"SET {self.feature_type}_type = '{feature_type_new}' "
+                           f"WHERE {self.feature_type}_id = '{self.feature_id}'")
                     tools_db.execute_sql(sql)
 
-                # Set active layer
-                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
-                if layer:
-                    self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
                 tools_qgis.show_info(message)
 
@@ -127,22 +203,22 @@ class GwFeatureTypeChangeButton(GwMaptool):
                 return
 
         else:
-            message = "The node has not been updated because no catalog has been selected"
+            message = "Feature has not been updated because no catalog has been selected"
             tools_qgis.show_warning(message)
 
         # Close form
-        tools_gw.close_dialog(self.dlg_chg_node_type)
+        tools_gw.close_dialog(self.dlg_change)
 
         # Refresh map canvas
         self.refresh_map_canvas()
 
         # Check if the expression is valid
-        expr_filter = f"node_id = '{self.node_id}'"
+        expr_filter = f"{self.feature_type}_id = '{self.feature_id}'"
         (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
-        if layer:
-            self._open_custom_form(layer, expr)
+
+        self._open_custom_form(self.current_layer, expr)
 
 
     def _open_custom_form(self, layer, expr):
@@ -151,83 +227,100 @@ class GwFeatureTypeChangeButton(GwMaptool):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
         if features[0]:
-            self.customForm = GwInfo(tab_type='data')
+            self.customForm = GwInfo('data')
             self.customForm.user_current_layer = self.current_layer
-            complet_result, dialog = self.customForm.get_info_from_id(table_name='v_edit_node', tab_type='data',
-                                                                      feature_id=features[0]["node_id"])
+            feature_id = features[0][f"{self.feature_type}_id"]
+            complet_result, dialog = self.customForm.get_info_from_id(self.geom_view, feature_id, 'data')
             if not complet_result:
                 return
 
-            dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node'))
+            dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.geom_view))
 
 
-    def _change_elem_type(self, feature):
+    def _change_elem_type(self):
 
-        # Create the dialog, fill node_type and define its signals
-        self.dlg_chg_node_type = GwNodeTypeChangeUi()
-        tools_gw.load_settings(self.dlg_chg_node_type)
-        tools_gw.add_icon(self.dlg_chg_node_type.btn_catalog, "195")
+        # Create the dialog, fill feature_type and define its signals
+        self.dlg_change = GwFeatureTypeChangeUi()
+        tools_gw.load_settings(self.dlg_change)
+        tools_gw.add_icon(self.dlg_change.btn_catalog, "195")
 
-        # Get nodetype_id from current node
-        node_type = ""
+        # Get featuretype_id from current feature
         project_type = tools_gw.get_project_type()
         if project_type == 'ws':
-            node_type = feature.attribute('nodetype_id')
-            self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
+            self.dlg_change.feature_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
-            node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id), id FROM cat_node  WHERE active IS TRUE OR active IS NULL ORDER BY id"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+            sql = (f"SELECT DISTINCT(id), id "
+                   f"FROM {self.cat_table} "
+                   f"WHERE active IS TRUE OR active IS NULL "
+                   f"ORDER BY id")
+            rows = tools_db.get_rows(sql, log_sql=True)
+            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
 
-        self.dlg_chg_node_type.node_node_type.setText(node_type)
-        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self._open_catalog, 'node'))
-        self.dlg_chg_node_type.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
-        self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_chg_node_type))
+        self.dlg_change.feature_type.setText(self.feature_type)
+        self.dlg_change.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
+        self.dlg_change.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
+        self.dlg_change.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_change))
 
-        # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
-               "AND feature_type = 'NODE' ORDER BY id")
+        # Fill 1st combo boxes-new system feature type
+        sql = (f"SELECT DISTINCT(id) "
+               f"FROM cat_feature "
+               f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
+               f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_chg_node_type, "node_node_type_new", rows)
+        tools_qt.fill_combo_box(self.dlg_change, "feature_type_new", rows)
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change')
+        tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
 
 
     def _filter_catalog(self):
 
-        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        if node_node_type_new == "null":
+        feature_type_new = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
+        if feature_type_new == "null":
             return
 
         # Populate catalog_id
-        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' " \
-              f"AND (active IS TRUE OR active IS NULL) ORDER BY id"
+        sql = (f"SELECT DISTINCT(id), id "
+               f"FROM {self.cat_table} "
+               f"WHERE {self.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
+               f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
 
 
-    def _nodetype_change(self, event):
+    def _featuretype_change(self, event):
 
-        self.node_id = None
-
-        # With left click the digitizing is finished
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return
 
-        # Get the click
+        # Get snapped feature
         event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            # Get the point
-            snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            if snapped_feat:
-                self.node_id = snapped_feat.attribute('node_id')
-                # Change node type
-                self._change_elem_type(snapped_feat)
+        if not result.isValid():
+            return
+
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        if snapped_feat is None:
+            return
+
+        layer = self.snapper_manager.get_snapped_layer(result)
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if tablename and 'v_edit' in tablename:
+            if tablename == 'v_edit_node':
+                self.feature_type = 'node'
+            elif tablename == 'v_edit_connec':
+                self.feature_type = 'connec'
+            elif tablename == 'v_edit_gully':
+                self.feature_type = 'gully'
+            elif tablename == 'v_edit_arc':
+                self.feature_type = 'arc'
+
+        self.geom_view = tablename
+        self.cat_table = f'cat_{self.feature_type}'
+        if self.feature_type == 'gully':
+            self.cat_table = f'cat_grate'
+        self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
+        self._change_elem_type()
 
     # endregion
