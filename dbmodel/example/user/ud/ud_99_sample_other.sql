@@ -285,8 +285,6 @@ UPDATE cat_feature SET id=id;
 UPDATE connec SET the_geom  = '0101000020E764000044D7D93156941941F95742A672755141' 
 WHERE connec_id ='3024';
 
-UPDATE ext_streetaxis SET muni_id = 2 WHERE expl_id  = 2;
-
 
 -- hidden
 UPDATE config_form_fields SET hidden = true WHERE columnname 
