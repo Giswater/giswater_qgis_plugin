@@ -11,6 +11,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON raster_dem;
 DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON ext_raster_dem;
 DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_delete ON ext_raster_dem;
+
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON raster_dem_old;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON ext_raster_dem_old;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_delete ON ext_raster_dem_old;
+
 DROP FUNCTION IF EXISTS gw_trg_manage_raster_dem();
 
 

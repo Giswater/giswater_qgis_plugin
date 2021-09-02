@@ -28,4 +28,8 @@ INSERT INTO utils.address ( id, muni_id, postcode, streetaxis_id, postnumber, pl
 SELECT id, muni_id, postcode, streetaxis_id, postnumber, plot_id, the_geom, expl_id 
 FROM ext_address_old ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO utils.district (district_id, name, muni_id, observ, active, the_geom)
+SELECT district_id, name, muni_id, observ, active, the_geom
+FROM ext_district_old ON CONFLICT (district_id) DO NOTHING;
+
 UPDATE config_param_system SET value='SCHEMA_NAME' WHERE parameter='ws_current_schema';
