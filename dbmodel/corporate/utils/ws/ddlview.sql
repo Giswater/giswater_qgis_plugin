@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-CREATE VIEW ws.ext_municipality AS SELECT * 
+CREATE VIEW ext_municipality AS SELECT * 
 FROM utils.municipality;
 	
-CREATE VIEW ws.ext_type_street AS SELECT * 
+CREATE VIEW ext_type_street AS SELECT * 
 FROM utils.type_street;
 
-CREATE OR REPLACE VIEW ws.ext_streetaxis as 
+CREATE OR REPLACE VIEW ext_streetaxis as 
 SELECT  
 id,  
 code, type, 
@@ -24,7 +24,7 @@ ws_expl_id as expl_id,
 muni_id   
 FROM utils.streetaxis;
 
-CREATE OR REPLACE VIEW ws.ext_plot AS 
+CREATE OR REPLACE VIEW ext_plot AS 
 SELECT 
 id,
 plot_code, 
@@ -41,7 +41,7 @@ the_geom,
 ws_expl_id AS expl_id 
 FROM utils.plot;
 
-CREATE OR REPLACE VIEW ws.ext_address as 
+CREATE OR REPLACE VIEW ext_address as 
 SELECT 
 id, 
 muni_id, 

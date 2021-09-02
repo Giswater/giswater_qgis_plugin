@@ -17,7 +17,7 @@ INSERT INTO  utils.type_street (id, observ) SELECT id, observ FROM ext_type_stre
 
 INSERT INTO utils.streetaxis (id, code, type, name, text, the_geom, ws_expl_id, muni_id) 
 SELECT id, code, type, name, text, the_geom, expl_id, muni_id 
-FROM streetaxis_old ON CONFLICT (id) DO NOTHING;
+FROM ext_streetaxis_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO  utils.plot (id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ,
 text, the_geom, ws_expl_id) 
