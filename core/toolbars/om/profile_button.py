@@ -894,8 +894,8 @@ class GwProfileButton(GwAction):
             # defining variables
             y2_prev = self.nodes[index - 1].y2
             elev2_prev = self.nodes[index - 1].elev2
-            y1 = self.nodes[0].y1
-            elev1 = self.nodes[0].elev1
+            y1 = self.nodes[index].y1
+            elev1 = self.nodes[index].elev1
 
             # Fill y_max
             plt.annotate(
