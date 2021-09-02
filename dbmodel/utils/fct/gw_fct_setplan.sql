@@ -69,7 +69,7 @@ BEGIN
 
 		END IF;		
 
-	--control psector topology: find arc, that on inventory is defined as planified, but on psector it's final nodes are set as obsolete
+		--control psector topology: find arc, that on inventory is defined as planified, but on psector it's final nodes are set as obsolete
 		v_query = 'SELECT * FROM
 		(SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
 			JOIN node n ON node_id = node_1 where n.state = 2 AND a.state=2 AND pa.psector_id = '|| v_psector ||'

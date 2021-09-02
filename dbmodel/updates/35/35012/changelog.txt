@@ -7,3 +7,4 @@
 - Add function vodetrimarcs for UD exportation, relate to 1D/2D coupled model
 - Profilactic delete of legacy values on man_addfields_value on setcheckproject function
 - Add control on change street_id by streetname on edit triggers in order to avoid lose info
+- New functionality to replace pipes on plan mode in psectors
