@@ -2172,7 +2172,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=True, is_utils=False):
+    def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=True, utils_schema_name=None):
         """"""
 
         if not os.path.exists(filedir):
@@ -2182,8 +2182,8 @@ class GwAdminButton:
             tools_log.log_info("Processing folder", parameter=filedir)
         filelist = sorted(os.listdir(filedir))
         status = True
-        if is_utils:
-            schema_name = 'utils'
+        if utils_schema_name:
+            schema_name = utils_schema_name
         elif self.schema is None:
             schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
             schema_name = schema_name.replace('"', '')
@@ -3334,10 +3334,10 @@ class GwAdminButton:
     def _create_utils(self):
 
         # Manage cmb_utils_projecttypes null values
-        ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
-        ud_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False)
+        self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        self.ud_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False)
 
-        if ws_project_name == "" or ud_project_name == "":
+        if self.ws_project_name == "" or self.ud_project_name == "":
             msg = "You need to have a ws and ud schema created to create a utils schema"
             tools_qgis.show_message(msg, 0)
             return
@@ -3346,12 +3346,12 @@ class GwAdminButton:
         ws_project_result = None
         ud_project_result = None
 
-        sql = f"SELECT giswater, language, epsg FROM {ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        sql = f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
             ws_project_result = row
 
-        sql = f"SELECT giswater, language, epsg FROM {ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        sql = f"SELECT giswater, language, epsg FROM {self.ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
             ud_project_result = row
@@ -3375,7 +3375,8 @@ class GwAdminButton:
         description = f"Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
                   'project_name_schema': 'utils', 'project_locale': ws_project_result[1],
-                  'project_srid': ws_project_result[2], 'example_data': False, 'schema_version': None}
+                  'project_srid': ws_project_result[2], 'example_data': False, 'schema_version': None,
+                  'schema_utils':'utils', 'schema_ws':self.ws_project_name, 'schema_ud':self.ud_project_name}
         self.task_create_schema = GwCreateSchemaUtilsTask(self, description, params)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
@@ -3383,8 +3384,8 @@ class GwAdminButton:
 
     def _update_utils(self):
 
-        ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
-        sql = f"SELECT giswater, language, epsg FROM {ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        sql = f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
             self._update_utils_schema(row[0])
@@ -3393,19 +3394,19 @@ class GwAdminButton:
     def _load_base_utils(self):
 
         folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}utils"
-        status = self._execute_files(folder, is_utils=True)
+        status = self._execute_files(folder, utils_schema_name='utils')
         if not status and self.dev_commit is False:
             return False
         folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}utils{os.sep}fct"
-        status = self._execute_files(folder, is_utils=True)
+        status = self._execute_files(folder, utils_schema_name='utils')
         if not status and self.dev_commit is False:
             return False
         folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}ws"
-        status = self._execute_files(folder, is_utils=True)
+        status = self._execute_files(folder, utils_schema_name=self.ws_project_name)
         if not status and self.dev_commit is False:
             return False
         folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}ud"
-        status = self._execute_files(folder)
+        status = self._execute_files(folder, utils_schema_name=self.ud_project_name)
         if not status and self.dev_commit is False:
             return False
 
