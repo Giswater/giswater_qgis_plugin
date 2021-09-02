@@ -21,7 +21,7 @@ FROM ext_streetaxis_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO  utils.plot (id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ,
 text, the_geom, ws_expl_id) 
-SELECT id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ,
+SELECT id, plot_code, muni_id, postcode::integer, streetaxis_id, postnumber, complement, placement, square, observ,
 text, the_geom, expl_id FROM ext_plot_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO utils.address ( id, muni_id, postcode, streetaxis_id, postnumber, plot_id , the_geom , ws_expl_id)

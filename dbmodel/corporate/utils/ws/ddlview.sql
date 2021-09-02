@@ -7,10 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-CREATE VIEW ext_municipality AS SELECT * 
+CREATE OR REPLACE VIEW ext_municipality AS SELECT * 
 FROM utils.municipality;
 	
-CREATE VIEW ext_type_street AS SELECT * 
+CREATE OR REPLACE VIEW ext_type_street AS SELECT * 
 FROM utils.type_street;
 
 CREATE OR REPLACE VIEW ext_streetaxis as 

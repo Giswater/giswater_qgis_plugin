@@ -16,12 +16,12 @@ SELECT muni_id, name, observ, the_geom FROM ext_municipality_old ON CONFLICT (mu
 INSERT INTO  utils.type_street (id, observ) SELECT id, observ FROM ext_type_street_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO utils.streetaxis (id, code, type, name, text, the_geom, ud_expl_id, muni_id) 
-SELECT id, code, type, name, text, the_geom, expl_id, expl_id, muni_id 
+SELECT id, code, type, name, text, the_geom, expl_id, muni_id 
 FROM ext_streetaxis_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO  utils.plot (id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ,
 text, the_geom, ud_expl_id) 
-SELECT id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ,
+SELECT id, plot_code, muni_id, postcode::integer, streetaxis_id, postnumber, complement, placement, square, observ,
 text, the_geom, expl_id FROM ext_plot_old ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO utils.address ( id, muni_id, postcode, streetaxis_id, postnumber, plot_id , the_geom , ud_expl_id)
