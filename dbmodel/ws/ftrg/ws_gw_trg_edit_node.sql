@@ -478,10 +478,24 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 			
 		ELSIF v_man_table='man_pump' THEN		
-			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model) 
-			VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number,
-			NEW.brand, NEW.model);
-		
+			IF (v_insert_double_geom IS TRUE) THEN
+				IF (NEW.pol_id IS NULL) THEN
+					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+				
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (NEW.pol_id, 'PUMP', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
+				FROM node where node_id=NEW.node_id));
+
+				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model,pol_id) 
+				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number,
+				NEW.brand, NEW.model, NEW.pol_id);
+			ELSE
+				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model) 
+				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number,
+				NEW.brand, NEW.model);
+			END IF;
+
 		ELSIF v_man_table='man_reduction' THEN
 			
 			IF v_edit_node_reduction_auto_d1d2 = 'TRUE' THEN
@@ -510,7 +524,19 @@ BEGIN
 			VALUES(NEW.node_id, NEW.brand, NEW.model);
 		
 		ELSIF v_man_table='man_source' THEN	
-			INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
+			IF (v_insert_double_geom IS TRUE) THEN
+				IF (NEW.pol_id IS NULL) THEN
+					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+				
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (NEW.pol_id, 'SOURCE', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
+				FROM node where node_id=NEW.node_id));
+
+				INSERT INTO man_source (node_id, name, pol_id) VALUES(NEW.node_id, NEW.name, NEW.pol_id);
+			ELSE
+				INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
+			END IF;
 		
 		ELSIF v_man_table='man_waterwell' THEN
 			INSERT INTO man_waterwell (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -530,10 +556,23 @@ BEGIN
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;
 			
-		ELSIF v_man_table='man_netwjoin' THEN
-			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model)
-			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model);
-		
+		ELSIF v_man_table='man_netwjoin' THEN	
+			IF (v_insert_double_geom IS TRUE) THEN
+				IF (NEW.pol_id IS NULL) THEN
+					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+				
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (NEW.pol_id, 'NETWJOIN', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
+				FROM node where node_id=NEW.node_id));
+
+				INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model, pol_id)
+				VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model, NEW.pol_id);
+			ELSE
+				INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model)
+				VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model);
+			END IF;
+
 		ELSIF v_man_table='man_expansiontank' THEN
 			INSERT INTO man_expansiontank (node_id) VALUES(NEW.node_id);
 		
@@ -564,7 +603,7 @@ BEGIN
 			END IF;
 
 			--insert double geometry
-			IF (v_man_table IN ('man_register', 'man_tank') and (v_insert_double_geom IS TRUE)) THEN
+			IF (v_man_table IN ('man_register', 'man_tank', 'man_pump', 'man_netwjoin', 'man_source') and (v_insert_double_geom IS TRUE)) THEN
 					
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
 				v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
@@ -819,7 +858,7 @@ BEGIN
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
 			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, pol_id=NEW.pol_id
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF v_man_table ='man_manhole' THEN
@@ -832,7 +871,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;			
 
 		ELSIF v_man_table ='man_source' THEN
-			UPDATE man_source SET name=NEW.name
+			UPDATE man_source SET name=NEW.name, pol_id=NEW.pol_id
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_meter' THEN
@@ -863,7 +902,7 @@ BEGIN
 		ELSIF v_man_table ='man_netwjoin' THEN			
 			UPDATE man_netwjoin
 			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, pol_id=NEW.pol_id
 			WHERE node_id=OLD.node_id;		
 		
 		ELSIF v_man_table ='man_expansiontank' THEN
@@ -933,7 +972,10 @@ BEGIN
 
 		-- delete from polygon table (before the deletion of node)
 		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id );
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id );
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id);
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_pump WHERE node_id=OLD.node_id);
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_source WHERE node_id=OLD.node_id);
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netwjoin WHERE node_id=OLD.node_id);
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;

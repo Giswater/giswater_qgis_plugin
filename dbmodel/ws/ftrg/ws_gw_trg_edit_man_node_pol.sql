@@ -53,7 +53,28 @@ BEGIN
         		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
 			END  IF;
 			sys_type_var='TANK';
-		
+
+		ELSIF man_table='man_pump_pol' THEN
+			IF (SELECT node_id FROM man_pump WHERE node_id=NEW.node_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
+			END  IF;
+			sys_type_var='PUMP';
+
+		ELSIF man_table='man_netwjoin_pol' THEN
+			IF (SELECT node_id FROM man_netwjoin WHERE node_id=NEW.node_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
+			END  IF;
+			sys_type_var='NETWJOIN';
+
+		ELSIF man_table='man_source_pol' THEN
+			IF (SELECT node_id FROM man_source WHERE node_id=NEW.node_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
+			END  IF;
+			sys_type_var='SOURCE';
+
 		END IF;
 		
 		-- Insert into polygon table
@@ -66,6 +87,15 @@ BEGIN
 		
 		ELSIF man_table='man_tank_pol' THEN
 			UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+		ELSIF man_table='man_pump_pol' THEN
+			UPDATE man_pump SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+		ELSIF man_table='man_netwjoin_pol' THEN
+			UPDATE man_netwjoin SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+		ELSIF man_table='man_source_pol' THEN
+			UPDATE man_source SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 		
 		END IF;
 
@@ -93,6 +123,30 @@ BEGIN
 				END  IF;
 				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+			ELSIF man_table ='man_pump_pol' THEN
+				IF (SELECT node_id FROM man_pump WHERE node_id=NEW.node_id) IS NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
+				END  IF;
+				UPDATE man_pump SET pol_id=NULL WHERE node_id=OLD.node_id;
+				UPDATE man_pump SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+			ELSIF man_table ='man_netwjoin_pol' THEN
+				IF (SELECT node_id FROM man_netwjoin WHERE node_id=NEW.node_id) IS NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
+				END  IF;
+				UPDATE man_netwjoin SET pol_id=NULL WHERE node_id=OLD.node_id;
+				UPDATE man_netwjoin SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+
+			ELSIF man_table ='man_source_pol' THEN
+				IF (SELECT node_id FROM man_source WHERE node_id=NEW.node_id) IS NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
+				END  IF;
+				UPDATE man_source SET pol_id=NULL WHERE node_id=OLD.node_id;
+				UPDATE man_source SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			END IF;
 			
 		END IF;
@@ -107,7 +161,16 @@ BEGIN
 					
 		ELSIF man_table ='man_tank_pol' THEN
 			UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
+		
+		ELSIF man_table ='man_pump_pol' THEN
+			UPDATE man_pump SET pol_id=NULL WHERE node_id=OLD.node_id;
 						
+		ELSIF man_table ='man_netwjoin_pol' THEN
+			UPDATE man_netwjoin SET pol_id=NULL WHERE node_id=OLD.node_id;
+						
+		ELSIF man_table ='man_source_pol' THEN
+			UPDATE man_source SET pol_id=NULL WHERE node_id=OLD.node_id;
+									
 		END IF;
 
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
