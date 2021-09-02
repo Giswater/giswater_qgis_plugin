@@ -29,3 +29,9 @@ DELETE FROM config_param_system WHERE parameter IN ('admin_transaction_db', 'adm
 
 INSERT INTO sys_function VALUES (3072, 'gw_fct_sereplacefeatureplan', 'utils', 'function', 'json', 'json', 'Function to replace features on planning mode', 'role_epa')
 ON CONFLICT (id) DO NOTHING;
+
+--2021/09/01
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3074,'gw_trg_edit_inp_dscenario', 'ws', 'trigger function', NULL, NULL, 'Trigger that allows editing data on v_edit_inp_dscenario views',
+'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
