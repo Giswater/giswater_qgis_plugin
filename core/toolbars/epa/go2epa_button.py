@@ -138,7 +138,7 @@ class GwGo2EpaButton(GwAction):
 
         if self.project_type == 'ws':
             tableleft = "cat_dscenario"
-            tableright = "selector_inp_demand"
+            tableright = "selector_inp_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
