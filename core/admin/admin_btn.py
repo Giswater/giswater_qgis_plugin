@@ -1336,11 +1336,11 @@ class GwAdminButton:
         return True
 
 
-    def _load_sql(self, path_folder, no_ct=False):
+    def _load_sql(self, path_folder, no_ct=False, utils_schema_name=None):
         """"""
 
         for (path, ficheros, archivos) in os.walk(path_folder):
-            status = self._execute_files(path, no_ct=no_ct)
+            status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name)
             if not status:
                 return False
 
@@ -1548,9 +1548,11 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create project")
         if status:
             global_vars.dao.commit()
-            self._close_dialog_admin(self.dlg_readsql_create_project)
+            if is_utils is False:
+                self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
+                self._manage_utils()
                 if project_name is not None and is_utils is False:
                     tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', project_type)
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, project_name)
@@ -2358,6 +2360,7 @@ class GwAdminButton:
                 msg = "Process finished successfully"
                 tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
+                self._manage_utils()
                 self._set_info_project()
 
 
@@ -3426,28 +3429,38 @@ class GwAdminButton:
         for folder in folders:
             sub_folders = sorted(os.listdir(folderUtilsUpdates + folder))
             for sub_folder in sub_folders:
-                if schema_version is not None and str(sub_folder) > str(schema_version).replace('.', ''):
-                    if self._process_folder(folderUtilsUpdates + folder + os.sep + sub_folder,
-                                            os.sep + 'utils' + os.sep):
-                        status = self._load_sql(folderUtilsUpdates + folder + os.sep +
-                                                sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
-                        if status is False:
-                            return False
-                    if self._process_folder(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                            ''):
-                        status = self._load_sql(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                            no_ct=no_ct)
-                        if status is False:
-                            return False
-                    if self._process_folder(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), '') is True:
-                        status = self._execute_files(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                self.locale + os.sep), True)
-                        if status is False:
-                            return False
+                if schema_version and str(sub_folder) < str(schema_version).replace('.', ''):
+                        continue
+                if self._process_folder(folderUtilsUpdates + folder + os.sep + sub_folder,
+                                        os.sep + 'utils' + os.sep):
+                    status = self._load_sql(folderUtilsUpdates + folder + os.sep +
+                                            sub_folder + os.sep + 'utils' + os.sep,
+                                            utils_schema_name='utils')
+                    if status is False:
+                        return False
+                if self._process_folder(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
+                        ''):
+                    status = self._load_sql(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
+                        utils_schema_name=self.ws_project_name)
+                    if status is False:
+                        return False
+                if self._process_folder(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
+                        ''):
+                    status = self._load_sql(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
+                        utils_schema_name=self.ud_project_name)
+                    if status is False:
+                        return False
+                if self._process_folder(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
+                            self.locale + os.sep), '') is True:
+                    status = self._execute_files(
+                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
+                            self.locale + os.sep), True)
+                    if status is False:
+                        return False
 
     # endregion
