@@ -13,3 +13,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE inp_pump DROP CONSTRAINT IF EXISTS inp_pump_to_arc_fkey;
 ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_to_arc_fkey FOREIGN KEY (to_arc)
 REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+--2021/09/03
+ALTER TABLE inp_demand DROP CONSTRAINT IF EXISTS inp_demand_unique;
+ALTER TABLE inp_demand ADD CONSTRAINT inp_demand_unique UNIQUE(feature_id, dscenario_id);
