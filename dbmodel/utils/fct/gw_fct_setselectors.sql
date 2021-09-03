@@ -44,6 +44,12 @@ v_tableid text;
 v_checkall boolean;
 v_geometry text;
 v_useatlas boolean;
+v_querytext text;
+v_message text = '{"level":1, "text":"Process done successfully"}';
+v_count integer = 0;
+v_count_aux integer = 0;
+v_name text;
+
 
 BEGIN
 
@@ -112,7 +118,6 @@ BEGIN
 	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'sectorfromexpl')::boolean 
 		FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_exploitation' THEN
 
-		
 		IF  v_value='True' THEN
 			IF v_isalone IS TRUE THEN
 				EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
@@ -173,8 +178,10 @@ BEGIN
 		ELSE
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
 		END IF;
+		
 	ELSIF v_checkall IS FALSE THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+		
 	ELSE
 		-- manage isalone
 		IF v_isalone OR v_checkall IS FALSE THEN
@@ -202,6 +209,42 @@ BEGIN
 
 	END IF;
 
+	-- manage parents
+	IF v_tabname IN ('tab_psector', 'tab_dscenario') AND v_checkall is null THEN
+
+		-- getting name
+		v_name = substring (v_tabname,5,99);
+	
+		IF v_value THEN
+			-- getting parent_id for selected row
+			EXECUTE 'SELECT parent_id FROM '||v_table||' WHERE active IS TRUE AND parent_id IS NOT NULL AND '||v_tableid||' = '||v_id
+			INTO v_id;
+
+			IF v_id IS NOT NULL THEN
+				-- force parent_id to be visible if child have been enabled
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+				GET DIAGNOSTICS v_count = row_count;
+				IF v_count > 0 THEN
+					v_message = concat ('{"level":0, "text":"',v_name,' ',v_id,' have been enabled, because of its parent-relation with selected ', v_name,'"}');
+				END IF;
+			END IF;
+		ELSE
+			-- getting childs for parent_id for selected row	
+			v_querytext = 'SELECT '||v_tableid||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '||v_id;
+
+			FOR v_id IN EXECUTE v_querytext
+			LOOP
+				EXECUTE 'DELETE FROM '||v_tablename||' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+				GET DIAGNOSTICS v_count_aux = row_count;
+				v_count = v_count + v_count_aux;
+			END LOOP;
+
+			IF v_count > 0 THEN
+				v_message = concat ('{"level":0, "text":"',v_count,' ',v_name,'(s) have been disabled, because of its child-relation from selected ', v_name,'"}');
+			END IF;
+		END IF;
+	END IF;
+
 	-- get envelope over arcs or over exploitation if arcs dont exist
 	IF v_tabname='tab_sector' THEN
 		SELECT row_to_json (a) 
@@ -211,7 +254,7 @@ BEGIN
 		FROM (SELECT st_collect(the_geom) as the_geom FROM sector where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
 		
-	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state') THEN
+	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
 	ELSIF (SELECT the_geom FROM v_edit_arc LIMIT 1) IS NOT NULL or (v_checkall IS False and v_id is null) THEN
@@ -244,7 +287,8 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "useAtlas":"',v_useatlas,'", "selectorType":"',v_selectortype,'"}}');
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',
+	v_geometry,', "useAtlas":"',v_useatlas,'", "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	

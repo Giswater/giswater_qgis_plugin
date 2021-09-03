@@ -127,3 +127,10 @@ ALTER TABLE selector_mincut_result ALTER COLUMN cur_user SET DEFAULT "current_us
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netwjoin", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+
+-- 2021/09/03
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"dscenario_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+
+ALTER TABLE cat_dscenario ALTER active SET DEFAULT TRUE;

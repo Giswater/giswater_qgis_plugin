@@ -353,3 +353,22 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_inp_dscenario_valve','form_feature', 'main', 'status', null, null, 'integer', 'combo', 'status', NULL, NULL,  FALSE,
 FALSE, TRUE, FALSE,FALSE,'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_status_valve''', TRUE, FALSE, NULL, NULL,NULL,
 NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+-- 2021/09/03
+UPDATE cat_dscenario SET active = true;
+UPDATE cat_dscenario SET dscenario_type = 'DEMAND';
+
+INSERT INTO config_param_system VALUES (
+'basic_selector_tab_dscenario','{"table":"cat_dscenario", "selector":"selector_inp_dscenario", "table_id":"dscenario_id",  "selector_id":"dscenario_id",  "label":"dscenario_id, '' - '', name ''('', dscenario_type,'')''", "orderBy":"dscenario_id", "manageAll":true, "query_filter":" AND dscenario_id > 0 AND active is true", "typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,''('',  dscenario_type,'')''))"}',
+'Variable to configura all options related to search for the specificic tab','Selector variables','','',TRUE,null,'ws',null,null,'json')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_form_tabs VALUES ('selector_basic','tab_dscenario','Dscenario','Dscenario','role_epa',null,null,4,5)
+ON CONFLICT (formname, tabname, device) DO NOTHING;
+
+UPDATE config_form_tabs SET orderby = 6 WHERE formname = 'selector_basic' AND tabname = 'tab_psector';
+
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'DEMAND', 'DEMAND');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'VALVE', 'VALVE');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');

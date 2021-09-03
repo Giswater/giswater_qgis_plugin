@@ -64,6 +64,7 @@ v_count_expl integer;
 rec_macro record;
 v_count_selector integer;
 v_useatlas boolean;
+v_message text;
 
 
 BEGIN
@@ -81,6 +82,12 @@ BEGIN
 	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
 	v_geometry := ((p_data ->> 'data')::json->>'geometry');
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
+	v_message := (p_data ->> 'message')::json;
+
+	-- profilactic control of message
+	IF v_message is null THEN
+		v_message = '{"level":111, "text":"Process done successfully"}';
+	END IF;
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
@@ -268,7 +275,7 @@ BEGIN
 
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
-			',"body":{"message":{"level":1, "text":"Process done successfully"}'||
+			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{"geometry":'||v_geometry||'}'||

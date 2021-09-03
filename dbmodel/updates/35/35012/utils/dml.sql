@@ -35,3 +35,7 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (3074,'gw_trg_edit_inp_dscenario', 'ws', 'trigger function', NULL, NULL, 'Trigger that allows editing data on v_edit_inp_dscenario views',
 'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'layermanager') WHERE parameter = 'basic_selector_tab_psector';
+UPDATE config_param_system SET 
+value = gw_fct_json_object_set_key(value::json, 'queryfilter', 'AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE'::text) 
+WHERE parameter = 'basic_selector_tab_psector';

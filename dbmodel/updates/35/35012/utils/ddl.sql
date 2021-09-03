@@ -19,4 +19,4 @@ ALTER TABLE selector_rpt_main_tstep ALTER COLUMN cur_user SET DEFAULT "current_u
 ALTER TABLE selector_sector ALTER COLUMN cur_user SET DEFAULT "current_user"();
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"workcat_id", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"parent_id", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
