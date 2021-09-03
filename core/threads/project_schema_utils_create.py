@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_db
 
 
 class GwCreateSchemaUtilsTask(GwTask):
@@ -41,10 +41,16 @@ class GwCreateSchemaUtilsTask(GwTask):
             if not status and self.admin.dev_commit is False:
                 return False
 
-            # After create schema utils, execute gw_fct_admin_schema_utils_fk for mains schema
+            # After create schema utils:
+            # execute gw_fct_admin_schema_utils_fk for mains schema
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
             tools_db.execute_sql(sql)
             sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
+            tools_db.execute_sql(sql)
+
+            # Insert into config_param_system utils schema version
+            sql = f"INSERT INTO utils.config_param_system (parameter, value, data_type, descript)" \
+                  f" VALUES ('utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
             tools_db.execute_sql(sql)
 
             return True
