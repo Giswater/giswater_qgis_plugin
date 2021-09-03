@@ -3346,21 +3346,21 @@ class GwAdminButton:
             return
 
         # Get giswater version for ws and ud project selected
-        ws_project_result = None
-        ud_project_result = None
+        self.ws_project_result = None
+        self.ud_project_result = None
 
         sql = f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
-            ws_project_result = row
+            self.ws_project_result = row
 
         sql = f"SELECT giswater, language, epsg FROM {self.ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
-            ud_project_result = row
+            self.ud_project_result = row
 
-        if ws_project_result[0] != ud_project_result[0]:
-            msg = f"You need to select same version for ws and ud projects. Versions: WS - {ws_project_result[0]} ; UD - {ud_project_result[0]}"
+        if self.ws_project_result[0] != self.ud_project_result[0]:
+            msg = f"You need to select same version for ws and ud projects. Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}"
             tools_qgis.show_message(msg, 0)
             return
 
@@ -3377,9 +3377,10 @@ class GwAdminButton:
         # Set background task 'GwCreateSchemaTask'
         description = f"Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
-                  'project_name_schema': 'utils', 'project_locale': ws_project_result[1],
-                  'project_srid': ws_project_result[2], 'example_data': False, 'schema_version': None,
-                  'schema_utils':'utils', 'schema_ws':self.ws_project_name, 'schema_ud':self.ud_project_name}
+                  'project_name_schema': 'utils', 'project_locale': self.ws_project_result[1],
+                  'project_srid': self.ws_project_result[2], 'example_data': False, 'schema_version': None,
+                  'schema_utils':'utils', 'schema_ws':self.ws_project_name, 'schema_ud':self.ud_project_name,
+                  'main_project_version':self.ws_project_result[0]}
         self.task_create_schema = GwCreateSchemaUtilsTask(self, description, params)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
@@ -3388,10 +3389,10 @@ class GwAdminButton:
     def _update_utils(self):
 
         self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
-        sql = f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        sql = f"SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
         row = tools_db.get_row(sql)
         if row:
-            self._update_utils_schema(row[0])
+            self._update_utils_schema(row)
 
 
     def _load_base_utils(self):
@@ -3429,39 +3430,39 @@ class GwAdminButton:
         for folder in folders:
             sub_folders = sorted(os.listdir(folderUtilsUpdates + folder))
             for sub_folder in sub_folders:
-                if schema_version and str(sub_folder) < str(schema_version).replace('.', ''):
-                        continue
-                if self._process_folder(folderUtilsUpdates + folder + os.sep + sub_folder,
-                                        os.sep + 'utils' + os.sep):
-                    status = self._load_sql(folderUtilsUpdates + folder + os.sep +
-                                            sub_folder + os.sep + 'utils' + os.sep,
-                                            utils_schema_name='utils')
-                    if status is False:
-                        return False
-                if self._process_folder(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
-                        ''):
-                    status = self._load_sql(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
-                        utils_schema_name=self.ws_project_name)
-                    if status is False:
-                        return False
-                if self._process_folder(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
-                        ''):
-                    status = self._load_sql(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
-                        utils_schema_name=self.ud_project_name)
-                    if status is False:
-                        return False
-                if self._process_folder(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                            self.locale + os.sep), '') is True:
-                    status = self._execute_files(
-                        folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                            self.locale + os.sep), True)
-                    if status is False:
-                        return False
+                if (schema_version is None and sub_folder < str(self.ws_project_result[0]).replace('.', '')) \
+                        or schema_version is not None and (schema_version < str(sub_folder) < str(self.ws_project_result[0]).replace('.', '')):
+                    if self._process_folder(folderUtilsUpdates + folder + os.sep + sub_folder,
+                                            os.sep + 'utils' + os.sep):
+                        status = self._load_sql(folderUtilsUpdates + folder + os.sep +
+                                                sub_folder + os.sep + 'utils' + os.sep,
+                                                utils_schema_name='utils')
+                        if status is False:
+                            return False
+                    if self._process_folder(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
+                            ''):
+                        status = self._load_sql(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
+                            utils_schema_name=self.ws_project_name)
+                        if status is False:
+                            return False
+                    if self._process_folder(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
+                            ''):
+                        status = self._load_sql(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
+                            utils_schema_name=self.ud_project_name)
+                        if status is False:
+                            return False
+                    if self._process_folder(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
+                                self.locale + os.sep), '') is True:
+                        status = self._execute_files(
+                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
+                                self.locale + os.sep), True)
+                        if status is False:
+                            return False
         return True
 
     # endregion
