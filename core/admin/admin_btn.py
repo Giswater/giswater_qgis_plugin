@@ -3423,7 +3423,7 @@ class GwAdminButton:
         if not os.path.exists(folderUtilsUpdates):
             tools_qgis.show_message("The update folder was not found in sql folder")
             self.error_count = self.error_count + 1
-            return
+            return False
 
         folders = sorted(os.listdir(folderUtilsUpdates + ''))
         for folder in folders:
@@ -3462,5 +3462,6 @@ class GwAdminButton:
                             self.locale + os.sep), True)
                     if status is False:
                         return False
+        return True
 
     # endregion

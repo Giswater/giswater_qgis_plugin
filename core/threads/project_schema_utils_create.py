@@ -25,7 +25,7 @@ class GwCreateSchemaUtilsTask(GwTask):
 
 
     def run(self):
-        """ Automatic mincut: Execute function 'gw_fct_mincut' """
+        """"""
 
         super().run()
         self.is_test = self.params['is_test']
@@ -40,6 +40,13 @@ class GwCreateSchemaUtilsTask(GwTask):
             status = self.admin._update_utils_schema(schema_version)
             if not status and self.admin.dev_commit is False:
                 return False
+
+            # After create schema utils, execute gw_fct_admin_schema_utils_fk for mains schema
+            sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
+            tools_db.execute_sql(sql)
+            sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
+            tools_db.execute_sql(sql)
+
             return True
 
         except KeyError as e:
