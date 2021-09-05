@@ -80,7 +80,7 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.the_geom,
     gully.workcat_id_plan,
     gully.asset_id,
-    CASE WHEN gully.connec_matcat_id is null then ca.matcat_id END as connec_matcat_id,
+    CASE WHEN gully.connec_matcat_id is null then cc.matcat_id ELSE gully.connec_matcat_id END as connec_matcat_id,
 	gully.gratecat2_id
    FROM gully
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
@@ -91,7 +91,7 @@ CREATE OR REPLACE VIEW vu_gully AS
      LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
      LEFT JOIN v_ext_streetaxis c ON c.id::text = gully.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis d ON d.id::text = gully.streetaxis2_id::text
-     LEFT JOIN cat_arc ca ON ca.id = connec_arccat_id;
+     LEFT JOIN cat_connec cc ON cc.id = connec_arccat_id;
 
 CREATE OR REPLACE VIEW v_gully AS 
 SELECT * FROM vu_gully;
@@ -124,11 +124,9 @@ SELECT
 gully_id,
 xcoord,
 ycoord,
-units,
-groove,
-elev as bottom,
-elev-sandbox as elev,
-top_elev-elev as ymax,
+(elev)::numeric(12,3) as bottom,
+(elev-sandbox)::numeric(12,3) as elev,
+(top_elev-elev)::numeric(12,3) as ymax,
 y0,
 ysur
 FROM temp_gully;
@@ -136,16 +134,18 @@ FROM temp_gully;
 CREATE OR REPLACE VIEW vi_grate AS 
 SELECT
 gully_id,
-grate_length as length,
-grate_width as width,
+units,
+grate_length*0.01 as length,
+grate_width*0.01 as width,
 total_area,
 effective_area,
-efficiency,
+efficiency::numeric(12,3),
 n_barr_l,
 n_barr_w,
 n_barr_diag,
-a_param,
-b_param
+a_param::numeric(12,5),
+b_param::numeric(12,5),
+groove
 FROM temp_gully;
 
 CREATE OR REPLACE VIEW vi_link AS 
@@ -155,10 +155,9 @@ pjoint_id as outlet_id,
 link_length as length,
 n,
 z1,
-z2,
+case when z2 is not null then z2::text else '*' end as z2,
 q0,
-qmax,
-shape
+qmax
 FROM temp_gully;
 
 CREATE OR REPLACE VIEW vi_lxsections AS 

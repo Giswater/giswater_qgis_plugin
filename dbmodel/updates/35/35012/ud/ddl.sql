@@ -59,7 +59,7 @@ b_param double precision,
 
 pjoint_id character varying(30),
 link_length double precision,
-shape double precision,
+shape text,
 n double precision,
 z1 double precision,
 z2 double precision,

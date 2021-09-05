@@ -73,7 +73,7 @@ BEGIN
 	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
 	-- managing matcat
-	IF (SELECT matcat_id FROM cat_arc WHERE id = NEW.arccat_id) IS NOT NULL THEN
+	IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.arccat_id) IS NOT NULL THEN
 		v_matfromcat = true;
 	END IF;
 

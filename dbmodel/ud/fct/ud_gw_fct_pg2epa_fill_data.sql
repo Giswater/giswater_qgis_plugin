@@ -34,7 +34,7 @@ BEGIN
 
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
-	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_network_mode' AND cur_user=current_user)::boolean;
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	
 	IF v_rainfall IS NOT NULL THEN
 		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
@@ -131,18 +131,20 @@ BEGIN
 
 	-- fill temp_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
-
+	
 		INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, 1,1,0,0, -- gully
+		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
 		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
 		pjoint_id, 
-		case when custom_length is not null then custom_length else connec_length end, shape, 
-		case when custom_n is not null then custom_n else n end, top_elev-ymax+sandbox, outlet_depth, geom1, geom2, geom3, geom4, -- connec		
+		(case when custom_length is not null then custom_length else connec_length end),
+		shape, 
+		case when custom_n is not null then custom_n else n end, 
+		top_elev-ymax+sandbox, outlet_depth, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
 		the_geom
 		FROM v_edit_inp_gully g 
 		JOIN cat_grate c ON id = gratecat_id 
-		left JOIN cat_arc a ON connec_arccat_id = a.id
+		left JOIN cat_connec a ON connec_arccat_id = a.id
 		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
 		left JOIN value_state_type s ON state_type = s.id
 		WHERE isepa IS TRUE AND is_operative IS TRUE; 
