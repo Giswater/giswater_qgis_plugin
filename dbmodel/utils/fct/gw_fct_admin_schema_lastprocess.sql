@@ -31,7 +31,6 @@ DECLARE
 
 v_dbnname varchar;
 v_projecttype text;
-v_priority integer = 0;
 v_message text;
 v_version record;
 v_gwversion text;
@@ -47,6 +46,12 @@ v_superusers text;
 v_tablename record;
 v_schemaname text;
 v_oldversion text;
+v_error_context text;
+v_priority integer = 1;
+v_fid integer = 133;
+v_result text;
+v_result_info text;
+v_status text;
 	
 BEGIN 
 	-- search path
@@ -61,11 +66,11 @@ BEGIN
 	v_epsg := (p_data ->> 'data')::json->> 'epsg';
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
 	v_descript := (p_data ->> 'data')::json->> 'descript';
-    v_name := (p_data ->> 'data')::json->> 'name';
+	v_name := (p_data ->> 'data')::json->> 'name';
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
-	
+
 	-- enable triggers on typevalue tables
 	ALTER TABLE om_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 	ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
@@ -85,16 +90,14 @@ BEGIN
 	
 	-- last proccess
 	IF v_isnew IS TRUE THEN
-			
+	
 		-- inserting version table
 		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
 		(select postgis_version()), v_language, v_epsg);
-		
-		v_message='Project sucessfully created';
-		
+				
 		-- create json info_schema
 		v_descript := COALESCE(v_descript, '');
-        v_name := COALESCE(v_name, '');
+		v_name := COALESCE(v_name, '');
 		v_author := COALESCE(v_author, '');
 		v_date := COALESCE(v_date, '');
 
@@ -240,7 +243,6 @@ BEGIN
 		UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
 		UPDATE sys_param_user SET vdefault = 'false', ismandatory = true WHERE id ='qgis_info_docker';
 		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_form_docker';
-
 		
 		-- force all cat feature not active in order to increase step-by-step 
 		IF v_projecttype = 'WS' THEN 
@@ -254,12 +256,29 @@ BEGIN
 		
 		-- disable edit_noderotation_update_dsbl
 		UPDATE sys_param_user SET ismandatory = true, vdefault ='TRUE' WHERE id = 'edit_noderotation_update_dsbl';
-		
+
+		v_message='Project sucessfully created';
+
 	ELSIF v_isnew IS FALSE THEN
+
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+		
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, 'ERRORS'); 
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '-----------');
+
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO');     -- Info is 2 because we are inserting previously (updat sql) some info message for user using 1
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '-----------');
 		
 		v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
-        
-        -- create child views for users from 3.2 to 3.3 updates
+
+		-- inserting version table
+		SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
+		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
+		
+		-- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
 			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 			"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
@@ -271,35 +290,83 @@ BEGIN
 			"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 		END IF;
 
-		-- inserting version table
-		SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
-		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
+		v_message='Project sucessfully updated';
 
-		-- get return message
-		IF v_priority=0 THEN
-			v_message='Project sucessfully updated';
-		ELSIF v_priority=1 THEN
-			v_message=concat($$'Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') 
-			FROM audit_log_project WHERE fid = 133 and (log_message::json->>'version')='$$, v_gwversion, '''');
-		ELSIF v_priority=2 THEN
-			v_message='Project is not updated. There are one or more errors';
-		END IF;
-		
 	END IF;
-	
-	UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
-	
-	-- update permissions	
-	PERFORM gw_fct_admin_role_permissions();
-	PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
 
-	--    Control NULL's
-	v_message := COALESCE(v_message, '');
-	v_priority := 1;
+	-- last process
+	UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
+	PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
+	PERFORM gw_fct_admin_role_permissions();
+	
+	--build return with log table
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data 
+	WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
+
+	--DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;    
+
+	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||
+		',"body":{"form":{}'||
+			',"data":{ "info":'||v_result_info||
+			'}}}');
+
+	-- Manage exception
+	EXCEPTION WHEN OTHERS THEN
+
+		-- get error message
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+
+		IF v_isnew THEN
+			v_status = 'Failed';
+			v_priority = 3;
+			v_message = replace(SQLERRM,'"','') ;
+		ELSE
+			v_status = 'Accepted';
+			v_priority = 3;
+			v_message = 'Update project have been executed with warnings on views recreation';
+
+			-- last process
+			UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
+			PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
+			PERFORM gw_fct_admin_role_permissions();
+
+			-- inserting version table
+			SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+			INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
+			VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
+
+			-- build log
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'Update project have been executed with errors recreating child views');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+			
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, 'ERRORS'); 
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '-----------');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, concat ('SQL error: ',SQLERRM,'Context: ',v_error_context));
+
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO'); 
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '-----------');
+
+			--build return with log table
+			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+			FROM (SELECT id, error_message as message FROM audit_check_data 
+			WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
+		END IF;
+    
+		v_result_info := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+	RETURN ('{"status":"'||v_status||'", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||
+		',"body":{"form":{}'||
+			',"data":{ "info":'||v_result_info||
+			'}}}');
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

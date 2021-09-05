@@ -371,4 +371,12 @@ UPDATE config_form_tabs SET orderby = 6 WHERE formname = 'selector_basic' AND ta
 
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'DEMAND', 'DEMAND');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'VALVE', 'VALVE');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'INLET', 'INLET');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'PUMP', 'PUMP');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'PIPE', 'PIPE');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'JOINED', 'JOINED');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');
+
+-- 2021/09/05
+INSERT INTO audit_log_data (fid, criticity, error_message) 
+VALUES (214, 1, '3.5.012 has an important enhancement for ws dscenarios. Due this v_edit_inp_demand view need to be replaced by v_edit_inp_dscenario_* (pipe/pump/valve/demand/reservoir/inlet)');

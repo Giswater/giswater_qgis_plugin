@@ -39,3 +39,6 @@ UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::jso
 UPDATE config_param_system SET 
 value = gw_fct_json_object_set_key(value::json, 'queryfilter', 'AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE'::text) 
 WHERE parameter = 'basic_selector_tab_psector';
+
+UPDATE plan_psector SET active=TRUE WHERE active IS NULL;
+
