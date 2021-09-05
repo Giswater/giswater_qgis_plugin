@@ -67,32 +67,22 @@ INSERT INTO plan_psector_x_gully VALUES (5, '30059', '177', 1, 0, false, NULL, '
 INSERT INTO plan_psector_x_gully VALUES (11, '100012', '252', 2, 1, true, NULL, '0102000020E764000002000000E1A04978289319411915328C697551416EB749783B93194130F3855169755141', false);
 INSERT INTO plan_psector_x_gully VALUES (12, '100013', '251', 2, 1, true, NULL, '0102000020E764000002000000DEB292FD4A9319413F1519DF62755141EB2CC71750931941468E795864755141', false);
 
-
-
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
 INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852804', current_user, '2018-03-14 17:09:19.852804');
-
-
 
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
 
-
 SELECT gw_fct_fill_doc_tables();
-SELECT gw_fct_fill_om_tables();
+SELECT gw_fct_fill_om_tables();  -- 6 segons
 
 INSERT INTO doc_x_visit (doc_id, visit_id)
 SELECT 
 doc.id,
 om_visit.id
 FROM doc, om_visit;
-
-update node set link='https://www.giswater.org';
-update arc set link='https://www.giswater.org';
-update connec set link='https://www.giswater.org';
-update gully set link='https://www.giswater.org';
 
 
 UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
@@ -104,7 +94,6 @@ AND columnname = 'district_id';
 UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node','ve_gully') AND columnname = 'district_id';
 
 UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec') AND columnname = 'district_id';
-
 
 SELECT gw_fct_setcheckproject($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
@@ -230,48 +219,14 @@ INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target
 SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='chamber_param_1';
 
 
--- redo missed values for some arcs
-UPDATE arc SET sys_elev1=56.76 , sys_elev2=56.45 WHERE arc_id='100003';
-UPDATE arc SET sys_elev1=56.45 , sys_elev2=53.15 WHERE arc_id='100004';
-UPDATE arc SET sys_elev1=53.15 , sys_elev2=53 WHERE arc_id='100005';
-UPDATE arc SET sys_elev1=53 , sys_elev2=51.15 WHERE arc_id='100009';
-UPDATE arc SET sys_elev1=51.15 , sys_elev2=48.95 WHERE arc_id='100010';
-UPDATE arc SET sys_elev1=46.92 , sys_elev2=48.95 WHERE arc_id='100011';
-
--- calculate values for connecs and gullys
--- connec y1 & y2
-UPDATE connec c SET y1=vnode_ymax FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id;
-UPDATE connec c SET y2=vnode_ymax-0.4 FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id AND c.y1>1.2;
-UPDATE connec c SET y2=vnode_ymax-0.2 FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id AND c.y1<1.2;
--- connec_length
-UPDATE connec SET connec_length=ST_Length(link.the_geom) FROM link WHERE link.feature_id=connec_id AND link.feature_type='CONNEC';
-UPDATE gully SET connec_length=ST_Length(link.the_geom) FROM link WHERE link.feature_id=gully_id AND link.feature_type='GULLY';
-
--- gully connec_depth
-UPDATE gully SET connec_depth='1.2';
-
---set enddate NULL for on service features
-UPDATE node SET enddate=NULL WHERE state=1;
-UPDATE arc SET enddate=NULL WHERE state=1;
-UPDATE connec SET enddate=NULL WHERE state=1;
-UPDATE gully SET enddate=NULL WHERE state=1;
-
--- set customer_code NULL
-UPDATE connec SET customer_code=NULL;
-
-
 INSERT INTO selector_sector (sector_id, cur_user)
 SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
 
 SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
-
-UPDATE node SET elev = null WHERE top_elev IS NOT NULL AND ymax IS NOT NULL;
-UPDATE connec SET customer_code = concat('cc',connec_id);
 
 UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';
 
@@ -280,10 +235,6 @@ UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_co
 UPDATE element SET code = concat ('E',element_id);
 
 UPDATE cat_feature SET id=id;
-
-
-UPDATE connec SET the_geom  = '0101000020E764000044D7D93156941941F95742A672755141' 
-WHERE connec_id ='3024';
 
 
 -- hidden
@@ -358,15 +309,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id';
 
 
--- refactor of type's
-UPDATE man_type_fluid SET fluid_type = replace (fluid_type, 'Standard', 'St.');
-UPDATE man_type_category SET category_type = replace (category_type, 'Standard', 'St.');
-UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
-UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
-
 update config_form_fields SET widgettype = 'text', dv_querytext = null, placeholder  ='Ex.macrosector_id' WHERE columnname  = 'macrosector_id';
-
-UPDATE connec SET connec_depth = 1.5;
 
 
 -- add tooltips for specific fields
@@ -412,62 +355,11 @@ WHERE columnname='matcat_id' AND formname LIKE 've_connec%';
 UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
 WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 
-UPDATE node SET nodecat_id='C_MANHOLE_100', matcat_id='Brick' WHERE nodecat_id='C_MANHOLE-BR100';
-UPDATE node SET nodecat_id='C_MANHOLE_100', matcat_id='Concret' WHERE nodecat_id='C_MANHOLE-CON100';
-UPDATE node SET nodecat_id='C_MANHOLE_80', matcat_id='Concret' WHERE nodecat_id='C_MANHOLE-CON80';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='CHAMBER-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='HIGH POINT-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='JUMP-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='NETGULLY-01';
-UPDATE node SET nodecat_id='R_MANHOLE_100', matcat_id='Brick' WHERE nodecat_id='R_MANHOLE-BR100';
-UPDATE node SET nodecat_id='R_MANHOLE_100', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON100';
-UPDATE node SET nodecat_id='R_MANHOLE_150', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON150';
-UPDATE node SET nodecat_id='R_MANHOLE_200', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON200';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='SEW_STORAGE-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='VALVE-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='WEIR-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='NETINIT-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='NETELEMENT-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='JUNCTION-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='OUTFALL-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='NODE-01';
-UPDATE node SET matcat_id='Brick' WHERE nodecat_id='VIR_NODE-01';
-UPDATE node SET matcat_id='Concret' WHERE nodecat_id='WWTP-01';
-
 DELETE FROM cat_node WHERE id IN ('C_MANHOLE-BR100','C_MANHOLE-CON100','C_MANHOLE-CON80','R_MANHOLE-BR100','R_MANHOLE-CON100','R_MANHOLE-CON150',
 'R_MANHOLE-CON200');
 
-UPDATE arc SET arccat_id='CC100', matcat_id='Concret' WHERE arccat_id='CON-CC100';
-UPDATE arc SET matcat_id='Concret' WHERE arccat_id='SIPHON-CC100';
-UPDATE arc SET arccat_id='CC040', matcat_id='PVC' WHERE arccat_id='PVC-CC040';
-UPDATE arc SET arccat_id='CC060', matcat_id='PVC' WHERE arccat_id='PVC-CC060';
-UPDATE arc SET arccat_id='CC080', matcat_id='PVC' WHERE arccat_id='PVC-CC080';
-UPDATE arc SET matcat_id='PVC' WHERE arccat_id='WACCEL-CC020';
-UPDATE arc SET arccat_id='CC020', matcat_id='PVC' WHERE arccat_id='PVC-CC020';
-UPDATE arc SET arccat_id='CC040', matcat_id='Concret' WHERE arccat_id='CON-CC040';
-UPDATE arc SET arccat_id='CC060', matcat_id='Concret' WHERE arccat_id='CON-CC060';
-UPDATE arc SET arccat_id='CC080', matcat_id='Concret' WHERE arccat_id='CON-CC080';
-UPDATE arc SET arccat_id='EG150', matcat_id='Concret' WHERE arccat_id='CON-EG150';
-UPDATE arc SET arccat_id='RC150', matcat_id='Concret' WHERE arccat_id='CON-RC150';
-UPDATE arc SET arccat_id='RC200', matcat_id='Concret' WHERE arccat_id='CON-RC200';
-UPDATE arc SET arccat_id='PP020', matcat_id='PEAD' WHERE arccat_id='PE-PP020';
-UPDATE arc SET arccat_id='CC040', matcat_id='PEC' WHERE arccat_id='PEC-CC040';
-UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='WEIR_60';
-UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='PUMP_01';
-UPDATE arc SET arccat_id='CC315', matcat_id='PEC' WHERE arccat_id='PEC-CC315';
-UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='VIRTUAL';
-
 DELETE FROM cat_arc WHERE id IN ('CON-CC100','PVC-CC040','PVC-CC060','PVC-CC080','PVC-CC020','CON-CC040','CON-CC060','CON-CC080','CON-EG150','CON-RC150',
 'CON-RC200','PE-PP020','PEC-CC040','PEC-CC315');
-
-UPDATE connec SET connecat_id='CC025_D', matcat_id='PVC' WHERE connecat_id='PVC-CC025_D';
-UPDATE connec SET connecat_id='CC040_I', matcat_id='Concret' WHERE connecat_id='CON-CC040_I';
-UPDATE connec SET connecat_id='CC025_T', matcat_id='PVC' WHERE connecat_id='PVC-CC025_T';
-UPDATE connec SET connecat_id='CC030_D', matcat_id='PVC' WHERE connecat_id='PVC-CC030_D';
-UPDATE connec SET connecat_id='CC020_D', matcat_id='Concret' WHERE connecat_id='CON-CC020_D';
-UPDATE connec SET connecat_id='CC030_D', matcat_id='Concret' WHERE connecat_id='CON-CC030_D';
-UPDATE connec SET matcat_id='Virtual' WHERE connecat_id='VIRTUAL';
-
 
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
@@ -478,19 +370,6 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' c
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
-
-UPDATE node SET district_id =1 WHERE expl_id=1;
-UPDATE node SET district_id =2 WHERE expl_id=2;
-
-UPDATE arc SET district_id =1 WHERE expl_id=1;
-UPDATE arc SET district_id =2 WHERE expl_id=2;
-
-UPDATE connec SET district_id =1 WHERE expl_id=1;
-UPDATE connec SET district_id =2 WHERE expl_id=2;
-
-UPDATE gully SET district_id =1 WHERE expl_id=1;
-UPDATE gully SET district_id =2 WHERE expl_id=2;
-
 
 --arc
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc_%';
@@ -530,7 +409,6 @@ UPDATE config_form_fields SET widgettype = 'typeahead',
 dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL' FROM cat_feature WHERE 
 system_id = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id';
 
-
 --placeholder
 UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
 UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
@@ -538,7 +416,6 @@ UPDATE config_form_fields SET placeholder = 'Catalog of the private part of conn
 -- to clean trash must be executed 2 times
 SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
 SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-
 
 DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 

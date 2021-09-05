@@ -7,12 +7,3 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
-
-ALTER TABLE gully ALTER COLUMN inventory SET NOT NULL;
-ALTER TABLE gully ALTER COLUMN state_type SET NOT NULL;
-ALTER TABLE gully ALTER COLUMN workcat_id SET NOT NULL;
---ALTER TABLE gully ALTER COLUMN builtdate SET NOT NULL;
-ALTER TABLE gully ALTER COLUMN verified SET NOT NULL;
-ALTER TABLE gully ALTER COLUMN code SET NOT NULL;
-ALTER TABLE gully ALTER COLUMN the_geom SET NOT NULL;

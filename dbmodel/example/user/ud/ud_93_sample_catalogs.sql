@@ -217,6 +217,12 @@ INSERT INTO man_type_function VALUES (4, 'Standard Function', 'ELEMENT');
 INSERT INTO man_type_function VALUES (5, 'Standard Function', 'GULLY');
 
 
+-- refactor of type's
+UPDATE man_type_fluid SET fluid_type = replace (fluid_type, 'Standard', 'St.');
+UPDATE man_type_category SET category_type = replace (category_type, 'Standard', 'St.');
+UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
+UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
+
 
 -- ----------------------------
 -- Update shortcuts

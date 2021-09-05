@@ -378,5 +378,5 @@ INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'JOINED', 'JOINED');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');
 
 -- 2021/09/05
-INSERT INTO audit_log_data (fid, criticity, error_message) 
+INSERT INTO audit_check_data (fid, criticity, error_message) 
 VALUES (214, 1, '3.5.012 has an important enhancement for ws dscenarios. Due this v_edit_inp_demand view need to be replaced by v_edit_inp_dscenario_* (pipe/pump/valve/demand/reservoir/inlet)');
