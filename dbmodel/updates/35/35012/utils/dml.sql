@@ -44,3 +44,4 @@ UPDATE plan_psector SET active=TRUE WHERE active IS NULL;
 
 DELETE FROM sys_function WHERE function_name = 'gw_trg_vnode_update';
 
+UPDATE config_param_system SET standardvalue = null where parameter = 'admin_raster_dem';
