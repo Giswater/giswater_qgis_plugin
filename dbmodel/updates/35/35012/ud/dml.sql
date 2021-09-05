@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/08/19
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', '1D SWMM');
-INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', '1D/2D SWMM-IBER');
+--INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', '1D/2D SWMM-IBER');
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, dv_querytext, isenabled, layoutorder, project_type, isparent, vdefault, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, epaversion)

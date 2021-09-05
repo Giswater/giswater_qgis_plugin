@@ -8,5 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2021/08/30
+--2021/08/19
 ALTER TABLE selector_inp_hydrology ALTER COLUMN cur_user SET DEFAULT "current_user"();
+
+--2021/09/05
+ALTER TABLE cat_grate RENAME efective_area TO effective_area;
+

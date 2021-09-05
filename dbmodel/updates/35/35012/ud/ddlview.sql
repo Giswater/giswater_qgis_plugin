@@ -16,9 +16,10 @@ status int2,
 efficiency double precision);
 
 CREATE OR REPLACE VIEW v_edit_inp_gully as
-SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gratecat_id, units, groove, arc_id, s.sector_id, expl_id, state, state_type, the_geom, pjoint_id, pjoint_type, status, efficiency FROM selector_sector s, v_edit_gully g
+SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gratecat_id, units, groove, arc_id, s.sector_id, expl_id, state, state_type, the_geom, annotation, connec_length, connec_arccat_id, pjoint_id, pjoint_type, status, efficiency FROM selector_sector s, v_edit_gully g
 JOIN inp_gully USING (gully_id)
 WHERE g.sector_id  = s.sector_id AND cur_user = current_user;
+
 
 INSERT INTO inp_gully
 SELECT  gully_id FROM gully
@@ -46,12 +47,12 @@ connec_length double precision,
 grate_length double precision,
 grate_width double precision,
 grate_area double precision,
-effarea double precision,
-nbarl double precision,
-nbarw double precision,
-nbard double precision,
-aparam double precision,
-bparam double precision);
+effective_area double precision,
+n_barr_l double precision,
+n_barr_w double precision,
+n_barr_diag double precision,
+a_param double precision,
+b_param double precision);
 
 CREATE OR REPLACE VIEW vi_gully AS 
 SELECT * FROM temp_gully;

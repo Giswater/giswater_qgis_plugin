@@ -38,6 +38,8 @@ v_input json;
 v_vdefault boolean;
 v_error_context text;
 v_count integer;
+v_response text;
+v_message text;
 
 
 BEGIN

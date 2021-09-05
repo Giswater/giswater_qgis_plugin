@@ -48,6 +48,9 @@ BEGIN
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Giswater version: ',(SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',(SELECT title FROM inp_project_id where author=current_user), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',v_result, v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Export mode: ',
+	(SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode')
+	, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Hydrology scenario: ',(SELECT name 
 	FROM selector_inp_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';DWF scenario: ',(SELECT idval 
