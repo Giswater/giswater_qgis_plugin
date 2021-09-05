@@ -2,9 +2,14 @@
 *************
 - New mapzones conflict (-1)
 - Enhance dscenario management working with not only demands, adding pipes, shortpipes, valves, pumps, tanks and reservoir
-- Rename some inp_demand tables to harmonize with new dscenario management names
 - Add new exportation method for ud (1D-SWMM or 1D/2D Coupled model)
 - Add function vodetrimarcs for UD exportation, relate to 1D/2D coupled model
 - Profilactic delete of legacy values on man_addfields_value on setcheckproject function
 - Add control on change street_id by streetname on edit triggers in order to avoid lose info
 - New functionality to replace pipes on plan mode in psectors
+- Add columns connec_matcat_id & gratecat2_id for gullies
+- Add column inlet_offset for man_conduit
+- Enhance manage views & manage child views functions
+- Enhance performace creating ud example projects
+- Create relation parent-child on dscenario and psector with selection logics and add selector dscenario on selector form
+- Remove trigger vnode_update
