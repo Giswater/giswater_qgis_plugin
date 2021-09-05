@@ -71,7 +71,7 @@ q0 double precision,
 qmax double precision,
 flap varchar(3),
 
-the_geom geometry(LineString,SRID_VALUE));
+the_geom geometry(Point,SRID_VALUE));
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"connec_matcat_id", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"gratecat2_id", "dataType":"text", "isUtils":"False"}}$$);
