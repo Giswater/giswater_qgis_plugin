@@ -25,7 +25,7 @@ BEGIN
     -- control if gully has link
 	IF TG_OP = 'INSERT' AND (SELECT link_id FROM link WHERE feature_id = NEW.gully_id) IS NULL THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-         "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
+         "data":{"message":"3138", "function":"2968","debug_msg":null}}$$);';
 	END IF;
 
 	-- control if gully exists and it is link_class =  2
@@ -33,7 +33,7 @@ BEGIN
 		IF (SELECT link_geom FROM plan_psector_x_gully WHERE gully_id = NEW.gully_id ORDER BY link_geom limit 1) IS NULL 
 		AND (SELECT state FROM gully WHERE gully_id = NEW.gully_id)=2 THEN
 		        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3082", "function":"2936","debug_msg":null}}$$);';
+			"data":{"message":"3082", "function":"2968","debug_msg":null}}$$);';
 		END IF;
 	END IF;
 
@@ -56,7 +56,7 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"1130","debug_msg":""}}$$);';
+			"data":{"message":"3182", "function":"2968","debug_msg":""}}$$);';
 		END IF;
 		NEW.doable=true;
 	END IF;
