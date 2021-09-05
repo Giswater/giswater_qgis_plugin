@@ -6,6 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO inp_gully (gully_id, isepa, efficiency)
+SELECT gully_id, true, 1 FROM gully where state > 0;
+
+UPDATE gully set connec_matcat_id = 'Concret';
 
 INSERT INTO sys_function VALUES (2916, 'gw_fct_fill_doc_tables','ud','function','void','void','Create example documents (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2886, 'gw_fct_fill_om_tables','ud','function','void','void','Create example visits (used on sample creation)','role_admin',false);

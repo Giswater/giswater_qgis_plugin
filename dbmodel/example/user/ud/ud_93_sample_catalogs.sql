@@ -178,6 +178,10 @@ INSERT INTO cat_grate VALUES ('BGRT4', 'FD', 12.4000, 100.0000, 1240.0000, 582.4
 INSERT INTO cat_grate VALUES ('BGRT5', 'FD', 47.5000, 100.0000, 4825.0000, 1400.0000, 7.0000, 3.0000, NULL, 0.7792, 0.3230, NULL, NULL, NULL, NULL, NULL,'N_BGRT5', true, NULL, 'GULLY');
 
 
+UPDATE cat_grate SET n_barr_l = 0 WHERE n_barr_l IS NULL;
+UPDATE cat_grate SET n_barr_w = 0 WHERE n_barr_w IS NULL;
+UPDATE cat_grate SET n_barr_diag = 0 WHERE n_barr_diag IS NULL;
+
 
 -----------------------------
 -- Records of man_type_category
