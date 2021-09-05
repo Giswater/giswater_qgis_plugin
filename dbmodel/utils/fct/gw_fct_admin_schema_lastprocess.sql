@@ -265,9 +265,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
 		
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, 'ERRORS'); 
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '-----------');
-
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO');     -- Info is 2 because we are inserting previously (updat sql) some info message for user using 1
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '-----------');
 		
@@ -305,8 +302,6 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data 
 	WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
 
-	--DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;    
-
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
@@ -316,57 +311,6 @@ BEGIN
 			',"data":{ "info":'||v_result_info||
 			'}}}');
 
-	-- Manage exception
-	EXCEPTION WHEN OTHERS THEN
-
-		-- get error message
-		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-
-		IF v_isnew THEN
-			v_status = 'Failed';
-			v_priority = 3;
-			v_message = replace(SQLERRM,'"','') ;
-		ELSE
-			v_status = 'Accepted';
-			v_priority = 3;
-			v_message = 'Update project have been executed with warnings on views recreation';
-
-			-- last process
-			UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
-			PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
-			PERFORM gw_fct_admin_role_permissions();
-
-			-- inserting version table
-			SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-			INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
-			VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
-
-			-- build log
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'Update project have been executed with errors recreating child views');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
-			
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, 'ERRORS'); 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '-----------');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, concat ('SQL error: ',SQLERRM,'Context: ',v_error_context));
-
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO'); 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '-----------');
-
-			--build return with log table
-			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-			FROM (SELECT id, error_message as message FROM audit_check_data 
-			WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
-		END IF;
-    
-		v_result_info := COALESCE(v_result, '{}'); 
-		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
-
-	RETURN ('{"status":"'||v_status||'", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||
-		',"body":{"form":{}'||
-			',"data":{ "info":'||v_result_info||
-			'}}}');
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

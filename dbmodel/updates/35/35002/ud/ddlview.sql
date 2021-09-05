@@ -189,67 +189,67 @@ UNION
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_vnode", "v_ui_arc_x_relations","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", 
-    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec"], "action":"saveView","hasChilds":"False"}}$$);
+    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
       SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"], "action":"saveView","hasChilds":"False"}}$$);
+    "data":{"viewName":["v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
     
      SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_gully"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_gully"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["ve_connec","v_connec","vu_connec","ve_gully","v_gully","vu_gully"], "fieldName":"featurecat_id",
-    "action":"deleteField","hasChilds":"False"}}$$);
+    "action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
 --RESTORE CONNEC VIEWS
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully","v_gully","ve_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully","v_gully","ve_gully"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, 
-    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_gully"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
     
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 --DELETE 2ND FIELD
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_man_connec","v_edit_man_gully"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
     
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_gully"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["ve_connec","v_connec","vu_connec","ve_gully","v_gully","vu_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"False"}}$$);
+    "data":{"viewName":["ve_connec","v_connec","vu_connec","ve_gully","v_gully","vu_gully"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
 --RESTORE ALL VIEWS
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully", "v_gully","ve_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully", "v_gully","ve_gully"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
         
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
     
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
+    "data":{"viewName":["v_edit_gully"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
     
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_man_connec","v_edit_man_gully","vp_basic_gully", "v_anl_flow_gully","v_ui_node_x_connection_upstream","vp_basic_connec","v_rtc_period_hydrometer",
     "v_rtc_period_dma", "v_rtc_period_node", "v_edit_man_connec", "v_edit_man_gully",
     "v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_edit_vnode","v_arc_x_vnode","v_ui_arc_x_relations","v_anl_flow_connec","v_anl_flow_hydrometer","v_web_parent_connec", "v_web_parent_gully"],
-    "action":"restoreView","hasChilds":"False"}}$$);
+    "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
     
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"feature_id"}}$$);

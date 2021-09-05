@@ -13,27 +13,27 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", "v_rtc_period_pjointpattern", "v_rtc_interval_nodepattern", "v_rtc_period_nodepattern", 
 "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec", "vi_pjoint", "v_edit_inp_demand",
-"vi_parent_hydrometer","v_ui_arc_x_relations", "v_edit_inp_connec", "v_web_parent_connec"], "action":"saveView","hasChilds":"False"}}$$);
+"vi_parent_hydrometer","v_ui_arc_x_relations", "v_edit_inp_connec", "v_web_parent_connec"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"False"}}$$);
+"data":{"viewName":["vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
 --restore connec views
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+"data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
 
 --delete 2nd field
  SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":[ "vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"False"}}$$);
+"data":{"viewName":[ "vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"feature_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
 --remove fields from table
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"feature_id"}}$$);
@@ -41,15 +41,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "
 
 --restore all views
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+"data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_inp_connec","v_ui_arc_x_relations","vi_parent_hydrometer", "v_edit_inp_demand", "vi_pjoint", "vp_basic_connec","v_rtc_period_hydrometer",
 "v_rtc_period_dma", "v_rtc_period_node", "v_rtc_period_nodepattern", "v_rtc_interval_nodepattern","v_rtc_period_pjointpattern",
-"v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_vnode","v_arc_x_vnode", "v_web_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+"v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_vnode","v_arc_x_vnode", "v_web_parent_connec"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 
 -- 2021/05/01

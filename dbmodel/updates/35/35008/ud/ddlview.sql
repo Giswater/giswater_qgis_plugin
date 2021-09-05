@@ -42,15 +42,15 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
 --SAVE VIEWS
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_vnode", "v_vnode","v_ui_arc_x_relations","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", 
-"v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_ui_workcat_x_feature", "v_web_parent_gully", "v_edit_man_gully"], "action":"saveView","hasChilds":"False"}}$$);
+"v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully","v_ui_workcat_x_feature", "v_web_parent_gully", "v_edit_man_gully"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "action":"saveView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_gully"], "action":"SAVE-VIEW","hasChilds":"True"}}$$);
     
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["ve_gully","v_gully","vu_gully", "v_plan_psector_gully","v_ui_plan_arc_cost","v_plan_result_arc","v_plan_current_psector_budget_detail","v_plan_current_psector_budget", "v_plan_psector_budget_arc",
-"v_plan_psector_all","v_plan_current_psector","v_plan_psector","v_plan_arc"], "action":"saveView","hasChilds":"False"}}$$);
+"v_plan_psector_all","v_plan_current_psector","v_plan_psector","v_plan_arc"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
     
 ALTER TABLE gully ALTER COLUMN gratecat_id TYPE character varying(30) USING gratecat_id::character varying(30);
 
@@ -58,11 +58,11 @@ ALTER TABLE gully ALTER COLUMN gratecat_id TYPE character varying(30) USING grat
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_plan_arc","v_plan_psector","v_plan_current_psector","v_plan_psector_all",
 "v_plan_psector_budget_arc","v_plan_current_psector_budget","v_plan_current_psector_budget_detail","v_plan_result_arc","v_ui_plan_arc_cost","v_plan_psector_gully","vu_gully",
-"v_gully", "ve_gully"  ], "action":"restoreView","hasChilds":"False"}}$$);
+"v_gully", "ve_gully"  ], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_gully"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
     
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":[ "v_edit_man_gully","v_ui_workcat_x_feature", "v_anl_flow_gully","vp_basic_gully","v_ui_node_x_connection_upstream",
-"v_rtc_period_pjoint","v_ui_workcat_x_feature_end","v_edit_link", "v_arc_x_vnode","v_ui_arc_x_relations","v_vnode", "v_web_parent_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+"v_rtc_period_pjoint","v_ui_workcat_x_feature_end","v_edit_link", "v_arc_x_vnode","v_ui_arc_x_relations","v_vnode", "v_web_parent_gully"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);

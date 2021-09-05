@@ -1490,13 +1490,13 @@ CREATE OR REPLACE VIEW vi_symbols AS
 
    
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_arc"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_gully"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);

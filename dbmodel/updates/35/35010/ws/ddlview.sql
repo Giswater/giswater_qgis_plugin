@@ -1192,13 +1192,13 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_arc"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"asset_id", "action":"addField","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 -- View: v_edit_inp_junction
 
@@ -1250,15 +1250,15 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_rtc_hydrometer_x_connec","v_ui_hydrometer","vi_parent_hydrometer","v_rtc_hydrometer",
 "v_edit_rtc_hydro_data_x_connec","v_om_mincut_hydrometer","v_ui_hydroval_x_connec","v_vnode","v_arc_x_vnode","v_edit_link"], 
-"action":"saveView","hasChilds":"False"}}$$);
+"action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "action":"saveView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "action":"SAVE-VIEW","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["vi_parent_connec","ve_connec","vi_pjoint","v_edit_inp_connec","v_edit_inp_demand", 
 "v_rtc_interval_nodepattern","v_rtc_period_nodepattern","v_rtc_period_node", "v_rtc_period_pjointpattern", "v_rtc_period_pjoint",
-"v_rtc_period_dma","v_rtc_period_hydrometer","v_ui_workcat_x_feature","v_ui_arc_x_relations","v_ui_workcat_x_feature_end","v_connec", "vu_connec"], "action":"saveView","hasChilds":"False"}}$$);
+"v_rtc_period_dma","v_rtc_period_hydrometer","v_ui_workcat_x_feature","v_ui_arc_x_relations","v_ui_workcat_x_feature_end","v_connec", "vu_connec"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 ALTER TABLE ext_rtc_hydrometer ALTER COLUMN m3_volume TYPE float;
 
@@ -1266,12 +1266,12 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["vu_connec", "v_connec", "v_ui_workcat_x_feature_end", "v_ui_arc_x_relations", "v_ui_workcat_x_feature",
 "v_rtc_period_hydrometer","v_rtc_period_dma","v_rtc_period_pjoint","v_rtc_period_pjointpattern", "v_rtc_period_node",
 "v_rtc_period_nodepattern","v_rtc_interval_nodepattern","v_edit_inp_demand","v_edit_inp_connec","vi_pjoint","ve_connec","vi_parent_connec"], 
-"action":"restoreView","hasChilds":"False"}}$$);
+"action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_link", "v_arc_x_vnode", "v_vnode", "v_ui_hydroval_x_connec","v_om_mincut_hydrometer",
 "v_edit_rtc_hydro_data_x_connec","v_rtc_hydrometer", "vi_parent_hydrometer", "v_ui_hydrometer","v_rtc_hydrometer_x_connec"], 
-"action":"restoreView","hasChilds":"False"}}$$);
+"action":"RESTORE-VIEW","hasChilds":"False"}}$$);
