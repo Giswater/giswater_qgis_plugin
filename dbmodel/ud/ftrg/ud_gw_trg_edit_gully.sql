@@ -53,8 +53,8 @@ v_autorotation_disabled boolean;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_disable_linktonetwork boolean;
+v_matfromcat boolean = false;
 
-    
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -72,6 +72,10 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
+	-- managing matcat
+	IF (SELECT matcat_id FROM cat_arc WHERE id = NEW.arccat_id) IS NOT NULL THEN
+		v_matfromcat = true;
+	END IF;
 
 	IF v_unitsfactor IS NULL THEN
 		v_doublegeometry = FALSE;
@@ -483,20 +487,40 @@ BEGIN
 		END IF;
 
 		-- FEATURE INSERT
-		INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, 
-			connec_depth, siphon, arc_id, pol_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, 
-			category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
-			postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
-			link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-			lastupdate, lastupdate_user, asset_id)
-		VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
-			NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
-			NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
-			NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
-			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
-			NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
-			NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
-			NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
+		IF v_matfromcat THEN
+
+			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, 
+				connec_depth, siphon, arc_id, pol_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, 
+				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
+				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
+				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
+				lastupdate, lastupdate_user, asset_id, gratecat2_id)
+			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
+				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
+				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
+				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
+				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
+				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
+				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.gratecat2_id);
+		ELSE
+
+			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, 
+				connec_depth, siphon, arc_id, pol_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, 
+				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
+				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
+				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
+				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id)
+			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
+				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
+				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
+				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
+				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
+				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
+				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id);
+
+		END IF;
 
 		IF NEW.state=1 THEN
 			-- Control of automatic insert of link and vnode
@@ -513,9 +537,11 @@ BEGIN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';			
-			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
+			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned 
+			-- link. Unique option for user is modify the existing automatic link
 			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
+			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text 
+			AND config_param_user.cur_user::name = "current_user"());
 			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id) VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id);
 		END IF;
 
@@ -719,19 +745,36 @@ BEGIN
 		END IF;
 
 		-- UPDATE values
-		UPDATE gully 
-		SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
-		connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
-		annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
-		fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
-		descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
-		label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
-		postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
-		asset_id=NEW.asset_id
-		WHERE gully_id = OLD.gully_id;
+		IF v_matfromcat THEN
+			UPDATE gully 
+			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, 
+			groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, 
+			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, 
+			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
+			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
+			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
+			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
+			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id
+			WHERE gully_id = OLD.gully_id;
 
+		ELSE
+			UPDATE gully 
+			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, 
+			groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, 
+			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, 
+			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
+			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
+			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
+			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
+			asset_id=NEW.asset_id, connec_arccat_id = NEW.connec_arccat_id, gratecat2_id = NEW.gratecat2_id
+			WHERE gully_id = OLD.gully_id;
 
+		END IF;
+		
 		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields

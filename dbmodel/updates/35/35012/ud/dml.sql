@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/08/19
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', '1D SWMM');
---INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', '1D/2D SWMM-IBER');
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', '1D/2D SWMM-IBER');
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, dv_querytext, isenabled, layoutorder, project_type, isparent, vdefault, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, epaversion)
@@ -37,7 +37,32 @@ INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_cr
 VALUES ('v_edit_inp_gully', 'Editable view to manage gullies on epa', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO config_fprocess VALUES (141,'vi_gully', '[GULLY]', NULL, 99)
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('vi_gully', 'View with gully data ready to work with 2D-IBER', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('vi_grate', 'View with grate data ready to work with 2D-IBER', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('vi_link', 'View with connec data ready to work with 2D-IBER', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('vi_lsections', 'View with connec sections data ready to work with 2D-IBER', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_fprocess VALUES (141,'vi_gully', '[GULLY]', NULL, 91)
+ON CONFLICT (fid, tablename, target) DO NOTHING;
+
+INSERT INTO config_fprocess VALUES (141,'vi_grate', '[GRATE]', NULL, 92)
+ON CONFLICT (fid, tablename, target) DO NOTHING;
+
+INSERT INTO config_fprocess VALUES (141,'vi_link', '[LINK]', NULL, 93)
+ON CONFLICT (fid, tablename, target) DO NOTHING;
+
+INSERT INTO config_fprocess VALUES (141,'vi_lxsections', '[LXSECTIONS]', NULL, 94)
 ON CONFLICT (fid, tablename, target) DO NOTHING;
 
 UPDATE sys_table SET id = 'inp_demand' WHERE id = 'inp_dscenario_demand';
@@ -48,3 +73,6 @@ UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attr
 WHERE id='inp_lid_control';
 
 DELETE FROM sys_param_user WHERE project_type='ws';
+
+INSERT INTO inp_gully (gully_id, isepa, efficiency)
+SELECT gully_id, true, 1 FROM gully where state > 0;

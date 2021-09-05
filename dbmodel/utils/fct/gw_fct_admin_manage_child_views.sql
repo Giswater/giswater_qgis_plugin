@@ -20,13 +20,17 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
---only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
+--only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from ONE UNIQUE parent
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"gully", "systemId":"CONDUIT"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"connec_matcat_id" }}$$);
+
+--only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from ONE UNIQUE MAN-TABLE
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"CONDUIT"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"connec_matcat_id" }}$$);
 
 --only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"feature":{"catFeature":"PIPE"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$); --only replace views, not config
+"feature":{"catFeature":"PIPE"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 
 --delete views & config_form_fields information
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
@@ -64,7 +68,7 @@ v_return_msg text = 'Process finished with some errors';
 v_error_context text;
 v_newcolumn text;
 v_query json;
-
+v_system_id text;
 
 BEGIN
 
@@ -81,7 +85,8 @@ BEGIN
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_newcolumn = ((p_data ->>'data')::json->>'newColumn')::text;
-
+	v_feature_type = ((p_data ->>'feature')::json->>'featureType')::text;
+	v_system_id = ((p_data ->>'feature')::json->>'systemId')::text;
 
 	IF v_cat_feature IS NULL THEN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
@@ -102,9 +107,23 @@ BEGIN
 		
 	ELSIF v_action = 'MULTI-UPDATE' THEN
 	
-		FOR v_childview, v_cat_feature, v_parent_layer IN SELECT child_layer, id, parent_layer 
-		FROM cat_feature WHERE child_layer IS NOT NULL
+		IF v_system_id IS NOT NULL THEN			
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL AND system_id = '||quote_literal(v_system_id); 	
+			
+		ELSIF v_feature_type IS NOT NULL THEN
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type); 	
+		
+		ELSIF v_feature_type IS NULL THEN
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL'; 	
+		
+		END IF;
+
+		raise notice 'v_querytext %', v_querytext;
+	
+		FOR v_childview, v_cat_feature, v_parent_layer IN EXECUTE v_querytext
 		LOOP
+
+			raise notice ' v_childview, % v_cat_feature, % v_parent_layer %',  v_childview, v_cat_feature, v_parent_layer;
 
 			-- delete existing view
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
@@ -118,15 +137,15 @@ BEGIN
 					
 			-- insert into config_form_fields new column values coyping from parent
 			INSERT INTO config_form_fields (formname, formtype,tabname,  columnname, layoutname, layoutorder, 
-      		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-      		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-      		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       		stylesheet, widgetfunction, linkedobject, hidden)
+			datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+			stylesheet, widgetfunction, linkedobject, hidden)
 			SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
-       		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-       		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-     		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-       		stylesheet, widgetfunction,linkedobject, hidden
+			datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+			stylesheet, widgetfunction,linkedobject, hidden
 			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 			
@@ -302,9 +321,9 @@ BEGIN
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
 
-            EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-            "feature":{"catFeature":"'||v_cat_feature||'"}, 
-            "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+			"feature":{"catFeature":"'||v_cat_feature||'"}, 
+			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			
 		END LOOP;
 		
@@ -433,9 +452,9 @@ BEGIN
 			v_return_msg = 'Process finished successfully';
 			END IF;
 
-            EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-            "feature":{"catFeature":"'||v_cat_feature||'"}, 
-            "data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+			"feature":{"catFeature":"'||v_cat_feature||'"}, 
+			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			
 			--create trigger on view 
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||

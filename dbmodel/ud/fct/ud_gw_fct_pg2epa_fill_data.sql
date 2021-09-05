@@ -18,6 +18,7 @@ DECLARE
 v_rainfall text;
 v_isoperative boolean;
 v_statetype text;
+v_networkmode integer;
 
 BEGIN
 
@@ -33,6 +34,7 @@ BEGIN
 
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_network_mode' AND cur_user=current_user)::boolean;
 	
 	IF v_rainfall IS NOT NULL THEN
 		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
@@ -127,8 +129,26 @@ BEGIN
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
 
-	RETURN 1;
-		
+	-- fill temp_gully in order to work with 1D/2D
+	IF v_networkmode = 2 THEN
+
+		INSERT INTO temp_gully 
+		SELECT 
+		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, 1,1,0,0, -- gully
+		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
+		pjoint_id, 
+		case when custom_length is not null then custom_length else connec_length end, shape, 
+		case when custom_n is not null then custom_n else n end, top_elev-ymax+sandbox, outlet_depth, geom1, geom2, geom3, geom4, -- connec		
+		the_geom
+		FROM v_edit_inp_gully g 
+		JOIN cat_grate c ON id = gratecat_id 
+		left JOIN cat_arc a ON connec_arccat_id = a.id
+		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
+		left JOIN value_state_type s ON state_type = s.id
+		WHERE isepa IS TRUE AND is_operative IS TRUE; 
+	END IF;
+	
+	RETURN 1;	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

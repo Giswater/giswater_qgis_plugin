@@ -405,7 +405,7 @@ BEGIN
 			
 		IF v_man_table='man_conduit' THEN
 			
-			INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
+			INSERT INTO man_conduit (arc_id, inlet_offset) VALUES (NEW.arc_id, NEW.inlet_offset);
 		
 		ELSIF v_man_table='man_siphon' THEN
 							
@@ -620,12 +620,12 @@ BEGIN
 
 		-- child tables fields
 		IF v_man_table='man_conduit' THEN
-								
-			UPDATE man_conduit SET arc_id=NEW.arc_id
+
+			UPDATE man_conduit SET arc_id=NEW.arc_id, inlet_offset = NEW.inlet_offset
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF v_man_table='man_siphon' THEN			
-								
+
 			UPDATE man_siphon SET  name=NEW.name
 			WHERE arc_id=OLD.arc_id;
 		
