@@ -260,8 +260,7 @@ class GwSelector:
         if level == 0:
             message = json_result['body']['message']['text']
             tools_qgis.show_message(message, level)
-        print(level)
-
+¡
         try:
             # Zoom to feature
             x1 = json_result['body']['data']['geometry']['x1']
