@@ -120,15 +120,6 @@ DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_node_geom ON "SCHEMA_NAME".plan_pse
 CREATE TRIGGER gw_trg_plan_psector_x_node_geom  AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".plan_psector_x_node 
 FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('plan');
 
-DROP TRIGGER IF EXISTS gw_trg_om_psector_x_arc ON "SCHEMA_NAME".om_psector_x_arc;
---25/09 - create trg commented because om_psector disappears in 3.2 version (updates 32016)
---CREATE TRIGGER gw_trg_om_psector_x_arc  AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_arc 
---FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
- 
-DROP TRIGGER IF EXISTS gw_trg_om_psector_x_node ON "SCHEMA_NAME".om_psector_x_node;
---CREATE TRIGGER gw_trg_om_psector_x_node AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_node 
---FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
-
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON "SCHEMA_NAME".node;
 CREATE TRIGGER gw_trg_topocontrol_node BEFORE INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME".node
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_topocontrol_node();
@@ -140,10 +131,6 @@ FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_rpt_cat_result();
 DROP TRIGGER IF EXISTS gw_trg_visit_expl ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_visit_expl BEFORE INSERT OR UPDATE OF the_geom ON "SCHEMA_NAME".om_visit 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_visit_expl();
-
-DROP TRIGGER IF EXISTS gw_trg_vnode_update ON "SCHEMA_NAME".vnode;
-CREATE TRIGGER gw_trg_vnode_update BEFORE UPDATE OF the_geom ON "SCHEMA_NAME".vnode
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_vnode_update();
 
 DROP TRIGGER IF EXISTS gw_trg_ui_doc_x_node ON "SCHEMA_NAME".v_ui_doc_x_node;
 CREATE TRIGGER gw_trg_ui_doc_x_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_doc_x_node
