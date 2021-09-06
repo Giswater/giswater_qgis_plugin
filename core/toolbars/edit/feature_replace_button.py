@@ -33,6 +33,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.cat_table = None
         self.feature_edit_type = None
         self.feature_type_cat = None
+        self.feature_id = None
         self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
@@ -235,9 +236,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
-        # Get feature type from current feature
-        feature_type = feature.attribute(self.feature_edit_type)
-
         # Avoid to replace obsolete or planned features
         if feature.attribute('state') in (0, 2):
             message = "Current feature has state 0 or 2. Therefore it is not replaceable"
@@ -257,10 +255,13 @@ class GwFeatureReplaceButton(GwMaptool):
                     rows = tools_db.get_rows(sql)
                     tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
-        self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
+
+        # Get feature type from current feature
+        feature_type = feature.attribute(self.feature_edit_type)
+        self.dlg_replace.feature_type.setText(feature_type)
 
         # Fill 1st combo boxes-new system feature type
         sql = (f"SELECT DISTINCT(id), id "
@@ -268,11 +269,11 @@ class GwFeatureReplaceButton(GwMaptool):
                f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-
         rows.insert(0, ['', ''])
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
+        # Set buttons signals
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))

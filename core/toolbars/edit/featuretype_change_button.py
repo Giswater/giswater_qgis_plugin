@@ -35,6 +35,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_type = None
         self.geom_view = None
         self.cat_table = None
+        self.feature_edit_type = None
+        self.feature_type_cat = None
         self.feature_id = None
         self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
@@ -118,11 +120,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if self.show_help:
             message = "Click on feature to change its type"
             tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-
-        super().deactivate()
 
     # endregion
 
@@ -243,7 +240,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.geom_view))
 
 
-    def _change_elem_type(self):
+    def _change_elem_type(self, feature):
 
         # Create the dialog, fill feature_type and define its signals
         self.dlg_change = GwFeatureTypeChangeUi()
@@ -262,10 +259,9 @@ class GwFeatureTypeChangeButton(GwMaptool):
             rows = tools_db.get_rows(sql, log_sql=True)
             tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
 
-        self.dlg_change.feature_type.setText(self.feature_type)
-        self.dlg_change.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
-        self.dlg_change.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
-        self.dlg_change.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_change))
+        # Get feature type from current feature
+        feature_type = feature.attribute(self.feature_edit_type)
+        self.dlg_change.feature_type.setText(feature_type)
 
         # Fill 1st combo boxes-new system feature type
         sql = (f"SELECT DISTINCT(id) "
@@ -273,7 +269,14 @@ class GwFeatureTypeChangeButton(GwMaptool):
                f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_change, "feature_type_new", rows)
+        rows.insert(0, ['', ''])
+        tools_qt.fill_combo_values(self.dlg_change.feature_type_new, rows)
+        tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type, 0)
+
+        # Set buttons signals
+        self.dlg_change.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
+        self.dlg_change.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
+        self.dlg_change.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_change))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
@@ -326,7 +329,9 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.cat_table = f'cat_{self.feature_type}'
         if self.feature_type == 'gully':
             self.cat_table = f'cat_grate'
+        self.feature_edit_type = f'{self.feature_type}_type'
+        self.feature_type_cat = f'{self.feature_type}type_id'
         self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
-        self._change_elem_type()
+        self._change_elem_type(snapped_feat)
 
     # endregion
