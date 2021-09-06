@@ -110,7 +110,7 @@ class GwSnapManager(object):
         segment_flag = tools_gw.get_segment_flag(2)
         layer_settings = self.config_snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
-            tools_gw.set_snapping_type(layer_settings, 2)
+            tools_gw.set_snapping_type(layer_settings, segment_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -128,7 +128,7 @@ class GwSnapManager(object):
         vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         if layer_settings:
-            tools_gw.set_snapping_type(layer_settings, 1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -148,7 +148,7 @@ class GwSnapManager(object):
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
-            tools_gw.set_snapping_type(layer_settings, 1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -168,7 +168,7 @@ class GwSnapManager(object):
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
-            tools_gw.set_snapping_type(layer_settings, 1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:

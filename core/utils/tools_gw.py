@@ -2936,6 +2936,7 @@ def set_snapping_type(layer_settings, value):
     elif Qgis.QGIS_VERSION_INT >= 31200:
         layer_settings.setTypeFlag(value)
 
+
 def get_segment_flag(default_value):
 
     if Qgis.QGIS_VERSION_INT >= 31200:
@@ -2944,6 +2945,7 @@ def get_segment_flag(default_value):
         segment_flag = default_value
 
     return segment_flag
+
 
 def get_vertex_flag(default_value):
 
@@ -2955,6 +2957,7 @@ def get_vertex_flag(default_value):
     return vertex_flag
 
 # endregion
+
 
 # region private functions
 
