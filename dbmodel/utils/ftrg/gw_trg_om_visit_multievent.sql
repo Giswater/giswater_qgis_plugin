@@ -124,6 +124,12 @@ BEGIN
 		EXECUTE 'UPDATE om_visit_event SET  value=$3 WHERE visit_id=$1 AND parameter_id=$2'
                     USING NEW.visit_id, v_parameters.id, v_new_value_param;  
         END LOOP;
+    
+    -- set enddate when change to closed status (4) from another previous status
+	IF NEW.status = 4 AND OLD.status < 4 THEN 
+		NEW.enddate=left (date_trunc('second', now())::text, 19);
+		UPDATE om_visit SET enddate=NEW.enddate WHERE id=NEW.visit_id;
+	END IF;
         
     RETURN NEW;
     
