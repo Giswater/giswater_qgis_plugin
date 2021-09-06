@@ -2062,7 +2062,7 @@ def manage_layer_manager(json_result, sql=None):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
-                    segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
+                    segment_flag = get_vertex_flag(2)
                     layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
                         layer_settings.setTypeFlag(segment_flag)
@@ -2906,9 +2906,27 @@ def get_project_version(schemaname=None):
 def set_snapping_type(layer_settings, value):
 
     if Qgis.QGIS_VERSION_INT < 31200:
-        layer_settings.setTolerance(value)
-    elif Qgis.QGIS_VERSION_INT >= 31200:
         layer_settings.setType(value)
+    elif Qgis.QGIS_VERSION_INT >= 31200:
+        layer_settings.setTypeFlag(value)
+
+def get_segment_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag
+    else:
+        segment_flag = default_value
+
+    return segment_flag
+
+def get_vertex_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag
+    else:
+        vertex_flag = default_value
+
+    return vertex_flag
 
 # endregion
 

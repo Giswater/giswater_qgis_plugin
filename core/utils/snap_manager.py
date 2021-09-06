@@ -107,7 +107,7 @@ class GwSnapManager(object):
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
-        segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
+        segment_flag = tools_gw.get_segment_flag(2)
         layer_settings = self.config_snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
             tools_gw.set_snapping_type(layer_settings, 2)
@@ -125,7 +125,7 @@ class GwSnapManager(object):
         self.show_snap_message(msg, 'node')
 
         QgsProject.instance().blockSignals(True)
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         if layer_settings:
             tools_gw.set_snapping_type(layer_settings, 1)
@@ -144,7 +144,7 @@ class GwSnapManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
@@ -164,7 +164,7 @@ class GwSnapManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
