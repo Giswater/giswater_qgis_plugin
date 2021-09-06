@@ -80,9 +80,12 @@ class GwCatalog:
         self._get_catalog(matcat_id, pnom, dnom, id, feature_type, child_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, child_type))
-        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
-        dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
+        if matcat_id:
+            matcat_id.currentIndexChanged.connect(partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, child_type))
+        if pnom:
+            pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
+        if dnom:
+            dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
 
         # Set shortcut keys
         self.dlg_catalog.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_catalog))

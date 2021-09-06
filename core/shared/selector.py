@@ -256,17 +256,21 @@ class GwSelector:
         json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
         if json_result is None or json_result['status'] == 'Failed':
             return
-        if str(tab_name) not in ('tab_state', 'tab_hydrometer'):
-            try:
-                # Zoom to feature
-                x1 = json_result['body']['data']['geometry']['x1']
-                y1 = json_result['body']['data']['geometry']['y1']
-                x2 = json_result['body']['data']['geometry']['x2']
-                y2 = json_result['body']['data']['geometry']['y2']
-                if x1 is not None:
-                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-            except KeyError:
-                pass
+        level = json_result['body']['message']['level']
+        if level == 0:
+            message = json_result['body']['message']['text']
+            tools_qgis.show_message(message, level)
+
+        try:
+            # Zoom to feature
+            x1 = json_result['body']['data']['geometry']['x1']
+            y1 = json_result['body']['data']['geometry']['y1']
+            x2 = json_result['body']['data']['geometry']['x2']
+            y2 = json_result['body']['data']['geometry']['y2']
+            if x1 is not None:
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        except KeyError:
+            pass
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')

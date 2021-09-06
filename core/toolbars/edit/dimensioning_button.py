@@ -22,15 +22,6 @@ class GwDimensioningButton(GwMaptool):
 
 
     # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-    def canvasMoveEvent(self, event):
-        pass
-
-
-    def canvasReleaseEvent(self, event):
-        pass
-
-
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -69,13 +60,8 @@ class GwDimensioningButton(GwMaptool):
             # Manage new tool
             self.layer.featureAdded.connect(self._open_new_dimensioning)
 
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
-
     # endregion
+
 
     # region private functions
 

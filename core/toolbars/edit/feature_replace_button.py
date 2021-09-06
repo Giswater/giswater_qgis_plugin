@@ -33,6 +33,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.cat_table = None
         self.feature_edit_type = None
         self.feature_type_cat = None
+        self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -112,11 +113,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
     def activate(self):
 
-        self.project_type = tools_gw.get_project_type()
-
-        # Set active and current layer
-        self._set_active_layer("NODE")
-
         # Check button
         self.action.setChecked(True)
 
@@ -134,6 +130,16 @@ class GwFeatureReplaceButton(GwMaptool):
         self.snapper_manager.config_snap_to_arc()
         self.snapper_manager.set_snap_mode()
 
+        # Manage active layer
+        layer = self.iface.activeLayer()
+        if not layer:
+            self._set_active_layer("NODE")
+        else:
+            tools_log.log_info(layer.name())
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename not in self.list_tables:
+                self._set_active_layer("NODE")
+
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
@@ -141,11 +147,6 @@ class GwFeatureReplaceButton(GwMaptool):
         if self.show_help:
             message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
             tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-
-        super().deactivate()
 
     # endregion
 
@@ -170,19 +171,17 @@ class GwFeatureReplaceButton(GwMaptool):
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
-            obj_action.triggered.connect(partial(super().clicked_event))
             obj_action.triggered.connect(partial(self._set_active_layer, action))
 
 
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
-        layers = {"ARC": "v_edit_arc", "NODE": "v_edit_node",
-                  "CONNEC": "v_edit_connec", "GULLY": "v_edit_gully"}
-        tablename = layers.get(name.upper())
-        self.layer_node = tools_qgis.get_layer_by_tablename(tablename)
-        self.iface.setActiveLayer(self.layer_node)
-        self.current_layer = self.layer_node
+        tablename = f"v_edit_{name.lower()}"
+        layer = tools_qgis.get_layer_by_tablename(tablename)
+        if layer:
+            self.iface.setActiveLayer(layer)
+            self.current_layer = layer
 
 
     def _manage_dates(self, date_value):
@@ -441,10 +440,8 @@ class GwFeatureReplaceButton(GwMaptool):
 
             # Refresh canvas
             self.refresh_map_canvas()
-            tools_qgis.set_layer_index('v_edit_arc')
-            tools_qgis.set_layer_index('v_edit_connec')
-            tools_qgis.set_layer_index('v_edit_gully')
-            tools_qgis.set_layer_index('v_edit_node')
+            for table in self.list_tables:
+                tools_qgis.set_layer_index(table)
 
             # Deactivate map tool
             self.deactivate()
