@@ -5,7 +5,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3076
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_views(p_data json)
 RETURNS json AS
@@ -258,7 +258,7 @@ BEGIN
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":""}'||
 			   '}'||
-		'}')::json, 2690, null, null, null);
+		'}')::json, 3076, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

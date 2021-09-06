@@ -45,3 +45,8 @@ UPDATE plan_psector SET active=TRUE WHERE active IS NULL;
 DELETE FROM sys_function WHERE function_name = 'gw_trg_vnode_update';
 
 UPDATE config_param_system SET standardvalue = null where parameter = 'admin_raster_dem';
+
+--2021/09/06
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3076, 'gw_fct_admin_manage_views','utils', 'function', 'json', 'json',
+'Function that allows saving, modifying and recuperating a list of views', 'role_admin', null, null);
