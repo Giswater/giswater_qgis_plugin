@@ -380,3 +380,11 @@ INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');
 -- 2021/09/05
 INSERT INTO audit_check_data (fid, criticity, error_message) 
 VALUES (214, 1, '3.5.012 has an important enhancement for ws dscenarios. Due this v_edit_inp_demand view need to be replaced by v_edit_inp_dscenario_* (pipe/pump/valve/demand/reservoir/inlet)');
+
+-- 2021/09/06
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'dscenario_type', null, null, 'string', 'combo', 'dscenario_type', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,'SELECT id, idval FROM inp_typevalue WHERE typevalue=''typevalue_dscenario''', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
