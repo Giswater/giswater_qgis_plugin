@@ -584,3 +584,6 @@ UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_d
 
 UPDATE cat_feature_node SET epa_default = 'UNDEFINED' WHERE id = 'AIR_VALVE';
 UPDATE cat_feature_node SET epa_default = 'JUNCTION' WHERE id = 'CLORINATHOR';
+
+UPDATE cat_dscenario SET active = true;
+UPDATE cat_dscenario SET dscenario_type = 'DEMAND';

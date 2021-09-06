@@ -5,7 +5,94 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ud_sample, public, pg_catalog;
+
+
+
+CREATE OR REPLACE VIEW vu_connec AS 
+ SELECT connec.connec_id,
+    connec.code,
+    connec.customer_code,
+    connec.top_elev,
+    connec.y1,
+    connec.y2,
+    connec.connecat_id,
+    connec.connec_type,
+    cat_feature.system_id AS sys_type,
+    connec.private_connecat_id,
+        CASE
+            WHEN connec.matcat_id IS NULL THEN cat_connec.matcat_id
+            ELSE connec.matcat_id
+        END AS matcat_id,
+    connec.expl_id,
+    exploitation.macroexpl_id,
+    connec.sector_id,
+    sector.macrosector_id,
+    connec.demand,
+    connec.state,
+    connec.state_type,
+    CASE WHEN (y1+y2)/2 IS NOT NULL THEN ((y1+y2)/2)::numeric(12,3) ELSE connec_depth END as connec_depth,
+    connec.connec_length,
+    connec.arc_id,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.dma_id,
+    dma.macrodma_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.district_id,
+    c.descript::character varying(100) AS streetname,
+    connec.postnumber,
+    connec.postcomplement,
+    d.descript::character varying(100) AS streetname2,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    cat_connec.svg,
+    connec.rotation,
+    concat(cat_feature.link_path, connec.link) AS link,
+    connec.verified,
+    connec.undelete,
+    cat_connec.label,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    connec.accessibility,
+    connec.diagonal,
+    connec.publish,
+    connec.inventory,
+    connec.uncertain,
+    connec.num_value,
+    connec.pjoint_id,
+    connec.pjoint_type,
+    date_trunc('second'::text, connec.tstamp) AS tstamp,
+    connec.insert_user,
+    date_trunc('second'::text, connec.lastupdate) AS lastupdate,
+    connec.lastupdate_user,
+    connec.the_geom,
+    connec.workcat_id_plan,
+    connec.asset_id
+   FROM ud_sample.connec
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     LEFT JOIN cat_feature ON connec.connec_type::text = cat_feature.id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = connec.streetaxis2_id::text;
 
 
 CREATE OR REPLACE VIEW vu_gully AS 
@@ -24,7 +111,7 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.siphon,
     gully.connec_arccat_id,
     gully.connec_length,
-    gully.connec_depth,
+    case when (top_elev-ymax+sandbox+ connec_y2)/2 IS NOT NULL then ((top_elev-ymax+sandbox+ connec_y2)/2)::numeric(12,3) ELSE connec_depth END as connec_depth,
     gully.arc_id,
     gully.expl_id,
     exploitation.macroexpl_id,
@@ -81,7 +168,9 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.workcat_id_plan,
     gully.asset_id,
     CASE WHEN gully.connec_matcat_id is null then cc.matcat_id ELSE gully.connec_matcat_id END as connec_matcat_id,
-	gully.gratecat2_id
+    	gully.gratecat2_id,
+	top_elev-ymax+sandbox AS connec_y1,
+	gully.connec_y2	
    FROM gully
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
      LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
@@ -113,11 +202,12 @@ DROP VIEW IF EXISTS v_edit_inp_gully;
 CREATE OR REPLACE VIEW v_edit_inp_gully as
 SELECT 
 gully_id, code, isepa, top_elev, ymax, sandbox, connec_matcat_id, gully_type, gratecat_id, units, groove, arc_id, s.sector_id, expl_id, state, state_type, the_geom, annotation, 
-connec_length, connec_arccat_id, pjoint_id,
-custom_length, custom_n, efficiency, outlet_depth, y0, ysur, q0, qmax, flap
+connec_length, connec_arccat_id, connec_y1, connec_y2, pjoint_id, pjoint_type,
+custom_length, custom_n, efficiency, y0, ysur, q0, qmax, flap
 FROM selector_sector s, v_edit_gully g
 left JOIN inp_gully USING (gully_id)
 WHERE g.sector_id  = s.sector_id AND cur_user = current_user;
+
 
 CREATE OR REPLACE VIEW vi_gully AS 
 SELECT 
@@ -154,8 +244,8 @@ gully_id,
 pjoint_id as outlet_id,
 link_length as length,
 n,
-z1,
-case when z2 is not null then z2::text else '*' end as z2,
+y1,
+case when y2 is not null then y2::text else '*' end as y2,
 q0,
 qmax
 FROM temp_gully;

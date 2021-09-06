@@ -22,8 +22,12 @@ BEGIN
     v_epa_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-
+	
+		-- DISABLED
+		
     ELSIF TG_OP = 'UPDATE' THEN
+	
+		-- DISABLED columns: gully_id, code, arc_id, sector_id, state, connec_y1, pjoint_id, pjoint_type
 
 		RETURN NEW;
 

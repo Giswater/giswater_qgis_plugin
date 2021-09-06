@@ -136,11 +136,11 @@ BEGIN
 		SELECT 
 		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
 		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
-		pjoint_id, 
+		pjoint_id, pjoint_type,
 		(case when custom_length is not null then custom_length else connec_length end),
 		shape, 
 		case when custom_n is not null then custom_n else n end, 
-		top_elev-ymax+sandbox, outlet_depth, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
+		connec_y1, connec_y2, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
 		the_geom
 		FROM v_edit_inp_gully g 
 		JOIN cat_grate c ON id = gratecat_id 
