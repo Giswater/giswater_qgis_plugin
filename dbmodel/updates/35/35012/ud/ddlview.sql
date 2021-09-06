@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
@@ -84,7 +84,7 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.the_geom,
     connec.workcat_id_plan,
     connec.asset_id
-   FROM ud_sample.connec
+   FROM SCHEMA_NAME.connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
