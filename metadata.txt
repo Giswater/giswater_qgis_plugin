@@ -4,7 +4,7 @@
 [general]
 name=giswater
 qgisMinimumVersion=3.10
-qgisMaximumVersion=3.16
+qgisMaximumVersion=3.99
 pgMinimumVersion=9.5
 pgMaximumVersion=11.99
 

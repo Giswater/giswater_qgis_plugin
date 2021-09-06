@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
-import json
 import os
 import random
 import re
@@ -28,7 +27,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -2901,6 +2900,17 @@ def get_project_version(schemaname=None):
 
     return project_version
 
+
+# region compatibility QGIS version functions
+
+def set_snapping_type(layer_settings, value):
+
+    if Qgis.QGIS_VERSION_INT < 31200:
+        layer_settings.setTolerance(value)
+    elif Qgis.QGIS_VERSION_INT >= 31200:
+        layer_settings.setType(value)
+
+# endregion
 
 # region private functions
 
