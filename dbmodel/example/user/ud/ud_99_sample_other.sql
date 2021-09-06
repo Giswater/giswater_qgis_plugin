@@ -428,3 +428,20 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
 UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';
+
+UPDATE gully SET siphon = false where siphon is null;
+UPDATE gully SET groove = false where groove is null;
+UPDATE gully SET publish = true where publish is null;
+UPDATE gully SET uncertain = false where uncertain is null;
+
+UPDATE gully SET connec_arccat_id = 'PVC-CC025_D' where connec_arccat_id is null;
+UPDATE gully SET fluid_type = 'St. Fluid' where fluid_type is null;
+UPDATE gully SET location_type = 'St. Location' where location_type is null;
+UPDATE gully SET function_type = 'St. Function' where function_type is null;
+UPDATE gully SET category_type = 'St. Category' where category_type is null;
+UPDATE gully SET builtdate = '2017-12-05' where builtdate is null;
+UPDATE gully SET category_type = 'St. Category' where category_type is null;
+
+UPDATE gully SET top_elev= 46.4, ymax=0.8, sandbox=0 WHERE gully_id = '100013';
+UPDATE gully SET code = '100012', top_elev= 47.4, ymax=0.8, sandbox=0 WHERE gully_id = '100012';
+

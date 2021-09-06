@@ -26,9 +26,9 @@ q0 double precision,
 qmax double precision,
 flap varchar(3));
 
-drop TABLE temp_gully cascade;
+
 CREATE TABLE temp_gully (
-gully_id character varying(16),
+gully_id character varying(16) PRIMARY KEY,
 gully_type character varying(30),
 gratecat_id character varying(30),
 sector_id integer,
