@@ -27,7 +27,8 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
+    QgsCoordinateTransformContext
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -2899,6 +2900,31 @@ def get_project_version(schemaname=None):
         project_version = row[0]
 
     return project_version
+
+
+def export_layers_to_gpkg(layers, path):
+    """ This function is not used on Giswater Project at the moment. """
+
+    uri = tools_db.get_uri()
+    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    is_first = True
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.driverName = "GPKG"
+
+    for layer in layers:
+
+        uri.setDataSource(schema_name, f"{layer['name']}", "the_geom", None, f"{layer['id']}")
+        vlayer = QgsVectorLayer(uri.uri(), f"{layer['name']}", 'postgres')
+
+        if is_first:
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
+            is_first = False
+        else:
+            # switch mode to append layer instead of overwriting the file
+            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
 
 
 # region compatibility QGIS version functions
