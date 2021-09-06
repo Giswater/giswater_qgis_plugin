@@ -138,7 +138,8 @@ BEGIN
 		SELECT 
 		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
 		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
-		pjoint_id, pjoint_type,
+		(case when pjoint_type = 'VNODE' THEN concat('VN',pjoint_id) ELSE pjoint_id end) as pjoint_id,
+		pjoint_type,
 		(case when custom_length is not null then custom_length else connec_length end),
 		shape, 
 		case when custom_n is not null then custom_n else n end, 

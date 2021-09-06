@@ -76,3 +76,15 @@ DELETE FROM sys_param_user WHERE project_type='ws';
 
 INSERT INTO inp_gully (gully_id, isepa, efficiency)
 SELECT gully_id, true, 1 FROM gully where state > 0;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, vdefault, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, epaversion)
+VALUES ('inp_options_minlength', 'epaoptions', 'Value for minimum length on 1D/2D export mode because arc triming with links', 'role_epa', 'Arc minimun length (1D/2D)',
+TRUE, 0, 'ud', FALSE, '1', FALSE, 'numeric','text', TRUE, 
+'lyt_general_2',TRUE, '{"from":"5.0.022", "to":null,"language":"english"}') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('vi_gully2pjoint', 'View to manage link of gullies on epa', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
