@@ -52,6 +52,7 @@ class GwNodeData:
         self.descript = None
         self.data_type = None
         self.surface_type = None
+        self.none_values = None
 
 
 class GwProfileButton(GwAction):
@@ -69,6 +70,7 @@ class GwProfileButton(GwAction):
         self.links = []
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
+        self.none_values = []
 
 
     def clicked_event(self):
@@ -136,6 +138,7 @@ class GwProfileButton(GwAction):
         self.links.clear()
         self.nodes = []
         self.links = []
+        self.none_values = []
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
@@ -176,6 +179,9 @@ class GwProfileButton(GwAction):
         self.plot.show()
         mng = self.plot.get_current_fig_manager()
         mng.window.showMaximized()
+
+        message = "There are missing values in these nodes:"
+        tools_qt.show_info_box(message, inf_text=self.none_values)
 
 
     def _save_profile(self):
@@ -896,6 +902,10 @@ class GwProfileButton(GwAction):
             elev2_prev = self.nodes[index - 1].elev2
             y1 = self.nodes[index].y1
             elev1 = self.nodes[index].elev1
+
+            if y2_prev in (None, 'None') or self.nodes[index].descript['ymax'] in (None, 'None') or y1 in (None, 'None')\
+                    or elev2_prev in (None, 'None') or self.nodes[index].descript['elev'] in (None, 'None') or elev1 in (None, 'None'):
+                self.none_values.append(self.nodes[index].descript['code'])
 
             # Fill y_max
             plt.annotate(
