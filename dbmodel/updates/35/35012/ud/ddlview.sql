@@ -238,12 +238,12 @@ SELECT
 gully_id,
 xcoord,
 ycoord,
-(elev)::numeric(12,3) as bottom,
-(elev-sandbox)::numeric(12,3) as elev,
+(elev)::numeric(12,3) as elev,
 (top_elev-elev)::numeric(12,3) as ymax,
 y0,
 ysur
 FROM temp_gully;
+
 
 CREATE OR REPLACE VIEW vi_grate AS 
 SELECT
@@ -262,6 +262,7 @@ b_param::numeric(12,5),
 groove
 FROM temp_gully;
 
+
 CREATE OR REPLACE VIEW vi_link AS 
 SELECT
 gully_id,
@@ -274,6 +275,7 @@ q0,
 qmax
 FROM temp_gully;
 
+
 CREATE OR REPLACE VIEW vi_lxsections AS 
 SELECT
 gully_id,
@@ -284,7 +286,8 @@ geom3 as geom3,
 geom4 as geom4
 FROM temp_gully;
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_conduits AS 
+
+CREATE OR REPLACE VIEW vi_conduits AS 
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
@@ -294,9 +297,9 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_conduits AS
     rpt_inp_arc.elevmax2 AS z2,
     rpt_inp_arc.q0::numeric(12,4) AS q0,
     rpt_inp_arc.qmax::numeric(12,4) AS qmax
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
   UNION
 SELECT rpt_inp_arc.arc_id,
@@ -308,15 +311,14 @@ SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.elevmax2 AS z2,
     rpt_inp_arc.q0::numeric(12,4) AS q0,
     rpt_inp_arc.qmax::numeric(12,4) AS qmax
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
 
 
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_xsections AS 
+CREATE OR REPLACE VIEW vi_xsections AS 
  SELECT rpt_inp_arc.arc_id,
     cat_arc_shape.epa AS shape,
     cat_arc.geom1::text AS other1,
@@ -325,11 +327,11 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_xsections AS
     0::text AS other4,
     rpt_inp_arc.barrels AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -340,11 +342,11 @@ UNION
     cat_arc.geom4::text AS other4,
     rpt_inp_arc.barrels AS other5,
     inp_conduit.culvert::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text <> 'CUSTOM'::text AND cat_arc_shape.epa::text <> 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -355,11 +357,11 @@ UNION
     NULL::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT inp_orifice.arc_id,
@@ -370,10 +372,10 @@ UNION
     inp_orifice.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arc_id::text
-     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arc_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -384,10 +386,10 @@ UNION
     inp_flwreg_orifice.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
-     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -398,10 +400,10 @@ UNION
     inp_weir.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arc_id::text
-     JOIN SCHEMA_NAME.inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arc_id::text
+     JOIN inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_weirs'::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -412,10 +414,10 @@ UNION
     inp_flwreg_weir.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
-     JOIN SCHEMA_NAME.inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
+     JOIN inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_weirs'::text
 UNION
 
@@ -427,11 +429,11 @@ SELECT rpt_inp_arc.arc_id,
     0::text AS other4,
     rpt_inp_arc.barrels AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -442,11 +444,11 @@ UNION
     cat_arc.geom4::text AS other4,
     rpt_inp_arc.barrels AS other5,
     inp_conduit.culvert::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text <> 'CUSTOM'::text AND cat_arc_shape.epa::text <> 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -457,11 +459,11 @@ UNION
     NULL::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
-     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_conduit ON rpt_inp_arc.arcparent::text = inp_conduit.arc_id::text
+     JOIN cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT inp_orifice.arc_id,
@@ -472,10 +474,10 @@ UNION
     inp_orifice.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arcparent::text
-     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arcparent::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -486,10 +488,10 @@ UNION
     inp_flwreg_orifice.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
-     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -500,10 +502,10 @@ UNION
     inp_weir.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arcparent::text
-     JOIN SCHEMA_NAME.inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arcparent::text
+     JOIN inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_weirs'::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -514,7 +516,7 @@ UNION
     inp_flwreg_weir.geom4::text AS other4,
     NULL::integer AS other5,
     NULL::text AS other6
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.rpt_inp_arc
-     JOIN SCHEMA_NAME.inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
-     JOIN SCHEMA_NAME.inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
+     JOIN inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
