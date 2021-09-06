@@ -28,14 +28,15 @@ class GwFeatureTypeChangeButton(GwMaptool):
     A form is opened showing current feature_type.type and combos to replace it
     """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.project_type = None
         self.feature_type = None
         self.geom_view = None
         self.cat_table = None
         self.feature_id = None
+        self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -84,9 +85,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         self.project_type = tools_gw.get_project_type()
 
-        # Set active and current layer
-        self._set_active_layer("NODE")
-
         # Check button
         self.action.setChecked(True)
 
@@ -103,6 +101,15 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.config_snap_to_arc()
         self.snapper_manager.set_snap_mode()
+
+        # Manage active layer
+        layer = self.iface.activeLayer()
+        if not layer:
+            self._set_active_layer("NODE")
+        else:
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename not in self.list_tables:
+                self._set_active_layer("NODE")
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -140,7 +147,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
-            obj_action.triggered.connect(partial(super().clicked_event))
             obj_action.triggered.connect(partial(self._set_active_layer, action))
 
 

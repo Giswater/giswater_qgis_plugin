@@ -135,7 +135,6 @@ class GwFeatureReplaceButton(GwMaptool):
         if not layer:
             self._set_active_layer("NODE")
         else:
-            tools_log.log_info(layer.name())
             tablename = tools_qgis.get_layer_source_table_name(layer)
             if tablename not in self.list_tables:
                 self._set_active_layer("NODE")
