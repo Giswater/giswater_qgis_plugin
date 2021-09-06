@@ -28,6 +28,8 @@ BEGIN
 	-- Delete previous results on temp_node & arc tables
 	TRUNCATE temp_node;
 	TRUNCATE temp_arc;
+	TRUNCATE temp_gully;
+
 
 	-- set all timeseries of raingage using user's value
 	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
