@@ -121,7 +121,6 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_gw.set_config_parser('btn_search', 'open_search', 'true')
             tools_qt.manage_translation('search', self.dlg_search)
 
 
@@ -200,7 +199,6 @@ class GwSearch:
     def _close_search(self):
 
         self.dlg_search = None
-        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
 
 
     def _set_typeahead_completer(self, widget, completer=None):
