@@ -88,3 +88,15 @@ INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_cr
 VALUES ('vi_gully2pjoint', 'View to manage link of gullies on epa', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
+--2021/09/07
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'visit_id', 0, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'code', 1, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'visitcat_name', 2, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'gully_id', 3, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'visit_start', 4, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'visit_end', 5, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'user_name', 6, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'is_done', 7, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'feature_type', 8, true);
+INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'form_type', 9, true);
+

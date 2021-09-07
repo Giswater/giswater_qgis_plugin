@@ -14,7 +14,7 @@ INSERT INTO config_function VALUES (2160, 'gw_fct_setfields', NULL, NULL, '[{"fu
 ON CONFLICT (id) DO NOTHING;
 
 --2021/08/20
-INSERT INTO sys_fprocess VALUES (395, 'Check to_arc missed values for pumps', 'ws')
+INSERT INTO sys_fprocess VALUES (395, 'Check to_arc missed VALUES for pumps', 'ws')
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3070, 'gw_fct_pg2epa_vnodetrimarcs', 'ud', 'function', 'text', 'json', 'Function to trim arcs using gullies', 'role_epa')
@@ -50,3 +50,38 @@ UPDATE config_param_system SET standardvalue = null where parameter = 'admin_ras
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3076, 'gw_fct_admin_manage_views','utils', 'function', 'json', 'json',
 'Function that allows saving, modifying and recuperating a list of views', 'role_admin', null, null);
+
+--2021/09/07
+
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'visit_id', 0, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'code', 1, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'visitcat_name', 2, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'connec_id', 3, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'visit_start', 4, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'visit_end', 5, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'user_name', 6, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'is_done', 7, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'feature_type', 8, true);
+INSERT INTO config_form_tableview VALUES ('connec_form', 'utils', 'v_ui_om_visitman_x_connec', 'form_type', 9, true);
+
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'visit_id', 0, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'code', 1, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'visitcat_name', 2, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'node_id', 3, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'visit_start', 4, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'visit_end', 5, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'user_name', 6, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'is_done', 7, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'feature_type', 8, true);
+INSERT INTO config_form_tableview VALUES ('node_form', 'utils', 'v_ui_om_visitman_x_node', 'form_type', 9, true);
+
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'visit_id', 0, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'code', 1, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'visitcat_name', 2, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'arc_id', 3, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'visit_start', 4, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'visit_end', 5, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'user_name', 6, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'is_done', 7, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'feature_type', 8, true);
+INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'form_type', 9, true);
