@@ -38,10 +38,10 @@ class CadAddPoint(ParentMapTool):
         self.dlg_create_point = AuxPoint()
         self.load_settings(self.dlg_create_point)
 
-        validator = QDoubleValidator(-99999.99, 99999.999, 3)
+        validator = QDoubleValidator(-99999.99, 9999999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_x.setValidator(validator)
-        validator = QDoubleValidator(-99999.99, 99999.999, 3)
+        validator = QDoubleValidator(-99999.99, 9999999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
         self.dlg_create_point.dist_x.setFocus()
