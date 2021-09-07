@@ -144,6 +144,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
+            obj_action.triggered.connect(partial(super().clicked_event))
             obj_action.triggered.connect(partial(self._set_active_layer, action))
 
 
