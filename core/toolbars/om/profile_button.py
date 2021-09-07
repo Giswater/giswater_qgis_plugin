@@ -348,6 +348,8 @@ class GwProfileButton(GwAction):
                 if self.first_node:
                     self.initNode = element_id
                     self.first_node = False
+                    message = f"Node 1 selected"
+                    tools_qgis.show_info(message, parameter=element_id)
                 else:
                     self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
