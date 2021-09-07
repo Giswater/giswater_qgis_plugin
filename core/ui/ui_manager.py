@@ -155,8 +155,8 @@ FORM_CLASS = _get_ui_class('feature_replace.ui', 'edit')
 class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('nodetype_change.ui', 'edit')
-class GwNodeTypeChangeUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('featuretype_change.ui', 'edit')
+class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Change node type</string>
+   <string>Change feature type</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">
@@ -72,7 +72,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <property name="text">
-        <string>New node type:</string>
+        <string>New feature type:</string>
        </property>
        <property name="margin">
         <number>3</number>
@@ -96,7 +96,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="node_node_type_new">
+      <widget class="QComboBox" name="feature_type_new">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -129,7 +129,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <property name="text">
-        <string>Current node type:</string>
+        <string>Current feature type:</string>
        </property>
        <property name="margin">
         <number>3</number>
@@ -156,9 +156,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLineEdit" name="node_node_type">
+      <widget class="QLineEdit" name="feature_type">
        <property name="text">
-        <string>node_type</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -210,7 +210,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="node_nodecat_id"/>
+      <widget class="QComboBox" name="featurecat_id"/>
      </item>
      <item>
       <widget class="QPushButton" name="btn_catalog">
@@ -248,7 +248,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>node_node_type</tabstop>
+  <tabstop>feature_type</tabstop>
  </tabstops>
  <resources/>
  <connections/>

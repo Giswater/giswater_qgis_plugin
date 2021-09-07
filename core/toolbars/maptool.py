@@ -28,7 +28,6 @@ class GwMaptool(QgsMapTool):
         self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
-
         self.show_help = tools_gw.get_config_parser('system', 'show_help', "project", "giswater")
         self.layer_arc = None
         self.layer_connec = None
@@ -84,11 +83,10 @@ class GwMaptool(QgsMapTool):
 
     def clicked_event(self):
 
-        self.prev_maptool = self.iface.mapCanvas().mapTool()
-        if not (self == self.iface.mapCanvas().mapTool()):
+        selected_maptool = self.iface.mapCanvas().mapTool()
+        self.prev_maptool = selected_maptool
+        if not self == selected_maptool:
             self.iface.mapCanvas().setMapTool(self)
-        else:
-            self.iface.mapCanvas().unsetMapTool(self)
 
 
     def deactivate(self):
@@ -136,6 +134,7 @@ class GwMaptool(QgsMapTool):
 
     def set_action_pan(self):
         """ Set action 'Pan' """
+
         try:
             self.iface.actionPan().trigger()
         except Exception:
