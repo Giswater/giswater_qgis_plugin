@@ -20,6 +20,8 @@ ALTER TABLE selector_sector ALTER COLUMN cur_user SET DEFAULT "current_user"();
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"workcat_id", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"flag", "dataType":"boolean", "isUtils":"False"}}$$);
+
 
 DROP TRIGGER IF EXISTS gw_trg_notify ON vnode;
 DROP TRIGGER IF EXISTS gw_trg_vnode_update ON vnode;

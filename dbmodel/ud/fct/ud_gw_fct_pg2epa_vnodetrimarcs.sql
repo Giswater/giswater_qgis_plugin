@@ -13,12 +13,15 @@ $BODY$
 --SELECT link_id, vnode_id FROM SCHEMA_NAME.link, SCHEMA_NAME.vnode where st_dwithin(st_endpoint(link.the_geom), vnode.the_geom, 0.01) and vnode.state = 0 and link.state > 0
 
 /*
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "lang":"EN", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "resultId":"b", "useNetworkGeom":"False", "dumpSubcatch":"False"}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('r1')
 */
 
 DECLARE
 v_arc record;
 v_arc2 record;
+v_arc3 record;
 v_count integer = 0;
 v_result integer = 0;
 v_record record;
@@ -47,7 +50,7 @@ BEGIN
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, top_elev, ymax)
 	SELECT  arc.arc_id, vnode_id, locate,
 	(n1.sys_top_elev - locate*(n1.sys_top_elev-n2.sys_top_elev))::numeric(12,3),
-	(CASE WHEN (n1.sys_ymax - locate*(n1.sys_ymax-n2.sys_ymax)) IS NULL THEN 0 ELSE (n1.sys_ymax - locate*(n1.sys_ymax-n2.sys_ymax)) END)::numeric (12,3) as depth
+	(CASE WHEN (n1.sys_ymax - locate*(n1.sys_ymax-n2.sys_ymax)) IS NULL THEN 0 ELSE (n1.sys_ymax - locate*(n1.sys_ymax-n2.sys_ymax)) END)::numeric (12,3) as ymax
 	FROM (
 		SELECT  vnode_id, arc_id, locate
 			FROM (
@@ -77,14 +80,11 @@ BEGIN
 	ORDER BY arc_id, locate;
 
 	RAISE NOTICE 'new nodes on temp_node table ';
-	INSERT INTO temp_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
+	INSERT INTO temp_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam, parent)
 	SELECT 
 		vnode_id as node_id, 
-		CASE 
-			WHEN g.top_elev IS NULL THEN t.top_elev::numeric(12,3) -- top_elev it's interpolated top_elev againts node1 and node2 of pipe
-			ELSE g.top_elev END as top_elev,
-		CASE	WHEN g.top_elev IS NULL THEN t.top_elev::numeric(12,3) - t.ymax::numeric(12,3)-- elev it's interpolated using top_elev-depth againts node1 and node2 of pipe
-			ELSE g.top_elev - g.ymax END as elev,
+		t.top_elev::numeric(12,3), -- top_elev it's interpolated top_elev againts node1 and node2 of pipe
+		t.top_elev::numeric(12,3) - t.ymax::numeric(12,3),-- elev it's interpolated using top_elev-depth againts node1 and node2 of pipe
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
@@ -93,7 +93,8 @@ BEGIN
 		a.state_type,
 		null,
 		ST_LineInterpolatePoint (a.the_geom, locate::numeric(12,4)) as the_geom,
-		addparam
+		addparam,
+		t.arc_id
 		FROM temp_go2epa t
 		JOIN temp_arc a USING (arc_id)
 		JOIN v_gully g ON concat('VN',pjoint_id)=vnode_id
@@ -116,7 +117,7 @@ BEGIN
 	the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope)
 
 	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
-			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
+			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2, a.top_elev-a.ymax as elev1, b.top_elev-b.ymax as elev2
 			FROM temp_go2epa a
 			LEFT JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
 			ORDER by arc_id)
@@ -125,8 +126,8 @@ BEGIN
 		temp_arc.flw_code,
 		a.node_1,
 		a.node_2,
-		temp_arc.elevmax1,
-		temp_arc.elevmax2,
+		elev1,
+		elev2,
 		temp_arc.arc_type,
 		temp_arc.arccat_id,
 		temp_arc.epa_type,
@@ -170,8 +171,18 @@ BEGIN
 	RAISE NOTICE '7 - set minimum value of arcs';
 	IF v_minlength > 0 THEN	
 	
-		FOR v_arc IN SELECT arc_id, node_1, node_2 FROM temp_arc where length < v_minlength
 		LOOP
+
+			SELECT count(*) INTO v_count FROM temp_arc where length < v_minlength and flag is not true;
+			RAISE NOTICE 'v_count %', v_count;
+
+			SELECT arc_id, node_1, node_2 INTO v_arc FROM temp_arc where length < v_minlength and flag is not true LIMIT 1;
+			GET DIAGNOSTICS v_count = row_count;
+
+			RAISE NOTICE 'v_count %', v_count;
+
+			IF v_count = 0 THEN EXIT; END IF;
+		
 			-- get nodes to be fusioned
 			IF v_arc.node_1 LIKE 'VN%' THEN
 				v_delnode = v_arc.node_1;
@@ -184,9 +195,13 @@ BEGIN
 				v_delnode = null;
 				v_keepnode = null;
 			END IF;
+
+			UPDATE temp_arc SET flag = TRUE WHERE arc_id = v_arc.arc_id;
 	
 			-- fusion process
 			IF v_keepnode IS NOT NULL THEN
+
+				RAISE NOTICE 'v_arc %', v_arc;
 
 				-- keep traceability on temp node;
 				UPDATE temp_node SET fusioned_node = v_delnode WHERE node_id = v_keepnode;
@@ -198,20 +213,35 @@ BEGIN
 				SELECT the_geom INTO v_pointgeom FROM temp_node WHERE node_id = v_keepnode;
 
 				-- enlarge arcs
-				FOR v_arc2 IN SELECT arc_id, node_1, node_2 FROM temp_arc WHERE (node_1 = v_keepnode OR node_2 = v_keepnode)
+				FOR v_arc2 IN SELECT arc_id, node_1, node_2, length FROM temp_arc WHERE (node_1 = v_keepnode OR node_2 = v_keepnode)
 				LOOP
+				
+					RAISE NOTICE 'v_arc2 %', v_arc2;
+				
 					UPDATE temp_arc SET the_geom=ST_SetPoint(the_geom,0, v_pointgeom) WHERE arc_id = v_arc2.arc_id AND node_1 = v_keepnode;
 					UPDATE temp_arc SET the_geom=ST_SetPoint(the_geom, ST_NumPoints(the_geom)-1, v_pointgeom) WHERE arc_id = v_arc2.arc_id AND node_2 = v_keepnode;
+					UPDATE temp_arc SET length=st_length(the_geom) WHERE arc_id = v_arc2.arc_id;
+
+					SELECT arc_id, node_1, node_2, length INTO v_arc3 FROM temp_arc WHERE arc_id = v_arc2.arc_id;
+
+					RAISE NOTICE 'v_arc3 %', v_arc3;
+
 				END LOOP;
-	
+				
 				-- delete features
 				DELETE FROM temp_node WHERE node_id = v_delnode;
 				DELETE FROM temp_arc WHERE arc_id = v_arc.arc_id;
-	
-				UPDATE temp_gully SET pjoint_id = v_keepnode WHERE pjoint_id = v_delnode;
+
+				-- update gylly
+				UPDATE temp_gully SET pjoint_id = v_keepnode, pjoint_type = 'REDIRECTIONED' WHERE pjoint_id = v_delnode;
 			END IF;		
 		END LOOP;
 	END IF;
+
+	-- update last values
+	UPDATE temp_node SET y0=0, ysur = 999 WHERE node_type = 'VNODE';
+	UPDATE temp_node SET ymax = geom1 FROM cat_arc c JOIN arc a ON a.arccat_id = c.id WHERE parent = a.arc_id;
+	UPDATE temp_gully g SET link_length = st_length(st_makeline(g.the_geom, n.the_geom)) FROM temp_node n WHERE g.pjoint_id = node_id;
 
 RETURN v_result;
 END;

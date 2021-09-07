@@ -286,6 +286,15 @@ geom3 as geom3,
 geom4 as geom4
 FROM temp_gully;
 
+CREATE OR REPLACE VIEW vi_gully2pjoint AS 
+SELECT gully_id,
+    pjoint_id,
+    expl_id,
+    st_makeline(g.the_geom, r.the_geom) AS st_makeline
+   FROM selector_inp_result s, temp_gully g
+     JOIN rpt_inp_node r ON pjoint_id = r.node_id::text
+  WHERE r.result_id::text = s.result_id::text AND s.cur_user = CURRENT_USER::text;
+
 
 CREATE OR REPLACE VIEW vi_conduits AS 
  SELECT rpt_inp_arc.arc_id,

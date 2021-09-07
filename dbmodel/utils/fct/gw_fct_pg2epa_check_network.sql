@@ -111,9 +111,9 @@ BEGIN
 
 	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  228)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
-			SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' and sector_id > 0 EXCEPT 
-			(SELECT node_1 as node_id FROM temp_arc where result_id = '||quote_literal(v_result_id)||' UNION
-			SELECT node_2 FROM temp_arc where result_id = '||quote_literal(v_result_id)||'))a
+			SELECT node_id FROM temp_node where sector_id > 0 EXCEPT 
+			(SELECT node_1 as node_id FROM temp_arc  UNION
+			SELECT node_2 FROM temp_arc ))a
 			JOIN temp_node USING (node_id)) b';
 	
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;

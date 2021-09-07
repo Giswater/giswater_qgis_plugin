@@ -12,6 +12,8 @@ ALTER TABLE selector_inp_hydrology ALTER COLUMN cur_user SET DEFAULT "current_us
 
 --2021/09/05
 ALTER TABLE cat_grate RENAME efective_area TO effective_area;
+ALTER TABLE temp_node RENAME nodeparent TO parent;
+ALTER TABLE rpt_inp_node RENAME nodeparent TO parent;
 
 --2021/08/19
 CREATE TABLE inp_gully(

@@ -176,9 +176,9 @@ BEGIN
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope
 	FROM temp_arc;
 	INSERT INTO rpt_inp_node (result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id,
-	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, nodeparent, arcposition, fusioned_node)
+	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
 	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
-	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, nodeparent, arcposition, fusioned_node
+	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
 
 	RAISE NOTICE '13 - Create the inp file structure';	
