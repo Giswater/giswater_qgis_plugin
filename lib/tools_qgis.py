@@ -20,6 +20,7 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
     QgsCoordinateTransform
 from qgis.core import QgsVectorLayer
+from qgis.utils import iface
 
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
@@ -59,7 +60,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+    iface.messageBar().pushMessage(title, msg, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
