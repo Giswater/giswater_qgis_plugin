@@ -176,10 +176,8 @@ BEGIN
 						GET DIAGNOSTICS v_affectrow = row_count;
 						IF v_affectrow=0 THEN
 
-							-- set obsolete features where psector_x_* state is 1 but feature state_type is in plan_obsolete_state_type					
-							EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
-							FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
-							AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type='||v_plan_obsolete_state_type||';';
+							-- delete features where state_type is plan_obsolete_state_type	(usually generated after ficticius arcs)					
+							EXECUTE 'DELETE FROM '||lower(rec_type.id)||' n WHERE n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type='||v_plan_obsolete_state_type||';';
 
 								GET DIAGNOSTICS v_affectrow = row_count;
 								IF v_affectrow=0 THEN
