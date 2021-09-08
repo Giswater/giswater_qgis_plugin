@@ -221,8 +221,6 @@ class GwPsector:
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
             tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
-            self.workcat_id.setText(f"{row['workcat_id']}")
-            self.parent_id.setText(f"{row['parent_id']}")
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
@@ -251,6 +249,8 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "atlas_id", row)
             self.fill_widget(self.dlg_plan_psector, "scale", row)
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
+            self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
+            self.fill_widget(self.dlg_plan_psector, "parent_id", row)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
