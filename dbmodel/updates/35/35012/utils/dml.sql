@@ -85,3 +85,14 @@ INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman
 INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'is_done', 7, true);
 INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'feature_type', 8, true);
 INSERT INTO config_form_tableview VALUES ('arc_form', 'utils', 'v_ui_om_visitman_x_arc', 'form_type', 9, true);
+
+--2021/09/08
+DELETE FROM config_param_user WHERE "parameter" ='edit_link_update_connecrotation';
+
+INSERT INTO config_param_system (parameter, value, descript, label, isenabled, layoutorder, project_type, "datatype", widgettype, iseditable, layoutname) 
+SELECT id, 'true', descript, label, true, 10, 'utils', 'boolean', 'check', true, 'lyt_system' FROM sys_param_user spu WHERE id ='edit_link_update_connecrotation';
+
+DELETE FROM sys_param_user WHERE id='edit_link_update_connecrotation';
+
+UPDATE config_param_system SET descript='If true, connec''s label and symbol will be rotated using the angle of link. You need to have label symbol configurated with "CASE WHEN label_x = 5 THEN ''    '' ||  "connec_id"  
+ELSE  "connec_id"  || ''    ''  END", label_x as quadrant and label_rotation as rotation' WHERE "parameter" = 'edit_link_update_connecrotation';
