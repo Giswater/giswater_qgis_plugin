@@ -110,6 +110,8 @@ class GwPsector:
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
+        self.workcat_id = self.dlg_plan_psector.findChild(QLineEdit, "workcat_id")
+        self.parent_id = self.dlg_plan_psector.findChild(QLineEdit, "parent_id")
 
         scale = self.dlg_plan_psector.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
@@ -198,7 +200,7 @@ class GwPsector:
                                 set_edit_triggers=QTableView.DoubleClicked)
                 tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
-                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
+                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
                    f" FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
             row = tools_db.get_row(sql)
@@ -219,6 +221,8 @@ class GwPsector:
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
             tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
+            self.workcat_id.setText(f"{row['workcat_id']}")
+            self.parent_id.setText(f"{row['parent_id']}")
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
