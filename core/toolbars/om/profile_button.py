@@ -299,9 +299,11 @@ class GwProfileButton(GwAction):
 
     def _activate_snapping_node(self):
 
-        self.initNode = None
-        self.endNode = None
-        self.first_node = True
+        if hasattr(self, "first_node"):
+            self.snapper_manager.remove_marker()
+        self.initNode = None if not hasattr(self, "initNode") else self.initNode
+        self.endNode = None if not hasattr(self, "endNode") else self.endNode
+        self.first_node = True if not hasattr(self, "first_node") else self.first_node
 
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
@@ -462,6 +464,10 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
+
+        self.initNode = None
+        self.endNode = None
+        self.first_node = True
 
 
     def _set_profile_layout(self):
