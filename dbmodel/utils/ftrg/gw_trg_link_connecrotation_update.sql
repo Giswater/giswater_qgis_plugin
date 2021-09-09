@@ -30,7 +30,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	-- execute only if user has true the parameter edit_link_update_connecrotation
-	IF (SELECT value FROM config_param_user WHERE parameter='edit_link_update_connecrotation' AND cur_user=current_user)::boolean = TRUE THEN
+	IF (SELECT value FROM config_param_system WHERE parameter='edit_link_update_connecrotation')::boolean = TRUE THEN
 
     
     IF TG_OP='INSERT' THEN
@@ -70,7 +70,7 @@ BEGIN
 				END IF;
 
 				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-				UPDATE connec SET label_rotation=label_rotation_aux, label_x=label_side WHERE connec_id=rec_connec.connec_id;
+				UPDATE connec SET label_rotation=label_rotation_aux, rotation=label_rotation_aux, label_x=label_side WHERE connec_id=rec_connec.connec_id;
 					
 			END LOOP;
 		
@@ -109,7 +109,7 @@ BEGIN
 				END IF;
 
 				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-				UPDATE gully set label_rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;	
+				UPDATE gully set label_rotation=label_rotation_aux, rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;	
 				
 			END LOOP;
 		END IF;
@@ -154,7 +154,7 @@ BEGIN
 				END IF;
 				
 				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-				UPDATE connec set label_rotation=label_rotation_aux,label_x=label_side  where connec_id=rec_connec.connec_id;	
+				UPDATE connec set label_rotation=label_rotation_aux, rotation=label_rotation_aux, label_x=label_side  where connec_id=rec_connec.connec_id;	
 
 			END LOOP;
 
@@ -194,7 +194,7 @@ BEGIN
 				END IF;
 
 				-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-				UPDATE GULLY set label_rotation=label_rotation_aux,label_x=label_side  where gully_id=rec_gully.gully_id;			
+				UPDATE GULLY set label_rotation=label_rotation_aux, rotation=label_rotation_aux, label_x=label_side  where gully_id=rec_gully.gully_id;			
 			
 			END LOOP;
 		END IF;

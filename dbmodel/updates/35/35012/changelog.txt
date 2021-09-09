@@ -13,3 +13,4 @@
 - Enhance performace creating ud example projects
 - Create relation parent-child on dscenario and psector with selection logics and add selector dscenario on selector form
 - Remove trigger vnode_update
+- Calculate symbol rotation on gw_trg_link_connecrotation_update and manage it by system variable instead of user
