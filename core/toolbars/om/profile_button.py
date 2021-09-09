@@ -180,8 +180,9 @@ class GwProfileButton(GwAction):
         mng = self.plot.get_current_fig_manager()
         mng.window.showMaximized()
 
-        message = "There are missing values in these nodes:"
-        tools_qt.show_info_box(message, inf_text=self.none_values)
+        if len(self.none_values) > 0:
+            message = "There are missing values in these nodes:"
+            tools_qt.show_info_box(message, inf_text=self.none_values)
 
 
     def _save_profile(self):
