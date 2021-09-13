@@ -202,6 +202,8 @@ def log_db(text=None, color="black", bold='', message_level=0, logger_file=True,
         text = json.dumps(text)
     msg = f'<font color="{color}"><{bold}>{text}</font>'
 
+    msg = (msg[:200] + '...') if len(msg) > 200 and bold == '' else msg
+
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if global_vars.logger and message_level >= global_vars.logger.min_message_level:
         QgsMessageLog.logMessage(msg, global_vars.logger.tab_db, message_level)
