@@ -110,3 +110,4 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"insertIntoNode", "label
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where nodetype_id = $userNodetype  OR nodetype_id is null order by id", "selectedId":"$userNodecat"}]'
 WHERE id=2118;
 
+ALTER TABLE plan_psector ALTER COLUMN active SET DEFAULT TRUE;
