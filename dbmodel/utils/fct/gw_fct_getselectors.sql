@@ -146,7 +146,18 @@ BEGIN
 
 		-- getting from v_expl_x_user variable to setup v_filterfrominput
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
-			v_filterfrominput = concat (v_filterfrominput, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
+			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+				v_filterfrominput = ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)';
+			ELSE
+				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			END IF;
+		ELSE 
+			-- built filter from input (recalled from typeahead)
+			IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
+				v_filterfrominput := NULL;
+			ELSE 
+				v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			END IF;
 		END IF;
 
 		-- Manage filters from ids (only mincut)
@@ -155,12 +166,6 @@ BEGIN
 			v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
 		END IF;
 
-		-- built filter from input (recalled from typeahead)
-		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
-			v_filterfrominput := NULL;
-		ELSE 
-			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-		END IF;
 
 		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
