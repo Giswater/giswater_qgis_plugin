@@ -286,6 +286,7 @@ geom3 as geom3,
 geom4 as geom4
 FROM temp_gully;
 
+DROP VIEW IF EXISTS vi_gully2pjoint;
 CREATE OR REPLACE VIEW vi_gully2pjoint AS 
 SELECT gully_id,
     pjoint_id,
