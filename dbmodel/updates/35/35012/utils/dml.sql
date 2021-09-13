@@ -111,3 +111,9 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"insertIntoNode", "label
 WHERE id=2118;
 
 ALTER TABLE plan_psector ALTER COLUMN active SET DEFAULT TRUE;
+
+UPDATE config_form_fields SET tabname='data' WHERE formname like 've_%';
+UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_node';
+UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_arc';
+UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_connec';
+UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_gully';
