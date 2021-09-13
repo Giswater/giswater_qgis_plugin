@@ -63,6 +63,7 @@ v_node_2 text;
 v_node_1 text;
 v_man_table text;
 v_epa_table text;
+v_statetype_obsolete integer;
 
 BEGIN
 
@@ -70,6 +71,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+    SELECT value INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
 
     --set current process as users parameter
     DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
@@ -365,8 +367,13 @@ BEGIN
 				DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
 				-- Moving to obsolete the previous node
-				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
-				UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+				IF v_statetype_obsolete IS NULL THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3134", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
+				ELSE
+					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
+					UPDATE node SET state=0, state_type=v_statetype_obsolete, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+				END IF;
 			    
 			ELSIF v_state_node = 2 THEN
 						
