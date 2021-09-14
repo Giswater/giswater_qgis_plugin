@@ -222,18 +222,24 @@ class GwAdminButton:
             self.task1.setProgress(50)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
+            schema_name = self._get_schema_name()
+            sql = (f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;")
+            tools_db.execute_sql(sql)
             status = self.load_updates(project_type, update_changelog=True)
             if status:
                 self._set_info_project()
+                tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
+
             self.task1.setProgress(100)
         else:
             return
 
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Update project")
+
         if status:
             global_vars.dao.commit()
-            self._close_dialog_admin(self.dlg_readsql_show_info)
+            self.dlg_readsql_show_info.btn_update.hide()
         else:
             global_vars.dao.rollback()
 
@@ -1384,7 +1390,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
 
 
-    def _execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False, srid=None):
+    def _execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
         """ Execute last process function """
 
         if new_project is True:
