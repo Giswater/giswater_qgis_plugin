@@ -103,6 +103,20 @@ INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitm
 
 --2021/09/14
 
+UPDATE config_form_fields SET columnname='effective_area' WHERE columnname='efective_area' and formname='cat_grate';
+
+UPDATE config_form_fields SET widgettype='typeahead',dv_querytext='SELECT id, id as idval FROM cat_connec WHERE active IS TRUE'
+WHERE columnname='connec_arccat_id' and formname ilike '%gully%';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT DISTINCT ON (formname) formname, 'form_feature', 'data', 'connec_matcat_id', 'lyt_data_1', 11, 'string', 'typeahead', 'connec_matcat_id', 
+'Material of a conection arc', NULL, FALSE, FALSE, TRUE, FALSE, NULL, 'SELECT id, id AS idval FROM cat_mat_arc WHERE active IS TRUE', TRUE, TRUE, 
+NULL, NULL, NULL, NULL, NULL, NULL, TRUE FROM config_form_fields WHERE formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%'
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
 INSERT INTO config_form_fields
