@@ -218,10 +218,10 @@ BEGIN
 		ALTER TABLE samplepoint ALTER COLUMN workcat_id DROP NOT NULL;
 
 		IF v_projecttype = 'UD' THEN 
-			LTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
-			LTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
+			ALTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
+			ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
 		END IF;
-		
+
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
 		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:') ON CONFLICT (parameter) DO NOTHING;
