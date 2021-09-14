@@ -204,6 +204,24 @@ BEGIN
 		ALTER TABLE sys_addfields DROP COLUMN if exists _num_decimals_;
 		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_value_column_;
 		
+		--drop NOT NULL restrictions
+		ALTER TABLE arc ALTER COLUMN verified DROP NOT NULL;
+		ALTER TABLE node ALTER COLUMN verified DROP NOT NULL;
+		ALTER TABLE connec ALTER COLUMN verified DROP NOT NULL;
+		ALTER TABLE element ALTER COLUMN verified DROP NOT NULL;
+		ALTER TABLE samplepoint ALTER COLUMN verified DROP NOT NULL;
+
+		ALTER TABLE arc ALTER COLUMN workcat_id DROP NOT NULL;
+		ALTER TABLE node ALTER COLUMN workcat_id DROP NOT NULL;
+		ALTER TABLE connec ALTER COLUMN workcat_id DROP NOT NULL;
+		ALTER TABLE element ALTER COLUMN workcat_id DROP NOT NULL;
+		ALTER TABLE samplepoint ALTER COLUMN workcat_id DROP NOT NULL;
+
+		IF v_projecttype = 'UD' THEN 
+			LTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
+			LTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
+		END IF;
+		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
 		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:') ON CONFLICT (parameter) DO NOTHING;
