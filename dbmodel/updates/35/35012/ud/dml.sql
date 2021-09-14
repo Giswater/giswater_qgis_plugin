@@ -100,3 +100,131 @@ INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitm
 INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'feature_type', 8, true);
 INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitman_x_gully', 'form_type', 9, true);
 
+
+--2021/09/14
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
+INSERT INTO config_form_fields
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname = 've_gully' AND columnname IN ('gully_id', 'code', 'top_elev', 'ymax', 'sandbox', 'connec_matcat_id',  'units', 'groove', 'arc_id', 'sector_id',  'annotation',
+'connec_length','connec_arccat_id','pjoint_id','pjoint_type','gratecat_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET widgettype='combo' WHERE formname = 'v_edit_inp_gully' AND columnname IN ('gratecat_id');
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+false, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname = 've_gully' AND columnname in ('expl_id','gully_type')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+false, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname = 've_gully' AND columnname ='state';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname = 've_gully' AND columnname ='state_type';
+
+UPDATE config_form_fields SET isparent=true WHERE formname = 'v_edit_inp_gully' AND columnname in ('state','gully_type');
+
+UPDATE config_form_fields SET iseditable=FALSE
+WHERE formname = 'v_edit_inp_gully' AND columnname IN ('gully_id', 'code', 'arc_id','state','sector_id','expl_id', 'connec_length',
+'pjoint_id','pjoint_type');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder,ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'efficiency', null, null, 'double', 'text', 'connec_y1', NULL, NULL,  FALSE,
+FALSE, FALSE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder,ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'efficiency', null, null, 'double', 'text', 'connec_y2', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'isepa', null, null, 'boolean', 'check', 'isepa', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'custom_length', null, null, 'double', 'text', 'custom_length', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'custom_n', null, null, 'double', 'text', 'custom_n', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'efficiency', null, null, 'double', 'text', 'efficiency', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'y0', null, null, 'double', 'text', 'y0', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'ysur', null, null, 'double', 'text', 'ysur', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'q0', null, null, 'double', 'text', 'q0', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'qmax', null, null, 'double', 'text', 'qmax', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'flap', null, null, 'string', 'text', 'flap', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
