@@ -53,8 +53,9 @@ BEGIN
         UPDATE gully
         SET top_elev=NEW.top_elev, ymax=NEW.ymax, sandbox=NEW.sandbox, connec_matcat_id=NEW.connec_matcat_id,
         gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, state_type=NEW.state_type,
-        annotation=NEW.annotation,connec_length=NEW.connec_length, connec_arccat_id=NEW.connec_arccat_id, connec_y2=NEW.connec_y2
-        WHERE gully_id=NEW.gully_id, the_geom=NEW.the_geom;
+        annotation=NEW.annotation,connec_length=NEW.connec_length, connec_arccat_id=NEW.connec_arccat_id, connec_y2=NEW.connec_y2,
+        the_geom=NEW.the_geom
+        WHERE gully_id=NEW.gully_id;
         RETURN NEW;
 
         RETURN NEW;
