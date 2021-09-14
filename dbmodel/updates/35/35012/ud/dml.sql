@@ -114,7 +114,7 @@ isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_is
 widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT DISTINCT ON (formname) formname, 'form_feature', 'data', 'connec_matcat_id', 'lyt_data_1', 11, 'string', 'typeahead', 'connec_matcat_id', 
 'Material of a conection arc', NULL, FALSE, FALSE, TRUE, FALSE, NULL, 'SELECT id, id AS idval FROM cat_mat_arc WHERE active IS TRUE', TRUE, TRUE, 
-NULL, NULL, NULL, NULL, NULL, NULL, TRUE FROM config_form_fields WHERE formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%'
+NULL, NULL, NULL, NULL, NULL, NULL, FALSE FROM config_form_fields WHERE formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%'
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
@@ -166,14 +166,14 @@ WHERE formname = 'v_edit_inp_gully' AND columnname IN ('gully_id', 'code', 'arc_
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder,ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
-VALUES ('v_edit_inp_gully','form_feature', 'main', 'efficiency', null, null, 'double', 'text', 'connec_y1', NULL, NULL,  FALSE,
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'connec_y1', null, null, 'double', 'text', 'connec_y1', NULL, NULL,  FALSE,
 FALSE, FALSE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
 NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder,ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
-VALUES ('v_edit_inp_gully','form_feature', 'main', 'efficiency', null, null, 'double', 'text', 'connec_y2', NULL, NULL,  FALSE,
+VALUES ('v_edit_inp_gully','form_feature', 'main', 'connec_y2', null, null, 'double', 'text', 'connec_y2', NULL, NULL,  FALSE,
 FALSE, TRUE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
 NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
