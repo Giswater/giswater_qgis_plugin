@@ -117,3 +117,7 @@ UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_node';
 UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_arc';
 UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_connec';
 UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_gully';
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('config_user_x_sector', 'Table to manage sector_id when variable user_x_exploitation is enabled', 'role_admin', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;

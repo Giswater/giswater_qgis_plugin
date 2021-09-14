@@ -151,6 +151,14 @@ BEGIN
 			ELSE
 				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
+			
+		ELSIF v_selector = 'selector_sector' AND v_expl_x_user THEN
+			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+				v_filterfrominput = ' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user)';
+			ELSE
+				v_filterfrominput = concat (' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			END IF;
+
 		ELSE 
 			-- built filter from input (recalled from typeahead)
 			IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN

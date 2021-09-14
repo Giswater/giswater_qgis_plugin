@@ -28,3 +28,21 @@ DROP TRIGGER IF EXISTS gw_trg_vnode_update ON vnode;
 DROP FUNCTION IF EXISTS gw_trg_vnode_update();
 
 UPDATE sys_table SET notify_action = null where id = 'vnode';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_manager", "column":"sector_id", "dataType":"integer[]", "isUtils":"False"}}$$);
+
+CREATE TABLE config_user_x_sector (
+  sector_id integer NOT NULL,
+  username character varying(50) NOT NULL,
+  manager_id integer,
+  active boolean DEFAULT true,
+  CONSTRAINT config_user_x_sector_pkey PRIMARY KEY (sector_id, username),
+  CONSTRAINT config_user_x_sector_sector_id_fkey FOREIGN KEY (sector_id)
+      REFERENCES sector (sector_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT config_user_x_sector_manager_id_fkey FOREIGN KEY (manager_id)
+      REFERENCES cat_manager (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT config_user_x_sector_username_fkey FOREIGN KEY (username)
+      REFERENCES cat_users (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT);
