@@ -7,19 +7,18 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsProject
+from qgis.core import QgsProject, Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
 from .models.plugin_toolbar import GwPluginToolbar
-from .shared.search import GwSearch
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi, GwSearchUi
+from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt
 
 
 class GwLoadProject(QObject):
@@ -132,6 +131,7 @@ class GwLoadProject(QObject):
 
         global_vars.project_loaded = True
 
+        # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
         if project_version == plugin_version:
@@ -143,8 +143,41 @@ class GwLoadProject(QObject):
             tools_log.log_warning(message)
             tools_qgis.show_warning(message)
 
+        # Manage compatibility version of Giswater
+        self._check_version_compatibility()
+
 
     # region private functions
+
+    def _check_version_compatibility(self):
+
+        # Get version compatiblity from metadata.txt
+        qgis_version = Qgis.QGIS_VERSION[:4]
+        postgresql_version = tools_db.get_pg_version()[:3]
+
+        # Qgis
+        minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
+        majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
+        recomendedQgisVersion = tools_qgis.get_plugin_metadata('recomendedQgisVersion', '3.16', global_vars.plugin_dir)
+
+        # PostgreSQL
+        minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
+        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
+        recomendedPgVersion = tools_qgis.get_plugin_metadata('recomendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
+
+
+        if qgis_version < minorQgisVersion or qgis_version > majorQgisVersion:
+            tools_qgis.show_message(f"Version of QGIS is don't compatible with Giswater, please check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility")
+        if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
+            tools_qgis.show_message(f"Version of PostgreSQL is don't compatible with Giswater, please check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility")
+
+        if qgis_version != recomendedQgisVersion:
+            tools_qgis.show_message(f"The version of QGIS does not match than recomended version, you can check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility",
+                                    message_level=0)
+        if int(postgresql_version) != int(recomendedPgVersion):
+            tools_qgis.show_message(f"The version of PostgreSQL does not match than recomended version, you can check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility",
+                                    message_level=0)
+
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """

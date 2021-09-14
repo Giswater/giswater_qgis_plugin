@@ -27,3 +27,12 @@ category=Plugins
 icon=icons/dialogs/20x20/giswater.png
 experimental=False
 deprecated=False
+
+# Compatibility versions
+minorQgisVersion=3.16
+majorQgisVersion=3.99
+recomendedQgisVersion=3.17
+
+minorPgVersion=9.05
+majorPgVersion=11.99
+recomendedPgVersion=9.05
