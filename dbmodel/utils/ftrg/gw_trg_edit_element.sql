@@ -156,8 +156,8 @@ BEGIN
 
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
-		-- double geometry
-		IF v_insert_double_geom AND v_doublegeometry AND NEW.elementcat_id IS NOT NULL THEN
+		-- double geometry only if NEW.the_geom exists
+		IF v_insert_double_geom AND v_doublegeometry AND NEW.elementcat_id IS NOT NULL AND NEW.the_geom IS NOT NULL THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
