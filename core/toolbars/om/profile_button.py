@@ -312,6 +312,10 @@ class GwProfileButton(GwAction):
         self.endNode = None if not hasattr(self, "endNode") else self.endNode
         self.first_node = True if not hasattr(self, "first_node") else self.first_node
 
+        if self.first_node is False:
+            message = f"First node already selected with id: {self.initNode}. Select second one."
+            tools_qgis.show_info(message)
+
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
