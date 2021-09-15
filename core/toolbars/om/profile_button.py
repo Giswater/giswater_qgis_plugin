@@ -107,6 +107,7 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self._clear_profile)
         self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self._remove_selection, actionpan=True))
+        self.dlg_draw_profile.dlg_closed.connect(partial(self._reset_profile_variables))
 
         # Set shortcut keys
         self.dlg_draw_profile.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_draw_profile))
@@ -129,6 +130,12 @@ class GwProfileButton(GwAction):
 
 
     # region private functions
+
+    def _reset_profile_variables(self):
+
+        self.initNode = None
+        self.endNode = None
+        self.first_node = True
 
 
     def _get_profile(self):
@@ -465,9 +472,7 @@ class GwProfileButton(GwAction):
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
 
-        self.initNode = None
-        self.endNode = None
-        self.first_node = True
+        self._reset_profile_variables()
 
 
     def _set_profile_layout(self):
@@ -1313,6 +1318,7 @@ class GwProfileButton(GwAction):
 
         # Clear selection
         self._remove_selection()
+        self._reset_profile_variables()
 
 
     def _delete_profile(self):
