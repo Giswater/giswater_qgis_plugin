@@ -67,7 +67,7 @@ BEGIN
 	INSERT INTO selector_expl VALUES (v_exploitation, current_user);
 	
 	--Execute the process only if admin_raster_dem is true
-	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' THEN
+	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem')::boolean = TRUE THEN	
 		
 		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
 		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
