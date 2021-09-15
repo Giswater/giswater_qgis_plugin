@@ -225,7 +225,9 @@ class GwEpaFileManager(GwTask):
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
-            if bool(re.match('\[(.*?)\]', row['text'])) and 'GULLY' in row['text']:
+            if bool(re.match('\[(.*?)\]', row['text'])) and \
+                    ('GULLY' in row['text'] or 'LINK' in row['text'] or
+                     'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
                 read = False
             elif bool(re.match('\[(.*?)\]', row['text'])):
                 read = True
@@ -235,21 +237,32 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        # Generate gully file
-        # Replace extension .inp to .gul
-        file_gully = open(folder_path.replace('.inp', '.gul'), "w")
-        read = True
-        for row in all_rows:
-            # Use regexp to check which targets to read (only TITLE and GULLY)
-            if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or 'GULLY' in row['text']):
-                read = True
-            elif bool(re.match('\[(.*?)\]', row['text'])):
-                read = False
-            if 'text' in row and row['text'] is not None and read:
-                line = row['text'].rstrip() + "\n"
-                file_gully.write(line)
+        # Generate aditional files
+        feature_list = {"GULLY":{"extension":".gul"},
+                        "LINK":{"extension":".link"},
+                        "GRATE":{"extension":".grate"},
+                        "LXSECTIONS":{"extension":".lxsections"}}
 
-        self._close_file(file_gully)
+        for feature in feature_list:
+            # Replace extension .inp
+            aditional_file = open(folder_path.replace('.inp', f'{feature_list[feature]["extension"]}'), "w")
+            read = True
+            save_file = False
+            for row in all_rows:
+                # Use regexp to check which targets to read (only TITLE and aditional target)
+                if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or feature in row['text']):
+                    read = True
+                elif bool(re.match('\[(.*?)\]', row['text'])):
+                    read = False
+                if 'text' in row and row['text'] is not None and read:
+                    line = row['text'].rstrip() + "\n"
+                    aditional_file.write(line)
+                if bool(re.match('\[(.*?)\]', row['text'])) and (feature in row['text']):
+                    save_file = True
+
+            self._close_file(aditional_file)
+            if save_file is False:
+                os.remove(aditional_file.name)
 
 
     def _execute_epa(self):
