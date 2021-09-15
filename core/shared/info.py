@@ -607,6 +607,81 @@ class GwInfo(QObject):
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
+        # TODO: tot a la crida de getinfofromcoordinates, per tant tot aixo fora
+        feature = f'"tableName":"cf_{complet_result["body"]["feature"]["featureType"]}", "idName":""'
+        body = tools_gw.create_body(feature=feature)
+        list_tabs = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
+
+        widget_offset = 0
+        prev_layout = ""
+        for field in list_tabs['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']:
+                continue
+            label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
+            if widget is None:
+                continue
+            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                if layout.objectName() != prev_layout:
+                    widget_offset = 0
+                    prev_layout = layout.objectName()
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
+                    layout_list.append(layout)
+                # print(f"{field}")
+                # Manage widget and label positions
+                label_pos = field['widgetcontrols']['labelPosition'] if ('widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
+                widget_pos = field['layoutorder'] + widget_offset
+
+                # If the widget has a label
+                if label:
+                    # If it has a labelPosition configured
+                    if label_pos is not None:
+                        if label_pos == 'top':
+                            layout.addWidget(label, 0, widget_pos)
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 1, widget_pos)
+                            else:
+                                layout.addWidget(widget, 1, widget_pos)
+                                print(f"placed widget {widget.objectName()} at {widget_pos} "
+                                      f"(label at top)")
+                        elif label_pos == 'left':
+                            layout.addWidget(label, 0, widget_pos)
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 0, widget_pos + 1)
+                            else:
+                                layout.addWidget(widget, 0, widget_pos + 1)
+                                print(
+                                    f"placed widget {widget.objectName()} at {widget_pos + 1} "
+                                    f"(label at left [{widget_pos}])")
+                            widget_offset += 1
+                        else:
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 0, widget_pos)
+                            else:
+                                layout.addWidget(widget, 0, widget_pos)
+                                print(f"placed widget {widget.objectName()} at {widget_pos} (no label)")
+                    # If widget has label but labelPosition is not configured (put it on the left by default)
+                    else:
+                        layout.addWidget(label, 0, widget_pos)
+                        if type(widget) is QSpacerItem:
+                            layout.addItem(widget, 0, widget_pos + 1)
+                        else:
+                            layout.addWidget(widget, 0, widget_pos + 1)
+                            print(f"placed widget {widget.objectName()} at {widget_pos + 1} "
+                                  f"(label at left [{widget_pos}]) - default case")
+                # If the widget has no label
+                else:
+                    if type(widget) is QSpacerItem:
+                        layout.addItem(widget, 0, widget_pos)
+                    else:
+                        layout.addWidget(widget, 0, widget_pos)
+                        print(f"placed widget {widget.objectName()} at {widget_pos} (no label)")
+
+                # Layouts where the label goes next to the widget
+                # else:
+                #     tools_gw.add_widget(self.dlg_cf, field, label, widget)
+
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
