@@ -607,7 +607,7 @@ class GwInfo(QObject):
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
-        # TODO: tot a la crida de getinfofromcoordinates, per tant tot aixo fora
+        # TODO: this code is temporary, the widgets for the other tabs will be in 'complet_result' too.
         feature = f'"tableName":"cf_{complet_result["body"]["feature"]["featureType"]}", "idName":""'
         body = tools_gw.create_body(feature=feature)
         list_tabs = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
@@ -628,13 +628,16 @@ class GwInfo(QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
-                # print(f"{field}")
+
                 # Manage widget and label positions
                 label_pos = field['widgetcontrols']['labelPosition'] if ('widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
                 widget_pos = field['layoutorder'] + widget_offset
 
+                # The data tab is somewhat special (it has 2 columns)
+                if 'lyt_data' in layout.objectName():
+                    tools_gw.add_widget(self.dlg_cf, field, label, widget)
                 # If the widget has a label
-                if label:
+                elif label:
                     # If it has a labelPosition configured
                     if label_pos is not None:
                         if label_pos == 'top':
@@ -677,10 +680,6 @@ class GwInfo(QObject):
                     else:
                         layout.addWidget(widget, 0, widget_pos)
                         print(f"placed widget {widget.objectName()} at {widget_pos} (no label)")
-
-                # Layouts where the label goes next to the widget
-                # else:
-                #     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
