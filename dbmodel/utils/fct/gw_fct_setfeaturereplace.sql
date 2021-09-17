@@ -363,7 +363,7 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
-
+			
 		ELSIF v_feature_type='arc' THEN
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
@@ -405,6 +405,8 @@ BEGIN
 	END IF;
 
 	-- upgrading and downgrading features
+	
+	
 	v_state_type = (SELECT id FROM value_state_type WHERE state=0 LIMIT 1);
 		
 	IF v_workcat_id_end IS NOT NULL THEN 
@@ -460,7 +462,7 @@ BEGIN
 	ELSIF v_feature_type='connec' THEN
 		UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') WHERE parameter='edit_connec_proximity';
 	ELSIF v_feature_type='node' THEN
-		-- todo
+		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
 	ELSIF v_feature_type='gully' THEN
 		-- todo
 	END IF;
