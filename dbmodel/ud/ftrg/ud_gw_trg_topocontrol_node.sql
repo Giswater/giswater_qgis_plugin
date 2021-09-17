@@ -109,7 +109,7 @@ BEGIN
 			IF (NEW.state=2 AND v_node.node_id IS NOT NULL) THEN
 				
 				-- inserting on plan_psector_x_node the existing node as state=0
-				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node.node_id, 0);
+				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node.node_id, 0) ON CONFLICT (psector_id, node_id) DO NOTHING;
 
 				-- looking for all the arcs (1 and 2) using existing node
 				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=v_node.node_id 
