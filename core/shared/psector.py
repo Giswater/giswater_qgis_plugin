@@ -14,17 +14,19 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
+from ..utils.snap_manager import GwSnapManager
 
 
 class GwPsector:
@@ -97,6 +99,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34")
@@ -378,10 +381,15 @@ class GwPsector:
             partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
+        self.dlg_plan_psector.btn_select_arc.clicked.connect(
+            partial(self._replace_arc))
+
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(self._enable_arc_replace))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -1715,5 +1723,142 @@ class GwPsector:
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False
         return all_checked
+
+
+    def _replace_arc(self):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
+        self.emit_point.canvasClicked.connect(self._open_arc_replace_form)
+
+
+    def _open_arc_replace_form(self, point):
+
+        self.dlg_replace_arc = GwReplaceArc()
+        tools_gw.load_settings(self.dlg_replace_arc)
+
+        event_point = self.snapper_manager.get_event_point(point=point)
+        self.arc_id = None
+
+        # Manage current psector
+        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        current_psector = row[0]
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+        if str(current_psector) != str(selected_psector):
+            message = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(message)
+
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{selected_psector}' "
+                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+            tools_db.execute_sql(sql)
+
+        # Snap point
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_arc:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.arc_id = snapped_feat.attribute('arc_id')
+                self.arc_cat_id = snapped_feat.attribute('arccat_id')
+
+                # Set highlight
+                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
+                try:
+                    geometry = feature.geometry()
+                    self.rubber_band.setToGeometry(geometry, None)
+                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band.setWidth(5)
+                    self.rubber_band.show()
+                except AttributeError:
+                    pass
+
+        # Populate combo arccat
+        sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows, 1)
+
+        # Set text current arccat
+        self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)
+
+        # Disconnect Snapping
+        self.snapper_manager.recover_snapping_options()
+        tools_qgis.disconnect_snapping(True, None, self.vertex_marker)
+
+        # Triggers
+        self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
+        self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
+        self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.reset_rubberband, self.rubber_band))
+
+        # Open form
+        tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
+
+    def _set_plan_replace_feature(self):
+
+        new_arc_cat = f'"{tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)}"'
+
+        feature = f'"featureType":"ARC", "ids":["{self.arc_id}"]'
+        extras = f'"catalog":{new_arc_cat}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setreplacefeatureplan', body)
+
+        # Refresh tableview psector_x_arc
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc')
+
+        message = json_result['message']['text']
+        if message is not None:
+            tools_qt.show_info_box(message)
+
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], close=False)
+
+        if not text_result:
+            self.dlg_replace_arc.close()
+            tools_gw.reset_rubberband(self.rubber_band)
+        else:
+            self.dlg_replace_arc.btn_accept.setEnabled(False)
+
+
+    def _enable_arc_replace(self):
+
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+
+        if tab_idx == 0:
+            self.dlg_plan_psector.btn_select_arc.setEnabled(True)
+        else:
+            self.dlg_plan_psector.btn_select_arc.setEnabled(False)
+
+    def _mouse_move_arc(self, point):
+
+        if not self.layer_arc:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(self.layer_arc)
+
+        # Get clicked point and add marker
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
     # endregion

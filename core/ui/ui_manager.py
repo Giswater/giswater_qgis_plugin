@@ -204,6 +204,11 @@ class GwPsectorManagerUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('psector_rapport.ui', 'plan')
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('replace_arc.ui', 'plan')
+class GwReplaceArc(GwDialog, FORM_CLASS):
+    pass
+
 # endregion
 
 
