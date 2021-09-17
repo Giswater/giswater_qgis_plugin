@@ -16,6 +16,7 @@ om_aux text;
 rec_type record;
 v_plan_table text;
 v_plan_table_id text;
+v_projectype text;
 
 rec record;
 
@@ -43,6 +44,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     om_aux:= TG_ARGV[0];
+    v_projectype := (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
     v_execute_mode:= (SELECT value::json ->> 'mode' FROM config_param_system WHERE parameter='plan_psector_execute_action');
     v_plan_obsolete_state_type:= (SELECT value::json ->> 'plan_obsolete_state_type' FROM config_param_system WHERE parameter='plan_psector_execute_action');
     v_current_psector:= (SELECT value::integer FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user);
@@ -142,7 +144,7 @@ BEGIN
 				--change state/state_type of psector features acording to its current status on the psector_x_* table
 				FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
 
-					v_sql = 'SELECT '||rec_type.id||'_id as id, state FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id = '||OLD.psector_id||';';
+					v_sql = 'SELECT '||rec_type.id||'_id as id, state FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id = '||OLD.psector_id||' ORDER BY '||rec_type.id||'_id DESC;';
 
 					FOR rec IN EXECUTE v_sql LOOP
 							
@@ -188,6 +190,9 @@ BEGIN
 
 								-- disconnect related connecs from arc about to be deleted
 								EXECUTE 'UPDATE connec SET arc_id=NULL WHERE arc_id='''||rec.id||''';';
+								IF v_projectype = 'UD' THEN
+									EXECUTE 'UPDATE gully SET arc_id=NULL WHERE arc_id='''||rec.id||''';';
+								END IF;
 
 								-- delete parent arcs
 								EXECUTE 'DELETE FROM arc n USING plan_psector_x_arc p WHERE n.arc_id = p.arc_id 
