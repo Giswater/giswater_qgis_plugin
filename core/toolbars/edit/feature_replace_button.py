@@ -27,7 +27,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
-        self.project_type = None
+        self.project_type = global_vars.project_type
         self.feature_type = None
         self.geom_view = None
         self.cat_table = None
