@@ -151,32 +151,28 @@ class GwLoadProject(QObject):
 
     def _check_version_compatibility(self):
 
-        # Get version compatiblity from metadata.txt
+        # Get current QGIS and PostgreSQL versions
         qgis_version = Qgis.QGIS_VERSION[:4]
-        postgresql_version = tools_db.get_pg_version()[:3]
+        postgresql_version = tools_db.get_pg_version()
 
-        # Qgis
+        # Get version compatiblity from metadata.txt
         minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
         majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
-        recomendedQgisVersion = tools_qgis.get_plugin_metadata('recomendedQgisVersion', '3.16', global_vars.plugin_dir)
-
-        # PostgreSQL
+        recommendedQgisVersion = tools_qgis.get_plugin_metadata('recommendedQgisVersion', '3.16', global_vars.plugin_dir)
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
         majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
-        recomendedPgVersion = tools_qgis.get_plugin_metadata('recomendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
+        recommendedPgVersion = tools_qgis.get_plugin_metadata('recommendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
 
-
+        url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if qgis_version < minorQgisVersion or qgis_version > majorQgisVersion:
-            tools_qgis.show_message(f"Version of QGIS is don't compatible with Giswater, please check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility")
+            tools_qgis.show_warning(f"QGIS version is not compatible with Giswater. Please check wiki: {url_wiki}")
         if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
-            tools_qgis.show_message(f"Version of PostgreSQL is don't compatible with Giswater, please check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility")
+            tools_qgis.show_warning(f"PostgreSQL version is not compatible with Giswater. Please check wiki: {url_wiki}")
 
-        if qgis_version != recomendedQgisVersion:
-            tools_qgis.show_message(f"The version of QGIS does not match than recomended version, you can check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility",
-                                    message_level=0)
-        if int(postgresql_version) != int(recomendedPgVersion):
-            tools_qgis.show_message(f"The version of PostgreSQL does not match than recomended version, you can check wiki: https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility",
-                                    message_level=0)
+        if qgis_version != recommendedQgisVersion:
+            tools_qgis.show_info(f"QGIS version does not match recommended version, you can check wiki: {url_wiki}")
+        if int(postgresql_version) != int(recommendedPgVersion):
+            tools_qgis.show_info(f"PostgreSQL version does not match recommended version, you can check wiki: {url_wiki}")
 
 
     def _get_project_variables(self):
