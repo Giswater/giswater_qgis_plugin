@@ -42,6 +42,10 @@ from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
+# These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
+# noinspection PyUnresolvedReferences
+from ..shared import info
+
 
 def load_settings(dialog):
     """ Load user UI settings related with dialog position and size """
@@ -997,7 +1001,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
                 kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
-                widget = add_button(module, **kwargs)
+                widget = add_button(**kwargs)
                 widget = set_widget_size(widget, field)
 
             if widget is None:
@@ -1113,7 +1117,7 @@ def add_button(**kwargs):
     """
 
     field = kwargs['field']
-    module = tools_backend_calls  # HARDCODED?? Potser si ja que ara totes les funcions que es criden des de botons estan a tools_backend_calls
+    module = tools_backend_calls
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
@@ -1137,6 +1141,8 @@ def add_button(**kwargs):
         add_icon(widget, f'{icon}', size)
 
     if 'widgetfunction' in field:
+        if 'module' in field['widgetfunction']:
+            module = globals()[field['widgetfunction']['module']]
         if 'functionName' in field['widgetfunction']:
             if field['widgetfunction']['functionName']:
                 function_name = field['widgetfunction']['functionName']
@@ -1152,7 +1158,7 @@ def add_button(**kwargs):
     func_params = ""
     if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
         function_name = field['widgetfunction']['functionName']
-        exist = tools_os.check_python_function(tools_backend_calls, function_name)
+        exist = tools_os.check_python_function(module, function_name)
         if not exist:
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
             tools_qgis.show_message(msg, 2)
@@ -1458,6 +1464,8 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
         function_name = field['widgetfunction']['functionName']
+        if 'module' in field['widgetfunction']:
+            module = globals()[field['widgetfunction']['module']]
         exist = tools_os.check_python_function(module, function_name)
         if not exist:
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"

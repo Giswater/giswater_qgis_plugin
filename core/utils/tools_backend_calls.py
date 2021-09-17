@@ -346,38 +346,6 @@ def open_rpt_result(**kwargs):
         return
 
 
-def open_selected_feature(**kwargs):
-    """
-    Open selected feature from @qtable
-        function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
-        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-    """
-    qtable = kwargs['qtable']
-    complet_list = kwargs['complet_result']
-    func_params = kwargs['func_params']
-
-    # Get selected rows
-    selected_list = qtable.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
-        return
-
-    index = selected_list[0]
-    row = index.row()
-    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    feature_id = index.sibling(row, column_index).data()
-    table_name = complet_list['body']['feature']['tableName']
-    if 'tablefind' in func_params:
-        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['tablefind'])
-        table_name = index.sibling(row, column_index).data()
-    info_feature = GwInfo('tab_data')
-    complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
-    if not complet_result:
-        tools_log.log_info("FAIL open_selected_feature")
-        return
-
-
 def set_layer_index(**kwargs):
     """ Force reload dataProvider of layer """
     """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
@@ -407,6 +375,7 @@ def get_info_node(**kwargs):
     if not complet_result:
         tools_log.log_info("FAIL open_node")
         return
+
 
 def refresh_attribute_table(**kwargs):
     """ Set layer fields configured according to client configuration.
