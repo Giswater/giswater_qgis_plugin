@@ -39,3 +39,9 @@ AS SELECT plan_psector.psector_id,
    FROM selector_expl,
     plan_psector
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+--2021/09/07
+CREATE OR REPLACE VIEW v_ui_workspace AS
+SELECT id, name, descript, config
+FROM cat_workspace
+WHERE isautomatic IS FALSE;
