@@ -46,3 +46,12 @@ CREATE TABLE config_user_x_sector (
   CONSTRAINT config_user_x_sector_username_fkey FOREIGN KEY (username)
       REFERENCES cat_users (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT);
+
+--2021/09/17
+CREATE TABLE cat_workspace (
+id serial PRIMARY KEY,
+name character varying(50),
+descript text,
+config json,
+isautomatic boolean DEFAULT FALSE);
+ALTER TABLE cat_workspace ADD CONSTRAINT cat_workspace_unique_name UNIQUE(name);
