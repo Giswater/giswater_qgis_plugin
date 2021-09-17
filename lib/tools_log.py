@@ -20,13 +20,14 @@ from . import tools_qt, tools_os
 class GwLogger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
-                 remove_previous=False, log_limit_characters=None):
+                 remove_previous=False):
 
         # Create logger
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(int(log_level))
         self.min_log_level = int(log_level)
-        self.log_limit_characters = log_limit_characters
+        self.log_limit_characters = None
+        self.db_limit_characters = None
         self.tab_python = f"{global_vars.plugin_name.capitalize()} PY"
         self.tab_db = f"{global_vars.plugin_name.capitalize()} DB"
 
@@ -62,13 +63,15 @@ class GwLogger(object):
         self.add_file_handler()
 
 
-    def set_logger_parameters(self, min_log_level, log_limit_characters):
-        """ Set logger parameters min_log_level and log_limit_characters """
+    def set_logger_parameters(self, min_log_level, log_limit_characters, db_limit_characters):
+        """ Set logger parameters min_log_level, log_limit_characters, db_limit_characters """
 
         if isinstance(min_log_level, int):
             self.min_log_level = min_log_level
         if isinstance(log_limit_characters, int):
             self.log_limit_characters = log_limit_characters
+        if isinstance(db_limit_characters, int):
+            self.db_limit_characters = db_limit_characters
 
 
     def add_file_handler(self):
@@ -152,13 +155,12 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name, min_log_level=20, log_limit_characters=None):
+def set_logger(logger_name, min_log_level=20):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:
         log_suffix = '%Y%m%d'
-        global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix),
-            log_limit_characters=log_limit_characters)
+        global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.logger.min_message_level = values.get(int(min_log_level), 0)
 
@@ -201,8 +203,10 @@ def log_db(text=None, color="black", bold='', message_level=0, logger_file=True,
     if type(text) is dict:
         text = json.dumps(text)
     msg = f'<font color="{color}"><{bold}>{text}</font>'
-
-    msg = (msg[:200] + '...') if len(msg) > 200 and bold == '' else msg
+    limit = 200
+    if global_vars.logger and global_vars.logger.db_limit_characters:
+        limit = global_vars.logger.db_limit_characters
+    msg = (msg[:limit] + '...') if len(msg) > limit and bold == '' else msg
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if global_vars.logger and message_level >= global_vars.logger.min_message_level:
