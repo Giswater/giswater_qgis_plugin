@@ -529,4 +529,72 @@ UNION
    FROM selector_inp_result,
     rpt_inp_arc
      JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
-     JOIN inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
+     JOIN inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text;
+
+
+     
+CREATE OR REPLACE VIEW v_edit_inp_subcatchment AS 
+ SELECT inp_subcatchment.subc_id,
+    inp_subcatchment.outlet_id,
+    inp_subcatchment.rg_id,
+    inp_subcatchment.area,
+    inp_subcatchment.imperv,
+    inp_subcatchment.width,
+    inp_subcatchment.slope,
+    inp_subcatchment.clength,
+    inp_subcatchment.snow_id,
+    inp_subcatchment.nimp,
+    inp_subcatchment.nperv,
+    inp_subcatchment.simp,
+    inp_subcatchment.sperv,
+    inp_subcatchment.zero,
+    inp_subcatchment.routeto,
+    inp_subcatchment.rted,
+    inp_subcatchment.maxrate,
+    inp_subcatchment.minrate,
+    inp_subcatchment.decay,
+    inp_subcatchment.drytime,
+    inp_subcatchment.maxinfil,
+    inp_subcatchment.suction,
+    inp_subcatchment.conduct,
+    inp_subcatchment.initdef,
+    inp_subcatchment.curveno,
+    inp_subcatchment.conduct_2,
+    inp_subcatchment.drytime_2,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.hydrology_id,
+    inp_subcatchment.the_geom,
+    inp_subcatchment.descript
+   FROM selector_sector, inp_subcatchment, config_param_user
+  WHERE inp_subcatchment.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+  AND inp_subcatchment.hydrology_id = value::integer AND config_param_user.cur_user = "current_user"()::text
+  AND config_param_user.parameter = 'inp_options_hydrology_scenario';
+
+
+
+CREATE OR REPLACE VIEW vi_options AS 
+ SELECT a.parameter,
+    a.value
+   FROM ( SELECT a_1.idval AS parameter,
+            b.value,
+                CASE
+                    WHEN a_1.layoutname ~~ '%general_1%'::text THEN '1'::text
+                    WHEN a_1.layoutname ~~ '%hydraulics_1%'::text THEN '2'::text
+                    WHEN a_1.layoutname ~~ '%hydraulics_2%'::text THEN '3'::text
+                    WHEN a_1.layoutname ~~ '%date_1%'::text THEN '3'::text
+                    WHEN a_1.layoutname ~~ '%date_2%'::text THEN '4'::text
+                    WHEN a_1.layoutname ~~ '%general_2%'::text THEN '5'::text
+                    ELSE NULL::text
+                END AS layoutname,
+            a_1.layoutorder
+           FROM sys_param_user a_1
+             JOIN config_param_user b ON a_1.id = b.parameter::text
+          WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text, 'lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND (a_1.epaversion::json ->> 'from'::text) = '5.0.022'::text AND b.value IS NOT NULL AND a_1.idval IS NOT NULL
+        UNION
+         SELECT 'INFILTRATION'::text AS parameter,
+            cat_hydrology.infiltration AS value,
+            '1'::text AS text,
+            2
+           FROM config_param_user, cat_hydrology
+          WHERE config_param_user.parameter = 'inp_options_hydrology_scenario' AND cur_user = "current_user"()::text) a
+  ORDER BY a.layoutname, a.layoutorder;

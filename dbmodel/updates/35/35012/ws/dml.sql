@@ -76,6 +76,7 @@ DELETE FROM sys_param_user WHERE project_type='ud';
 
 
 --2021/09/02
+UPDATE sys_table SET id = 'selector_inp_dscenario' WHERE id = 'selector_inp_demand';
 
 UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", 
 "trg_fields":"dscenario_id","featureType":["v_edit_inp_demand","v_edit_inp_dscenario_pipe","v_edit_inp_dscenario_pump","v_edit_inp_dscenario_reservoir","v_edit_inp_dscenario_shortpipe",

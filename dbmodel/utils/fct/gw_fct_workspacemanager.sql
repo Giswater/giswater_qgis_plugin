@@ -57,12 +57,9 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type
- 	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'inp_storage') IS NOT NULL THEN
-		v_project_type = 'UD';
- 	ELSE
-		v_project_type = 'WS';
- 	END IF;
+	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
+	-- get parameters
 	v_action = json_extract_path_text(p_data,'data','action');
 	v_ws_id = json_extract_path_text(p_data,'data','id');
 	v_ws_name = json_extract_path_text(p_data,'data','name');
