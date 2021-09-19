@@ -132,16 +132,7 @@ CREATE TABLE inp_dscenario_raingage (
   fname character varying(254),
   sta character varying(12),
   units character varying(3),
-  CONSTRAINT inp_dscenario_raingage_pkey PRIMARY KEY (dscenario_id, rg_id),
-  CONSTRAINT inp_dscenario_raingage_expl_id_fkey FOREIGN KEY (expl_id)
-      REFERENCES exploitation (expl_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE INDEX inp_dscenario_raingage_index
-  ON inp_dscenario_raingage
-  USING gist
-  (the_geom);
+  CONSTRAINT inp_dscenario_raingage_pkey PRIMARY KEY (dscenario_id, rg_id));
 
 
 CREATE TABLE inp_dscenario_conduit(
@@ -178,6 +169,8 @@ CREATE TABLE inp_dscenario_junction(
       REFERENCES node (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE);
 
+INSERT INTO config_param_user SELECT 'inp_options_hydrology_scenario', hydrology_id, cur_user  FROM selector_inp_hydrology
+ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 ALTER TABLE selector_inp_hydrology RENAME TO _selector_inp_hydrology_;
 

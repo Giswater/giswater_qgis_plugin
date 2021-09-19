@@ -597,8 +597,6 @@ INSERT INTO inp_pattern VALUES ('pattern_02');
 
 INSERT INTO inp_project_id VALUES ('title', NULL, 'Dec-2017');
 
-INSERT INTO selector_inp_hydrology VALUES ('1', current_user);
-
 INSERT INTO inp_storage  VALUES ('18828', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 INSERT INTO inp_storage  VALUES ('238', 'TABULAR', 'EBAR-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 

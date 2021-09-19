@@ -28,11 +28,3 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('inp_dscenario_raingage');
 CREATE TRIGGER gw_trg_typevalue_fk
 AFTER INSERT OR UPDATE ON inp_dscenario_raingage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_raingage');
-
-CREATE TRIGGER gw_trg_typevalue_fk
-AFTER INSERT OR UPDATE  ON inp_dscenario_outfall
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_outfall');
-  
-CREATE TRIGGER gw_trg_typevalue_fk
-AFTER INSERT OR UPDATE ON inp_dscenario_storage
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_storage');
