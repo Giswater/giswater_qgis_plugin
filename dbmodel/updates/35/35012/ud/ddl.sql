@@ -152,8 +152,8 @@ CREATE TABLE inp_dscenario_conduit(
   seepage numeric(12,4),
   CONSTRAINT inp_dscenario_conduit_pkey PRIMARY KEY (dscenario_id, arc_id),
   CONSTRAINT inp_dscenario_conduit_arc_id_fkey FOREIGN KEY (arc_id)  REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_conduit_custom_arccat_id_fkey FOREIGN KEY (custom_arccat_id)  REFERENCES cat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_conduit_custom_matcat_id_fkey FOREIGN KEY (custom_matcat_id)  REFERENCES cat_mat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT inp_dscenario_conduit_arccat_id_fkey FOREIGN KEY (arccat_id)  REFERENCES cat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_dscenario_conduit_matcat_id_fkey FOREIGN KEY (matcat_id)  REFERENCES cat_mat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 

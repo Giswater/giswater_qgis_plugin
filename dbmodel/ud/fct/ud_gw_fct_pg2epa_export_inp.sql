@@ -28,6 +28,7 @@ v_result varchar;
 v_fid integer = 141;
 v_return json;
 v_client_epsg integer;
+v_exportmode integer;
 
 
 BEGIN
@@ -38,9 +39,14 @@ BEGIN
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_client_epsg = (p_data->>'client')::json->>'epsg'; 
+
+	-- get user parameters
+	v_exportmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user);
+	IF v_exportmode IS NULL THEN v_exportmode = 1; END IF;
 	
 	--Delete previous
 	TRUNCATE temp_csv;
+	
       
 	-- build header of inp file
 	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header','[TITLE]',v_fid);
@@ -66,49 +72,55 @@ BEGIN
 	FOR rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid order by orderby
 	LOOP
 		-- insert header
-		INSERT INTO temp_csv (csv1,fid) VALUES (NULL,v_fid);
-		EXECUTE 'INSERT INTO temp_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
-	
-		INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20,csv21,csv22,csv23,csv24,csv25,csv26, csv27, csv28, csv29, csv30)
-		SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
-		,rpad(c13,20),rpad(c14,20),rpad(c15,20),rpad(c16,20),rpad(c17,20),rpad(c18,20),rpad(c19,20),rpad(c20,20),rpad(c21,20),rpad(c22,20),rpad(c23,20),rpad(c24,20),rpad(c25,20),rpad(c26,20)
-		,rpad(c27,20),rpad(c28,20),rpad(c29,20),rpad(c30,20)
-		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
-		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text, c14 text, c15 text, 
-		c16 text, c17 text, c18 text, c19 text, c20 text, c21 text, c22 text, c23 text, c24 text, c25 text, c26 text, c27 text, c28 text, c29 text, c30 text);
-	
-		INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
-	
-		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
-	
-		--add underlines    
-		FOR num_col_rec IN 1..num_column
-		LOOP
-			IF num_col_rec=1 then
-				EXECUTE 'UPDATE temp_csv set csv1=rpad('';;----------'',20) WHERE id='||id_last||';';
-			ELSE
-				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''----------'',20) WHERE id='||id_last||';';
-			END IF;
-		END LOOP;
-	
-		-- insert values		
-		CASE WHEN rec_table.tablename = 'vi_coordinates' THEN
-			-- on the fly transformation of epsg
-			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_coordinates', 
-			node_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_coordinates;
+		IF rec_table.tablename IN ('vi_gully','vi_grate','vi_link','vi_lxsections') AND v_exportmode = 1 THEN
+			-- nothing because this targets does not to be exported
 
-		WHEN rec_table.tablename = 'vi_vertices' THEN
-			-- on the fly transformation of epsg
-			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_vertices', 
-			arc_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_vertices;
+		ELSE
+		
+			INSERT INTO temp_csv (csv1,fid) VALUES (NULL,v_fid);
+			EXECUTE 'INSERT INTO temp_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
+		
+			INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20,csv21,csv22,csv23,csv24,csv25,csv26, csv27, csv28, csv29, csv30)
+			SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
+			,rpad(c13,20),rpad(c14,20),rpad(c15,20),rpad(c16,20),rpad(c17,20),rpad(c18,20),rpad(c19,20),rpad(c20,20),rpad(c21,20),rpad(c22,20),rpad(c23,20),rpad(c24,20),rpad(c25,20),rpad(c26,20)
+			,rpad(c27,20),rpad(c28,20),rpad(c29,20),rpad(c30,20)
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
+			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text, c14 text, c15 text, 
+			c16 text, c17 text, c18 text, c19 text, c20 text, c21 text, c22 text, c23 text, c24 text, c25 text, c26 text, c27 text, c28 text, c29 text, c30 text);
+		
+			INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
+		
+			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+		
+			--add underlines    
+			FOR num_col_rec IN 1..num_column
+			LOOP
+				IF num_col_rec=1 then
+					EXECUTE 'UPDATE temp_csv set csv1=rpad('';;----------'',20) WHERE id='||id_last||';';
+				ELSE
+					EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''----------'',20) WHERE id='||id_last||';';
+				END IF;
+			END LOOP;
+		
+			-- insert values		
+			CASE WHEN rec_table.tablename = 'vi_coordinates' THEN
+				-- on the fly transformation of epsg
+				INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_coordinates', 
+				node_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_coordinates;
 
-		WHEN rec_table.tablename = 'vi_symbols' THEN
-			-- on the fly transformation of epsg
-			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_symbols', 
-			rg_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_symbols;
-		ELSE 
-			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
-		END CASE;		
+			WHEN rec_table.tablename = 'vi_vertices' THEN
+				-- on the fly transformation of epsg
+				INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_vertices', 
+				arc_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_vertices;
+
+			WHEN rec_table.tablename = 'vi_symbols' THEN
+				-- on the fly transformation of epsg
+				INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_symbols', 
+				rg_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_symbols;
+			ELSE 
+				EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
+			END CASE;
+		END IF;	
 	END LOOP;
 
 	-- build return
