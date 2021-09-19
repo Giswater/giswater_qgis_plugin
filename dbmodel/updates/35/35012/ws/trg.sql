@@ -12,58 +12,46 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/08/24
 
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_pipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_pipe');
-
+AFTER INSERT OR UPDATE ON inp_dscenario_pipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_pipe');
 
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_shortpipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_shortpipe');
-
+AFTER INSERT OR UPDATE ON inp_dscenario_shortpipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_shortpipe');
 
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_pump
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_pump');
-
+AFTER INSERT OR UPDATE ON inp_dscenario_pump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_pump');
 
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_valve
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_valve');
+AFTER INSERT OR UPDATE ON inp_dscenario_valve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_valve');
 
 
-  --2021/09/01
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pipe 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PIPE');
+--2021/09/01
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pipe 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PIPE');
 
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pump 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pump 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
 
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_reservoir 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('RESERVOIR');
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_reservoir 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('RESERVOIR');
 
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_shortpipe 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('SHORTPIPE');
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_shortpipe 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('SHORTPIPE');
 
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_tank 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TANK');
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_tank 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TANK');
 
-  CREATE TRIGGER gw_trg_edit_inp_dscenario 
-  INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_valve 
-  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
-
+CREATE TRIGGER gw_trg_edit_inp_dscenario 
+INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_valve 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
 
 CREATE TRIGGER gw_trg_edit_man_pump_pol
 INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_pump

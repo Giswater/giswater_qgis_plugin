@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
 
@@ -63,7 +63,6 @@ v_options json;
 v_error_context text;
 
 v_dumpsubc boolean;
-v_hydroscenario text;
 v_hydroscenarioval text;
 
 v_checkresult boolean;
@@ -76,6 +75,8 @@ v_default boolean;
 v_defaultval text;
 v_dwfscenarioval text;
 v_exportmodeval text;
+
+object_rec record;
 
 BEGIN
 
@@ -112,8 +113,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE id < 0;
 
 	-- get user parameters
-	v_hydroscenario = (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user);
-	v_hydroscenarioval = (SELECT name FROM selector_inp_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user);
+	v_hydroscenarioval = (SELECT value FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
 	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
 
 	-- get settings values
@@ -323,8 +323,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: Column rted on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN selector_inp_hydrology
-		ON selector_inp_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
+		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN config_param_user ON hydrology_id=value::integer WHERE cur_user=current_user AND parameter = 'inp_options_hydrology_scenario';
 		
 		IF v_infiltration='CURVE_NUMBER' THEN
 		
@@ -407,6 +406,20 @@ BEGIN
 			v_count=0;
 		END IF;
 
+	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
+	FOR object_rec IN SELECT json_array_elements_text('["junction","conduit", "raingage"]'::json) as tabname, 
+				 json_array_elements_text('["node"    ,"arc"    , "rg"]'::json) as colname
+	LOOP
+
+		EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
+		END IF;
+	END LOOP;	
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');

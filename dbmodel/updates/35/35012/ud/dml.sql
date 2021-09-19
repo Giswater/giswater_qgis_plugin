@@ -273,12 +273,9 @@ UPDATE config_form_tabs SET orderby = 6 WHERE formname = 'selector_basic' AND ta
 
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'RAINGAGE', 'RAINGAGE');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'CONDUIT', 'CONDUIT');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'STORAGE', 'STORAGE');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'WEIRS', 'WEIRS');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'PUMP', 'PUMP');
+INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'JUNCTION', 'JUNCTION');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'JOINED', 'JOINED');
 INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');
-
 
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
 VALUES ('cat_dscenario', 'Table to manage scenarios', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
@@ -297,40 +294,8 @@ VALUES ('inp_dscenario_raingage', 'Table to manage scenario for raingages', 'rol
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_weir', 'Table to manage scenario for weirs', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_outlet', 'Table to manage scenario for outlets', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_orifice', 'Table to manage scenario for orifices', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_pump', 'Table to manage scenario for pumps', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
 VALUES ('inp_dscenario_junction', 'Table to manage scenario for junctions', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_storage', 'Table to manage scenario for storages', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_outfall', 'Table to manage scenario for outfalls', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('inp_dscenario_divider', 'Table to manage scenario for dividers', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-
-
-
 
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
 VALUES ('v_edit_inp_dscenario_conduit', 'View to manage scenario for conduits', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
@@ -341,34 +306,12 @@ VALUES ('v_edit_inp_dscenario_raingage', 'View to manage scenario for raingages'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_weir', 'View to manage scenario for weirs', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_outlet', 'View to manage scenario for outlets', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_orifice', 'View to manage scenario for orifices', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_pump', 'View to manage scenario for pumps', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
 VALUES ('v_edit_inp_dscenario_junction', 'View to manage scenario for junctions', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_storage', 'View to manage scenario for storages', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+VALUES ('rpt_inp_raingage', 'Table to store results for raingages', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_outfall', 'View to manage scenario for outfalls', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
+INSERT INTO sys_function VALUES (3074, 'gw_fct_pg2epa_dscenario', 'ud', 'function', null, null, 'role_epa')
 ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
-VALUES ('v_edit_inp_dscenario_divider', 'View to manage scenario for dividers', 'role_epa', 0, null, null, null, null, null, null, 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-

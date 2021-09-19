@@ -598,3 +598,102 @@ CREATE OR REPLACE VIEW vi_options AS
            FROM config_param_user, cat_hydrology
           WHERE config_param_user.parameter = 'inp_options_hydrology_scenario' AND cur_user = "current_user"()::text) a
   ORDER BY a.layoutname, a.layoutorder;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_conduit AS 
+ SELECT
+  p.dscenario_id,
+  arc_id,
+  barrels,
+  culvert,
+  kentry,
+  kexit,
+  kavg,
+  flap,
+  q0,
+  qmax,
+  seepage,
+  custom_arccat_id,
+  custom_matcat_id,
+  custom_n
+   FROM selector_sector, selector_inp_dscenario, v_arc
+     JOIN inp_dscenario_conduit p USING (arc_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+  AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
+SELECT
+  p.dscenario_id,
+  node_id,
+  y0,
+  ysur,
+  apond,
+  outfallparam
+  FROM selector_sector, selector_inp_dscenario, v_node
+     JOIN inp_dscenario_junction p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+  AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_raingage AS 
+SELECT
+  p.dscenario_id,
+  p.rg_id,
+  p.form_type,
+  p.intvl,
+  p.scf,
+  p.rgage_type,
+  p.timser_id,
+  p.fname,
+  p.sta,
+  p.units
+  FROM selector_inp_dscenario, v_edit_raingage
+     JOIN inp_dscenario_raingage p USING (rg_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_losses AS 
+ SELECT arc_id::varchar(50),
+    kentry,
+    kexit,
+    kavg,
+    flap,
+    seepage
+   FROM selector_inp_result, rpt_inp_arc
+  WHERE kentry > 0::numeric OR kexit > 0::numeric OR kavg > 0::numeric OR flap::text = 'YES'::text 
+  AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_raingages AS 
+ SELECT rg_id,
+    form_type,
+    intvl,
+    scf,
+    idval AS raingage_type,
+    timser_id AS other1,
+    NULL::character varying AS other2,
+    NULL::character varying AS other3
+   FROM selector_inp_result s, rpt_inp_raingage r
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'TIMESERIES'::text
+  AND s.result_id = r.result_id
+UNION
+ SELECT rg_id,
+    form_type,
+    intvl,
+    scf,
+    idval AS raingage_type,
+    fname AS other1,
+    sta AS other2,
+    units AS other3
+   FROM selector_inp_result s, rpt_inp_raingage r
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+   WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text
+   AND s.result_id = r.result_id;
+
+
+  

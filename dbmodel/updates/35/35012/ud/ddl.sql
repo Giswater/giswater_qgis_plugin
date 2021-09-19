@@ -156,87 +156,14 @@ CREATE TABLE inp_dscenario_conduit(
   q0 numeric(12,4),
   qmax numeric(12,4),
   seepage numeric(12,4),
-  custom_arccat_id character varying(30) NOT NULL,
-  custom_matcat_id character varying(30) NOT NULL,
+  custom_arccat_id character varying(30),
+  custom_matcat_id character varying(30),
   custom_n numeric(12,4),
   CONSTRAINT inp_dscenario_conduit_pkey PRIMARY KEY (dscenario_id, arc_id),
   CONSTRAINT inp_dscenario_conduit_arc_id_fkey FOREIGN KEY (arc_id)  REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_conduit_custom_arccat_id_fkey FOREIGN KEY (custom_arccat_id)  REFERENCES cat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_conduit_custom_matcat_id_fkey FOREIGN KEY (custom_matcat_id)  REFERENCES cat_mat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
-
-
-CREATE TABLE inp_dscenario_orifice(
-  dscenario_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
-  ori_type character varying(18),
-  "offset" numeric(12,4),
-  cd numeric(12,4),
-  orate numeric(12,4),
-  flap character varying(3),
-  shape character varying(18),
-  geom1 numeric(12,4),
-  geom2 numeric(12,4) DEFAULT 0.00,
-  geom3 numeric(12,4) DEFAULT 0.00,
-  geom4 numeric(12,4) DEFAULT 0.00,
-  CONSTRAINT inp_dscenario_orifice_pkey PRIMARY KEY (arc_id),
-  CONSTRAINT inp_dscenario_orifice_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-	ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE inp_dscenario_outlet(
-  dscenario_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
-  outlet_type character varying(16),
-  "offset" numeric(12,4),
-  curve_id character varying(16),
-  cd1 numeric(12,4),
-  cd2 numeric(12,4),
-  flap character varying(3),
-  CONSTRAINT inp_dscenario_outlet_pkey PRIMARY KEY (arc_id),
-  CONSTRAINT inp_dscenario_outlet_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_outlet_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE inp_dscenario_pump(
-  dscenario_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
-  curve_id character varying(16),
-  status character varying(3),
-  startup numeric(12,4),
-  shutoff numeric(12,4),
-  CONSTRAINT inp_dscenario_pump_pkey PRIMARY KEY (arc_id),
-  CONSTRAINT inp_dscenario_pump_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_pump_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE inp_dscenario_weir(
-  dscenario_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
-  weir_type character varying(18),
-  "offset" numeric(12,4),
-  cd numeric(12,4),
-  ec numeric(12,4),
-  cd2 numeric(12,4),
-  flap character varying(3),
-  geom1 numeric(12,4),
-  geom2 numeric(12,4) DEFAULT 0.00,
-  geom3 numeric(12,4) DEFAULT 0.00,
-  geom4 numeric(12,4) DEFAULT 0.00,
-  surcharge character varying(3),
-  CONSTRAINT inp_dscenario_weir_pkey PRIMARY KEY (arc_id),
-  CONSTRAINT inp_dscenario_weir_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
 
 
 CREATE TABLE inp_dscenario_junction(
@@ -246,78 +173,40 @@ CREATE TABLE inp_dscenario_junction(
   ysur numeric(12,4),
   apond numeric(12,4),
   outfallparam json,
-  CONSTRAINT inp_dscenario_junction_pkey PRIMARY KEY (node_id),
+  CONSTRAINT inp_dscenario_junction_pkey PRIMARY KEY (dscenario_id, node_id),
   CONSTRAINT inp_dscenario_junction_node_id_fkey FOREIGN KEY (node_id)
       REFERENCES node (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE);
 
 
-CREATE TABLE inp_dscenario_outfall(
-  dscenario_id integer NOT NULL,
-  node_id character varying(16) NOT NULL,
-  outfall_type character varying(16),
-  stage numeric(12,4),
-  curve_id character varying(16),
-  timser_id character varying(16),
-  gate character varying(3),
-  CONSTRAINT inp_dscenario_outfall_pkey PRIMARY KEY (node_id),
-  CONSTRAINT inp_dscenario_outfall_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_outfall_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_outfall_timser_id_fkey FOREIGN KEY (timser_id)
-      REFERENCES inp_timeseries (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE inp_dscenario_storage(
-  dscenario_id integer NOT NULL,
-  node_id character varying(50) NOT NULL,
-  storage_type character varying(18),
-  curve_id character varying(16),
-  a1 numeric(12,4),
-  a2 numeric(12,4),
-  a0 numeric(12,4),
-  fevap numeric(12,4),
-  sh numeric(12,4),
-  hc numeric(12,4),
-  imd numeric(12,4),
-  y0 numeric(12,4),
-  ysur numeric(12,4),
-  apond numeric(12,4),
-  CONSTRAINT inp_dscenario_storage_pkey PRIMARY KEY (node_id),
-  CONSTRAINT inp_dscenario_storage_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_storage_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE inp_dscenario_divider(
-  dscenario_id integer NOT NULL,
-  node_id character varying(50) NOT NULL,
-  divider_type character varying(18),
-  arc_id character varying(50),
-  curve_id character varying(16),
-  qmin numeric(16,6),
-  ht numeric(12,4),
-  cd numeric(12,4),
-  y0 numeric(12,4),
-  ysur numeric(12,4),
-  apond numeric(12,4),
-  CONSTRAINT inp_dscenario_divider_pkey PRIMARY KEY (node_id),
-  CONSTRAINT inp_dscenario_divider_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_divider_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
 ALTER TABLE selector_inp_hydrology RENAME TO _selector_inp_hydrology_;
+
+CREATE TABLE rpt_inp_raingage(
+  result_id character varying(30) NOT NULL,
+  rg_id character varying(16) NOT NULL,
+  form_type character varying(12) NOT NULL,
+  intvl character varying(10),
+  scf numeric(12,4) DEFAULT 1.00,
+  rgage_type character varying(18) NOT NULL,
+  timser_id character varying(16),
+  fname character varying(254),
+  sta character varying(12),
+  units character varying(3),
+  the_geom geometry(POINT,SRID_VALUE),
+  expl_id integer NOT NULL,
+  CONSTRAINT rpt_inp_raingage_pkey PRIMARY KEY (result_id, rg_id));
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"culvert", "dataType":"character varying(10)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"kentry", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"kexit", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"kavg", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"flap", "dataType":"character varying(3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"seepage", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"culvert", "dataType":"character varying(10)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"kentry", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"kexit", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"kavg", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"flap", "dataType":"character varying(3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"seepage", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+

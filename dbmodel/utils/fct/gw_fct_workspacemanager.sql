@@ -75,12 +75,13 @@ BEGIN
 
 		SELECT jsonb_build_object('inp',i.inp_conf) INTO v_ws_config FROM
 		(SELECT json_object_agg(parameter, value) as inp_conf
-		FROM config_param_user where (parameter ilike 'inp_options%' OR parameter ilike 'inp_report%') AND 
-		parameter NOT IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault') 
+		FROM config_param_user WHERE 
+		--(parameter ilike 'inp_options%' OR parameter ilike 'inp_report%') AND 
+		parameter NOT IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault', 'om_profile_stylesheet', 'edit_node_interpolate') 
 		AND cur_user=current_user) i;
 		
 		SELECT json_object_agg(parameter, value::JSON) as inp_conf INTO v_inp_json_config
-		FROM config_param_user where parameter IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault') 
+		FROM config_param_user where parameter IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault', 'om_profile_stylesheet', 'edit_node_interpolate') 
 		AND cur_user=current_user;
 		
 		v_ws_config = gw_fct_json_object_set_key(v_ws_config,'inp_json', v_inp_json_config);
@@ -96,6 +97,21 @@ BEGIN
 		FROM selector_psector where cur_user=current_user 
 		UNION
 		select jsonb_build_object('selector_inp_dscenario', array_agg(dscenario_id)) as selector_conf 
+		FROM selector_inp_dscenario where cur_user=current_user
+		UNION
+		select jsonb_build_object('selector_date', array_agg(dscenario_id)) as selector_conf 
+		FROM selector_inp_dscenario where cur_user=current_user
+		UNION
+		select jsonb_build_object('selector_rpt_main', array_agg(dscenario_id)) as selector_conf 
+		FROM selector_inp_dscenario where cur_user=current_user
+		UNION
+		select jsonb_build_object('selector_rpt_compare', array_agg(dscenario_id)) as selector_conf 
+		FROM selector_inp_dscenario where cur_user=current_user
+		UNION
+		select jsonb_build_object('selector_rpt_main_tsep', array_agg(dscenario_id)) as selector_conf 
+		FROM selector_inp_dscenario where cur_user=current_user
+		UNION
+		select jsonb_build_object('selector_rpt_compare_tstep', array_agg(dscenario_id)) as selector_conf 
 		FROM selector_inp_dscenario where cur_user=current_user
 		UNION
 		select jsonb_build_object('selector_state', array_agg(state_id)) as selector_conf 

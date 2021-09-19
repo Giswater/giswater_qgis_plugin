@@ -98,7 +98,7 @@ BEGIN
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_node.node_id=a.node_id;
 
-	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider, inp_junction
+	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider
 
 	-- Insert on arc rpt_inp table
 	INSERT INTO temp_arc 
@@ -129,7 +129,7 @@ BEGIN
 		AND epa_type !='UNDEFINED'
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user;
 
-	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
+	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump
 
 	-- fill temp_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
@@ -152,6 +152,10 @@ BEGIN
 		left JOIN value_state_type s ON state_type = s.id
 		WHERE isepa IS TRUE AND is_operative IS TRUE; 
 	END IF;
+
+	-- fill rpt_inp_raingage
+	INSERT INTO rpt_inp_raingage
+	SELECT 1, * FROM v_edit_raingage;
 	
 	RETURN 1;	
 END;

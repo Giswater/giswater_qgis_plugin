@@ -18,68 +18,21 @@ ON v_edit_inp_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_gully();
 
 --2021/09/18
 CREATE TRIGGER gw_trg_notify
-  AFTER INSERT OR UPDATE OF dscenario_id OR DELETE
-  ON cat_dscenario
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_notify('cat_dscenario');
+AFTER INSERT OR UPDATE OF dscenario_id OR DELETE ON cat_dscenario
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('cat_dscenario');
 
 CREATE TRIGGER gw_trg_notify
-  AFTER INSERT OR UPDATE OF rg_id OR DELETE
-  ON inp_dscenario_raingage
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_notify('inp_dscenario_raingage');
-
+AFTER INSERT OR UPDATE OF rg_id OR DELETE ON inp_dscenario_raingage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('inp_dscenario_raingage');
 
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_raingage
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_raingage');
+AFTER INSERT OR UPDATE ON inp_dscenario_raingage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_raingage');
 
+CREATE TRIGGER gw_trg_typevalue_fk
+AFTER INSERT OR UPDATE  ON inp_dscenario_outfall
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_outfall');
   
 CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_orifice
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_orifice');
-
-
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_outlet
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_outlet');
-
-
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_pump
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_pump');
-
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_weir
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_weir');
-
-
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_outfall
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_outfall');
-
-  
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_storage
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_storage');
-
-  
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_divider
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_divider');
+AFTER INSERT OR UPDATE ON inp_dscenario_storage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_storage');
