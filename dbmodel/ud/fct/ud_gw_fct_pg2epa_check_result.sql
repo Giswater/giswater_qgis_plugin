@@ -417,7 +417,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
+			VALUES (v_fid, v_result_id, 1, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
 		END IF;
 	END LOOP;	
 

@@ -241,12 +241,10 @@ BEGIN
 	END IF;
 	
 	--Set hydrology_selector when null values from user
-	IF v_project_type='UD' THEN
-        IF (SELECT hydrology_id FROM cat_hydrology LIMIT 1) THEN
-            IF (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user) IS NULL THEN
-                INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) VALUES ((SELECT hydrology_id FROM cat_hydrology LIMIT 1), current_user);
-            END IF;
-        END IF;
+	IF v_project_type='UD' AND (SELECT hydrology_id FROM cat_hydrology LIMIT 1) IS NOT NULL THEN
+            INSERT INTO config_param_user 
+            SELECT 'inp_options_hydrology_scenario', hydrology_id, current_user FROM cat_hydrology LIMIT 1
+            ON CONFLICT (parameter, cur_user) DO NOTHING;
 	END IF;
 
 	--Reset the rest of sequences

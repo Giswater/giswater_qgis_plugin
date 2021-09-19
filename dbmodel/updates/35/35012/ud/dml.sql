@@ -257,7 +257,7 @@ UPDATE sys_param_user SET layoutorder = 6 WHERE id = 'inp_options_link_offsets';
 
 
 INSERT INTO config_param_system VALUES (
-'basic_selector_tab_dscenario','{"table":"cat_dscenario", "selector":"selector_inp_dscenario", "table_id":"dscenario_id",  "selector_id":"dscenario_id",  "label":"dscenario_id, '' - '', name ''('', dscenario_type,'')''", "orderBy":"dscenario_id", "manageAll":true, "query_filter":" AND dscenario_id > 0 AND active is true", "typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,''('',  dscenario_type,'')''))"}',
+'basic_selector_tab_dscenario','{"table":"cat_dscenario", "selector":"selector_inp_dscenario", "table_id":"dscenario_id",  "selector_id":"dscenario_id",  "label":"dscenario_id, '' - '', name, '' ('', dscenario_type,'')''", "orderBy":"dscenario_id", "manageAll":true, "query_filter":" AND dscenario_id > 0 AND active is true", "typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))"}',
 'Variable to configura all options related to search for the specificic tab','Selector variables','','',TRUE,null,'ws',null,null,'json')
 ON CONFLICT (parameter) DO NOTHING;
 

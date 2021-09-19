@@ -29,6 +29,7 @@ BEGIN
 	TRUNCATE temp_node;
 	TRUNCATE temp_arc;
 	TRUNCATE temp_gully;
+	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
 
 
 	-- set all timeseries of raingage using user's value
@@ -155,7 +156,7 @@ BEGIN
 
 	-- fill rpt_inp_raingage
 	INSERT INTO rpt_inp_raingage
-	SELECT 1, * FROM v_edit_raingage;
+	SELECT result_id_var, * FROM v_edit_raingage;
 	
 	RETURN 1;	
 END;

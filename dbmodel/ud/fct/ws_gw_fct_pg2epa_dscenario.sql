@@ -35,23 +35,23 @@ BEGIN
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 		
 		-- updating values for raingage
-		UPDATE rpt_inp_raingage SET form_type = d.form_type FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.form_type IS NOT NULL;
-		UPDATE rpt_inp_raingage SET intvl = d.intvl FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.intvl IS NOT NULL;
-		UPDATE rpt_inp_raingage SET scf = d.scf FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.scf IS NOT NULL;
-		UPDATE rpt_inp_raingage SET rgage_type = d.rgage_type FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.rgage_type IS NOT NULL;
-		UPDATE rpt_inp_raingage SET timser_id = d.timser_id FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
-		UPDATE rpt_inp_raingage SET fname = d.fname FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.fname IS NOT NULL;
-		UPDATE rpt_inp_raingage SET sta = d.sta FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.sta IS NOT NULL;
-		UPDATE rpt_inp_raingage SET units = d.units FROM v_edit_inp_dscenario_raingage d
-		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.units IS NOT NULL;
-
+		UPDATE rpt_inp_raingage t SET form_type = d.form_type FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.form_type IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET intvl = d.intvl FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.intvl IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET scf = d.scf FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.scf IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET rgage_type = d.rgage_type FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.rgage_type IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL AND result_id = result_id_var;	
+		UPDATE rpt_inp_raingage t SET fname = d.fname FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.fname IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET sta = d.sta FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.sta IS NOT NULL AND result_id = result_id_var;
+		UPDATE rpt_inp_raingage t SET units = d.units FROM v_edit_inp_dscenario_raingage d
+		WHERE t.rg_id = d.rg_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.units IS NOT NULL AND result_id = result_id_var;
+	
 		-- updating values for conduits
 		UPDATE temp_arc t SET barrels = d.barrels FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.barrels IS NOT NULL;
@@ -72,9 +72,26 @@ BEGIN
 		UPDATE temp_arc t SET seepage = d.seepage FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.seepage IS NOT NULL;
 
-		-- TODO: update custom_arccat_id, custom_matcat_id, custom_n
+		-- arccat
+		UPDATE temp_arc t SET arccat_id = d.arccat_id FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arccat_id IS NOT NULL;
 
-		
+		-- n
+		-- when material comes from arccat
+		UPDATE temp_arc t SET n = d.n FROM (SELECT * FROM v_edit_inp_dscenario_conduit a 
+		JOIN cat_arc c ON c.id = a.arccat_id  
+		JOIN cat_mat_arc b ON c.matcat_id = id) d
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arccat_id IS NOT NULL;
+
+		-- when material is informed by user
+		UPDATE temp_arc t SET n = d.n FROM (SELECT * FROM v_edit_inp_dscenario_conduit a JOIN cat_mat_arc b ON a.matcat_id = id WHERE a.matcat_id IS NOT NULL)d
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.matcat_id IS NOT NULL;
+
+		-- when n is informed by user
+		UPDATE temp_arc t SET n = d.custom_n FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_n IS NOT NULL;
+
+
 		-- update junctions
 		UPDATE temp_node t SET y0 = d.y0 FROM v_edit_inp_dscenario_junction d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;		
@@ -84,7 +101,6 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;	
 
 		-- TODO: update outfallparam
-		
 			
 	END IF;
 

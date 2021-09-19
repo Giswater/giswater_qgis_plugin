@@ -162,11 +162,13 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '11 - check result previous exportation';
+	RAISE NOTICE '11 - dscenario';
+	PERFORM gw_fct_pg2epa_dscenario(v_result);
+
+	RAISE NOTICE '12 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	
-	RAISE NOTICE '12 - Move from temp tables';
+	RAISE NOTICE '13 - Move from temp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
@@ -181,7 +183,7 @@ BEGIN
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
 
-	RAISE NOTICE '13 - Create the inp file structure';	
+	RAISE NOTICE '14 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 
 	-- manage return message

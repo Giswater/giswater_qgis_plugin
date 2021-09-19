@@ -445,3 +445,21 @@ UPDATE gully SET category_type = 'St. Category' where category_type is null;
 UPDATE gully SET top_elev= 46.4, ymax=0.8, sandbox=0 WHERE gully_id = '100013';
 UPDATE gully SET code = '100012', top_elev= 47.4, ymax=0.8, sandbox=0 WHERE gully_id = '100012';
 
+INSERT INTO cat_dscenario VALUES (1, 'Demo1', 'Demo1', NULL, 'OTHER');
+INSERT INTO cat_dscenario VALUES (2, 'Demo2', 'Demo2', NULL, 'OTHER');
+INSERT INTO cat_dscenario VALUES (3, 'Demo3', 'Demo3', NULL, 'OTHER');
+
+INSERT INTO inp_dscenario_conduit VALUES (1,'242',2,null,0.1, 0.1, 0.1, null, null, null, null, 'CC100', 'PEAD');
+INSERT INTO inp_dscenario_conduit VALUES (1,'217',2,null,0.1, 0.1, 0.1, null, null, null, null, 'CC100', 'Concret',0.016);
+INSERT INTO inp_dscenario_conduit VALUES (1,'175',2,null,0.1, 0.1, 0.1, null, null, null, null, 'CC060', 'Concret');
+INSERT INTO inp_dscenario_conduit VALUES (1,'216',2,null,0.1, 0.1, 0.1, null, null, null, null, 'CC040', NULL,0.020);
+
+INSERT INTO inp_dscenario_junction VALUES (1,'236',2);
+INSERT INTO inp_dscenario_junction VALUES (1,'250',2);
+INSERT INTO inp_dscenario_junction VALUES (1,'301',2);
+INSERT INTO inp_dscenario_junction VALUES (1,'50',2);
+
+INSERT INTO inp_dscenario_raingage VALUES (1,'RG-01',null,null,null,null,'T10-5m');
+INSERT INTO inp_dscenario_raingage VALUES (2,'RG-01',null,null,null,null,'T10-5m');
+INSERT INTO inp_dscenario_raingage VALUES (3,'RG-01',null,null,null,null,'T10-5m');
+

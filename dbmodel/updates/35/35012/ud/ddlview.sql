@@ -604,6 +604,9 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_conduit AS
  SELECT
   p.dscenario_id,
   arc_id,
+  p.arccat_id,
+  p.matcat_id,
+  p.custom_n,
   barrels,
   culvert,
   kentry,
@@ -612,10 +615,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_conduit AS
   flap,
   q0,
   qmax,
-  seepage,
-  custom_arccat_id,
-  custom_matcat_id,
-  custom_n
+  seepage
    FROM selector_sector, selector_inp_dscenario, v_arc
      JOIN inp_dscenario_conduit p USING (arc_id)
      JOIN cat_dscenario d USING (dscenario_id)
