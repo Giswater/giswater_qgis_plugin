@@ -40,6 +40,9 @@ v_autoupdate_fluid boolean;
 v_message text;
 v_dsbl_error boolean;
 v_disable_linktonetwork boolean;
+v_system_id text;
+v_featuretype text;
+v_pol_id text;
 
 BEGIN
 
@@ -433,34 +436,40 @@ BEGIN
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
-		 
+		
+
+		SELECT system_id, cat_feature.id INTO v_system_id, v_featuretype FROM cat_feature 
+		JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id;
+
+		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+		FROM cat_feature_connec WHERE id='||quote_literal(v_featuretype)||''
+		INTO v_insert_double_geom, v_double_geom_buffer;
+
+		IF (v_insert_double_geom IS TRUE) THEN
+				IF (v_pol_id IS NULL) THEN
+					v_pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+					
+				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
+				from connec where connec_id=NEW.connec_id), v_featuretype, NEW.connec_id);
+		END IF;
+
+
 		IF v_man_table='man_greentap' THEN
 			INSERT INTO man_greentap (connec_id, linked_connec, brand, model) 
 			VALUES(NEW.connec_id, NEW.linked_connec, NEW.brand, NEW.model); 
 		
 		ELSIF v_man_table='man_fountain' THEN 
-			IF (v_insert_double_geom IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-		
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'FOUNTAIN',
-				 (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) from connec where connec_id=NEW.connec_id));
-					
-				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
-				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
-				NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
 			
-			ELSE
-				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
-				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
-				NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
-			
-			END IF;
-		 
+			INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, 
+			chlorinator, arq_patrimony) 
+			VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
+			NEW.chlorinator, NEW.arq_patrimony);
+					 
 		ELSIF v_man_table='man_tap' THEN		
 			INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
-			VALUES (NEW.connec_id,  NEW.linked_connec, NEW.cat_valve,  NEW.drain_diam, NEW.drain_exit,  NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
+			VALUES (NEW.connec_id, NEW.linked_connec, NEW.cat_valve, NEW.drain_diam, NEW.drain_exit, NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
 		  
 		ELSIF v_man_table='man_wjoin' THEN  
 		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve, brand, model) 
@@ -477,19 +486,7 @@ BEGIN
 	            EXECUTE v_sql;
 	        END IF;
 
-	        --insert double geometry
-			IF (v_man_table IN ('man_fountain') and (v_insert_double_geom IS TRUE)) THEN
-				
-				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
-
-				INSERT INTO polygon(pol_id,the_geom) 
-				VALUES (v_auto_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
-				from connec where connec_id=NEW.connec_id));
-				
-				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE connec_id = '''||NEW.connec_id||''';';
-			END IF;
-
-		END IF;
+	 	END IF;
 
 		
 		IF NEW.state=1 THEN
@@ -711,8 +708,7 @@ BEGIN
 			
 		ELSIF v_man_table ='man_fountain' THEN 			
 			UPDATE man_fountain SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
-			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
-			pol_id=NEW.pol_id
+			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony
 			WHERE connec_id=OLD.connec_id;	
 		END IF;
 
@@ -761,9 +757,7 @@ BEGIN
  		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		IF v_man_table ='man_fountain'  THEN
-			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
-		END IF;		
+		DELETE FROM polygon WHERE feature_id = OLD.connec_id;
 
 		-- delete links & vnode's
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
