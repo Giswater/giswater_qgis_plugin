@@ -40,8 +40,31 @@ AS SELECT plan_psector.psector_id,
     plan_psector
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
---2021/09/07
+--2021/09/15
 CREATE OR REPLACE VIEW v_ui_workspace AS
 SELECT id, name, descript, config
 FROM cat_workspace
 WHERE isautomatic IS FALSE;
+
+--2021/09/20
+CREATE OR REPLACE VIEW ve_pol_node AS
+SELECT 
+pol_id,
+feature_id,
+polygon.feature_type,
+polygon.the_geom
+FROM node
+JOIN v_state_node USING(node_id)
+JOIN polygon ON polygon.feature_id::text = node.node_id::text;
+
+
+CREATE OR REPLACE VIEW ve_pol_connec AS
+SELECT 
+pol_id,
+feature_id,
+polygon.feature_type,
+polygon.the_geom
+FROM connec
+JOIN v_state_connec USING(connec_id)
+JOIN polygon ON polygon.feature_id::text = connec.connec_id::text;
+

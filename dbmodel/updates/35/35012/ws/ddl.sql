@@ -123,14 +123,14 @@ ALTER TABLE inp_rules RENAME CONSTRAINT inp_rules_x_sector_id_fkey TO inp_rules_
 ALTER TABLE selector_inp_dscenario ALTER COLUMN cur_user SET DEFAULT "current_user"();
 ALTER TABLE selector_mincut_result ALTER COLUMN cur_user SET DEFAULT "current_user"();
 
---2021/09/02
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netwjoin", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"pol_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
-
 -- 2021/09/03
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"dscenario_type", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 ALTER TABLE cat_dscenario ALTER active SET DEFAULT TRUE;
+
+-- 2021/09/20
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_register", "column":"pol_id", "newName":"_pol_id_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_tank", "column":"pol_id", "newName":"_pol_id_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_fountain", "column":"pol_id", "newName":"_pol_id_"}}$$);

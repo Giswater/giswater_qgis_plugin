@@ -108,26 +108,26 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS
   AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW ve_pol_pump AS 
-SELECT man_pump.pol_id,
-v_node.node_id,
+CREATE OR REPLACE VIEW ve_pol_register AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
 polygon.the_geom
 FROM v_node
-JOIN man_pump ON man_pump.node_id::text = v_node.node_id::text
-JOIN polygon ON polygon.pol_id::text = man_pump.pol_id::text;
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='REGISTER';
 
-CREATE OR REPLACE VIEW ve_pol_source AS 
-SELECT man_source.pol_id,
-v_node.node_id,
+CREATE OR REPLACE VIEW ve_pol_tank AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
 polygon.the_geom
 FROM v_node
-JOIN man_source ON man_source.node_id::text = v_node.node_id::text
-JOIN polygon ON polygon.pol_id::text = man_source.pol_id::text;
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='TANK';
 
 CREATE OR REPLACE VIEW ve_pol_netwjoin AS 
-SELECT man_netwjoin.pol_id,
-v_node.node_id,
+SELECT polygon.pol_id,
+polygon.feature_id as connec_id,
 polygon.the_geom
-FROM v_node
-JOIN man_netwjoin ON man_netwjoin.node_id::text = v_node.node_id::text
-JOIN polygon ON polygon.pol_id::text = man_netwjoin.pol_id::text;
+FROM v_connec
+JOIN polygon ON polygon.feature_id::text = v_connec.connec_id::text
+WHERE polygon.sys_type='FOUNTAIN';

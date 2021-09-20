@@ -46,7 +46,7 @@ CREATE TABLE config_user_x_sector (
   CONSTRAINT config_user_x_sector_username_fkey FOREIGN KEY (username)
       REFERENCES cat_users (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT);
-
+  
 --2021/09/17
 CREATE TABLE cat_workspace (
 id serial PRIMARY KEY,
@@ -55,3 +55,14 @@ descript text,
 config json,
 isautomatic boolean DEFAULT FALSE);
 ALTER TABLE cat_workspace ADD CONSTRAINT cat_workspace_unique_name UNIQUE(name);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_node", "column":"double_geom", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_connec", "column":"double_geom", "dataType":"json", "isUtils":"False"}}$$);
+
+ALTER TABLE cat_feature_node ALTER COLUMN double_geom SET DEFAULT '{"activated":false,"value":1}';
+ALTER TABLE cat_feature_connec ALTER COLUMN double_geom SET DEFAULT '{"activated":false,"value":1}';
+
+UPDATE cat_feature_node SET double_geom = '{"activated":false,"value":1}';
+UPDATE cat_feature_connec SET double_geom = '{"activated":false,"value":1}';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"feature_id", "dataType":"character varying (16)", "isUtils":"False"}}$$);
