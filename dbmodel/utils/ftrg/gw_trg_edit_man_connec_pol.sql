@@ -30,21 +30,11 @@ BEGIN
 		END IF;
 		
 		-- Connec ID	
-		IF man_table IS NULL THEN 
+		IF (NEW.connec_id IS NULL) THEN
+			v_feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (v_feature_id IS NULL) THEN
-				v_feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
-				IF (v_feature_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
-				END IF;	
-			END IF;	
-		ELSE 
-			IF (NEW.connec_id IS NULL) THEN
-				v_feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
-				IF (v_feature_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
-				END IF;	
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+       	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
 			END IF;	
 		END IF;
 
@@ -61,16 +51,9 @@ BEGIN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
-		IF man_table IS NULL THEN
-			IF (NEW.feature_id != OLD.feature_id) THEN
-				UPDATE polygon SET feature_id=NEW.feature_id, feature_type =feature_type 
-				FROM v_edit_connec WHERE connec_id=NEW.feature_id AND pol_id=NEW.pol_id;
-			END IF;
-		ELSE
-			IF (NEW.connec_id != OLD.connec_id) THEN
-				UPDATE polygon SET feature_id=NEW.connec_id, feature_type =feature_type 
-				FROM v_edit_connec WHERE connec_id=NEW.connec_id AND pol_id=NEW.pol_id;
-			END IF;
+		IF (NEW.connec_id != OLD.connec_id) THEN
+			UPDATE polygon SET feature_id=NEW.connec_id, feature_type =feature_type 
+			FROM v_edit_connec WHERE connec_id=NEW.connec_id AND pol_id=NEW.pol_id;
 		END IF;
 		
 		
