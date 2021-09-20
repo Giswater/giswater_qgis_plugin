@@ -53,14 +53,3 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
 INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_valve 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
 
-CREATE TRIGGER gw_trg_edit_man_pump_pol
-INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_pump
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_pump_pol');
-
-CREATE TRIGGER gw_trg_edit_man_source_pol
-INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_source
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_source_pol');
-
-CREATE TRIGGER gw_trg_edit_man_netwjoin_pol
-INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_netwjoin
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_netwjoin_pol');

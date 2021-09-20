@@ -394,10 +394,10 @@ NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) D
 
 -- 2021/09/17
 UPDATE cat_feature_node SET double_geom = value::json FROM config_param_system WHERE parameter ='edit_node_doublegeom' 
-AND json_extract_path_text(value,'activated') = true AND type IN ('REGISTER', 'TANK');
+AND json_extract_path_text(value::json,'activated')::boolean = true AND type IN ('REGISTER', 'TANK');
 
 UPDATE cat_feature_connec SET double_geom = value::json FROM config_param_system WHERE parameter ='edit_node_doublegeom' 
-AND json_extract_path_text(value,'activated') = true AND type IN ('FOUNTAIN');
+AND json_extract_path_text(value::json,'activated')::boolean = true AND type IN ('FOUNTAIN');
 
 UPDATE polygon p SET feature_id=node_id FROM man_tank m WHERE p.pol_id=m._pol_id_ AND sys_type='TANK';
 UPDATE polygon p SET feature_id=node_id FROM man_register m WHERE p.pol_id=m._pol_id_ AND sys_type='REGISTER';
