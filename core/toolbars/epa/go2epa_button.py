@@ -136,16 +136,12 @@ class GwGo2EpaButton(GwAction):
         self._set_signals()
         self.dlg_go2epa.btn_cancel.setEnabled(False)
 
-        if self.project_type == 'ws':
-            tableleft = "cat_dscenario"
-            tableright = "selector_inp_dscenario"
-            field_id_left = "dscenario_id"
-            field_id_right = "dscenario_id"
-            self.dlg_go2epa.btn_hs_ds.clicked.connect(
-                partial(self._sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
-
-        elif self.project_type == 'ud':
-            self.dlg_go2epa.btn_hs_ds.clicked.connect(self._ud_hydrology_selector)
+        tableleft = "cat_dscenario"
+        tableright = "selector_inp_dscenario"
+        field_id_left = "dscenario_id"
+        field_id_right = "dscenario_id"
+        self.dlg_go2epa.btn_hs_ds.clicked.connect(
+            partial(self._sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
 
         # Check OS and enable/disable checkbox execute EPA software
         if sys.platform != "win32":
@@ -340,86 +336,6 @@ class GwGo2EpaButton(GwAction):
         self._multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
         tools_gw.open_dialog(dlg_psector_sel)
-
-
-    def _ud_hydrology_selector(self):
-        """ Dialog hydrology_selector.ui """
-
-        self.dlg_hydrology_selector = GwHydrologySelectorUi()
-        tools_gw.load_settings(self.dlg_hydrology_selector)
-
-        self.dlg_hydrology_selector.btn_accept.clicked.connect(self._save_hydrology)
-        self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self._update_labels)
-        self.dlg_hydrology_selector.txt_name.textChanged.connect(
-            partial(self._filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name,
-                    self.dlg_hydrology_selector.hydrology))
-
-        sql = "SELECT DISTINCT(name), hydrology_id FROM cat_hydrology ORDER BY name"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            message = "Any data found in table"
-            tools_qgis.show_warning(message, parameter='cat_hydrology')
-            return False
-
-        tools_qt.fill_combo_values(self.dlg_hydrology_selector.hydrology, rows)
-
-        sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
-               "INNER JOIN selector_inp_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
-               "WHERE t2.cur_user = current_user")
-        row = tools_db.get_row(sql)
-        if row:
-            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
-        else:
-            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
-
-        self._update_labels()
-        tools_gw.open_dialog(self.dlg_hydrology_selector)
-
-
-    def _save_hydrology(self):
-
-        hydrology_id = tools_qt.get_combo_value(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology,
-                                                1)
-        sql = ("SELECT cur_user FROM selector_inp_hydrology "
-               "WHERE cur_user = current_user")
-        row = tools_db.get_row(sql)
-        if row:
-            sql = (f"UPDATE selector_inp_hydrology "
-                   f"SET hydrology_id = {hydrology_id} "
-                   f"WHERE cur_user = current_user")
-        else:
-            sql = (f"INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) "
-                   f"VALUES('{hydrology_id}', current_user)")
-        tools_db.execute_sql(sql)
-
-        message = "Values has been update"
-        tools_qgis.show_info(message)
-        tools_gw.close_dialog(self.dlg_hydrology_selector)
-
-
-    def _update_labels(self):
-        """ Show text in labels from SELECT """
-
-        sql = (f"SELECT infiltration, text FROM cat_hydrology"
-               f" WHERE name = '{self.dlg_hydrology_selector.hydrology.currentText()}'")
-        row = tools_db.get_row(sql)
-        if row is not None:
-            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
-            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
-
-
-    def _filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
-
-        sql = (f"SELECT DISTINCT(name), hydrology_id FROM {tablename}"
-               f" WHERE name LIKE '%{widgettxt.text()}%'"
-               f" ORDER BY name ")
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            message = "Check the table 'cat_hydrology' "
-            tools_qgis.show_warning(message)
-            return False
-        tools_qt.fill_combo_values(widgetcbx, rows)
-        self._update_labels()
 
 
     def _go2epa_select_file_inp(self):
