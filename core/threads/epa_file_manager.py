@@ -237,32 +237,20 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        # Generate aditional files
-        feature_list = {"GULLY":{"extension":".gul"},
-                        "LINK":{"extension":".link"},
-                        "GRATE":{"extension":".grate"},
-                        "LXSECTIONS":{"extension":".lxsections"}}
+        # Replace extension .inp
+        aditional_file = open(folder_path.replace('.inp', f'.gul'), "w")
+        read = True
+        for row in all_rows:
+            # Use regexp to check which targets to read (only TITLE and aditional target)
+            if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or row['text'] in ['GULLY', 'LINK', 'GRATE', 'LXSECTIONS']):
+                read = True
+            elif bool(re.match('\[(.*?)\]', row['text'])):
+                read = False
+            if 'text' in row and row['text'] is not None and read:
+                line = row['text'].rstrip() + "\n"
+                aditional_file.write(line)
 
-        for feature in feature_list:
-            # Replace extension .inp
-            aditional_file = open(folder_path.replace('.inp', f'{feature_list[feature]["extension"]}'), "w")
-            read = True
-            save_file = False
-            for row in all_rows:
-                # Use regexp to check which targets to read (only TITLE and aditional target)
-                if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or feature in row['text']):
-                    read = True
-                elif bool(re.match('\[(.*?)\]', row['text'])):
-                    read = False
-                if 'text' in row and row['text'] is not None and read:
-                    line = row['text'].rstrip() + "\n"
-                    aditional_file.write(line)
-                if bool(re.match('\[(.*?)\]', row['text'])) and (feature in row['text']):
-                    save_file = True
-
-            self._close_file(aditional_file)
-            if save_file is False:
-                os.remove(aditional_file.name)
+        self._close_file(aditional_file)
 
 
     def _execute_epa(self):
