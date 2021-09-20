@@ -13,6 +13,7 @@ $BODY$
 
 DECLARE 
 man_table varchar;
+v_feature_id text;
 
 BEGIN
 
@@ -28,25 +29,29 @@ BEGIN
 			NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 		
-		-- Node ID	
-		IF (NEW.connec_id IS NULL) THEN
-			NEW.connec_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
+		-- Connec ID	
+		IF man_table IS NULL THEN 
+			IF (v_feature_id IS NULL) THEN
+				v_feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
+				IF (v_feature_id IS NULL) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
+				END IF;	
+			END IF;	
+		ELSE 
 			IF (NEW.connec_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
-			END IF;
+				v_feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
+				IF (v_feature_id IS NULL) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
+				END IF;	
+			END IF;	
 		END IF;
-		
-		IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2096", "function":"2460","debug_msg":null}}$$);';
-		END IF;
-		
+
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'FOUNTAIN', NEW.the_geom);
-		
-		-- Update man table
-		UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;
+		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
+		SELECT NEW.pol_id, sys_type, NEW.the_geom, v_feature_id, connec_type
+		FROM v_edit_connec WHERE connec_id=v_feature_id;
 		
 		RETURN NEW;
 		
@@ -56,23 +61,25 @@ BEGIN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
-		IF (NEW.connec_id != OLD.connec_id) THEN
-			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) iS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2098", "function":"2460","debug_msg":null}}$$);';
+		IF man_table IS NULL THEN
+			IF (NEW.feature_id != OLD.feature_id) THEN
+				UPDATE polygon SET feature_id=NEW.feature_id, feature_type =feature_type 
+				FROM v_edit_connec WHERE connec_id=NEW.feature_id AND pol_id=NEW.pol_id;
 			END IF;
-			UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;
-			UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;
-		
+		ELSE
+			IF (NEW.connec_id != OLD.connec_id) THEN
+				UPDATE polygon SET feature_id=NEW.node_id, feature_type =feature_type 
+				FROM v_edit_connec WHERE connec_id=NEW.connec_id AND pol_id=NEW.pol_id;
+			END IF;
 		END IF;
+		
 		
 		RETURN NEW;
     
 	-- DELETE
     ELSIF TG_OP = 'DELETE' THEN
 	
-		UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;
-		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
+			DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 				
 		RETURN NULL;
    

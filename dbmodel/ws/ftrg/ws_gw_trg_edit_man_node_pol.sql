@@ -13,7 +13,7 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	sys_type_var text;
+	v_feature_id text;
 
 BEGIN
 
@@ -31,147 +31,55 @@ BEGIN
 		END IF;
 		
 		-- Node ID	
-		IF (NEW.node_id IS NULL) THEN
-			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
-			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
+		IF man_table IS NULL THEN 
+			IF (v_feature_id IS NULL) THEN
+				v_feature_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
+				ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
+				IF (v_feature_id IS NULL) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	        		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
+				END IF;	
+			END IF;	
+		ELSE 
 			IF (NEW.node_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
-			END IF;
-		END IF;
-		
-		IF man_table='man_register_pol' THEN
-			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2100", "function":"2462","debug_msg":null}}$$);';
-			END  IF;
-			sys_type_var='REGISTER';
-		
-		ELSIF man_table='man_tank_pol' THEN
-			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
-			END  IF;
-			sys_type_var='TANK';
-
-		ELSIF man_table='man_pump_pol' THEN
-			IF (SELECT node_id FROM man_pump WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
-			END  IF;
-			sys_type_var='PUMP';
-
-		ELSIF man_table='man_netwjoin_pol' THEN
-			IF (SELECT node_id FROM man_netwjoin WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
-			END  IF;
-			sys_type_var='NETWJOIN';
-
-		ELSIF man_table='man_source_pol' THEN
-			IF (SELECT node_id FROM man_source WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
-			END  IF;
-			sys_type_var='SOURCE';
-
+				v_feature_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
+				ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
+				IF (v_feature_id IS NULL) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	        		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
+				END IF;	
+			END IF;	
 		END IF;
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, sys_type_var, NEW.the_geom);
+		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
+		SELECT NEW.pol_id, sys_type, NEW.the_geom, v_feature_id, node_type
+		FROM v_edit_node WHERE node_id=v_feature_id;
 		
-		
-		-- Update man table
-		IF man_table='man_register_pol' THEN
-			UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-		
-		ELSIF man_table='man_tank_pol' THEN
-			UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-		ELSIF man_table='man_pump_pol' THEN
-			UPDATE man_pump SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-		ELSIF man_table='man_netwjoin_pol' THEN
-			UPDATE man_netwjoin SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-		ELSIF man_table='man_source_pol' THEN
-			UPDATE man_source SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-		
-		END IF;
 
 		RETURN NEW;
 		
-    
 	-- UPDATE
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
-		IF (NEW.node_id != OLD.node_id) THEN
-			IF man_table ='man_register_pol' THEN
-				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2104", "function":"2462","debug_msg":null}}$$);';
-				END  IF;
-				UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
-				UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-			
-			ELSIF man_table ='man_tank_pol' THEN
-				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
-				END  IF;
-				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
-				UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-			ELSIF man_table ='man_pump_pol' THEN
-				IF (SELECT node_id FROM man_pump WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
-				END  IF;
-				UPDATE man_pump SET pol_id=NULL WHERE node_id=OLD.node_id;
-				UPDATE man_pump SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-			ELSIF man_table ='man_netwjoin_pol' THEN
-				IF (SELECT node_id FROM man_netwjoin WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
-				END  IF;
-				UPDATE man_netwjoin SET pol_id=NULL WHERE node_id=OLD.node_id;
-				UPDATE man_netwjoin SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
-
-			ELSIF man_table ='man_source_pol' THEN
-				IF (SELECT node_id FROM man_source WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
-				END  IF;
-				UPDATE man_source SET pol_id=NULL WHERE node_id=OLD.node_id;
-				UPDATE man_source SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+		IF man_table IS NULL THEN
+			IF (NEW.feature_id != OLD.feature_id) THEN
+				UPDATE polygon SET feature_id=NEW.feature_id, feature_type =feature_type 
+				FROM v_edit_node WHERE node_id=NEW.feature_id AND pol_id=NEW.pol_id;
 			END IF;
-			
+		ELSE
+			IF (NEW.node_id != OLD.node_id) THEN
+				UPDATE polygon SET feature_id=NEW.node_id, feature_type =feature_type 
+				FROM v_edit_node WHERE node_id=NEW.node_id AND pol_id=NEW.pol_id;
+			END IF;
 		END IF;
 		
 		RETURN NEW;
     
 	-- DELETE
     ELSIF TG_OP = 'DELETE' THEN
-	
-		IF man_table ='man_register_pol' THEN
-			UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
-					
-		ELSIF man_table ='man_tank_pol' THEN
-			UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
-		
-		ELSIF man_table ='man_pump_pol' THEN
-			UPDATE man_pump SET pol_id=NULL WHERE node_id=OLD.node_id;
-						
-		ELSIF man_table ='man_netwjoin_pol' THEN
-			UPDATE man_netwjoin SET pol_id=NULL WHERE node_id=OLD.node_id;
-						
-		ELSIF man_table ='man_source_pol' THEN
-			UPDATE man_source SET pol_id=NULL WHERE node_id=OLD.node_id;
-									
-		END IF;
 
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 				
