@@ -124,7 +124,7 @@ FROM v_node
 JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
 WHERE polygon.sys_type='TANK';
 
-CREATE OR REPLACE VIEW ve_pol_netwjoin AS 
+CREATE OR REPLACE VIEW ve_pol_fountain AS 
 SELECT polygon.pol_id,
 polygon.feature_id as connec_id,
 polygon.the_geom

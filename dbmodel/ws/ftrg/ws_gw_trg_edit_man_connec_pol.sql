@@ -68,7 +68,7 @@ BEGIN
 			END IF;
 		ELSE
 			IF (NEW.connec_id != OLD.connec_id) THEN
-				UPDATE polygon SET feature_id=NEW.node_id, feature_type =feature_type 
+				UPDATE polygon SET feature_id=NEW.connec_id, feature_type =feature_type 
 				FROM v_edit_connec WHERE connec_id=NEW.connec_id AND pol_id=NEW.pol_id;
 			END IF;
 		END IF;
