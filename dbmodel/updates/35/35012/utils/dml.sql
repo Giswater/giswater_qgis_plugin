@@ -138,3 +138,6 @@ VALUES (3078, 'gw_fct_workspacemanager','utils', 'function', 'json', 'json',
 --2021/09/19
 INSERT INTO sys_fprocess VALUES (396, 'Check duplicity of features when more than one scenario is enabled', 'utils')
 ON CONFLICT (fid) DO NOTHING;
+
+--2021/09/20
+UPDATE sys_table SET sys_role='role_om' WHERE id IN ('anl_arc', 'anl_node', 'anl_polygon', 'anl_connec', 'anl_arc_x_node');
