@@ -127,7 +127,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Arc catalog used for new arc(s): ',v_catalog));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Copied columns from old arc(s): Mapzones, *_type, soil, address and label values'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('NOT copied columns from old arc(s): Free text and addfield values'));
-		v_message = 'Arc(s) replacement done succesfully';
+		v_message = 'Arc replacement done succesfully';
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Replacement on planned mode is only available for arcs'));
