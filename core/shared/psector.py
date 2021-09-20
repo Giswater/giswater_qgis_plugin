@@ -1792,6 +1792,8 @@ class GwPsector:
                 except AttributeError:
                     pass
 
+        if self.arc_id is None: return
+
         # Populate combo arccat
         sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "
         rows = tools_db.get_rows(sql)
@@ -1802,12 +1804,12 @@ class GwPsector:
 
         # Disconnect Snapping
         self.snapper_manager.recover_snapping_options()
-        tools_qgis.disconnect_snapping(True, None, self.vertex_marker)
+        tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
 
         # Triggers
         self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
         self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
-        self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.reset_rubberband, self.rubber_band))
+        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band))
 
         # Open form
         tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
