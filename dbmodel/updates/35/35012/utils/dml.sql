@@ -122,6 +122,18 @@ INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_cr
 VALUES ('config_user_x_sector', 'Table to manage sector_id when variable user_x_exploitation is enabled', 'role_admin', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
 
+--2021/09/17
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('cat_workspace', 'Table to save workspace configuration - values of currently set selectors and inp settings', 'role_basic', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('v_ui_workspace', 'Shows saved workspaces', 'role_basic', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3078, 'gw_fct_workspacemanager','utils', 'function', 'json', 'json',
+'Function that allows saving workspaces - currently set values of selectors and inp configuration', 'role_basic', null, 'giswater');
 
 --2021/09/19
 INSERT INTO sys_fprocess VALUES (396, 'Check duplicity of features when more than one scenario is enabled', 'utils')
