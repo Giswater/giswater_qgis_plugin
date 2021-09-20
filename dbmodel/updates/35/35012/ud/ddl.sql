@@ -203,3 +203,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"flap", "dataType":"character varying(3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"seepage", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 
+--2021/09/20
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_gully", "column":"double_geom", "dataType":"json", "isUtils":"False"}}$$);

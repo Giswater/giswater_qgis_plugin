@@ -695,5 +695,47 @@ UNION
    WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text
    AND s.result_id = r.result_id;
 
+--2021/09/20
+CREATE OR REPLACE VIEW ve_pol_chamber AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
+polygon.the_geom
+FROM v_node
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='CHAMBER';
 
-  
+CREATE OR REPLACE VIEW ve_pol_netgully AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
+polygon.the_geom
+FROM v_node
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='NETGULLY';
+
+CREATE OR REPLACE VIEW ve_pol_storage AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
+polygon.the_geom
+FROM v_node
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='STORAGE';
+
+CREATE OR REPLACE VIEW ve_pol_wwtp AS 
+SELECT polygon.pol_id,
+polygon.feature_id as node_id,
+polygon.the_geom
+FROM v_node
+JOIN polygon ON polygon.feature_id::text = v_node.node_id::text
+WHERE polygon.sys_type='WWTP';
+
+DROP VIEW IF EXISTS ve_pol_gully;
+CREATE OR REPLACE VIEW ve_pol_gully AS
+SELECT 
+polygon.pol_id,
+feature_id AS gully_id,
+polygon.feature_type,
+polygon.the_geom
+FROM gully
+JOIN v_state_gully USING(gully_id)
+JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;
+

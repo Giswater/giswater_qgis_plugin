@@ -50,7 +50,7 @@ WHERE isautomatic IS FALSE;
 CREATE OR REPLACE VIEW ve_pol_node AS
 SELECT 
 pol_id,
-feature_id,
+feature_id as node_id,
 polygon.feature_type,
 polygon.the_geom
 FROM node
@@ -61,7 +61,7 @@ JOIN polygon ON polygon.feature_id::text = node.node_id::text;
 CREATE OR REPLACE VIEW ve_pol_connec AS
 SELECT 
 pol_id,
-feature_id,
+feature_id as connec_id,
 polygon.feature_type,
 polygon.the_geom
 FROM connec
