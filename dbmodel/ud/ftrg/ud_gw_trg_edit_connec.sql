@@ -27,6 +27,9 @@ v_matfromcat boolean = false;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_disable_linktonetwork boolean;
+v_doublegeometry boolean;
+v_doublegeom_buffer double precision;
+v_pol_id varchar(16);
 
 
 BEGIN
@@ -407,6 +410,23 @@ BEGIN
 			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
 		END IF;
 		
+		--check if feature is double geom
+		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+		FROM cat_feature_connec WHERE id='||quote_literal(NEW.connec_type)||''
+		INTO v_doublegeometry, v_doublegeom_buffer;
+		
+		-- set and get id for polygon
+		IF (v_doublegeometry IS TRUE) THEN
+				IF (v_pol_id IS NULL) THEN
+					PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+					v_pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+					
+				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				VALUES (v_pol_id, 'CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer))) 
+				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
+		END IF;
+
 		IF NEW.state=1 THEN
 			-- Control of automatic insert of link and vnode
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
@@ -426,7 +446,7 @@ BEGIN
 			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
 			
 		END IF;
-		 
+		
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -626,6 +646,9 @@ BEGIN
 	
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.connec_id||'","featureType":"CONNEC"}, "data":{}}$$)';
+
+		-- delete from polygon table (before the deletion of node)
+		DELETE FROM polygon WHERE feature_id=OLD.connec_id;
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;

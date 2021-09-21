@@ -31,7 +31,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
 v_sys_type text;
-v_doublegeometry boolean;
+v_doublegeometry boolean;	
 v_length float;
 v_width float;
 v_rotation float;
@@ -51,11 +51,11 @@ dx float;
 dy float;
 v_x float;
 v_y float;
-v_new_pol_id varchar(16);
+v_pol_id varchar(16);
 v_codeautofill boolean;
 v_srid integer;
 v_force_delete boolean;
-
+v_system_id text;
 
 BEGIN
 
@@ -72,8 +72,6 @@ BEGIN
 
 	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
-	SELECT ((value::json)->>'activated')::boolean INTO v_doublegeometry FROM config_param_system WHERE parameter='edit_node_doublegeom';
-	SELECT ((value::json)->>'value') INTO v_doublegeom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
@@ -155,12 +153,6 @@ BEGIN
 		-- Node ID
 		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 		NEW.node_id:= (SELECT nextval('urn_id_seq'));
-
-		-- set and get id for polygon
-		IF v_doublegeometry THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
 
 		-- get sys type for parent table
 		IF v_man_table = 'parent' THEN
@@ -490,7 +482,27 @@ BEGIN
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.lastupdate, NEW.lastupdate_user,NEW.matcat_id,
 			NEW.asset_id);	
 		END IF;
-				
+		
+		--check if feature is double geom	
+		SELECT system_id INTO v_system_id FROM cat_feature WHERE cat_feature.id=NEW.node_type;
+
+		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+		FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
+		INTO v_doublegeometry, v_doublegeom_buffer;
+		
+		-- set and get id for polygon
+		IF (v_doublegeometry IS TRUE) THEN
+				IF (v_pol_id IS NULL) THEN
+					PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+					v_pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+					
+				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) 
+				from node where node_id=NEW.node_id), NEW.node_type, NEW.node_id);
+		END IF;
+		
+
 		IF v_man_table='man_junction' THEN
 					
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
@@ -505,34 +517,19 @@ BEGIN
 		
 		ELSIF v_man_table='man_storage' THEN
 			
-			IF v_doublegeometry THEN
-				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_new_pol_id, 'STORAGE', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) from node where node_id=NEW.node_id));		
-			END IF;
-
-			INSERT INTO man_storage (node_id, pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
-			VALUES(NEW.node_id, v_new_pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
+			INSERT INTO man_storage (node_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
+			VALUES(NEW.node_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 						
 		ELSIF v_man_table='man_netgully' THEN
 
-			IF v_doublegeometry THEN
-				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_new_pol_id, 'NETGULLY', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) from node where node_id=NEW.node_id));
-			END IF;
-			
-			INSERT INTO man_netgully (node_id, pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
-			VALUES(NEW.node_id, v_new_pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
+			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon ) 
+			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 			NEW.groove, NEW.siphon );
 									 			
 		ELSIF v_man_table='man_chamber' THEN
 
-			IF v_doublegeometry THEN
-				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_new_pol_id, 'CHAMBER', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) from node where node_id=NEW.node_id));
-			END IF;
-
-			INSERT INTO man_chamber (node_id, pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
-			VALUES (NEW.node_id, v_new_pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
+			INSERT INTO man_chamber (node_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
+			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
 			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
 						
 		ELSIF v_man_table='man_manhole' THEN
@@ -551,13 +548,8 @@ BEGIN
 			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);	
 
 		ELSIF v_man_table='man_wwtp' THEN
-		
-			IF v_doublegeometry THEN
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (v_new_pol_id, 'WWTP', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer)))
-				from node where node_id=NEW.node_id));
-			END IF;
-			
-			INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id, v_new_pol_id, NEW.name);
+					
+			INSERT INTO man_wwtp (node_id, name) VALUES (NEW.node_id, NEW.name);
 						
 		ELSIF v_man_table='man_netelement' THEN
 					
@@ -568,18 +560,6 @@ BEGIN
 			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=NEW.node_type);
 			v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 			EXECUTE v_sql;
-
-			--insert double geometry
-			IF (v_man_table IN ('man_chamber', 'man_storage', 'man_wwtp','man_netgully') and (v_doublegeometry IS TRUE)) THEN
-					
-				v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
-
-				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_new_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) 
-				from node where node_id=NEW.node_id));
-	
-				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_new_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
-			END IF;
 		END IF;
 
 		-- man addfields insert
@@ -857,10 +837,7 @@ BEGIN
 		"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';
 
 		-- delete from polygon table (before the deletion of node)
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
+		DELETE FROM polygon WHERE feature_id=OLD.node_id;
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;

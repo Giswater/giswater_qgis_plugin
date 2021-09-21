@@ -68,20 +68,18 @@ BEGIN
 	-- get system and user variables
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
-	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
 	-- managing matcat
-	IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.arccat_id) IS NOT NULL THEN
+	IF (SELECT matcat_id FROM cat_grate WHERE id = NEW.gratecat_id) IS NOT NULL THEN
 		v_matfromcat = true;
 	END IF;
 
-	IF v_unitsfactor IS NULL THEN
-		v_doublegeometry = FALSE;
-	ELSE 
-		v_doublegeometry = TRUE;
-	END IF;
+	--check if feature is double geom	
+	EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+	FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
+	INTO v_doublegeometry, v_unitsfactor;
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
@@ -481,8 +479,8 @@ BEGIN
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('GULLY', v_the_geom_pol, v_new_pol_id);
-
+				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 			END IF;
 		END IF;
 
@@ -561,7 +559,7 @@ BEGIN
 			END LOOP;
 		END IF;
 
-		INSERT INTO inp_gully (NEW.gully_id);
+		INSERT INTO inp_gully VALUES (NEW.gully_id);
 
 		RETURN NEW;
 
@@ -730,11 +728,11 @@ BEGIN
 					v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
 					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
-						INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);
-						UPDATE gully SET pol_id=v_new_pol_id WHERE gully_id = NEW.gully_id;
+						INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+						VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 
 					ELSE
-						UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id);
+						UPDATE polygon SET the_geom = v_the_geom_pol WHERE gully_id =NEW.gully_id;
 					END IF;
 				END IF;
 		END IF;
@@ -814,7 +812,7 @@ BEGIN
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
 
 		-- delete from polygon table (before the deletion of gully)
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);
+		DELETE FROM polygon WHERE gully_id=OLD.gully_id;
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
