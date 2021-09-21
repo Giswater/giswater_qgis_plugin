@@ -156,19 +156,21 @@ BEGIN
     
 
 	-- profilactic delete of legacy values on man_addfields_value
-	IF v_project_type='WS' THEN
-		DELETE FROM man_addfields_value WHERE feature_id IN(
-		SELECT m.feature_id FROM man_addfields_value m LEFT JOIN
-		(SELECT arc_id as feature_id from arc UNION SELECT node_id FROM node UNION SELECT connec_id from connec) a USING (feature_id)
-		WHERE a.feature_id is null
-		);
-	ELSE
-		DELETE FROM man_addfields_value WHERE feature_id IN(
-		SELECT m.feature_id FROM man_addfields_value m LEFT JOIN
-		(SELECT arc_id as feature_id from arc UNION SELECT node_id FROM node UNION SELECT connec_id from connec UNION SELECT gully_id from gully) a USING (feature_id)
-		WHERE a.feature_id is null
-		);
-	END IF;	
+	IF 'role_edit' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+		IF v_project_type='WS' THEN
+			DELETE FROM man_addfields_value WHERE feature_id IN(
+			SELECT m.feature_id FROM man_addfields_value m LEFT JOIN
+			(SELECT arc_id as feature_id from arc UNION SELECT node_id FROM node UNION SELECT connec_id from connec) a USING (feature_id)
+			WHERE a.feature_id is null
+			);
+		ELSE
+			DELETE FROM man_addfields_value WHERE feature_id IN(
+			SELECT m.feature_id FROM man_addfields_value m LEFT JOIN
+			(SELECT arc_id as feature_id from arc UNION SELECT node_id FROM node UNION SELECT connec_id from connec UNION SELECT gully_id from gully) a USING (feature_id)
+			WHERE a.feature_id is null
+			);
+		END IF;
+	END IF;
 		
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=101 AND cur_user=current_user;
