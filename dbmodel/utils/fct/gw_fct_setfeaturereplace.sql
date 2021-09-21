@@ -171,11 +171,16 @@ BEGIN
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1070", "function":"2126","debug_msg":"'||v_state||'"}}$$);' INTO v_audit_result;
-		
-		ELSE
 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"1070", "function":"2126","debug_msg":"State is 0 or 2"}}$$);' INTO v_audit_result;
+
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+		v_id := v_old_feature_id;
+	ELSE
 		-- new feature_id
 		v_id := (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 
@@ -389,181 +394,181 @@ BEGIN
 		ELSIF v_feature_type='gully' THEN
 			-- nothing to do		
 		END IF;
-	END IF;
 
-	-- update node_id on on going or planned psectors
-	IF v_feature_type='node' THEN
-		SELECT count(psector_id) INTO v_count FROM plan_psector_x_node JOIN plan_psector USING (psector_id) 
-		WHERE status in (1,2) AND node_id = v_old_feature_id;
-		IF v_count > 0 THEN
-			UPDATE plan_psector_x_node SET node_id = v_id FROM plan_psector pp
-			WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_feature_id;
+		-- update node_id on on going or planned psectors
+		IF v_feature_type='node' THEN
+			SELECT count(psector_id) INTO v_count FROM plan_psector_x_node JOIN plan_psector USING (psector_id) 
+			WHERE status in (1,2) AND node_id = v_old_feature_id;
+			IF v_count > 0 THEN
+				UPDATE plan_psector_x_node SET node_id = v_id FROM plan_psector pp
+				WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_feature_id;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Replace node id in ',v_count,' psector.'));
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Replace node id in ',v_count,' psector.'));
+			END IF;
 		END IF;
-	END IF;
 
-	-- upgrading and downgrading features
-	
-	
-	v_state_type = (SELECT id FROM value_state_type WHERE state=0 LIMIT 1);
-		
-	IF v_workcat_id_end IS NOT NULL THEN 
-		EXECUTE 'UPDATE '||v_feature_type||' SET state=0, workcat_id_end='''||v_workcat_id_end||''', enddate='''||v_enddate||''', 
-		state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
-	ELSE
-		EXECUTE 'UPDATE '||v_feature_type||' SET state=0, enddate='''||v_enddate||''', 
-		state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
-	END IF;
-
-	INSERT INTO audit_check_data (fid, result_id, error_message)
-	VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_feature_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
-
-	IF v_id IS NOT NULL THEN
-		IF v_workcat_id_end IS NOT NULL THEN 
-			EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', 
-			enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
-		ELSE
-			EXECUTE 'UPDATE '||v_feature_type||' SET state=1,builtdate='''||v_enddate||''', 
-			enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
-		END IF;
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (v_fid, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
+		-- upgrading and downgrading features
+		v_state_type = (SELECT id FROM value_state_type WHERE state=0 LIMIT 1);
 			
-		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (v_fid, v_result_id, concat('Common values from old feature have been updated on new feature.'));
-		
-	END IF;
-		
-	--reconect existing link to the new feature
-	IF v_feature_type='connec' OR v_feature_type='gully' THEN
-		SELECT count(link_id) INTO v_count FROM link WHERE (feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
-		(exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1);
-		IF v_count > 0 THEN
-			UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
-			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+		IF v_workcat_id_end IS NOT NULL THEN 
+			EXECUTE 'UPDATE '||v_feature_type||' SET state=0, workcat_id_end='''||v_workcat_id_end||''', enddate='''||v_enddate||''', 
+			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
+		ELSE
+			EXECUTE 'UPDATE '||v_feature_type||' SET state=0, enddate='''||v_enddate||''', 
+			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
 		END IF;
-		
-	ELSIF v_feature_type='node' THEN
-		SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
-		IF v_count > 0 THEN
-			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
-		END IF;
-	END IF;
 
-	-- enable config parameters
-	IF v_feature_type='arc' THEN
-		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
-	ELSIF v_feature_type='connec' THEN
-		UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') WHERE parameter='edit_connec_proximity';
-	ELSIF v_feature_type='node' THEN
-		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
-	ELSIF v_feature_type='gully' THEN
-		-- todo
-	END IF;
+		INSERT INTO audit_check_data (fid, result_id, error_message)
+		VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_feature_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
+
+		IF v_id IS NOT NULL THEN
+			IF v_workcat_id_end IS NOT NULL THEN 
+				EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', 
+				enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
+			ELSE
+				EXECUTE 'UPDATE '||v_feature_type||' SET state=1,builtdate='''||v_enddate||''', 
+				enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
+			END IF;
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (v_fid, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
+				
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (v_fid, v_result_id, concat('Common values from old feature have been updated on new feature.'));
+			
+		END IF;
+		
+		--reconect existing link to the new feature
+		IF v_feature_type='connec' OR v_feature_type='gully' THEN
+			SELECT count(link_id) INTO v_count FROM link WHERE (feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
+			(exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1);
+			IF v_count > 0 THEN
+				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+			END IF;
+			
+		ELSIF v_feature_type='node' THEN
+			SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+			IF v_count > 0 THEN
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
+			END IF;
+		END IF;
+
+		-- enable config parameters
+		IF v_feature_type='arc' THEN
+			UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
+		ELSIF v_feature_type='connec' THEN
+			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') WHERE parameter='edit_connec_proximity';
+		ELSIF v_feature_type='node' THEN
+			UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
+		ELSIF v_feature_type='gully' THEN
+			-- todo
+		END IF;
+		
 	
-	
-	IF v_feature_type = 'connec' THEN
-		v_field_cat ='connecat_id';
-	ELSIF v_feature_type = 'arc' THEN
-		v_field_cat ='arccat_id';
+		IF v_feature_type = 'connec' THEN
+			v_field_cat ='connecat_id';
+		ELSIF v_feature_type = 'arc' THEN
+			v_field_cat ='arccat_id';
+		ELSIF v_feature_type = 'gully' THEN
+			v_field_cat ='gratecat_id';
+		ELSIF v_feature_type = 'node' THEN
+			v_field_cat ='nodecat_id';	
+		END IF;
+
+		-- log
 		INSERT INTO audit_log_data (fid, feature_type,feature_id, log_message) 
 		SELECT v_fid, 'ARC', arc_id, concat('{"description":"Pipe replacement", "workcat":"'||quote_nullable(v_workcat_id_end)||'", "sector":"',name,'", "length":',
 		(st_length(arc.the_geom))::numeric(12,2),', "newCatalog":"',v_featurecat_id_new,'", "oldCatalog":"',v_old_featurecat,'"}') 
 		FROM arc JOIN sector USING (sector_id) WHERE arc_id = v_id::text;
-	ELSIF v_feature_type = 'gully' THEN
-		v_field_cat ='gratecat_id';
-	ELSIF v_feature_type = 'node' THEN
-		v_field_cat ='nodecat_id';	
-	END IF;
 
-	-- update catalog of new feature
-	IF v_featurecat_id_new IS NOT NULL AND v_feature_type_new IS NOT NULL THEN
+		-- update catalog of new feature
+		IF v_featurecat_id_new IS NOT NULL AND v_feature_type_new IS NOT NULL THEN
 
-		EXECUTE 'UPDATE v_edit_'||v_feature_type||' SET '||v_field_cat||' =  '||quote_literal(v_featurecat_id_new)||' 
-		WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||';';
-
-		IF v_feature_type!='gully' THEN
-			EXECUTE 'UPDATE v_edit_'||v_feature_type||' SET '||v_feature_type||'_type =  '||quote_literal(v_feature_type_new)||' 
+			EXECUTE 'UPDATE '||v_feature_type||' SET '||v_field_cat||' =  '||quote_literal(v_featurecat_id_new)||' 
 			WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||';';
+
+			IF v_project_type = 'UD' THEN
+				IF v_feature_type != 'gully' THEN
+					EXECUTE 'UPDATE '||v_feature_type||' SET '||v_feature_type||'_type =  '||quote_literal(v_feature_type_new)||' 
+					WHERE '||v_feature_type||'_id = '||quote_literal(v_id)||';';
+				END IF;
+			END IF;
 		END IF;
+		
+		--reset mapzone configuration
+		IF v_feature_type = 'node' AND v_project_type='WS' THEN
+
+			EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
+			FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
+			INTO v_mapzone_old;
+
+			EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
+			FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
+			INTO v_mapzone_new;
+
+			IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+			END IF;
+
+			IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
+				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+				"client":{"device":4, "infoType":1,"lang":"ES"},
+				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
+
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
+			
+			ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
+				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+				"client":{"device":4, "infoType":1,"lang":"ES"},
+				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":null, "action":"replaceNode"}}}$$);';
+				
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node will be removed.'));
+
+			ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+			
+			
+			ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
+				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+				"client":{"device":4, "infoType":1,"lang":"ES"},
+				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
+				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
+				
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter needs to be configured.'));
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Configuration for old node will be removed.'));
+			END IF;
+		END IF;
+
+		-- get log (fid: 143)
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
+
+		IF v_audit_result is null THEN
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Replace feature done successfully';
+	    ELSE
+
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+	    END IF;
 
 	END IF;
-	
-	--reset mapzone configuration
-	IF v_feature_type = 'node' AND v_project_type='WS' THEN
-
-		EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
-		FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
-		INTO v_mapzone_old;
-
-		EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
-		FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
-		INTO v_mapzone_new;
-
-		IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
-		END IF;
-
-		IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
-			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-			"client":{"device":4, "infoType":1,"lang":"ES"},
-			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
-
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
-		
-		ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
-			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-			"client":{"device":4, "infoType":1,"lang":"ES"},
-			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":null, "action":"replaceNode"}}}$$);';
-			
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node will be removed.'));
-
-		ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
-		
-		
-		ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
-			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-			"client":{"device":4, "infoType":1,"lang":"ES"},
-			"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-			"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
-			
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter needs to be configured.'));
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (v_fid, v_result_id, concat('Configuration for old node will be removed.'));
-			
-		END IF;
-		
-	END IF;
-
-	-- get log (fid: 143)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
-
-	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Replace feature done successfully';
-    ELSE
-
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-
-    END IF;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
