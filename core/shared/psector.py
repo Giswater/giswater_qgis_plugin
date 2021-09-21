@@ -1821,7 +1821,7 @@ class GwPsector:
         feature = f'"featureType":"ARC", "ids":["{self.arc_id}"]'
         extras = f'"catalog":{new_arc_cat}'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setreplacefeatureplan', body)
+        json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
         # Refresh tableview psector_x_arc
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc')
