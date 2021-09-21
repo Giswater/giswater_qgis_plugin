@@ -141,3 +141,7 @@ ON CONFLICT (fid) DO NOTHING;
 
 --2021/09/20
 UPDATE sys_table SET sys_role='role_om' WHERE id IN ('anl_arc', 'anl_node', 'anl_polygon', 'anl_connec', 'anl_arc_x_node');
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
+VALUES ('audit_fid_log', 'Table to store logs of fid process', 'role_basic', 0, null, null, null, null, null, null, 'giswater') 
+ON CONFLICT (id) DO NOTHING;
