@@ -28,3 +28,10 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('inp_dscenario_raingage');
 CREATE TRIGGER gw_trg_typevalue_fk
 AFTER INSERT OR UPDATE ON inp_dscenario_raingage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_raingage');
+
+--2021/09/21
+DROP TRIGGER IF EXISTS gw_trg_edit_pol_gully ON ve_pol_gully;
+
+CREATE TRIGGER gw_trg_edit_pol_gully
+INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_gully
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_gully_pol();

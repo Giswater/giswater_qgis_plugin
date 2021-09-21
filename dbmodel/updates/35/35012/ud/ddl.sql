@@ -205,3 +205,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", 
 
 --2021/09/20
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_gully", "column":"double_geom", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_chamber", "column":"pol_id", "newName":"_pol_id_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_storage", "column":"pol_id", "newName":"_pol_id_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netgully", "column":"pol_id", "newName":"_pol_id_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_wwtp", "column":"pol_id", "newName":"_pol_id_"}}$$);

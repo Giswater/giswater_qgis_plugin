@@ -312,3 +312,30 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function VALUES (3074, 'gw_fct_pg2epa_dscenario', 'ud', 'function', null, null, 'role_epa')
 ON CONFLICT (id) DO NOTHING;
+
+
+--2021/09/20
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT  formname, formtype, tabname, 'gratecat2_id', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, FALSE, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id';
+
+-- 2021/09/21
+UPDATE cat_feature_node SET double_geom = value::json FROM config_param_system WHERE parameter ='edit_node_doublegeom' 
+AND json_extract_path_text(value::json,'activated')::boolean = true AND type IN ('NETGULLY', 'STORAGE', 'WWTP', 'CHAMBER');
+
+UPDATE cat_feature_gully SET double_geom = concat('{"activated":true,"value":',value, '}' 
+FROM config_param_user WHERE parameter ='edit_gully_doublegeom' AND value IS NOT NULL;
+
+UPDATE cat_feature_gully SET double_geom = '{"activated":false,"value":1}' WHERE double_geom IS NULL;
+
+UPDATE polygon p SET feature_id=node_id FROM man_netgully m WHERE p.pol_id=m._pol_id_ AND sys_type='NETGULLY';
+UPDATE polygon p SET feature_id=node_id FROM man_storage m WHERE p.pol_id=m._pol_id_ AND sys_type='STORAGE';
+UPDATE polygon p SET feature_id=node_id FROM man_wwtp m WHERE p.pol_id=m._pol_id_ AND sys_type='WWTP';
+UPDATE polygon p SET feature_id=node_id FROM man_chamber m WHERE p.pol_id=m._pol_id_ AND sys_type='CHAMBER';
+UPDATE polygon p SET feature_id=gully_id FROM gully m WHERE p.pol_id=m.pol_id AND sys_type='GULLY';
