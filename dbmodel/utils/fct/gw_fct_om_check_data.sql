@@ -97,7 +97,11 @@ BEGIN
 	-- UTILS
 
 	RAISE NOTICE '01 - system variables (302)';
-	v_querytext = 'SELECT parameter FROM config_param_system WHERE lower(value) != lower(standardvalue) AND standardvalue IS NOT NULL';
+	v_querytext = 'SELECT parameter FROM config_param_system WHERE lower(value) != lower(standardvalue) AND standardvalue IS NOT NULL 
+	AND  standardvalue NOT ILIKE ''{%}'' UNION
+	SELECT parameter FROM config_param_system 
+	WHERE lower(json_extract_path_text(value::json,''activated'')) != lower(json_extract_path_text(standardvalue::json,''activated'')) 
+	AND standardvalue IS NOT NULL AND standardvalue ILIKE ''{%}'' ';
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	EXECUTE concat('SELECT (array_agg(parameter))::text FROM (',v_querytext,')a') INTO v_result;
 
@@ -446,8 +450,8 @@ BEGIN
 	RAISE NOTICE '17 - Check for orphan polygons on polygon table (255)';
 	IF v_project_type ='UD' THEN
 
-		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
-					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a) b';
+		v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT gully_id FROM gully UNION
+		SELECT node_id FROM node UNION SELECT connec_id FROM connec)) b';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		

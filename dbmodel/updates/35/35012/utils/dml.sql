@@ -145,3 +145,6 @@ UPDATE sys_table SET sys_role='role_om' WHERE id IN ('anl_arc', 'anl_node', 'anl
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity, qgis_message, sys_sequence, sys_sequence_field, notify_action, source)
 VALUES ('audit_fid_log', 'Table to store logs of fid process', 'role_basic', 0, null, null, null, null, null, null, 'giswater') 
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_param_system SET standardvalue = '{"activated":true,"value":0.1}' WHERE parameter IN ('edit_arc_searchnodes', 'edit_connec_proximity',
+'edit_gully_proximity', 'edit_node_proximity');
