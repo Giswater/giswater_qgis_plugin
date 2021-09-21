@@ -105,14 +105,14 @@ INSERT INTO config_form_tableview VALUES ('gully_form', 'utils', 'v_ui_om_visitm
 
 UPDATE config_form_fields SET columnname='effective_area' WHERE columnname='efective_area' and formname='cat_grate';
 
-UPDATE config_form_fields SET widgettype='typeahead',dv_querytext='SELECT id, id as idval FROM cat_connec WHERE active IS TRUE'
+UPDATE config_form_fields SET widgettype='combo',dv_querytext='SELECT id, id as idval FROM cat_connec WHERE active IS TRUE'
 WHERE columnname='connec_arccat_id' and formname ilike '%gully%';
 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT DISTINCT ON (formname) formname, 'form_feature', 'data', 'connec_matcat_id', 'lyt_data_1', 11, 'string', 'typeahead', 'connec_matcat_id', 
+SELECT DISTINCT ON (formname) formname, 'form_feature', 'data', 'connec_matcat_id', 'lyt_data_1', 11, 'string', 'combo', 'connec_matcat_id', 
 'Material of a conection arc', NULL, FALSE, FALSE, TRUE, FALSE, NULL, 'SELECT id, id AS idval FROM cat_mat_arc WHERE active IS TRUE', TRUE, TRUE, 
 NULL, NULL, NULL, NULL, NULL, NULL, FALSE FROM config_form_fields WHERE formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%'
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -323,7 +323,29 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT  formname, formtype, tabname, 'gratecat2_id', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, FALSE, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id';
+FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT  formname,'form_feature', 'main','connec_y1', 'lyt_data_1', 21,  'double', 'text', 'connec_y1',NULL, NULL,  FALSE,
+FALSE, FALSE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE
+FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT  formname,'form_feature', 'main','connec_y2', 'lyt_data_1', 22,  'double', 'text', 'connec_y2',NULL, NULL,  FALSE,
+FALSE, FALSE, FALSE,FALSE,NULL, NULL, NULL, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE
+FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 
 -- 2021/09/21
 UPDATE cat_feature_node SET double_geom = value::json FROM config_param_system WHERE parameter ='edit_node_doublegeom' 
