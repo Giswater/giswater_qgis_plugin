@@ -38,10 +38,12 @@ BEGIN
       		 	"data":{"message":"2048", "function":"2416","debug_msg":null}}$$);'; 
 			END IF;
 		END IF;
-			
+
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'GULLY', NEW.the_geom);
-		
+		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
+		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.gully_id, gully_type
+		FROM v_edit_gully WHERE gully_id=NEW.gully_id;
+
 		-- Update man table
 		UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;
 		
@@ -58,6 +60,10 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2050", "function":"2416","debug_msg":null}}$$);';
 			END IF;
+
+			UPDATE polygon SET feature_id=NEW.gully_id, feature_type =feature_type 
+			FROM v_edit_gully WHERE gully_id=OLD.gully_id AND pol_id=NEW.pol_id;
+
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
 			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;
 		

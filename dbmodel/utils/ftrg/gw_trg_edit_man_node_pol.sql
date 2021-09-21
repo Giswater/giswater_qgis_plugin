@@ -13,7 +13,6 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	v_feature_id text;
 
 BEGIN
 
@@ -31,10 +30,10 @@ BEGIN
 		END IF;
 		
 		-- Node ID	
-		IF (NEW.node_id IS NULL) THEN
-			v_feature_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
+	IF (NEW.node_id IS NULL) THEN
+			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
-			IF (v_feature_id IS NULL) THEN
+			IF (NEW.node_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	       		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
 			END IF;	
@@ -42,8 +41,8 @@ BEGIN
 		
 		-- Insert into polygon table
 		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
-		SELECT NEW.pol_id, sys_type, NEW.the_geom, v_feature_id, node_type
-		FROM v_edit_node WHERE node_id=v_feature_id;
+		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.node_id, node_type
+		FROM v_edit_node WHERE node_id=NEW.node_id;
 		
 
 		RETURN NEW;
@@ -55,7 +54,7 @@ BEGIN
 		
 		IF (NEW.node_id != OLD.node_id) THEN
 			UPDATE polygon SET feature_id=NEW.node_id, feature_type =feature_type 
-			FROM v_edit_node WHERE node_id=NEW.node_id AND pol_id=NEW.pol_id;
+			FROM v_edit_node WHERE node_id=OLD.node_id AND pol_id=NEW.pol_id;
 		END IF;
 		
 		RETURN NEW;
