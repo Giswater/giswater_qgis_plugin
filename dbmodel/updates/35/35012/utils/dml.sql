@@ -148,3 +148,14 @@ ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_param_system SET standardvalue = '{"activated":true,"value":0.1}' WHERE parameter IN ('edit_arc_searchnodes', 'edit_connec_proximity',
 'edit_gully_proximity', 'edit_node_proximity');
+
+DELETE FROM sys_function WHERE id=2418;
+UPDATE sys_function SET project_type='utils' WHERE id=2462 OR id=2460;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity, source)
+VALUES ('ve_pol_node', 'Editable view for polygons related to node features', 'role_edit', 0,'giswater') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity, source)
+VALUES ('ve_pol_connec', 'Editable view for polygons related to connec features', 'role_edit', 0,'giswater')
+ON CONFLICT (id) DO NOTHING;
