@@ -27,7 +27,7 @@ UPDATE sys_param_user SET project_type='utils' WHERE id IN ('inp_options_debug')
 
 DELETE FROM config_param_system WHERE parameter IN ('admin_transaction_db', 'admin_superusers');
 
-INSERT INTO sys_function VALUES (3072, 'gw_fct_sereplacefeatureplan', 'utils', 'function', 'json', 'json', 'Function to replace features on planning mode', 'role_epa')
+INSERT INTO sys_function VALUES (3072, 'gw_fct_setreplacefeatureplan', 'utils', 'function', 'json', 'json', 'Function to replace features on planning mode', 'role_epa')
 ON CONFLICT (id) DO NOTHING;
 
 --2021/09/01

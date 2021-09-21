@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3072
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setreplacefeatureplan(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setreplacefeatureplan(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setfeaturereplaceplan(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfeaturereplaceplan(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_setreplacefeatureplan($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"ARC", "ids":["2100","2101","2102"]}, "data":{"catalog":"PVC110-PN16"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setfeaturereplaceplan($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"ARC", "ids":["2100","2101","2102"]}, "data":{"catalog":"PVC110-PN16"}}$$);
 */
 
 
