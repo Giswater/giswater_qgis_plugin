@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2870
 
-DROP FUNCTION IF EXISTS ws_sample.gw_api_setselectors (json);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_setselectors(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setselectors (json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
   RETURNS json AS
 $BODY$
 
 /*example
-SELECT ws_sample.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT ws_sample.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ud"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ud"}}$$)::text
 
-SELECT ws_sample.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
 
 
@@ -49,14 +49,14 @@ v_message text = '{"level":1, "text":"Process done successfully"}';
 v_count integer = 0;
 v_count_aux integer = 0;
 v_name text;
-v_forceparent boolean;
+v_disableparent boolean;
 
 
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -71,10 +71,9 @@ BEGIN
 	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
-	v_forceparent := (p_data ->> 'data')::json->> 'forceParent';
+	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
 	v_data = p_data->>'data';
 
-	IF v_forceparent IS NULL THEN v_forceParent = TRUE; END IF;
 	
 	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
@@ -95,7 +94,7 @@ BEGIN
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		PERFORM gw_fct_setselectors(p_data);
-		SET search_path = 'ws_sample', public;
+		SET search_path = 'SCHEMA_NAME', public;
 	END IF;
 
 	-- Get system parameters
@@ -214,7 +213,7 @@ BEGIN
 	END IF;
 
 	-- manage parents
-	IF v_tabname IN ('tab_psector', 'tab_dscenario') AND v_checkall is null AND v_forceparent THEN
+	IF v_tabname IN ('tab_psector', 'tab_dscenario') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
 
 		-- getting name
 		v_name = substring (v_tabname,5,99);
