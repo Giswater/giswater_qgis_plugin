@@ -361,3 +361,234 @@ UPDATE polygon p SET feature_id=node_id FROM man_storage m WHERE p.pol_id=m._pol
 UPDATE polygon p SET feature_id=node_id FROM man_wwtp m WHERE p.pol_id=m._pol_id_ AND sys_type='WWTP';
 UPDATE polygon p SET feature_id=node_id FROM man_chamber m WHERE p.pol_id=m._pol_id_ AND sys_type='CHAMBER';
 UPDATE polygon p SET feature_id=gully_id FROM gully m WHERE p.pol_id=m.pol_id AND sys_type='GULLY';
+
+UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", 
+"trg_fields":"dscenario_id","featureType":["v_edit_inp_dscenario_conduit","v_edit_inp_dscenario_junction","v_edit_inp_dscenario_raingage"]}]'
+WHERE id='cat_dscenario';
+
+UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", 
+"trg_fields":"rg_id","featureType":["v_edit_inp_subcatchment", "v_edit_inp_dscenario_conduit","v_edit_inp_dscenario_junction",
+"v_edit_inp_dscenario_raingage"]}]'
+WHERE id='raingage';
+
+--v_edit_inp_dscenario_conduit
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'dscenario_id', null, null, 'integer', 'combo', 'dscenario_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE dscenario_id IS NOT NULL', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'arc_id', null, null, 'string', 'text', 'arc_id', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'arccat_id', null, null, 'integer', 'combo', 'arccat_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT id as id, id as idval FROM cat_arc WHERE active IS TRUE', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'matcat_id', null, null, 'integer', 'combo', 'matcat_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT id as id, id as idval FROM cat_mat_arc WHERE active IS TRUE', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'custom_n', null, null, 'double', 'text', 'custom_n', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'barrels', null, null, 'integer', 'text', 'barrels', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'culvert', null, null, 'double', 'text', 'culvert', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'kentry', null, null, 'double', 'text', 'kentry', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'kexit', null, null, 'double', 'text', 'kexit', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'kavg', null, null, 'double', 'text', 'kavg', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'flap', null, null, 'string', 'text', 'flap', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'q0', null, null, 'double', 'text', 'q0', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'qmax', null, null, 'double', 'text', 'qmax', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_conduit','form_feature', 'main', 'seepage', null, null, 'double', 'text', 'seepage', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+--v_edit_inp_dscenario_junction
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'dscenario_id', null, null, 'integer', 'combo', 'dscenario_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE dscenario_id IS NOT NULL', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'node_id', null, null, 'string', 'text', 'node_id', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'y0', null, null, 'double', 'text', 'y0', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'ysur', null, null, 'double', 'text', 'ysur', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'apond', null, null, 'double', 'text', 'apond', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_junction','form_feature', 'main', 'outfallparam', null, null, 'string', 'text', 'outfallparam', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+--v_edit_inp_dscenario_raingage
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'dscenario_id', null, null, 'integer', 'combo', 'dscenario_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE dscenario_id IS NOT NULL', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'rg_id', null, null, 'integer', 'combo', 'rg_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT rg_id as id, rg_id as idval FROM raingage WHERE rg_id IS NOT NULL', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'rg_id', null, null, 'string', 'text', 'rg_id', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'form_type', null, null, 'integer', 'combo', 'form_type', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_raingage''', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'intvl', null, null, 'string', 'text', 'intvl', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'scf', null, null, 'double', 'text', 'scf', NULL, NULL,  TRUE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'rgage_type', null, null, 'integer', 'combo', 'rgage_type', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_raingage''', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'timser_id', null, null, 'integer', 'combo', 'timser_id', NULL, NULL, TRUE,
+FALSE, TRUE, FALSE,FALSE,'SELECT  id, id as idval FROM inp_timeseries WHERE id IS NOT NULL ', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'fname', null, null, 'string', 'text', 'fname', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'sta', null, null, 'string', 'text', 'sta', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'units', null, null, 'string', 'text', 'units', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

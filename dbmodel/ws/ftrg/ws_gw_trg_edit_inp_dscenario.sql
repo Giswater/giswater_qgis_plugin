@@ -55,25 +55,29 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		IF v_dscenario = 'VALVE' THEN
 			UPDATE inp_dscenario_valve SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure, 
-			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status;
+			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status 
+			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
 		ELSIF v_dscenario = 'TANK' THEN
 			UPDATE inp_dscenario_tank SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel,
-			maxlevel=NEW.maxlevel, 	diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id;
+			maxlevel=NEW.maxlevel, 	diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id 
+			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario = 'SHORTPIPE' THEN
-			UPDATE inp_dscenario_shortpipe SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, minorloss=NEW.minorloss, status=NEW.status;
+			UPDATE inp_dscenario_shortpipe SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, minorloss=NEW.minorloss, status=NEW.status 
+			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario = 'RESERVOIR' THEN
-			UPDATE inp_dscenario_reservoir SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, pattern_id=NEW.pattern_id, head=NEW.head;
+			UPDATE inp_dscenario_reservoir SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, pattern_id=NEW.pattern_id, head=NEW.head 
+			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 	  
 	  ELSIF v_dscenario = 'PUMP' THEN
 	  	UPDATE inp_dscenario_pump SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, power=NEW.power, curve_id=NEW.curve_id,
-	  	speed=NEW.speed, pattern=NEW.pattern, status=NEW.status;
+	  	speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 	  ELSIF v_dscenario = 'PIPE' THEN
 	  	UPDATE inp_dscenario_pipe SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status,
-	  	roughness=NEW.roughness, dint=NEW.dint;
+	  	roughness=NEW.roughness, dint=NEW.dint WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 
 	  END IF;

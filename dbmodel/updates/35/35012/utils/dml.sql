@@ -32,7 +32,7 @@ ON CONFLICT (id) DO NOTHING;
 
 --2021/09/01
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3074,'gw_trg_edit_inp_dscenario', 'ws', 'trigger function', NULL, NULL, 'Trigger that allows editing data on v_edit_inp_dscenario views',
+VALUES (3074,'gw_trg_edit_inp_dscenario', 'utils', 'trigger function', NULL, NULL, 'Trigger that allows editing data on v_edit_inp_dscenario views',
 'role_epa', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'layermanager') WHERE parameter = 'basic_selector_tab_psector';
@@ -159,3 +159,4 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity, source)
 VALUES ('ve_pol_connec', 'Editable view for polygons related to connec features', 'role_edit', 0,'giswater')
 ON CONFLICT (id) DO NOTHING;
+
