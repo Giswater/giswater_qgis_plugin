@@ -592,3 +592,12 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_inp_dscenario_raingage','form_feature', 'main', 'units', null, null, 'string', 'text', 'units', NULL, NULL,  FALSE,
 FALSE, TRUE, FALSE,FALSE,NULL, NULL, FALSE, NULL, NULL,NULL,
 NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+--2021/09/22
+ALTER TABLE sys_foreignkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_typevalue_raingage', 'inp_dscenario_raingage', 'rgage_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_typevalue_raingage', 'inp_dscenario_raingage', 'form_type');

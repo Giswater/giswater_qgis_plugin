@@ -402,3 +402,21 @@ AND json_extract_path_text(value::json,'activated')::boolean = true AND type IN 
 UPDATE polygon p SET feature_id=node_id FROM man_tank m WHERE p.pol_id=m._pol_id_ AND sys_type='TANK';
 UPDATE polygon p SET feature_id=node_id FROM man_register m WHERE p.pol_id=m._pol_id_ AND sys_type='REGISTER';
 UPDATE polygon p SET feature_id=connec_id FROM man_fountain m WHERE p.pol_id=m._pol_id_ AND sys_type='FOUNTAIN';
+
+--2021/09/22
+ALTER TABLE sys_foreignkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_value_status_pump', 'inp_dscenario_pump', 'status');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_dscenario_valve', 'status');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_typevalue_valve', 'inp_dscenario_valve', 'valv_type');	
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_pipe', 'status');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status');
