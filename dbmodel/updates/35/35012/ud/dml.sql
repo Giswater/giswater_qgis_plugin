@@ -351,7 +351,7 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 UPDATE cat_feature_node SET double_geom = value::json FROM config_param_system WHERE parameter ='edit_node_doublegeom' 
 AND json_extract_path_text(value::json,'activated')::boolean = true AND type IN ('NETGULLY', 'STORAGE', 'WWTP', 'CHAMBER');
 
-UPDATE cat_feature_gully SET double_geom = concat('{"activated":true,"value":',value, '}' 
+UPDATE cat_feature_gully SET double_geom = concat('{"activated":true,"value":"',value,'"}')::json 
 FROM config_param_user WHERE parameter ='edit_gully_doublegeom' AND value IS NOT NULL;
 
 UPDATE cat_feature_gully SET double_geom = '{"activated":false,"value":1}' WHERE double_geom IS NULL;
