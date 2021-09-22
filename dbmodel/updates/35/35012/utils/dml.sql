@@ -160,3 +160,8 @@ INSERT INTO sys_table(id, descript, sys_role, sys_criticity, source)
 VALUES ('ve_pol_connec', 'Editable view for polygons related to connec features', 'role_edit', 0,'giswater')
 ON CONFLICT (id) DO NOTHING;
 
+
+--2021/09/22
+INSERT INTO sys_fprocess VALUES (397, 'Parent psector forced when child psector is enabled', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
