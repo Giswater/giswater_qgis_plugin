@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2802
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(p_data json) 
-RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(p_data json)
+  RETURNS json AS
 $BODY$
 
 /*
@@ -36,7 +36,10 @@ v_count integer;
 BEGIN 
 
 	SET search_path = "SCHEMA_NAME", public;
-
+	
+	-- get input data
+	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
+	
 	-- get system variables
 	SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -53,9 +56,6 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 		PERFORM setval('SCHEMA_NAME.om_visit_x_gully_id_seq', (SELECT max(id) FROM om_visit_x_gully) , true);
 	END IF;
-
-	-- get input data
-	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
 
 	-- get if visit is multiplier
 	v_querytext =  'SELECT * FROM om_visit_x_node WHERE visit_id = '||(v_visitid)||' UNION 
@@ -77,8 +77,8 @@ BEGIN
 		FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
 		LOOP 
 			-- inserting new visit on visit table
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
-			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done, status)
+			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done, v_visit.status) RETURNING id INTO v_idlast;
 		
 			-- looking for documents
 			FOR v_doc IN SELECT * FROM doc_x_visit WHERE visit_id=v_visitid
@@ -110,8 +110,8 @@ BEGIN
 		FOR v_feature IN SELECT * FROM om_visit_x_arc WHERE visit_id=v_visitid
 		LOOP 
 			-- inserting new visit on visit table
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
-			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done, status)
+			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done, v_visit.status) RETURNING id INTO v_idlast;
 			
 			-- looking for documents
 			FOR v_doc IN SELECT * FROM doc_x_visit WHERE visit_id=v_visitid
@@ -143,8 +143,8 @@ BEGIN
 		FOR v_feature IN SELECT * FROM om_visit_x_connec WHERE visit_id=v_visitid
 		LOOP 
 			-- inserting new visit on visit table
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
-			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done, status)
+			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done, v_visit.status) RETURNING id INTO v_idlast;
 
 			-- looking for documents
 			FOR v_doc IN SELECT * FROM doc_x_visit WHERE visit_id=v_visitid
@@ -178,8 +178,8 @@ BEGIN
 			FOR v_feature IN SELECT * FROM om_visit_x_gully WHERE visit_id=v_visitid
 			LOOP 
 				-- inserting new visit on visit table
-				INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
-				VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
+				INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done, status)
+				VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done, v_visit.status) RETURNING id INTO v_idlast;
 				
 				-- looking for documents
 				FOR v_doc IN SELECT * FROM doc_x_visit WHERE visit_id=v_visitid
