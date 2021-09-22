@@ -71,6 +71,8 @@ BEGIN
 		        	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		        	USING NEW.the_geom
 		        	INTO v_ws_expl_id;
+                ELSE
+                    v_ws_expl_id=NEW.expl_id;
 		      	END IF;
 	    		
 			    --get expl_id value of the oposite schema
@@ -87,6 +89,8 @@ BEGIN
 		            EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		            USING NEW.the_geom
 		            INTO v_ud_expl_id;
+		        ELSE
+                    v_ud_expl_id=NEW.expl_id;
 		        END IF;
 
 		           --get expl_id value of the oposite schema
@@ -121,7 +125,7 @@ BEGIN
 				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id;
 			ELSIF v_project_type = 'UD' THEN
 				EXECUTE 'UPDATE '||v_schema_utils||'.streetaxis 
-				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6, ws_expl_id=$7,muni_id=$7
+				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6, ud_expl_id=$7,muni_id=$7
 				WHERE id=$1'
 				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id;
 			END IF;
