@@ -165,3 +165,6 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess VALUES (397, 'Parent psector forced when child psector is enabled', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
+COMMENT ON COLUMN config_visit_class.ui_tablename IS 'When configure a ui view, this columns are required: *_id, startdate, enddate, class_id::integer';
+
+
