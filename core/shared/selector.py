@@ -214,7 +214,11 @@ class GwSelector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         is_alone = False
+        disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
+
+        if key_modifier == Qt.ControlModifier:
+            disable_parent = True
 
         if selection_mode == 'removePrevious' or \
                 (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
@@ -225,10 +229,10 @@ class GwSelector:
                 widget_all.blockSignals(False)
             self._remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self._set_selector(dialog, widget, is_alone, selector_vars)
+        self._set_selector(dialog, widget, is_alone, selector_vars, disable_parent)
 
 
-    def _set_selector(self, dialog, widget, is_alone, selector_vars):
+    def _set_selector(self, dialog, widget, is_alone, selector_vars, disable_parent):
         """
         Send values to DB and reload selectors
             :param dialog: QDialog
@@ -245,7 +249,8 @@ class GwSelector:
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
-                      f'"isAlone":"{is_alone}", "value":"{tools_qt.is_checked(dialog, widget)}", '
+                      f'"isAlone":"{is_alone}", "disableParent":"{disable_parent}", '
+                      f'"value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
