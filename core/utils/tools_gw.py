@@ -75,7 +75,7 @@ def save_settings(dialog):
 
     x, y = dialog.pos().x(), dialog.pos().y()
     if isinstance(dialog, GwMainWindow):
-        x, y = x + 7, y + 24
+        x, y = x, y + 40
     elif isinstance(dialog, GwDialog):
         x, y = x + 8, y + 31
 
