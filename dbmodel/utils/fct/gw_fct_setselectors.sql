@@ -17,7 +17,9 @@ SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "l
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
+fid: 397
 
+select * from SCHEMA_NAME.anl_arc
 
 */
 
@@ -50,7 +52,7 @@ v_count integer = 0;
 v_count_aux integer = 0;
 v_name text;
 v_disableparent boolean;
-
+v_fid integer = 397;
 
 BEGIN
 
@@ -74,7 +76,7 @@ BEGIN
 	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
 	v_data = p_data->>'data';
 
-	
+
 	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
 	IF v_useatlas IS null then v_useatlas = true; END IF;
@@ -231,13 +233,18 @@ BEGIN
 					v_message = concat ('{"level":0, "text":"',v_name,' ',v_id,' have been enabled, because of its parent-relation with selected ', v_name,'"}');
 				END IF;
 
+				-- delete from trace tables
+				DELETE FROM anl_arc WHERE fid = v_fid and cur_user = current_user;
+				DELETE FROM anl_node WHERE fid = v_fid and cur_user = current_user;
+
+				-- insert into trace tables
 				INSERT INTO anl_arc (fid, arc_id, descript, the_geom) SELECT 
-				397, arc_id, 'Arc forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_arc 
-				JOIN arc USING (arc_id) WHERE psector_id = v_id;
+				v_fid, arc_id, 'Arc forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_arc p
+				JOIN arc USING (arc_id) WHERE psector_id = v_id AND  p.state = 1;
 
 				INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 
-				397, node_id, 'Node forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_node 
-				JOIN node USING (node_id) WHERE psector_id = v_id;
+				v_fid, node_id, 'Node forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_node p
+				JOIN node USING (node_id) WHERE psector_id = v_id AND p.state = 1;
 				
 			END IF;
 		ELSE
@@ -252,6 +259,11 @@ BEGIN
 			END LOOP;
 
 			IF v_count > 0 THEN
+
+				-- delete from trace tables
+				DELETE FROM anl_arc WHERE fid = v_fid and cur_user = current_user;
+				DELETE FROM anl_node WHERE fid = v_fid and cur_user = current_user;
+			
 				v_message = concat ('{"level":0, "text":"',v_count,' ',v_name,'(s) have been disabled, because of its child-relation from selected ', v_name,'"}');
 			END IF;
 		END IF;
