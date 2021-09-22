@@ -11,14 +11,23 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setarcdivide(p_data json) RETURNS json AS
 $BODY$
 
-/*
-
-SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["269951"]},
-"data":{}}$$)
+/*EXAMPLE:
 
 -- fid: 212
+
+-- MODE 1: individual
+SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
+"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["269951"]}, "data":{}}$$)
+
+-- MODE 2: massive using id as array
+SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
+"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":
+"SELECT array_to_json(array_agg(node_id::text)) FROM node JOIN ... WHERE ..."}, "data":{}}$$);
+
+-- MODE 3: massive usign pure SQL
+SELECT SCHEMA_NAME.gw_fct_setarcdivide(concat('
+{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["',node_id,'"]},
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}')::json) FROM node JOIN ... WHERE ...;
 
 */
 
