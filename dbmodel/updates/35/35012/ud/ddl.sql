@@ -209,3 +209,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_cham
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_storage", "column":"pol_id", "newName":"_pol_id_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netgully", "column":"pol_id", "newName":"_pol_id_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_wwtp", "column":"pol_id", "newName":"_pol_id_"}}$$);
+
+
+ALTER TABLE arc ALTER COLUMN inverted_slope SET DEFAULT FALSE;
