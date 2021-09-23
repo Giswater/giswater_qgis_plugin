@@ -14,11 +14,11 @@ $BODY$
 /*EXAMPLE
 --create new workspace
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "name":"WS1", "descript":"test" }}$$);
+"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "name":"WS2", "descript":"test" }}$$);
 
 --set workspace as current
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CURRENT", "id":"2"}}$$);
+"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CURRENT", "id":"9"}}$$);
 
 --reset workspace, set previous settings
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
