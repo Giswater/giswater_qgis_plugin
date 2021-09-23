@@ -49,31 +49,45 @@ v_sector_value json;
 rec_inp text;
 rec_selectorcomp text;
 rec_selectorcolumn record;
+v_datatype text;
 
-v_return_status text = 'Failed';
-v_return_msg text = 'Process finished with some errors';
+v_return_level integer;
+v_return_status text;
+v_return_msg text;
 v_error_context text;
-
+v_audit_result text;
+v_version text;
+v_result_info json;
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type
-	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
+	
+	--set current process as users parameter
+	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
+
+	INSERT INTO config_param_user (value, parameter, cur_user)
+	VALUES (txid_current(),'utils_cur_trans',current_user );
+	
 	-- get parameters
 	v_action = json_extract_path_text(p_data,'data','action');
 	v_workspace_id = json_extract_path_text(p_data,'data','id');
 	v_workspace_name = json_extract_path_text(p_data,'data','name');
 	v_workspace_descript = json_extract_path_text(p_data,'data','descript');
-
-	IF v_action = 'CREATE' AND v_workspace_name IN (SELECT name FROM cat_workspace) THEN
-		v_return_status = 'Failed';
-		v_return_msg = 'Name already exists, please set a new one or delete existing workspace';
-	END IF;
 	
+		
 	IF v_action = 'CREATE' OR v_action = 'CURRENT' THEN
+
+		IF v_action = 'CREATE' AND v_workspace_name IN (SELECT name FROM cat_workspace) THEN
+		
+			v_return_msg = 'Name already exists, please set a new one or delete existing workspace';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3188", "function":"3078","debug_msg":null}}$$);' INTO v_audit_result;
+		ELSE
 		--create configuration json for creating new workspace or saving the current settings as temporal in order to beeing able to reset them
 
 		SELECT jsonb_build_object('inp',i.inp_conf) INTO v_workspace_config FROM
@@ -137,32 +151,35 @@ BEGIN
 				select json_build_object('from_date', from_date, 'to_date', to_date,'context', context)::text as selector_value
 				FROM selector_date where cur_user=current_user)a )s;
 		END IF;
-		raise notice 'v_selectors_config,%',v_selectors_config;
 
-raise notice 'v_selectors_configcompound,%',v_selectors_configcompound;
 
 		v_selectors_config = v_selectors_config::jsonb||v_selectors_configcompound::jsonb;
 		v_workspace_config = gw_fct_json_object_set_key(v_workspace_config,'selectors', v_selectors_config);
 
-		RAISE NOTICE 'v_workspace_config,%',v_workspace_config;
-
+		END IF;
 	END IF;
 
 
 	IF v_action = 'DELETE' THEN
 
-		DELETE FROM cat_workspace WHERE id=v_workspace_id;
+		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault') = v_workspace_id::text THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3186", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
+		ELSE
+			DELETE FROM cat_workspace WHERE id=v_workspace_id;
+			v_return_msg = 'Workspace successfully deleted';
+
+		END IF;
 		
-		v_return_status = 'Accepted';
-		v_return_msg = 'Workspace successfully deleted';
-		
-		
-	ELSIF v_action = 'CREATE' THEN
+	ELSIF v_action = 'CREATE' AND v_audit_result is null THEN
 
 		INSERT INTO cat_workspace (name, descript, config)
-		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config);
+		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config) RETURNING id INTO v_workspace_id;
 
-		v_return_status = 'Accepted';
+		INSERT INTO config_param_user (parameter,value, cur_user)
+		VALUES ('utils_workspace_vdefault',v_workspace_id, current_user)
+		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
+
 		v_return_msg = 'Workspace successfully created';
 		
 	ELSIF v_action = 'CURRENT' THEN
@@ -172,7 +189,12 @@ raise notice 'v_selectors_configcompound,%',v_selectors_configcompound;
 		VALUES (concat('temp_',current_user), v_workspace_config, TRUE)
 		ON CONFLICT (name) DO NOTHING;
 
-		--capture config of selected workspace
+		--save workspace in config_param_user
+		INSERT INTO config_param_user (parameter,value, cur_user)
+		VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
+		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
+		
+				--capture config of selected workspace
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
@@ -195,19 +217,18 @@ raise notice 'v_selectors_configcompound,%',v_selectors_configcompound;
 
 			v_selector_name = json_object_keys(rec_sector);
 			--remove values for selector
+
 			EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
-			RAISE NOTICE 'rec_sector,%',rec_sector;
+
 			v_sector_value = json_extract_path_text(rec_sector,v_selector_name);
 			
 			IF  v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
 			OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
-				RAISE NOTICE 'v_sector_value,%',v_sector_value;
+				
 				FOR rec_selectorcomp IN SELECT * FROM json_array_elements(v_sector_value) LOOP
-				RAISE NOTICE 'rec_selectorcomp,%',rec_selectorcomp;
+
 					SELECT string_agg(key,', ') as keys,  string_agg(quote_literal(value),', ') as values  INTO rec_selectorcolumn FROM (
 					SELECT * from json_each_text(rec_selectorcomp::JSON))a;
-					
-					RAISE NOTICE 'rec_selectorcolumn,%',rec_selectorcolumn.keys;
 					
 					EXECUTE 'INSERT INTO '||v_selector_name||' ('||rec_selectorcolumn.keys||') 
 					VALUES ('||rec_selectorcolumn.values||' );';
@@ -216,8 +237,12 @@ raise notice 'v_selectors_configcompound,%',v_selectors_configcompound;
 			ELSE 
 				--SELECT * FROM json_object_keys('{"selector_rpt_compare_tstep_resultdate": "2020-12-2", "selector_rpt_compare_tstep_resulttime": "12:00"}')
 				IF v_sector_value IS NOT NULL THEN
+					EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
+					AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
+					INTO v_datatype;
+
 					EXECUTE 'INSERT INTO '||v_selector_name||'
-					SELECT value::integer, current_user FROM json_array_elements_text('''||v_sector_value||''')';
+					SELECT value::'||v_datatype||', current_user FROM json_array_elements_text('''||v_sector_value||''')';
 				END IF;
 
 			END IF;
@@ -237,16 +262,36 @@ raise notice 'v_selectors_configcompound,%',v_selectors_configcompound;
 			ON CONFLICT DO NOTHING;
 		END LOOP;
 
-		v_return_status = 'Accepted';
 		v_return_msg = 'Workspace successfully changed';
 
 	END IF;
-	
-	--  Return
-	RETURN ('{"status":"'||v_return_status||'", "message":{"level":0, "text":"'||v_return_msg||'"} '||
-		',"body":{"form":{}'||
-		',"data":{}}'||
-		'}')::json;
+				
+	IF v_audit_result is null THEN
+		v_return_status = 'Accepted';
+		v_return_level = 3;
+		IF v_return_msg IS NULL THEN
+			v_return_msg='Process executed successfully';
+		END IF;
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_return_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_return_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_return_msg;
+
+    END IF;
+				
+	-- Control nulls
+	v_version := COALESCE(v_version, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+
+		-- Return
+	--RETURN gw_fct_json_create_return(
+	return('{"status":"'||v_return_status||'", "message":{"level":'||v_return_level||', "text":"'||v_return_msg||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||
+		       '}'||
+	    '}}');
+	    --::json, 3078, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
