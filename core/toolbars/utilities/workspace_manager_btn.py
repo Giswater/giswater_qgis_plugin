@@ -9,7 +9,7 @@ import json
 import re
 from functools import partial
 
-from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QTableView
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
@@ -22,7 +22,7 @@ from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwWorkspaceManagerButton(GwAction):
-    """ Button 100: Workspace manager """
+    """ Button 214: Workspace manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -59,7 +59,7 @@ class GwWorkspaceManagerButton(GwAction):
         self._fill_tbl()
 
         # Connect main dialog signals
-        self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._update_tbl))
+        self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
@@ -97,32 +97,17 @@ class GwWorkspaceManagerButton(GwAction):
             return False, False
         for field in complet_list['body']['data']['fields']:
             if 'hidden' in field and field['hidden']: continue
-
-            self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, field)
-            self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
-            # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', 1, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm)
-
-        return complet_list
-
-
-    def _update_tbl(self, filter_name=""):
-        """ Update the table with the filter """
-
-        complet_list = self._get_list("v_ui_workspace", filter_name)
-
-        if complet_list is False:
-            return False, False
-        for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
-
             model = self.tbl_wrkspcm.model()
+            if model is None:
+                model = QStandardItemModel()
+                self.tbl_wrkspcm.setModel(model)
             model.removeRows(0, model.rowCount())
 
-            if field['value'] is None:
-                continue
-            self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
+            if field['value']:
+                self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, field)
+                self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
+            # TODO: config_form_tableview
+            # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', 1, True)
             tools_qt.set_tableview_config(self.tbl_wrkspcm)
 
         return complet_list
@@ -139,7 +124,7 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            self._update_tbl(self.filter_name.text())
+            self._fill_tbl(self.filter_name.text())
             tools_gw.close_dialog(self.dlg_create_workspace)
 
 
@@ -177,7 +162,7 @@ class GwWorkspaceManagerButton(GwAction):
             if 'message' in result and result['message']:
                 message = result['message']
                 tools_qgis.show_message(message['text'], message['level'])
-            self._update_tbl(self.filter_name.text())
+            self._fill_tbl(self.filter_name.text())
 
 
     def _delete_workspace(self):
@@ -209,7 +194,7 @@ class GwWorkspaceManagerButton(GwAction):
                     message = result['message']
                     tools_qgis.show_message(message['text'], message['level'])
 
-            self._update_tbl(self.filter_name.text())
+            self._fill_tbl(self.filter_name.text())
 
 
     def _set_label_current_workspace(self, value):
