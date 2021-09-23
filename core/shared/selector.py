@@ -332,8 +332,12 @@ class GwSelector:
         status = tools_qt.is_checked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+
+        disable_parent = False
+        key_modifier = QApplication.keyboardModifiers()
+
         if key_modifier == Qt.ShiftModifier:
-            return
+            disable_parent = True
 
         for widget in widget_list:
             if widget_all is not None:
@@ -343,6 +347,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self._set_selector(dialog, widget_all, False, selector_vars)
+        self._set_selector(dialog, widget_all, False, selector_vars, disable_parent)
 
     # endregion
