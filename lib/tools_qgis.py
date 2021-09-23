@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+from functools import partial
+
 import console
 import os.path
 import shlex
@@ -14,7 +16,7 @@ from random import randrange
 
 from qgis.PyQt.QtCore import Qt, QTimer, QSettings
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QDockWidget, QApplication
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
@@ -61,6 +63,49 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
 
     # Show message
     iface.messageBar().pushMessage(title, msg, message_level, duration)
+
+    # Check if logger to file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text)
+
+
+def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True):
+    """
+    Show message to the user with selected message level and a button to open the url
+        :param text: The text to be shown (String)
+        :param url: The url that will be opened by the button. It will also show after the message (String)
+        :param btn_text: The text of the button (String)
+        :param message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)}
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param logger_file: Whether it should log the message in a file or not (bool)
+    """
+
+    global user_parameters
+
+    # Get optional parameter 'show_message_durations'
+    dev_duration = None
+    if 'show_message_durations' in user_parameters:
+        dev_duration = user_parameters['show_message_durations']
+    # If is set, use this value
+    if dev_duration not in (None, "None"):
+        if message_level in (1, 2) and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
+    msg = None
+    if text:
+        msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
+
+    # Create the message with the button
+    widget = iface.messageBar().createMessage(f"{msg}", f"{url}")
+    button = QPushButton(widget)
+    button.setText(f"{btn_text}")
+    button.pressed.connect(partial(tools_os.open_file, url))
+    widget.layout().addWidget(button)
+
+    # Show the message
+    iface.messageBar().pushWidget(widget, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
