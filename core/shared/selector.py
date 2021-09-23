@@ -217,7 +217,7 @@ class GwSelector:
         disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
 
-        if key_modifier == Qt.ControlModifier:
+        if key_modifier == Qt.ShiftModifier:
             disable_parent = True
 
         if selection_mode == 'removePrevious' or \
