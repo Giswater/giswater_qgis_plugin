@@ -80,7 +80,7 @@ BEGIN
 		-- when material comes from arccat
 		UPDATE temp_arc t SET n = d.n FROM (SELECT * FROM v_edit_inp_dscenario_conduit a 
 		JOIN cat_arc c ON c.id = a.arccat_id  
-		JOIN cat_mat_arc b ON c.matcat_id = id) d
+		JOIN cat_mat_arc b ON c.matcat_id = b.id) d
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arccat_id IS NOT NULL;
 
 		-- when material is informed by user
