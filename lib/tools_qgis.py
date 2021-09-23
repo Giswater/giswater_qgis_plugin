@@ -150,7 +150,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir):
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = f"Metadata file not found: {metadata_file}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         return default_value
 
     value = None
@@ -160,7 +160,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir):
         value = metadata.get('general', parameter)
     except configparser.NoOptionError:
         message = f"Parameter not found: {parameter}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         value = default_value
     finally:
         return value
@@ -204,14 +204,14 @@ def enable_python_console():
     """ Enable Python console and Log Messages panel """
 
     # Manage Python console
-    python_console = global_vars.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
+    python_console = iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
     if python_console:
         python_console.setVisible(True)
     else:
         console.show_console()
 
     # Manage Log Messages panel
-    message_log = global_vars.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+    message_log = iface.mainWindow().findChild(QDockWidget, 'MessageLog')
     if message_log:
         message_log.setVisible(True)
 
@@ -318,7 +318,7 @@ def get_primary_key(layer=None):
 
     uri_pk = None
     if layer is None:
-        layer = global_vars.iface.activeLayer()
+        layer = iface.activeLayer()
     if layer is None:
         return uri_pk
     uri = layer.dataProvider().dataSourceUri().lower()
@@ -442,7 +442,7 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
             tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if action_pan:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def refresh_map_canvas(_restore_cursor=False):
@@ -474,7 +474,7 @@ def disconnect_signal_selection_changed():
     except Exception:
         pass
     finally:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def select_features_by_expr(layer, expr):
@@ -593,11 +593,11 @@ def restore_user_layer(layer_name, user_current_layer=None):
     """ Set active layer, preferably @user_current_layer else @layer_name """
 
     if user_current_layer:
-        global_vars.iface.setActiveLayer(user_current_layer)
+        iface.setActiveLayer(user_current_layer)
     else:
         layer = get_layer_by_tablename(layer_name)
         if layer:
-            global_vars.iface.setActiveLayer(layer)
+            iface.setActiveLayer(layer)
 
 
 def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
@@ -643,7 +643,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         layer.setRenderer(renderer)
 
     layer.triggerRepaint()
-    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
+    iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
 def remove_layer_from_toc(layer_name, group_name):
@@ -772,8 +772,8 @@ def set_margin(layer, margin):
     xmax = extent.xMaximum() + margin
     ymax = extent.yMaximum() + margin
     extent.set(xmin, ymin, xmax, ymax)
-    global_vars.iface.mapCanvas().setExtent(extent)
-    global_vars.iface.mapCanvas().refresh()
+    iface.mapCanvas().setExtent(extent)
+    iface.mapCanvas().refresh()
 
 
 def create_qml(layer, style):
@@ -922,7 +922,7 @@ def check_query_layer(layer):
 
 def get_epsg():
 
-    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = iface.mapCanvas().mapSettings().destinationCrs().authid()
     epsg = epsg.split(':')[1]
 
     return epsg
