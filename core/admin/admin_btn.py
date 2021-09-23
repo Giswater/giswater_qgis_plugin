@@ -3292,13 +3292,13 @@ class GwAdminButton:
         """ Puts the dialog in a docker, depending on the user configuration """
 
         try:
-            tools_gw.close_docker()
+            tools_gw.close_docker('admin_position')
             global_vars.session_vars['docker_type'] = 'qgis_form_docker'
             global_vars.session_vars['dialog_docker'] = GwDocker()
-            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
-            tools_gw.manage_docker_options()
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
-            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
+            self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
         except Exception as e:
             tools_log.log_info(str(e))
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')

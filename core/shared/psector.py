@@ -511,13 +511,13 @@ class GwPsector:
         self.dlg_psector_rapport.btn_path.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_path', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_path', "user", "session")
         tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_composer', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_composer', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_csv', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
 
         if tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
@@ -568,13 +568,13 @@ class GwPsector:
     def generate_rapports(self):
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path', txt_path)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
         chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer', chk_composer)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', chk_composer)
         chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail', chk_csv_detail)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', chk_csv_detail)
         chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv', chk_csv)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', chk_csv)
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):

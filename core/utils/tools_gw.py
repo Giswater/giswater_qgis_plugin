@@ -2310,7 +2310,7 @@ def init_docker(docker_param='qgis_info_docker'):
     return global_vars.session_vars['dialog_docker']
 
 
-def close_docker():
+def close_docker(option_name='position'):
     """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
         remove from iface and del class
     """
@@ -2325,7 +2325,7 @@ def close_docker():
                     del widget
                     global_vars.session_vars['dialog_docker'].setWidget(None)
                     global_vars.session_vars['docker_type'] = None
-                    set_config_parser('docker', 'position', f'{docker_pos}')
+                    set_config_parser('docker', option_name, f'{docker_pos}')
                 global_vars.iface.removeDockWidget(global_vars.session_vars['dialog_docker'])
                 global_vars.session_vars['dialog_docker'] = None
     except AttributeError:
@@ -2333,13 +2333,13 @@ def close_docker():
         global_vars.session_vars['dialog_docker'] = None
 
 
-def manage_docker_options():
+def manage_docker_options(option_name='position'):
     """ Check if user want dock the dialog or not """
 
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker', 'position', "user", "session"))
+        pos = int(get_config_parser('docker', option_name, "user", "session"))
         global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dialog_docker'].position = pos
@@ -2817,7 +2817,45 @@ def remove_deprecated_config_vars():
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
-    # Get deprecated vars for init
+    # Remove deprecated sections for init
+    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    init_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_init', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not init_parser.has_section(section):
+                continue
+            init_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        init_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated sections for session
+    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    session_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_session', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not session_parser.has_section(section):
+                continue
+            session_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        session_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated vars for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
@@ -2841,7 +2879,7 @@ def remove_deprecated_config_vars():
         init_parser.write(configfile)
         configfile.close()
 
-    # Get deprecated vars for session
+    # Remove deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
