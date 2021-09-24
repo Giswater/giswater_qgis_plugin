@@ -413,10 +413,6 @@ class GwInfo(QObject):
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
 
-        if feature_id:
-            self.dlg_cf.setGeometry(self.dlg_cf.pos().x(), self.dlg_cf.pos().y(), self.dlg_cf.width(),
-                                    self.dlg_cf.height())
-
         # Get widget controls
         self._get_widget_controls(new_feature)
 

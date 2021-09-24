@@ -73,15 +73,12 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
-    x, y = dialog.pos().x(), dialog.pos().y()
-    if isinstance(dialog, GwMainWindow):
-        x, y = x, y + 40
-    elif isinstance(dialog, GwDialog):
-        x, y = x + 8, y + 31
+    x, y = dialog.geometry().x(), dialog.geometry().y()
+    w, h = dialog.geometry().width(), dialog.geometry().height()
 
     try:
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
     except Exception:
