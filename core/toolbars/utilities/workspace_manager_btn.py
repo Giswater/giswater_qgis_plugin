@@ -117,6 +117,9 @@ class GwWorkspaceManagerButton(GwAction):
 
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
+        if len(name) == 0:
+            tools_qt.set_stylesheet(self.new_workspace_name)
+            return
         action = "CREATE"
 
         extras = f'"action":"{action}", "name":"{name}", "descript":"{descript}"'
@@ -124,6 +127,9 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
+            tools_qt.set_stylesheet(self.new_workspace_name, "")
+            self.new_workspace_name.setText("")
+            self.new_workspace_descript.setPlainText("")
             self._fill_tbl(self.filter_name.text())
             tools_gw.close_dialog(self.dlg_create_workspace)
 
