@@ -97,15 +97,32 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
      
  
-	IF v_pluginlot AND v_visit_type=1 THEN
-		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate, 
-		webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-		lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
-	ELSE 
-		
-		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate,
-		webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-		status=NEW.status WHERE id=NEW.visit_id;
+ 	IF visit_table <> 'arc' then
+ 	
+		IF v_pluginlot AND v_visit_type=1 THEN
+			UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate, 
+			webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
+			lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
+		ELSE 
+			
+			UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate,
+			webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
+			status=NEW.status WHERE id=NEW.visit_id;
+		END IF;
+	
+	ELSE
+	
+		IF v_pluginlot AND v_visit_type=1 THEN
+			UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate, 
+			webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=ST_CENTROID(NEW.the_geom), descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
+			lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
+		ELSE 
+			
+			UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate,
+			webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=ST_CENTROID(NEW.the_geom), descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
+			status=NEW.status WHERE id=NEW.visit_id;
+		END IF;
+	
 	END IF;
 
    	-- Get related parameters(events) from visit_class
