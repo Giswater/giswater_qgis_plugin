@@ -3370,7 +3370,7 @@ class GwInfo(QObject):
 
     def _fill_tab_plan(self, complet_result):
 
-        plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
+        plan_layout = self.dlg_cf.findChild(QGridLayout, 'lyt_plan_1')
 
         if self.feature_type == 'arc' or self.feature_type == 'node':
             index_tab = self.tab_main.currentIndex()
