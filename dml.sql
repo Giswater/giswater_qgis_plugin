@@ -26,8 +26,21 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 
 
 
-
 -- TAB HYDROMETER VALUES
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_val_1', 'lyt_hydrometer_val_1','lytHyrometerVal1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_val_2', 'lyt_hydrometer_val_2','lytHyrometerVal2');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_val_3', 'lyt_hydrometer_val_3','lytHyrometerVal3');
+
+INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
+    VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydrometer WHERE hydrometer_id IS NOT NULL', 4);
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydrometer_val_1', 1, 'string', 'combo', 'Cat period filter:', false, false, true, false, true, 'SELECT DISTINCT(t1.code), t2.cat_period_id FROM ext_cat_period as t1 JOIN (SELECT * FROM v_ui_hydroval_x_connec) AS t2 ON t1.id = t2.cat_period_id ORDER BY t2.cat_period_id DESC ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_visit_x_arc');
+
+
+
+
+
 -- TAB VISIT
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_visit_1', 'lyt_visit_1','lytVisits1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_visit_2', 'lyt_visit_2','lytVisits2');
@@ -47,7 +60,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  column
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
     VALUES ('arc', 'form_feature', 'visit', 'tbl_visits', 'lyt_visit_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_path", "parameters":{"columnfind":"path"}}', 'tbl_visit_x_arc');
-
 
 
 
