@@ -89,20 +89,21 @@ BEGIN
 			"data":{"message":"3188", "function":"3078","debug_msg":null}}$$);' INTO v_audit_result;
 		ELSE
 		--create configuration json for creating new workspace or saving the current settings as temporal in order to beeing able to reset them
-
+		--save configuration from config_param_user
 		SELECT jsonb_build_object('inp',i.inp_conf) INTO v_workspace_config FROM
 		(SELECT json_object_agg(parameter, value) as inp_conf
 		FROM config_param_user WHERE 
 		(parameter ilike 'inp_options%' OR parameter ilike 'inp_report%') AND 
 		parameter NOT IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault') 
 		AND cur_user=current_user) i;
-		
+		--save configuration from config_param_user (parameters with json values)
 		SELECT json_object_agg(parameter, value::JSON) as inp_conf INTO v_inp_json_config
 		FROM config_param_user where parameter IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault') 
 		AND cur_user=current_user;
 		
 		v_workspace_config = gw_fct_json_object_set_key(v_workspace_config,'inp_json', v_inp_json_config);
 		
+		--save current configuration of selector
 		SELECT json_agg(s.selector_conf) INTO v_selectors_config FROM (
 		select jsonb_build_object('selector_expl', array_agg(expl_id))  as selector_conf
 		FROM selector_expl where cur_user=current_user 
@@ -125,18 +126,18 @@ BEGIN
 		select jsonb_build_object('selector_state', array_agg(state_id)) as selector_conf 
 		FROM selector_state where cur_user=current_user)s;
 			
-		
+		--save current configuration of selectors, where there is more than 1 field of selector or the selector are diffent in ws and ud 
 		IF v_project_type = 'WS' THEN
 			SELECT json_agg(s.selector_conf) INTO v_selectors_configcompound FROM (
-				select jsonb_build_object('selector_rpt_main_tstep_resultdate',array_agg(timestep)) as selector_conf 
+				select jsonb_build_object('selector_rpt_main_tstep',array_agg(timestep)) as selector_conf 
 				FROM selector_rpt_main_tstep where cur_user=current_user
 				UNION
-				select jsonb_build_object('selector_rpt_compare_tstep_resultdate',array_agg(timestep)) as selector_conf 
+				select jsonb_build_object('selector_rpt_compare_tstep',array_agg(timestep)) as selector_conf 
 				FROM selector_rpt_compare_tstep where cur_user=current_user
 				UNION
-				select jsonb_build_object('selector_date', json_agg(selector_conf::json)) FROM (
-				select json_build_object('selector_date_from_date', from_date, 'selector_date_to_date', to_date,'selector_date_context', context)::text as selector_conf 
-				FROM selector_date where cur_user=current_user)a)s;
+				select jsonb_build_object('selector_date', json_agg(a.selector_value::json)) as selector_conf FROM (
+				select json_build_object('from_date', from_date, 'to_date', to_date,'context', context)::text as selector_value
+				FROM selector_date where cur_user=current_user)a )s;
 		ELSIF v_project_type = 'UD' THEN
 			SELECT json_agg(s.selector_conf) INTO v_selectors_configcompound  FROM (
 				select jsonb_build_object('selector_rpt_main_tstep', json_agg(a.selector_value::json))as selector_conf FROM (
@@ -152,7 +153,7 @@ BEGIN
 				FROM selector_date where cur_user=current_user)a )s;
 		END IF;
 
-
+		--join jsons of configuration
 		v_selectors_config = v_selectors_config::jsonb||v_selectors_configcompound::jsonb;
 		v_workspace_config = gw_fct_json_object_set_key(v_workspace_config,'selectors', v_selectors_config);
 
@@ -161,7 +162,7 @@ BEGIN
 
 
 	IF v_action = 'DELETE' THEN
-
+		--check if someone uses a workspace at the moment, if not, remove it 
 		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault') = v_workspace_id::text THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3186", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
@@ -172,7 +173,7 @@ BEGIN
 		END IF;
 		
 	ELSIF v_action = 'CREATE' AND v_audit_result is null THEN
-
+		--insert new workspace into catalog and set it as vdefault
 		INSERT INTO cat_workspace (name, descript, config)
 		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config) RETURNING id INTO v_workspace_id;
 
@@ -201,12 +202,14 @@ BEGIN
 		
 		
 	ELSIF v_action = 'RESET' THEN
-	
+		--delete current vdefault workspace
+		DELETE FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user=current_user;
+
 		--capture previously set settings
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE name=concat('temp_',current_user);
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
-
+		--delete temporal workspace
 		DELETE FROM cat_workspace WHERE name=concat('temp_',current_user);
 		
 	END IF;
@@ -216,12 +219,12 @@ BEGIN
 		FOR rec_sector IN SELECT * FROM json_array_elements(v_config_values) LOOP
 
 			v_selector_name = json_object_keys(rec_sector);
+			
 			--remove values for selector
-
 			EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
 
 			v_sector_value = json_extract_path_text(rec_sector,v_selector_name);
-			
+			--insert values into selectors with more than 1 field
 			IF  v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
 			OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
 				
@@ -235,7 +238,7 @@ BEGIN
 			
 				END LOOP;
 			ELSE 
-				--SELECT * FROM json_object_keys('{"selector_rpt_compare_tstep_resultdate": "2020-12-2", "selector_rpt_compare_tstep_resulttime": "12:00"}')
+			--insert values into selectors with 1 field
 				IF v_sector_value IS NOT NULL THEN
 					EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
 					AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
@@ -248,7 +251,7 @@ BEGIN
 			END IF;
 			
 		END LOOP;
-
+		--insert values into config_param_user
 		FOR rec_inp IN SELECT 'inp' UNION SELECT 'inp_json' LOOP
 			v_config_values = json_extract_path_text(v_workspace_config,rec_inp);
 
