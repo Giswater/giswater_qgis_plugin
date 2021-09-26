@@ -28,9 +28,10 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+
+	-- pressure pumps
 	v_query_text = 'SELECT temp_arc.arc_id, temp_arc.node_1, the_geom, curve_id FROM temp_arc
-			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''PUMP'' AND pump_type = ''PRESSPUMP''';	
-			
+			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''PUMP'' AND pump_type = ''PRESSPUMP''';			
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text
 	LOOP
@@ -95,7 +96,7 @@ BEGIN
 		v_record_a1.node_2 = v_record.node_id;
 		v_record_a1.length = v_record_a1.length/2;
 		v_record_a1.the_geom := ST_LineSubstring(v_record_a1.the_geom,0.5,1);
-		v_record_a1.addparam = gw_fct_json_object_set_key(addparam::json, 'valv_type', 'PSV');
+		v_record_a1.addparam = gw_fct_json_object_set_key(v_record_a1.addparam::json, 'valv_type', 'PSV'::text);
 		INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam)
 		VALUES(v_record_a1.result_id, v_record_a1.arc_id, v_record_a1.node_1, v_record_a1.node_2, v_record_a1.arc_type, v_record_a1.arccat_id, v_record_a1.epa_type, v_record_a1.sector_id, v_record_a1.state, v_record_a1.state_type, 
 		v_record_a1.annotation, v_record_a1.diameter, v_record_a1.roughness, v_record_a1.length, v_record_a1.status, v_record_a1.the_geom, v_record_a1.expl_id, v_record_a1.flw_code, v_record_a1.addparam);
@@ -108,8 +109,8 @@ BEGIN
 		v_record_a2.node_1 = v_record.node_id;
 		v_record_a2.length = v_record_a2.length/2;
 		v_record_a2.the_geom := ST_LineSubstring(v_record_a2.the_geom,0,0.5);
-		v_record_a2.addparam = gw_fct_json_object_set_key(addparam::json, 'valv_type', 'PRV');
-		v_record_a2.addparam = gw_fct_json_object_set_key(addparam::json, 'pressure', v_record_a2.addparam::json->>'add_settings');
+		v_record_a2.addparam = gw_fct_json_object_set_key(v_record_a2.addparam::json, 'valv_type', 'PRV'::text);
+		v_record_a2.addparam = gw_fct_json_object_set_key(v_record_a2.addparam::json, 'pressure', (v_record_a2.addparam::json->>'add_settings')::text);
 		INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam)
 		VALUES(v_record_a2.result_id, v_record_a2.arc_id, v_record_a2.node_1, v_record_a2.node_2, v_record_a2.arc_type, v_record_a2.arccat_id, v_record_a2.epa_type, v_record_a2.sector_id, v_record_a2.state, v_record_a2.state_type, 
 		v_record_a2.annotation, v_record_a2.diameter, v_record_a2.roughness, v_record_a2.length, v_record_a2.status, v_record_a2.the_geom, v_record_a2.expl_id, v_record_a2.flw_code, v_record_a2.addparam);
