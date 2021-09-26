@@ -258,6 +258,16 @@ BEGIN
 	RAISE NOTICE '21 Set demand = 0 for dry nodes';
 	IF v_removedemands THEN
 		UPDATE temp_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) FROM anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
+		GET DIAGNOSTICS v_count = row_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat(
+			'WARNING-227: Variabe to force remove demand on dry nodes and ',v_count,' dry nodes with demand have found wich demand have automaticly been removed'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat(
+			'INFO: Variabe to force remove demand on dry nodes is enabled but no dry nodes with demand have been found.'));
+		END IF;
 	END IF;
 
 	RAISE NOTICE '22 - Check result previous exportation';
