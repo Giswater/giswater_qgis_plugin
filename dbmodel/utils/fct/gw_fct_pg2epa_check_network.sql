@@ -360,8 +360,30 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'), v_count);
 		END IF;
-	END IF;
 
+	ELSE -- UD project
+
+		-- counting arcs with length less than 2m
+		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 2 and st_length(the_geom) > 0.49999;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' arcs with length with length less than 2 meters'), v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than 2 metres'), v_count);
+		END IF;	
+
+		-- counting arcs with length less than 0.5m
+		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 0.5;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' arcs with length with length less than 0.5 meters'), v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than 0.5 metres'), v_count);
+		END IF;	
+
+	END IF;
 
 	RAISE NOTICE '6 - Stats';
 	
