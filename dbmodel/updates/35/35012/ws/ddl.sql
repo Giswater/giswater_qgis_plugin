@@ -134,3 +134,7 @@ ALTER TABLE cat_dscenario ALTER active SET DEFAULT TRUE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_register", "column":"pol_id", "newName":"_pol_id_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_tank", "column":"pol_id", "newName":"_pol_id_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_fountain", "column":"pol_id", "newName":"_pol_id_"}}$$);
+
+-- 2021/09/26
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_valve", "column":"add_settings", "dataType":"double precision", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_valve", "column":"add_settings", "dataType":"double precision", "isUtils":"False"}}$$);

@@ -131,3 +131,49 @@ polygon.the_geom
 FROM v_connec
 JOIN polygon ON polygon.feature_id::text = v_connec.connec_id::text
 WHERE polygon.sys_type='FOUNTAIN';
+
+
+
+CREATE OR REPLACE VIEW ws_sample.v_edit_inp_valve AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_valve.valv_type,
+    inp_valve.pressure,
+    inp_valve.flow,
+    inp_valve.coef_loss,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    inp_valve.to_arc,
+    inp_valve.status,
+    v_node.the_geom,
+    inp_valve.custom_dint,
+    inp_valve.add_settings
+   FROM selector_sector, v_node
+     JOIN inp_valve USING (node_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+-- 2021/09/26
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    p.valv_type,
+    p.pressure,
+    p.flow,
+    p.coef_loss,
+    p.curve_id,
+    p.minorloss,
+    p.status,
+    p.add_settings
+   FROM selector_sector, selector_inp_dscenario, v_node
+     JOIN inp_dscenario_valve p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;

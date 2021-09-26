@@ -26,7 +26,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
   IF TG_OP = 'INSERT' THEN
 	  IF v_dscenario = 'VALVE' THEN
 	  	INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status)
-   		VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
+   		VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings);
 	  
 	  ELSIF v_dscenario = 'TANK' THEN
 	  	INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id)
@@ -55,7 +55,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		IF v_dscenario = 'VALVE' THEN
 			UPDATE inp_dscenario_valve SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure, 
-			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status 
+			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, add_settings=NEW.add_settings 
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
 		ELSIF v_dscenario = 'TANK' THEN

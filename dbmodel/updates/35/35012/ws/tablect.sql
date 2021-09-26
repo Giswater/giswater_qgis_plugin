@@ -17,3 +17,11 @@ REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 --2021/09/03
 ALTER TABLE inp_demand DROP CONSTRAINT IF EXISTS inp_demand_unique;
 ALTER TABLE inp_demand ADD CONSTRAINT inp_demand_unique UNIQUE(feature_id, dscenario_id);
+
+
+-- 2021/09/26
+ALTER TABLE inp_valve DROP CONSTRAINT inp_valve_valv_type_check;
+
+ALTER TABLE inp_valve
+  ADD CONSTRAINT inp_valve_valv_type_check CHECK (valv_type::text = ANY (ARRAY['FCV'::character varying, 'GPV'::character varying, 'PBV'::character varying, 'PRV'::character varying, 'PSV'::character varying, 'TCV'::character varying, 'PSRV'::character varying]));
+

@@ -74,6 +74,7 @@ v_values text;
 v_checkresult boolean;
 v_count2 integer;
 v_periodtype integer;
+object_rec record;
 
 BEGIN
 
@@ -510,8 +511,8 @@ BEGIN
 
 
 	RAISE NOTICE '12 - Check if there are conflicts with dscenarios (396)';
-	FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "junction", "pipe", "pump", "valve"]'::json) as tabname, 
-			         json_array_elements_text('["node", "node"     , "node"    , "arc" , "node" , "node"]'::json) as colname
+	FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve"]'::json) as tabname, 
+			         json_array_elements_text('["node", "node"     , "arc" , "node" , "node"]'::json) as colname
 	LOOP
 
 		EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;

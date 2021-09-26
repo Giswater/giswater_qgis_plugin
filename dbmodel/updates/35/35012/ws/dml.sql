@@ -420,3 +420,5 @@ VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_pipe', 'status'
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status');
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_valve_', 'PSRV', 'PSRV' , 'Pressure sustain + reduction valve');
