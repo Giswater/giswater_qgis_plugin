@@ -190,7 +190,7 @@ class GwEpaFileManager(GwTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = tools_gw.create_body(extras=extras)
-        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, is_thread=True, log_sql=True)
+        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, log_sql=True)
         self.function_failed = dict_result['function_failed']
         self.json_result = dict_result['json_result']
         self.complet_result = dict_result['complet_result']
