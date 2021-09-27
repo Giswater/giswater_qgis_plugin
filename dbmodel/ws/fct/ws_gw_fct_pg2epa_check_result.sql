@@ -511,19 +511,25 @@ BEGIN
 
 
 	RAISE NOTICE '12 - Check if there are conflicts with dscenarios (396)';
-	FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve"]'::json) as tabname, 
-			         json_array_elements_text('["node", "node"     , "arc" , "node" , "node"]'::json) as colname
-	LOOP
+	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
+	
+		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve"]'::json) as tabname, 
+					 json_array_elements_text('["node", "node"     , "arc" , "node" , "node"]'::json) as colname
+		LOOP
 
-		EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
-		END IF;
-	END LOOP;
+			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 1, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
+			END IF;
+		END LOOP;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
+	END IF;
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
