@@ -37,6 +37,8 @@ class GwWorkspaceManagerButton(GwAction):
     # region private functions
 
     def _open_workspace_manager(self):
+        """ Open workspace manager """
+
         # Main dialog
         self.dlg_workspace_manager = GwWorkspaceManagerUi()
         tools_gw.load_settings(self.dlg_workspace_manager)
@@ -114,6 +116,7 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _create_workspace(self):
+        """ Create a workspace """
 
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
@@ -135,6 +138,7 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _set_current_workspace(self):
+        """ Set the selected workspace as the current one """
 
         action = "CURRENT"
 
@@ -157,6 +161,7 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _reset_workspace(self):
+        """ Reset the values of the selected workspace """
 
         action = "RESET"
 
@@ -172,6 +177,7 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _delete_workspace(self):
+        """ Delete the selected workspace """
 
         action = "DELETE"
 
@@ -204,6 +210,7 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _set_label_current_workspace(self, value):
+        """ Set the current workspace label with @value """
 
         sql = (f"SELECT name FROM cat_workspace "
                f" WHERE id='{value}'")
