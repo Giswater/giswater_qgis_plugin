@@ -171,13 +171,6 @@ class GwLoadProject(QObject):
             msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
             tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
 
-        if qgis_version != recommendedQgisVersion:
-            msg = "QGIS version does not match recommended version, you can check wiki"
-            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=0, btn_text="Open wiki")
-        if int(postgresql_version) != int(recommendedPgVersion):
-            msg = "PostgreSQL version does not match recommended version, you can check wiki"
-            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=0, btn_text="Open wiki")
-
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """
