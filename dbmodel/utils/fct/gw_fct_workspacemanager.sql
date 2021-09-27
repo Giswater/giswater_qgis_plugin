@@ -20,10 +20,6 @@ SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CURRENT", "id":"9"}}$$);
 
---reset workspace, set previous settings
-SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"RESET"}}$$);
-
 --delete selected workspace
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"DELETE", "id":"1"}}$$);
@@ -185,10 +181,10 @@ BEGIN
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
-		--save current settings in a temporal workspace in order the set it back as they were
-		INSERT INTO cat_workspace (name, config, isautomatic)
+		--comment code related to reset workspace - save current settings in a temporal workspace in order the set it back as they were
+		/*INSERT INTO cat_workspace (name, config, isautomatic)
 		VALUES (concat('temp_',current_user), v_workspace_config, TRUE)
-		ON CONFLICT (name) DO NOTHING;
+		ON CONFLICT (name) DO NOTHING;*/
 
 		--save workspace in config_param_user
 		INSERT INTO config_param_user (parameter,value, cur_user)
@@ -200,8 +196,8 @@ BEGIN
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 		
-		
-	ELSIF v_action = 'RESET' THEN
+		--comment code related to reseting the workspace
+	/*ELSIF v_action = 'RESET' THEN
 		--delete current vdefault workspace
 		DELETE FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user=current_user;
 
@@ -210,7 +206,7 @@ BEGIN
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 		--delete temporal workspace
-		DELETE FROM cat_workspace WHERE name=concat('temp_',current_user);
+		DELETE FROM cat_workspace WHERE name=concat('temp_',current_user);*/
 		
 	END IF;
 
