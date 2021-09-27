@@ -62,7 +62,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
-        self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace))
+        self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace, 'workspace_create'))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
@@ -71,7 +71,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_workspace_manager))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_workspace_manager)
+        tools_gw.open_dialog(self.dlg_workspace_manager, 'workspace_manager')
 
 
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
