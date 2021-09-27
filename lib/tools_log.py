@@ -50,12 +50,13 @@ class GwLogger(object):
         log_info(f"Log file: {filepath}", logger_file=False, tab_name=self.tab_python)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
+        self.filepath = filepath
 
         # Initialize number of errors in current process
         self.num_errors = 0
 
         # Add file handler
-        self.add_file_handler(filepath)
+        self.add_file_handler()
 
 
     def set_logger_parameters(self, min_log_level, log_limit_characters, db_limit_characters):
@@ -69,13 +70,13 @@ class GwLogger(object):
             self.db_limit_characters = db_limit_characters
 
 
-    def add_file_handler(self, filepath):
+    def add_file_handler(self):
         """ Add file handler """
 
         log_format = '%(asctime)s [%(levelname)s] - %(message)s\n'
         log_date = '%d/%m/%Y %H:%M:%S'
         formatter = logging.Formatter(log_format, log_date)
-        self.fh = logging.FileHandler(filepath)
+        self.fh = logging.FileHandler(self.filepath)
         self.fh.setFormatter(formatter)
         self.logger_file.addHandler(self.fh)
 
