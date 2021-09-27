@@ -364,7 +364,7 @@ BEGIN
 	ELSE -- UD project
 
 		-- counting arcs with length less than 2m
-		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 2 and st_length(the_geom) > 0.49999;
+		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 2 and st_length(the_geom) > 0.49999 AND epa_type = 'CONDUIT';
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' arcs with length with length less than 2 meters'), v_count);
@@ -374,13 +374,13 @@ BEGIN
 		END IF;	
 
 		-- counting arcs with length less than 0.5m
-		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 0.5;
+		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 0.5 AND epa_type = 'CONDUIT';
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' arcs with length with length less than 0.5 meters'), v_count);
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' conduits with length with length less than 0.5 meters'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than 0.5 metres'), v_count);
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No conduits with length less than 0.5 metres'), v_count);
 		END IF;	
 
 	END IF;

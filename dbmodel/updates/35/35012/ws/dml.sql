@@ -372,13 +372,13 @@ ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 UPDATE config_form_tabs SET orderby = 6 WHERE formname = 'selector_basic' AND tabname = 'tab_psector';
 
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'DEMAND', 'DEMAND');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'VALVE', 'VALVE');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'INLET', 'INLET');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'PUMP', 'PUMP');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'PIPE', 'PIPE');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'JOINED', 'JOINED');
-INSERT INTO inp_typevalue VALUES ('typevalue_dscenario', 'OTHER', 'OTHER');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'DEMAND', 'DEMAND');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'VALVE', 'VALVE');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'INLET', 'INLET');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'PUMP', 'PUMP');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'PIPE', 'PIPE');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'JOINED', 'JOINED');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'OTHER', 'OTHER');
 
 -- 2021/09/05
 INSERT INTO audit_check_data (fid, criticity, error_message) 
@@ -389,7 +389,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('cat_dscenario','form_feature', 'main', 'dscenario_type', null, null, 'string', 'combo', 'dscenario_type', NULL, NULL,  FALSE,
-FALSE, TRUE, FALSE,FALSE,'SELECT id, idval FROM inp_typevalue WHERE typevalue=''typevalue_dscenario''', TRUE, FALSE, NULL, NULL,NULL,
+FALSE, TRUE, FALSE,FALSE,'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_dscenario''', TRUE, FALSE, NULL, NULL,NULL,
 NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 -- 2021/09/17
@@ -421,4 +421,6 @@ VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_pipe', 'status'
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status');
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_valve_', 'PSRV', 'PSRV' , 'Pressure sustain + reduction valve');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_valve', 'PSRV', 'PSRV' , 'Pressure sustain + reduction valve');
+
+INSERT INTO 

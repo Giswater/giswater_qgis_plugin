@@ -463,3 +463,7 @@ INSERT INTO inp_dscenario_raingage VALUES (1,'RG-01',null,null,null,null,'T10-5m
 INSERT INTO inp_dscenario_raingage VALUES (2,'RG-01',null,null,null,null,'T10-5m');
 INSERT INTO inp_dscenario_raingage VALUES (3,'RG-01',null,null,null,null,'T10-5m');
 
+UPDATE inp_dwf SET value = 0.0001;
+
+UPDATE config_param_user SET value = null WHERE value ='COVER' and parameter = 'edit_elementcat_vdefault';
+

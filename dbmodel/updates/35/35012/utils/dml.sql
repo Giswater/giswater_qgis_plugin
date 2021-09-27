@@ -173,3 +173,4 @@ VALUES (3186, 'Workspace is being used by another user and can not be deleted', 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, TRUE, 'utils',NULL);
 
+INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (133, 1, 'v_edit_inp_demand table have been renamed. Now is v_edit_inp_dscenario_demand');

@@ -31,11 +31,11 @@ CREATE TABLE inp_dscenario_pipe (
   arc_id character varying(16) NOT NULL,
   minorloss numeric(12,6),
   status character varying(12),
-  roughness numeric(12,4) NOT NULL,
-  dint numeric(12,3) NOT NULL,
+  roughness numeric(12,4),
+  dint numeric(12,3),
   CONSTRAINT inp_dscenario_pipe_pkey PRIMARY KEY (arc_id, dscenario_id),
   CONSTRAINT inp_dscenario_pipe_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES arc (arc_id) MATCH SIMPLE
+      REFERENCES inp_pipe (arc_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_pipe_status_check CHECK (status::text = ANY (ARRAY['CLOSED'::character varying, 'CV'::character varying, 'OPEN'::character varying]::text[]))
 );
@@ -68,7 +68,7 @@ CREATE TABLE inp_dscenario_reservoir (
   head double precision,
   CONSTRAINT inp_dscenario_reservoir_pkey PRIMARY KEY (node_id, dscenario_id),
   CONSTRAINT inp_dscenario_reservoir_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
+      REFERENCES inp_reservoir (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_reservoir_pattern_id_fkey FOREIGN KEY (pattern_id)
       REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
@@ -91,7 +91,7 @@ CREATE TABLE inp_dscenario_valve(
       REFERENCES inp_curve (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_valve_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
+      REFERENCES inp_valve (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT inp_dscenario_valve_status_check CHECK (status::text = ANY (ARRAY['ACTIVE'::character varying, 'CLOSED'::character varying, 'OPEN'::character varying]::text[])),
   CONSTRAINT inp_dscenario_valve_valv_type_check CHECK (valv_type::text = ANY (ARRAY['FCV'::character varying, 'GPV'::character varying, 'PBV'::character varying, 'PRV'::character varying, 'PSV'::character varying, 'TCV'::character varying]::text[]))
@@ -110,7 +110,7 @@ CREATE TABLE inp_dscenario_tank (
   curve_id character varying(16),
   CONSTRAINT inp_dscenario_tank_pkey PRIMARY KEY (node_id, dscenario_id),
   CONSTRAINT inp_dscenario_tank_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
+      REFERENCES inp_tank (node_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -138,3 +138,26 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_foun
 -- 2021/09/26
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_valve", "column":"add_settings", "dataType":"double precision", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_valve", "column":"add_settings", "dataType":"double precision", "isUtils":"False"}}$$);
+
+ALTER TABLE inp_demand RENAME to inp_dscenario_demand;
+ALTER VIEW v_edit_inp_demand RENAME to v_edit_inp_dscenario_demand;
+
+UPDATE sys_table SET id = 'inp_dscenario_demand' WHERE id = 'inp_demand';
+UPDATE sys_table SET id = 'v_edit_inp_dscenario_demand' WHERE id = 'v_edit_inp_demand';
+
+UPDATE sys_foreignkey SET target_table = 'inp_dscenario_demand' WHERE  target_table = 'inp_demand';
+
+UPDATE config_form_fields SET formname = 'v_edit_inp_dscenario_demand' WHERE formname = 'v_edit_inp_demand';
+
+DROP TRIGGER gw_trg_typevalue_fk ON inp_dscenario_demand;
+
+CREATE TRIGGER gw_trg_typevalue_fk
+  AFTER INSERT OR UPDATE
+  ON inp_dscenario_demand
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_demand');
+
+
+
+
+
