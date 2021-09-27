@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_psector_duplicate</class>
- <widget class="QDialog" name="dlg_psector_duplicate">
+ <class>dlg_workspace_create</class>
+ <widget class="QDialog" name="dlg_workspace_create">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Duplicate psector</string>
+   <string>Create new workspace</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="3">
@@ -75,7 +75,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="lbl_new_psector">
+          <widget class="QLabel" name="lbl_new_workspace_descript">
            <property name="font">
             <font>
              <pointsize>8</pointsize>

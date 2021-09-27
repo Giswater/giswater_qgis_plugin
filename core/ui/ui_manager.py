@@ -228,6 +228,14 @@ class GwPrintUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('toolbox_reports.ui', 'utilities')
 class GwToolboxReportsUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('workspace_manager.ui', 'utilities')
+class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('workspace_create.ui', 'utilities')
+class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 # region TOC
