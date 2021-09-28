@@ -113,6 +113,9 @@ BEGIN
 		select jsonb_build_object('selector_inp_dscenario', array_agg(dscenario_id)) as selector_conf 
 		FROM selector_inp_dscenario where cur_user=current_user
 		UNION
+		select jsonb_build_object('selector_hydrometer', array_agg(state_id)) as selector_conf 
+		FROM selector_hydrometer where cur_user=current_user
+		UNION
 		select jsonb_build_object('selector_rpt_main', array_agg(result_id)) as selector_conf 
 		FROM selector_rpt_main where cur_user=current_user
 		UNION
