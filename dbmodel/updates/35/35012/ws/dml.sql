@@ -422,3 +422,9 @@ INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target
 VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status');
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_valve', 'PSRV', 'PSRV' , 'Pressure sustain + reduction valve');
+
+UPDATE config_toolbox SET functionparams ='{"featureType":["node","connec"]}',
+inputparams ='[{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
+"dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"$userExploitation"},
+{"widgetname":"updateValues", "label":"Features to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,
+"comboIds":["allValues", "nullValues"], "comboNames":["ALL", "ONLY NULL ELEV"], "selectedId":"nullValues"}]' WHERE id=2760;
