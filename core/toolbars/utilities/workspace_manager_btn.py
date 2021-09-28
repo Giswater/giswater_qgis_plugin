@@ -47,22 +47,13 @@ class GwWorkspaceManagerButton(GwAction):
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
-        # Create workspace dialog
-        self.dlg_create_workspace = GwCreateWorkspaceUi()
-        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
-        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
-
-        # Connect create workspace dialog signals
-        self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
-        self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
-
         # Fill table
         self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
         self._fill_tbl()
 
         # Connect main dialog signals
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
-        self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace, 'workspace_create', stay_on_top=True))
+        self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
@@ -73,6 +64,38 @@ class GwWorkspaceManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_workspace_manager, 'workspace_manager')
+
+
+    def _open_create_workspace_dlg(self):
+
+        # Create workspace dialog
+        self.dlg_create_workspace = GwCreateWorkspaceUi()
+        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
+        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
+
+        # gw_fct_workspacemanager doesn't send log info data, so we disable the info_log tab
+        tools_qt.remove_tab(self.dlg_create_workspace.mainTab, "tab_info_log")
+
+        # Connect create workspace dialog signals
+        self.new_workspace_name.textChanged.connect(partial(self._check_exists))
+        self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
+        self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
+
+        # Open the dialog
+        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
+
+
+    def _check_exists(self, name=""):
+        sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"
+        row = tools_db.get_row(sql, log_info=False)
+        if row:
+            self.dlg_create_workspace.btn_accept.setEnabled(False)
+            tools_qt.set_stylesheet(self.new_workspace_name)
+            self.new_workspace_name.setToolTip("Workspace already exists")
+            return
+        self.dlg_create_workspace.btn_accept.setEnabled(True)
+        tools_qt.set_stylesheet(self.new_workspace_name, style="")
+        self.new_workspace_name.setToolTip("")
 
 
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
@@ -131,9 +154,6 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            tools_qt.set_stylesheet(self.new_workspace_name, "")
-            self.new_workspace_name.setText("")
-            self.new_workspace_descript.setPlainText("")
             self._fill_tbl(self.filter_name.text())
             tools_gw.close_dialog(self.dlg_create_workspace)
 
@@ -192,8 +212,6 @@ class GwWorkspaceManagerButton(GwAction):
         # Get selected workspace id
         index = self.tbl_wrkspcm.selectionModel().currentIndex()
         value = index.sibling(index.row(), 0).data()
-
-        # TODO: Check if is current workspace or is used by others
 
         message = "Are you sure you want to delete these records?"
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
