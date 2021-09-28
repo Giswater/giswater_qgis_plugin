@@ -389,10 +389,6 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
-FORM_CLASS = _get_ui_class('selector_multirow.ui')
-class GwMultirowSelectorUi(GwDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = _get_ui_class('selector.ui')
 class GwSelectorUi(GwDialog, FORM_CLASS):
     pass

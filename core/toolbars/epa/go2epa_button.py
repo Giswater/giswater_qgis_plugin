@@ -16,9 +16,10 @@ from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTa
     QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
 from qgis.core import QgsApplication
 
+from ...shared.selector import GwSelector
 from ...threads.epa_file_manager import GwEpaFileManager
 from ...utils import tools_gw
-from ...ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi, GwGo2EpaOptionsUi
+from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 from ..dialog import GwAction
@@ -55,64 +56,6 @@ class GwGo2EpaButton(GwAction):
 
 
     # region private functions
-    def _multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
-                             field_id):
-        """
-            :param qtable_left: QTableView origin
-            :param qtable_right: QTableView destini
-            :param id_ori: Refers to the id of the source table
-            :param tablename_des: table destini
-            :param id_des: Refers to the id of the target table, on which the query will be made
-            :param query_right:
-            :param query_left:
-            :param field_id:
-        """
-
-        selected_list = qtable_left.selectionModel().selectedRows()
-
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-        expl_id = []
-        curuser_list = []
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = qtable_left.model().record(row).value(id_ori)
-            expl_id.append(id_)
-            curuser = qtable_left.model().record(row).value("cur_user")
-            curuser_list.append(curuser)
-        for i in range(0, len(expl_id)):
-            # Check if expl_id already exists in expl_selector
-            sql = (f"SELECT DISTINCT({id_des}, cur_user)"
-                   f" FROM {tablename_des}"
-                   f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
-            row = tools_db.get_row(sql)
-
-            if row:
-                # if exist - show warning
-                message = "Id already selected"
-                tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
-            else:
-                sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
-                       f" VALUES ({expl_id[i]}, current_user)")
-                tools_db.execute_sql(sql)
-
-        # Refresh
-        oder_by = {0: "ASC", 1: "DESC"}
-        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
-        idx = qtable_left.horizontalHeader().sortIndicatorSection()
-        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
-        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self._fill_table_by_query(qtable_right, query_right)
-
-        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
-        idx = qtable_right.horizontalHeader().sortIndicatorSection()
-        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
-        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self._fill_table_by_query(qtable_left, query_left)
-        tools_qgis.refresh_map_canvas()
-
 
     def _open_go2epa(self):
 
@@ -320,22 +263,19 @@ class GwGo2EpaButton(GwAction):
     def _sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
 
-        dlg_psector_sel = GwMultirowSelectorUi('dscenario')
-        tools_gw.load_settings(dlg_psector_sel)
-        dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
+        # Get class Selector from selector.py
+        go2epa_selector = GwSelector()
 
-        if tableleft == 'cat_dscenario':
-            dlg_psector_sel.setWindowTitle(" Dscenario selector")
-            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                     tools_qt.tr('Filter by: Dscenario name', context_name='labels'))
-            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                     tools_qt.tr('Unselected dscenarios', context_name='labels'))
-            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                     tools_qt.tr('Selected dscenarios', context_name='labels'))
+        # Create the dialog
+        dlg_selector = GwSelectorUi()
+        tools_gw.load_settings(dlg_selector)
 
-        self._multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
+        # Create the signals
+        go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
+        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
 
-        tools_gw.open_dialog(dlg_psector_sel)
+        # Open form
+        tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
 
     def _go2epa_select_file_inp(self):
@@ -452,161 +392,6 @@ class GwGo2EpaButton(GwAction):
             self.completer.setModel(model)
             if result_name in rows:
                 self.dlg_go2epa.chk_only_check.setEnabled(True)
-
-
-    def _multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-                                      23, 24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
-        """
-        :param dialog:
-        :param tableleft: Table to consult and load on the left side
-        :param tableright: Table to consult and load on the right side
-        :param field_id_left: ID field of the left table
-        :param field_id_right: ID field of the right table
-        :param name: field name (used in add_lot.py)
-        :param hide_left: Columns to hide from the left table
-        :param hide_right: Columns to hide from the right table
-        :param aql: (add query left) Query added to the left side (used in dialog.py def basic_exploitation_selector())
-        :return:
-        """
-
-        # fill QTableView all_rows
-        tbl_all_rows = dialog.findChild(QTableView, "all_rows")
-        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        schema_name = global_vars.schema_name.replace('"', '')
-        query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
-        query_left += f"(SELECT {schema_name}.{tableleft}.{name} FROM {schema_name}.{tableleft}"
-        query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
-        query_left += f" WHERE cur_user = current_user)"
-        query_left += f" AND  {field_id_left} > -1"
-        query_left += aql
-
-        self._fill_table_by_query(tbl_all_rows, query_left + f" ORDER BY {name};")
-        self._hide_colums(tbl_all_rows, hide_left)
-        tbl_all_rows.setColumnWidth(1, 200)
-
-        # fill QTableView selected_rows
-        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
-        query_right += f" FROM {schema_name}.{tableleft}"
-        query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
-
-        query_right += " WHERE cur_user = current_user"
-
-        self._fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
-        self._hide_colums(tbl_selected_rows, hide_right)
-        tbl_selected_rows.setColumnWidth(0, 200)
-
-        # Button select
-        dialog.btn_select.clicked.connect(partial(self._multi_rows_selector, tbl_all_rows, tbl_selected_rows,
-                                                  field_id_left, tableright, field_id_right, query_left,
-                                                  query_right,
-                                                  field_id_right))
-
-        # Button unselect
-        query_delete = f"DELETE FROM {schema_name}.{tableright}"
-        query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self._unselector, tbl_all_rows, tbl_selected_rows, query_delete,
-                                                    query_left, query_right, field_id_right))
-
-        # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self._query_like_widget_text, dialog, dialog.txt_name,
-                                                    tbl_all_rows, tableleft, tableright, field_id_right,
-                                                    field_id_left,
-                                                    name, aql))
-
-        # Order control
-        tbl_all_rows.horizontalHeader().sectionClicked.connect(
-            partial(self._order_by_column, tbl_all_rows, query_left))
-        tbl_selected_rows.horizontalHeader().sectionClicked.connect(
-            partial(self._order_by_column, tbl_selected_rows, query_right))
-
-
-    def _order_by_column(self, qtable, query, idx):
-        """
-        :param qtable: QTableView widget
-        :param query: Query for populate QsqlQueryModel
-        :param idx: The index of the clicked column
-        :return:
-        """
-
-        oder_by = {0: "ASC", 1: "DESC"}
-        sort_order = qtable.horizontalHeader().sortIndicatorOrder()
-        col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
-        query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self._fill_table_by_query(qtable, query)
-        tools_qgis.refresh_map_canvas()
-
-
-    def _hide_colums(self, widget, comuns_to_hide):
-
-        for i in range(0, len(comuns_to_hide)):
-            widget.hideColumn(comuns_to_hide[i])
-
-
-    def _unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
-
-        selected_list = qtable_right.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-        expl_id = []
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = str(qtable_right.model().record(row).value(field_id_right))
-            expl_id.append(id_)
-        for i in range(0, len(expl_id)):
-            tools_db.execute_sql(query_delete + str(expl_id[i]))
-
-        # Refresh
-        oder_by = {0: "ASC", 1: "DESC"}
-        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
-        idx = qtable_left.horizontalHeader().sortIndicatorSection()
-        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
-        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self._fill_table_by_query(qtable_left, query_left)
-
-        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
-        idx = qtable_right.horizontalHeader().sortIndicatorSection()
-        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
-        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self._fill_table_by_query(qtable_right, query_right)
-        tools_qgis.refresh_map_canvas()
-
-
-    def _fill_table_by_query(self, qtable, query):
-        """
-        :param qtable: QTableView to show
-        :param query: query to set model
-        """
-
-        model = QSqlQueryModel()
-        model.setQuery(query, db=global_vars.qgis_db_credentials)
-        qtable.setModel(model)
-        qtable.show()
-
-        # Check for errors
-        if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
-
-
-    def _query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
-                               name='name', aql=''):
-        """ Fill the QTableView by filtering through the QLineEdit"""
-
-        schema_name = global_vars.schema_name.replace('"', '')
-        query = tools_qt.get_text(dialog, text_line, return_string_null=False).lower()
-        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
-               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
-               f" RIGHT JOIN {schema_name}.{tableright}"
-               f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
-               f"  AND  {field_id_l} > -1")
-        sql += aql
-        self._fill_table_by_query(qtable, sql)
 
 
     def _go2epa_options(self):
