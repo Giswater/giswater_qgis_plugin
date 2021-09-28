@@ -12,10 +12,10 @@ from functools import partial
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QTableView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QApplication
 
 from ..dialog import GwAction
-from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi
+from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
@@ -83,19 +83,6 @@ class GwWorkspaceManagerButton(GwAction):
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
-
-
-    def _check_exists(self, name=""):
-        sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"
-        row = tools_db.get_row(sql, log_info=False)
-        if row:
-            self.dlg_create_workspace.btn_accept.setEnabled(False)
-            tools_qt.set_stylesheet(self.new_workspace_name)
-            self.new_workspace_name.setToolTip("Workspace already exists")
-            return
-        self.dlg_create_workspace.btn_accept.setEnabled(True)
-        tools_qt.set_stylesheet(self.new_workspace_name, style="")
-        self.new_workspace_name.setToolTip("")
 
 
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
@@ -182,6 +169,7 @@ class GwWorkspaceManagerButton(GwAction):
             self._set_label_current_workspace(value)
             tools_qgis.refresh_map_canvas()  # First refresh all the layers
             global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+            self._manage_selectors()
 
 
     def _reset_workspace(self):
@@ -231,6 +219,19 @@ class GwWorkspaceManagerButton(GwAction):
             self._fill_tbl(self.filter_name.text())
 
 
+    def _check_exists(self, name=""):
+        sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"
+        row = tools_db.get_row(sql, log_info=False)
+        if row:
+            self.dlg_create_workspace.btn_accept.setEnabled(False)
+            tools_qt.set_stylesheet(self.new_workspace_name)
+            self.new_workspace_name.setToolTip("Workspace already exists")
+            return
+        self.dlg_create_workspace.btn_accept.setEnabled(True)
+        tools_qt.set_stylesheet(self.new_workspace_name, style="")
+        self.new_workspace_name.setToolTip("")
+
+
     def _set_label_current_workspace(self, value):
         """ Set the current workspace label with @value """
 
@@ -241,5 +242,18 @@ class GwWorkspaceManagerButton(GwAction):
             return
         text = f"Selected workspace: {row[0]}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
+
+
+    def _manage_selectors(self):
+
+        # Get the selector UI if it's open
+        windows = [x for x in QApplication.allWidgets() if not x.isHidden() and (issubclass(type(x), GwSelectorUi))]
+
+        if windows:
+            try:
+                selector = windows[0].property('GwSelector')
+                selector.open_selector()
+            except Exception:
+                pass
 
     # endregion

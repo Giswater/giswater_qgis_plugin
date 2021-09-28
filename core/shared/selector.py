@@ -30,6 +30,7 @@ class GwSelector:
 
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
+        dlg_selector.setProperty('GwSelector', self)
 
         # Get the name of the last tab used by the user
         selector_vars = {}
@@ -45,7 +46,7 @@ class GwSelector:
             tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
         # Save the name of current tab used by the user
-        dlg_selector.rejected.connect(partial(
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
 
