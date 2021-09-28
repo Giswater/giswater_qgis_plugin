@@ -149,15 +149,4 @@ UPDATE sys_foreignkey SET target_table = 'inp_dscenario_demand' WHERE  target_ta
 
 UPDATE config_form_fields SET formname = 'v_edit_inp_dscenario_demand' WHERE formname = 'v_edit_inp_demand';
 
-DROP TRIGGER gw_trg_typevalue_fk ON inp_dscenario_demand;
-
-CREATE TRIGGER gw_trg_typevalue_fk
-  AFTER INSERT OR UPDATE
-  ON inp_dscenario_demand
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_demand');
-
-
-
-
 

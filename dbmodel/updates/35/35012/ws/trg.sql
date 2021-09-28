@@ -33,3 +33,7 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
 INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_valve 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
 
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON inp_dscenario_demand;
+CREATE TRIGGER gw_trg_typevalue_fk
+AFTER INSERT OR UPDATE ON inp_dscenario_demand
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('inp_dscenario_demand');

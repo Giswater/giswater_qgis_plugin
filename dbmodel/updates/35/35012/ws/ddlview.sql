@@ -134,7 +134,7 @@ WHERE polygon.sys_type='FOUNTAIN';
 
 
 
-CREATE OR REPLACE VIEW ws_sample.v_edit_inp_valve AS 
+CREATE OR REPLACE VIEW v_edit_inp_valve AS 
  SELECT v_node.node_id,
     v_node.elevation,
     v_node.depth,
