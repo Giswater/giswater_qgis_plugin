@@ -62,7 +62,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
-        self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace, 'workspace_create'))
+        self.dlg_workspace_manager.btn_create.clicked.connect(partial(tools_gw.open_dialog, self.dlg_create_workspace, 'workspace_create', stay_on_top=True))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
