@@ -604,3 +604,50 @@ VALUES ('inp_typevalue', 'inp_typevalue_raingage', 'inp_dscenario_raingage', 'fo
 
 
 UPDATE arc SET inverted_slope = FALSE WHERE inverted_slope IS NULL;
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'dscenario_id', null, null, 'string', 'text', 'dscenario_id', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'name', null, null, 'string', 'text', 'name', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'descript', null, null, 'string', 'text', 'descript', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'parent_id', null, null, 'string', 'text', 'parent_id', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'dscenario_type', null, null, 'string', 'combo', 'dscenario_type', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,'SELECT id, idval FROM inp_typevalue WHERE typevalue=''typevalue_dscenario''', TRUE, FALSE, NULL, NULL,NULL,
+NULL, NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 
+isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
+false, false, null, null,false, null, null,null,
+null,null,null,false);
