@@ -463,7 +463,7 @@ BEGIN
 			VALUES (125, 1, '255','INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.',v_count);
 		END IF;
 	ELSIF v_project_type='WS' THEN
-		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
+		v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT node_id FROM node UNION SELECT connec_id FROM connec)) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
