@@ -178,7 +178,10 @@ class GwWorkspaceManagerButton(GwAction):
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
-        self._set_label_current_workspace(value)
+        if result and result['status'] == "Accepted":
+            self._set_label_current_workspace(value)
+            tools_qgis.refresh_map_canvas()  # First refresh all the layers
+            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
 
     def _reset_workspace(self):
