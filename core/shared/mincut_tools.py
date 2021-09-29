@@ -244,10 +244,14 @@ class GwMincutTools:
             format_low = 'yyyy-MM-dd 00:00:00.000'
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-            if str(state_id) in ('0', '3'):
+            if str(state_id) == '0':
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from: forecast_start')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
+            elif str(state_id) == '3':
+                tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from: received_date')
+                tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to: received_date')
+                dates_filter = f"AND received_date BETWEEN {interval}"
             elif str(state_id) in ('1', '2'):
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from: exec_start')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to: exec_end')
