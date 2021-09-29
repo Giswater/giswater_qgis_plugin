@@ -390,7 +390,9 @@ BEGIN
 		INTO v_lastpage;
 	
 	-- add limit
-	v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	IF v_limit != -1 THEN
+		v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	END IF;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
