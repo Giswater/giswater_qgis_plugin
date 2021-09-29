@@ -488,11 +488,8 @@ class GwAdminButton:
         if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
 
-        else:
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
-
+        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
         self.project_types = self.project_types.split(',')
 
         # Populate combo types
