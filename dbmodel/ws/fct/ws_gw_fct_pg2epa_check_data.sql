@@ -213,7 +213,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 166 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '166',concat('ERROR-166: There is/are ',v_count,' node2arcs with more than two arcs. It''s impossible to continue. For more info you can type:'),v_count);
+		VALUES (v_fid, v_result_id, 3, '166',concat('ERROR-166: There is/are ',v_count,' node2arcs with more than two arcs. It''s impossible to continue'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,  '166','INFO: No results found looking for node2arc(s) with more than two arcs.',v_count);

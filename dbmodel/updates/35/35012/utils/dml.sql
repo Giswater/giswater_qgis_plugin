@@ -168,7 +168,7 @@ ON CONFLICT (fid) DO NOTHING;
 COMMENT ON COLUMN config_visit_class.ui_tablename IS 'When configure a ui view, this columns are required: *_id, startdate, enddate, class_id::integer';
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3186, 'Workspace is being used by another user and can not be deleted', NULL, 1, TRUE, 'utils',NULL);
+VALUES (3186, 'Workspace is being used by some user and can not be deleted', NULL, 1, TRUE, 'utils',NULL);
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, TRUE, 'utils',NULL);
