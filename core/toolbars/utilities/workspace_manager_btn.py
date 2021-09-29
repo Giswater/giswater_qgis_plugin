@@ -73,9 +73,6 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
 
-        # gw_fct_workspacemanager doesn't send log info data, so we disable the info_log tab
-        tools_qt.remove_tab(self.dlg_create_workspace.mainTab, "tab_info_log")
-
         # Connect create workspace dialog signals
         self.new_workspace_name.textChanged.connect(partial(self._check_exists))
         self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
@@ -141,8 +138,9 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
+            tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
             self._fill_tbl(self.filter_name.text())
-            tools_gw.close_dialog(self.dlg_create_workspace)
+            self._set_label_current_workspace(name=name)
 
 
     def _set_current_workspace(self):
@@ -232,15 +230,17 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_name.setToolTip("")
 
 
-    def _set_label_current_workspace(self, value):
+    def _set_label_current_workspace(self, value="", name=None):
         """ Set the current workspace label with @value """
 
-        sql = (f"SELECT name FROM cat_workspace "
-               f" WHERE id='{value}'")
-        row = tools_db.get_row(sql)
-        if not row:
-            return
-        text = f"Selected workspace: {row[0]}"
+        if name is None:
+            sql = (f"SELECT name FROM cat_workspace "
+                   f" WHERE id='{value}'")
+            row = tools_db.get_row(sql)
+            if not row:
+                return
+            name = row[0]
+        text = f"Selected workspace: {name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
 
 
