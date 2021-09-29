@@ -1787,17 +1787,18 @@ def manage_json_return(json_result, sql, rubber_band=None):
                 if key.lower() in ('point', 'line', 'polygon'):
                     if key not in json_result['body']['data']:
                         continue
-                    if 'features' not in json_result['body']['data'][key]:
-                        continue
-                    if len(json_result['body']['data'][key]['features']) == 0:
-                        continue
 
+                    # Remove the layer if it exists
                     layer_name = f'{key}'
                     if 'layerName' in json_result['body']['data'][key]:
                         if json_result['body']['data'][key]['layerName']:
                             layer_name = json_result['body']['data'][key]['layerName']
-
                     tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
+
+                    if 'features' not in json_result['body']['data'][key]:
+                        continue
+                    if len(json_result['body']['data'][key]['features']) == 0:
+                        continue
 
                     # Get values for create and populate layer
                     counter = len(json_result['body']['data'][key]['features'])
@@ -1859,6 +1860,9 @@ def manage_json_return(json_result, sql, rubber_band=None):
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+    finally:
+        # Clean any broken temporal layers (left with no data)
+        tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):

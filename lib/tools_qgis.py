@@ -717,6 +717,25 @@ def remove_layer_from_toc(layer_name, group_name):
         remove_layer_from_toc(layer_name, group_name)
 
 
+def clean_layer_group_from_toc(group_name):
+    """
+    Remove all "broken" layers from a group
+        :param group_name: Group's name (String)
+    """
+
+    root = QgsProject.instance().layerTreeRoot()
+    group = root.findGroup(group_name)
+    if group:
+        layers = group.findLayers()
+        for layer in layers:
+            if layer.layer() is None:
+                group.removeChildNode(layer)
+        # Remove group if is void
+        layers = group.findLayers()
+        if not layers:
+            root.removeChildNode(group)
+
+
 def get_plugin_settings_value(key, default_value=""):
     """ Get @value of QSettings located in @key """
 
