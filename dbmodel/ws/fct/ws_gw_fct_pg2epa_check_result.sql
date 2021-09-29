@@ -75,6 +75,7 @@ v_checkresult boolean;
 v_count2 integer;
 v_periodtype integer;
 object_rec record;
+v_graphiclog boolean;
 
 BEGIN
 
@@ -90,6 +91,9 @@ BEGIN
 	
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_graphiclog = (SELECT (value::json->>'graphicLog')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
+	v_graphiclog = false;
 
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -549,35 +553,52 @@ BEGIN
 	v_options := COALESCE(v_options, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-	--points
-	v_result = null;
-	
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-	 'type',       'Feature',
-	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
+	IF v_graphiclog THEN
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+		--points
+		v_result = null;
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT id, node_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
+			UNION
+			SELECT id, node_id, 'Removed demand node'  as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
 
-	IF v_fid::text = 127::text THEN
-		v_result_point = '{}';
+		v_result := COALESCE(v_result, '[]'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+
+		-- arcs
+		v_result = null;
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		    'type',       'Feature',
+		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		   'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM 
+		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139)
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
 	END IF;
-	
-	-- Control nulls
+
 	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||
 			',"data":{"options":'||v_options||','||
 				'"info":'||v_result_info||','||
-				'"point":'||v_result_point||'}'||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||'}'||
 			'}'||
 		'}')::json, 2848, null, null, null);
 
