@@ -741,7 +741,7 @@ JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;
 
 
 CREATE OR REPLACE VIEW v_arc_x_vnode AS 
-SELECT a.link_id,
+ SELECT a.link_id,
     a.vnode_id,
     a.arc_id,
     a.feature_type,
@@ -756,14 +756,14 @@ SELECT a.link_id,
         END AS vnode_topelev,
     (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS vnode_ymax,
     (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS vnode_elev
-   FROM ( SELECT a_1.link_id,
-            vnode.vnode_id,
+   FROM ( SELECT link.link_id,
+            exit_id::integer as vnode_id,
             v_edit_arc.arc_id,
-            a_1.feature_type,
-            a_1.feature_id,
-            a_1.vnode_topelev,
+            link.feature_type,
+            link.feature_id,
+            link.vnode_topelev,
             st_length(v_edit_arc.the_geom) AS length,
-            st_linelocatepoint(v_edit_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
+            st_linelocatepoint(v_edit_arc.the_geom, st_endpoint(link.the_geom))::numeric(12,3) AS locate,
             v_edit_arc.node_1,
             v_edit_arc.node_2,
             v_edit_arc.sys_elev1,
@@ -772,7 +772,8 @@ SELECT a.link_id,
             v_edit_arc.sys_y2,
             v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
             v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
-           FROM v_edit_arc, vnode
-             JOIN link a_1 ON vnode.vnode_id = a_1.exit_id::integer
-          WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0 AND a_1.state = 1) a
+           FROM v_edit_arc, anl_arc, v_edit_link link
+          WHERE v_edit_arc.state > 0 AND cur_user = current_user AND fid = 222 AND st_dwithin(v_edit_arc.the_geom, st_endpoint(link.the_geom), 0.01::double precision)
+          AND v_edit_arc.arc_id = anl_arc.arc_id
+          ) a
   ORDER BY a.arc_id, a.node_2 DESC;
