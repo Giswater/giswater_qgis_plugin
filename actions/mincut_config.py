@@ -343,7 +343,7 @@ class MincutConfig(ParentAction):
                 utils_giswater.setWidgetText(
                     self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: received_date')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: received_date')
-                dates_filter = f"AND received_date BETWEEN {interval})"
+                dates_filter = f"AND received_date BETWEEN {interval}"
             elif str(state_id) in ('1', '2'):
                 utils_giswater.setWidgetText(
                     self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
