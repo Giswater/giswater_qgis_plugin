@@ -86,7 +86,7 @@ class GwWorkspaceManagerButton(GwAction):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
-        filter_fields = f'"name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+        filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
