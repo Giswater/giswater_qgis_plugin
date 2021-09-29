@@ -39,7 +39,7 @@ class GwSelector:
 
         if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
-            dlg_selector.btn_close.clicked.connect(tools_gw.close_docker)
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))

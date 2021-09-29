@@ -2300,7 +2300,7 @@ def init_docker(docker_param='qgis_info_docker'):
         close_docker()
         global_vars.session_vars['docker_type'] = docker_param
         global_vars.session_vars['dialog_docker'] = GwDocker()
-        global_vars.session_vars['dialog_docker'].dlg_closed.connect(close_docker)
+        global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
         manage_docker_options()
     else:
         global_vars.session_vars['dialog_docker'] = None

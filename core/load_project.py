@@ -276,7 +276,7 @@ class GwLoadProject(QObject):
 
         buttons_to_hide = None
         try:
-            row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
+            row = tools_gw.get_config_parser('toolbars_hidebuttons', 'buttons_to_hide', "user", "init")
             if not row or row in (None, 'None'):
                 return None
 

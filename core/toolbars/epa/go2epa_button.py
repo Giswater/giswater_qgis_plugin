@@ -94,7 +94,7 @@ class GwGo2EpaButton(GwAction):
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.docker_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_close.clicked.disconnect()
-            self.dlg_go2epa.btn_close.clicked.connect(tools_gw.close_docker)
+            self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
         else:
             tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 

@@ -274,6 +274,13 @@ class GwMenuLoad(QObject):
 
             self.tree_config_files.addTopLevelItem(item)
 
+        # Sort items on QTreeWidget
+        for index in range(self.tree_config_files.topLevelItemCount()):
+            # Obtain the actual top-level item
+            top_level_item = self.tree_config_files.topLevelItem(index)
+            # Sort
+            top_level_item.sortChildren(0, Qt.AscendingOrder)
+
 
     def _set_config_value(self, item, column):
 

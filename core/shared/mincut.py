@@ -533,7 +533,7 @@ class GwMincut:
     def _set_signals(self):
 
         if global_vars.session_vars['dialog_docker']:
-            self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
+            self.dlg_mincut.dlg_closed.connect(partial(tools_gw.close_docker, option_name='position'))
 
         self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
         self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
