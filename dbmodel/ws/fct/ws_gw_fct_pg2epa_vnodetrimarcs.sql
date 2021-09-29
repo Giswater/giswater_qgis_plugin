@@ -82,11 +82,8 @@ BEGIN
 	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
 	SELECT 
 		vnode_id as node_id, 
-		CASE 
-			WHEN connec.elevation IS NULL THEN t.elevation::numeric(12,3) -- elevation it's interpolated elevation againts node1 and node2 of pipe
-			ELSE connec.elevation END as elevation,
-		CASE	WHEN connec.elevation IS NULL THEN t.elevation::numeric(12,3) - t.depth::numeric(12,3)-- elev it's interpolated using elevation-depth againts node1 and node2 of pipe
-			ELSE connec.elevation - connec.depth END as elev,
+		t.elevation::numeric(12,3), -- elevation it's interpolated elevation againts node1 and node2 of pipe
+		t.elevation::numeric(12,3) - t.depth::numeric(12,3) as elev,  -- elev it's interpolated using elevation-depth againts node1 and node2 of pipe 
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
