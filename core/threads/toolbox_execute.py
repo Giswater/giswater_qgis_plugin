@@ -127,7 +127,7 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2]
         extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
-        dict_result = tools_gw.exec_pg_function(self.function_name, self.body, log_sql=True)
+        dict_result = tools_gw.exec_pg_function(self.function_name, self.body, log_sql=True, is_thread=True)
         self.json_result = dict_result['json_result']
 
         if self.isCanceled():
