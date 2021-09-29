@@ -204,14 +204,14 @@ BEGIN
 			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1, total_length
 				FROM v_arc_x_vnode 
 				JOIN anl_arc USING (arc_id)
-				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN gully c ON c.gully_id = v_arc_x_vnode.feature_id
 				WHERE fid=222 AND cur_user = current_user
 				AND anl_arc.node_1 = v_arc_x_vnode.node_1';
 
 			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2, total_length
 				FROM v_arc_x_vnode 
 				JOIN anl_arc USING (arc_id)
-				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN gully c ON c.gully_id = v_arc_x_vnode.feature_id
 				WHERE fid=222 AND cur_user = current_user
 				AND anl_arc.node_1 = v_arc_x_vnode.node_2';
 
@@ -273,7 +273,7 @@ BEGIN
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1 as dist, total_length
 					FROM v_arc_x_vnode 
 					JOIN anl_arc USING (arc_id)
-					JOIN v_edit_connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN connec c ON c.connec_id = v_arc_x_vnode.feature_id
 					WHERE fid=222 AND cur_user = current_user
 					AND anl_arc.node_1 = v_arc_x_vnode.node_1
 				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
@@ -282,7 +282,7 @@ BEGIN
 				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2 as dist, total_length
 					FROM v_arc_x_vnode 
 					JOIN anl_arc USING (arc_id)
-					JOIN v_edit_connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN connec c ON c.connec_id = v_arc_x_vnode.feature_id
 					WHERE fid=222 AND cur_user = current_user
 					AND anl_arc.node_1 = v_arc_x_vnode.node_2
 				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
