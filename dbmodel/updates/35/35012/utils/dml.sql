@@ -174,3 +174,6 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, TRUE, 'utils',NULL);
 
 INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (133, 1, 'v_edit_inp_demand table have been renamed. Now is v_edit_inp_dscenario_demand');
+
+--2021/09/29
+UPDATE config_form_tabs SET tabactions='[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]' WHERE formname = 'visit' AND device IN (1,2);
