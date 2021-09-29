@@ -334,11 +334,16 @@ class MincutConfig(ParentAction):
             format_low = 'yyyy-MM-dd 00:00:00.000'
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-            if str(state_id) in ('0', '3'):
+            if str(state_id) == '0':
                 utils_giswater.setWidgetText(
                     self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
+            elif str(state_id) == '3':
+                utils_giswater.setWidgetText(
+                    self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: received_date')
+                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: received_date')
+                dates_filter = f"AND received_date BETWEEN {interval})"
             elif str(state_id) in ('1', '2'):
                 utils_giswater.setWidgetText(
                     self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
