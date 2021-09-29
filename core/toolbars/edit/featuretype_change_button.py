@@ -104,14 +104,19 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.snapper_manager.config_snap_to_arc()
         self.snapper_manager.set_snap_mode()
 
+        # Manage last feature type selected
+        last_feature_type = tools_gw.get_config_parser("btn_featuretype_change", "last_feature_type", "user", "session")
+        if last_feature_type is None:
+            last_feature_type = "NODE"
+
         # Manage active layer
         layer = self.iface.activeLayer()
         if not layer:
-            self._set_active_layer("NODE")
+            self._set_active_layer(last_feature_type)
         else:
             tablename = tools_qgis.get_layer_source_table_name(layer)
             if tablename not in self.list_tables:
-                self._set_active_layer("NODE")
+                self._set_active_layer(last_feature_type)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -146,6 +151,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))
             obj_action.triggered.connect(partial(self._set_active_layer, action))
+            obj_action.triggered.connect(partial(tools_gw.set_config_parser, section="btn_featuretype_change",
+                                                 parameter="last_feature_type", value=action, comment=None))
 
 
     def _set_active_layer(self, name):
