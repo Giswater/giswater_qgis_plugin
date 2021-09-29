@@ -52,8 +52,7 @@ CREATE TABLE cat_workspace (
 id serial PRIMARY KEY,
 name character varying(50),
 descript text,
-config json,
-isautomatic boolean DEFAULT FALSE);
+config json);
 ALTER TABLE cat_workspace ADD CONSTRAINT cat_workspace_unique_name UNIQUE(name);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_node", "column":"double_geom", "dataType":"json", "isUtils":"False"}}$$);

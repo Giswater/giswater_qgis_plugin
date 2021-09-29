@@ -43,8 +43,7 @@ AS SELECT plan_psector.psector_id,
 --2021/09/15
 CREATE OR REPLACE VIEW v_ui_workspace AS
 SELECT id, name, descript, config
-FROM cat_workspace
-WHERE isautomatic IS FALSE;
+FROM cat_workspace;
 
 --2021/09/20
 CREATE OR REPLACE VIEW ve_pol_node AS
