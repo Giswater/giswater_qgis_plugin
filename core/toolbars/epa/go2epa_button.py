@@ -79,12 +79,8 @@ class GwGo2EpaButton(GwAction):
         self._set_signals()
         self.dlg_go2epa.btn_cancel.setEnabled(False)
 
-        tableleft = "cat_dscenario"
-        tableright = "selector_inp_dscenario"
-        field_id_left = "dscenario_id"
-        field_id_right = "dscenario_id"
         self.dlg_go2epa.btn_hs_ds.clicked.connect(
-            partial(self._sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
+            partial(self._sector_selection))
 
         # Check OS and enable/disable checkbox execute EPA software
         if sys.platform != "win32":
@@ -260,7 +256,7 @@ class GwGo2EpaButton(GwAction):
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT', f"{chk_import_result}")
 
 
-    def _sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
+    def _sector_selection(self):
         """ Load the tables in the selection form """
 
         # Get class Selector from selector.py
@@ -272,10 +268,38 @@ class GwGo2EpaButton(GwAction):
 
         # Create the signals
         go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
-        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
+        dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa))
+        dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
+
+        self._manage_form_settings('save')
 
         # Open form
-        tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+        tools_gw.docker_dialog(dlg_selector)
+
+
+    def _manage_form_settings(self, action):
+
+        if action == 'save':
+            # Get widgets form values
+            self.txt_result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+            self.chk_only_check = self.dlg_go2epa.chk_only_check.isChecked()
+            self.chk_export = self.dlg_go2epa.chk_export.isChecked()
+            self.chk_export_subcatch = self.dlg_go2epa.chk_export_subcatch.isChecked()
+            self.txt_file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+            self.chk_exec = self.dlg_go2epa.chk_exec.isChecked()
+            self.txt_file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+            self.chk_import_result = self.dlg_go2epa.chk_import_result.isChecked()
+        elif action == 'restore':
+            # Set widgets form values
+            if self.txt_result_name is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, self.txt_result_name)
+            if self.chk_only_check is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, self.chk_only_check)
+            if self.chk_export is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export, self.chk_export)
+            if self.chk_export_subcatch is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, self.chk_export_subcatch)
+            if self.txt_file_inp is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.txt_file_inp)
+            if self.chk_exec is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
+            if self.txt_file_rpt is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
+            if self.chk_import_result is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
+
 
 
     def _go2epa_select_file_inp(self):
