@@ -210,7 +210,7 @@
 		</message>
 		<message>
 			<source>58_text</source>
-			<translation>Fasprint</translation>
+			<translation>Fastprint</translation>
 		</message>
 		<message>
 			<source>206_text</source>
@@ -1029,8 +1029,10 @@
 			<translation>La ruta del seu compositor està mal configurada. Modifique-ho i torna-ho a intentar</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menysque sigui un node que no divideix l'arc \  N</translation>
 		</message>
