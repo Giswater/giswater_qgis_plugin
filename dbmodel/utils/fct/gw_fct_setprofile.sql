@@ -45,7 +45,7 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
     v_papersize_xdim integer;
     v_papersize_ydim integer;
     v_title text;
-    v_date date;
+    v_date text;
     v_scaletofit boolean;
     v_scale_eh integer;
     v_scale_ev integer;
