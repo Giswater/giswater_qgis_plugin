@@ -40,7 +40,7 @@ v_streetaxis2 text;
 v_sys_type text;
 v_force_delete boolean;
 v_system_id text;
-v_featuretype text;
+v_featurecat_id text;
 
 -- dynamic mapzones strategy
 v_isdma boolean = false;
@@ -378,7 +378,7 @@ BEGIN
 		END IF;
 		
 		-- Parent id
-		SELECT pol_id INTO v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.feature_type
+		SELECT pol_id INTO v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.featurecat_id
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 
 		IF v_pol_id IS NOT NULL THEN
@@ -452,11 +452,11 @@ BEGIN
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
 
 		
-		SELECT system_id, cat_feature.id INTO v_system_id, v_featuretype FROM cat_feature 
+		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
 		JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-		FROM cat_feature_node WHERE id='||quote_literal(v_featuretype)||''
+		FROM cat_feature_node WHERE id='||quote_literal(v_featurecat_id)||''
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
 		IF (v_insert_double_geom IS TRUE) THEN
@@ -464,9 +464,9 @@ BEGIN
 					v_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
 				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
-				from node where node_id=NEW.node_id), v_featuretype, NEW.node_id);
+				from node where node_id=NEW.node_id), v_featurecat_id, NEW.node_id);
 		END IF;
 		
 
@@ -707,7 +707,7 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 			
 			-- Parent id
-			SELECT pol_id INTO v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.feature_type
+			SELECT pol_id INTO v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.featurecat_id
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 			IF v_pol_id IS NOT NULL THEN

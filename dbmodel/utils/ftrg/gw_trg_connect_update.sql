@@ -32,7 +32,7 @@ xvar float;
 yvar float;
 v_autoupdate_dma boolean;
 v_autoupdate_fluid boolean;
-
+v_pol_id text;
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -118,6 +118,15 @@ BEGIN
 			FROM (SELECT gully_id, a.fluid_type FROM v_edit_gully JOIN arc a USING (arc_id) WHERE a.arc_id = NEW.arc_id)a
 			WHERE a.gully_id=gully.gully_id;
 		END IF;
+
+		-- Updating polygon geometry in case of exists it
+		v_pol_id:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.connec_id);
+		IF (v_pol_id IS NOT NULL) THEN   
+			xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+			yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
+			UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=v_pol_id;
+		END IF;      
+				
 
 	ELSIF v_featuretype='gully' THEN
 	

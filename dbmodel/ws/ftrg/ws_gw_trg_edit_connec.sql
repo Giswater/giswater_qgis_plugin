@@ -41,7 +41,7 @@ v_message text;
 v_dsbl_error boolean;
 v_disable_linktonetwork boolean;
 v_system_id text;
-v_featuretype text;
+v_featurecat_id text;
 v_pol_id text;
 
 BEGIN
@@ -438,11 +438,11 @@ BEGIN
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
 		
 
-		SELECT system_id, cat_feature.id INTO v_system_id, v_featuretype FROM cat_feature 
+		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
 		JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-		FROM cat_feature_connec WHERE id='||quote_literal(v_featuretype)||''
+		FROM cat_feature_connec WHERE id='||quote_literal(v_featurecat_id)||''
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
 		IF (v_insert_double_geom IS TRUE) THEN
@@ -450,9 +450,9 @@ BEGIN
 					v_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id, feature_id ) 
 				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
-				from connec where connec_id=NEW.connec_id), v_featuretype, NEW.connec_id);
+				from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
 		END IF;
 
 

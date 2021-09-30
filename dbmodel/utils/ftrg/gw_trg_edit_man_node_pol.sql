@@ -40,7 +40,7 @@ BEGIN
 		END IF;	
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
+		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
 		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.node_id, node_type
 		FROM v_edit_node WHERE node_id=NEW.node_id;
 		
@@ -53,7 +53,7 @@ BEGIN
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
 		IF (NEW.node_id != OLD.node_id) THEN
-			UPDATE polygon SET feature_id=NEW.node_id, feature_type =feature_type 
+			UPDATE polygon SET feature_id=NEW.node_id, featurecat_id =node_type 
 			FROM v_edit_node WHERE node_id=OLD.node_id AND pol_id=NEW.pol_id;
 		END IF;
 		
