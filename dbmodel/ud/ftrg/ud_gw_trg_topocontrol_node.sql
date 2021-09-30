@@ -232,8 +232,7 @@ BEGIN
 			END IF;
 			
 			-- Updating polygon geometry in case of exists it
-			v_pol:= (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id 
-			UNION SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id);
+			v_pol:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.node_id);
 			IF (v_pol IS NOT NULL) THEN   
 				v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		

@@ -221,7 +221,7 @@ BEGIN
 			END IF;
 				
 			-- Updating polygon geometry in case of exists it
-			pol_id_var:= (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id);
+			pol_id_var:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.node_id);
 			IF (pol_id_var IS NOT NULL) THEN   
 				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
