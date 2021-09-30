@@ -177,3 +177,6 @@ INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (133, 1, 'v_
 
 --2021/09/29
 UPDATE config_form_tabs SET tabactions='[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]' WHERE formname = 'visit' AND device IN (1,2);
+
+--2021/09/30
+DELETE FROM config_param_system WHERE parameter = 'edit_node_doublegeom';
