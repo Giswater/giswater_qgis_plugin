@@ -497,7 +497,7 @@ BEGIN
 					v_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id, feature_id ) 
 				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) 
 				from node where node_id=NEW.node_id), NEW.node_type, NEW.node_id);
 		END IF;
@@ -753,10 +753,10 @@ BEGIN
 
 			-- update geom polygon
 			IF NEW.gratecat_id != OLD.gratecat_id OR OLD.gratecat_id IS NULL THEN
-				UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = NEW.pol_id;
+				UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id = NEW.node_id;
 			END IF;
 
-			UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
+			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_outfall' THEN
@@ -764,7 +764,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_storage' THEN
-			UPDATE man_storage SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, 
+			UPDATE man_storage SET length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, 
 			max_volume=NEW.max_volume, util_volume=NEW.util_volume,min_height=NEW.min_height, 
 			accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
@@ -774,7 +774,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF v_man_table='man_chamber' THEN
-			UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
+			UPDATE man_chamber SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
@@ -792,7 +792,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF v_man_table='man_wwtp' THEN
-			UPDATE man_wwtp SET pol_id=NEW.pol_id, name=NEW.name
+			UPDATE man_wwtp SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 				
 		ELSIF v_man_table ='man_netelement' THEN

@@ -422,7 +422,7 @@ BEGIN
 					v_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
 				VALUES (v_pol_id, 'CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer))) 
 				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;

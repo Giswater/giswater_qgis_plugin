@@ -479,7 +479,7 @@ BEGIN
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
 				VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 			END IF;
 		END IF;
@@ -728,7 +728,7 @@ BEGIN
 					v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
 					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
-						INSERT INTO polygon(pol_id, sys_type, the_geom, feature_type,feature_id ) 
+						INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
 						VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 
 					ELSE

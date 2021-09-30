@@ -40,7 +40,7 @@ BEGIN
 		END IF;
 
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, feature_type) 
+		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
 		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.gully_id, gully_type
 		FROM v_edit_gully WHERE gully_id=NEW.gully_id;
 
@@ -61,7 +61,7 @@ BEGIN
       		 	"data":{"message":"2050", "function":"2416","debug_msg":null}}$$);';
 			END IF;
 
-			UPDATE polygon SET feature_id=NEW.gully_id, feature_type =feature_type 
+			UPDATE polygon SET feature_id=NEW.gully_id, featurecat_id =gully_type 
 			FROM v_edit_gully WHERE gully_id=OLD.gully_id AND pol_id=NEW.pol_id;
 
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
