@@ -1824,7 +1824,10 @@ class GwPsector:
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
         # Refresh tableview psector_x_arc
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc')
+        if self.dlg_plan_psector.tbl_psector_x_arc.model() is None:
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc', isQStandardItemModel=True)
 
         message = json_result['message']['text']
         if message is not None:
@@ -1832,7 +1835,7 @@ class GwPsector:
 
         text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], close=False)
 
-        if not text_result:
+        if not change_tab:
             self.dlg_replace_arc.close()
             tools_gw.reset_rubberband(self.rubber_band)
         else:
