@@ -356,6 +356,8 @@ FROM config_param_user WHERE parameter ='edit_gully_doublegeom' AND value IS NOT
 
 UPDATE cat_feature_gully SET double_geom = '{"activated":false,"value":1}' WHERE double_geom IS NULL;
 
+DELETE FROM config_param_user WHERE parameter='edit_gully_doublegeom';
+
 UPDATE polygon p SET feature_id=node_id FROM man_netgully m WHERE p.pol_id=m._pol_id_ AND sys_type='NETGULLY';
 UPDATE polygon p SET feature_id=node_id FROM man_storage m WHERE p.pol_id=m._pol_id_ AND sys_type='STORAGE';
 UPDATE polygon p SET feature_id=node_id FROM man_wwtp m WHERE p.pol_id=m._pol_id_ AND sys_type='WWTP';
