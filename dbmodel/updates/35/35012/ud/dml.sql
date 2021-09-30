@@ -661,3 +661,6 @@ null,null,null,false);
 
 --2021/09/30
 DELETE FROM config_param_system WHERE parameter = 'edit_node_doublegeom';
+
+update sys_param_user set layoutname='lyt_gully' where layoutname='lyt_gully_vdef';
+update sys_param_user set descript='Default grate catalog when parent layer (v_edit_gully) is used', label='Default catalog for gully (parent layer):' where id='edit_gratecat_vdefault';
