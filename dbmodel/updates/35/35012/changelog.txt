@@ -15,3 +15,5 @@
 - Remove trigger vnode_update
 - Calculate symbol rotation on gw_trg_link_connecrotation_update and manage it by system variable instead of user
 - Enable user_x_sector constraints when user_x_exploitation variable is configured
+- New function for workspace manager
+- Change polygon strategy for double geom. Using parent tables
