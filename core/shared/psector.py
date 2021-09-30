@@ -1823,11 +1823,17 @@ class GwPsector:
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
-        # Refresh tableview psector_x_arc
-        if self.dlg_plan_psector.tbl_psector_x_arc.model() is None:
-            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
+        if self.project_type.upper() == 'UD':
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
 
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc', isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec', isQStandardItemModel=True)
+        if self.project_type.upper() == 'UD':
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully', isQStandardItemModel=True)
 
         message = json_result['message']['text']
         if message is not None:
