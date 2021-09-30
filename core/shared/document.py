@@ -106,7 +106,7 @@ class GwDocument:
         tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
 
         # Set signals
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+        self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -122,7 +122,7 @@ class GwDocument:
         self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
             self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers))
+            partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
 
         self.dlg_add_doc.doc_id.textChanged.connect(
             partial(self._fill_dialog_document, self.dlg_add_doc, table_object, None))
@@ -149,7 +149,7 @@ class GwDocument:
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.feature_type = "arc"
-        tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers)
+        tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
@@ -376,7 +376,7 @@ class GwDocument:
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser('dialogs', 'doc_manager_keep_open', "user", "init", prefix=True)
+        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'doc_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
 

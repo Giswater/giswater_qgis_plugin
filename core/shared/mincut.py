@@ -533,7 +533,7 @@ class GwMincut:
     def _set_signals(self):
 
         if global_vars.session_vars['dialog_docker']:
-            self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
+            self.dlg_mincut.dlg_closed.connect(partial(tools_gw.close_docker, option_name='position'))
 
         self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
         self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
@@ -736,8 +736,6 @@ class GwMincut:
 
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
-
-        self.snapper_manager.show_snap_message(False)
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
@@ -1687,8 +1685,6 @@ class GwMincut:
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        self.snapper_manager.show_snap_message(False)
-
         # Set signals
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self._auto_mincut_snapping)
@@ -1979,8 +1975,6 @@ class GwMincut:
         self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
-
-        self.snapper_manager.show_snap_message(False)
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)
@@ -2353,8 +2347,6 @@ class GwMincut:
         self.layer = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
-
-        self.snapper_manager.show_snap_message(False)
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)

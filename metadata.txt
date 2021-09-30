@@ -1,34 +1,24 @@
-# This file should be included when you package your plugin.
-# Mandatory items:
-
 [general]
 name=giswater
 qgisMinimumVersion=3.10
 qgisMaximumVersion=3.99
-
 description=Plugin to manage water networks (water supply, sewerage and urban drainage) using QGIS and PostGIS-PostgreSQL(from 9.5 to 11.x)
 about=Disclaimer: This plugin is released using the open source GNU-GPL3 license. Although a reasonable effort has been made to assure that the results obtained are correct,  some of the capabilities provided by Giswater are experimental, therefore the development team and the Giswater Association are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from the program, nor for any damages or litigation that result from the use of these programs for any purpose.
-version=3.5.011
-
-
+version=3.5.012
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
-# End of mandatory metadata.
 
-changelog=Version 3.5.011
-    - Bug fix on manage list of element_types for populate combo location on manage element form
-    - Bug fix on manage line break when add new document
-    - Enhancement on manage admin form when dont have any schema created on current connection
-    - Add section Report on toolbox form
-    - Add new tab 'backend' in Log Message Panel
-
-
-# Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
-
 homepage=https://www.giswater.org
 repository=https://github.com/giswater/giswater_qgis_plugin
 tracker=https://github.com/giswater/giswater_qgis_plugin/issues
 category=Plugins
 icon=icons/dialogs/20x20/giswater.png
 experimental=False
-deprecated=False
+
+# Compatibility versions
+minorQgisVersion=3.16
+majorQgisVersion=3.99
+recommendedQgisVersion=3.18
+minorPgVersion=9.05.00
+majorPgVersion=11.00.99
+recommendedPgVersion=9.05.00

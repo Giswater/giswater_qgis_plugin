@@ -155,8 +155,8 @@ FORM_CLASS = _get_ui_class('feature_replace.ui', 'edit')
 class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('nodetype_change.ui', 'edit')
-class GwNodeTypeChangeUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('featuretype_change.ui', 'edit')
+class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
@@ -204,6 +204,11 @@ class GwPsectorManagerUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('psector_rapport.ui', 'plan')
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('replace_arc.ui', 'plan')
+class GwReplaceArc(GwDialog, FORM_CLASS):
+    pass
+
 # endregion
 
 
@@ -222,6 +227,14 @@ class GwPrintUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = _get_ui_class('toolbox_reports.ui', 'utilities')
 class GwToolboxReportsUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('workspace_manager.ui', 'utilities')
+class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('workspace_create.ui', 'utilities')
+class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
@@ -375,10 +388,6 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             icon = QIcon(icon_path)
             self.action.setIcon(icon)
             self.action.setText(text)
-
-FORM_CLASS = _get_ui_class('selector_multirow.ui')
-class GwMultirowSelectorUi(GwDialog, FORM_CLASS):
-    pass
 
 FORM_CLASS = _get_ui_class('selector.ui')
 class GwSelectorUi(GwDialog, FORM_CLASS):

@@ -38,34 +38,28 @@ class GwSearch:
         self.project_type = global_vars.project_type
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
         self.is_mincut = False
-
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
     def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
 
-        # If search is open, dont let user open another one
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
-
+        # If docker search is already opened, don't let user open another one
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
         if docker_search and dlg_mincut is None:
-            return
-        if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
 
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
             self._init_dialog()
-        form = ""
 
         # If dlg_mincut is None we are not opening from mincut
+        form = ""
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
@@ -74,7 +68,6 @@ class GwSearch:
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
         qgis_project_add_schema = global_vars.project_vars['add_schema']
-
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
@@ -128,9 +121,7 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_gw.set_config_parser('btn_search', 'open_search', 'true')
             tools_qt.manage_translation('search', self.dlg_search)
-
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
@@ -193,6 +184,7 @@ class GwSearch:
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
+
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
@@ -204,11 +196,9 @@ class GwSearch:
         tools_gw.reset_rubberband(self.aux_rubber_band)
 
 
-
     def _close_search(self):
 
         self.dlg_search = None
-        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
 
 
     def _set_typeahead_completer(self, widget, completer=None):
@@ -634,6 +624,7 @@ class GwSearch:
         text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_end, False, False)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
+
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -979,4 +970,5 @@ class GwSearch:
             self.aux_rubber_band.show()
         except AttributeError:
             pass
-    # endregions
+
+    # endregion

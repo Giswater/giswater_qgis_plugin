@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+from functools import partial
+
 import console
 import os.path
 import shlex
@@ -14,12 +16,13 @@ from random import randrange
 
 from qgis.PyQt.QtCore import Qt, QTimer, QSettings
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QDockWidget, QApplication
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
     QgsCoordinateTransform
 from qgis.core import QgsVectorLayer
+from qgis.utils import iface
 
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
@@ -48,8 +51,10 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
         dev_duration = user_parameters['show_message_durations']
     # If is set, use this value
     if dev_duration not in (None, "None"):
-        duration = int(dev_duration)
-
+        if message_level in (1, 2) and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
     msg = None
     if text:
         msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
@@ -57,8 +62,50 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    if len(global_vars.session_vars['threads']) == 0:
-        global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+    iface.messageBar().pushMessage(title, msg, message_level, duration)
+
+    # Check if logger to file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text)
+
+
+def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True):
+    """
+    Show message to the user with selected message level and a button to open the url
+        :param text: The text to be shown (String)
+        :param url: The url that will be opened by the button. It will also show after the message (String)
+        :param btn_text: The text of the button (String)
+        :param message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)}
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param logger_file: Whether it should log the message in a file or not (bool)
+    """
+
+    global user_parameters
+
+    # Get optional parameter 'show_message_durations'
+    dev_duration = None
+    if 'show_message_durations' in user_parameters:
+        dev_duration = user_parameters['show_message_durations']
+    # If is set, use this value
+    if dev_duration not in (None, "None"):
+        if message_level in (1, 2) and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
+    msg = None
+    if text:
+        msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
+
+    # Create the message with the button
+    widget = iface.messageBar().createMessage(f"{msg}", f"{url}")
+    button = QPushButton(widget)
+    button.setText(f"{btn_text}")
+    button.pressed.connect(partial(tools_os.open_file, url))
+    widget.layout().addWidget(button)
+
+    # Show the message
+    iface.messageBar().pushWidget(widget, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
@@ -141,14 +188,14 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir):
     """ Get @parameter from metadata.txt file """
 
     # Check if metadata file exists
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = f"Metadata file not found: {metadata_file}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         return default_value
 
     value = None
@@ -158,7 +205,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_
         value = metadata.get('general', parameter)
     except configparser.NoOptionError:
         message = f"Parameter not found: {parameter}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         value = default_value
     finally:
         return value
@@ -184,14 +231,14 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
+def get_major_version(plugin_dir, default_version='3.5'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
     return major_version
 
 
-def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir):
+def get_build_version(plugin_dir, default_version='35001'):
     """ Get plugin build version from metadata.txt file """
 
     build_version = get_plugin_metadata('version', default_version, plugin_dir).replace(".", "")
@@ -202,14 +249,14 @@ def enable_python_console():
     """ Enable Python console and Log Messages panel """
 
     # Manage Python console
-    python_console = global_vars.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
+    python_console = iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
     if python_console:
         python_console.setVisible(True)
     else:
         console.show_console()
 
     # Manage Log Messages panel
-    message_log = global_vars.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+    message_log = iface.mainWindow().findChild(QDockWidget, 'MessageLog')
     if message_log:
         message_log.setVisible(True)
 
@@ -316,7 +363,7 @@ def get_primary_key(layer=None):
 
     uri_pk = None
     if layer is None:
-        layer = global_vars.iface.activeLayer()
+        layer = iface.activeLayer()
     if layer is None:
         return uri_pk
     uri = layer.dataProvider().dataSourceUri().lower()
@@ -440,7 +487,7 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
             tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if action_pan:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def refresh_map_canvas(_restore_cursor=False):
@@ -472,7 +519,7 @@ def disconnect_signal_selection_changed():
     except Exception:
         pass
     finally:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def select_features_by_expr(layer, expr):
@@ -591,11 +638,11 @@ def restore_user_layer(layer_name, user_current_layer=None):
     """ Set active layer, preferably @user_current_layer else @layer_name """
 
     if user_current_layer:
-        global_vars.iface.setActiveLayer(user_current_layer)
+        iface.setActiveLayer(user_current_layer)
     else:
         layer = get_layer_by_tablename(layer_name)
         if layer:
-            global_vars.iface.setActiveLayer(layer)
+            iface.setActiveLayer(layer)
 
 
 def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
@@ -641,7 +688,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         layer.setRenderer(renderer)
 
     layer.triggerRepaint()
-    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
+    iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
 def remove_layer_from_toc(layer_name, group_name):
@@ -668,6 +715,25 @@ def remove_layer_from_toc(layer_name, group_name):
             if not layers:
                 root.removeChildNode(group)
         remove_layer_from_toc(layer_name, group_name)
+
+
+def clean_layer_group_from_toc(group_name):
+    """
+    Remove all "broken" layers from a group
+        :param group_name: Group's name (String)
+    """
+
+    root = QgsProject.instance().layerTreeRoot()
+    group = root.findGroup(group_name)
+    if group:
+        layers = group.findLayers()
+        for layer in layers:
+            if layer.layer() is None:
+                group.removeChildNode(layer)
+        # Remove group if is void
+        layers = group.findLayers()
+        if not layers:
+            root.removeChildNode(group)
 
 
 def get_plugin_settings_value(key, default_value=""):
@@ -770,8 +836,8 @@ def set_margin(layer, margin):
     xmax = extent.xMaximum() + margin
     ymax = extent.yMaximum() + margin
     extent.set(xmin, ymin, xmax, ymax)
-    global_vars.iface.mapCanvas().setExtent(extent)
-    global_vars.iface.mapCanvas().refresh()
+    iface.mapCanvas().setExtent(extent)
+    iface.mapCanvas().refresh()
 
 
 def create_qml(layer, style):
@@ -920,7 +986,7 @@ def check_query_layer(layer):
 
 def get_epsg():
 
-    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = iface.mapCanvas().mapSettings().destinationCrs().authid()
     epsg = epsg.split(':')[1]
 
     return epsg

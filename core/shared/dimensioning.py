@@ -233,9 +233,9 @@ class GwDimensioning:
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
 
-        self.snapper_manager.config_snap_to_node(False)
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -335,9 +335,9 @@ class GwDimensioning:
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
 
-        self.snapper_manager.config_snap_to_node(False)
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
@@ -432,7 +432,7 @@ class GwDimensioning:
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
                 label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])

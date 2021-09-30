@@ -41,20 +41,23 @@ class GwMenuLoad(QObject):
         self.main_menu.setObjectName("Giswater")
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
-        config_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png")
+        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
+        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+        icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
+        config_icon = QIcon(icon_path)
 
         # region Toolbar
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
         icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
         self.main_menu.addMenu(toolbars_menu)
+
         for toolbar in global_vars.giswater_settings.value(f"toolbars/list_toolbars"):
             toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
             toolbars_menu.addMenu(toolbar_submenu)
             buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-
             project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
                                                            "project", "giswater")
             if project_exclusive not in (None, 'None'):
@@ -66,6 +69,7 @@ class GwMenuLoad(QObject):
                     continue
 
                 icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
+                icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
                 button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
                 text = ""
@@ -77,14 +81,18 @@ class GwMenuLoad(QObject):
                 if button_def is None:
                     continue
 
-                action_function = getattr(buttons, button_def)(icon_path, button_def, text, None, ag)
-                action = toolbar_submenu.addAction(icon, f"{text}")
-                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
-                if shortcut_key:
-                    action.setShortcuts(QKeySequence(f"{shortcut_key}"))
-                    global_vars.shortcut_keys.append(shortcut_key)
-
-                action.triggered.connect(partial(self._clicked_event, action_function))
+                # Check if the class associated to the button definition exists
+                if hasattr(buttons, button_def):
+                    button_class = getattr(buttons, button_def)
+                    action_function = button_class(icon_path, button_def, text, None, ag)
+                    action = toolbar_submenu.addAction(icon, f"{text}")
+                    shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
+                    if shortcut_key:
+                        action.setShortcuts(QKeySequence(f"{shortcut_key}"))
+                        global_vars.shortcut_keys.append(shortcut_key)
+                    action.triggered.connect(partial(self._clicked_event, action_function))
+                else:
+                    tools_log.log_warning(f"Class '{button_def}' not imported in file '{buttons.__file__}'")
         # endregion
 
         # region Actions
@@ -266,6 +274,13 @@ class GwMenuLoad(QObject):
 
             self.tree_config_files.addTopLevelItem(item)
 
+        # Sort items on QTreeWidget
+        for index in range(self.tree_config_files.topLevelItemCount()):
+            # Obtain the actual top-level item
+            top_level_item = self.tree_config_files.topLevelItem(index)
+            # Sort
+            top_level_item.sortChildren(0, Qt.AscendingOrder)
+
 
     def _set_config_value(self, item, column):
 
@@ -302,7 +317,6 @@ class GwMenuLoad(QObject):
 
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
-        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
         self.iface.actionPan().trigger()
         self._reload_layers()
 

@@ -22,15 +22,6 @@ class GwDimensioningButton(GwMaptool):
 
 
     # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-    def canvasMoveEvent(self, event):
-        pass
-
-
-    def canvasReleaseEvent(self, event):
-        pass
-
-
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -60,22 +51,17 @@ class GwDimensioningButton(GwMaptool):
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            self.snapper_manager.config_snap_to_arc(False)
-            self.snapper_manager.config_snap_to_connec(False)
-            self.snapper_manager.config_snap_to_gully(False)
-            self.snapper_manager.config_snap_to_node(False)
+            self.snapper_manager.config_snap_to_arc()
+            self.snapper_manager.config_snap_to_connec()
+            self.snapper_manager.config_snap_to_gully()
+            self.snapper_manager.config_snap_to_node()
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool
             self.layer.featureAdded.connect(self._open_new_dimensioning)
 
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
-
     # endregion
+
 
     # region private functions
 

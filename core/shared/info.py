@@ -261,10 +261,10 @@ class GwInfo(QObject):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_arc(False)
-        self.snapper_manager.config_snap_to_node(False)
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
+        self.snapper_manager.config_snap_to_arc()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
         self.iface.actionAddFeature().toggled.connect(self._action_is_checked)
 
@@ -324,9 +324,9 @@ class GwInfo(QObject):
 
         # if we are doing info over connec or over node
         if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc(False)
+            self.snapper_manager.config_snap_to_arc()
         elif option == 'node':
-            self.snapper_manager.config_snap_to_node(False)
+            self.snapper_manager.config_snap_to_node()
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self._mouse_moved, layer))
         emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -412,10 +412,6 @@ class GwInfo(QObject):
             exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
-
-        if feature_id:
-            self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 1, self.dlg_cf.pos().y() + 7, self.dlg_cf.width(),
-                                    self.dlg_cf.height())
 
         # Get widget controls
         self._get_widget_controls(new_feature)
@@ -857,8 +853,6 @@ class GwInfo(QObject):
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
-
-        self.snapper_manager.show_snap_message(False)
         global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
         ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate))
 
@@ -1439,7 +1433,7 @@ class GwInfo(QObject):
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
                 label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])

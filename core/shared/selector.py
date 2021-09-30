@@ -30,6 +30,7 @@ class GwSelector:
 
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
+        dlg_selector.setProperty('GwSelector', self)
 
         # Get the name of the last tab used by the user
         selector_vars = {}
@@ -38,14 +39,14 @@ class GwSelector:
 
         if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
-            dlg_selector.btn_close.clicked.connect(tools_gw.close_docker)
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
             tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
         # Save the name of current tab used by the user
-        dlg_selector.rejected.connect(partial(
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
 
@@ -214,7 +215,11 @@ class GwSelector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         is_alone = False
+        disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
+
+        if key_modifier == Qt.ShiftModifier:
+            disable_parent = True
 
         if selection_mode == 'removePrevious' or \
                 (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
@@ -225,10 +230,10 @@ class GwSelector:
                 widget_all.blockSignals(False)
             self._remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self._set_selector(dialog, widget, is_alone, selector_vars)
+        self._set_selector(dialog, widget, is_alone, selector_vars, disable_parent)
 
 
-    def _set_selector(self, dialog, widget, is_alone, selector_vars):
+    def _set_selector(self, dialog, widget, is_alone, selector_vars, disable_parent):
         """
         Send values to DB and reload selectors
             :param dialog: QDialog
@@ -245,7 +250,8 @@ class GwSelector:
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
-                      f'"isAlone":"{is_alone}", "value":"{tools_qt.is_checked(dialog, widget)}", '
+                      f'"isAlone":"{is_alone}", "disableParent":"{disable_parent}", '
+                      f'"value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
@@ -256,17 +262,21 @@ class GwSelector:
         json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
         if json_result is None or json_result['status'] == 'Failed':
             return
-        if str(tab_name) not in ('tab_state', 'tab_hydrometer'):
-            try:
-                # Zoom to feature
-                x1 = json_result['body']['data']['geometry']['x1']
-                y1 = json_result['body']['data']['geometry']['y1']
-                x2 = json_result['body']['data']['geometry']['x2']
-                y2 = json_result['body']['data']['geometry']['y2']
-                if x1 is not None:
-                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-            except KeyError:
-                pass
+        level = json_result['body']['message']['level']
+        if level == 0:
+            message = json_result['body']['message']['text']
+            tools_qgis.show_message(message, level)
+
+        try:
+            # Zoom to feature
+            x1 = json_result['body']['data']['geometry']['x1']
+            y1 = json_result['body']['data']['geometry']['y1']
+            x2 = json_result['body']['data']['geometry']['x2']
+            y2 = json_result['body']['data']['geometry']['y2']
+            if x1 is not None:
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        except KeyError:
+            pass
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
@@ -323,8 +333,12 @@ class GwSelector:
         status = tools_qt.is_checked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+
+        disable_parent = False
+        key_modifier = QApplication.keyboardModifiers()
+
         if key_modifier == Qt.ShiftModifier:
-            return
+            disable_parent = True
 
         for widget in widget_list:
             if widget_all is not None:
@@ -334,6 +348,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self._set_selector(dialog, widget_all, False, selector_vars)
+        self._set_selector(dialog, widget_all, False, selector_vars, disable_parent)
 
     # endregion

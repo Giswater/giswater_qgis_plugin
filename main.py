@@ -137,8 +137,7 @@ class Giswater(QObject):
 
         # Create log file
         min_log_level = 20
-        log_limit_characters = None
-        tools_log.set_logger(self.plugin_name, min_log_level, log_limit_characters)
+        tools_log.set_logger(self.plugin_name, min_log_level)
         tools_log.log_info("Initialize plugin")
 
         # Check if config file exists
@@ -163,8 +162,9 @@ class Giswater(QObject):
 
         # Set logger parameters min_log_level and log_limit_characters
         min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
-        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
-        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters)
+        log_limit_characters = int(tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False))
+        db_limit_characters = int(tools_gw.get_config_parser('system', 'db_limit_characters', 'user', 'init', 200))
+        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, db_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')

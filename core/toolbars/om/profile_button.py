@@ -52,6 +52,7 @@ class GwNodeData:
         self.descript = None
         self.data_type = None
         self.surface_type = None
+        self.none_values = None
 
 
 class GwProfileButton(GwAction):
@@ -69,6 +70,7 @@ class GwProfileButton(GwAction):
         self.links = []
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
+        self.none_values = []
 
 
     def clicked_event(self):
@@ -105,6 +107,7 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self._clear_profile)
         self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self._remove_selection, actionpan=True))
+        self.dlg_draw_profile.dlg_closed.connect(partial(self._reset_profile_variables))
 
         # Set shortcut keys
         self.dlg_draw_profile.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_draw_profile))
@@ -128,6 +131,12 @@ class GwProfileButton(GwAction):
 
     # region private functions
 
+    def _reset_profile_variables(self):
+
+        self.initNode = None
+        self.endNode = None
+        self.first_node = True
+
 
     def _get_profile(self):
 
@@ -136,6 +145,7 @@ class GwProfileButton(GwAction):
         self.links.clear()
         self.nodes = []
         self.links = []
+        self.none_values = []
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
@@ -176,6 +186,10 @@ class GwProfileButton(GwAction):
         self.plot.show()
         mng = self.plot.get_current_fig_manager()
         mng.window.showMaximized()
+
+        if len(self.none_values) > 0:
+            message = "There are missing values in these nodes:"
+            tools_qt.show_info_box(message, inf_text=self.none_values)
 
 
     def _save_profile(self):
@@ -292,9 +306,15 @@ class GwProfileButton(GwAction):
 
     def _activate_snapping_node(self):
 
-        self.initNode = None
-        self.endNode = None
-        self.first_node = True
+        if hasattr(self, "first_node"):
+            self.snapper_manager.remove_marker()
+        self.initNode = None if not hasattr(self, "initNode") else self.initNode
+        self.endNode = None if not hasattr(self, "endNode") else self.endNode
+        self.first_node = True if not hasattr(self, "first_node") else self.first_node
+
+        if self.first_node is False:
+            message = f"First node already selected with id: {self.initNode}. Select second one."
+            tools_qgis.show_info(message)
 
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
@@ -304,7 +324,6 @@ class GwProfileButton(GwAction):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
-        self.snapper_manager.show_snap_message(False)
         self.canvas.xyCoordinates.connect(self._mouse_move)
         self.emit_point.canvasClicked.connect(partial(self._snapping_node))
 
@@ -343,6 +362,8 @@ class GwProfileButton(GwAction):
                 if self.first_node:
                     self.initNode = element_id
                     self.first_node = False
+                    message = f"Node 1 selected"
+                    tools_qgis.show_info(message, parameter=element_id)
                 else:
                     self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
@@ -454,6 +475,8 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
+
+        self._reset_profile_variables()
 
 
     def _set_profile_layout(self):
@@ -897,6 +920,10 @@ class GwProfileButton(GwAction):
             y1 = self.nodes[index].y1
             elev1 = self.nodes[index].elev1
 
+            if y2_prev in (None, 'None') or self.nodes[index].descript['ymax'] in (None, 'None') or y1 in (None, 'None')\
+                    or elev2_prev in (None, 'None') or self.nodes[index].descript['elev'] in (None, 'None') or elev1 in (None, 'None'):
+                self.none_values.append(self.nodes[index].descript['code'])
+
             # Fill y_max
             plt.annotate(
                 str(y2_prev) + '\n' + str(self.nodes[index].descript['ymax']) + '\n' + str(y1),
@@ -1295,6 +1322,7 @@ class GwProfileButton(GwAction):
 
         # Clear selection
         self._remove_selection()
+        self._reset_profile_variables()
 
 
     def _delete_profile(self):

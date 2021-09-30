@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
-import json
 import os
 import random
 import re
@@ -28,7 +27,8 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
     QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
+    QgsCoordinateTransformContext
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -73,15 +73,12 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
-    x, y = dialog.pos().x(), dialog.pos().y()
-    if isinstance(dialog, GwMainWindow):
-        x, y = x + 7, y + 24
-    elif isinstance(dialog, GwDialog):
-        x, y = x + 8, y + 31
+    x, y = dialog.geometry().x(), dialog.geometry().y()
+    w, h = dialog.geometry().width(), dialog.geometry().height()
 
     try:
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
     except Exception:
@@ -708,7 +705,7 @@ def enable_all(dialog, result):
 
 def set_stylesheet(field, widget, wtype='label'):
 
-    if field['stylesheet'] is not None:
+    if 'stylesheet' in field and field['stylesheet'] is not None:
         if wtype in field['stylesheet']:
             widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
     return widget
@@ -1642,10 +1639,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql, is_thread=is_thread)
-        if is_thread:
-            return json_result,  global_vars.session_vars['last_error_msg']
-        else:
-            return json_result
+        return json_result
+
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
             json_result = manage_json_geometry(json_result)
@@ -1792,17 +1787,18 @@ def manage_json_return(json_result, sql, rubber_band=None):
                 if key.lower() in ('point', 'line', 'polygon'):
                     if key not in json_result['body']['data']:
                         continue
-                    if 'features' not in json_result['body']['data'][key]:
-                        continue
-                    if len(json_result['body']['data'][key]['features']) == 0:
-                        continue
 
+                    # Remove the layer if it exists
                     layer_name = f'{key}'
                     if 'layerName' in json_result['body']['data'][key]:
                         if json_result['body']['data'][key]['layerName']:
                             layer_name = json_result['body']['data'][key]['layerName']
-
                     tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
+
+                    if 'features' not in json_result['body']['data'][key]:
+                        continue
+                    if len(json_result['body']['data'][key]['features']) == 0:
+                        continue
 
                     # Get values for create and populate layer
                     counter = len(json_result['body']['data'][key]['features'])
@@ -1864,6 +1860,9 @@ def manage_json_return(json_result, sql, rubber_band=None):
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+    finally:
+        # Clean any broken temporal layers (left with no data)
+        tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
@@ -2063,7 +2062,7 @@ def manage_layer_manager(json_result, sql=None):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
-                    segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
+                    segment_flag = get_vertex_flag(2)
                     layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
                         layer_settings.setTypeFlag(segment_flag)
@@ -2301,7 +2300,7 @@ def init_docker(docker_param='qgis_info_docker'):
         close_docker()
         global_vars.session_vars['docker_type'] = docker_param
         global_vars.session_vars['dialog_docker'] = GwDocker()
-        global_vars.session_vars['dialog_docker'].dlg_closed.connect(close_docker)
+        global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
         manage_docker_options()
     else:
         global_vars.session_vars['dialog_docker'] = None
@@ -2310,7 +2309,7 @@ def init_docker(docker_param='qgis_info_docker'):
     return global_vars.session_vars['dialog_docker']
 
 
-def close_docker():
+def close_docker(option_name='position'):
     """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
         remove from iface and del class
     """
@@ -2325,7 +2324,7 @@ def close_docker():
                     del widget
                     global_vars.session_vars['dialog_docker'].setWidget(None)
                     global_vars.session_vars['docker_type'] = None
-                    set_config_parser('docker', 'position', f'{docker_pos}')
+                    set_config_parser('docker', option_name, f'{docker_pos}')
                 global_vars.iface.removeDockWidget(global_vars.session_vars['dialog_docker'])
                 global_vars.session_vars['dialog_docker'] = None
     except AttributeError:
@@ -2333,13 +2332,13 @@ def close_docker():
         global_vars.session_vars['dialog_docker'] = None
 
 
-def manage_docker_options():
+def manage_docker_options(option_name='position'):
     """ Check if user want dock the dialog or not """
 
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker', 'position', "user", "session"))
+        pos = int(get_config_parser('docker', option_name, "user", "session"))
         global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dialog_docker'].position = pos
@@ -2817,7 +2816,45 @@ def remove_deprecated_config_vars():
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
-    # Get deprecated vars for init
+    # Remove deprecated sections for init
+    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    init_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_init', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not init_parser.has_section(section):
+                continue
+            init_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        init_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated sections for session
+    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    session_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_session', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not session_parser.has_section(section):
+                continue
+            session_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        session_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated vars for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
@@ -2841,7 +2878,7 @@ def remove_deprecated_config_vars():
         init_parser.write(configfile)
         configfile.close()
 
-    # Get deprecated vars for session
+    # Remove deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
@@ -2879,7 +2916,88 @@ def hide_widgets_form(dialog, dlg_name):
                 widget.setVisible(False)
 
 
+def get_project_version(schemaname=None):
+    """ Get project version from table 'version' """
+
+    if schemaname in (None, 'null', ''):
+        schemaname = self.schema_name
+
+    project_version = None
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tablename = "version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if not exists:
+            return None
+
+    sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_version = row[0]
+
+    return project_version
+
+
+def export_layers_to_gpkg(layers, path):
+    """ This function is not used on Giswater Project at the moment. """
+
+    uri = tools_db.get_uri()
+    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    is_first = True
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.driverName = "GPKG"
+
+    for layer in layers:
+
+        uri.setDataSource(schema_name, f"{layer['name']}", "the_geom", None, f"{layer['id']}")
+        vlayer = QgsVectorLayer(uri.uri(), f"{layer['name']}", 'postgres')
+
+        if is_first:
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
+            is_first = False
+        else:
+            # switch mode to append layer instead of overwriting the file
+            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
+
+
+# region compatibility QGIS version functions
+
+def set_snapping_type(layer_settings, value):
+
+    if Qgis.QGIS_VERSION_INT < 31200:
+        layer_settings.setType(value)
+    elif Qgis.QGIS_VERSION_INT >= 31200:
+        layer_settings.setTypeFlag(value)
+
+
+def get_segment_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag
+    else:
+        segment_flag = default_value
+
+    return segment_flag
+
+
+def get_vertex_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag
+    else:
+        vertex_flag = default_value
+
+    return vertex_flag
+
+# endregion
+
+
 # region private functions
+
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
@@ -2944,6 +3062,5 @@ def _get_parser_from_filename(filename):
         return filepath, None
 
     return filepath, parser
-
 
 # endregion

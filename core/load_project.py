@@ -7,19 +7,18 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsProject
+from qgis.core import QgsProject, Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
 from .models.plugin_toolbar import GwPluginToolbar
-from .shared.search import GwSearch
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi, GwSearchUi
+from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt
 
 
 class GwLoadProject(QObject):
@@ -98,12 +97,6 @@ class GwLoadProject(QObject):
         if status is False:
             return
 
-        # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
-        if tools_os.set_boolean(open_search):
-            dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
-
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
@@ -136,13 +129,48 @@ class GwLoadProject(QObject):
         global_vars.project_epsg = tools_qgis.get_epsg()
         QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
 
-        # Log it
         global_vars.project_loaded = True
-        message = "Project read finished"
-        tools_log.log_info(message)
+
+        # Manage versions of Giswater and PostgreSQL
+        plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
+        project_version = tools_gw.get_project_version(schema_name)
+        if project_version == plugin_version:
+            message = "Project read finished"
+            tools_log.log_info(message)
+        else:
+            message = (f"Project read finished with different versions on plugin metadata ({plugin_version}) and "
+                       f"PostgreSQL sys_version table ({project_version}).")
+            tools_log.log_warning(message)
+            tools_qgis.show_warning(message)
+
+        # Manage compatibility version of Giswater
+        self._check_version_compatibility()
 
 
     # region private functions
+
+    def _check_version_compatibility(self):
+
+        # Get current QGIS and PostgreSQL versions
+        qgis_version = Qgis.QGIS_VERSION[:4]
+        postgresql_version = tools_db.get_pg_version()
+
+        # Get version compatiblity from metadata.txt
+        minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
+        majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
+        recommendedQgisVersion = tools_qgis.get_plugin_metadata('recommendedQgisVersion', '3.16', global_vars.plugin_dir)
+        minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
+        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
+        recommendedPgVersion = tools_qgis.get_plugin_metadata('recommendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
+
+        url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
+        if qgis_version < minorQgisVersion or qgis_version > majorQgisVersion:
+            msg = "QGIS version is not compatible with Giswater. Please check wiki"
+            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+        if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
+            msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
+            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+
 
     def _get_project_variables(self):
         """ Manage QGIS project variables """
@@ -248,7 +276,7 @@ class GwLoadProject(QObject):
 
         buttons_to_hide = None
         try:
-            row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
+            row = tools_gw.get_config_parser('toolbars_hidebuttons', 'buttons_to_hide', "user", "init")
             if not row or row in (None, 'None'):
                 return None
 
@@ -280,35 +308,36 @@ class GwLoadProject(QObject):
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar
-        icon_folder = global_vars.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
+        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 successful = False
-                count_trys = 0
-                while not successful and count_trys < 10:
+                attempt = 0
+                while not successful and attempt < 10:
                     button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
                     if button_def not in (None, 'None'):
-                        text = tools_qt.tr(f'{index_action}_text')
-                        icon_path = icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-
-                        button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
-                        self.buttons[index_action] = button
+                        # Check if the class associated to the button definition exists
+                        if hasattr(buttons, button_def):
+                            text = tools_qt.tr(f'{index_action}_text')
+                            icon_path = f"{icon_folder}{plugin_toolbar.toolbar_id}{os.sep}{index_action}.png"
+                            button_class = getattr(buttons, button_def)
+                            button = button_class(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
+                            self.buttons[index_action] = button
                         successful = True
-                    count_trys = count_trys + 1
+                    attempt = attempt + 1
 
         # Disable buttons which are project type exclusive
         project_exclusive = None
         successful = False
-        count_trys = 0
-        while not successful and count_trys < 10:
+        attempt = 0
+        while not successful and attempt < 10:
             project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
-
             if project_exclusive not in (None, "None"):
                 successful = True
-            count_trys = count_trys + 1
+            attempt = attempt + 1
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')

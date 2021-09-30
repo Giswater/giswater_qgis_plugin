@@ -14,10 +14,8 @@ from .basic.selector_button import GwSelectorButton
 # Om
 from .om.mincut_button import GwMincutButton
 from .om.mincut_manager_button import GwMincutManagerButton
-
 from .om.flow_trace_button import GwFlowTraceButton
 from .om.flow_exit_button import GwFlowExitButton
-
 from .om.profile_button import GwProfileButton
 from .om.visit_button import GwVisitButton
 from .om.visit_manager_button import GwVisitManagerButton
@@ -29,7 +27,7 @@ from .edit.arc_add_button import GwArcAddButton
 from .edit.feature_replace_button import GwFeatureReplaceButton
 from .edit.arc_divide_button import GwArcDivideButton
 from .edit.arc_fusion_button import GwArcFusionButton
-from .edit.nodetype_change_button import GwNodeTypeChangeButton
+from .edit.featuretype_change_button import GwFeatureTypeChangeButton
 from .edit.connect_link_button import GwConnectLinkButton
 from .edit.feature_end_button import GwFeatureEndButton
 from .edit.feature_delete_button import GwFeatureDeleteButton
@@ -59,6 +57,7 @@ from .utilities.config_btn import GwConfigButton
 from .utilities.csv_btn import GwCSVButton
 from .utilities.print_btn import GwPrintButton
 from .utilities.project_check_btn import GwProjectCheckButton
+from .utilities.workspace_manager_btn import GwWorkspaceManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton

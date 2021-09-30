@@ -15,6 +15,7 @@ from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars
 from ...lib import tools_qgis
+from . import tools_gw
 
 
 class GwSnapManager(object):
@@ -99,17 +100,15 @@ class GwSnapManager(object):
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
-    def config_snap_to_arc(self, msg=True):
+    def config_snap_to_arc(self):
         """ Set snapping to 'arc' """
-
-        self.show_snap_message(msg, 'arc')
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
-        segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag if Qgis.QGIS_VERSION_INT >= 31200 else 2
+        segment_flag = tools_gw.get_segment_flag(2)
         layer_settings = self.config_snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
-            layer_settings.setTypeFlag(segment_flag)
+            tools_gw.set_snapping_type(layer_settings, segment_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -118,16 +117,14 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_node(self, msg=True):
+    def config_snap_to_node(self):
         """ Set snapping to 'node' """
 
-        self.show_snap_message(msg, 'node')
-
         QgsProject.instance().blockSignals(True)
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setTypeFlag(vertex_flag)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -136,18 +133,16 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_connec(self, msg=True):
+    def config_snap_to_connec(self):
         """ Set snapping to 'connec' """
-
-        self.show_snap_message(msg, 'connec')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setTypeFlag(vertex_flag)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -156,18 +151,16 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_gully(self, msg=True):
+    def config_snap_to_gully(self):
         """ Set snapping to 'gully' """
-
-        self.show_snap_message(msg, 'gully')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag if Qgis.QGIS_VERSION_INT >= 31200 else 1
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'),
             QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setTypeFlag(vertex_flag)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
@@ -373,20 +366,6 @@ class GwSnapManager(object):
         vertex_marker.setColor(colors[color_type])
         vertex_marker.setIconSize(icon_size)
         vertex_marker.setPenWidth(pen_width)
-
-
-    def show_snap_message(self, msg, feature_type=None):
-
-        if msg is False:
-            return
-        if global_vars.user_level['level'] not in (None, 'None'):
-            if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
-                if msg is True:
-                    msg = f'Snap to'
-                    tools_qgis.show_info(msg, 1, parameter=feature_type)
-                elif type(msg) is str:
-                    tools_qgis.show_info(msg, 1)
-
 
     # region private functions
 
