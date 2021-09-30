@@ -587,3 +587,6 @@ UPDATE cat_feature_node SET epa_default = 'JUNCTION' WHERE id = 'CLORINATHOR';
 
 UPDATE cat_dscenario SET active = true;
 UPDATE cat_dscenario SET dscenario_type = 'DEMAND';
+
+UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":3}' WHERE id IN ('TANK', 'EXPANTANK');
+UPDATE cat_feature_connec SET double_geom = '{"activated":true,"value":1}' WHERE id = 'FOUNTAIN';

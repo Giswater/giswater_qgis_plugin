@@ -467,3 +467,6 @@ UPDATE inp_dwf SET value = 0.0001;
 
 UPDATE config_param_user SET value = null WHERE value ='COVER' and parameter = 'edit_elementcat_vdefault';
 
+UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":4}' WHERE id IN ('SEWER_STORAGE');
+UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":2}' WHERE id IN ('REGISTER');
+UPDATE cat_feature_gully SET double_geom = '{"activated":true,"value":1}' WHERE id = 'GULLY';
