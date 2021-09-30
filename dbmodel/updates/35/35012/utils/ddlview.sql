@@ -50,7 +50,7 @@ CREATE OR REPLACE VIEW ve_pol_node AS
 SELECT 
 pol_id,
 feature_id as node_id,
-polygon.feature_type,
+polygon.featurecat_id,
 polygon.the_geom
 FROM node
 JOIN v_state_node USING(node_id)
@@ -61,7 +61,7 @@ CREATE OR REPLACE VIEW ve_pol_connec AS
 SELECT 
 pol_id,
 feature_id as connec_id,
-polygon.feature_type,
+polygon.featurecat_id,
 polygon.the_geom
 FROM connec
 JOIN v_state_connec USING(connec_id)

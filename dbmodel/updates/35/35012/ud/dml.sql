@@ -362,6 +362,11 @@ UPDATE polygon p SET feature_id=node_id FROM man_wwtp m WHERE p.pol_id=m._pol_id
 UPDATE polygon p SET feature_id=node_id FROM man_chamber m WHERE p.pol_id=m._pol_id_ AND sys_type='CHAMBER';
 UPDATE polygon p SET feature_id=gully_id FROM gully m WHERE p.pol_id=m.pol_id AND sys_type='GULLY';
 
+UPDATE polygon p SET featurecat_id = node_type FROM node WHERE p.feature_id = node_id;
+UPDATE polygon p SET featurecat_id = connec_type FROM connec WHERE p.feature_id = connec_id;
+UPDATE polygon p SET featurecat_id = gully_type FROM gully WHERE p.feature_id = gully_id;
+
+
 UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", 
 "trg_fields":"dscenario_id","featureType":["v_edit_inp_dscenario_conduit","v_edit_inp_dscenario_junction","v_edit_inp_dscenario_raingage"]}]'
 WHERE id='cat_dscenario';
@@ -651,3 +656,6 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('cat_dscenario', 'form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', false, false, true, 
 false, false, null, null,false, null, null,null,
 null,null,null,false);
+
+--2021/09/30
+DELETE FROM config_param_system WHERE parameter = 'edit_node_doublegeom';

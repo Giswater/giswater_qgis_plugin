@@ -733,7 +733,7 @@ CREATE OR REPLACE VIEW ve_pol_gully AS
 SELECT 
 polygon.pol_id,
 feature_id AS gully_id,
-polygon.feature_type,
+polygon.featurecat_id,
 polygon.the_geom
 FROM gully
 JOIN v_state_gully USING(gully_id)

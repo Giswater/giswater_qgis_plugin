@@ -64,5 +64,5 @@ ALTER TABLE cat_feature_connec ALTER COLUMN double_geom SET DEFAULT '{"activated
 UPDATE cat_feature_node SET double_geom = '{"activated":false,"value":1}';
 UPDATE cat_feature_connec SET double_geom = '{"activated":false,"value":1}';
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"feature_type", "dataType":"character varying(50)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"featurecat_id", "dataType":"character varying(50)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"feature_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
