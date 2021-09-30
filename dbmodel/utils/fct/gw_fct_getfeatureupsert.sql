@@ -689,7 +689,8 @@ BEGIN
 					WHEN 'sys_elev2' THEN
 						field_value =v_noderecord2.sys_elev;	
 					WHEN 'gratecat_id' THEN
-						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 	WHERE (a->>'param') = 'gratecat_id';
+						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
+						WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
 					ELSE
 					END CASE;
 				END IF;
