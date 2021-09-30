@@ -130,16 +130,15 @@ BEGIN
 		IF v_connect_arc IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
 		END IF;
+
 		--check related polygon
-		IF v_man_table IN ('man_tank', 'man_register', 'man_wwtp', 'man_storage','man_netgully','man_chamber') THEN
-		 	EXECUTE 'SELECT pol_id FROM '||v_man_table||' where node_id= '''||v_feature_id||''';'
-		 	INTO v_connect_pol;
+		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '''||v_feature_id||''';'
+		INTO v_connect_pol;
 
-		 	IF v_connect_pol IS NOT NULL THEN
-		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
-		 	END IF;
+		IF v_connect_pol IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
 		END IF;
-
+		
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
 		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
 		OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
@@ -158,13 +157,8 @@ BEGIN
 		END IF;
 		
 		--check related polygon
-		IF v_man_table = 'man_fountain' THEN
-		 	EXECUTE 'SELECT pol_id FROM '||v_man_table||' where connec_id= '''||v_feature_id||''';'
-		 	INTO v_connect_pol;
-		ELSIF v_feature_type = 'gully' THEN
-			EXECUTE 'SELECT pol_id FROM gully WHERE gully_id = '''||v_feature_id||''';'
-		 	INTO v_connect_pol;
-		END IF;
+		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '''||v_feature_id||''';'
+		INTO v_connect_pol;
 
 		IF v_connect_pol IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
