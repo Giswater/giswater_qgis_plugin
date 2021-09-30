@@ -1833,13 +1833,11 @@ class GwPsector:
         if message is not None:
             tools_qt.show_info_box(message)
 
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], close=False)
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'])
 
         if not change_tab:
             self.dlg_replace_arc.close()
             tools_gw.reset_rubberband(self.rubber_band)
-        else:
-            self.dlg_replace_arc.btn_accept.setEnabled(False)
 
 
     def _enable_arc_replace(self):
