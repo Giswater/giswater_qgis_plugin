@@ -38,7 +38,8 @@ v_result_info text;
 v_feature_text text;
 v_feature_array text[];
 i integer = 0;
-
+v_project_type text;
+v_arc_type text;
 
 BEGIN
 
@@ -51,7 +52,7 @@ BEGIN
 	v_catalog = (p_data->>'data')::json->>'catalog';
 
 	-- select config values
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user values
 	v_currentpsector  = (SELECT value FROM config_param_user WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user);
@@ -99,27 +100,68 @@ BEGIN
 				IF rec.state_type IS NULL THEN
 					rec.state_type = (SELECT id FROM value_state_type WHERE state_id = 1 LIMIT 1);
 				END IF;
-				
-				-- insert new arc (also insert on psector table) 
-				INSERT INTO v_edit_arc
-				(arccat_id, epa_type, expl_id, sector_id, state, state_type, minsector_id, dma_id, presszone_id, dqa_id, soilcat_id,
-				function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
-				muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
-				label_x,label_y,label_rotation,inventory)
-				VALUES
-				(v_catalog, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.minsector_id, rec.dma_id, rec.presszone_id, rec.dqa_id, rec.soilcat_id,
-				rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
-				rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
-				rec.label_x, rec.label_y, rec.label_rotation, false)
-				RETURNING arc_id INTO v_arc;
+				IF v_project_type ='WS' THEN
+					-- insert new arc (also insert on psector table) 
+					INSERT INTO v_edit_arc
+					(arccat_id, epa_type, expl_id, sector_id, state, state_type, minsector_id, dma_id, presszone_id, dqa_id, soilcat_id,
+					function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
+					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
+					label_x,label_y,label_rotation,inventory)
+					VALUES
+					(v_catalog, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.minsector_id, rec.dma_id, rec.presszone_id, rec.dqa_id, rec.soilcat_id,
+					rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
+					rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
+					rec.label_x, rec.label_y, rec.label_rotation, false)
+					RETURNING arc_id INTO v_arc;
 
-				UPDATE connec SET arc_id = v_arc WHERE arc_id = v_id;
-				GET DIAGNOSTICS v_count = row_count;
+				ELSIF v_project_type ='UD' THEN
+
+					SELECT arc_type INTO v_arc_type FROM cat_arc WHERE id=v_catalog;
+
+					IF v_arc_type IS NULL THEN
+						v_arc_type=rec.arc_type;
+					END IF;
+
+					 INSERT INTO v_edit_arc
+					(arccat_id, arc_type, epa_type, expl_id, sector_id, state, state_type,  dma_id, soilcat_id,
+					function_type, category_type, fluid_type, location_type, workcat_id_plan, ownercat_id, the_geom,
+					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
+					label_x,label_y,label_rotation, inventory, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2,
+					matcat_id, inverted_slope)
+					VALUES
+					(v_catalog, v_arc_type, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.dma_id, rec.soilcat_id,
+					rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
+					rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
+					rec.label_x, rec.label_y, rec.label_rotation, false, rec.y1, rec.y2, rec.custom_y1, rec.custom_y2,
+					rec.elev1, rec.elev2, rec.custom_elev1, rec.custom_elev2, rec.matcat_id, rec.inverted_slope)
+					RETURNING arc_id INTO v_arc;
+				END IF;
+	
+				INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
+				SELECT v_currentpsector, connec_id, v_arc, 1,false FROM connec WHERE arc_id = v_id AND state=1
+				ON CONFLICT (connec_id, psector_id) DO NOTHING;
+
+				SELECT count(*) INTO v_count FROM connec WHERE arc_id = v_id AND state=1;
+
 				INSERT INTO audit_check_data (fid, error_message) 
-				VALUES (v_fid, concat('Arc (',v_id,') have been downgraded, new planned arc have been created (',v_arc,') and ',v_count,' connec(s) have been reconnected.'));
+				VALUES (v_fid, concat('Arc (',v_id,') have been downgraded, new planned arc have been created (',v_arc,')'));
+				INSERT INTO audit_check_data (fid, error_message) 
+				VALUES (v_fid, concat(v_count,' connec(s) have been reconnected.'));
+
+				IF v_project_type ='UD' THEN
+					INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
+					SELECT v_currentpsector, gully_id, v_arc, 1,false FROM gully WHERE arc_id = v_id AND state=1
+					ON CONFLICT (gully_id, psector_id) DO NOTHING;
+
+					SELECT count(*) INTO v_count FROM gully WHERE arc_id = v_id AND state=1;
+
+					INSERT INTO audit_check_data (fid, error_message) 
+					VALUES (v_fid, concat(v_count,' gully(s) have been reconnected.')); 
+				END IF;
 
 				UPDATE arc SET streetaxis_id = rec.streetaxis_id WHERE arc_id = v_arc;
 				UPDATE arc SET streetaxis2_id = rec.streetaxis_id WHERE arc_id = v_arc;
+				
 			END IF;
 		END LOOP;
 
@@ -138,7 +180,7 @@ BEGIN
 	-- get info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fid=214 ORDER BY criticity desc, id asc) row;
+	WHERE cur_user="current_user"() AND fid=143 ORDER BY criticity desc, id asc) row;
 
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
@@ -154,9 +196,9 @@ BEGIN
 			'}}'||
 	    '}')::json;
 
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
  
 END;
