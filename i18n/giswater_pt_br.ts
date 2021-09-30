@@ -210,7 +210,7 @@
 		</message>
 		<message>
 			<source>58_text</source>
-			<translation>Fasprint</translation>
+			<translation>Fastprint</translation>
 		</message>
 		<message>
 			<source>206_text</source>
@@ -1009,11 +1009,15 @@
 			<translation>Select a node and click on it, the upstream nodes are computed</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>

@@ -49,8 +49,8 @@ class GwCreateSchemaUtilsTask(GwTask):
             tools_db.execute_sql(sql)
 
             # Insert into config_param_system utils schema version
-            sql = f"INSERT INTO utils.config_param_system (parameter, value, data_type, descript)" \
-                  f" VALUES ('utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
+            sql = f"INSERT INTO utils.config_param_system (id, parameter, value, data_type, descript)" \
+                  f" VALUES (10, 'utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
             tools_db.execute_sql(sql)
 
             return True
