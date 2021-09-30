@@ -320,7 +320,7 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT  formname, formtype, tabname, 'gratecat2_id', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, FALSE, 
+SELECT  formname, formtype, tabname, 'gratecat2_id', 'lyt_data_2', 43, datatype, widgettype, 'gratecat2_id', 'gratecat2_id', placeholder, FALSE, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE (formname ilike '%ve_gully%' OR formname ilike '%v_edit_gully%') AND columnname='gratecat_id' 
