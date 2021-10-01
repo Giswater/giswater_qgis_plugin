@@ -256,7 +256,7 @@ def show_message(**kwargs):
     Shows a message in the message bar.
 
     Called from PostgreSQL -> PERFORM pg_notify(v_channel,
-                              '{"functionAction":{"functions":[{"name":"showMessage", "parameters":
+                              '{"functionAction":{"functions":[{"name":"show_message", "parameters":
                               {"level":1, "duration":10, "text":"Current psector have been selected"}}]}
                               ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
     Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
@@ -270,77 +270,6 @@ def show_message(**kwargs):
 
 
 # region unused functions atm
-def show_message_old(**kwargs):
-
-    """
-    PERFORM pg_notify(current_user,
-              '{"functionAction":{"functions":[{"name":"show_message","parameters":
-              {"message":"line 1 \n line 2","tabName":"Notify channel",
-              "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"ws_sample"}');
-
-    functions called in -> getattr(self, function_name)(**params):
-    Show message in console log,
-    :param kwargs: dict with all needed
-        kwargs: ['message']: message to show
-        kwargs: ['tabName']: tab where the info will be displayed
-        kwargs: ['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black),
-                     1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
-        kwargs: ['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue),
-                    4 = None(black)
-        kwargs: ['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
-        kwargs: ['styleSheet']['bold']: if is true, then print as bold
-    :return:
-    """
-
-    # Set default styleSheet
-    color = "black"
-    level = 0
-    bold = ''
-
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
-    if 'styleSheet' in kwargs:
-        color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
-        level = kwargs['styleSheet']['level'] if 'level' in kwargs['styleSheet'] else 0
-        if 'bold' in kwargs['styleSheet']:
-            bold = 'b' if kwargs['styleSheet']['bold'] else ''
-        else:
-            bold = ''
-
-    msg = f'<font color="{color}"><{bold}>{msg}</font>'
-    QgsMessageLog.logMessage(msg, tab_name, level)
-
-
-def show_messagebox(**kwargs):
-    """ Shows a message box with detail information """
-
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    title = kwargs['title'] if 'title' in kwargs else 'New message'
-    inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
-    msg_box = QMessageBox()
-    msg_box.setText(msg)
-    if title:
-        title = tools_qt.tr(title)
-        msg_box.setWindowTitle(title)
-    if inf_text:
-        inf_text = tools_qt.tr(inf_text)
-        msg_box.setInformativeText(inf_text)
-    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-    msg_box.setStandardButtons(QMessageBox.Ok)
-    msg_box.setDefaultButton(QMessageBox.Ok)
-    msg_box.open()
-
-
-def raise_notice(**kwargs):
-    """ Used to show raise notices sent by postgresql
-    Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-
-    """
-
-    msg_list = kwargs['msg']
-    for msg in msg_list:
-        tools_log.log_info(f"{msg}")
-
 
 def get_all_layers(group, all_layers):
 
