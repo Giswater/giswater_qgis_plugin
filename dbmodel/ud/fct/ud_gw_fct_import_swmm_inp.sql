@@ -117,7 +117,6 @@ BEGIN
 			DELETE FROM ext_municipality;
 			DELETE FROM selector_expl;
 			DELETE FROM selector_state;
-			DELETE FROM selector_inp_hydrology;
 
 			DELETE FROM cat_feature_arc ;
 			DELETE FROM cat_feature_node ;
@@ -255,7 +254,8 @@ BEGIN
 			INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
 			INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 			INSERT INTO selector_sector(sector_id,cur_user) VALUES (1,current_user);
-			INSERT INTO selector_inp_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
+			
+			INSERT INTO config_param_user(parameter,value, cur_user) VALUES ('inp_options_hydrology_scenario','1', current_user);
 			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Setting selectors -> Done');
@@ -275,6 +275,7 @@ BEGIN
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc');
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAORIF','VARC','ARC', 'v_edit_arc');
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTL','VARC','ARC', 'v_edit_arc');
+
 
 			INSERT INTO cat_dwf_scenario VALUES (1, 'default');
 			
