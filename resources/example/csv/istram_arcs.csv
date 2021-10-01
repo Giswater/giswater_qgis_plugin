@@ -1,0 +1,86 @@
+ID Tramo    ;Nodo 1      ;Z ini       ;Nodo 2      ;Z fin       ;Material                ;Forma;		Geom1;		Geom2;		Tipo     ;Descripción             
+E1-T1       ;E1-N1       ;     714,440;E1-N2       ;     714,240;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T2       ;E1-N2       ;     714,240;E1-N3       ;     714,040;THA                     ;RECT_CLOSED; 1200,000;		1000;            ;                        
+E1-T3       ;E1-N3       ;     714,040;E1-N4       ;     713,840;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T4       ;E1-N4       ;     713,840;E1-N5       ;     713,641;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T5       ;E1-N5       ;     713,641;E1-N6       ;     713,441;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T6       ;E1-N6       ;     713,441;E1-N7       ;     713,241;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T7       ;E1-N7       ;     713,241;E1-N8       ;     713,041;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T8       ;E1-N8       ;     713,041;E1-N9       ;     711,127;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T9       ;E1-N9       ;     711,127;E1-N10      ;     709,911;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E1-T10      ;E1-N10      ;     709,911;E1-N11      ;     709,860;THA                     ;CIRCULAR;    1600,000;            ;            ;                        
+E2-T1       ;E2-N1       ;     714,500;E2-N2       ;     714,433;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T2       ;E2-N2       ;     714,433;E2-N3       ;     714,328;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T3       ;E2-N3       ;     714,328;E2-N4       ;     714,229;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T4       ;E2-N4       ;     714,229;E2-N5       ;     713,630;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T5       ;E2-N5       ;     713,630;E2-N6       ;     713,530;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T6       ;E2-N6       ;     713,530;E2-N7       ;     713,430;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T7       ;E2-N7       ;     713,430;E2-N8       ;     713,330;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T8       ;E2-N8       ;     713,330;E2-N9       ;     712,730;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T9       ;E2-N9       ;     712,730;E2-N10      ;     712,730;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T10      ;E2-N10      ;     712,730;E2-N11      ;     712,630;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T11      ;E2-N11      ;     712,630;E2-N12      ;     712,530;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T12      ;E2-N12      ;     712,530;E2-N13      ;     712,431;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T13      ;E2-N13      ;     712,431;E2-N14      ;     712,386;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T14      ;E2-N14      ;     712,386;E2-N15      ;     712,300;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T15      ;E2-N15      ;     712,300;E2-N16      ;     712,200;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T16      ;E2-N16      ;     712,200;E2-N17      ;     712,100;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T17      ;E2-N17      ;     712,100;E2-N18      ;     712,035;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E2-T18      ;E2-N18      ;     712,035;E1-N10      ;     711,990;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E3-T1       ;E3-N1       ;     710,982;E3-N2       ;     710,780;THA                     ;CIRCULAR;     400,000;            ;            ;                        
+E3-T2       ;E3-N2       ;     710,780;E3-N3       ;     710,700;THA                     ;CIRCULAR;     400,000;            ;            ;                        
+E3-T3       ;E3-N3       ;     710,700;E3-N4       ;     710,624;THA                     ;CIRCULAR;     400,000;            ;            ;                        
+E3-T4       ;E3-N4       ;     710,624;E3-N5       ;     710,548;THA                     ;CIRCULAR;     400,000;            ;            ;                        
+E4-T1       ;E4-N1       ;     710,740;E4-N2       ;     710,689;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T2       ;E4-N2       ;     710,689;E4-N3       ;     707,206;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T3       ;E4-N3       ;     707,206;E4-N4       ;     707,186;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T4       ;E4-N4       ;     707,186;E4-N5       ;     707,110;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T5       ;E4-N5       ;     707,110;E4-N6       ;     707,034;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T6       ;E4-N6       ;     707,034;E4-N7       ;     707,007;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T7       ;E4-N7       ;     707,007;E4-N8       ;     707,000;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T8       ;E4-N8       ;     707,000;E4-N9       ;     706,591;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E4-T9       ;E4-N9       ;     706,591;E4-N10      ;     706,580;PVC                     ;CIRCULAR;     800,000;            ;            ;                        
+E6-T1       ;E6-N1       ;     712,930;E6-N2       ;     712,720;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E6-T2       ;E6-N2       ;     712,720;E6-N3       ;     712,511;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E9-T1       ;E9-N1       ;     709,845;E9-N2       ;     709,830;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E9-T2       ;E9-N2       ;     709,830;E9-N3       ;     709,810;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T3       ;E9-N3       ;     709,810;E9-N4       ;     709,735;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T4       ;E9-N4       ;     709,735;E9-N5       ;     709,685;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T5       ;E9-N5       ;     709,685;E9-N6       ;     709,637;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T6       ;E9-N6       ;     709,637;E9-N7       ;     709,562;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T7       ;E9-N7       ;     709,562;E9-N8       ;     709,487;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T8       ;E9-N8       ;     709,487;E9-N9       ;     709,412;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T9       ;E9-N9       ;     709,412;E9-N10      ;     709,337;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T10      ;E9-N10      ;     709,337;E9-N11      ;     709,262;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T11      ;E9-N11      ;     709,262;E9-N12      ;     709,187;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T12      ;E9-N12      ;     709,187;E9-N13      ;     709,112;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T13      ;E9-N13      ;     709,112;E9-N14      ;     709,037;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T14      ;E9-N14      ;     709,037;E9-N15      ;     708,892;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T15      ;E9-N15      ;     708,892;E9-N16      ;     708,822;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T16      ;E9-N16      ;     708,822;E9-N17      ;     708,783;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T17      ;E9-N17      ;     708,783;E9-N18      ;     708,724;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T18      ;E9-N18      ;     708,724;E9-N19      ;     708,412;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T19      ;E9-N19      ;     708,412;E9-N20      ;     708,181;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T20      ;E9-N20      ;     708,181;E9-N21      ;     707,959;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T21      ;E9-N21      ;     707,959;E9-N22      ;     707,950;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T22      ;E9-N22      ;     707,950;E9-N23      ;     707,870;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T23      ;E9-N23      ;     707,870;E9-N24      ;     707,849;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T24      ;E9-N24      ;     707,849;E4-N10      ;     707,788;THA                     ;CIRCULAR;    1200,000;            ;            ;TRAMO GRAVEDAD          
+E9-T25      ;E4-N10      ;     707,788;E9-N25      ;     704,825;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E9-T26      ;E9-N25      ;     704,825;E9-N26      ;     704,779;DEPOSITO/BOMBAS         ;CIRCULAR;     400,000;            ;            ;TRAMO IMPULSION         
+E9-T27      ;E9-N26      ;     704,779;E9-N27      ;     707,603;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E9-T28      ;E9-N27      ;     707,603;E9-N28      ;     707,676;PVC-O DN800             ;CIRCULAR;     800,000;            ;            ;TRAMO IMPULSION         
+E9-T29      ;E9-N28      ;     707,676;E9-N29      ;     707,751;PVC-O DN800             ;CIRCULAR;     800,000;            ;            ;TRAMO IMPULSION         
+E9-T30      ;E9-N29      ;     707,751;E9-N30      ;     707,826;PVC-O DN800             ;CIRCULAR;     800,000;            ;            ;TRAMO IMPULSION         
+E9-T31      ;E9-N30      ;     707,826;E9-N31      ;     711,112;PVC-O DN800             ;CIRCULAR;     800,000;            ;            ;TRAMO IMPULSION         
+E9-T32      ;E9-N31      ;     711,112;E9-N32      ;     717,223;PVC-O DN800             ;CIRCULAR;     800,000;            ;            ;TRAMO IMPULSION         
+E9-T33      ;E9-N32      ;     717,223;E9-N33      ;     716,759;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T34      ;E9-N33      ;     716,759;E9-N34      ;     716,292;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T35      ;E9-N34      ;     716,292;E9-N35      ;     715,822;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T36      ;E9-N35      ;     715,822;E9-N36      ;     715,356;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T37      ;E9-N36      ;     715,356;E9-N37      ;     715,096;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T38      ;E9-N37      ;     715,096;E9-N38      ;     714,834;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E9-T39      ;E9-N38      ;     711,861;E9-N39      ;     711,803;THA                     ;CIRCULAR;    1000,000;            ;            ;TRAMO GRAVEDAD          
+E11-T1      ;E11-N1      ;     708,209;E11-N2      ;     708,203;THA                     ;CIRCULAR;    1200,000;            ;            ;                        
+E11-T2      ;E11-N2      ;     708,203;E11-N3      ;     708,059;THA                     ;CIRCULAR;    1200,000;            ;            ;ALIVIO DEL TANQUE BOMBEO
+E11-T3      ;E11-N3      ;     708,059;E11-N4      ;     708,020;THA                     ;CIRCULAR;    1200,000;            ;            ;ALIVIO DEL TANQUE BOMBEO
