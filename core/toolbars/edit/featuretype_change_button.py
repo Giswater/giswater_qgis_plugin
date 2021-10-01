@@ -33,7 +33,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.project_type = None
         self.feature_type = None
-        self.geom_view = None
+        self.tablename = None
         self.cat_table = None
         self.feature_edit_type = None
         self.feature_type_cat = None
@@ -195,12 +195,12 @@ class GwFeatureTypeChangeButton(GwMaptool):
                     fieldname = f"connecat_id"
                 elif self.feature_type == "gully":
                     fieldname = f"gratecat_id"
-                sql = (f"UPDATE {self.geom_view} "
+                sql = (f"UPDATE {self.tablename} "
                        f"SET {fieldname} = '{featurecat_id}' "
                        f"WHERE {self.feature_type}_id = '{self.feature_id}'")
                 tools_db.execute_sql(sql)
                 if project_type == 'ud':
-                    sql = (f"UPDATE {self.geom_view} "
+                    sql = (f"UPDATE {self.tablename} "
                            f"SET {self.feature_type}_type = '{feature_type_new}' "
                            f"WHERE {self.feature_type}_id = '{self.feature_id}'")
                     tools_db.execute_sql(sql)
@@ -229,7 +229,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if not is_valid:
             return
 
-        self._open_custom_form(self.current_layer, expr)
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
+
+        # self._open_custom_form(self.current_layer, expr)
 
 
     def _open_custom_form(self, layer, expr):
@@ -241,11 +245,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
             self.customForm = GwInfo('data')
             self.customForm.user_current_layer = self.current_layer
             feature_id = features[0][f"{self.feature_type}_id"]
-            complet_result, dialog = self.customForm.get_info_from_id(self.geom_view, feature_id, 'data')
+            complet_result, dialog = self.customForm.get_info_from_id(self.tablename, feature_id, 'data')
             if not complet_result:
                 return
 
-            dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.geom_view))
+            dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.tablename))
 
 
     def _change_elem_type(self, feature):
@@ -333,7 +337,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             elif tablename == 'v_edit_arc':
                 self.feature_type = 'arc'
 
-        self.geom_view = tablename
+        self.tablename = tablename
         self.cat_table = f'cat_{self.feature_type}'
         if self.feature_type == 'gully':
             self.cat_table = f'cat_grate'
