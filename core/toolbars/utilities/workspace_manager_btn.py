@@ -12,10 +12,10 @@ from functools import partial
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QTableView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QApplication
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
 
 from ..dialog import GwAction
-from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwSelectorUi
+from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
@@ -167,7 +167,7 @@ class GwWorkspaceManagerButton(GwAction):
             self._set_label_current_workspace(value)
             tools_qgis.refresh_map_canvas()  # First refresh all the layers
             global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
-            self._manage_selectors()
+            tools_gw.refresh_selectors()
 
 
     def _reset_workspace(self):
@@ -242,18 +242,5 @@ class GwWorkspaceManagerButton(GwAction):
             name = row[0]
         text = f"Selected workspace: {name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
-
-
-    def _manage_selectors(self):
-
-        # Get the selector UI if it's open
-        windows = [x for x in QApplication.allWidgets() if not x.isHidden() and (issubclass(type(x), GwSelectorUi))]
-
-        if windows:
-            try:
-                selector = windows[0].property('GwSelector')
-                selector.open_selector()
-            except Exception:
-                pass
 
     # endregion

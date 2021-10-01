@@ -24,7 +24,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget
+    QToolButton, QWidget, QApplication
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
@@ -35,6 +35,7 @@ from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
 from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
+from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
@@ -2707,6 +2708,26 @@ def set_epsg():
 
     epsg = tools_qgis.get_epsg()
     global_vars.project_epsg = epsg
+
+
+def refresh_selectors():
+    """
+    Refreshes the selectors' UI if it's open
+    """
+
+    # Get the selector UI if it's open
+    windows = [x for x in QApplication.allWidgets() if not x.isHidden() and (issubclass(type(x), GwSelectorUi))]
+
+    if windows:
+        try:
+            dialog = windows[0]
+            selector = dialog.property('GwSelector')
+            # selector.open_selector()
+            # tools_gw.close_dialog(windows[0])
+            cur_tab = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
+            selector.get_selector(dialog, '"selector_basic"', current_tab=cur_tab)
+        except Exception:
+            pass
 
 
 def open_dlg_help():
