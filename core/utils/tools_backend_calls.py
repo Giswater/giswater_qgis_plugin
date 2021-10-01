@@ -11,6 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
+from ... import global_vars
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os
 
@@ -236,8 +237,40 @@ def open_url(widget):
         tools_qgis.show_warning(message, parameter=widget.text())
 
 
-# region unused functions atm
+def get_selector(**kwargs):
+    """
+    Refreshes the selectors if the selector dialog is open
+
+    Called form PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[
+                              {"name":"getSelectors","parameters":{"tab":"tab_psector"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
+    """
+
+    global_vars.signal_manager.refresh_selectors.emit()
+
+
 def show_message(**kwargs):
+    """
+    Shows a message in the message bar.
+
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[{"name":"showMessage", "parameters":
+                              {"level":1, "duration":10, "text":"Current psector have been selected"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
+    """
+
+    text = kwargs['text'] if 'text' in kwargs else 'No message found'
+    level = kwargs['level'] if 'level' in kwargs else 1
+    duration = kwargs['duration'] if 'duration' in kwargs else 10
+
+    global_vars.signal_manager.show_message.emit(text, level, duration)
+
+
+# region unused functions atm
+def show_message_old(**kwargs):
 
     """
     PERFORM pg_notify(current_user,
