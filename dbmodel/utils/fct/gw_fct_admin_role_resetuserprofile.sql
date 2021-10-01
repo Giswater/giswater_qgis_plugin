@@ -133,28 +133,26 @@ BEGIN
 
 						IF v_projecttype ='UD' THEN	
 						
-							DELETE FROM selector_inp_hydrology WHERE cur_user=v_user;
 							DELETE FROM selector_rpt_compare_tstep WHERE cur_user=v_user;
 							DELETE FROM selector_rpt_main_tstep WHERE cur_user=v_user;
 
-							INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) SELECT hydrology_id, v_user FROM selector_inp_hydrology WHERE cur_user=v_copyfromuser;
 							INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user) SELECT resultdate, resulttime, v_user FROM selector_rpt_main_tstep WHERE cur_user=v_copyfromuser;
 							INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user) SELECT resultdate, resulttime, v_user FROM selector_rpt_compare_tstep WHERE cur_user=v_copyfromuser;
 
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-UD selectors have been copied (selector_inp_hydrology, selector_rpt_main_tstep, selector_rpt_compare_tstep)'));
+							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-UD selectors have been copied (selector_rpt_main_tstep, selector_rpt_compare_tstep)'));
 
 						ELSE
-							DELETE FROM selector_inp_demand WHERE cur_user=v_user;
+							DELETE FROM selector_inp_dscenario WHERE cur_user=v_user;
 
 							DELETE FROM selector_rpt_compare_tstep WHERE cur_user=v_user;
 							DELETE FROM selector_rpt_main_tstep WHERE cur_user=v_user;
 										
-							INSERT INTO selector_inp_demand (dscenario_id, cur_user) SELECT dscenario_id, v_user FROM selector_inp_demand WHERE cur_user=v_copyfromuser;
+							INSERT INTO selector_inp_dscenario (dscenario_id, cur_user) SELECT dscenario_id, v_user FROM selector_inp_dscenario WHERE cur_user=v_copyfromuser;
 
 							INSERT INTO selector_rpt_main_tstep (timestep, cur_user) SELECT timestep, v_user FROM selector_rpt_main_tstep WHERE cur_user=v_copyfromuser;
 							INSERT INTO selector_rpt_compare_tstep (timestep, cur_user) SELECT timestep, v_user FROM selector_rpt_compare_tstep WHERE cur_user=v_copyfromuser;
 
-							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-WS selectors have been copied (selector_inp_demand, selector_rpt_compare_tstep, selector_rpt_main_tstep)'));
+							INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: EPA-WS selectors have been copied (selector_inp_dscenario, selector_rpt_compare_tstep, selector_rpt_main_tstep)'));
 
 						END IF;
 

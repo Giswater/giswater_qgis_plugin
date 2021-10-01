@@ -31,7 +31,7 @@ BEGIN
 
 		-- hydrology_id
 		IF (NEW.hydrology_id IS NULL) THEN
-			NEW.hydrology_id=(SELECT "hydrology_id" FROM selector_inp_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
+			NEW.hydrology_id=(SELECT value FROM config_param_user WHERE parameter ='inp_options_hydrology_scenario' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 	
 		-- Subc ID
