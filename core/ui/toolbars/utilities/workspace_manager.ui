@@ -67,7 +67,11 @@
        </widget>
       </item>
       <item row="6" column="0" colspan="8">
-       <widget class="QTableView" name="tbl_wrkspcm"/>
+       <widget class="QTableView" name="tbl_wrkspcm">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+       </widget>
       </item>
       <item row="7" column="7">
        <widget class="QPushButton" name="btn_cancel">
