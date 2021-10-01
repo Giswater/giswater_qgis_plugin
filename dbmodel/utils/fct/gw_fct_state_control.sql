@@ -246,8 +246,8 @@ BEGIN
 				INSERT INTO selector_psector VALUES (v_psector_vdefault, current_user);
 				-- message to user 
 				v_channel = replace(current_user,'.','_');
-				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"showMessage", "parameters":{"type":"textWindow", "level":1, "text":"Current psector have been selected"}},
-				{"name":"getSelectors","parameters":{"tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');			
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"type":"textWindow", "level":1, "text":"Current psector have been selected"}},
+				{"name":"get_selector","parameters":{"tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');			
 				
 			END IF;
 		END IF;
