@@ -1,0 +1,4 @@
+3.5.013
+*************
+- Enhance graf analytics function cheching if graf_delimiter is filled on cat_feature_node table
+- Minor adjustments on dscenario strategy for ws
