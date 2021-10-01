@@ -45,9 +45,8 @@ BEGIN
 			END IF;
 
 			-- setting this scenario as vdefault scenario
-			DELETE FROM selector_inp_hydrology WHERE cur_user = current_user;
-			INSERT INTO selector_inp_hydrology VALUES (NEW.hydrology_id, current_user);
-			
+			UPDATE config_param_user SET value = NEW.hydrology_id WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user;
+						
 		END IF;
 		
 		IF v_scenario_table = 'cat_dwf_scenario' THEN 	
@@ -60,7 +59,7 @@ BEGIN
 
 			-- setting this scenario as vdefault scenario
 			UPDATE config_param_user SET value =  NEW.id WHERE parameter = 'inp_options_dwfscenario' and cur_user = current_user;
-			
+		
 		END IF;
 
 		RETURN NEW;
