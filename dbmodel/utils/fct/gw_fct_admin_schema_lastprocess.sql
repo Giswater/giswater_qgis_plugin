@@ -230,6 +230,8 @@ BEGIN
 		--update value of rename_view_x_id parameter
 		UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
 		
+		UPDATE config_param_system SET value= '{"setArcObsolete":"false","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
+		
 		-- -- fk for ext tables or utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  
 		
