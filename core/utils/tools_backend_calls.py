@@ -243,12 +243,13 @@ def get_selector(**kwargs):
 
     Called form PostgreSQL -> PERFORM pg_notify(v_channel,
                               '{"functionAction":{"functions":[
-                              {"name":"getSelectors","parameters":{"tab":"tab_psector"}}]}
+                              {"name":"get_selector","parameters":{"tab":"tab_psector"}}]}
                               ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
     Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
     """
 
-    global_vars.signal_manager.refresh_selectors.emit()
+    tab_name = kwargs['tab'] if 'tab' in kwargs else None
+    global_vars.signal_manager.refresh_selectors.emit(tab_name)
 
 
 def show_message(**kwargs):

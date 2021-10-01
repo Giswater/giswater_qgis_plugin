@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 class GwSignalManager(QObject):
     show_message = pyqtSignal(str, int, int)
-    refresh_selectors = pyqtSignal()
+    refresh_selectors = pyqtSignal(str)
 
     def __init__(self):
         """

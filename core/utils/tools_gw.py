@@ -2710,7 +2710,7 @@ def set_epsg():
     global_vars.project_epsg = epsg
 
 
-def refresh_selectors():
+def refresh_selectors(tab_name=None):
     """
     Refreshes the selectors' UI if it's open
     """
@@ -2722,8 +2722,9 @@ def refresh_selectors():
         try:
             dialog = windows[0]
             selector = dialog.property('GwSelector')
-            cur_tab = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
-            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=cur_tab)
+            if tab_name is None:
+                tab_name = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
+            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=tab_name)
         except Exception:
             pass
 
