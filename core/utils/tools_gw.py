@@ -73,10 +73,9 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
-    x, y = dialog.geometry().x(), dialog.geometry().y()
-    w, h = dialog.geometry().width(), dialog.geometry().height()
-
     try:
+        x, y = dialog.geometry().x(), dialog.geometry().y()
+        w, h = dialog.geometry().width(), dialog.geometry().height()
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
