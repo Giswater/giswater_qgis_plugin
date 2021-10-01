@@ -14,4 +14,6 @@ notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enable
 "v_edit_inp_dscenario_tank", "v_edit_inp_dscenario_valve"]}]' 
 WHERE id = 'cat_dscenario';
 
-UPDATE config_form_fields SET widgettype ='text' WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname = 'demand_type'
+UPDATE config_form_fields SET widgettype ='text' WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname = 'demand_type';
+
+UPDATE config_form_fields SET hidden=false where formname = 'v_edit_inp_dscenario_demand';

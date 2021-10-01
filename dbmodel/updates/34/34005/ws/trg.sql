@@ -97,7 +97,7 @@ CREATE TRIGGER gw_trg_edit_field_valve INSTEAD OF UPDATE
 ON v_edit_field_valve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_field_node('field_valve');
   
 CREATE TRIGGER gw_trg_edit_inp_demand INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_demand FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_demand();
+ON v_edit_inp_demand FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario_demand();
 
 CREATE TRIGGER gw_trg_edit_man_tank_pol INSTEAD OF INSERT OR UPDATE OR DELETE
 ON ve_pol_tank FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_tank_pol');

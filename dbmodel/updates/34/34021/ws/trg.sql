@@ -12,7 +12,7 @@ CREATE TRIGGER gw_trg_edit_inp_demand
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_demand
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_demand();
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario_demand();
   
   
 CREATE TRIGGER gw_trg_vi_demands
