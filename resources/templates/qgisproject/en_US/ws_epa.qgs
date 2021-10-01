@@ -215,7 +215,7 @@
         </layer-tree-group>
         <layer-tree-group expanded="0" checked="Qt::Unchecked" name="Dscenario">
           <customproperties/>
-          <layer-tree-layer providerKey="postgres" legend_split_behavior="0" expanded="1" patch_size="-1,-1" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_inp_dscenario_demand&quot;" checked="Qt::Checked" legend_exp="" id="v_edit_inp_dscenario_demand_c70f6be8_d319_48f5_aac1_06c0b460ddd0" name="Dscenario demand">
+          <layer-tree-layer providerKey="postgres" legend_split_behavior="0" expanded="1" patch_size="-1,-1" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='dscenario_id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_inp_dscenario_demand&quot;" checked="Qt::Checked" legend_exp="" id="v_edit_inp_dscenario_demand_c70f6be8_d319_48f5_aac1_06c0b460ddd0" name="Demand dscenario">
             <customproperties/>
           </layer-tree-layer>
           <layer-tree-layer providerKey="postgres" legend_split_behavior="0" expanded="1" patch_size="-1,-1" source=" dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='dscenario_id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_inp_dscenario_pipe&quot;" checked="Qt::Checked" legend_exp="" id="v_edit_inp_dscenario_pipe_20582f33_7f37_4d0e_9c06_b117c7e72519" name="Pipe dscenario">
@@ -750,7 +750,7 @@
           </legendlayer>
         </legendgroup>
         <legendgroup checked="Qt::Unchecked" open="false" name="Dscenario">
-          <legendlayer drawingOrder="-1" checked="Qt::Checked" open="true" showFeatureCount="0" name="Dscenario demand">
+          <legendlayer drawingOrder="-1" checked="Qt::Checked" open="true" showFeatureCount="0" name="Demand dscenario">
             <filegroup hidden="false" open="true">
               <legendlayerfile visible="0" isInOverview="0" layerid="v_edit_inp_dscenario_demand_c70f6be8_d319_48f5_aac1_06c0b460ddd0"/>
             </filegroup>
@@ -14525,11 +14525,11 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer type="vector" styleCategories="AllStyleCategories" readOnly="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" autoRefreshTime="0" autoRefreshEnabled="0" wkbType="NoGeometry" maxScale="0" refreshOnNotifyMessage="" geometry="No geometry" refreshOnNotifyEnabled="0">
       <id>v_edit_inp_dscenario_demand_c70f6be8_d319_48f5_aac1_06c0b460ddd0</id>
-      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_dscenario_demand"</datasource>
+      <datasource> dbname='__DBNAME__'  host=__HOST__  port=__PORT__  sslmode=__SSLMODE__ key='dscenario_id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_dscenario_demand"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
-      <layername>Dscenario demand</layername>
+      <layername>Demand dscenario</layername>
       <srs>
         <spatialrefsys>
           <wkt></wkt>
