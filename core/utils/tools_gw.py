@@ -2722,10 +2722,8 @@ def refresh_selectors():
         try:
             dialog = windows[0]
             selector = dialog.property('GwSelector')
-            # selector.open_selector()
-            # tools_gw.close_dialog(windows[0])
             cur_tab = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
-            selector.get_selector(dialog, '"selector_basic"', current_tab=cur_tab)
+            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=cur_tab)
         except Exception:
             pass
 
