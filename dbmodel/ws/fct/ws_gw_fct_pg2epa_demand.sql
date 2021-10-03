@@ -24,6 +24,7 @@ v_demandtype integer;
 v_patternmethod integer;
 v_uniquepattern text;
 v_queryfrom text;
+v_networkmode integer;
       
 BEGIN
 
@@ -35,6 +36,7 @@ BEGIN
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
 	v_demandtype = (SELECT value FROM config_param_user WHERE parameter='inp_options_demandtype' AND cur_user=current_user);
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user); 
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
@@ -79,48 +81,73 @@ BEGIN
 		END IF;
 
 	ELSIF v_demandtype = 2 THEN -- CONNEC ESTIMATED
+
+		IF v_networkmode = 3 THEN
 						
-		IF v_patternmethod  = 21 THEN -- UNIQUE ESTIMATED (PJOINT)
-			-- demand & pattern
-			UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = v_uniquepattern 
-			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
+			IF v_patternmethod  = 21 THEN -- UNIQUE ESTIMATED (PJOINT)
+				-- demand & pattern
+				UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = v_uniquepattern 
+				FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
 
-		ELSIF v_patternmethod  = 22 THEN -- DMA ESTIMATED (PJOINT)
-			-- demand
-			UPDATE temp_node SET demand=sum::numeric(12,8) 
-			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
-			-- pattern
-			UPDATE temp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE temp_node.node_id=concat('VN',pjoint_id);
+			ELSIF v_patternmethod  = 22 THEN -- DMA ESTIMATED (PJOINT)
+				-- demand
+				UPDATE temp_node SET demand=sum::numeric(12,8) 
+				FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
+				-- pattern
+				UPDATE temp_node SET pattern_id=dma.pattern_id 
+				FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE temp_node.node_id=concat('VN',pjoint_id);
 
-		ELSIF v_patternmethod = 23 THEN -- CONNEC ESTIMATED (PJOINT)
-			-- demand & pattern
-			UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = c.pattern_id
-			FROM
-			(SELECT concat('VN',pjoint_id)as pjoint_id, sum(demand), pattern_id FROM inp_connec join connec using (connec_id) where pjoint_type  ='VNODE' GROUP BY pjoint_id, pattern_id)c
-			WHERE pjoint_id = node_id;
+			ELSIF v_patternmethod = 23 THEN -- CONNEC ESTIMATED (PJOINT)
+				-- demand & pattern
+				UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = c.pattern_id
+				FROM
+				(SELECT concat('VN',pjoint_id)as pjoint_id, sum(demand), pattern_id FROM inp_connec join connec using (connec_id) where pjoint_type  ='VNODE' GROUP BY pjoint_id, pattern_id)c
+				WHERE pjoint_id = node_id;
 
-		ELSIF v_patternmethod = 24 THEN -- PJOINT ESTIMATED (PJOINT)
-			-- demand & pattern			
-			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
-			INSERT INTO rpt_inp_pattern_value (
-				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
-				   
-			SELECT result_id_var, dma_id, concat('VN',pattern_id), idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM vi_pjointpattern JOIN vnode ON pattern_id=vnode_id::text JOIN v_edit_link ON exit_id::integer = vnode_id WHERE exit_type  ='VNODE'
-			UNION
-			SELECT result_id_var, node.dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id
-				   JOIN v_edit_link ON exit_id = node_id
-				   WHERE exit_type  ='NODE'
-			ORDER by 3,4;					   	
+			ELSIF v_patternmethod = 24 THEN -- PJOINT ESTIMATED (PJOINT)
+				-- demand & pattern			
+				DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
+				INSERT INTO rpt_inp_pattern_value (
+					   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+					   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
+					   
+				SELECT result_id_var, dma_id, concat('VN',pattern_id), idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+					   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+					   FROM vi_pjointpattern JOIN vnode ON pattern_id=vnode_id::text JOIN v_edit_link ON exit_id::integer = vnode_id WHERE exit_type  ='VNODE'
+				UNION
+				SELECT result_id_var, node.dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+					   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+					   FROM vi_pjointpattern JOIN node ON pattern_id=node_id
+					   JOIN v_edit_link ON exit_id = node_id
+					   WHERE exit_type  ='NODE'
+				ORDER by 3,4;					   	
 
-			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND pjoint_type = 'VNODE';
-			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = pjoint_id AND pjoint_type = 'NODE';
-		END IF;	
+				UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND pjoint_type = 'VNODE';
+				UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = pjoint_id AND pjoint_type = 'NODE';
+			END IF;	
+			
+		ELSIF v_networkmode = 4 THEN
+
+			IF v_patternmethod  = 21 THEN -- UNIQUE ESTIMATED (CONNEC)
+				-- demand & pattern
+				UPDATE temp_node SET demand=v.demand, pattern_id = v_uniquepattern 
+				FROM v_edit_inp_connec v WHERE connec_id = node_id;
+
+			ELSIF v_patternmethod  = 22 THEN -- DMA ESTIMATED (CONNEC)
+				-- demand
+				UPDATE temp_node SET demand=v.demand
+				FROM v_edit_inp_connec v WHERE connec_id = node_id;
+				-- pattern
+				UPDATE temp_node SET pattern_id=dma.pattern_id 
+				FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE temp_node.node_id=connec_id;
+
+			ELSIF v_patternmethod = 23 THEN -- CONNEC ESTIMATED (CONNEC)
+				-- demand & pattern
+				UPDATE temp_node SET demand=v.demand, pattern_id = v.pattern_id 
+				FROM v_edit_inp_connec v WHERE connec_id = node_id;
+			END IF;	
+		END IF;
+
 		
 	ELSIF v_demandtype = 3 THEN -- SIMPLIFIED PERIOD (losses as unique multiplier for the whole system)
 

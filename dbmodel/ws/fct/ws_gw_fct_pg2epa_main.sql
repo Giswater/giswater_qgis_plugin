@@ -14,7 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", , "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
 
 --fid: 227
 
@@ -150,7 +150,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
 
 		RAISE NOTICE '8 - Try to trim arcs with vnode';
-		IF v_networkmode = 3 THEN
+		IF v_networkmode IN (3,4) THEN
 		
 			-- profilactic control on temp_table
 			TRUNCATE temp_table;

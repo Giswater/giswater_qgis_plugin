@@ -10,21 +10,27 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS 
 $BODY$
 
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
+*/
+
 DECLARE     
 
 v_usedmapattern boolean;
 v_buildupmode integer;
 v_statetype text;
 v_isoperative boolean;
+v_networkmode integer;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  Get variables
+	--  Get system & user variables
 	v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
 
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -42,20 +48,30 @@ BEGIN
 		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
 	END IF;
 
-
 	raise notice 'Inserting nodes on temp_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
-			JOIN value_state_type ON ve_arc.state_type = value_state_type.id
-			WHERE ve_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
-			||v_statetype||')
+		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
+		WHERE ve_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
+		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
+
+	IF v_networkmode = 4 THEN
+	
+		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
+			SELECT DISTINCT ON (c.connec_id)
+			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id
+			FROM selector_sector, v_edit_inp_connec c
+			JOIN value_state_type ON id = state_type
+			WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
+			||v_statetype;		
+	END IF;
 
 	-- update child param for inp_reservoir
 	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
