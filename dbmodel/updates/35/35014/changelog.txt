@@ -1,0 +1,3 @@
+3.5.014
+*************
+- Enable epa_automatic_man2inp_values capability

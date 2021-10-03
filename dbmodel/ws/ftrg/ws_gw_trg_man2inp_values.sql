@@ -12,12 +12,11 @@ $BODY$
 DECLARE 
 
 v_automatic_man2inp_values json;
+v_records json[];
 v_record json;
 v_sourcetable text;
-v_targettable text;
-v_sourcecol text;
-v_targetcol text;
-v_querytext text;    
+v_querytext text;   
+v_node text;
 
 BEGIN
 
@@ -26,27 +25,31 @@ BEGIN
 	-- get values
 	v_automatic_man2inp_values = (SELECT value FROM config_param_system WHERE parameter = 'epa_automatic_man2inp_values');
 	v_sourcetable  = (SELECT child_layer FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id);
-	
-	IF v_automatic_man2inp_values->>'status' THEN
+
+
+	IF (v_automatic_man2inp_values->>'status')::boolean = true THEN
 
 		-- getting variable
 		v_automatic_man2inp_values := v_automatic_man2inp_values ->>'values';
 
 		-- getting values for querytext if exist
-		SELECT v into v_record FROM (
-		SELECT json_array_elements_text((value::json->>'values')::json) v, ((json_array_elements_text((value::json->>'values')::json)::json)->>'source')::json->>'table' t
+		SELECT array_agg(v) into v_records FROM (
+		SELECT json_array_elements_text((value::json->>'values')::json) v, (json_array_elements_text((value::json->>'values')::json)::json)->>'sourceTable' t
 		FROM config_param_system WHERE parameter = 'epa_automatic_man2inp_values' )a
 		WHERE t = v_sourcetable;
 
-		IF v_record IS NOT NULL THEN 
+		IF v_records IS NOT NULL THEN
 
-			-- building querytext
-			v_sourcetable := (v_record::json->>'source')::json->>'table';
-			v_targettable := (v_record::json->>'target')::json->>'table';
-			v_sourcecol := (v_record->>'source')::json->>'column';
-			v_targetcol := (v_record->>'target')::json->>'column';
-			v_querytext = ' UPDATE '||v_targettable||' t SET '||v_targetcol||' = '||v_sourcecol||' FROM '||v_sourcetable||' s WHERE t.node_id = s.node_id';
-			EXECUTE v_querytext;
+			v_node = NEW.node_id;
+
+			FOREACH v_record IN ARRAY v_records
+			LOOP
+				-- building querytext
+				v_querytext := (v_record::json->>'query');
+				v_querytext := v_querytext ||' AND t.node_id = '||v_node||'::text';
+
+				EXECUTE v_querytext;
+			END LOOP;
 			
 		END IF;
 
