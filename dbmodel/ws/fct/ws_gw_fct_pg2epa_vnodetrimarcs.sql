@@ -22,26 +22,10 @@ v_count integer = 0;
 v_result integer = 0;
 v_record record;
 v_count2 integer = 0;
-v_isoperative boolean;
-v_statetype text;
-v_networkmode integer;
-
      
 BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-
-	--  Get system & user variables
-	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
-
-	--Use state_type only is operative true or not
-	IF v_isoperative THEN
-		v_statetype = ' AND value_state_type.is_operative = TRUE ';
-	ELSE
-		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
-	END IF;
-
 
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs ';
 	TRUNCATE temp_go2epa;
@@ -51,7 +35,7 @@ BEGIN
 	"client":{"device":4, "infoType":1, "lang":"ES"},
 	"feature":{},"data":{"parameters":{"fid":227}}}$$)';
 	
-	RAISE NOTICE '2 - insert data on temp_table new arcs';
+	RAISE NOTICE '2 - insert data on temp_table';
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id, vnode_id, locate,
 	(n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3),
@@ -71,7 +55,7 @@ BEGIN
 				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
 			FROM temp_arc , v_vnode AS vnode
 			JOIN link a ON vnode_id=exit_id::integer
-			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND temp_arc.arc_type != 'NODE2ARC' AND a.state > 0
+			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
 		UNION	
 			-- ficticius vnode coming from temp_table (using values created by gw_fct_pg2epa_breakpipes function)
 			SELECT distinct on (temp_table.id) concat('VN',temp_table.id) as vnode_id, 
@@ -82,11 +66,12 @@ BEGIN
 				else (st_linelocatepoint (temp_arc.the_geom , geom_point))::numeric(12,4) end as locate
 			FROM temp_arc , temp_table
 			WHERE st_dwithin ( temp_arc.the_geom, geom_point, 0.01) 
+			AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_arc.state > 0
 
 		UNION
 			SELECT  vnode_id, arc_id, locate
 			FROM (
-			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc WHERE arc_type != 'NODE2ARC'
+			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') 
 			)z
 		) a
 	JOIN arc USING (arc_id)
@@ -112,7 +97,8 @@ BEGIN
 		FROM temp_go2epa t
 		JOIN temp_arc a USING (arc_id)
 		LEFT JOIN connec ON concat('VN',pjoint_id)=vnode_id
-		WHERE vnode_id ilike 'VN%';
+		WHERE vnode_id ilike 'VN%' AND a.arc_type !='LINK';
+
 
 	RAISE NOTICE '3 - update temp_table to work with next process';
 	UPDATE temp_go2epa SET idmin = c.idmin FROM
@@ -179,29 +165,6 @@ BEGIN
 	UPDATE temp_node SET epa_type ='TODELETE' FROM (SELECT a.id FROM temp_node a, temp_node b WHERE a.id < b.id AND a.node_id = b.node_id)a WHERE temp_node.id = a.id;
 	-- step 2
 	DELETE FROM temp_node WHERE epa_type ='TODELETE';
-
-	IF v_networkmode =  4 THEN
-
-		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
-		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom, expl_id)
-			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
-			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
-			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
-			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
-			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
-			l.the_geom,
-			c.expl_id
-			FROM selector_sector, v_edit_link l 
-			JOIN connec c ON connec_id = feature_id
-			JOIN value_state_type ON value_state_type.id = state_type
-			JOIN cat_connec ON cat_connec.id = connecat_id
-			JOIN inp_connec USING (connec_id)
-			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
-				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
-				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
-				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-				AND epa_type != ''UNDEFINED''';
-	END IF;
  
 RETURN v_result;
 END;

@@ -147,6 +147,29 @@ BEGIN
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''';
 
+	IF v_networkmode =  4 THEN
+
+		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
+		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom, expl_id)
+			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
+			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
+			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
+			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
+			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
+			l.the_geom,
+			c.expl_id
+			FROM selector_sector, v_edit_link l 
+			JOIN connec c ON connec_id = feature_id
+			JOIN value_state_type ON value_state_type.id = state_type
+			JOIN cat_connec ON cat_connec.id = connecat_id
+			JOIN inp_connec USING (connec_id)
+			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
+				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
+				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
+				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+				AND epa_type != ''UNDEFINED''';
+	END IF;
+
 
         raise notice 'updating inp_pipe';
         
