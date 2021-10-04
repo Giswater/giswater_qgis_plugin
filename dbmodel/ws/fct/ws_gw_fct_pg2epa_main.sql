@@ -261,11 +261,11 @@ BEGIN
 		GET DIAGNOSTICS v_count = row_count;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat(
+			VALUES (v_fid, v_result, 2, concat(
 			'WARNING-227: Variabe to force remove demand on dry nodes and ',v_count,' dry nodes with demand have found wich demand have automaticly been removed'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat(
+			VALUES (v_fid, v_result, 1, concat(
 			'INFO: Variabe to force remove demand on dry nodes is enabled but no dry nodes with demand have been found.'));
 		END IF;
 	END IF;
