@@ -46,6 +46,7 @@ v_return text;
 v_formname text;
 text text;
 v_widgettype text;
+v_uservalues json;
 
 BEGIN
 
@@ -138,23 +139,27 @@ BEGIN
 			USING  v_value, v_widget;			
 		END IF;
 	END IF;
-
-	RAISE NOTICE 'v_value  % v_widget % ',v_value, v_widget;
-	RAISE NOTICE 'v_table: %',v_table;
-
    END LOOP;
 
+	-- get uservalues
+	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	AND cur_user = current_user)a);
+
+	-- Control nulls
+	v_uservalues := COALESCE(v_uservalues, '{}');
+
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||
-			',"data":{}}'||
+			',"data":{ "userValues":'||v_uservalues||'}}'||
 	    '}')::json;
 	    
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

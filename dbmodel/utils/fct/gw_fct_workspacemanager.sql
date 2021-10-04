@@ -13,6 +13,8 @@ $BODY$
 
 /*EXAMPLE
 --create new workspace
+SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "name":"WS2", "descript":"test" }}$$);
 
@@ -55,6 +57,9 @@ v_error_context text;
 v_audit_result text;
 v_version text;
 v_result_info json;
+v_uservalues json;
+v_current_workspace integer;
+
 BEGIN
 
 	-- search path
@@ -178,7 +183,6 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	IF v_action = 'DELETE' THEN
 		--check if someone uses a workspace at the moment, if not, remove it 
 		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault') = v_workspace_id::text THEN
@@ -217,6 +221,10 @@ BEGIN
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
+
+		-- reset user variable
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
+		ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_current_workspace;
 		
 		--comment code related to reseting the workspace
 	/*ELSIF v_action = 'RESET' THEN
@@ -229,6 +237,16 @@ BEGIN
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 		--delete temporal workspace
 		DELETE FROM cat_workspace WHERE name=concat('temp_',current_user);*/
+
+	ELSIF v_action = 'CHECK' THEN 
+
+		-- code to check if user selection fits on some current workspace
+		v_current_workspace = NULL;
+
+		IF v_current_workspace IS NOT NULL THEN
+			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_current_workspace, current_user)
+			ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_current_workspace;
+		END IF;
 		
 	END IF;
 
@@ -293,8 +311,10 @@ BEGIN
 		END LOOP;
 
 		v_return_msg = 'Workspace successfully changed';
-
 	END IF;
+
+	raise notice '3';
+	
 				
 	IF v_audit_result is null THEN
 		v_return_status = 'Accepted';
@@ -309,23 +329,28 @@ BEGIN
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_return_msg;
 
     END IF;
-	
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info 
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
+	-- get uservalues
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	AND cur_user = current_user)a);
+	
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-
-		-- Return
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_uservalues := COALESCE(v_uservalues, '{}');
+ 
+	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_return_status||'", "message":{"level":'||v_return_level||', "text":"'||v_return_msg||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||
+		     ',"data":{ "userValues":'||v_uservalues||', "info":'||v_result_info||
 		       '}'||
 	    '}}')::json, 3078, null, null, null);
 
+	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;

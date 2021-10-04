@@ -53,6 +53,7 @@ v_count_aux integer = 0;
 v_name text;
 v_disableparent boolean;
 v_fid integer = 397;
+v_uservalues json;
 
 BEGIN
 
@@ -307,11 +308,17 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
 
+	-- get uservalues
+	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	AND cur_user = current_user)a);
+	
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
+	v_uservalues := COALESCE(v_uservalues, '{}');
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"userValues":'||v_uservalues||', "geometry":',
 	v_geometry,', "useAtlas":"',v_useatlas,'", "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
