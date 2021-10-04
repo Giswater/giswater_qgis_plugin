@@ -34,6 +34,7 @@ update node set sector_id=0, dma_id=0, dqa_id=0,  presszone_id=0;
 update connec set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0
 
 
+
 ----------
 TO EXECUTE
 ----------
@@ -45,7 +46,6 @@ select * from exploitation
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
-
 hieracy
 -------
 if floodfromnode not exits 
@@ -55,11 +55,15 @@ if floodfromnode not exits
 if updatefeature
 	updatemapzone
 
--- CUSTOM SAMPLE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
-"updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
+---------------
+TEST EXAMPLE WITHOUT MODIFY SYSTEM VALUES
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "macroExploitation":[1], "checkData":false, "updateFeature":false, "updateMapZone":0, "geomParamUpdate":4}}}');
+DELETE FROM anl_arc
+SELECT arc_id, descript, the_geom FROM anl_arc WHERE fid = 145
 ----------------
 
+
+SELECT dma_id from SCHEMA_NAME.arc
 
 --SECTOR
 SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
@@ -346,32 +350,35 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
-			-- reset mapzones (update to 0)
-			IF v_floodfromnode IS NULL THEN
-				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 FROM v_edit_arc v WHERE v.arc_id = arc.arc_id ';
-				EXECUTE v_querytext;
-				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 FROM v_edit_node v WHERE v.node_id = node.node_id ';
-				EXECUTE v_querytext;
-				v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 FROM v_edit_connec v WHERE v.connec_id = connec.connec_id ';
-				EXECUTE v_querytext;
-			ELSE
-				EXECUTE 'SELECT '||quote_ident(v_field)||' FROM v_edit_node WHERE node_id = '||quote_literal(v_floodfromnode)
-				INTO v_nodemapzone;
-				IF v_nodemapzone IS NOT NULL THEN
-					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+			IF v_updatefeature THEN 
+				-- reset mapzones (update to 0)
+				IF v_floodfromnode IS NULL THEN
+					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 FROM v_edit_arc v WHERE v.arc_id = arc.arc_id ';
 					EXECUTE v_querytext;
-					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 FROM v_edit_node v WHERE v.node_id = node.node_id ';
 					EXECUTE v_querytext;
-					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 FROM v_edit_connec v WHERE v.connec_id = connec.connec_id ';
+					EXECUTE v_querytext;
+				ELSE
+					EXECUTE 'SELECT '||quote_ident(v_field)||' FROM v_edit_node WHERE node_id = '||quote_literal(v_floodfromnode)
+					INTO v_nodemapzone;
+					IF v_nodemapzone IS NOT NULL THEN
+						v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+						EXECUTE v_querytext;
+						v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+						EXECUTE v_querytext;
+						v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+						EXECUTE v_querytext;
+					END IF;
+				END IF;
+
+				-- reset mapzone geometry
+				IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' AND v_updatefeature AND v_updatemapzgeom > 0 THEN
+					v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
+					WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
 					EXECUTE v_querytext;
 				END IF;
-			END IF;
 
-			-- reset mapzone geometry
-			IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' AND v_updatefeature AND v_updatemapzgeom > 0 THEN
-				v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
-				WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
-				EXECUTE v_querytext;
 			END IF;
 
 			-- fill the graf table
