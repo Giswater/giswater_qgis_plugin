@@ -164,12 +164,14 @@ class GwLoadProject(QObject):
         recommendedPgVersion = tools_qgis.get_plugin_metadata('recommendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
-        if qgis_version < minorQgisVersion or qgis_version > majorQgisVersion:
-            msg = "QGIS version is not compatible with Giswater. Please check wiki"
-            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
-        if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
-            msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-            tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+        if qgis_version is not None and minorQgisVersion is not None and majorQgisVersion is not None:
+            if qgis_version < minorQgisVersion or qgis_version > majorQgisVersion:
+                msg = "QGIS version is not compatible with Giswater. Please check wiki"
+                tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+        if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
+            if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
+                msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
+                tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
 
 
     def _get_project_variables(self):

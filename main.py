@@ -17,6 +17,7 @@ from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
+from .core.utils.signal_manager import GwSignalManager
 from .lib import tools_qgis, tools_os, tools_log
 from .core.ui.dialog import GwDialog
 from .core.ui.main_window import GwMainWindow
@@ -175,6 +176,9 @@ class Giswater(QObject):
         max_retries = int(tools_gw.get_config_parser('system', 'max_retries', 'user', 'init', False))
         global_vars.max_retries = max_retries
 
+        # Create the GwSignalManager
+        self._create_signal_manager()
+
         # Define signals
         self._set_signals()
 
@@ -182,6 +186,14 @@ class Giswater(QObject):
         self._set_info_button()
 
         return True
+
+
+    def _create_signal_manager(self):
+        """ Creates an instance of GwSignalManager and connects all the signals """
+
+        global_vars.signal_manager = GwSignalManager()
+        global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
+        global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
 
 
     def _manage_user_config_folder(self, user_folder_dir):

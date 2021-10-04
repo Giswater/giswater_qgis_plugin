@@ -35,6 +35,7 @@ project_type = None                     # Project type get from table "version"
 data_epsg = None                        # SRID retrieved from QGIS project layer "v_edit_node"
 project_epsg = None                     # EPSG of QGIS project
 logger = None                           # Instance of class GwLogger. Found in "/lib/tools_log.py"
+signal_manager = None                   # Instance of class GwSignalManager. Found in "/core/utils/signal_manager.py"
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
 qgis_settings = None                    # Instance of class QSettings. General QGIS settings
 current_user = None                     # Current user connected with PostgreSql

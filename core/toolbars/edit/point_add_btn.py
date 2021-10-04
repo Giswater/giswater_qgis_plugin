@@ -70,7 +70,7 @@ class GwPointAddButton(GwAction):
         action_group = self.action.property('action_group')
 
         # Get list of different connec, gully and node types
-        features_cat = global_vars.feature_cat
+        features_cat = tools_gw.manage_feature_cat()
         project_type = tools_gw.get_project_type()
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)

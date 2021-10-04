@@ -11,6 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
+from ... import global_vars
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os
 
@@ -236,78 +237,40 @@ def open_url(widget):
         tools_qgis.show_warning(message, parameter=widget.text())
 
 
-# region unused functions atm
+def get_selector(**kwargs):
+    """
+    Refreshes the selectors if the selector dialog is open
+
+    Called form PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[
+                              {"name":"get_selector","parameters":{"tab":"tab_psector"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
+    """
+
+    tab_name = kwargs['tab'] if 'tab' in kwargs else None
+    global_vars.signal_manager.refresh_selectors.emit(tab_name)
+
+
 def show_message(**kwargs):
-
     """
-    PERFORM pg_notify(current_user,
-              '{"functionAction":{"functions":[{"name":"show_message","parameters":
-              {"message":"line 1 \n line 2","tabName":"Notify channel",
-              "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"ws_sample"}');
+    Shows a message in the message bar.
 
-    functions called in -> getattr(self, function_name)(**params):
-    Show message in console log,
-    :param kwargs: dict with all needed
-        kwargs: ['message']: message to show
-        kwargs: ['tabName']: tab where the info will be displayed
-        kwargs: ['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black),
-                     1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
-        kwargs: ['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue),
-                    4 = None(black)
-        kwargs: ['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
-        kwargs: ['styleSheet']['bold']: if is true, then print as bold
-    :return:
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[{"name":"show_message", "parameters":
+                              {"level":1, "duration":10, "text":"Current psector have been selected"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
     """
 
-    # Set default styleSheet
-    color = "black"
-    level = 0
-    bold = ''
+    text = kwargs['text'] if 'text' in kwargs else 'No message found'
+    level = kwargs['level'] if 'level' in kwargs else 1
+    duration = kwargs['duration'] if 'duration' in kwargs else 10
 
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
-    if 'styleSheet' in kwargs:
-        color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
-        level = kwargs['styleSheet']['level'] if 'level' in kwargs['styleSheet'] else 0
-        if 'bold' in kwargs['styleSheet']:
-            bold = 'b' if kwargs['styleSheet']['bold'] else ''
-        else:
-            bold = ''
-
-    msg = f'<font color="{color}"><{bold}>{msg}</font>'
-    QgsMessageLog.logMessage(msg, tab_name, level)
+    global_vars.signal_manager.show_message.emit(text, level, duration)
 
 
-def show_messagebox(**kwargs):
-    """ Shows a message box with detail information """
-
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    title = kwargs['title'] if 'title' in kwargs else 'New message'
-    inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
-    msg_box = QMessageBox()
-    msg_box.setText(msg)
-    if title:
-        title = tools_qt.tr(title)
-        msg_box.setWindowTitle(title)
-    if inf_text:
-        inf_text = tools_qt.tr(inf_text)
-        msg_box.setInformativeText(inf_text)
-    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-    msg_box.setStandardButtons(QMessageBox.Ok)
-    msg_box.setDefaultButton(QMessageBox.Ok)
-    msg_box.open()
-
-
-def raise_notice(**kwargs):
-    """ Used to show raise notices sent by postgresql
-    Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-
-    """
-
-    msg_list = kwargs['msg']
-    for msg in msg_list:
-        tools_log.log_info(f"{msg}")
-
+# region unused functions atm
 
 def get_all_layers(group, all_layers):
 

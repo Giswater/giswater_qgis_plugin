@@ -266,15 +266,23 @@ class GwGo2EpaButton(GwAction):
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
 
-        # Create the signals
+        # Create the common signals
         go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
-        dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa))
-        dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
-
-        self._manage_form_settings('save')
 
         # Open form
-        tools_gw.docker_dialog(dlg_selector)
+        if global_vars.session_vars['dialog_docker']:
+            # Set signals when have docker form
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa))
+            dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
+            # Save widgets settings from go2epa form
+            self._manage_form_settings('save')
+            # Open form
+            tools_gw.docker_dialog(dlg_selector)
+        else:
+            # Set signals when have not docker form
+            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
+            # Open form
+            tools_gw.open_dialog(dlg_selector)
 
 
     def _manage_form_settings(self, action):
