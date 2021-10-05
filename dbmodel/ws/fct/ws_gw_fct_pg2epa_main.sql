@@ -228,21 +228,17 @@ BEGIN
 		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes'
 		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
 		
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '18 - Delete disconnected arcs with associated nodes'
 		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
 			
 		RAISE NOTICE '19 - Delete orphan nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '19 - Delete orphan nodes'
 		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 107 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 107 AND cur_user=current_user);
 
 		RAISE NOTICE '20 - Delete arcs without extremal nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '20 - Delete arcs without extremal nodes'
 		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
 	END IF;
 
 	-- update values from inp_*_importinp tables

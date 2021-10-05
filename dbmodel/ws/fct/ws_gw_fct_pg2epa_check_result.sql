@@ -91,9 +91,7 @@ BEGIN
 	
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_graphiclog = (SELECT (value::json->>'graphicLog')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-
-	v_graphiclog = false;
+	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -581,7 +579,7 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM 
-		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139)
+		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid IN (139, 232))
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
