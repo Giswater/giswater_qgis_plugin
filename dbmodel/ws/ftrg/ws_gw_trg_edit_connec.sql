@@ -422,20 +422,24 @@ BEGIN
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-		END IF; 	
+		END IF; 
+
+		IF NEW.epa_type IS NULL THEN
+			NEW.epa_type ='JUNCTION';
+		END IF;
 
 		-- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, adate, adescript, accessibility, lastupdate, lastupdate_user,
-		asset_id)		
+		asset_id, epa_type)		
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure,
-		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
+		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type);
 		
 
 		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
@@ -534,10 +538,23 @@ BEGIN
 		-- inp connec insert
 		INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 
+		-- epa insert
+		IF (NEW.epa_type = 'JUNCTION') THEN 
+			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+		END IF;
+	
 		RETURN NEW;
-
 	
 	ELSIF TG_OP = 'UPDATE' THEN
+
+		-- EPA update
+		IF (NEW.epa_type != OLD.epa_type) THEN   
+			IF NEW.epa_type = 'UNDEFINED' THEN
+				DELETE FROM inp_connec WHERE connec_id = NEW.connec_id;
+			IF NEW.epa_type = 'JUNCTION' THEN
+				INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+			END IF;
+		END IF;
 
 		-- UPDATE geom
 		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
@@ -688,7 +705,7 @@ BEGIN
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure,
-			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id
+			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type
 			WHERE connec_id=OLD.connec_id;
 			
 		IF v_man_table ='man_greentap' THEN

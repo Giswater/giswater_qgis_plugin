@@ -43,11 +43,11 @@ BEGIN
 		END IF;
 
         UPDATE inp_connec 
-		SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor 
+		SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint
 		WHERE connec_id=OLD.connec_id;
      
         UPDATE connec
-		SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation
+		SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation, epa_type = NEW.epa_type
 		WHERE connec_id=OLD.connec_id;
 
 	IF NEW.arc_id != OLD.arc_id THEN
