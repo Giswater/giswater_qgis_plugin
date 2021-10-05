@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project"}}}$$) -- when is called from toolbox
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
@@ -426,6 +426,18 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
 	END IF;
+
+
+	RAISE NOTICE '4 - Check if y0 is higger than ymax on nodes (401)';
+	v_count = (SELECT count(*) FROM temp_node WHERE y0 > ymax);
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-401: There is/are ', v_count, ' nodes with y0 higger then ymax.'));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes has y0 lower than ymax.'));
+	END IF;
+	
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
