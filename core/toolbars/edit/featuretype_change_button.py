@@ -21,7 +21,7 @@ from .... import global_vars
 
 
 class GwFeatureTypeChangeButton(GwMaptool):
-    """ Button 24: Change feature type
+    """ Button 28: Change feature type
     User select from drop-down button feature type: ARC, NODE, CONNEC.
     Snap to this feature type is activated.
     User selects a feature of that type from the map.
@@ -88,7 +88,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.project_type = tools_gw.get_project_type()
 
         # Check button
-        self.action.setChecked(True)
+        # TODO: Manage toolbar action selection when execute from shortcut key.
+        try:
+            self.action.setChecked(True)
+        except Exception as e:
+            pass
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
