@@ -25,6 +25,9 @@ SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1
 --delete selected workspace
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"DELETE", "id":"1"}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK" }}$$);
 */
 
 DECLARE 
@@ -49,6 +52,7 @@ rec_selectorcomp text;
 rec_selectorcolumn record;
 v_datatype text;
 v_fid integer=398;
+v_check_config json;
 
 v_return_level integer;
 v_return_status text;
@@ -58,7 +62,6 @@ v_audit_result text;
 v_version text;
 v_result_info json;
 v_uservalues json;
-v_current_workspace integer;
 
 BEGIN
 
@@ -90,7 +93,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
 		
-	IF v_action = 'CREATE' THEN
+	IF v_action = 'CREATE' OR v_action = 'CHECK' THEN
 
 		IF v_action = 'CREATE' AND v_workspace_name IN (SELECT name FROM cat_workspace) THEN
 			
@@ -171,6 +174,11 @@ BEGIN
 		v_selectors_config = v_selectors_config::jsonb||v_selectors_configcompound::jsonb;
 		v_workspace_config = gw_fct_json_object_set_key(v_workspace_config,'selectors', v_selectors_config);
 
+		IF v_action = 'CHECK' THEN
+			DELETE FROM temp_table WHERE fid=v_fid AND cur_user=current_user;
+			INSERT INTO temp_table (fid,addparam) VALUES (v_fid, v_workspace_config);
+		END IF;
+
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'SELECTOR CONFIGURATION');
 		INSERT INTO audit_check_data (fid, error_message) SELECT v_fid, value::text FROM json_array_elements(v_selectors_config) order by value;
 
@@ -222,9 +230,6 @@ BEGIN
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 
-		-- reset user variable
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
-		ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_current_workspace;
 		
 		--comment code related to reseting the workspace
 	/*ELSIF v_action = 'RESET' THEN
@@ -241,11 +246,15 @@ BEGIN
 	ELSIF v_action = 'CHECK' THEN 
 
 		-- code to check if user selection fits on some current workspace
-		v_current_workspace = NULL;
+		v_workspace_id = NULL;
+		
+		SELECT addparam INTO v_check_config FROM temp_table WHERE fid=v_fid AND cur_user=current_user;
 
-		IF v_current_workspace IS NOT NULL THEN
-			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_current_workspace, current_user)
-			ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_current_workspace;
+		SELECT id INTO v_workspace_id FROM cat_workspace WHERE config::text = v_check_config::text LIMIT 1; 
+
+		IF v_workspace_id IS NOT NULL THEN
+			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
+			ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_workspace_id;
 		END IF;
 		
 	END IF;
@@ -313,7 +322,6 @@ BEGIN
 		v_return_msg = 'Workspace successfully changed';
 	END IF;
 
-	raise notice '3';
 	
 				
 	IF v_audit_result is null THEN
@@ -360,3 +368,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+

@@ -7,6 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2021/10/05
-ALTER TABLE polygon DROP CONSTRAINT IF EXISTS polygon_feature_id_unique;
-ALTER TABLE polygon ADD CONSTRAINT polygon_feature_id_unique UNIQUE(feature_id);
+
+	--2021/10/05
+	DROP VIEW IF EXISTS v_ui_workspace;
+	CREATE OR REPLACE VIEW v_ui_workspace AS 
+	SELECT cat_workspace.id,
+	cat_workspace.name,
+	cat_workspace.descript,
+	cat_workspace.cur_user,
+	cat_workspace.config
+	FROM cat_workspace;
