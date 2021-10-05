@@ -1,3 +1,6 @@
 3.5.014
 *************
 - Enable epa_automatic_man2inp_values capability
+- Minor bug fixes from prev release
+- New functions on toolbox to copy values from diferent scenarios
+- New checks on go2epa (y0>ymax or cat_connec.dint = null)

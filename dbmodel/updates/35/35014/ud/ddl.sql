@@ -9,3 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/10/05
 ALTER TABLE gully ALTER COLUMN state_type SET NOT NULL;
+
+DROP TRIGGER if exists gw_trg_scenario_management ON cat_hydrology;
+DROP TRIGGER if exists gw_trg_scenario_management ON cat_dwf_scenario;
+DROP FUNCTION IF EXISTS gw_trg_scenario_management;
