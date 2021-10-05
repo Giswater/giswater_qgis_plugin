@@ -10,3 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2021/10/03
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode','4','PJOINT & CONNEC (ALL NODARCS)');
 UPDATE connec SET epa_type = 'JUNCTION';
+
+INSERT INTO sys_fprocess VALUES (400, 'Null values on dint for registres on cat_connec)', 'ws')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO inp_typevalue VALUES ('inp_result_status', '0', 'DEPRECATED');

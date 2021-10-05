@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/10/05
 ALTER TABLE polygon DROP CONSTRAINT IF EXISTS polygon_feature_id_unique;
 ALTER TABLE polygon ADD CONSTRAINT polygon_feature_id_unique UNIQUE(feature_id);
+
+ALTER TABLE rpt_cat_result DROP CONSTRAINT rpt_cat_result_status_check;
+ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_status_check CHECK (status = ANY (ARRAY[0, 1, 2]));
