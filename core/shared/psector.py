@@ -343,6 +343,9 @@ class GwPsector:
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_status, str(result[1]), 1)
 
+            # Set check active True as default for new pesectors
+            tools_qt.set_checked(self.dlg_plan_psector, "active", True)
+
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
