@@ -34,7 +34,7 @@ class GwArcAddButton(GwAction):
         self.menu.setObjectName("GW_arc_menu")
         self._fill_arc_menu()
 
-        self.menu.aboutToShow.connect(self._check_reload)
+        self.menu.aboutToShow.connect(self._fill_arc_menu)
 
         if toolbar is not None:
             self.action.setMenu(self.menu)
@@ -48,15 +48,6 @@ class GwArcAddButton(GwAction):
 
 
     # region private functions
-
-
-    def _check_reload(self):
-        """ Check for reload button """
-
-        reload_cat_feature = tools_gw.get_config_parser('system', 'reload_cat_feature', 'project', 'giswater')
-        reload_cat_feature = tools_os.set_boolean(reload_cat_feature)
-        if reload_cat_feature:
-            self._fill_arc_menu()
 
 
     def _fill_arc_menu(self):
