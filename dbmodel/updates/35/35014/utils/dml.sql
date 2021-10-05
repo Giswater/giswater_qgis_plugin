@@ -13,3 +13,8 @@ UPDATE config_param_system SET value =
 {"sourceTable":"ve_node_deposito", "query":"UPDATE inp_tank t SET minlevel = h_min, maxlevel = h_max, diameter  = diametro FROM ve_node_deposito s WHERE t.node_id = s.node_id"},
 {"sourceTable":"ve_node_valvula_reductora_pres", "query":"UPDATE inp_valve t SET pressure = pression_exit FROM ve_node_valvula_reductora_pres s WHERE t.node_id = s.node_id"}]}'
 WHERE parameter = 'epa_automatic_man2inp_values';
+
+
+--2021/10/05
+UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'graphicLog'::text, 'true'::text) WHERE id = 'inp_options_debug';
+UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'graphicLog'::text, 'true'::text) WHERE parameter = 'inp_options_debug';
