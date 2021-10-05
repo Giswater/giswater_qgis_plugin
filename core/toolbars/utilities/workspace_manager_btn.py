@@ -144,7 +144,7 @@ class GwWorkspaceManagerButton(GwAction):
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
             self._fill_tbl(self.filter_name.text())
-            self._set_label_current_workspace(name=name)
+            self._set_labels_current_workspace(name=name)
 
 
     def _set_current_workspace(self):
@@ -168,7 +168,7 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            self._set_label_current_workspace(value)
+            self._set_labels_current_workspace(value)
             tools_qgis.refresh_map_canvas()  # First refresh all the layers
             global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
             tools_gw.refresh_selectors()
@@ -234,7 +234,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_name.setToolTip("")
 
 
-    def _set_label_current_workspace(self, value="", name=None):
+    def _set_labels_current_workspace(self, value="", name=None):
         """ Set the current workspace label with @value """
 
         if name is None:
@@ -246,5 +246,7 @@ class GwWorkspaceManagerButton(GwAction):
             name = row[0]
         text = f"Selected workspace: {name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
+        text = f"<b>GW workspace:</b> {name}"
+        tools_gw.set_statusbar_widget("last_workspace", text=text)
 
     # endregion

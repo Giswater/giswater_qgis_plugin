@@ -2753,6 +2753,16 @@ def open_dlg_help():
         return True
 
 
+def set_statusbar_widget(widget_name, text=''):
+    """  """
+
+    widget = global_vars.statusbar_widgets[widget_name]
+    if not widget:
+        return
+    widget.setText(f"{text}")
+    global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
+
+
 def create_sqlite_conn(file_name):
     """ Creates an sqlite connection to a file """
 

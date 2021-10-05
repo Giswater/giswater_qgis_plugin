@@ -87,6 +87,9 @@ class Giswater(QObject):
             # Remove 'Giswater menu'
             self._unset_giswater_menu()
 
+            # Remove status bar widgets
+            self._remove_statusbar_widgets()
+
             # Set 'Main Info button' if project is unload or project don't have layers
             layers = QgsProject.instance().mapLayers().values()
             if hide_gw_button is False and len(layers) == 0:
@@ -281,6 +284,16 @@ class Giswater(QObject):
         menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
         if menu_giswater not in (None, "None"):
             menu_giswater.deleteLater()
+
+
+    def _remove_statusbar_widgets(self):
+        """ Remove Giswater status bar widgets """
+
+        for key in global_vars.statusbar_widgets:
+            widget = global_vars.statusbar_widgets[key]
+            if widget:
+                self.iface.mainWindow().statusBar().removeWidget(widget)
+                widget.deleteLater()
 
 
     def _project_new(self):
