@@ -40,7 +40,8 @@ BEGIN
 		-- Insert into polygon table
 		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
 		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.connec_id, connec_type
-		FROM v_edit_connec WHERE connec_id=NEW.connec_id;
+		FROM v_edit_connec WHERE connec_id=NEW.connec_id
+		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
 		RETURN NEW;
 		
