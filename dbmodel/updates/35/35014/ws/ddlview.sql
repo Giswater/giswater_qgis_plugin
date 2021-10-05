@@ -222,10 +222,10 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
     inp_connec.pattern_id,
     connec.the_geom,
     inp_connec.peak_factor,
-custom_roughness,
-custom_length,
-custom_dint,
-connec.epa_type
+	custom_roughness,
+	custom_length,
+	custom_dint,
+	connec.epa_type
    FROM selector_sector,v_connec connec
      JOIN inp_connec USING (connec_id)
   WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
