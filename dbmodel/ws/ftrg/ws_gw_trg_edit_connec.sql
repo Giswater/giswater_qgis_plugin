@@ -535,24 +535,21 @@ BEGIN
 			END LOOP;
 		END IF;		
 
-		-- inp connec insert
-		INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
-
 		-- epa insert
 		IF (NEW.epa_type = 'JUNCTION') THEN 
-			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 		END IF;
 	
 		RETURN NEW;
-	
+		
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		-- EPA update
 		IF (NEW.epa_type != OLD.epa_type) THEN   
 			IF NEW.epa_type = 'UNDEFINED' THEN
 				DELETE FROM inp_connec WHERE connec_id = NEW.connec_id;
-			IF NEW.epa_type = 'JUNCTION' THEN
-				INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+			ELSIF NEW.epa_type = 'JUNCTION' THEN
+				INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 			END IF;
 		END IF;
 

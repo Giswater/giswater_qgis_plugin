@@ -12,6 +12,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"custom_length", "dataType":"double precision", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"custom_dint", "dataType":"double precision", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"epa_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_demand", "column":"id", "isUtils":"False"}}$$);
+
 
 -- 2021/10/05
 ALTER TABLE arc ALTER COLUMN state_type SET NOT NULL;

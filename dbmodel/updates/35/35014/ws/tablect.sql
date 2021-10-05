@@ -7,9 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2021/10/03
-INSERT INTO inp_typevalue VALUES ('inp_options_networkmode','4','PJOINT & CONNEC (ALL NODARCS)');
-UPDATE connec SET epa_type = 'JUNCTION';
-
-INSERT INTO sys_fprocess VALUES (400, 'Null values on dint for registres on cat_connec)', 'ws')
-ON CONFLICT (fid) DO NOTHING;
+-- 2021/10/05
+ALTER TABLE connec ADD CONSTRAINT connec_epa_type_check CHECK (epa_type = ANY (ARRAY['JUNCTION', 'UNDEFINED']));

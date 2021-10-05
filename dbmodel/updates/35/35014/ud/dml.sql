@@ -34,7 +34,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3100,'Copy hydrology values', '{"featureType":[]}', 
 '[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology JOIN v_edit_inp_subcatchment USING (hydrology_id) WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
-  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology JOIN v_edit_inp_subcatchment USING (hydrology_id) WHERE active IS TRUE , "layoutname":"grl_option_parameters", "layoutorder":2, "selectedId":"$userHydrology"}
+  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology JOIN v_edit_inp_subcatchment USING (hydrology_id) WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":2, "selectedId":"$userHydrology"}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 

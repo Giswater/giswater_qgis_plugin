@@ -14,21 +14,26 @@ DECLARE
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
        
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
-        RETURN NEW;
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
+	RETURN NEW;
 		
 
-    ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 		
+		-- EPA update
+		IF (NEW.epa_type != OLD.epa_type) AND NEW.epa_type = 'UNDEFINED' THEN   
+			DELETE FROM inp_connec WHERE connec_id = NEW.connec_id;
+		END IF;
+
 		-- The geom
 		IF (ST_equals (NEW.the_geom, OLD.the_geom)) IS FALSE THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
-			
+				
 			--update elevation from raster
 			IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
@@ -42,27 +47,26 @@ BEGIN
 			END IF;
 		END IF;
 
-        UPDATE inp_connec 
-		SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint
-		WHERE connec_id=OLD.connec_id;
-     
-        UPDATE connec
-		SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation, epa_type = NEW.epa_type
-		WHERE connec_id=OLD.connec_id;
+		UPDATE inp_connec 
+			SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint
+			WHERE connec_id=OLD.connec_id;
+	     
+		UPDATE connec
+			SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation, epa_type = NEW.epa_type
+			WHERE connec_id=OLD.connec_id;
 
-	IF NEW.arc_id != OLD.arc_id THEN
-		UPDATE v_edit_connec SET arc_id=NEW.arc_id
-		WHERE connec_id=OLD.connec_id;
+		IF NEW.arc_id != OLD.arc_id THEN
+			UPDATE v_edit_connec SET arc_id=NEW.arc_id
+			WHERE connec_id=OLD.connec_id;
+		END IF;
+
+		RETURN NEW;
+		
+	    ELSIF TG_OP = 'DELETE' THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"1032", "function":"1310","debug_msg":null}}$$);';
+		RETURN NEW;
 	END IF;
-
-        RETURN NEW;
-        
-    ELSIF TG_OP = 'DELETE' THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1032", "function":"1310","debug_msg":null}}$$);';
-        RETURN NEW;
-    
-    END IF;
 
 END;
 $BODY$
