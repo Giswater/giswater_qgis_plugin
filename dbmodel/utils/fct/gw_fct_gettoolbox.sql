@@ -20,9 +20,8 @@ SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"filterText":"Import inp epanet file"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"filterText":""}}$$)
+SELECT SCHEMA_NAME.gw_fct_gettoolbox($${"client":{"device":4, "lang":"CA", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "isToolbox":true}}$$);
+
 
 */
 
@@ -62,6 +61,9 @@ v_debug json;
 v_msgerr json;
 v_value text;
 v_reports_fields json;
+v_inp_hydrology integer;
+v_inp_dwf integer;
+v_inp_dscenario integer;
 
 BEGIN
 
@@ -77,7 +79,7 @@ BEGIN
 	v_function := (p_data ->> 'data')::json->> 'function';
 
 	-- get project type
-  SELECT lower(project_type) INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT lower(project_type) INTO v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- convert v_function to alias
 	IF v_function IS NOT NULL THEN
@@ -100,6 +102,9 @@ BEGIN
 	v_state  = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user limit 1);
 	v_inp_result = (SELECT result_id FROM selector_inp_result WHERE cur_user = current_user limit 1);
 	v_rpt_result = (SELECT result_id FROM selector_rpt_main WHERE cur_user = current_user limit 1);
+	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user limit 1);
+	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
+	v_inp_dscenario = (SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user limit 1);
 
 	IF v_projectype = 'ws' THEN
 		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
@@ -209,8 +214,8 @@ BEGIN
 	FROM sys_function JOIN config_toolbox USING (id) 
 	WHERE alias = v_filter  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
 	LOOP
-
 		v_querytext = rec.inputparams::json->>'dvQueryText';
+
 		v_value =  rec.inputparams::json->>'value';
 		IF v_querytext IS NOT NULL THEN
 
@@ -225,6 +230,9 @@ BEGIN
 			v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
 			v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			RAISE NOTICE 'v_querytext %', v_querytext;
+	 
 			EXECUTE v_querytext INTO v_arrayresult;
 	
 			IF (rec.inputparams::json->>'isNullValue')::boolean IS TRUE THEN
@@ -241,6 +249,12 @@ BEGIN
 					v_selectedid = concat('"selectedId":"',v_expl,'"');
 				ELSIF v_selectedid = '$userState' THEN
 					v_selectedid = concat('"selectedId":"',v_state,'"');
+				ELSIF v_selectedid = '$userHydrology' THEN
+					v_selectedid = concat('"selectedId":"',v_inp_hydrology,'"');
+				ELSIF v_selectedid = '$userDwf' THEN
+					v_selectedid = concat('"selectedId":"',v_inp_dwf,'"');
+				ELSIF v_selectedid = '$userDscenario' THEN
+					v_selectedid = concat('"selectedId":"',v_inp_dscenario,'"');
 				ELSIF v_selectedid = '$userInpResult' THEN
 					v_selectedid = concat('"selectedId":"',v_inp_result,'"');
 				ELSIF v_selectedid = '$userRptResult' THEN
@@ -254,16 +268,17 @@ BEGIN
 						v_selectedid = concat('"selectedId":"',v_arrayresult[1],'"');
 					END IF;
 				END IF;
-				
 			END IF;
 
+			IF v_selectedid IS NULL OR  v_selectedid = '' THEN v_selectedid = '"selectedId":""';END IF;
+			
 			v_querytext = concat('SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
 				"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM (',v_querytext_mod,')a');
 			v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
 			v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 70);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querytext INTO v_queryresult;		
-			
+
 			v_rec_replace = (REPLACE(rec.inputparams::text, concat('"dvQueryText":"', rec.inputparams::json->>'dvQueryText','"') , v_queryresult))::json;
 			v_rec_replace = (REPLACE(v_rec_replace::text, concat('"selectedId":"', rec.inputparams::json->>'selectedId','"'), v_selectedid))::json;
 					
