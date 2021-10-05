@@ -128,12 +128,16 @@ class GwWorkspaceManagerButton(GwAction):
 
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
+        if descript == '':
+            descript = 'null'
+        else:
+            descript = f'"{descript}"'
         if len(name) == 0:
             tools_qt.set_stylesheet(self.new_workspace_name)
             return
         action = "CREATE"
 
-        extras = f'"action":"{action}", "name":"{name}", "descript":"{descript}"'
+        extras = f'"action":"{action}", "name":"{name}", "descript":{descript}'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 

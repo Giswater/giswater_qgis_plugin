@@ -2432,6 +2432,8 @@ def fill_tableview_rows(widget, field):
     for item in field['value']:
         row = []
         for value in item.values():
+            if value is None:
+                value = ""
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
             model.appendRow(row)
