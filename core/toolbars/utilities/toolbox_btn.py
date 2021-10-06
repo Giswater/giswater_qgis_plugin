@@ -129,6 +129,9 @@ class GwToolBoxButton(GwAction):
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
             tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
 
+        # Set shortcut keys
+        self.dlg_toolbox.key_escape.connect(partial(tools_gw.close_docker))
+
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if global_vars.session_vars['dialog_docker']:

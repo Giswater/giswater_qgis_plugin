@@ -40,10 +40,17 @@ class GwSelector:
         if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
+
+            # Set shortcut keys
+            dlg_selector.key_escape.connect(partial(tools_gw.close_docker))
+
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
             tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+
+            # Set shortcut keys
+            dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(

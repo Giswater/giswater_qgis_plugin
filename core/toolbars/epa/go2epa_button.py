@@ -79,6 +79,9 @@ class GwGo2EpaButton(GwAction):
         self._set_signals()
         self.dlg_go2epa.btn_cancel.setEnabled(False)
 
+        # Set shortcut keys
+        self.dlg_go2epa.key_escape.connect(partial(tools_gw.close_docker))
+
         self.dlg_go2epa.btn_hs_ds.clicked.connect(
             partial(self._sector_selection))
 
