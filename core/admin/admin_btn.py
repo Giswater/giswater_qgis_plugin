@@ -637,7 +637,7 @@ class GwAdminButton:
         self._update_manage_ui()
         self.visit_manager()
 
-        if not tools_db.check_role(self.username) and not show_dialog:
+        if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
