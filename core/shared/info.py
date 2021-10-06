@@ -1716,6 +1716,7 @@ class GwInfo(QObject):
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
+                return None
             tools_gw.close_dialog(dialog)
             return None
 
@@ -1776,6 +1777,7 @@ class GwInfo(QObject):
                 if close_dlg:
                     if global_vars.session_vars['dialog_docker']:
                         tools_gw.close_docker()
+                        return True
                     tools_gw.close_dialog(dialog)
                 return True
 
