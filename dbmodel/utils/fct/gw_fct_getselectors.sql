@@ -65,7 +65,7 @@ rec_macro record;
 v_count_selector integer;
 v_useatlas boolean;
 v_message text;
-
+v_uservalues json;
 
 BEGIN
 
@@ -285,13 +285,15 @@ BEGIN
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE 
-
+		v_uservalues = json_extract_path_text(p_data,'data','userValues');
+		v_uservalues := COALESCE(v_uservalues, '{}');
+		
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
-			',"data":{"geometry":'||v_geometry||'}'||
+			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
 			'}'||
 		    '}')::json;
 	END IF;
