@@ -906,10 +906,10 @@ class GwAdminButton:
                 return False
 
             if self._process_folder(self.folderLocale, '') is False:
-                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'EN') is False:
+                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'en_US') is False:
                     return False
                 else:
-                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
+                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'en_US', True)
                     if status is False and self.dev_commit is False:
                         return False
             else:
