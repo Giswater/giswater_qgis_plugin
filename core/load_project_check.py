@@ -243,11 +243,11 @@ class GwLoadProjectCheck:
                 sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
                 row = tools_db.get_row(sql, log_info=False)
                 if row:
-                    tools_gw.set_statusbar_widget("current_psector", f"<b>GW psector:</b> {row[0]}")
+                    tools_gw.set_statusbar_widget("current_psector", f"<b>GW psector:</b> {row[0]}", index=1)
             elif user_value['parameter'] == 'utils_workspace_vdefault'and user_value['value']:
                 sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
                 row = tools_db.get_row(sql, log_info=False)
                 if row:
-                    tools_gw.set_statusbar_widget("last_workspace", f"<b>GW workspace:</b> {row[0]}")
+                    tools_gw.set_statusbar_widget("current_workspace", f"<b>GW workspace:</b> {row[0]}", index=2)
 
     # endregion

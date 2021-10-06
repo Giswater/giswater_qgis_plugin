@@ -52,7 +52,7 @@ project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
 statusbar_widgets = {
     'current_psector': None,
-    'last_workspace': None,
+    'current_workspace': None,
 }
 # endregion
 
