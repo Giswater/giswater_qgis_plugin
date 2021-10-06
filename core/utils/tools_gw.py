@@ -2759,6 +2759,8 @@ def set_statusbar_widget(widget_name, text='', index=1):
     widget = global_vars.statusbar_widgets[widget_name]
     if not widget:
         return
+    if text is None:
+        text = ''
     widget.setText(f"{text}")
     global_vars.iface.mainWindow().statusBar().insertPermanentWidget(index, widget)
 

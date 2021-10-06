@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_db
 
 
 class GwSelector:
@@ -290,6 +290,18 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
+
+        # Update current_workspace label (status bar)
+        user_values = json_result['body']['data']['userValues']
+        if user_values:
+            for value in user_values:
+                if value['parameter'] == 'utils_workspace_vdefault':
+                    text = value['value']
+                    if value['value']:
+                        sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
+                        row = tools_db.get_row(sql, log_info=False)
+                        text = f"<b>GW workspace:</b> {row[0]}"
+                    tools_gw.set_statusbar_widget('current_workspace', text, index=2)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
