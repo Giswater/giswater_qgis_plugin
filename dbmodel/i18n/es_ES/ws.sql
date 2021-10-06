@@ -84,7 +84,7 @@ INSERT INTO node_type VALUES ('POZO_CAPTACION', 'WATERWELL', 'JUNCTION', 'man_wa
 INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tap');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unión donde convergen 4 tuberías');
 INSERT INTO node_type VALUES ('CAPTACION', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captación');
-INSERT INTO node_type VALUES ('POZO_AGUA', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pozo de acceso para inspección');
+INSERT INTO node_type VALUES ('POZO_ACCESO', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pozo de acceso para inspección');
 INSERT INTO node_type VALUES ('REGISTRO', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registro');
 INSERT INTO node_type VALUES ('REGISTRO_CONTROL', 'REGISTER', 'JUNCTION', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Registro de control');
 INSERT INTO node_type VALUES ('REGISTRO_BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registro de bypass');
