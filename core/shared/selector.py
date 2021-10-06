@@ -196,8 +196,9 @@ class GwSelector:
                 widget.blockSignals(True)
                 index = dialog.main_tab.currentIndex()
                 tab_name = dialog.main_tab.widget(index).objectName()
-                value = selector_vars[f"var_txt_filter_{tab_name}"]
-                tools_qt.set_widget_text(dialog, widget, f'{value}')
+                if f"var_txt_filter_{tab_name}" in selector_vars:
+                    value = selector_vars[f"var_txt_filter_{tab_name}"]
+                    tools_qt.set_widget_text(dialog, widget, f'{value}')
                 widget.blockSignals(False)
 
     # region private functions
