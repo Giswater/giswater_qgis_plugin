@@ -81,7 +81,7 @@ field json;
 query_text text;
 v_qgis_project_type text;
 v_logfoldervolume text;
-
+v_uservalues json;
 
 BEGIN 
 
@@ -463,6 +463,14 @@ BEGIN
 		SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
 	END IF;
 
+	-- get uservalues
+	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
+		
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	AND cur_user = current_user)a);
+
+	v_uservalues := COALESCE(v_uservalues, '{}');
+		
 	-- show form
 	IF v_hidden_form IS FALSE AND v_fid=101 THEN
 
@@ -642,7 +650,8 @@ BEGIN
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
 				',"data":{ "epsg":'||v_epsg||
-				         ',"info":'||v_result_info||','||
+						',"userValues":'||v_uservalues||
+				    ',"info":'||v_result_info||','||
 						'"point":'||v_result_point||','||
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
@@ -653,7 +662,8 @@ BEGIN
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
 				',"data":{ "epsg":'||v_epsg||
-				         ',"info":{},'||
+						',"userValues":'||v_uservalues||
+				    ',"info":{},'||
 						'"point":{},'||
 						'"line":{},'||
 						'"polygon":{},'||

@@ -252,10 +252,8 @@ BEGIN
 
 		SELECT id INTO v_workspace_id FROM cat_workspace WHERE config::text = v_check_config::text LIMIT 1; 
 
-		IF v_workspace_id IS NOT NULL THEN
-			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
-			ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_workspace_id;
-		END IF;
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
+		ON CONFLICT (parameter, cur_user) DO UPDATE SET value = v_workspace_id;
 		
 	END IF;
 
