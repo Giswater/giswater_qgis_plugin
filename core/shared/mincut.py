@@ -448,6 +448,9 @@ class GwMincut:
         # Enable/Disable widget depending state
         self._enable_widgets('0')
 
+        # Disabled button accept from mincut form
+        self.dlg_mincut.btn_accept.setEnabled(False)
+
         # Show form in docker?
         self.manage_docker()
         tools_qt.manage_translation('mincut', self.dlg_mincut)
@@ -1066,6 +1069,9 @@ class GwMincut:
         self.dlg_connec.btn_accept.clicked.connect(partial(self._accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(tools_gw.close_dialog, self.dlg_connec))
 
+        # Enabled button accept from mincut form
+        self.dlg_mincut.btn_accept.setEnabled(True)
+
         # Set autocompleter for 'customer_code'
         self._set_completer_customer_code(self.dlg_connec.connec_id)
 
@@ -1215,10 +1221,13 @@ class GwMincut:
         tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
         tools_gw.add_icon(self.dlg_hydro.btn_delete, "112")
 
-        # Set dignals
+        # Set signals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self._insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self._delete_records_hydro))
         self.dlg_hydro.btn_accept.clicked.connect(partial(self._accept_hydro, self.dlg_hydro, "hydrometer"))
+
+        # Enabled button accept from mincut form
+        self.dlg_mincut.btn_accept.setEnabled(True)
 
         # Set autocompleter for 'customer_code'
         self._set_completer_customer_code(self.dlg_hydro.customer_code_connec, True)
@@ -1877,6 +1886,9 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
+
+        # Enabled button accept from mincut form
+        self.dlg_mincut.btn_accept.setEnabled(True)
 
 
     def _refresh_mincut(self):

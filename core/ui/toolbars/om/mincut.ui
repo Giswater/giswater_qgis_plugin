@@ -946,7 +946,7 @@
      <normaloff>../../../../icons/dialogs/20x20/126.png</normaloff>../../../../icons/dialogs/20x20/126.png</iconset>
    </property>
    <property name="text">
-    <string>Automatic Mincut</string>
+    <string>Network Mincut</string>
    </property>
    <property name="toolTip">
     <string>Automatic Mincut</string>
@@ -979,7 +979,7 @@
      <normaloff>../../../../icons/dialogs/20x20/121.png</normaloff>../../../../icons/dialogs/20x20/121.png</iconset>
    </property>
    <property name="text">
-    <string>Connec</string>
+    <string>Connec Mincut</string>
    </property>
   </action>
   <action name="actionAddHydrometer">
@@ -991,7 +991,7 @@
      <normaloff>../../../../icons/dialogs/20x20/122.png</normaloff>../../../../icons/dialogs/20x20/122.png</iconset>
    </property>
    <property name="text">
-    <string>Hydrometer</string>
+    <string>Hydrometer Mincut</string>
    </property>
   </action>
   <action name="actionComposer">
