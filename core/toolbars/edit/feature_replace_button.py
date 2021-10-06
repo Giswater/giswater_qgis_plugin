@@ -52,12 +52,6 @@ class GwFeatureReplaceButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
 
     def canvasMoveEvent(self, event):
 

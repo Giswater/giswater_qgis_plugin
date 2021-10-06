@@ -27,13 +27,6 @@ class GwArcFusionButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
     def canvasReleaseEvent(self, event):
 
         self._get_arc_fusion(event)

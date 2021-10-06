@@ -125,6 +125,19 @@ class GwMaptool(QgsMapTool):
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
+    def canvasReleaseEvent(self, event):
+
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+
+
     def recover_previus_maptool(self):
 
         if self.prev_maptool:

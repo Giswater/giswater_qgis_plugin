@@ -28,12 +28,6 @@ class GwArcDivideButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTool inherited event functions """
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
     def activate(self):
         """ Called when set as currently active map tool """
 
@@ -188,58 +182,57 @@ class GwArcDivideButton(GwMaptool):
 
     def _get_arc_divide(self, event):
 
-        if event.button() == Qt.LeftButton:
-
-            event_point = self.snapper_manager.get_event_point(event)
-
-            # Snap to node
-            if self.snapped_feat is None:
-
-                result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result.isValid():
-                    return
-
-                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                point = self.snapper_manager.get_snapped_point(result)
-
-                # Hide marker
-                self.vertex_marker.hide()
-
-                # Set a new point to go on with
-                self.rubber_band.addPoint(point)
-
-                # Add arc snapping
-                self.iface.setActiveLayer(self.layer_arc)
-
-            # Snap to arc
-            else:
-
-                result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result.isValid():
-                    return
-
-                layer = self.snapper_manager.get_snapped_layer(result)
-                point = self.snapper_manager.get_snapped_point(result)
-                point = self.toLayerCoordinates(layer, point)
-
-                # Get selected feature (at this moment it will have one and only one)
-                node_id = self.snapped_feat.attribute('node_id')
-
-                # Move selected node to the released point
-                # Show message before executing
-                message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
-                           "Please ensure that features has no undelete value on true.\n"
-                           "On the other hand you must know that traceability table will storage precedent information.")
-                title = "Info"
-                answer = tools_qt.show_question(message, title)
-                if answer:
-                    self._move_node(node_id, point)
-                    tools_qgis.set_layer_index('v_edit_arc')
-                    tools_qgis.set_layer_index('v_edit_connec')
-                    tools_qgis.set_layer_index('v_edit_gully')
-                    tools_qgis.set_layer_index('v_edit_node')
-
-        elif event.button() == Qt.RightButton:
+        if event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            return
+
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snap to node
+        if self.snapped_feat is None:
+
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if not result.isValid():
+                return
+
+            self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            point = self.snapper_manager.get_snapped_point(result)
+
+            # Hide marker
+            self.vertex_marker.hide()
+
+            # Set a new point to go on with
+            self.rubber_band.addPoint(point)
+
+            # Add arc snapping
+            self.iface.setActiveLayer(self.layer_arc)
+
+        # Snap to arc
+        else:
+
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if not result.isValid():
+                return
+
+            layer = self.snapper_manager.get_snapped_layer(result)
+            point = self.snapper_manager.get_snapped_point(result)
+            point = self.toLayerCoordinates(layer, point)
+
+            # Get selected feature (at this moment it will have one and only one)
+            node_id = self.snapped_feat.attribute('node_id')
+
+            # Move selected node to the released point
+            # Show message before executing
+            message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
+                       "Please ensure that features has no undelete value on true.\n"
+                       "On the other hand you must know that traceability table will storage precedent information.")
+            title = "Info"
+            answer = tools_qt.show_question(message, title)
+            if answer:
+                self._move_node(node_id, point)
+                tools_qgis.set_layer_index('v_edit_arc')
+                tools_qgis.set_layer_index('v_edit_connec')
+                tools_qgis.set_layer_index('v_edit_gully')
+                tools_qgis.set_layer_index('v_edit_node')
 
     # endregion

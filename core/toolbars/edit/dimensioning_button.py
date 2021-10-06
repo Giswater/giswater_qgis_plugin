@@ -22,12 +22,6 @@ class GwDimensioningButton(GwMaptool):
 
 
     # region QgsMapTools inherited
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.action.trigger()
-            return
-
 
     def activate(self):
 
