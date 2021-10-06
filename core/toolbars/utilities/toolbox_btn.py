@@ -366,7 +366,7 @@ class GwToolBoxButton(GwAction):
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') is None:
+            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
