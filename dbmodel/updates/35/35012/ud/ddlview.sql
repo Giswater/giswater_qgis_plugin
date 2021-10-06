@@ -200,7 +200,8 @@ CREATE OR REPLACE VIEW vu_gully AS
      LEFT JOIN cat_connec cc ON cc.id = connec_arccat_id;
 
 CREATE OR REPLACE VIEW v_gully AS 
-SELECT * FROM vu_gully;
+SELECT vu_gully.* FROM vu_gully
+JOIN v_state_gully USING (gully_id);
 
 CREATE OR REPLACE VIEW v_edit_gully AS 
 SELECT * FROM v_gully;
