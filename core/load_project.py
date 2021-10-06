@@ -410,7 +410,7 @@ class GwLoadProject(QObject):
         sql = ("SELECT t1.name FROM cat_workspace AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.id::text = t2.value "
                " WHERE t2.parameter='utils_workspace_vdefault' AND t2.cur_user = current_user")
-        row = tools_db.get_row(sql)
+        row = tools_db.get_row(sql, log_info=False)
         if row:
             tools_gw.set_statusbar_widget("last_workspace", f"<b>GW workspace:</b> {row[0]}")
 
