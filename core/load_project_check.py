@@ -61,6 +61,7 @@ class GwLoadProjectCheck:
 
         # Execute function 'gw_fct_setcheckproject'
         result = self._execute_check_project_function(init_project, fields)
+        self._manage_statusbar_widgets(result)
 
         return True, result
 
@@ -225,5 +226,28 @@ class GwLoadProjectCheck:
                 tools_qgis.set_layer_visible(layer)
 
         tools_gw.close_dialog(self.dlg_audit_project)
+
+
+    def _manage_statusbar_widgets(self, result):
+        """  """
+
+        for key in global_vars.statusbar_widgets:
+            if not global_vars.statusbar_widgets[key]:
+                widget = QLabel()
+                global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
+                global_vars.statusbar_widgets[key] = widget
+
+        for user_value in result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+                # Set current_psector lbl
+                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    tools_gw.set_statusbar_widget("current_psector", f"<b>GW psector:</b> {row[0]}")
+            elif user_value['parameter'] == 'utils_workspace_vdefault'and user_value['value']:
+                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    tools_gw.set_statusbar_widget("last_workspace", f"<b>GW workspace:</b> {row[0]}")
 
     # endregion
