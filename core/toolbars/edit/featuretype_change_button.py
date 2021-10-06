@@ -87,12 +87,9 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         self.project_type = tools_gw.get_project_type()
 
-        # Check button
-        # TODO: Manage toolbar action selection when execute from shortcut key.
-        try:
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
             self.action.setChecked(True)
-        except Exception as e:
-            pass
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()

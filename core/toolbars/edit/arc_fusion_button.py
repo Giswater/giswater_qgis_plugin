@@ -24,8 +24,6 @@ class GwArcFusionButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -41,12 +39,11 @@ class GwArcFusionButton(GwMaptool):
         self._get_arc_fusion(event)
 
 
-
-
     def activate(self):
 
         # Check button
-        self.action.setChecked(True)
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -66,13 +63,8 @@ class GwArcFusionButton(GwMaptool):
             message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(message)
 
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
-
     # endregion
+
 
     # region private functions
 

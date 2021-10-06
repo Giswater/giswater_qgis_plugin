@@ -135,8 +135,9 @@ class GwConnectLinkButton(GwMaptool):
 
     def activate(self):
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Rubber band
         tools_gw.reset_rubberband(self.rubber_band)
@@ -159,11 +160,6 @@ class GwConnectLinkButton(GwMaptool):
         if self.show_help:
             message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
             tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-
-        super().deactivate()
 
 
     def manage_result(self, result, layer):

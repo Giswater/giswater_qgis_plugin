@@ -37,8 +37,9 @@ class GwArcDivideButton(GwMaptool):
     def activate(self):
         """ Called when set as currently active map tool """
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -183,6 +184,7 @@ class GwArcDivideButton(GwMaptool):
         # Deactivate map tool
         self.deactivate()
         self.set_action_pan()
+
 
     def _get_arc_divide(self, event):
 
