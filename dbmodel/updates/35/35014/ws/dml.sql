@@ -69,3 +69,7 @@ UPDATE config_param_system SET value =
 {"source":{"table":"ve_node_pr_reduc_valve", "column":"pression_exit"}, "target":{"table":"inp_valve", "column":"pressure"}}]}',
 project_type = 'utils'
 WHERE parameter = 'epa_automatic_man2inp_values';
+
+UPDATE config_param_system SET value =
+'{"forcePatternOnNewDma":{"status":false, "value":"dma_id"}}'
+WHERE parameter = 'epa_patterns';

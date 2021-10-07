@@ -11,6 +11,9 @@ $BODY$
 
 DECLARE 
 expl_id_int integer;
+v_newpattern json;
+v_status boolean;
+v_value text;
 
 BEGIN
 
@@ -18,6 +21,10 @@ BEGIN
 	
 	IF TG_OP = 'INSERT' THEN
 	
+		v_newpattern = (SELECT value::json->>'forcePatternOnNewDma' FROM config_param_system WHERE parameter = 'epa_patterns');
+		v_status = v_newpattern->>'status';
+		v_value = v_newpattern->>'value';
+		
 		--Exploitation ID
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;				
@@ -25,8 +32,14 @@ BEGIN
 
 		expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 		
-		IF (SELECT value::json->>'ceateNewPatternWhenNewDma' FROM config_param_system WHERE parameter = 'epa_patterns')::boolean = true THEN
-			NEW.pattern_id = NEW.dma_id;
+		IF v_status THEN
+		
+			IF  v_value = 'dma_id' OR v_value IS NULL THEN
+				NEW.pattern_id = NEW.dma_id;
+			ELSE
+				NEW.pattern_id = v_value;
+			END IF;
+
 			INSERT INTO inp_pattern values (NEW.pattern_id)
 			ON CONFLICT (pattern_id) DO NOTHING;
 		END IF;
