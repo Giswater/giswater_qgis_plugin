@@ -510,15 +510,15 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
             if counter > 0:
                 counter = len(data[k]['features'])
                 geometry_type = data[k]['geometryType']
+                aux_layer_name = layer_name
                 try:
                     if not layer_name:
-                        layer_name = data[k]['layerName']
+                        aux_layer_name = data[k]['layerName']
                 except KeyError:
-                    layer_name = 'Temporal layer'
+                    aux_layer_name = 'Temporal layer'
                 if del_old_layers:
-                    tools_qgis.remove_layer_from_toc(layer_name, group)
-                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                layer_name = None
+                    tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
                 fill_layer_temp(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:

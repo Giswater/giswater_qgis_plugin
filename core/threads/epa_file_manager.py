@@ -87,12 +87,6 @@ class GwEpaFileManager(GwTask):
 
         super().finished(result)
 
-        sql = f"SELECT {self.funtion_name}("
-        if self.body:
-            sql += f"{self.body}"
-        sql += f");"
-        tools_gw.manage_json_response(self.json_result, sql, None)
-
         self.dlg_go2epa.btn_cancel.setEnabled(False)
         if self.isCanceled():
             return
@@ -190,7 +184,7 @@ class GwEpaFileManager(GwTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = tools_gw.create_body(extras=extras)
-        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, log_sql=True)
+        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
         self.function_failed = dict_result['function_failed']
         self.json_result = dict_result['json_result']
         self.complet_result = dict_result['complet_result']
