@@ -27,11 +27,6 @@ class GwArcFusionButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def canvasReleaseEvent(self, event):
-
-        self._get_arc_fusion(event)
-
-
     def activate(self):
 
         # Check button
@@ -55,6 +50,12 @@ class GwArcFusionButton(GwMaptool):
         if self.show_help:
             message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(message)
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._get_arc_fusion(event)
+
 
     # endregion
 

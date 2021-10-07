@@ -34,6 +34,35 @@ class GwConnectLinkButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
+    def activate(self):
+
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
+
+        # Rubber band
+        tools_gw.reset_rubberband(self.rubber_band)
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.set_snapping_status()
+
+        # Set snapping to 'connec' and 'gully'
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+
+        # Change cursor
+        cursor = tools_gw.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
+            tools_qgis.show_info(message)
+
+
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
 
@@ -131,35 +160,6 @@ class GwConnectLinkButton(GwMaptool):
 
             if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
                 self.cancel_map_tool()
-
-
-    def activate(self):
-
-        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
-        if hasattr(self.action, "setChecked"):
-            self.action.setChecked(True)
-
-        # Rubber band
-        tools_gw.reset_rubberband(self.rubber_band)
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
-        # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-
-        # Change cursor
-        cursor = tools_gw.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
-            tools_qgis.show_info(message)
 
 
     def manage_result(self, result, layer):
