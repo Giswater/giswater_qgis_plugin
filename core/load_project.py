@@ -110,9 +110,6 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
-        # Manage status bar widgets
-        self._manage_statusbar_widgets()
-
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
@@ -387,32 +384,6 @@ class GwLoadProject(QObject):
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
-
-
-    def _manage_statusbar_widgets(self):
-        """  """
-
-        for key in global_vars.statusbar_widgets:
-            if not global_vars.statusbar_widgets[key]:
-                widget = QLabel()
-                global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
-                global_vars.statusbar_widgets[key] = widget
-
-        # Set current_psector lbl
-        sql = ("SELECT t1.name FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-        if row:
-            tools_gw.set_statusbar_widget("current_psector", f"<b>GW psector:</b> {row[0]}")
-
-        # Set last_workspace lbl
-        sql = ("SELECT t1.name FROM cat_workspace AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.id::text = t2.value "
-               " WHERE t2.parameter='utils_workspace_vdefault' AND t2.cur_user = current_user")
-        row = tools_db.get_row(sql)
-        if row:
-            tools_gw.set_statusbar_widget("last_workspace", f"<b>GW workspace:</b> {row[0]}")
 
 
     def _manage_snapping_layers(self):

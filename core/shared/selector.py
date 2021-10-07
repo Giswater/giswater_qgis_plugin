@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_db
 
 
 class GwSelector:
@@ -40,10 +40,17 @@ class GwSelector:
         if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
+
+            # Set shortcut keys
+            dlg_selector.key_escape.connect(partial(tools_gw.close_docker))
+
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
             tools_gw.open_dialog(dlg_selector, dlg_name='selector')
+
+            # Set shortcut keys
+            dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
@@ -189,8 +196,9 @@ class GwSelector:
                 widget.blockSignals(True)
                 index = dialog.main_tab.currentIndex()
                 tab_name = dialog.main_tab.widget(index).objectName()
-                value = selector_vars[f"var_txt_filter_{tab_name}"]
-                tools_qt.set_widget_text(dialog, widget, f'{value}')
+                if f"var_txt_filter_{tab_name}" in selector_vars:
+                    value = selector_vars[f"var_txt_filter_{tab_name}"]
+                    tools_qt.set_widget_text(dialog, widget, f'{value}')
                 widget.blockSignals(False)
 
     # region private functions
@@ -282,6 +290,9 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
+
+        # Update current_workspace label (status bar)
+        tools_gw.set_workspace_label(json_result)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):

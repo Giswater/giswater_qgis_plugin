@@ -22,17 +22,12 @@ class GwDimensioningButton(GwMaptool):
 
 
     # region QgsMapTools inherited
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.action.trigger()
-            return
-
 
     def activate(self):
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         self.layer = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
         if self.layer:

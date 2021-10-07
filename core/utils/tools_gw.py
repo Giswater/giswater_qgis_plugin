@@ -510,15 +510,15 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
             if counter > 0:
                 counter = len(data[k]['features'])
                 geometry_type = data[k]['geometryType']
+                aux_layer_name = layer_name
                 try:
                     if not layer_name:
-                        layer_name = data[k]['layerName']
+                        aux_layer_name = data[k]['layerName']
                 except KeyError:
-                    layer_name = 'Temporal layer'
+                    aux_layer_name = 'Temporal layer'
                 if del_old_layers:
-                    tools_qgis.remove_layer_from_toc(layer_name, group)
-                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                layer_name = None
+                    tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
                 fill_layer_temp(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
@@ -2753,14 +2753,29 @@ def open_dlg_help():
         return True
 
 
-def set_statusbar_widget(widget_name, text=''):
+def set_statusbar_widget(widget_name, text='', index=1):
     """  """
 
     widget = global_vars.statusbar_widgets[widget_name]
     if not widget:
         return
+    if text is None:
+        text = ''
     widget.setText(f"{text}")
-    global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
+    global_vars.iface.mainWindow().statusBar().insertPermanentWidget(index, widget)
+
+
+def set_workspace_label(json_result):
+    user_values = json_result['body']['data']['userValues']
+    if user_values:
+        for value in user_values:
+            if value['parameter'] == 'utils_workspace_vdefault':
+                text = value['value']
+                if value['value']:
+                    sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
+                    row = tools_db.get_row(sql, log_info=False)
+                    text = f"<b>GW workspace:</b> {row[0]}"
+                set_statusbar_widget('current_workspace', text, index=2)
 
 
 def create_sqlite_conn(file_name):

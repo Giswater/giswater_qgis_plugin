@@ -637,7 +637,7 @@ class GwAdminButton:
         self._update_manage_ui()
         self.visit_manager()
 
-        if not tools_db.check_role(self.username) and not show_dialog:
+        if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
@@ -906,10 +906,10 @@ class GwAdminButton:
                 return False
 
             if self._process_folder(self.folderLocale, '') is False:
-                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'EN') is False:
+                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'en_US') is False:
                     return False
                 else:
-                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
+                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'en_US', True)
                     if status is False and self.dev_commit is False:
                         return False
             else:
@@ -3292,6 +3292,7 @@ class GwAdminButton:
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
         except Exception as e:
             tools_log.log_info(str(e))
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')

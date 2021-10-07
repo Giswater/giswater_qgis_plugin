@@ -247,6 +247,6 @@ class GwWorkspaceManagerButton(GwAction):
         text = f"Selected workspace: {name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
         text = f"<b>GW workspace:</b> {name}"
-        tools_gw.set_statusbar_widget("last_workspace", text=text)
+        tools_gw.set_statusbar_widget("current_workspace", text=text, index=2)
 
     # endregion

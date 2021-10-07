@@ -50,10 +50,6 @@ class GwInfoButton(GwMaptool):
             return
 
 
-    def canvasMoveEvent(self, event):
-        pass
-
-
     def canvasReleaseEvent(self, event):
 
         self._get_info(event)

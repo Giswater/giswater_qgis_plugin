@@ -56,43 +56,13 @@ class GwFeatureTypeChangeButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
-    def canvasMoveEvent(self, event):
-
-        # Hide marker and get coordinates
-        self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-
-
-    def canvasReleaseEvent(self, event):
-
-        self._featuretype_change(event)
-
-
     def activate(self):
 
         self.project_type = tools_gw.get_project_type()
 
-        # Check button
-        # TODO: Manage toolbar action selection when execute from shortcut key.
-        try:
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
             self.action.setChecked(True)
-        except Exception as e:
-            pass
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -129,6 +99,27 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if self.show_help:
             message = "Click on feature to change its type"
             tools_qgis.show_info(message)
+
+
+    def canvasMoveEvent(self, event):
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping layers 'v_edit_'
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename and 'v_edit' in tablename:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._featuretype_change(event)
+
 
     # endregion
 

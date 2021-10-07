@@ -125,6 +125,19 @@ class GwMaptool(QgsMapTool):
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
+    def canvasReleaseEvent(self, event):
+
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+
+
     def recover_previus_maptool(self):
 
         if self.prev_maptool:
@@ -143,14 +156,11 @@ class GwMaptool(QgsMapTool):
 
     def reset_rubber_band(self, geom_type="polygon"):
 
-        try:
-            if geom_type == "polygon":
-                geom_type = QgsWkbTypes.PolygonGeometry
-            elif geom_type == "line":
-                geom_type = QgsWkbTypes.LineString
-            self.rubber_band.reset(geom_type)
-        except Exception:
-            pass
+        if geom_type == "polygon":
+            geom_type = QgsWkbTypes.PolygonGeometry
+        elif geom_type == "line":
+            geom_type = QgsWkbTypes.LineGeometry
+        self.rubber_band.reset(geom_type)
 
 
     def reset(self):

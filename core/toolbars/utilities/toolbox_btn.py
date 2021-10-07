@@ -129,6 +129,9 @@ class GwToolBoxButton(GwAction):
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
             tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
 
+        # Set shortcut keys
+        self.dlg_toolbox.key_escape.connect(partial(tools_gw.close_docker))
+
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if global_vars.session_vars['dialog_docker']:
@@ -363,7 +366,7 @@ class GwToolBoxButton(GwAction):
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') is None:
+            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)

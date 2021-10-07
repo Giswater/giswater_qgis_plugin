@@ -39,6 +39,7 @@ class GwFlowTraceButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
+
         self._set_flow_trace(event)
 
 
@@ -77,12 +78,6 @@ class GwFlowTraceButton(GwMaptool):
             layer = tools_qgis.get_layer_by_tablename('v_edit_node')
             if layer:
                 self.iface.setActiveLayer(layer)
-
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
 
 
     # region private functions
