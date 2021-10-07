@@ -294,6 +294,7 @@ class Giswater(QObject):
             if widget:
                 self.iface.mainWindow().statusBar().removeWidget(widget)
                 widget.deleteLater()
+                global_vars.statusbar_widgets[key] = None
 
 
     def _project_new(self):
