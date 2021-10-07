@@ -353,7 +353,7 @@ BEGIN
 						VALUES (212, 1,'Copy addfields from old to new arcs.');
 
 						-- update arc_id of disconnected nodes linked to old arc
-						FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=v_arc_id
+						FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=v_arc_id AND node_id!=v_node_id
 						LOOP
 							UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
 							v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
@@ -498,20 +498,6 @@ BEGIN
 
 						END IF;
 						
-						-- Update arc_id on node
-						FOR rec_aux IN SELECT * FROM node WHERE arc_id=v_arc_id  LOOP
-
-							-- find the new arc id
-							SELECT arc_id INTO v_newarc FROM v_edit_arc AS a 
-							WHERE ST_DWithin(rec_aux.the_geom, a.the_geom, 0.5) AND arc_id !=v_arc_id ORDER BY ST_Distance(rec_aux.the_geom, a.the_geom) LIMIT 1;
-
-							-- update values
-							UPDATE node SET arc_id=v_newarc WHERE node_id=rec_aux.node_id;
-								
-						END LOOP;
-
-						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1, 'Update arc_id on node.');
 
 						--set arc to obsolete or delete it
 						IF v_set_arc_obsolete IS TRUE THEN
@@ -871,6 +857,9 @@ BEGIN
 	END IF;
 	
 	END IF;
+
+	--last process
+	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
 			
 	-- get results
 	-- info
