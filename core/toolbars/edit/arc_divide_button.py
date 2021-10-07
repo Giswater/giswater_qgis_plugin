@@ -33,7 +33,7 @@ class GwArcDivideButton(GwMaptool):
 
         # selected_action = 1: WITH MOVEMENT
         # selected_action = 2: WITHOUT MOVEMENT
-        self.selected_action = None
+        self.selected_action = 1
         self.menu = QMenu()
         self.menu.setObjectName("GW_replace_menu")
         self._fill_action_menu()
