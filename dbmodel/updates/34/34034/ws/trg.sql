@@ -9,10 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/04/01
-DROP TRIGGER IF EXISTS gw_trg_man2inp_values ON node;
-CREATE TRIGGER gw_trg_man2inp_values AFTER INSERT OR UPDATE ON node
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_man2inp_values();
-
 DROP TRIGGER IF EXISTS gw_trg_edit_link ON v_edit_link;
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_link FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
