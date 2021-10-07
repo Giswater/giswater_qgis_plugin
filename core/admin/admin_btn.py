@@ -3292,6 +3292,7 @@ class GwAdminButton:
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
         except Exception as e:
             tools_log.log_info(str(e))
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
