@@ -49,3 +49,12 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess VALUES (401, 'Y0 higger than ymax on nodes)', 'ud')
 ON CONFLICT (fid) DO NOTHING;
 
+
+INSERT INTO config_param_system (parameter, value, descript, standardvalue, isenabled, project_type) VALUES(
+'epa_automatic_man2inp_values', 
+'{"status":false, "values":[
+{"source":{"table":"ve_node_outfall", "column":"min_height"}, "target":{"table":"inp_storage", "column":"y0"}}]}',
+'Before trigger go2epa, automatic loop updating values on inp tables',
+'{"status":false}'
+, FALSE, 'ws')
+ON CONFLICT (parameter) DO NOTHING;

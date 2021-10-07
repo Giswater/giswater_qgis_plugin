@@ -19,3 +19,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscena
 ALTER TABLE arc ALTER COLUMN state_type SET NOT NULL;
 ALTER TABLE node ALTER COLUMN state_type SET NOT NULL;
 ALTER TABLE connec ALTER COLUMN state_type SET NOT NULL;
+
+DROP FUNCTION IF EXISTS gw_trg_man2inp_values;
+DROP TRIGGER IF EXISTS gw_trg_man2inp_values ON node;
+
+

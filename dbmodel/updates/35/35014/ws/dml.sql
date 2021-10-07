@@ -63,3 +63,9 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT child_layer,'form_feature', 'data', 'epa_type', 'lyt_top_1', 11, 'string', 'combo', 'epa_type', null, null, TRUE,
 FALSE, TRUE, FALSE,null,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''CONNEC''', TRUE, FALSE, NULL, NULL,NULL,
 NULL, '{"setMultiline":false}', NULL, FALSE FROM cat_feature WHERE feature_type='CONNEC' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_param_system SET value =
+'{"status":true, "values":[
+{"source":{"table":"ve_node_pr_reduc_valve", "column":"pression_exit"}, "target":{"table":"inp_valve", "column":"pressure"}}]}',
+project_type = 'utils'
+WHERE parameter = 'epa_automatic_man2inp_values';
