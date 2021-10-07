@@ -292,16 +292,7 @@ class GwSelector:
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
         # Update current_workspace label (status bar)
-        user_values = json_result['body']['data']['userValues']
-        if user_values:
-            for value in user_values:
-                if value['parameter'] == 'utils_workspace_vdefault':
-                    text = value['value']
-                    if value['value']:
-                        sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
-                        row = tools_db.get_row(sql, log_info=False)
-                        text = f"<b>GW workspace:</b> {row[0]}"
-                    tools_gw.set_statusbar_widget('current_workspace', text, index=2)
+        tools_gw.set_workspace_label(json_result)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
