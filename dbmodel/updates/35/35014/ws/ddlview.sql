@@ -230,3 +230,11 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
      JOIN inp_connec USING (connec_id)
   WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"epa_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"dma_style", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"presszone_style", "action":"ADD-FIELD","hasChilds":"True"}}$$);

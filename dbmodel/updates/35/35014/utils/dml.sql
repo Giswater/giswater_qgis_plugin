@@ -43,3 +43,7 @@ UPDATE config_toolbox SET
 	WHERE id = 2680;
 	
 INSERT INTO inp_typevalue VALUES ('inp_result_status', '0', 'DEPRECATED');
+
+UPDATE polygon SET feature_id = element_id, featurecat_id=elementtype_id 
+FROM element JOIN cat_element ce ON ce.id=elementcat_id 
+WHERE polygon.pol_id=element.pol_id;
