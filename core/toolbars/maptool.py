@@ -156,14 +156,11 @@ class GwMaptool(QgsMapTool):
 
     def reset_rubber_band(self, geom_type="polygon"):
 
-        try:
-            if geom_type == "polygon":
-                geom_type = QgsWkbTypes.PolygonGeometry
-            elif geom_type == "line":
-                geom_type = QgsWkbTypes.LineString
-            self.rubber_band.reset(geom_type)
-        except Exception:
-            pass
+        if geom_type == "polygon":
+            geom_type = QgsWkbTypes.PolygonGeometry
+        elif geom_type == "line":
+            geom_type = QgsWkbTypes.LineGeometry
+        self.rubber_band.reset(geom_type)
 
 
     def reset(self):
