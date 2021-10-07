@@ -57,6 +57,10 @@ v_srid integer;
 v_force_delete boolean;
 v_system_id text;
 
+-- automatic_man2inp_values
+v_man_view text;
+v_input json;
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -75,6 +79,9 @@ BEGIN
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
+	-- man2inp_values
+	v_man_view  = (SELECT child_layer FROM cat_feature WHERE id = NEW.node_type);
+	v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'"}}');
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
@@ -588,7 +595,10 @@ BEGIN
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
 		END IF;
-			  
+
+		-- man2inp_values
+		PERFORM gw_fct_man2inp_values(v_input);
+
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -827,8 +837,11 @@ BEGIN
 						USING NEW.node_id , v_addfields.id;
 				END IF;
 			END LOOP;
-		END IF;       
-	    		
+		END IF;
+
+		-- man2inp_values
+		PERFORM gw_fct_man2inp_values(v_input);      
+
 		RETURN NEW;
 			
 	ELSIF TG_OP = 'DELETE' THEN
