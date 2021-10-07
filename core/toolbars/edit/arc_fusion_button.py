@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwArcFusionUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwArcFusionButton(GwMaptool):
@@ -77,7 +77,10 @@ class GwArcFusionButton(GwMaptool):
         if not result or result['status'] == 'Failed':
             return
 
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
+        text_result = None
+        log = tools_gw.get_config_parser("btn_arc_fusion", "disable_showlog", 'user', 'session')
+        if not tools_os.set_boolean(log, False):
+            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
 
         if not text_result:
             self.dlg_fusion.close()
