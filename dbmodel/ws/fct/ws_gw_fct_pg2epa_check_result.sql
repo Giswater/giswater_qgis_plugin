@@ -564,7 +564,7 @@ BEGIN
 		) AS feature
 		FROM (SELECT id, node_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
 			UNION
-			SELECT id, node_id, 'Removed demand node'  as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
+			SELECT id, node_id, 'Dry node with demand' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 

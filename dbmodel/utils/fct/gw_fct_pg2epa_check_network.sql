@@ -313,14 +313,29 @@ BEGIN
 				having max(water) = 0;
 				
 			-- insert into result table dry nodes with demands (error)
+
+			-- removed demands
 			INSERT INTO anl_node (fid, node_id, the_geom, descript)
 			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand which have been updated to 0') FROM rpt_inp_node n
 				WHERE (addparam::json->>'removedDemand')::boolean is true AND result_id = v_result_id;
 
+			-- not removed demands
+			INSERT INTO anl_node (fid, node_id, the_geom, descript)
+			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand') FROM rpt_inp_node n
+				JOIN
+				(
+				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				UNION
+				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				)
+				a USING (node_id)
+				WHERE n.demand > 0 AND result_id = v_result_id;
+
+
 		ELSIF  v_fid = 227 THEN  
 			-- insert into result table arc results
-			INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
-			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Dry arc')
+			INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
+			SELECT DISTINCT ON (a.arc_id) 232, a.arc_id, the_geom, concat('Dry arc')
 				FROM temp_anlgraf a
 				JOIN temp_arc b ON a.arc_id=b.arc_id
 				GROUP BY a.arc_id,the_geom
@@ -328,7 +343,7 @@ BEGIN
 
 			-- insert into result table dry nodes with demands (error)
 			INSERT INTO anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand, which have been updated to 0') FROM temp_node n
+			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand') FROM temp_node n
 				JOIN
 				(
 				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
@@ -353,7 +368,7 @@ BEGIN
 		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' Dry node(s) with demand which have been updated to cero'), v_count);
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-233: There is/are ',v_count,' Dry node(s) with demand'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'), v_count);
