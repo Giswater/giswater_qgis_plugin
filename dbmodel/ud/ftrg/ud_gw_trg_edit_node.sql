@@ -81,7 +81,7 @@ BEGIN
 
 	-- man2inp_values
 	v_man_view  = (SELECT child_layer FROM cat_feature WHERE id = NEW.node_type);
-	v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'"}}');
+	v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id

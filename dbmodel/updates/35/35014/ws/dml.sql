@@ -65,10 +65,13 @@ FALSE, TRUE, FALSE,null,'SELECT id, id as idval FROM sys_feature_epa_type WHERE 
 NULL, '{"setMultiline":false}', NULL, FALSE FROM cat_feature WHERE feature_type='CONNEC' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_param_system SET value =
-'{"status":true, "values":[
-{"source":{"table":"ve_node_pr_reduc_valve", "column":"pression_exit"}, "target":{"table":"inp_valve", "column":"pressure"}}]}',
-project_type = 'utils'
+'{"status":false, "values":[
+{"sourceTable":"ve_node_deposito", "query":"UPDATE inp_tank t SET minlevel = h_min, maxlevel = h_max, diameter  = diametro FROM ve_node_deposito s "},
+{"sourceTable":"ve_node_valvula_reductora_pres", "query":"UPDATE inp_valve t SET pressure = pression_exit FROM ve_node_valvula_reductora_pres s "}]}',
+project_type = 'utils',
+descript = 'Before insert - update of any feature, automatic update of columns on inp tables from columns on man table'
 WHERE parameter = 'epa_automatic_man2inp_values';
+
 
 UPDATE config_param_system SET value =
 '{"forcePatternOnNewDma":{"status":false, "value":"dma_id"}}'

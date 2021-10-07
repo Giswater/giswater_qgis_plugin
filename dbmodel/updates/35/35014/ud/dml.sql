@@ -53,8 +53,8 @@ ON CONFLICT (fid) DO NOTHING;
 INSERT INTO config_param_system (parameter, value, descript, standardvalue, isenabled, project_type) VALUES(
 'epa_automatic_man2inp_values', 
 '{"status":false, "values":[
-{"source":{"table":"ve_node_sewer_storage", "column":"min_height"}, "target":{"table":"inp_storage", "column":"y0"}}]}',
-'Before trigger go2epa, automatic loop updating values on inp tables',
+{"sourceTable":"ve_node_sewer_storage", "query":"UPDATE inp_storage t SET y0 = min_height FROM ve_node_sewer_storage s "}]}',
+'Before insert - update of any feature, automatic update of columns on inp tables from columns on man table',
 '{"status":false}'
 , FALSE, 'ws')
 ON CONFLICT (parameter) DO NOTHING;

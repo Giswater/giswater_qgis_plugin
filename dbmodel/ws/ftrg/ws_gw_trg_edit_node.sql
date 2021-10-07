@@ -83,7 +83,7 @@ BEGIN
 	
 	-- man2inp_values
 	v_man_view  = (SELECT child_layer FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id);
-	v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'"}}');
+	v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
 	--Get data from config table
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
