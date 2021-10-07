@@ -42,6 +42,7 @@ v_project_type text;
 
 v_feature text;
 v_tablefeature text;
+v_elementtype_id text;
 
 BEGIN
 
@@ -72,6 +73,8 @@ BEGIN
 		END IF;
 	END IF;
  	
+ 	SELECT elementtype_id INTO v_elementtype_id FROM cat_element WHERE id=NEW.elementcat_id;
+
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
 
@@ -172,7 +175,8 @@ BEGIN
 				-- get element dimensions to generate CIRCULARE geometry
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id);
+				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
+				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id, v_elementtype_id, NEW.element_id);
 
 			ELSIF v_length*v_width != 0 THEN
  
@@ -211,7 +215,8 @@ BEGIN
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id);
+				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
+				VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id, v_elementtype_id, NEW.element_id);
 			END IF;
 		END IF;
 		
@@ -279,8 +284,8 @@ BEGIN
 
 				-- get element dimensions to generate CIRCULARE geometry
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
-					INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES 
-					('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id);
+					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
+					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id, v_elementtype_id, NEW.element_id);
 					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
 				ELSE									
 					UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
@@ -324,7 +329,8 @@ BEGIN
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
-					INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('ELEMENT', v_the_geom_pol,v_new_pol_id);
+					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
+					VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id, v_elementtype_id, NEW.element_id);
 					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
 
 				ELSE
