@@ -237,7 +237,7 @@ class GwLoadProjectCheck:
                 global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
                 global_vars.statusbar_widgets[key] = widget
 
-        if 'userValues' in json_result['body']['data']:
+        if 'userValues' in result['body']['data']:
             for user_value in result['body']['data']['userValues']:
                 if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
                     # Set current_psector lbl
