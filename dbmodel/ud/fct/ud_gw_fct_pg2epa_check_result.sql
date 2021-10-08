@@ -449,7 +449,9 @@ BEGIN
 		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
 		LEFT JOIN temp_node b USING (node_id)
-		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL OR a.sector_id::text != b.sector_id::text) a';
+		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
+		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+		OR a.sector_id::text != b.sector_id::text) a';
 	
 		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
@@ -471,8 +473,10 @@ BEGIN
 		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
 		LEFT JOIN temp_arc b USING (arc_id)
-		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL OR a.sector_id::text != b.sector_id::text) a';
-	
+		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
+		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+		OR a.sector_id::text != b.sector_id::text) a';	
+		
 		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
 			i = i+1;
