@@ -20,6 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId
 
 DECLARE
 
+i integer = 0;
 v_fid integer;
 v_record record;
 v_project_type text;
@@ -531,6 +532,85 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
+	END IF;
+
+	RAISE NOTICE '13 - Check if node_id and arc_id defined on CONTROLS and RULES exists (402)';
+
+	-- CONTROLS arcs
+	v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+		(SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_arc b USING (arc_id)
+		WHERE b.arc_id IS NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+	EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with links (arc o nodarc) not present on this result. Control id''s:',v_querytext));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct link id (arc or nodarc) values.'));
+	END IF;
+
+	-- CONTROLS nodes
+	v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+		(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_node b USING (node_id)
+		WHERE b.node_id IS NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+	EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with nodes not present on this result. Control id''s:',v_querytext));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct node id values.'));
+	END IF;
+
+	-- RULES nodes
+	FOR object_rec IN SELECT json_array_elements_text('["NODE", "JUNCTION", "RESERVOIR", "TANK"]'::json) as tabname
+	LOOP
+		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_rules WHERE active is true)a
+		LEFT JOIN temp_node b USING (node_id)
+		WHERE b.node_id IS NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			i = i+1;
+			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' RULES with ',lower(object_rec.tabname),' not present on this result. Rule id''s:',v_querytext));
+		END IF;
+	END LOOP;
+
+	IF v_count = 0 AND i = 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct node id values.'));
+	END IF;
+
+	-- RULES arcs
+	i = 0;
+	FOR object_rec IN SELECT json_array_elements_text('["LINK", "PIPE", "PUMP", "VALVE"]'::json) as tabname
+	LOOP
+		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_rules WHERE active is true)a
+		LEFT JOIN temp_arc b USING (arc_id)
+		WHERE b.arc_id IS NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			i = i+1;
+			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' RULES with ',lower(object_rec.tabname),' not present on this result. Rule id''s:',v_querytext));
+		END IF;
+	END LOOP;
+
+	IF v_count = 0 AND i = 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
 
 	-- insert spacers for log
