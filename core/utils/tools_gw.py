@@ -2754,7 +2754,12 @@ def open_dlg_help():
 
 
 def set_statusbar_widget(widget_name, text='', index=1):
-    """  """
+    """
+    Set the text of a status bar widget
+        :param widget_name: the name of the widget (found in global_vars.statusbar_widgets) ['current_psector', 'current_workspace']
+        :param text: the text to set in the widget (String)
+        :param index: where to put the widget (Integer)
+    """
 
     widget = global_vars.statusbar_widgets[widget_name]
     if not widget:
@@ -2766,7 +2771,7 @@ def set_statusbar_widget(widget_name, text='', index=1):
 
 
 def set_workspace_label(json_result):
-    """ """
+    """ Sets the text of the status bar's label for workspace using :json_result: """
 
     if 'userValues' in json_result['body']['data']:
         user_values = json_result['body']['data']['userValues']

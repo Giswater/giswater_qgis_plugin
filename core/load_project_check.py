@@ -229,7 +229,10 @@ class GwLoadProjectCheck:
 
 
     def _manage_statusbar_widgets(self, result):
-        """  """
+        """
+        Create and set values for the statusbar widgets
+            :param result: looks the data in result['body']['data']['userValues']
+        """
 
         for key in global_vars.statusbar_widgets:
             if not global_vars.statusbar_widgets[key]:
