@@ -246,7 +246,7 @@ BEGIN
 				INSERT INTO selector_psector VALUES (v_psector_vdefault, current_user);
 				-- message to user 
 				v_channel = replace(current_user,'.','_');
-				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"type":"textWindow", "level":1, "text":"Current psector have been selected"}},
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"type":"textWindow", "level":0, "text":"Current psector have been selected"}},
 				{"name":"get_selector","parameters":{"tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');			
 				
 			END IF;
@@ -258,7 +258,7 @@ BEGIN
 		
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) THEN
-				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":1, "duration":10, "text":"Current psector have been selected"}},
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":0, "duration":10, "text":"Current psector have been selected"}},
 				{"name":"get_selector","parameters":{"current_tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 			END IF;
 
@@ -275,7 +275,7 @@ BEGIN
 				INSERT INTO selector_psector VALUES (v_psector_vdefault, current_user);	
 				-- message to user 
 				v_channel = replace(current_user,'.','_');
-				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":1, "duration":10, "text":"Current psector have been selected"}},
+				PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"show_message", "parameters":{"level":0, "duration":10, "text":"Current psector have been selected"}},
 				{"name":"get_selector","parameters":{"current_tab":"tab_psector"}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');		
 			END IF;
 
