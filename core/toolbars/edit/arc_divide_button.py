@@ -15,7 +15,7 @@ from qgis.gui import QgsVertexMarker
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis, tools_db
+from ....lib import tools_qt, tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 
@@ -225,7 +225,8 @@ class GwArcDivideButton(GwMaptool):
                 self.cancel_map_tool()
                 return
 
-            if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
+            log = tools_gw.get_config_parser("btn_arc_divide", "disable_showlog", 'user', 'session')
+            if not tools_os.set_boolean(log, False):
                 self.dlg_dtext = GwDialogTextUi('arc_divide')
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
                 tools_gw.open_dialog(self.dlg_dtext)
@@ -297,12 +298,15 @@ class GwArcDivideButton(GwMaptool):
         node_id = self.snapped_feat.attribute('node_id')
 
         # Move selected node to the released point
-        # Show message before executing
-        message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
-                   "Please ensure that features has no undelete value on true.\n"
-                   "On the other hand you must know that traceability table will storage precedent information.")
-        title = "Info"
-        answer = tools_qt.show_question(message, title)
+        answer = True
+        ask = tools_gw.get_config_parser("btn_arc_divide", "disable_prev_warning", 'user', 'session')
+        if not tools_os.set_boolean(ask, False):
+            # Show message before executing
+            message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
+                       "Please ensure that features has no undelete value on true.\n"
+                       "On the other hand you must know that traceability table will storage precedent information.")
+            title = "Info"
+            answer = tools_qt.show_question(message, title)
         if answer:
             self._move_node(node_id, point)
             tools_qgis.set_layer_index('v_edit_arc')
