@@ -515,7 +515,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     if not layer_name:
                         aux_layer_name = data[k]['layerName']
                 except KeyError:
-                    aux_layer_name = 'Temporal layer'
+                    aux_layer_name = str(k)
                 if del_old_layers:
                     tools_qgis.remove_layer_from_toc(aux_layer_name, group)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
