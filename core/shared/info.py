@@ -178,7 +178,10 @@ class GwInfo(QObject):
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
-            tools_qgis.show_message(json_result['message']['text'], level)
+            msg = f"Execution of {function_name} failed."
+            if 'text' in json_result['message']:
+                msg = json_result['message']['text']
+            tools_qgis.show_message(msg, level)
             return False, None
 
         self.complet_result = json_result
