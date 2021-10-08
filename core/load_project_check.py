@@ -237,17 +237,18 @@ class GwLoadProjectCheck:
                 global_vars.iface.mainWindow().statusBar().addPermanentWidget(widget)
                 global_vars.statusbar_widgets[key] = widget
 
-        for user_value in result['body']['data']['userValues']:
-            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
-                # Set current_psector lbl
-                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    tools_gw.set_statusbar_widget("current_psector", f"<b>Psector:</b> {row[0]}", index=1)
-            elif user_value['parameter'] == 'utils_workspace_vdefault'and user_value['value']:
-                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
-                row = tools_db.get_row(sql, log_info=False)
-                if row:
-                    tools_gw.set_statusbar_widget("current_workspace", f"<b>Workspace:</b> {row[0]}", index=2)
+        if 'userValues' in json_result['body']['data']:
+            for user_value in result['body']['data']['userValues']:
+                if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+                    # Set current_psector lbl
+                    sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
+                    row = tools_db.get_row(sql, log_info=False)
+                    if row:
+                        tools_gw.set_statusbar_widget("current_psector", f"<b>Psector:</b> {row[0]}", index=1)
+                elif user_value['parameter'] == 'utils_workspace_vdefault'and user_value['value']:
+                    sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
+                    row = tools_db.get_row(sql, log_info=False)
+                    if row:
+                        tools_gw.set_statusbar_widget("current_workspace", f"<b>Workspace:</b> {row[0]}", index=2)
 
     # endregion

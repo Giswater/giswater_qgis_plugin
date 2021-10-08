@@ -2766,16 +2766,19 @@ def set_statusbar_widget(widget_name, text='', index=1):
 
 
 def set_workspace_label(json_result):
-    user_values = json_result['body']['data']['userValues']
-    if user_values:
-        for value in user_values:
-            if value['parameter'] == 'utils_workspace_vdefault':
-                text = value['value']
-                if value['value']:
-                    sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
-                    row = tools_db.get_row(sql, log_info=False)
-                    text = f"<b>Workspace:</b> {row[0]}"
-                set_statusbar_widget('current_workspace', text, index=2)
+    """ """
+
+    if 'userValues' in json_result['body']['data']:
+        user_values = json_result['body']['data']['userValues']
+        if user_values:
+            for value in user_values:
+                if value['parameter'] == 'utils_workspace_vdefault':
+                    text = value['value']
+                    if value['value']:
+                        sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
+                        row = tools_db.get_row(sql, log_info=False)
+                        text = f"<b>Workspace:</b> {row[0]}"
+                    set_statusbar_widget('current_workspace', text, index=2)
 
 
 def create_sqlite_conn(file_name):
