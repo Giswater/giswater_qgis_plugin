@@ -47,5 +47,5 @@ ON CONFLICT (id) DO UPDATE SET function_name = 'gw_fct_man2inp_values', project_
 
 UPDATE config_param_system SET value= '{"setArcObsolete":"false","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
 
-INSERT INTO SCHEMA_NAME.sys_fprocess VALUES (402, 'Check if node_id and arc_id defined on CONTROLS/RULES exists)', 'utils')
+INSERT INTO sys_fprocess VALUES (402, 'Check if node_id and arc_id defined on CONTROLS/RULES exists)', 'utils')
 ON CONFLICT (fid) DO NOTHING;

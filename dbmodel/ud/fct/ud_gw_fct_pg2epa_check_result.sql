@@ -29,6 +29,8 @@ SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
 */
 
 DECLARE
+
+i integer = 0;
 v_fid integer;
 v_record record;
 v_project_type text;
@@ -437,7 +439,53 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes has y0 lower than ymax.'));
 	END IF;
+
 	
+	RAISE NOTICE '5 - Check if node_id and arc_id defined on CONTROLS exists (402)';
+
+	-- nodes
+	FOR object_rec IN SELECT json_array_elements_text('["NODE"]'::json) as tabname
+	LOOP
+		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_node b USING (node_id)
+		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			i = i+1;
+			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with ',lower(object_rec.tabname),' not present on this result. Controls id''s:',v_querytext));
+		END IF;
+	END LOOP;
+
+	IF v_count = 0 AND i = 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct node id values.'));
+	END IF;
+
+	-- links
+	FOR object_rec IN SELECT json_array_elements_text('["LINK", "PUMP", "ORIFICE", "WEIR"]'::json) as tabname
+	LOOP
+		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_arc b USING (arc_id)
+		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL OR a.sector_id::text != b.sector_id::text) a';
+	
+		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			i = i+1;
+			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with ',lower(object_rec.tabname),' not present on this result. Controls id''s:',v_querytext));
+		END IF;
+	END LOOP;
+
+	IF v_count = 0 AND i = 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
+	END IF;
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');

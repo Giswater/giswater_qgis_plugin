@@ -15,8 +15,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
-SELECT gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
 	other: 188,107,111,113,187,294,295
@@ -226,30 +226,31 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '8 - Null elevation control (fid: 164)';
-	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE sys_elev IS NULL AND cur_user = current_user;
-	
+	RAISE NOTICE '8 - Null sys elevation control (fid: 164, 284)';
+	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE epa_type !='UNDEFINED' AND sys_elev IS NULL AND cur_user = current_user;
+
+	--arcs without sys elevation (164)
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom)
-		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node WHERE top_elev IS NULL;
+		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) 
+		WHERE epa_type !='UNDEFINED' AND sys_elev IS NULL AND cur_user = current_user;
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164: There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164: There is/are ',v_count,' EPA node(s) without sys_elevation values.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '164', 'INFO: No nodes with null values on field elevation have been found.',v_count);
 	END IF;
-	--arcs without elevation (284)
+	--arcs without sys elevation (284)
 	SELECT count(*) INTO v_count FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
 	IF v_count > 0 THEN
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom)
-		SELECT 64, node_id, nodecat_id, the_geom FROM v_edit_node WHERE result_id=v_result_id AND elevation IS NULL;
+		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom)
+		SELECT 284, arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284: There is/are ',v_count,' arc(s) without elevation. Take a look on temporal table for details.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284: There is/are ',v_count,' arc(s) without values on sys_elev1 or sys_elev2.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '284', 'INFO: No arcs with null values on field elevation have been found.',v_count);
+		VALUES (v_fid, v_result_id, 1, '284', 'INFO: No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.',v_count);
 	END IF;
-
 		
 	RAISE NOTICE '9- Raingage data (285)';
 	SELECT count(*) INTO v_count FROM v_edit_raingage where (form_type is null) OR (intvl is null) OR (rgage_type is null);
@@ -334,8 +335,10 @@ BEGIN
 
 
 	RAISE NOTICE '12 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc)a 
-		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) WHERE n.node_id IS NOT NULL';
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc UNION SELECT node_2, sector_id FROM v_edit_arc)a 
+		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
+		       JOIN selector_sector USING (sector_id) 
+		       WHERE n.node_id IS NOT NULL AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
@@ -418,7 +421,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 187, 294, 381, 382)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 164, 187, 294, 381, 382)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
@@ -433,7 +436,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 295)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
