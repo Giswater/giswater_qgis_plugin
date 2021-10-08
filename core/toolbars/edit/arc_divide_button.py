@@ -31,8 +31,8 @@ class GwArcDivideButton(GwMaptool):
         if toolbar is not None:
             toolbar.removeAction(self.action)
 
-        # selected_action = 1: WITH MOVEMENT
-        # selected_action = 2: WITHOUT MOVEMENT
+        # selected_action = 1: DRAG-DROP
+        # selected_action = 2: STATIC
         self.selected_action = 1
         self.menu = QMenu()
         self.menu.setObjectName("GW_replace_menu")
@@ -125,7 +125,7 @@ class GwArcDivideButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['WITH', 'WITHOUT']
+        actions = ['DRAG-DROP', 'STATIC']
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -136,7 +136,7 @@ class GwArcDivideButton(GwMaptool):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        if name == "WITH":
+        if name == "DRAG-DROP":
             self.selected_action = 1
         else:
             self.selected_action = 2
@@ -154,7 +154,7 @@ class GwArcDivideButton(GwMaptool):
         if self.snapped_feat is None:
             self._move_event_snap_to_node(event_point, x, y)
 
-        # Second step: After a node is selected -> Snap to arc (only action "WITH")
+        # Second step: After a node is selected -> Snap to arc (only action "DRAG-DROP")
         else:
             if self.selected_action == 1:
                 self._move_event_snap_to_arc(event_point, x, y)
@@ -249,7 +249,12 @@ class GwArcDivideButton(GwMaptool):
         if self.snapped_feat is None:
             self._release_event_snap_to_node(event_point)
             if self.selected_action == 2:
-                answer = self._release_event_snap_to_arc(event_point)
+                is_valid, answer = self._release_event_snap_to_arc(event_point)
+                if not is_valid:
+                    msg = "Current node is not located over an arc. Please, select option 'DRAG-DROP'"
+                    tools_qgis.show_info(msg)
+                    self.cancel_map_tool()
+                    return
                 if not answer:
                     self.cancel_map_tool()
 
@@ -282,7 +287,7 @@ class GwArcDivideButton(GwMaptool):
 
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
-            return False
+            return False, False
 
         layer = self.snapper_manager.get_snapped_layer(result)
         point = self.snapper_manager.get_snapped_point(result)
@@ -305,6 +310,6 @@ class GwArcDivideButton(GwMaptool):
             tools_qgis.set_layer_index('v_edit_gully')
             tools_qgis.set_layer_index('v_edit_node')
 
-        return answer
+        return True, answer
 
     # endregion
