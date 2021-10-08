@@ -2821,7 +2821,9 @@ def user_params_to_userconfig():
             # Manage if parameter need prefix and project_type is not defined
             if parameter.startswith("_") and global_vars.project_type is None:
                 continue
-
+            if parameter.startswith("#"):
+                continue
+                
             _pre = False
             inv_param = parameter
             # If it needs a prefix

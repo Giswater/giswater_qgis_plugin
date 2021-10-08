@@ -68,7 +68,6 @@ class GwMenuLoad(QObject):
                 if index_action in project_exclusive:
                     continue
 
-                icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
                 button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
