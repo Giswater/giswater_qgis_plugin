@@ -1650,7 +1650,7 @@ class GwPsector:
         if not row:
             return
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
-        tools_gw.set_statusbar_widget("current_psector", f"<b>GW psector:</b> {row[0]}", index=1)
+        tools_gw.set_statusbar_widget("current_psector", f"<b>Psector:</b> {row[0]}", index=1)
 
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):

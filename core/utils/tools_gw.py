@@ -2774,7 +2774,7 @@ def set_workspace_label(json_result):
                 if value['value']:
                     sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
                     row = tools_db.get_row(sql, log_info=False)
-                    text = f"<b>GW workspace:</b> {row[0]}"
+                    text = f"<b>Workspace:</b> {row[0]}"
                 set_statusbar_widget('current_workspace', text, index=2)
 
 
