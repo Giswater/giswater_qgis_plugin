@@ -43,3 +43,9 @@ WHERE polygon.pol_id=element.pol_id;
 
 INSERT INTO sys_function VALUES (3032, 'gw_fct_man2inp_values', 'utils', 'function', 'json')
 ON CONFLICT (id) DO UPDATE SET function_name = 'gw_fct_man2inp_values', project_type ='utils', function_type='function', input_params='json', return_type=null;
+
+
+UPDATE config_param_system SET value= '{"setArcObsolete":"false","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
+
+INSERT INTO SCHEMA_NAME.sys_fprocess VALUES (402, 'Check if node_id and arc_id defined on CONTROLS/RULES exists)', 'utils')
+ON CONFLICT (fid) DO NOTHING;
