@@ -21,17 +21,17 @@ INSERT INTO sys_fprocess VALUES (399, 'Copy EPA DWF values)', 'ud') ON CONFLICT 
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES ('3100', 'gw_fct_manage_hydrology_values', 'ud', 'function','json', 'json', 
-'Function to manage values of defined target dwf catalog (delete it or copy from other one). It works with all ojects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater', 'role_epa', NULL) 
+'Function to manage values of defined target dwf catalog (delete or copy from another one). It works with all ojects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater', 'role_epa', NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES ('3102', 'gw_fct_manage_dwf_values', 'ud', 'function','json', 'json', 
-'Function to manage values of defined target dwf catalog (delete it or copy from other one). It works with dwf table', 'role_epa', NULL) 
+'Function to manage values of defined target dwf catalog (insert, delete or copy from another one). It works with dwf table', 'role_epa', NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3100,'Manage Hydrology values (Subcatchment & others)', '{"featureType":[]}', 
-'[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
+VALUES (3100,'Manage Hydrology values', '{"featureType":[]}', 
+'[{"widgetname":"target", "label":"Target Scenario::", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
   {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userSector"},
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE & COPY", "KEEP & COPY", "ONLY DELETE"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"DELETE-ONLY"},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":4, "selectedId":"$userHydrology"}
@@ -40,7 +40,7 @@ VALUES (3100,'Manage Hydrology values (Subcatchment & others)', '{"featureType":
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3102,'Mange Dwf values', '{"featureType":[]}', 
+VALUES (3102,'Manage Dwf values', '{"featureType":[]}', 
 '[
   {"widgetname":"target", "label":"Target Scenario:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf_scenario c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":"$userDwf"},
   {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userSector"},

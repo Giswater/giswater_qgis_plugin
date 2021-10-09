@@ -39,6 +39,7 @@ v_action text;
 v_querytext text;
 v_sector integer;
 v_result_id text = null;
+v_sector_name text;
 
 BEGIN
 
@@ -56,30 +57,46 @@ BEGIN
 	-- getting scenario name
 	v_source_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_copyfrom);
 	v_target_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_target);
+	v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE HYDROLOGY VALUES FROM ', v_source_name, ' TO ', v_target_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '---------------------------------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE HYDROLOGY VALUES'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------------------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Target scenario: ',v_target_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Action: ',v_action));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Sector: ',v_sector_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from scenario: ',v_source_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
  
 	-- check controlmethod
 	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 4, concat('Process has failed.'));
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
+
 		
-	ELSIF v_copyfrom = v_target THEN
+	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 4, concat('Process has failed.'));	
-
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: (',v_source_name,') and (', v_target_name,') have same infiltration method.'));
+		VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have same infiltration method.'));
 
 		FOR object_rec IN SELECT json_array_elements_text('["subcatchment", "lid_usage", "loadings_pol_x_subc", "groundwater", "coverage_land_x_subc"]'::json) as table,
 		json_array_elements_text('["subc_id", "subc_id, lidco_id", "subc_id, poll_id", "subc_id", "subc_id, landus_id"]'::json) as pk,
@@ -99,7 +116,7 @@ BEGIN
 				GET DIAGNOSTICS v_count = row_count;
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
 				END IF;
 			END IF;
 				
@@ -138,14 +155,22 @@ BEGIN
 				
 			ELSIF v_action = 'DELETE-ONLY' THEN
 
-				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
+				IF object_rec.table = 'subcatchment' THEN
+					IF (SELECT count(*) FROM (SELECT DISTINCT (hydrology_id) FROM v_edit_inp_subcatchment)a) = 1 AND
+						(SELECT DISTINCT (hydrology_id) FROM v_edit_inp_subcatchment LIMIT 1) = v_target THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('WARNING: Delete have been disabled because it is the unique hydrology scenario enabled for current subcatchment.'));
+						
+					 ELSE
+						EXECUTE 'DELETE FROM v_edit_inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
 
-				-- get message
-				GET DIAGNOSTICS v_count = row_count;
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+						-- get message
+						GET DIAGNOSTICS v_count = row_count;
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					END IF;
 				END IF;
+
 			END IF;
 		END LOOP;		
 
@@ -153,11 +178,15 @@ BEGIN
 		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user;
 
 	END IF;
+
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
 	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

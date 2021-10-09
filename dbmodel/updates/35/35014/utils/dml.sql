@@ -18,6 +18,7 @@ WHERE parameter = 'basic_selector_tab_psector';
 
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'queryfilter') WHERE parameter = 'basic_selector_tab_psector';
 
+DELETE FROM sys_function WHERE id = 3042;
 INSERT INTO sys_function VALUES (3042, 'gw_fct_manage_dscenario_values', 'utils', 'function', 'json', 'json', 'Function to manage values of one dscenario catalog (delete or copy from another one)', 'role_epa') 
 ON CONFLICT (id) DO NOTHING;
 
@@ -25,7 +26,7 @@ INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, activ
 VALUES (3042,'Manage Dscenario values', '{"featureType":[]}', 
 '[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE & COPY", "KEEP & COPY", "ONLY DELETE"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"DELETE-COPY"},
-  {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userDscenario"},
+  {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userDscenario"}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 

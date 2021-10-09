@@ -42,11 +42,11 @@ v_action text;
 v_querytext text;
 v_sector integer;
 v_result_id text = null;
-
+v_sector_name text;
 
 BEGIN
 
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_sample", public;
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -58,22 +58,36 @@ BEGIN
 	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
 	
 	-- getting scenario name
-	v_source_name := (SELECT name FROM cat_dwf_scenario WHERE dwfscenario_id = v_copyfrom);
-	v_target_name := (SELECT name FROM cat_dwf_scenario WHERE dwfscenario_id = v_target);
+	v_source_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_copyfrom);
+	v_target_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_target);
+	v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE DWF VALUES FROM ', v_source_name, ' TO ', v_target_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '---------------------------------------------------------------------------------------');
-    
-	IF v_copyfrom = v_target THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 4, concat('Process has failed.'));	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE DWF VALUES'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Target scenario: ',v_target_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Action: ',v_action));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Sector: ',v_sector_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from scenario: ',v_source_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+    
+	IF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));	
 	ELSE
 		FOR object_rec IN SELECT json_array_elements_text('["dwf"]'::json) as table,
 					json_array_elements_text('["node_id"]'::json) as pk,
@@ -88,7 +102,7 @@ BEGIN
 				GET DIAGNOSTICS v_count = row_count;
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
 				END IF;
 			END IF;
 				
@@ -135,12 +149,8 @@ BEGIN
 
 				-- get message
 				GET DIAGNOSTICS v_count = row_count;
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
-				END IF;
-			
-				
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted into inp_dwf table from v_edit_inp_junction table.'));
 			END IF;
 		END LOOP;		
 
@@ -148,11 +158,15 @@ BEGIN
 		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user;
 
 	END IF;	
+
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
 		
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
