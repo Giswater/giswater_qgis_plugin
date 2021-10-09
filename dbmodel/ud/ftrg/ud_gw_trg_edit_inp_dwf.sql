@@ -26,13 +26,15 @@ BEGIN
    	
 		UPDATE inp_dwf 
 		SET node_id=NEW.node_id, value=NEW.value, pat1=NEW.pat1, pat2=NEW.pat2, pat3=NEW.pat3, pat4=NEW.pat4, dwfscenario_id = NEW.dwfscenario_id
-		WHERE id=NEW.id;
+		WHERE node_id=OLD.node_id AND dwfscenario_id = OLD.dwfscenario_id;
 		
 		RETURN NEW;
 		
     ELSIF TG_OP = 'DELETE' THEN  
 	 
-		DELETE FROM inp_dwf WHERE id = OLD.id;		
+		DELETE FROM inp_dwf
+		WHERE node_id=OLD.node_id AND dwfscenario_id = OLD.dwfscenario_id;
+		
 		RETURN NULL;
      
 	END IF;

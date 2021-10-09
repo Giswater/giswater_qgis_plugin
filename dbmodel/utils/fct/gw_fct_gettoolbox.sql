@@ -61,9 +61,10 @@ v_debug json;
 v_msgerr json;
 v_value text;
 v_reports_fields json;
-v_inp_hydrology integer;
-v_inp_dwf integer;
-v_inp_dscenario integer;
+v_inp_hydrology text;
+v_inp_dwf text;
+v_inp_dscenario text;
+v_sector text;
 
 BEGIN
 
@@ -105,6 +106,8 @@ BEGIN
 	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user limit 1);
 	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
 	v_inp_dscenario = (SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user limit 1);
+	v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0 limit 1 );
+
 
 	IF v_projectype = 'ws' THEN
 		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
@@ -217,6 +220,7 @@ BEGIN
 		v_querytext = rec.inputparams::json->>'dvQueryText';
 
 		v_value =  rec.inputparams::json->>'value';
+
 		IF v_querytext IS NOT NULL THEN
 
 			IF v_querytext ilike '%$userNodetype%' THEN
@@ -226,12 +230,11 @@ BEGIN
 			END IF;
 		
 			v_selectedid = rec.inputparams::json->>'selectedId';
+
 			v_querytext = concat('SELECT array_agg(id::text) FROM (',v_querytext_mod,')a');
 			v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
 			v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 60);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
-			RAISE NOTICE 'v_querytext %', v_querytext;
 	 
 			EXECUTE v_querytext INTO v_arrayresult;
 	
@@ -249,6 +252,8 @@ BEGIN
 					v_selectedid = concat('"selectedId":"',v_expl,'"');
 				ELSIF v_selectedid = '$userState' THEN
 					v_selectedid = concat('"selectedId":"',v_state,'"');
+				ELSIF v_selectedid = '$userSector' THEN
+					v_selectedid = concat('"selectedId":"',v_sector,'"');
 				ELSIF v_selectedid = '$userHydrology' THEN
 					v_selectedid = concat('"selectedId":"',v_inp_hydrology,'"');
 				ELSIF v_selectedid = '$userDwf' THEN
@@ -315,13 +320,6 @@ BEGIN
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
 	v_reports_fields := COALESCE(v_reports_fields, '[]');
 
-	v_expl := COALESCE(v_expl, '');
-	v_state := COALESCE(v_state, '');
-	v_inp_result := COALESCE(v_inp_result, '');
-	v_rpt_result := COALESCE(v_rpt_result, '');
-	v_nodetype := COALESCE(v_nodetype, '');
-	v_nodecat := COALESCE(v_nodecat, '');
-
 	-- make return
 	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
@@ -332,20 +330,13 @@ BEGIN
 						 ' , "admin":' || v_admin_fields ||'}}'||
 				', "reports":{"fields":{"edit":'||v_reports_fields||'}}}}}';
 
-	-- manage variables ($)
-	v_return = REPLACE (v_return::text, '$userExploitation', v_expl);
-	v_return = REPLACE (v_return::text, '$userState', v_state);
-	v_return = REPLACE (v_return::text, '$userInpResult', v_inp_result);
-	v_return = REPLACE (v_return::text, '$userRptResult', v_rpt_result);
-	v_return = REPLACE (v_return::text, '$userNodetype', v_nodetype);
-	v_return = REPLACE (v_return::text, '$userNodecat', v_nodecat);
-
+	
 	RETURN v_return;
        
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

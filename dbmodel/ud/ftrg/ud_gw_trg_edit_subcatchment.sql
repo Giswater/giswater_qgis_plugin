@@ -56,12 +56,12 @@ BEGIN
 		simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted, maxrate=NEW.maxrate, minrate=NEW.minrate, decay=NEW.decay, drytime=NEW.drytime, maxinfil=NEW.maxinfil, suction=NEW.suction, 
 		conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom,
 		descript = NEW.descript
-		WHERE subc_id = OLD.subc_id;
+		WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
                 
 		RETURN NEW;
    
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM inp_subcatchment WHERE subc_id = OLD.subc_id;
+		DELETE FROM inp_subcatchment WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
 
 		RETURN NULL;
    

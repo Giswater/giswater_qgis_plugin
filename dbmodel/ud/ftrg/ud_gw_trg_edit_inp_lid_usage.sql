@@ -17,28 +17,24 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-    -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
     
-		-- FEATURE INSERT
-		INSERT INTO inp_lid_usage (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv,rptfile, descript) 
-		VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript);
+		INSERT INTO inp_lid_usage (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv,rptfile, descript, hydrology_id) 
+		VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript, NEW.hydrology_id);
 		
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-    
-		-- UPDATE values
 		
 		UPDATE inp_lid_usage 
 		SET subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, "number"=NEW."number", area=NEW.area, width=NEW.width, initsat=NEW.initsat, fromimp=NEW.fromimp,
-		toperv=NEW.toperv, rptfile=NEW.rptfile, descript=NEW.descript
-		WHERE subc_id = OLD.subc_id;
+		toperv=NEW.toperv, rptfile=NEW.rptfile, descript=NEW.descript, hydrology_id = NEW.hydrology_id
+		WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
                 
 		RETURN NEW;
    
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM inp_lid_usage WHERE subc_id = OLD.subc_id;
+		DELETE FROM inp_lid_usage WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
 
 		RETURN NULL;
    

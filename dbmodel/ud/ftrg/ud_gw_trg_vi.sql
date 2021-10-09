@@ -73,8 +73,8 @@ BEGIN
 			VALUES (NEW.aquif_id, NEW.por, NEW.wp, NEW.fc, NEW.k, NEW.ks, NEW.ps, NEW.uef, NEW.led, NEW.gwr, NEW.be, NEW.wte, NEW.umc, NEW.pattern_id);
 			
 		ELSIF v_view='vi_groundwater' THEN
-			INSERT INTO inp_groundwater (subc_id, aquif_id, node_id, surfel, a1, b1, a2, b2, a3, tw, h) 
-			VALUES (NEW.subc_id, NEW.aquif_id, NEW.node_id, NEW.surfel, NEW.a1, NEW.b1, NEW.a2, NEW.b2, NEW.a3, NEW.tw, NEW.h);
+			INSERT INTO inp_groundwater (subc_id, aquif_id, node_id, surfel, a1, b1, a2, b2, a3, tw, h, hydrology_id) 
+			VALUES (NEW.subc_id, NEW.aquif_id, NEW.node_id, NEW.surfel, NEW.a1, NEW.b1, NEW.a2, NEW.b2, NEW.a3, NEW.tw, NEW.h, 1);
 			
 		ELSIF v_view='vi_snowpacks' THEN
 			INSERT INTO inp_snowpack (snow_id, snow_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7)
@@ -218,9 +218,9 @@ BEGIN
 			INSERT INTO inp_landuses (landus_id, sweepint, availab, lastsweep) VALUES (NEW.landus_id, NEW.sweepint, NEW.availab, NEW.lastsweep);
 			
 		ELSIF v_view='vi_coverages' THEN 
-			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent);
+			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
 			
-			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id) ON CONFLICT  (landus_id) DO NOTHING;
+			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id, hydrology_id) ON CONFLICT  (landus_id, 1) DO NOTHING;
 
 		ELSIF v_view='vi_buildup' THEN
 			INSERT INTO inp_buildup_land_x_pol(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
@@ -235,7 +235,7 @@ BEGIN
 			
 		ELSIF v_view='vi_dwf' THEN
 			INSERT INTO inp_dwf(node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
-			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4,1);
+			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4, 1);
 			
 		ELSIF v_view='vi_patterns' THEN
 	
@@ -262,7 +262,7 @@ BEGIN
 			END IF;	
 			
 		ELSIF v_view='vi_loadings' THEN
-			INSERT INTO inp_loadings_pol_x_subc (subc_id, poll_id, ibuildup) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup);
+			INSERT INTO inp_loadings_pol_x_subc (subc_id, poll_id, ibuildup, hydrology_id) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup, 1);
 			
 		ELSIF v_view='vi_rdii' THEN
 			INSERT INTO inp_rdii(node_id, hydro_id, sewerarea) VALUES (NEW.node_id, NEW.hydro_id, NEW.sewerarea);
@@ -310,7 +310,7 @@ BEGIN
 			
 		ELSIF v_view='vi_lid_usage' THEN
 			INSERT INTO inp_lidusage_subc_x_lidco (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv, rptfile, hydrology_id) 
-			VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.hydrology_id);
+			VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, 1);
 			
 		ELSIF v_view='vi_adjustments' THEN
 			INSERT INTO inp_adjustments (adj_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7, value_8, value_9, value_10, value_11, value_12)

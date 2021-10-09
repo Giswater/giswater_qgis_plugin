@@ -22,26 +22,30 @@ INSERT INTO sys_fprocess VALUES (398, 'Copy EPA hydrology values)', 'ud') ON CON
 INSERT INTO sys_fprocess VALUES (399, 'Copy EPA DWF values)', 'ud') ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3100', 'gw_fct_copy_hydrology_values', 'ud', 'function','json', 'json', 
-'Function to copy values from one hydrology catalog to other one', 'role_epa', NULL) 
+VALUES ('3100', 'gw_fct_manage_hydrology_values', 'ud', 'function','json', 'json', 
+'Function to manage values of defined target dwf catalog (delete it or copy from other one). It works with all ojects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater', 'role_epa', NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3102', 'gw_fct_copy_dwf_values', 'ud', 'function','json', 'json', 
-'Function to copy values from one dwf catalog to other one', 'role_epa', NULL) 
+VALUES ('3102', 'gw_fct_manage_hydrology_values', 'ud', 'function','json', 'json', 
+'Function to manage values of defined target dwf catalog (delete it or copy from other one). It works with dwf table', 'role_epa', NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3100,'Copy hydrology values', '{"featureType":[]}', 
-'[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology JOIN v_edit_inp_subcatchment USING (hydrology_id) WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
-  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology JOIN v_edit_inp_subcatchment USING (hydrology_id) WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":2, "selectedId":"$userHydrology"}
+VALUES (3100,'Manage Hydrology values (Subcatchment & others)', '{"featureType":[]}', 
+'[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
+  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":2, "selectedId":"$userHydrology"},
+  {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userSector"},
+  {"widgetname":"currentValues", "label":"Current values on target:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE", "KEEP", "DELONLY"], "comboNames":["DELETE & INSERT", "KEEP & INSERT", "ONLY DELETE"], "layoutname":"grl_option_parameters","layoutorder":4, "selectedId":"DELETE"}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3102,'Copy DWF values', '{"featureType":[]}', 
-'[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT d.id, idval FROM cat_dwf_scenario c JOIN v_edit_inp_dwf d ON dwfscenario_id = d.id WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
-  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT d.id, idval FROM cat_dwf_scenario c JOIN v_edit_inp_dwf d ON dwfscenario_id = d.id WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userDwf"}
+VALUES (3102,'Mange Dwf values', '{"featureType":[]}', 
+'[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf_scenario c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
+  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf_scenario c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userDwf"},
+  {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userSector"},
+  {"widgetname":"currentValues", "label":"Current values on target:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE", "KEEP", "DELONLY"], "comboNames":["DELETE & INSERT", "KEEP & INSERT", "ONLY DELETE"], "layoutname":"grl_option_parameters","layoutorder":4, "selectedId":"DELETE"}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
@@ -58,3 +62,20 @@ INSERT INTO config_param_system (parameter, value, descript, standardvalue, isen
 '{"status":false}'
 , FALSE, 'ws')
 ON CONFLICT (parameter) DO NOTHING;
+
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_lid_usage','form_feature', 'main', 'hydrology_id',null,null,'string', 'combo','hydrology_id','Hydrology identifier', false,
+false, true, false, false, 'SELECT DISTINCT (hydrology_id) AS id,  name  AS idval FROM cat_hydrology WHERE hydrology_id IS NOT NULL',true,
+null, null, null, null,null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+-- update 
+UPDATE inp_lid_usage SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
+UPDATE inp_loadings_pol_x_subc SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
+UPDATE inp_groundwater SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
+UPDATE inp_coverage_land_x_subc SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
+UPDATE inp_subcatchment SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND hydrology_id IS NULL; 
