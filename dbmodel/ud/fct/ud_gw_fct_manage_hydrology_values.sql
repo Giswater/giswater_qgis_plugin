@@ -11,7 +11,10 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"source":"1", "target":"2", "sector":"1", "currentValues":"DELETE"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"DELETE-COPY"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"KEEP-COPY"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"DEKETE-ONLY"}}}$$);
+
 -- fid: 398
 
 */
@@ -23,8 +26,8 @@ object_rec record;
 v_version text;
 v_result json;
 v_result_info json;
-v_source_id integer;
-v_target_id integer;
+v_copyfrom integer;
+v_target integer;
 v_error_context text;
 v_count integer;
 v_count2 integer;
@@ -32,7 +35,7 @@ v_projecttype text;
 v_fid integer = 398;
 v_source_name text;
 v_target_name text;
-v_current_values text;
+v_action text;
 v_querytext text;
 v_sector integer;
 v_result_id text = null;
@@ -45,14 +48,14 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- getting input data 	
-	v_source_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'source';
-	v_target_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
+	v_copyfrom :=  ((p_data ->>'data')::json->>'parameters')::json->>'source';
+	v_target :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
 	v_sector :=  ((p_data ->>'data')::json->>'parameters')::json->>'sector';
-	v_current_values :=  ((p_data ->>'data')::json->>'parameters')::json->>'currentValues';
+	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
 	
 	-- getting scenario name
-	v_source_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_source_id);
-	v_target_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_target_id);
+	v_source_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_copyfrom);
+	v_target_name := (SELECT name FROM cat_hydrology WHERE hydrology_id = v_target);
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
@@ -62,13 +65,13 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '---------------------------------------------------------------------------------------');
  
 	-- check controlmethod
-	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_source_id) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target_id) THEN
+	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 4, concat('Process has failed.'));
 		
-	ELSIF v_source_id = v_target_id THEN
+	ELSIF v_copyfrom = v_target THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -88,9 +91,9 @@ BEGIN
 		"subc_id, landus_id, t.percent"]'::json) as column
 		
 		LOOP
-			IF v_current_values = 'DELETE' THEN
+			IF v_action = 'DELETE-COPY' THEN
 
-				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target_id;
+				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
 
 				-- get message
 				GET DIAGNOSTICS v_count = row_count;
@@ -100,10 +103,10 @@ BEGIN
 				END IF;
 			END IF;
 				
-			IF v_current_values = 'KEEP' OR  v_current_values = 'DELETE' THEN
+			IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
 
 				-- get message
-				EXECUTE 'SELECT count(*) FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target_id INTO v_count;
+				EXECUTE 'SELECT count(*) FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target INTO v_count;
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_',object_rec.table,' table.'));
@@ -111,13 +114,13 @@ BEGIN
 
 				IF object_rec.table = 'subcatchment' THEN
 
-					v_querytext = 'INSERT INTO inp_subcatchment SELECT '||object_rec.column||', '||v_target_id||',the_geom, descript FROM inp_subcatchment WHERE hydrology_id = '||v_source_id||' AND sector_id = '||v_sector||
+					v_querytext = 'INSERT INTO inp_subcatchment SELECT '||object_rec.column||', '||v_target||',the_geom, descript FROM inp_subcatchment WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 					' ON CONFLICT (hydrology_id, subc_id) DO NOTHING';
-					RAISE NOTICE 'v_querytext % % % % %', v_querytext, v_target_id,object_rec, v_source_id,v_sector ;
+					RAISE NOTICE 'v_querytext % % % % %', v_querytext, v_target,object_rec, v_copyfrom,v_sector ;
 					EXECUTE v_querytext;	
 				ELSE
-					v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target_id||' FROM inp_'||object_rec.table||' t JOIN inp_subcatchment USING (subc_id, hydrology_id) 
-					WHERE hydrology_id = '||v_source_id||' AND sector_id = '||v_sector||
+					v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN inp_subcatchment USING (subc_id, hydrology_id) 
+					WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 					' ON CONFLICT (hydrology_id, '||object_rec.pk||') DO NOTHING';
 					RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;	
@@ -133,9 +136,9 @@ BEGIN
 					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_',object_rec.table,' table.'));
 				END IF;		
 				
-			ELSIF v_current_values = 'DELONLY' THEN
+			ELSIF v_action = 'DELETE-ONLY' THEN
 
-				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target_id;
+				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
 
 				-- get message
 				GET DIAGNOSTICS v_count = row_count;
@@ -147,10 +150,9 @@ BEGIN
 		END LOOP;		
 
 		-- set selector
-		UPDATE config_param_user SET value = v_target_id WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user;
+		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user;
 
 	END IF;
-	
 	
 	-- get results
 	-- info

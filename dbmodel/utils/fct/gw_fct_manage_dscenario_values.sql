@@ -11,8 +11,9 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"source":1, "target":2, "currentValues":"DELETE"}}}$$)
-SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"source":1, "target":2, "currentValues":"KEEP"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"DELETE-COPY"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"KEEP-COPY"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"DELETE-ONLY}}}$$)
 
 
 -- fid: 403
@@ -27,8 +28,8 @@ object_rec record;
 v_version text;
 v_result json;
 v_result_info json;
-v_source_id integer;
-v_target_id integer;
+v_copyfrom integer;
+v_target integer;
 v_error_context text;
 v_count integer;
 v_count2 integer;
@@ -36,7 +37,7 @@ v_projecttype text;
 v_fid integer = 403;
 v_source_name text;
 v_target_name text;
-v_current_values text;
+v_action text;
 v_querytext text;
 v_result_id text = null;
 
@@ -48,13 +49,13 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- getting input data 	
-	v_source_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'source';
-	v_target_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
-	v_current_values :=  ((p_data ->>'data')::json->>'parameters')::json->>'currentValues';
+	v_copyfrom :=  ((p_data ->>'data')::json->>'parameters')::json->>'copyFrom';
+	v_target :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
+	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
 	
 	-- getting scenario name
-	v_source_name := (SELECT name FROM cat_dscenario WHERE dscenario_id = v_source_id);
-	v_target_name := (SELECT name FROM cat_dscenario WHERE dscenario_id = v_target_id);
+	v_source_name := (SELECT name FROM cat_dscenario WHERE dscenario_id = v_copyfrom);
+	v_target_name := (SELECT name FROM cat_dscenario WHERE dscenario_id = v_target);
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
@@ -64,7 +65,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '---------------------------------------------------------------------------------------');
 
 	-- check dscenario type
-	IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_source_id) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target_id) THEN
+	IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_copyfrom) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target) THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 2, concat('WARNING-403: Dscenario type for (',v_source_name,') and (', v_target_name,') are not the same.'));
 	ELSE
@@ -72,7 +73,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: (',v_source_name,') and (', v_target_name,') have same dscenario_type.'));
 	END IF;
 
-	IF v_source_id = v_target_id THEN
+	IF v_copyfrom = v_target THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -88,8 +89,8 @@ BEGIN
 									   "node_id, y0, ysur, apond, outfallparam",
 									   "rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units"]'::json) as column
 			LOOP
-				IF v_current_values = 'DELETE' THEN
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id;
+				IF v_action = 'DELETE-COPY' THEN
+					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -99,16 +100,16 @@ BEGIN
 					END IF;
 				END IF;
 				
-				IF v_current_values = 'KEEP' OR  v_current_values = 'DELETE' THEN
+				IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
 
 					-- get message
-					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id INTO v_count;
+					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_dscenario_',object_rec.table,' table.'));
 					END IF;		
 
-					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target_id||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_source_id||
+					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 					'ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 					RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;	
@@ -123,9 +124,9 @@ BEGIN
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					END IF;
 						
-				ELSIF v_current_values = 'DELONLY' THEN
+				ELSIF v_action = 'DELETE-ONLY' THEN
 
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id;
+					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -144,9 +145,9 @@ BEGIN
 						 "node_id, pattern_id, head", "arc_id, minorloss, status, roughness, dint", "node_id, power, curve_id, speed, pattern, status", 
 						 "node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings"]'::json) as column
 			LOOP
-				IF v_current_values = 'DELETE' THEN
+				IF v_action = 'DELETE-COPY' THEN
 				
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id;
+					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -156,20 +157,20 @@ BEGIN
 					END IF;
 				END IF;
 
-				IF v_current_values = 'KEEP' OR  v_current_values = 'DELETE' THEN
+				IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
 
 					-- get message
-					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id INTO v_count;
+					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_dscenario_',object_rec.table,' table.'));
 					END IF;		
 
 					IF object_rec.table = 'demand' THEN -- it is not possible to parametrize due table structure (dscenario_id is not first column)
-						INSERT INTO inp_dscenario_demand SELECT feature_id, demand, pattern_id, demand_type, v_target_id, feature_type 
-						FROM inp_dscenario_demand WHERE dscenario_id = v_source_id ON CONFLICT (dscenario_id, feature_id) DO NOTHING;
+						INSERT INTO inp_dscenario_demand SELECT feature_id, demand, pattern_id, demand_type, v_target, feature_type 
+						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom ON CONFLICT (dscenario_id, feature_id) DO NOTHING;
 					ELSE
-						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target_id||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_source_id||
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						'ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 						RAISE NOTICE 'v_querytext %', v_querytext;
 						EXECUTE v_querytext;	
@@ -185,9 +186,9 @@ BEGIN
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					END IF;	
 
-				ELSIF v_current_values = 'DELONLY' THEN
+				ELSIF v_action = 'DELETE-ONLY' THEN
 
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target_id;
+					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -203,7 +204,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: Process done successfully.'));
 	
 		-- set selector
-		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_target_id, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
+		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_target, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
 
 	END IF;
 

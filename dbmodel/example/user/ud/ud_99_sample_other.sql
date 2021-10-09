@@ -16,10 +16,7 @@ INSERT INTO sys_function VALUES (2886, 'gw_fct_fill_om_tables','ud','function','
 UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2916;
 UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2886;
 
-
-INSERT INTO cat_dwf_scenario VALUES (1, 'scenario1', '2017-01-01', '2017-12-31');
-
-UPDATE inp_dwf SET dwfscenario_id=1;
+INSERT INTO inp_dwf (node_id, value, dwfscenario_id) SELECT node_id, 0.001, 1 FROM node WHERE state > 0;
 
 INSERT INTO cat_users VALUES ('user1','user1');
 INSERT INTO cat_users VALUES ('user2','user2');

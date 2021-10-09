@@ -52,8 +52,19 @@ ALTER TABLE inp_groundwater ADD CONSTRAINT inp_groundwater_pkey PRIMARY KEY(subc
 ALTER TABLE inp_coverage_land_x_subc DROP CONSTRAINT inp_coverage_land_x_subc_pkey;
 ALTER TABLE inp_coverage_land_x_subc ADD CONSTRAINT inp_coverage_land_x_subc_pkey PRIMARY KEY(subc_id, landus_id, hydrology_id);
 
-ALTER TABLE inp_dwf DROP CONSTRAINT inp_dwf_pkey;
+INSERT INTO cat_dwf_scenario VALUES (1, 'Default values') ON CONFLICT (id) DO NOTHING;
+
+UPDATE inp_dwf SET dwfscenario_id = 1 WHERE dwfscenario_id IS NULL;
+
+ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pkey;
 ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pkey PRIMARY KEY(node_id, dwfscenario_id);
 
 DROP VIEW IF EXISTS v_edit_inp_dwf;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dwf", "column":"id"}}$$);
+
+DROP RULE IF EXISTS insert_inp_dwf ON man_manhole;
+DROP RULE IF EXISTS insert_inp_dwf ON man_chamber;
+DROP RULE IF EXISTS insert_inp_dwf ON man_netinit;
+DROP RULE IF EXISTS insert_inp_dwf ON man_wjump;
+
+
