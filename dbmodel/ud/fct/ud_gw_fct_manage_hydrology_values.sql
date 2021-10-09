@@ -11,9 +11,9 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"DELETE-COPY"}}}$$);
-SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"KEEP-COPY"}}}$$);
-SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "target":"2", "sector":"1", "action":"DEKETE-ONLY"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"target":"2", "copyFrom":"1", "sector":"1", "action":"DELETE-COPY"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"target":"2", "copyFrom":"1", "sector":"1", "action":"KEEP-COPY"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_hydrology_values($${"client":{}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"target":"2", "copyFrom":"1", "sector":"1", "action":"DEKETE-ONLY"}}}$$);
 
 -- fid: 398
 
@@ -49,7 +49,7 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- getting input data 	
-	v_copyfrom :=  ((p_data ->>'data')::json->>'parameters')::json->>'source';
+	v_copyfrom :=  ((p_data ->>'data')::json->>'parameters')::json->>'copyFrom';
 	v_target :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
 	v_sector :=  ((p_data ->>'data')::json->>'parameters')::json->>'sector';
 	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
@@ -84,19 +84,21 @@ BEGIN
 	-- check controlmethod
 	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
 
 		
 	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have same infiltration method.'));
+		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have same infiltration method.'));
+		END IF;
 
 		FOR object_rec IN SELECT json_array_elements_text('["subcatchment", "lid_usage", "loadings_pol_x_subc", "groundwater", "coverage_land_x_subc"]'::json) as table,
 		json_array_elements_text('["subc_id", "subc_id, lidco_id", "subc_id, poll_id", "subc_id", "subc_id, landus_id"]'::json) as pk,
@@ -109,6 +111,8 @@ BEGIN
 		
 		LOOP
 			IF v_action = 'DELETE-COPY' THEN
+
+				raise notice ' % %', object_rec.table, v_target;
 
 				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
 
@@ -139,7 +143,7 @@ BEGIN
 					v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN inp_subcatchment USING (subc_id, hydrology_id) 
 					WHERE hydrology_id = '||v_copyfrom||' AND sector_id = '||v_sector||
 					' ON CONFLICT (hydrology_id, '||object_rec.pk||') DO NOTHING';
-					RAISE NOTICE 'v_querytext %', v_querytext;
+										
 					EXECUTE v_querytext;	
 				END IF;			
 			
@@ -156,10 +160,11 @@ BEGIN
 			ELSIF v_action = 'DELETE-ONLY' THEN
 
 				IF object_rec.table = 'subcatchment' THEN
-					IF (SELECT count(*) FROM (SELECT DISTINCT (hydrology_id) FROM v_edit_inp_subcatchment)a) = 1 AND
-						(SELECT DISTINCT (hydrology_id) FROM v_edit_inp_subcatchment LIMIT 1) = v_target THEN
+					IF (SELECT DISTINCT (hydrology_id) FROM v_edit_inp_subcatchment LIMIT 1) = v_target THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('WARNING: Delete have been disabled because it is the unique hydrology scenario enabled for current subcatchment.'));
+						VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS BEEN CANCELED......'));	
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 3, concat('ERROR: Delete have been disabled because it is the current scenario.'));
 						
 					 ELSE
 						EXECUTE 'DELETE FROM v_edit_inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;

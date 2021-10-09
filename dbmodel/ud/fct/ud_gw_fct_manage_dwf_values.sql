@@ -85,7 +85,7 @@ BEGIN
     
 	IF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));	
 	ELSE

@@ -6,14 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3042
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_copy_dscenario_values(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_manage_dscenario_values(p_data json) 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"DELETE-COPY"}}}$$)
-SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"KEEP-COPY"}}}$$)
-SELECT SCHEMA_NAME.gw_fct_copy_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"copyFrom":1, "target":2, "action":"DELETE-ONLY}}}$$)
+SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "lang":"EN", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"source":"1", "action":"DELETE-COPY", "copyFrom":"2"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":2, "copyFrom":1, "action":"KEEP-COPY"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":2, "copyFrom":1, "action":"DELETE-ONLY}}}$$)
 
 
 -- fid: 403
@@ -43,7 +44,7 @@ v_result_id text = null;
 
 BEGIN
 
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -77,21 +78,23 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
-	-- check dscenario type
-	IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_copyfrom) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target) THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 2, concat('WARNING-403: Dscenario type for (',v_source_name,') and (', v_target_name,') are not the same.'));
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: (',v_source_name,') and (', v_target_name,') have same dscenario_type.'));
-	END IF;
-
 	IF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
 	ELSE
+
+		-- check dscenario type
+		IF v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
+			IF (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_copyfrom) != (SELECT dscenario_type FROM cat_dscenario WHERE dscenario_id = v_target) THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-403: Dscenario type for target and source is not the same.'));
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have the same dscenario_type.'));
+			END IF;
+		END IF;
 
 		-- Computing process
 		IF v_projecttype = 'UD' THEN
@@ -109,7 +112,7 @@ BEGIN
 					GET DIAGNOSTICS v_count = row_count;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_dscenario_',object_rec.table,' table.'));
+						VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) has/have been removed from inp_dscenario_',object_rec.table,' table.'));
 					END IF;
 				END IF;
 				
@@ -119,13 +122,13 @@ BEGIN
 					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_dscenario_',object_rec.table,' table.'));
+						VALUES (v_fid, v_result_id, 1, concat('INFO: There was/were ',v_count,' row(s) related to this dscenario which has/have been keep on table inp_dscenario_',object_rec.table,'.'));
 					END IF;		
 
 					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 					' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 					RAISE NOTICE 'v_querytext %', v_querytext;
-					EXECUTE v_querytext;	
+					EXECUTE v_querytext;
 				
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
@@ -134,7 +137,7 @@ BEGIN
 						VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					ELSIF v_count2 > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) has/have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					END IF;
 						
 				ELSIF v_action = 'DELETE-ONLY' THEN
@@ -143,10 +146,8 @@ BEGIN
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
-					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
-					END IF;
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) has/have been removed from inp_',object_rec.table,' table.'));
 				END IF;				
 			END LOOP;		
 				
@@ -205,10 +206,8 @@ BEGIN
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
-					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
-					END IF;
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
 				END IF;	
 			END LOOP;		
 		END IF;
