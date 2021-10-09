@@ -21,13 +21,13 @@ UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::jso
 INSERT INTO sys_function VALUES (3042, 'gw_fct_copy_dscenario_values', 'utils', 'function', 'json', 'json', 'Function to copy values from one dscenario to another one', 'role_epa') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (397, 'EPA dscenarios management)', 'utils')
-ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3042,'Copy Dscenario values', '{"featureType":[]}', 
 '[{"widgetname":"source", "label":"Source:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
-{"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userDscenario"}]', NULL, TRUE) 
+  {"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userDscenario"},
+  {"widgetname":"currentValues", "label":"Current values:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE", "KEEP"], "comboNames":["DELETE", "KEEP"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"DELETE"}
+ ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 
@@ -48,4 +48,7 @@ ON CONFLICT (id) DO UPDATE SET function_name = 'gw_fct_man2inp_values', project_
 UPDATE config_param_system SET value= '{"setArcObsolete":"false","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
 
 INSERT INTO sys_fprocess VALUES (402, 'Check if node_id and arc_id defined on CONTROLS/RULES exists)', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (403, 'Copy dscenarios values)', 'utils')
 ON CONFLICT (fid) DO NOTHING;
