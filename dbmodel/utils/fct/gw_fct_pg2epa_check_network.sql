@@ -26,7 +26,7 @@ SELECT * FROM audit_check_data WHERE fid = 139
 SELECT * FROM temp_anlgraf;
 
 -- fid: main:139
-	other: 227,231,233,228
+	other: 227,231,233,228,404
 
 */
 
@@ -84,7 +84,7 @@ BEGIN
 	END IF;
 	
 	TRUNCATE temp_anlgraf;
-	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139);
+	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404);
 	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 		
@@ -145,8 +145,23 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, 'INFO: No duplicated node(s) found on this result.');
 	END IF;
 
+	RAISE NOTICE '3 - Check links over nodarcs (404)';
+
+	SELECT count(*) INTO v_count FROM v_edit_link l, temp_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND epa_type NOT IN ('CONDUIT', 'PIPE');
 	
-	RAISE NOTICE '3 - Check result arcs without start/end node on rpt tables (fid:  231)';
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, descript)
+			SELECT 404, link_id, ''LINK'', l.state, l.expl_id, l.the_geom, ''Link over nodarc'' FROM v_edit_link l, temp_arc a 
+			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND epa_type NOT IN (''CONDUIT'', ''PIPE'')';
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-404: There is/are ',v_count,' link(s) with endpoint over nodarcs.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1,'INFO: No endpoint links checked over nodarcs on this result.',v_count);
+	END IF;
+	
+	
+	RAISE NOTICE '4 - Check result arcs without start/end node on rpt tables (fid:  231)';
 	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||'
 			EXCEPT ( 
 			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
@@ -169,7 +184,7 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '4 - Check disconnected network';	
+	RAISE NOTICE '5 - Check disconnected network';	
 
 	IF v_fid = 227 THEN
 	
@@ -254,7 +269,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 
-		RAISE NOTICE '5 - Check dry network';	
+		RAISE NOTICE '6 - Check dry network';	
 		DELETE FROM temp_anlgraf;
 		v_cont = 0;
 
@@ -398,7 +413,7 @@ BEGIN
 
 	END IF;
 
-	RAISE NOTICE '6 - Stats';
+	RAISE NOTICE '7 - Stats';
 	
 	IF v_project_type =  'WS' THEN
 
@@ -489,7 +504,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom_p'
 		) AS feature
 		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fid, the_geom
-			  FROM  anl_node WHERE cur_user="current_user"() AND fid  IN (139,228,227,233,290)
+			  FROM  anl_node WHERE cur_user="current_user"() AND fid IN (139,228,227,233,290)
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
@@ -505,7 +520,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fid, the_geom
-			  FROM  anl_arc WHERE cur_user="current_user"() AND  (fid = 139 OR fid = 227 OR fid = 232)
+			  FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (139,227,232,404)
 			 ) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 

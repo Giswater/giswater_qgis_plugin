@@ -251,33 +251,20 @@ BEGIN
 				'INFO: Roughness values have been checked againts head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.'));
 		END IF;
 
-			
 		RAISE NOTICE '4 - Check for network mode';
-		IF v_networkmode = 3 THEN
+		IF v_networkmode = 4 THEN
 
-			-- vnode over nodarc for case of use vnode treaming arcs on network model
-			SELECT count(vnode_id) INTO v_count FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND temp_arc.result_id =  v_result_id  AND vnode.state > 0 AND arc_type = 'NODE2ARC';
-
-			IF v_count > 0 THEN
-
+			-- check demandtype only operative 2 (405)
+			IF v_demandtype::text != '2' THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-159: There is/are ',v_count,
-				' vnode(s) over node2arc. This is an important inconsistency. You need to reduce the nodarc length or check affected vnodes. For more info you can type'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid = 159 AND cur_user=current_user'));
-
-				INSERT INTO anl_node (fid, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
-				SELECT 159, vnode_id, 'VNODE', 1, temp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
-				FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-				WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND temp_arc.result_id =  v_result_id AND vnode.state > 0 AND arc_type = 'NODE2ARC';
-				v_count=0;	
+				VALUES (v_fid, v_result_id, 3, concat(
+				'ERROR-405: There export method only is operative with demandtype = CONNEC ESTIMATED'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, 'INFO: Vnodes checked. There is/are not vnodes over nodarcs.');
-			END IF;
+				VALUES (v_fid, v_result_id, 1, concat(
+				'INFO: The network exportation mode (PJOINT & CONNEC WITH ALL NODARCS) is compatible with demand type choosed (CONNEC ESTIMATED)'));
+			END IF;		
 		END IF;
-
 
 		RAISE NOTICE '5 - Check for demand type';	
 		IF v_demandtype IN (1,2) THEN
@@ -650,9 +637,9 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT id, node_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
+		FROM (SELECT node_id as feature_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
 			UNION
-			SELECT id, node_id, 'Dry node with demand' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
+		      SELECT node_id, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -667,7 +654,11 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM 
-		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid IN (139, 232))
+		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)
+		  UNION
+		 SELECT arc_id, 'Dry arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid =232)
+		  UNION
+		 SELECT arc_id, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 

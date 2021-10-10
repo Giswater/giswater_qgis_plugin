@@ -84,3 +84,6 @@ SELECT 'cat_feature_connec', formtype, tabname, columnname, layoutname, layoutor
 isparent, iseditable, isautoupdate, isfilter,'SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''CONNEC''', dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname='cat_feature_node' AND columnname = 'epa_default' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (405, 'Check compatible export method with pattern method', 'ws')
+ON CONFLICT (fid) DO NOTHING;

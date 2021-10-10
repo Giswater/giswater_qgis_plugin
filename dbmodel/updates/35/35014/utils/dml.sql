@@ -25,7 +25,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3042,'Manage Dscenario values', '{"featureType":[]}', 
 '[{"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
-  {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE & COPY", "KEEP & COPY", "ONLY DELETE"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"DELETE-COPY"},
+  {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE & COPY", "KEEP & COPY", "DELETE ONLY"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"DELETE-COPY"},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userDscenario"}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
@@ -50,5 +50,8 @@ UPDATE config_param_system SET value= '{"setArcObsolete":"false","setOldCode":"f
 INSERT INTO sys_fprocess VALUES (402, 'Check if node_id and arc_id defined on CONTROLS/RULES exists)', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (403, 'Copy dscenarios values)', 'utils')
+INSERT INTO sys_fprocess VALUES (403, 'Copy dscenarios values', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (404, 'Check links connected on nodarcs', 'utils')
 ON CONFLICT (fid) DO NOTHING;
