@@ -87,10 +87,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
 
-	
-	INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
-	INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
-
 	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
 		
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'warning' INTO v_warning_val;
@@ -149,14 +145,10 @@ BEGIN
 				INSERT INTO audit_check_data(fid, result_id, criticity, error_message, fcount)
 				SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name,' - ',(rec_result::json ->>'groupBy'),': ',(rec_result::json ->> 'fcount')), (rec_result::json ->> 'fcount')::integer
 				FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
-
 			END LOOP;
-			
 		END IF;
-
 	END LOOP;
 	
-
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
