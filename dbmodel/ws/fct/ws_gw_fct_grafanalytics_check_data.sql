@@ -98,7 +98,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (211, null, 1, '-------');
 
 	
-	-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of acs (208)
+	-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of arcs (208)
 	v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom, a.expl_id FROM 
 			(SELECT node_1 as node_id, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
 			  UNION
