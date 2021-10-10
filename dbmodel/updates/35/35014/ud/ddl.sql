@@ -69,6 +69,3 @@ DROP RULE IF EXISTS insert_inp_dwf ON man_wjump;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"tsparameters", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"expl_id", "dataType":"integer", "isUtils":"False"}}$$);
-
-
-
