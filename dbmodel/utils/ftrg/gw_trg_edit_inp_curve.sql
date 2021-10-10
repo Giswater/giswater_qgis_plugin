@@ -25,8 +25,13 @@ BEGIN
 			VALUES (NEW.id, NEW.curve_type, NEW.descript, NEW.sector_id);
 		
 		ELSIF v_table = 'inp_curve_value' THEN
-			INSERT INTO inp_curve_value (curve_id,x_value,y_value) 
-			VALUES (NEW.curve_id,NEW.x_value,NEW.y_value);
+
+			IF NEW.id IS NULL THEN
+				PERFORM setval('inp_curve_value_id_seq', (SELECT max(id) FROM inp_curve_value), true);
+				NEW.id := (SELECT nextval('inp_curve_value_id_seq'));
+			END IF;
+			INSERT INTO inp_curve_value (id, curve_id,x_value,y_value) 
+			VALUES (NEW.id, NEW.curve_id,NEW.x_value,NEW.y_value);
 			
 		END IF;
 		

@@ -17,9 +17,14 @@ BEGIN
    
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
+
+		IF NEW.id IS NULL THEN
+			PERFORM setval('inp_rules_id_seq', (SELECT max(id) FROM inp_rules), true);
+			NEW.id = (SELECT nextval('inp_rules_id_seq'));
+		END IF;
 	
-		INSERT INTO inp_rules (text, active, sector_id) 
-		VALUES (NEW.text, NEW.active, NEW.sector_id);
+		INSERT INTO inp_rules (id, text, active, sector_id) 
+		VALUES (NEW.id, NEW.text, NEW.active, NEW.sector_id);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN

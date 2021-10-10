@@ -28,3 +28,6 @@ ALTER TABLE cat_feature_connec ADD COLUMN epa_default character varying(30) NOT 
 -- 2021/10/10
 ALTER TABLE inp_tags DROP CONSTRAINT inp_tags_pkey;
 ALTER TABLE inp_tags ADD COLUMN id SERIAL PRIMARY KEY;
+
+ALTER SEQUENCE inp_curve_id_seq RENAME TO inp_curve_value_id_seq;
+ALTER SEQUENCE inp_pattern_id_seq RENAME TO inp_pattern_value_id_seq;

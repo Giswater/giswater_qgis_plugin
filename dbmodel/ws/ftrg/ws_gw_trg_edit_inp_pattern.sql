@@ -20,14 +20,15 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 		
-		
-
 		IF v_table = 'inp_pattern' THEN
 			INSERT INTO inp_pattern (pattern_id, observ, tscode, tsparameters,sector_id) 
 			VALUES (NEW.pattern_id, NEW.observ, NEW.tscode, NEW.tsparameters::json, NEW.sector_id) ;
 		
 		ELSIF v_table = 'inp_pattern_value' THEN
-			PERFORM setval('SCHEMA_NAME.inp_pattern_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
+			IF NEW.id IS NULL THEN
+				PERFORM setval('inp_pattern_value_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
+				NEW.id = (SELECT nextval('inp_pattern_value_id_seq'));
+			END IF;
 			INSERT INTO inp_pattern_value (pattern_id,factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8,factor_9,
 			factor_10,factor_11,factor_12,factor_13,factor_14,factor_15,factor_16,factor_17,
 			factor_18) 

@@ -1,5 +1,5 @@
 SET SEARCH_PATH = 'ws';
-SELECT setval('ws.inp_curve_id_seq', (SELECT max(id) FROM inp_curve_value), true);
+SELECT setval('ws.inp_curve_value_id_seq', (SELECT max(id) FROM inp_curve_value), true);
 
 
 INSERT INTO inp_curve VALUES ('GP20', 'PUMP', 'Pressure grup curve type for 20 wmc');
