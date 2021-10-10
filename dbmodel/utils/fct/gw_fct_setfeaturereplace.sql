@@ -249,7 +249,8 @@ BEGIN
 			execute v_query_string_insert;
 
 			IF v_feature_type='node' or v_feature_type='arc' THEN
-				EXECUTE 'SELECT epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id WHERE c.id='||quote_literal(v_old_featuretype)
+				EXECUTE 'SELECT epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id WHERE c.id='||quote_literal(v_old_featuretype)||' 
+				AND feature_type IN (''NODE'', ''ARC'')'
 				INTO v_epa_table;
 			ELSIF v_feature_type='connec' THEN
 				v_epa_table = 'inp_connec';
