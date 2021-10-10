@@ -14,13 +14,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_epanet_inp(p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{}, "data":{"parameters":{"debugMode":True}}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{}, "data":{"parameters":{}}}$$)
+SELECT SCHEMA_NAME.gw_fct_import_epanet_inp('{"data":{"parameters":{"debugMode":true}}}')
+SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"parameters":{}}}$$)
 
 -- fid: 239
 
@@ -665,14 +660,15 @@ BEGIN
 				v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 			END IF;
 
+
 			-- purge catalog tables
 			DELETE FROM arc WHERE state=0;
-			DELETE FROM cat_arc WHERE id NOT IN (SELECT arccat_id FROM arc);
-			DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
-			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
-			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
-			DELETE FROM cat_feature WHERE id NOT IN (SELECT arctype_id FROM cat_arc) AND feature_type = 'ARC';
-			DELETE FROM cat_feature WHERE id NOT IN (SELECT nodetype_id FROM cat_node) AND feature_type = 'NODE';
+			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
+			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
+			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_arc);
+			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_node);
+			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(arctype_id) FROM cat_arc) AND feature_type = 'ARC';
+			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(nodetype_id) FROM cat_node) AND feature_type = 'NODE';
 
 			-- last process. Harmonize values
 			UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;

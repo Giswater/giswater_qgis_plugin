@@ -9,3 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/10/05
 ALTER TABLE connec ADD CONSTRAINT connec_epa_type_check CHECK (epa_type = ANY (ARRAY['JUNCTION', 'UNDEFINED']));
+
+ALTER TABLE inp_curve DROP CONSTRAINT inp_curve_id_curve_type_check;

@@ -24,3 +24,7 @@ DROP TRIGGER IF EXISTS gw_trg_man2inp_values ON node;
 DROP FUNCTION IF EXISTS gw_trg_man2inp_values();
 
 ALTER TABLE cat_feature_connec ADD COLUMN epa_default character varying(30) NOT NULL DEFAULT 'JUNCTION';
+
+-- 2021/10/10
+ALTER TABLE inp_tags DROP CONSTRAINT inp_tags_pkey;
+ALTER TABLE inp_tags ADD COLUMN id SERIAL PRIMARY KEY;
