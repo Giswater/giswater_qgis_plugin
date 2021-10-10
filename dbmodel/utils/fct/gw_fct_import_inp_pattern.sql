@@ -41,10 +41,10 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('IMPORT INP PATTERNS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('---------------------------'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Cheking for exisiting curve id on table inp_pattern -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Cheking for exisiting pattern id on table inp_pattern -> Done'));
 
 	-- reset sequence
-	PERFORM setval('SCHEMA_NAME.inp_pattern_value_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
+	PERFORM setval('SCHEMA_NAME.inp_pattern_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
 
   	-- starting process
  	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
@@ -59,7 +59,7 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1, current_user);
 
 				-- insert inp_pattern
-				INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date), rec_csv.csv3::integer);
+				INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date), null, rec_csv.csv3::integer);
 
 				-- insert inp_pattern_value	
 				IF v_project_type = 'UD' THEN

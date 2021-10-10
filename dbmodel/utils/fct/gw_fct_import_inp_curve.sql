@@ -46,7 +46,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Cheking for exisiting curve id on table inp_curve -> Done'));
 
 	-- reset sequence
-	PERFORM setval('SCHEMA_NAME.inp_curve_value_id_seq', (SELECT max(id) FROM inp_curve_value), true);
+	PERFORM setval('SCHEMA_NAME.inp_curve_id_seq', (SELECT max(id) FROM inp_curve_value), true);
 
     -- starting process
     FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
