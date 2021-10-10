@@ -32,3 +32,8 @@ ON v_edit_inp_dwf FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dwf();
 
 CREATE TRIGGER gw_trg_edit_inp_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_subcatchment FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_subcatchment('subcatchment');
+
+CREATE TRIGGER gw_trg_vi_loadings INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_loadings FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_loadings');
+
+

@@ -13,10 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_swmm_inp(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{},
-"data":{"parameters":{"createSubcGeom":false}}}$$)
+SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"createSubcGeom":false}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -537,6 +534,8 @@ BEGIN
 			UPDATE cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
 			UPDATE node SET code = node_id WHERE code is null;
 			UPDATE arc SET code = arc_id WHERE code is null;
+			UPDATE cat_arc SET shape=UPPER(shape);
+
 				
 			-- Enable constraints
 			PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);	

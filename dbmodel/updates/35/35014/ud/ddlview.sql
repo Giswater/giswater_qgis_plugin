@@ -161,8 +161,6 @@ CREATE OR REPLACE VIEW vi_subcatchments AS
                   WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) e) c ON v_edit_inp_subcatchment.subc_id::text = c.subc_id::text;
 
 
-
-
 CREATE OR REPLACE VIEW vi_coverages AS 
  SELECT v_edit_inp_subcatchment.subc_id,
     inp_coverage_land_x_subc.landus_id,
@@ -206,7 +204,6 @@ CREATE OR REPLACE VIEW vi_coverages AS
                    FROM inp_subcatchment
                   WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
              JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
 
 
 CREATE OR REPLACE VIEW vi_groundwater AS 
@@ -422,3 +419,11 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
     inp_lid_usage.rptfile
    FROM v_edit_inp_subcatchment
      JOIN inp_lid_usage ON inp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+
+    
+CREATE OR REPLACE VIEW vi_loadings AS 
+ SELECT inp_loadings_pol_x_subc.subc_id,
+    inp_loadings_pol_x_subc.poll_id,
+    inp_loadings_pol_x_subc.ibuildup
+   FROM v_edit_inp_subcatchment
+     JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
