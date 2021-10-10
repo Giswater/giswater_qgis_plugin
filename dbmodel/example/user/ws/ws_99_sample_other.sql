@@ -592,3 +592,5 @@ UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":3}' WHERE i
 UPDATE cat_feature_connec SET double_geom = '{"activated":true,"value":1}' WHERE id = 'FOUNTAIN';
 
 UPDATE cat_connec SET dint = dnom::numeric;
+
+UPDATE node SET nodecat_id = 'TDN110-63 PN16' WHERE node_id = '1044';
