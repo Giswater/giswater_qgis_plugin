@@ -146,7 +146,8 @@ BEGIN
 
 	RAISE NOTICE '5 - Check for missed features on inp tables';
 	v_querytext = '(SELECT arc_id, ''arc'' FROM arc LEFT JOIN 
-			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) b using (arc_id)
+			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve UNION SELECT arc_id 
+			FROM inp_valve_importinp UNION SELECT arc_id FROM inp_pump_importinp) b using (arc_id)
 			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''UNDEFINED''
 			UNION 
 		SELECT node_id, ''node'' FROM node LEFT JOIN 
@@ -502,7 +503,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '283',concat(
-		'ERROR-283: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column for the whole system.'),v_count);
+		'ERROR-283: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
