@@ -1397,7 +1397,6 @@ class GwPsector:
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
-        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -1644,15 +1643,17 @@ class GwPsector:
 
     def set_label_current_psector(self, dialog):
 
-        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+        sql = ("SELECT t1.psector_id, t1.name FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
         if not row:
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
-        data = f'"selectorType": "selector_basic"'
-        body = tools_gw.create_body(extras=data)
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[1])
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{row[0]}, '
+                  f'"isAlone":"False", "disableParent":"False", '
+                  f'"value":"True"')
+        body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure("gw_fct_setselectors", body)
         tools_gw.manage_current_selections_docker(result)
 
