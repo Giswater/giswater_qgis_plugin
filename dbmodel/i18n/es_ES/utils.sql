@@ -10,20 +10,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of value_state
 -- ----------------------------
 INSERT INTO "value_state" VALUES (0,'OBSOLETO');
-INSERT INTO "value_state" VALUES (1,'EN_SERVICIO');
+INSERT INTO "value_state" VALUES (1,'OPERATIVO');
 INSERT INTO "value_state" VALUES (2,'PLANIFICADO');
 
 -- Records of value_state_type
 -- ----------------------------
 INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETO', false, false);
-INSERT INTO value_state_type VALUES (2, 1, 'EN_SERVICIO', true, true);
+INSERT INTO value_state_type VALUES (2, 1, 'OPERATIVO', true, true);
 INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICADO', true, true);
 INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIDO', true, false);
 INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
 
 -- Records of value_verified
 -- ----------------------------
-INSERT INTO "value_verified" VALUES ('PARA REVISAR');
+INSERT INTO "value_verified" VALUES ('PENDIENTE');
 INSERT INTO "value_verified" VALUES ('VERIFICADO');
 
 -- Records of value_yesno
@@ -41,9 +41,9 @@ INSERT INTO om_visit_parameter_type VALUES ('OTROS');
 
 -- Records of doc type table
 -- ----------------------------
-INSERT INTO doc_type VALUES ('AS_BUILT');
+INSERT INTO doc_type VALUES ('AS-BUILT');
 INSERT INTO doc_type VALUES ('INCIDENTE');
-INSERT INTO doc_type VALUES ('RELACION DE TRABAJO');
+INSERT INTO doc_type VALUES ('TRABAJO');
 INSERT INTO doc_type VALUES ('OTROS');
 INSERT INTO doc_type VALUES ('FOTO');
 
@@ -59,9 +59,9 @@ INSERT INTO price_value_unit VALUES ('t');
 
 -- Records of value_priority
 -- ----------------------------
-INSERT INTO value_priority VALUES ('PRIORIDAD ALTA');
-INSERT INTO value_priority VALUES ('PRIORIDAD MEDIA');
-INSERT INTO value_priority VALUES ('PRIORIDAD BAJA');
+INSERT INTO value_priority VALUES ('ALTA');
+INSERT INTO value_priority VALUES ('MEDIA');
+INSERT INTO value_priority VALUES ('BAJA');
 
 -- Records of plan_result_type
 -- ----------------------------
