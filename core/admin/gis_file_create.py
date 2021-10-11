@@ -57,7 +57,7 @@ class GwGisFileCreate:
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
         if os.path.exists(qgs_path):
             message = "Do you want to overwrite file?"
-            answer = tools_qt.show_question(message, "overwrite file")
+            answer = tools_qt.show_question(message, "overwrite file", force_action=True)
             if not answer:
                 return False, qgs_path
 

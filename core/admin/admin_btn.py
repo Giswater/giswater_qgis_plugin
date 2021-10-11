@@ -2351,7 +2351,7 @@ class GwAdminButton:
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info", force_action=True)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
