@@ -656,7 +656,8 @@ BEGIN
 		FROM 
 		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)
 		  UNION
-		 SELECT arc_id, 'Dry arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid =232)
+		 SELECT arc_id, 'Dry arc'::text as descript, the_geom FROM arc WHERE arc_id IN 
+		 (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid =232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)
 		  UNION
 		 SELECT arc_id, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		) row) features;
