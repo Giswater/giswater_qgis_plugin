@@ -311,7 +311,7 @@ BEGIN
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
-	AND cur_user = current_user)a);
+	AND cur_user = current_user ORDER BY parameter)a);
 	
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
