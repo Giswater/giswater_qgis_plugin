@@ -111,6 +111,15 @@ class GwMenuLoad(QObject):
 
         action_reset_dialogs.triggered.connect(self._reset_position_dialog)
 
+        action_open_selections = actions_menu.addAction(f"Show current selectors")
+        action_open_selections_shortcut = tools_gw.get_config_parser("system", f"open_selections_shortcut", "user", "init",
+                                                                    prefix=False)
+        if not action_open_selections_shortcut:
+            tools_gw.set_config_parser("system", f"open_selections_shortcut", f"{action_open_selections_shortcut}", "user",
+                                       "init", prefix=False)
+        action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
+        action_open_selections.triggered.connect(self._open_current_selections)
+
         action_help = actions_menu.addAction(f"Get help")
         action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
         if not action_help_shortcut:
@@ -309,6 +318,12 @@ class GwMenuLoad(QObject):
             tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
+
+
+    def _open_current_selections(self):
+
+        if global_vars.session_vars['current_selections']:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
 
 
     def _reset_plugin(self):

@@ -119,7 +119,7 @@ class GwConfigButton(GwAction):
             return False
 
         # Update current_workspace label (status bar)
-        tools_gw.set_workspace_label(json_result)
+        tools_gw.manage_current_selections_docker(json_result)
 
         message = "Values has been updated"
         tools_qgis.show_info(message)

@@ -87,9 +87,6 @@ class Giswater(QObject):
             # Remove 'Giswater menu'
             self._unset_giswater_menu()
 
-            # Remove status bar widgets
-            self._remove_statusbar_widgets()
-
             # Set 'Main Info button' if project is unload or project don't have layers
             layers = QgsProject.instance().mapLayers().values()
             if hide_gw_button is False and len(layers) == 0:
@@ -286,17 +283,6 @@ class Giswater(QObject):
             menu_giswater.deleteLater()
 
 
-    def _remove_statusbar_widgets(self):
-        """ Remove Giswater status bar widgets """
-
-        for key in global_vars.statusbar_widgets:
-            widget = global_vars.statusbar_widgets[key]
-            if widget:
-                self.iface.mainWindow().statusBar().removeWidget(widget)
-                widget.deleteLater()
-                global_vars.statusbar_widgets[key] = None
-
-
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
@@ -355,6 +341,12 @@ class Giswater(QObject):
         docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
         if docker_info:
             self.iface.removeDockWidget(docker_info)
+
+        # Remove 'current_selections' docker
+        if global_vars.session_vars['current_selections']:
+            self.iface.removeDockWidget(global_vars.session_vars['current_selections'])
+            global_vars.session_vars['current_selections'].deleteLater()
+            global_vars.session_vars['current_selections'] = None
 
         # Manage 'dialog_docker' from global_vars.session_vars and remove it if exists
         tools_gw.close_docker()

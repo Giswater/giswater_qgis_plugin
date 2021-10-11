@@ -1650,7 +1650,10 @@ class GwPsector:
         if not row:
             return
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
-        tools_gw.set_statusbar_widget("current_psector", f"<b>Psector:</b> {row[0]}", index=1)
+        data = f'"selectorType": "selector_basic"'
+        body = tools_gw.create_body(extras=data)
+        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
+        tools_gw.manage_current_selections_docker(result)
 
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):

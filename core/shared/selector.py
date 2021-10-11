@@ -292,7 +292,7 @@ class GwSelector:
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
         # Update current_workspace label (status bar)
-        tools_gw.set_workspace_label(json_result)
+        tools_gw.manage_current_selections_docker(json_result)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):

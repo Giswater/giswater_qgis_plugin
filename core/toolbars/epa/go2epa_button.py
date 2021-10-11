@@ -477,7 +477,7 @@ class GwGo2EpaButton(GwAction):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        tools_gw.set_workspace_label(json_result)
+        tools_gw.manage_current_selections_docker(json_result)
 
         message = "Values has been updated"
         tools_qgis.show_info(message)

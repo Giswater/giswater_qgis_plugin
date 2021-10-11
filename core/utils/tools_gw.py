@@ -24,7 +24,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication
+    QToolButton, QWidget, QApplication, QDockWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
@@ -2753,37 +2753,35 @@ def open_dlg_help():
         return True
 
 
-def set_statusbar_widget(widget_name, text='', index=1):
+def manage_current_selections_docker(result, open=False):
     """
-    Set the text of a status bar widget
-        :param widget_name: the name of the widget (found in global_vars.statusbar_widgets) ['current_psector', 'current_workspace']
-        :param text: the text to set in the widget (String)
-        :param index: where to put the widget (Integer)
+    Manage labels for the current_selections docker
+        :param result: looks the data in result['body']['data']['userValues']
+        :param open: if it has to create a new docker or just update it
     """
 
-    widget = global_vars.statusbar_widgets[widget_name]
-    if not widget:
-        return
-    if text is None:
-        text = ''
-    widget.setText(f"{text}")
-    global_vars.iface.mainWindow().statusBar().insertPermanentWidget(index, widget)
+    title = ""
+    if 'userValues' in result['body']['data']:
+        for user_value in result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['value']:
+                title += f"{user_value['value']} | "
 
-
-def set_workspace_label(json_result):
-    """ Sets the text of the status bar's label for workspace using :json_result: """
-
-    if 'userValues' in json_result['body']['data']:
-        user_values = json_result['body']['data']['userValues']
-        if user_values:
-            for value in user_values:
-                if value['parameter'] == 'utils_workspace_vdefault':
-                    text = value['value']
-                    if value['value']:
-                        sql = f"SELECT name FROM cat_workspace WHERE id = {value['value']}"
-                        row = tools_db.get_row(sql, log_info=False)
-                        text = f"<b>Workspace:</b> {row[0]}"
-                    set_statusbar_widget('current_workspace', text, index=2)
+        if global_vars.session_vars['current_selections'] is None:
+            global_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
+        else:
+            global_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
+        if open:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
 
 
 def create_sqlite_conn(file_name):
