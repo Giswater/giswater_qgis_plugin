@@ -132,9 +132,19 @@ BEGIN
 				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
 				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
 				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+			
+				-- related elements to obsolete
+				EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
+				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
+				enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				
 			ELSE 
 				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
 				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				
+				-- related elements to obsolete
+				EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
+				enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
 			END IF;
 		END LOOP;
 	END IF;
