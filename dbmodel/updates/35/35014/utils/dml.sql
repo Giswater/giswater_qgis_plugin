@@ -56,6 +56,8 @@ ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess VALUES (404, 'Check links connected on nodarcs', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
+UPDATE sys_param_user SET vdefault = 'FALSE' WHERE id = 'edit_update_elevation_from_dem';
+
 --2021/10/11
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('108', 'INP result line', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
