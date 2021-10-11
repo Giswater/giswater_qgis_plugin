@@ -23,6 +23,7 @@ v_psector integer;
 v_query text;
 v_count integer;
 v_plan_obsolete_state_type integer;
+v_uservalues json;
 
 v_audit_result text;
 v_level integer;
@@ -110,10 +111,16 @@ BEGIN
 
     END IF;
 
+  -- get uservalues
+	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	AND cur_user = current_user ORDER BY parameter)a);
+	--control nulls
+	v_uservalues := COALESCE(v_uservalues, '{}');
 		--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":{}'||
+		     ',"data":{"userValues":'||v_uservalues||', "info":{}'||
 			'}}'||
 	    '}')::json, 3002, null, null, null);
 
