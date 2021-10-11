@@ -1091,6 +1091,7 @@ class GwPsector:
         extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
+        tools_gw.manage_current_selections_docker(json_result)
         return json_result
 
 
@@ -1652,7 +1653,7 @@ class GwPsector:
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
         data = f'"selectorType": "selector_basic"'
         body = tools_gw.create_body(extras=data)
-        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
+        result = tools_gw.execute_procedure("gw_fct_setselectors", body)
         tools_gw.manage_current_selections_docker(result)
 
 
