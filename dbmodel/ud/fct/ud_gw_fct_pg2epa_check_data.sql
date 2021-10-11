@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 188,107,111,113,187,294,295
+	other: 107,111,113,164,175,187,188,294,295,379
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -62,8 +62,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 295) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 111, 113, 187, 294) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (188, 284) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 111, 113, 164, 175, 187, 379) AND cur_user=current_user;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -421,7 +421,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 164, 187, 294, 381, 382)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 164, 175, 187, 381, 382)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
@@ -436,7 +436,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
