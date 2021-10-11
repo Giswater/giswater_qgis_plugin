@@ -731,7 +731,11 @@ class GwAdminButton:
             tools_qgis.show_warning("GIS folder not set")
             return
 
+        qgis_file_type = self.dlg_create_gis_project.cmb_roletype.currentIndex()
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_type', qgis_file_type, prefix=False)
         tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
+        qgis_file_export = self.dlg_create_gis_project.chk_export_passwd.isChecked()
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_export', qgis_file_export, prefix=False)
 
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
@@ -792,12 +796,22 @@ class GwAdminButton:
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
+        qgis_file_type = tools_gw.get_config_parser('btn_admin', 'qgis_file_type', "user", "session", prefix=False)
+        if qgis_file_type is not None:
+            try:
+                qgis_file_type = int(qgis_file_type)
+                self.dlg_create_gis_project.cmb_roletype.setCurrentIndex(qgis_file_type)
+            except Exception:
+                pass
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False)
         if qgis_file_path is None:
             qgis_file_path = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
+        qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False)
+        qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
+        self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         if self.is_service:
             self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
             self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
