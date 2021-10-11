@@ -87,3 +87,6 @@ FROM config_form_fields WHERE formname='cat_feature_node' AND columnname = 'epa_
 
 INSERT INTO sys_fprocess VALUES (405, 'Check compatible export method with pattern method', 'ws')
 ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_dscenario', 'cat_dscenario', 'dscenario_type', true);

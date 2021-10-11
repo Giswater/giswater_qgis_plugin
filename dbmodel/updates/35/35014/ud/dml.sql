@@ -74,3 +74,8 @@ UPDATE inp_loadings_pol_x_subc SET hydrology_id = value::integer FROM config_par
 UPDATE inp_groundwater SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
 UPDATE inp_coverage_land_x_subc SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario';
 UPDATE inp_subcatchment SET hydrology_id = value::integer FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND hydrology_id IS NULL; 
+
+UPDATE inp_typevalue SET typevalue='inp_typevalue_dscenario' WHERE typevalue='typevalue_dscenario';
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_dscenario', 'cat_dscenario', 'dscenario_type', true);
