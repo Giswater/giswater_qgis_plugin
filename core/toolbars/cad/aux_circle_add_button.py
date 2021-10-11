@@ -75,8 +75,9 @@ class GwAuxCircleAddButton(GwMaptool):
     def activate(self):
 
         self.snap_to_selected_layer = False
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

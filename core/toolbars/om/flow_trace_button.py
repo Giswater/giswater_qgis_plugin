@@ -50,8 +50,9 @@ class GwFlowTraceButton(GwMaptool):
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()

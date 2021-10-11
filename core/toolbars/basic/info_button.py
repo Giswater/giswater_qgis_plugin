@@ -67,8 +67,9 @@ class GwInfoButton(GwMaptool):
             super().deactivate()
             return
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)
