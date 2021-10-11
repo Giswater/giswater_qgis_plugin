@@ -2976,7 +2976,7 @@ def get_project_version(schemaname=None):
     """ Get project version from table 'version' """
 
     if schemaname in (None, 'null', ''):
-        schemaname = self.schema_name
+        schemaname = global_vars.schema_name
 
     project_version = None
     tablename = "sys_version"
