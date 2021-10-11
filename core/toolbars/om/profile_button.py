@@ -475,9 +475,7 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
-
-        self._reset_profile_variables()
-
+        
 
     def _set_profile_layout(self):
         """ Set properties of main window """
