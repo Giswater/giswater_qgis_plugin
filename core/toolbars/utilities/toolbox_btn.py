@@ -396,6 +396,7 @@ class GwToolBoxButton(GwAction):
 
     def _execute_function(self, description, dialog, combo, result):
 
+        self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)
