@@ -1374,7 +1374,7 @@ class GwAdminButton:
 
         extras += ', "isToolbox":false'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, False)
+        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, commit=False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
         self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
@@ -1544,7 +1544,7 @@ class GwAdminButton:
             return self.bk_schema_name(list_schemas, project_name, i+1)
 
 
-    def _manage_process_result(self, project_name, project_type, is_test=False, is_utils=False):
+    def _manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
 
         status = (self.error_count == 0)
@@ -1565,6 +1565,9 @@ class GwAdminButton:
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+            tools_qgis.show_info("A rollback on schema will be done.")
+            if dlg:
+                tools_gw.close_dialog(dlg)
 
 
     def _rename_project_data_schema(self, schema, create_project=None):
@@ -2368,6 +2371,8 @@ class GwAdminButton:
 
         if accepted:
 
+            self.dlg_import_inp.btn_run.setVisible(False)
+
             # Set wait cursor
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2400,7 +2405,7 @@ class GwAdminButton:
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = tools_gw.create_body(extras=extras)
-            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema)
+            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema, commit=False)
 
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2425,13 +2430,14 @@ class GwAdminButton:
 
             self.task1.setProgress(100)
             # Manage process result
-            self._manage_process_result(project_name, project_type)
-
+            self._manage_process_result(project_name, project_type, dlg=self.dlg_import_inp)
         else:
             msg = "A rollback on schema will be done."
             tools_qt.show_info_box(msg, "Info")
             global_vars.dao.rollback()
             self.error_count = 0
+            tools_gw.close_dialog(self.dlg_import_inp)
+            return
 
 
         # Hide button execute
