@@ -241,6 +241,9 @@ class GwCSVButton(GwAction):
             unicode = 'latin1'
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
+        if tools_gw.get_config_parser('btn_csv2pg', 'chk_ignore_header', "user", "session") == 'True':
+            self.dlg_csv.chk_ignore_header.setChecked(True)
+
         if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "session") == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
         else:
