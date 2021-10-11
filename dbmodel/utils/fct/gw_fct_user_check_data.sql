@@ -44,6 +44,9 @@ v_log_project text;
 rec record;
 v_target text;
 v_infotext text;
+rec_selector json;
+v_selector_value json;
+v_selector_name text;
 
 v_result_id text;
 v_result text;
@@ -86,6 +89,19 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
+	
+	-- save state & expl selector
+	DELETE FROM temp_table WHERE fid=251 AND cur_user=current_user;
+	INSERT INTO temp_table (fid, addparam)   
+	SELECT 251, json_agg(s.selector_conf)  FROM (
+	select jsonb_build_object('selector_expl', array_agg(expl_id))  as selector_conf
+	FROM selector_expl where cur_user=current_user 
+	UNION
+	select jsonb_build_object('selector_state', array_agg(state_id)) as selector_conf 
+	FROM selector_state where cur_user=current_user)s;
+
+	INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
+	INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
 
 	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
 		
@@ -149,6 +165,20 @@ BEGIN
 		END IF;
 	END LOOP;
 	
+	--restore selectors
+	FOR rec_selector IN (select json_array_elements(addparam) from temp_table where fid=251) LOOP
+		raise notice 'rec_selector,%',rec_selector;
+		v_selector_name = json_object_keys(rec_selector);
+
+		--remove values for selector
+		EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
+		
+		v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
+	--insert previous values for selector
+		EXECUTE 'INSERT INTO '||v_selector_name||'
+		SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''')';
+	END LOOP;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
