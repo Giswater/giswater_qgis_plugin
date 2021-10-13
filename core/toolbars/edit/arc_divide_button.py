@@ -224,7 +224,7 @@ class GwArcDivideButton(GwMaptool):
             body = tools_gw.create_body(feature=feature_id)
             result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
             if not result or result['status'] == 'Failed':
-                self.manage_active_maptool()
+                self.cancel_map_tool()
                 return
 
             log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
@@ -257,10 +257,10 @@ class GwArcDivideButton(GwMaptool):
                 if not is_valid:
                     msg = "Current node is not located over an arc. Please, select option 'DRAG-DROP'"
                     tools_qgis.show_info(msg)
-                    self.manage_active_maptool()
+                    self.cancel_map_tool()
                     return
                 if not answer:
-                    self.manage_active_maptool()
+                    self.cancel_map_tool()
 
         # Snap to arc
         else:
