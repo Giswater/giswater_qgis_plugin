@@ -223,28 +223,25 @@ class GwArcDivideButton(GwMaptool):
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
         status = tools_db.execute_sql(sql, log_sql=True)
+
         if status:
             feature_id = f'"id":["{node_id}"]'
             body = tools_gw.create_body(feature=feature_id)
             result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
-            if not result or result['status'] == 'Failed':
-                self.cancel_map_tool()
-                if self.keep_maptool_active:
-                    self.clicked_event()
-                return
-
-            log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
-            if not tools_os.set_boolean(log, False):
-                self.dlg_dtext = GwDialogTextUi('arc_divide')
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
-                tools_gw.open_dialog(self.dlg_dtext)
-
+            if result and result['status'] == 'Accepted':
+                log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
+                if not tools_os.set_boolean(log, False):
+                    self.dlg_dtext = GwDialogTextUi('arc_divide')
+                    tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
+                    tools_gw.open_dialog(self.dlg_dtext)
         else:
             message = "Move node: Error updating geometry"
             tools_qgis.show_warning(message)
 
         # Check in init config file if user wants to keep map tool active or not
-        self.manage_active_maptool()
+        self.cancel_map_tool()
+        if self.keep_maptool_active:
+            self.clicked_event()
 
 
     def _release_event(self, event):
