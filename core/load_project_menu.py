@@ -250,7 +250,8 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        files = [f for f in os.listdir(f"{global_vars.user_folder_dir}{os.sep}config")]
+        path = f"{global_vars.user_folder_dir}{os.sep}config"
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
