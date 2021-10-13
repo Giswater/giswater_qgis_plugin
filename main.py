@@ -335,6 +335,8 @@ class Giswater(QObject):
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
         if docker_search:
             self.iface.removeDockWidget(docker_search)
+            # TODO: manage this better, deleteLater() is not fast enough and deletes the docker after opening the search
+            #  again on load_project.py --> if tools_os.set_boolean(open_search)
             docker_search.deleteLater()
 
         # Get 'Docker' docker form from qgis iface and remove it if exists
