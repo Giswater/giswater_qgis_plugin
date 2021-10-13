@@ -52,6 +52,8 @@ class GwArcDivideButton(GwMaptool):
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):
             self.action.setChecked(True)
+        else:
+            self.selected_action = tools_gw.get_config_parser("btn_arc_divide", "last_action", "user", "session")
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -140,6 +142,8 @@ class GwArcDivideButton(GwMaptool):
             self.selected_action = 1
         else:
             self.selected_action = 2
+
+        tools_gw.set_config_parser("btn_arc_divide", "last_action", self.selected_action, "user", "session")
 
 
     def _move_event(self, event):
@@ -248,7 +252,7 @@ class GwArcDivideButton(GwMaptool):
         # Snap to node
         if self.snapped_feat is None:
             self._release_event_snap_to_node(event_point)
-            if self.selected_action == 2:
+            if int(self.selected_action) == 2:
                 is_valid, answer = self._release_event_snap_to_arc(event_point)
                 if not is_valid:
                     msg = "Current node is not located over an arc. Please, select option 'DRAG-DROP'"
