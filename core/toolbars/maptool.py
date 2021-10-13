@@ -16,6 +16,7 @@ from qgis.PyQt.QtWidgets import QAction
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
+from ...lib import tools_os
 
 
 class GwMaptool(QgsMapTool):
@@ -188,3 +189,13 @@ class GwMaptool(QgsMapTool):
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
+
+
+    def manage_active_maptool(self):
+        """ Check in init config file if user wants to keep map tool active or not """
+
+        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init", prefix=True)
+        keep_maptool_active = tools_os.set_boolean(value, False)
+        if not keep_maptool_active:
+            self.cancel_map_tool()
+

@@ -16,7 +16,7 @@ from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ...ui.ui_manager import GwFeatureTypeChangeUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt, tools_db, tools_os
+from ....lib import tools_qgis, tools_qt, tools_db
 from .... import global_vars
 
 
@@ -225,10 +225,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             return
 
         # Check in init config file if user wants to keep map tool active or not
-        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init", prefix=True)
-        keep_maptool_active = tools_os.set_boolean(value, False)
-        if not keep_maptool_active:
-            self.cancel_map_tool()
+        self.manage_active_maptool()
 
 
     def _open_custom_form(self, layer, expr):
