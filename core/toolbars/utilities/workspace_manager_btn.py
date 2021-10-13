@@ -59,6 +59,8 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
+        selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
+        selection_model.selectionChanged.connect(self._fill_info)
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
 
         self.dlg_workspace_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_workspace_manager))
@@ -123,6 +125,25 @@ class GwWorkspaceManagerButton(GwAction):
             tools_qt.set_tableview_config(self.tbl_wrkspcm)
 
         return complet_list
+
+
+    def _fill_info(self, selected, deselected):
+        """ Fill info text area with details from selected workspace """
+
+        # Get id of selected workspace
+        cols = selected.indexes()
+        if not cols:
+            return
+        workspace_id = cols[0].data()
+
+        action = "INFO"
+        extras = f'"action":"{action}", "id":"{workspace_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+
+        if result and result['status'] == "Accepted":
+            tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
+                                  force_tab=False, call_set_tabs_enabled=False, close=False)
 
 
     def _create_workspace(self):
