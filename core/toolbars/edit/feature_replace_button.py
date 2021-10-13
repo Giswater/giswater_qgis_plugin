@@ -78,14 +78,12 @@ class GwFeatureReplaceButton(GwMaptool):
             last_feature_type = "NODE"
 
         # Manage active layer
+        self._set_active_layer(last_feature_type)
         layer = self.iface.activeLayer()
 
-        if not layer:
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if tablename not in self.list_tables:
             self._set_active_layer(last_feature_type)
-        else:
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename not in self.list_tables:
-                self._set_active_layer(last_feature_type)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
