@@ -429,8 +429,8 @@ class GwFeatureReplaceButton(GwMaptool):
             if not complet_result:
                 message = "Error replacing feature"
                 tools_qgis.show_warning(message)
-                self.deactivate()
-                self.set_action_pan()
+                # Check in init config file if user wants to keep map tool active or not
+                self.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
@@ -446,12 +446,11 @@ class GwFeatureReplaceButton(GwMaptool):
             for table in self.list_tables:
                 tools_qgis.set_layer_index(table)
 
-            # Deactivate map tool
-            self.deactivate()
-            self.set_action_pan()
-
             # Disable ok button at the end of process
             self.dlg_replace.btn_accept.setEnabled(False)
+
+            # Check in init config file if user wants to keep map tool active or not
+            self.manage_active_maptool()
 
 
     def _edit_change_elem_type_get_value(self, index):
