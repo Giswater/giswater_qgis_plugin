@@ -60,7 +60,7 @@ class GwWorkspaceManagerButton(GwAction):
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
         selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
-        selection_model.selectionChanged.connect(self._fill_info)
+        selection_model.selectionChanged.connect(partial(self._fill_info))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
 
         self.dlg_workspace_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_workspace_manager))
@@ -128,7 +128,11 @@ class GwWorkspaceManagerButton(GwAction):
 
 
     def _fill_info(self, selected, deselected):
-        """ Fill info text area with details from selected workspace """
+        """
+        Fill info text area with details from selected workspace.
+
+        Note: The parameters come from the selectionChanged signal.
+        """
 
         # Get id of selected workspace
         cols = selected.indexes()
