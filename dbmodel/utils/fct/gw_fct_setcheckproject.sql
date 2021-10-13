@@ -305,10 +305,19 @@ BEGIN
 	ELSE
 		-- Force exploitation selector in case of null values
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
-			INSERT INTO selector_expl (expl_id, cur_user) 
-			SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
-			v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS NOT TRUE THEN
+
+				INSERT INTO selector_expl (expl_id, cur_user) 
+				SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
+				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			ELSE
+				INSERT INTO selector_expl (expl_id, cur_user) 
+				SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1;
+				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1));
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			END IF;
 		END IF;
 	END IF;
 
