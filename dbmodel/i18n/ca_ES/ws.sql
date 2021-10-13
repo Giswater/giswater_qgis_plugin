@@ -40,7 +40,7 @@ INSERT INTO cat_feature VALUES ('VALVULA_ACCEL', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('T', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('X', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('CAPTACIO', 'SOURCE', 'NODE');
-INSERT INTO cat_feature VALUES ('POU_CAPTACIO', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('POU_ACCES', 'MANHOLE', 'NODE');
 INSERT INTO cat_feature VALUES ('REGISTRE', 'REGISTER', 'NODE');
 INSERT INTO cat_feature VALUES ('REGISTRE_CONTROL', 'REGISTER', 'NODE');
 INSERT INTO cat_feature VALUES ('REGISTRE_BYPASS', 'REGISTER', 'NODE');
@@ -82,7 +82,7 @@ INSERT INTO node_type VALUES ('POU', 'WATERWELL', 'JUNCTION', 'man_waterwell', '
 INSERT INTO node_type VALUES ('FONT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tap');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unió on 4 conductes convergeixen');
 INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captació');
-INSERT INTO node_type VALUES ('POU_CAPTACIO', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou de captació');
+INSERT INTO node_type VALUES ('POU_ACCES', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou accés');
 INSERT INTO node_type VALUES ('REGISTRE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre');
 INSERT INTO node_type VALUES ('REGISTRE_CONTROL', 'REGISTER', 'JUNCTION', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Registre de control');
 INSERT INTO node_type VALUES ('REGISTRE_BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre de bypass');
