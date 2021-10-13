@@ -13,12 +13,13 @@ from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi
+from .ui.ui_manager import GwDialogTextUi, GwSearchUi
+from .shared.search import GwSearch
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
 
 class GwLoadProject(QObject):
@@ -96,6 +97,12 @@ class GwLoadProject(QObject):
         status = self._check_layers_from_distinct_schema()
         if status is False:
             return
+
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
+        if tools_os.set_boolean(open_search):
+            dlg_search = GwSearchUi()
+            GwSearch().open_search(dlg_search, load_project=True)
 
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
