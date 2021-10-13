@@ -91,7 +91,7 @@ BEGIN
 
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WORKSPACE MANAGER'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-----------------------------');
 
 		
 	IF v_action = 'CREATE' OR v_action = 'CHECK' THEN
@@ -183,7 +183,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'SELECTOR CONFIGURATION');
 		INSERT INTO audit_check_data (fid, error_message) SELECT v_fid, value::text FROM json_array_elements(v_selectors_config) order by value;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '----------------------------------');
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'INP CONFIGURATION');
 		INSERT INTO audit_check_data (fid, error_message) SELECT v_fid, replace(jsonb_build_object(parameter, value)::text,'\','')
 		FROM config_param_user WHERE 
@@ -289,7 +289,7 @@ BEGIN
 		END LOOP;
 		
 		
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '----------------------------------');
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'INP CONFIGURATION');
 
 		--insert values into config_param_user
