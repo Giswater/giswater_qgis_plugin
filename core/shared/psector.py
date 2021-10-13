@@ -1397,7 +1397,7 @@ class GwPsector:
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
-
+        self.set_label_current_psector(self.dlg_psector_mng)
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
