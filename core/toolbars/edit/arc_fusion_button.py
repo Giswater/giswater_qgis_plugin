@@ -78,7 +78,7 @@ class GwArcFusionButton(GwMaptool):
             return
 
         text_result = None
-        log = tools_gw.get_config_parser("btn_arc_fusion", "disable_showlog", 'user', 'session')
+        log = tools_gw.get_config_parser("user_edit_tricks", "arc_fusion_disable_showlog", 'user', 'init')
         if not tools_os.set_boolean(log, False):
             text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
 

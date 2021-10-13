@@ -225,7 +225,7 @@ class GwArcDivideButton(GwMaptool):
                 self.cancel_map_tool()
                 return
 
-            log = tools_gw.get_config_parser("btn_arc_divide", "disable_showlog", 'user', 'session')
+            log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
             if not tools_os.set_boolean(log, False):
                 self.dlg_dtext = GwDialogTextUi('arc_divide')
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
@@ -299,7 +299,7 @@ class GwArcDivideButton(GwMaptool):
 
         # Move selected node to the released point
         answer = True
-        ask = tools_gw.get_config_parser("btn_arc_divide", "disable_prev_warning", 'user', 'session')
+        ask = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_prev_warning", 'user', 'init')
         if not tools_os.set_boolean(ask, False):
             # Show message before executing
             message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
