@@ -18,7 +18,5 @@ experimental=False
 # Compatibility versions
 minorQgisVersion=3.16
 majorQgisVersion=3.99
-recommendedQgisVersion=3.18
 minorPgVersion=9.05.00
 majorPgVersion=11.00.99
-recommendedPgVersion=9.05.00

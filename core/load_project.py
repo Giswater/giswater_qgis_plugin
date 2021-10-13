@@ -165,10 +165,8 @@ class GwLoadProject(QObject):
         # Get version compatiblity from metadata.txt
         minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
         majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
-        recommendedQgisVersion = tools_qgis.get_plugin_metadata('recommendedQgisVersion', '3.16', global_vars.plugin_dir)
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
         majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
-        recommendedPgVersion = tools_qgis.get_plugin_metadata('recommendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if qgis_version is not None and minorQgisVersion is not None and majorQgisVersion is not None:
