@@ -3757,7 +3757,7 @@ class GwInfo(QObject):
             list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
-            tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
+            tools_log.log_info("NO FEATURE TYPE DEFINED")
 
         tools_gw.init_docker()
         global is_inserting

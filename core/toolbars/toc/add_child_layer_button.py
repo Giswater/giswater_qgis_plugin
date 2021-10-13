@@ -127,12 +127,6 @@ class GwAddChildLayerButton(GwAction):
         if not status:
             return False
 
-        # Set config layer fields when user add new layer into the TOC
-        # QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
-
-        # Put add layers button into toc
-        # self.add_layers_button()
-
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Set background task 'ConfigLayerFields'
         schema_name = self.schema_name.replace('"', '')

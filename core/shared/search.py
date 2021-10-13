@@ -46,7 +46,7 @@ class GwSearch:
         self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
-    def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
+    def open_search(self, dlg_search, dlg_mincut=None):
 
         # If docker search is already opened, don't let user open another one
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
@@ -364,6 +364,7 @@ class GwSearch:
         form_search_add = ''
         extras_search_add = ''
         result = None
+        line_edit = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)

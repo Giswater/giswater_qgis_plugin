@@ -94,7 +94,7 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._init_show_database()
-        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog, layer_source=layer_source)
+        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
@@ -223,7 +223,7 @@ class GwAdminButton:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             schema_name = self._get_schema_name()
-            sql = (f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;")
+            sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
             tools_db.execute_sql(sql)
             status = self.load_updates(project_type, update_changelog=True)
             if status:
@@ -570,7 +570,7 @@ class GwAdminButton:
         qm_gen.init_dialog()
 
 
-    def _info_show_database(self, connection_status=True, username=None, show_dialog=False, layer_source=None):
+    def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
         """"""
 
         self.message_update = ''
@@ -598,7 +598,6 @@ class GwAdminButton:
         tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
 
         # Set title
-        connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
@@ -1749,9 +1748,8 @@ class GwAdminButton:
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
 
-            # Check super_user
+            # Get username
             self.username = self._get_user_connection(connection_name)
-            super_user = tools_db.check_super_user(self.username)
 
             # Check PostgreSQL Version
             self.postgresql_version = tools_db.get_pg_version()
@@ -2822,7 +2820,7 @@ class GwAdminButton:
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = "cat_feature_id = '" + form_name + "'"
+        expr_filter = f"cat_feature_id = '{form_name}'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
@@ -2848,7 +2846,7 @@ class GwAdminButton:
         if self.chk_multi_insert:
             expr_filter = "cat_feature_id IS NULL"
         else:
-            expr_filter = "cat_feature_id = '" + form_name + "'"
+            expr_filter = f"cat_feature_id = '{form_name}'"
 
         self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(dialog, qtable, tableview, schema_name=schema_name)
@@ -2872,7 +2870,7 @@ class GwAdminButton:
         else:
             sql = (f"SELECT DISTINCT(columnname), columnname "
                    f"FROM {schema_name}.ve_config_addfields "
-                   f"WHERE cat_feature_id = '" + form_name + "'")
+                   f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
@@ -2927,7 +2925,7 @@ class GwAdminButton:
         self._update_sys_fields()
 
 
-    def _manage_accept(self, action, form_name, model=None):
+    def _manage_accept(self, action, form_name):
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
@@ -2935,7 +2933,7 @@ class GwAdminButton:
         # Execute manage add fields function
         param_name = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
-               f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
+               f"WHERE param_name = '{param_name}' AND cat_feature_id = '{form_name}' ")
         row = tools_db.get_row(sql)
 
         if action == 'create':

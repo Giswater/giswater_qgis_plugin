@@ -335,11 +335,9 @@ class GwSelector:
 
     def _manage_all(self, dialog, widget_all, selector_vars):
 
-        key_modifier = QApplication.keyboardModifiers()
         status = tools_qt.is_checked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-
         disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
 

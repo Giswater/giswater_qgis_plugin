@@ -41,14 +41,12 @@ class GwMenuLoad(QObject):
         self.main_menu.setObjectName("Giswater")
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         config_icon = QIcon(icon_path)
 
         # region Toolbar
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
@@ -137,23 +135,22 @@ class GwMenuLoad(QObject):
         action_reset_plugin.triggered.connect(self._reset_plugin)
         # endregion
 
-        # region Adavanced
+        # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
         action_manage_file.triggered.connect(self._open_manage_file)
-        folder_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}105.png")
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}105.png"
+        folder_icon = QIcon(icon_path)
         action_manage_file.setIcon(folder_icon)
         # endregion
 
         # region Open user folder
-
         log_folder = os.path.join(global_vars.user_folder_dir, 'log')
         size = tools_os.get_folder_size(log_folder)
         log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
 
-        folder_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}102.png")
-        action_open_path = self.main_menu.addAction(f"Open folder  ({log_folder_volume})")
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
+        folder_icon = QIcon(icon_path)
+        action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
 
         action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)

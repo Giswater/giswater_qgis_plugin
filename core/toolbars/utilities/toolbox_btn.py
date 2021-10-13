@@ -235,7 +235,7 @@ class GwToolBoxButton(GwAction):
                     for row in range(numrows):
                         for column in range(numcols):
                             column_name = dict_keys[column]
-                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem((f"{field['value'][row][column_name]}")))
+                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{field['value'][row][column_name]}"))
 
                     continue
 

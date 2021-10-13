@@ -102,7 +102,7 @@ class GwLoadProject(QObject):
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "init")
         if tools_os.set_boolean(open_search):
             dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
+            GwSearch().open_search(dlg_search)
 
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
