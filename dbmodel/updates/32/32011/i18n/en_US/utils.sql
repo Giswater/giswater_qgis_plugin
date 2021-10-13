@@ -8,10 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO om_visit_cat_status VALUES (1, 'On going', NULL);
-INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
-INSERT INTO om_visit_cat_status VALUES (3, 'Canceled', NULL);
-INSERT INTO om_visit_cat_status VALUES (4, 'Closed', NULL);
+INSERT INTO om_visit_cat_status VALUES (1, 'Started', NULL);
+INSERT INTO om_visit_cat_status VALUES (2, 'Stand-by', NULL);
+INSERT INTO om_visit_cat_status VALUES (4, 'Finished', NULL);
 
 INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc')
 ON CONFLICT (filetype, fextension) DO NOTHING;

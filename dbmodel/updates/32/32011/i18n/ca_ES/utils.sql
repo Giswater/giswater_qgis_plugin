@@ -8,10 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO om_visit_cat_status VALUES (1, 'En curs', NULL);
-INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
-INSERT INTO om_visit_cat_status VALUES (3, 'Cancelada', NULL);
-INSERT INTO om_visit_cat_status VALUES (4, 'Tancada', NULL);
+INSERT INTO om_visit_cat_status VALUES (1, 'Iniciada', NULL);
+INSERT INTO om_visit_cat_status VALUES (2, 'Stand-by', NULL);
+INSERT INTO om_visit_cat_status VALUES (4, 'Finalitzada', NULL);
 
 INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc');
 INSERT INTO om_visit_filetype_x_extension VALUES ('Pdf', 'pdf');

@@ -15,5 +15,4 @@ INSERT INTO plan_typevalue VALUES ('psector_status', 3, 'CANCELADO', 'Psector ca
 
 INSERT INTO om_typevalue VALUES ('visit_cat_status', 1, 'Iniciada') ON CONFLICT (id, typevalue) DO NOTHING;
 INSERT INTO om_typevalue VALUES ('visit_cat_status', 2, 'Stand-by') ON CONFLICT (id, typevalue) DO NOTHING;
-INSERT INTO om_typevalue VALUES ('visit_cat_status', 3, 'Cancelada') ON CONFLICT (id, typevalue) DO NOTHING;
-INSERT INTO om_typevalue VALUES ('visit_cat_status', 4, 'Acabada') ON CONFLICT (id, typevalue) DO NOTHING;
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 4, 'Finalizada') ON CONFLICT (id, typevalue) DO NOTHING;
