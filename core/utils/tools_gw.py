@@ -19,7 +19,7 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
@@ -260,7 +260,7 @@ def create_body(form='', feature='', filter_fields='', extras=None):
 
     info_types = {'full': 1}
     info_type = info_types.get(global_vars.project_vars['info_type'])
-    lang = QgsApplication.locale().upper()
+    lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     client = f'$${{"client":{{"device":4, "lang":"{lang}"'
     if info_type is not None:
