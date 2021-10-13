@@ -84,13 +84,15 @@ class GwArcFusionButton(GwMaptool):
 
         if not text_result:
             self.dlg_fusion.close()
-        # Refresh map canvas
+
         self.refresh_map_canvas()
 
-        # Deactivate map tool
-        self.deactivate()
-
-        self.set_action_pan()
+        # Check in init config file if user wants to keep map tool active or not
+        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init", prefix=True)
+        keep_maptool_active = tools_os.set_boolean(value, False)
+        if not keep_maptool_active:
+            self.deactivate()
+            self.recover_previus_maptool()
 
 
     def _get_arc_fusion(self, event):
