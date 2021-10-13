@@ -177,7 +177,9 @@ class GwMaptool(QgsMapTool):
 
         # Deactivate map tool
         self.deactivate()
-        self.set_action_pan()
+
+        # Restore previous QGIS map tool
+        self.recover_previus_maptool()
 
 
     def refresh_map_canvas(self):
