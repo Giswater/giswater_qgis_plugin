@@ -2760,7 +2760,7 @@ def manage_current_selections_docker(result, open=False):
         :param open: if it has to create a new docker or just update it
     """
 
-    title = ""
+    title = "Gw Selectors: "
     if 'userValues' in result['body']['data']:
         for user_value in result['body']['data']['userValues']:
             if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
