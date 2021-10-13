@@ -32,7 +32,7 @@ class GwArcDivideButton(GwMaptool):
             toolbar.removeAction(self.action)
 
         # selected_action = 1: DRAG-DROP
-        # selected_action = 2: STATIC
+        # selected_action = 2: SELECT
         self.selected_action = 1
         self.menu = QMenu()
         self.menu.setObjectName("GW_replace_menu")
@@ -125,7 +125,7 @@ class GwArcDivideButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['DRAG-DROP', 'STATIC']
+        actions = ['DRAG-DROP', 'SELECT']
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -210,10 +210,8 @@ class GwArcDivideButton(GwMaptool):
     def _move_node(self, node_id, point):
         """ Move selected node to the current point """
 
-        srid = global_vars.data_epsg
-
         # Update node geometry
-        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
         status = tools_db.execute_sql(sql, log_sql=True)
@@ -235,7 +233,8 @@ class GwArcDivideButton(GwMaptool):
             message = "Move node: Error updating geometry"
             tools_qgis.show_warning(message)
 
-        self.cancel_map_tool()
+        # Check in init config file if user wants to keep map tool active or not
+        self.manage_active_maptool()
 
 
     def _release_event(self, event):
