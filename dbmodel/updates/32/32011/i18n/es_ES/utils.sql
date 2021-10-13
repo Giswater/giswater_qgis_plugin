@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO om_visit_cat_status VALUES (1, 'Iniciada', NULL);
 INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
+INSERT INTO om_visit_cat_status VALUES (3, 'Cancelada', NULL);
 INSERT INTO om_visit_cat_status VALUES (4, 'Finalizada', NULL);
 
 INSERT INTO om_visit_filetype_x_extension VALUES ('Documento', 'doc');

@@ -15,4 +15,5 @@ INSERT INTO plan_typevalue VALUES ('psector_status', 3, 'CANCEL.LAT', 'Psector c
 
 INSERT INTO om_typevalue VALUES ('visit_cat_status', 1, 'Iniciada');
 INSERT INTO om_typevalue VALUES ('visit_cat_status', 2, 'Stand-by');
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 3, 'Cancelada');
 INSERT INTO om_typevalue VALUES ('visit_cat_status', 4, 'Finalitzada');
