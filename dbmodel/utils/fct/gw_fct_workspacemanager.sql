@@ -13,8 +13,6 @@ $BODY$
 
 /*EXAMPLE
 --create new workspace
-SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "name":"WS2", "descript":"test" }}$$);
 
@@ -28,6 +26,9 @@ SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1
 
 SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK" }}$$);
+
+SELECT SCHEMA_NAME.gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+"feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"INFO","id":"2" }}$$);
 */
 
 DECLARE 
@@ -215,33 +216,21 @@ BEGIN
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
-		--comment code related to reset workspace - save current settings in a temporal workspace in order the set it back as they were
-		/*INSERT INTO cat_workspace (name, config)
-		VALUES (concat('temp_',current_user), v_workspace_config)
-		ON CONFLICT (name) DO NOTHING;*/
-
 		--save workspace in config_param_user
 		INSERT INTO config_param_user (parameter,value, cur_user)
 		VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
 		
-				--capture config of selected workspace
+		--capture config of selected workspace
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 
-		
-		--comment code related to reseting the workspace
-	/*ELSIF v_action = 'RESET' THEN
-		--delete current vdefault workspace
-		DELETE FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user=current_user;
-
-		--capture previously set settings
-		SELECT config INTO v_workspace_config FROM cat_workspace WHERE name=concat('temp_',current_user);
+	ELSIF v_action = 'INFO' THEN
+		--capture config of selected workspace
+		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
-		--delete temporal workspace
-		DELETE FROM cat_workspace WHERE name=concat('temp_',current_user);*/
 
 	ELSIF v_action = 'CHECK' THEN 
 
@@ -257,7 +246,7 @@ BEGIN
 		
 	END IF;
 
-	IF v_action = 'RESET' OR v_action = 'CURRENT' THEN
+	IF v_action = 'CURRENT' OR  v_action = 'INFO'  THEN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'SELECTOR CONFIGURATION');
 		--set selector values
 		FOR rec_selector IN SELECT * FROM json_array_elements(v_config_values) LOOP
@@ -266,37 +255,39 @@ BEGIN
 
 			v_selector_name = json_object_keys(rec_selector);
 			
-			--remove values for selector
-			EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
-	
-			v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
-			--insert values into selectors with more than 1 field
-			IF  v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
-			OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
-				
-				FOR rec_selectorcomp IN SELECT * FROM json_array_elements(v_selector_value) LOOP
-
-					SELECT string_agg(key,', ') as keys,  string_agg(quote_literal(value),', ') as values  INTO rec_selectorcolumn FROM (
-					SELECT * from json_each_text(rec_selectorcomp::JSON))a;
+			IF v_action = 'CURRENT' THEN
+				--remove values for selector
+				EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
+		
+				v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
+				--insert values into selectors with more than 1 field
+				IF  v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
+				OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
 					
-					EXECUTE 'INSERT INTO '||v_selector_name||' ('||rec_selectorcolumn.keys||') 
-					VALUES ('||rec_selectorcolumn.values||' );';
-			
-				END LOOP;
-			ELSE 
-			--insert values into selectors with 1 field
-				IF v_selector_value IS NOT NULL THEN
-					EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
-					AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
-					INTO v_datatype;
+					FOR rec_selectorcomp IN SELECT * FROM json_array_elements(v_selector_value) LOOP
 
-					EXECUTE 'INSERT INTO '||v_selector_name||'
-					SELECT value::'||v_datatype||', current_user FROM json_array_elements_text('''||v_selector_value||''')';
+						SELECT string_agg(key,', ') as keys,  string_agg(quote_literal(value),', ') as values  INTO rec_selectorcolumn FROM (
+						SELECT * from json_each_text(rec_selectorcomp::JSON))a;
+						
+						EXECUTE 'INSERT INTO '||v_selector_name||' ('||rec_selectorcolumn.keys||') 
+						VALUES ('||rec_selectorcolumn.values||' );';
+				
+					END LOOP;
+				ELSE 
+				--insert values into selectors with 1 field
+					IF v_selector_value IS NOT NULL THEN
+						EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
+						AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
+						INTO v_datatype;
+
+						EXECUTE 'INSERT INTO '||v_selector_name||'
+						SELECT value::'||v_datatype||', current_user FROM json_array_elements_text('''||v_selector_value||''')';
+					END IF;
+
 				END IF;
-
 			END IF;
-			
 		END LOOP;
+		
 		
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'INP CONFIGURATION');
@@ -307,17 +298,19 @@ BEGIN
 			
 			INSERT INTO audit_check_data (fid, error_message) SELECT v_fid, replace(jsonb_build_object(key, value)::text,'\','') from json_each_text(v_config_values);
 			
-			UPDATE config_param_user SET value = a.value,  cur_user = current_user 
-			FROM  (SELECT key, value from json_each_text(v_config_values))a
-			WHERE parameter=a.key;
-			
-			INSERT INTO config_param_user (parameter, value, cur_user) 
-			SELECT key, valor, current_user FROM 
-			(SELECT key, value as valor from json_each_text(v_config_values)) a
-			ON CONFLICT DO NOTHING;
+			IF v_action = 'CURRENT' THEN
+				UPDATE config_param_user SET value = a.value,  cur_user = current_user 
+				FROM  (SELECT key, value from json_each_text(v_config_values))a
+				WHERE parameter=a.key;
+				
+				INSERT INTO config_param_user (parameter, value, cur_user) 
+				SELECT key, valor, current_user FROM 
+				(SELECT key, value as valor from json_each_text(v_config_values)) a
+				ON CONFLICT DO NOTHING;
+			END IF;
 		END LOOP;
 
-		v_return_msg = 'Workspace successfully changed';
+		v_return_msg = 'Workspace changed successfully';
 	END IF;
 
 	
