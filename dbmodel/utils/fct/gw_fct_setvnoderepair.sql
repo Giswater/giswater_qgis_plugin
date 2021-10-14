@@ -55,7 +55,7 @@ BEGIN
 
 	-- getting input data 	
 	v_tolerance :=  (((p_data ->>'data')::json->>'parameters')::json)->>'tolerance';
-	IF v_tolerance IS NULL THEN v_tolerance = 0.1; END IF;
+	IF v_tolerance IS NULL THEN v_tolerance = 0.01; END IF;
 
 	v_fid :=  (((p_data ->>'data')::json->>'parameters')::json)->>'fid';
 	IF v_fid IS NULL THEN v_fid = 296; END IF;
