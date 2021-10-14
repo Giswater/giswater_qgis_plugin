@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/10/14
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
-VALUES('108', 'INP result line', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+VALUES('110', 'INP result line', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" readOnly="0" version="3.16.7-Hannover" simplifyDrawingTol="1" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" minScale="100000000" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
@@ -541,16 +541,7 @@ VALUES('108', 'INP result line', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com
   <editforminitcodesource>0</editforminitcodesource>
   <editforminitfilepath></editforminitfilepath>
   <editforminitcode><![CDATA[# -*- codificación: utf-8 -*-
-"""
-Los formularios de QGIS pueden tener una función de Python que
-es llamada cuando se abre el formulario.
 
-Use esta función para añadir lógica extra a sus formularios.
-
-Introduzca el nombre de la función en el campo
-"Python Init function".
-Sigue un ejemplo:
-"""
 from qgis.PyQt.QtWidgets import QWidget
 
 def my_form_open(dialog, layer, feature):
@@ -586,7 +577,7 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
-VALUES('109', 'INP result point', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+VALUES('111', 'INP result point', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="0" hasScaleBasedVisibilityFlag="0" readOnly="0" version="3.16.7-Hannover" simplifyDrawingTol="1" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" minScale="100000000" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
@@ -599,9 +590,9 @@ VALUES('109', 'INP result point', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.co
       <end></end>
     </fixedRange>
   </temporal>
-  <renderer-v2 attr="" symbollevels="0" forceraster="0" type="categorizedSymbol" enableorderby="0">
+  <renderer-v2 attr="fid" symbollevels="0" forceraster="0" type="categorizedSymbol" enableorderby="0">
     <categories>
-      <category value="159" symbol="0" label="Orphan node" render="true"/>
+      <category value="228" symbol="0" label="Orphan node" render="true"/>
       <category value="" symbol="2" label="Other errors" render="true"/>
     </categories>
     <symbols>
@@ -1109,16 +1100,7 @@ VALUES('109', 'INP result point', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.co
   <editforminitcodesource>0</editforminitcodesource>
   <editforminitfilepath></editforminitfilepath>
   <editforminitcode><![CDATA[# -*- codificación: utf-8 -*-
-"""
-Los formularios de QGIS pueden tener una función de Python que
-es llamada cuando se abre el formulario.
 
-Use esta función para añadir lógica extra a sus formularios.
-
-Introduzca el nombre de la función en el campo
-"Python Init function".
-Sigue un ejemplo:
-"""
 from qgis.PyQt.QtWidgets import QWidget
 
 def my_form_open(dialog, layer, feature):

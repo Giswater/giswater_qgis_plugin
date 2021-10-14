@@ -633,7 +633,7 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom' 
 		) AS feature
-		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
+		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
 			UNION
 		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row
 		      ) features;
