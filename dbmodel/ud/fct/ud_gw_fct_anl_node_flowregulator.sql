@@ -47,7 +47,11 @@ BEGIN
     DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=112;	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, concat('NODE FLOW REGULATOR ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, '---------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, 'INFO: The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, 'If you are looking to remove results please set column verified with this value');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, '');
+
 
     -- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -59,18 +63,18 @@ BEGIN
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id, state)
-				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 112, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,'||v_worklayer||'.state
-				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN ('||v_array||')
-				WHERE arc.state=1 and '||v_worklayer||'.state=1
-				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.state
+				SELECT node_1 as node_id, n.expl_id, 112, count(node_1) as num_arcs, n.the_geom,nodecat_id, n.state
+				FROM arc JOIN '||v_worklayer||' n ON node_id=node_1 AND node_id IN ('||v_array||')
+				WHERE arc.state=1 and n.state=1 AND n.verified !=''VERIFIED''
+				GROUP BY node_1, n.expl_id, n.the_geom, n.nodecat_id, n.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';	
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id,state)
-				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 112, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id,'||v_worklayer||'.state
-				FROM arc JOIN '||v_worklayer||' ON node_id=node_1
-				WHERE arc.state=1 and '||v_worklayer||'.state=1
-				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.state
+				SELECT node_1 as node_id, n.expl_id, 112, count(node_1) as num_arcs, n.the_geom, nodecat_id, n.state
+				FROM arc JOIN '||v_worklayer||' n ON node_id=node_1
+				WHERE arc.state=1 and n.state=1 AND n.verified !=''VERIFIED''
+				GROUP BY node_1, n.expl_id, n.the_geom, n.nodecat_id, n.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';
 	END IF;

@@ -48,8 +48,12 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=113;	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, concat('OUTFALL NODE ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, '-------------------------------------------------------------');
-
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, '----------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, 'INFO: The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, 'If you are looking to remove results please set column verified with this value');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (113, null, 4, '')
+	
+	
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
@@ -62,11 +66,11 @@ BEGIN
 		v_sql := 'SELECT * FROM '||v_worklayer||' AS a WHERE state=1 
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_2 = a.node_id) > 0)  
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0)
-					AND node_id IN ('||v_array||');';
+					AND node_id IN ('||v_array||') AND verified != ''VERIFIED'';';
 	ELSE
 		v_sql := 'SELECT * FROM '||v_worklayer||' AS a WHERE state=1 
 					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_2 = a.node_id) > 0)  
-					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0);';
+					AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0) AND verified != ''VERIFIED'' ;';
 	END IF;
 
 	FOR rec_node IN  EXECUTE v_sql

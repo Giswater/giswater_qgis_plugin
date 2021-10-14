@@ -56,15 +56,18 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=110;	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, concat('ARC INVERTED ANALYSIS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '-------------------------------------------------------------');
-
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '--------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'INFO: The analysis have been executed skipping arcs with ''VERIFIED'' on colum verified');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'If you are looking to remove results please set column verified with this value');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '')
+	
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN ('||v_array||');';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN ('||v_array||') AND verified != ''VERIFIED'';';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND verified != ''VERIFIED'';';
 	END IF;
 
 	-- get results

@@ -53,6 +53,10 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, concat('NODE WITH EXIT ARC OVER ENTRY ARC ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, 'INFO: The analysis have been executed skipping nodes with ''VERIFIED'' on colum verified');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, 'If you are looking to remove results please set column verified with this value');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (111, null, 4, '');
+
 
     	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -67,10 +71,10 @@ BEGIN
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		v_sql:= 'SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
-		and node_id in (select node_2 from v_edit_arc) and node_id IN ('||v_array||');';
+		and node_id in (select node_2 from v_edit_arc) and node_id IN ('||v_array||') AND verified != ''VERIFIED'')';
 	ELSE
 		v_sql:= ('SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
-		and node_id in (select node_2 from v_edit_arc)');
+		and node_id in (select node_2 from v_edit_arc) AND verified != ''VERIFIED''');
 	END IF;
 	
 
