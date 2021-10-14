@@ -69,7 +69,7 @@ BEGIN
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
 		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, active=NEW.active
-		WHERE dma_id=NEW.dma_id;
+		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;
 		

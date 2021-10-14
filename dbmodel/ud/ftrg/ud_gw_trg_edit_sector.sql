@@ -40,7 +40,7 @@ BEGIN
 			UPDATE sector 
 			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, 
 			undelete=NEW.undelete, active=NEW.active
-			WHERE sector_id=NEW.sector_id;
+			WHERE sector_id=OLD.sector_id;
 				
         RETURN NEW;
 

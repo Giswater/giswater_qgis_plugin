@@ -44,7 +44,7 @@ BEGIN
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
 		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, grafconfig=NEW.grafconfig::json, 
 		stylesheet = NEW.stylesheet::json, active=NEW.active
-		WHERE dqa_id=NEW.dqa_id;
+		WHERE dqa_id=OLD.dqa_id;
 		
 		RETURN NEW;
 		

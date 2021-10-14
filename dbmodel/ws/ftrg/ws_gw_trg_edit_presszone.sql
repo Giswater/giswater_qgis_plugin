@@ -40,7 +40,7 @@ BEGIN
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active
-		WHERE presszone_id=NEW.presszone_id;
+		WHERE presszone_id=OLD.presszone_id;
 		
 		RETURN NEW;
 		

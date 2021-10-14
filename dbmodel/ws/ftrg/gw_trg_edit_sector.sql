@@ -21,24 +21,24 @@ BEGIN
 	
 	IF TG_OP = 'INSERT' THEN
 
-	IF NEW.sector_id IS NULL THEN
-		NEW.sector_id=(SELECT nextval('SCHEMA_NAME.sector_sector_id_seq'::regclass));
-	END IF;
-					
-			INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, grafconfig, stylesheet)
-			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, 
-			NEW.grafconfig::json, NEW.stylesheet::json);
+		IF NEW.sector_id IS NULL THEN
+			NEW.sector_id=(SELECT nextval('ws_sample.sector_sector_id_seq'::regclass));
+		END IF;
+						
+		INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, grafconfig, stylesheet)
+		VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, 
+		NEW.grafconfig::json, NEW.stylesheet::json);
 	
-			INSERT INTO selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
+		INSERT INTO selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
 				
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-			UPDATE sector 
-			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, 
-			undelete=NEW.undelete, grafconfig=NEW.grafconfig::json, stylesheet = NEW.stylesheet::json
-			WHERE sector_id=NEW.sector_id;
+		UPDATE sector 
+		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, 
+		undelete=NEW.undelete, grafconfig=NEW.grafconfig::json, stylesheet = NEW.stylesheet::json
+		WHERE sector_id=OLD.sector_id;
 				
         RETURN NEW;
 
