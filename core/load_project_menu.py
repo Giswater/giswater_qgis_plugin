@@ -331,6 +331,7 @@ class GwMenuLoad(QObject):
         self._reset_all_rubberbands()
         self.iface.actionPan().trigger()
         self._reload_layers()
+        self._reset_notify()
 
 
     def _reload_layers(self):
@@ -367,5 +368,15 @@ class GwMenuLoad(QObject):
         for i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)
+
+
+    def _reset_notify(self):
+        """ Reset notify class """
+
+        if global_vars.notify:
+            list_channels = ['desktop', global_vars.current_user]
+            global_vars.notify.stop_listening(list_channels)
+            global_vars.notify.start_listening(list_channels)
+
 
     # endregion
