@@ -20,6 +20,7 @@ DECLARE
 	v_new_field text;
 	v_new_data json;
 	v_new_param integer;
+	v_field text;
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
@@ -51,9 +52,15 @@ BEGIN
 				IF  v_new_field = ANY(v_list) OR v_new_field IS NULL  THEN
 					CONTINUE;
 				ELSE 
+					IF rec.target_field = 'value_param' THEN
+						v_field = rec.typevalue_name;
+					ELSE
+						v_field=rec.target_field;
+					END IF;
+					
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3022", "function":"2744","debug_msg":
-					"'||concat('Catalog: ', rec.typevalue_table,', insert table: ',v_table, ', field: ',rec.target_field,', value: ', v_new_field)||'"}}$$);';	
+					"'||concat('Catalog: ', rec.typevalue_table,', insert table: ',v_table, ', field: ',v_field,', value: ', v_new_field)||'"}}$$);';	
 
 				END IF;
 				
