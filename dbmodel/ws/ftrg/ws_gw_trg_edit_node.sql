@@ -769,13 +769,10 @@ BEGIN
 
 				-- epa tables
 				SELECT epa_table,epa_default into v_new_epatable, NEW.epa_type FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id				
-				JOIN cat_node ON cat_feature_node.id=nodetype_id where cat_node.id=NEW.nodecat_id;
+				JOIN cat_node ON cat_feature_node.id=nodetype_id where cat_node.id=NEW.nodecat_id AND s.feature_type = 'NODE';
 
-					raise notice 'epa,%,%',v_new_epatable,NEW.epa_type;
-				v_old_epatable = (SELECT epa_table FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id
-								WHERE epa_default = OLD.epa_type LIMIT 1);
+				v_old_epatable = (SELECT epa_table FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id WHERE epa_default = OLD.epa_type AND s.feature_type = 'NODE' LIMIT 1);
 								
-				--NEW.epa_type = (SELECT epa_default FROM cat_feature_node JOINWHERE epa_table = v_new_epatable LIMIT 1);
 				IF v_new_epatable != v_old_epatable THEN
 					v_sql='DELETE FROM '||v_old_epatable||' WHERE node_id='||quote_literal(OLD.node_id);
 					EXECUTE v_sql;

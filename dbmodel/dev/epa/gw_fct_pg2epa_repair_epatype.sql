@@ -130,7 +130,7 @@ BEGIN
 
 		-- node's delete
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id WHERE epa_default !='UNDEFINED'
+		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id WHERE epa_default !='UNDEFINED' AND s.feature_type = 'NODE'
 		LOOP
 			RAISE NOTICE 'rec_feature % ', rec_feature;
 			
