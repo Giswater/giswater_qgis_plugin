@@ -784,9 +784,9 @@ INSERT INTO ext_cat_hydrometer VALUES ('4', NULL, NULL, NULL, NULL, NULL, NULL, 
 INSERT INTO ext_cat_hydrometer VALUES ('5', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'DN50', NULL);
 INSERT INTO ext_cat_hydrometer VALUES ('6', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'DN63', NULL);
 
-INSERT INTO ext_cat_period VALUES ('5', '2015-05-01 00:00:00', '2015-05-31 00:00:00', 2678400, NULL, '5');
-INSERT INTO ext_cat_period VALUES ('6', '2015-06-01 00:00:00', '2015-06-30 00:00:00', 2592000, NULL, '6');
-INSERT INTO ext_cat_period VALUES ('7', '2015-07-01 00:00:00', '2015-07-31 00:00:00', 2678400, NULL, '7');
+INSERT INTO ext_cat_period VALUES ('5', '2015-05-01 00:00:00', '2015-05-31 00:00:00', 2678400, NULL, 'May');
+INSERT INTO ext_cat_period VALUES ('6', '2015-06-01 00:00:00', '2015-06-30 00:00:00', 2592000, NULL, 'June');
+INSERT INTO ext_cat_period VALUES ('7', '2015-07-01 00:00:00', '2015-07-31 00:00:00', 2678400, NULL, 'July');
 
 INSERT INTO ext_hydrometer_category VALUES ('1', 'Domestic');
 INSERT INTO ext_hydrometer_category VALUES ('2', 'Industry');
