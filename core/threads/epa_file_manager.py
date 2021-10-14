@@ -202,10 +202,15 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Create inp file into POSTGRESQL")
+        tools_log.log_info(f"Export INP file into PostgreSQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
+            return False
+
+        if self.file_inp == "null":
+            message = "You have to set this parameter"
+            self.error_msg = f"{message}: INP file"
             return False
 
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
