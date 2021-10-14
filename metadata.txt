@@ -7,12 +7,12 @@ about=Disclaimer: This plugin is released using the open source GNU-GPL3 license
 version=3.5.014
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 
-changelog=Version 3.5.012
-    - Add new widgets (parent_id, workcat_id) to psector form
-    - Allow pan action activation between node selections (profile tool)
-    - New tool to replace pipe automatically on psectors
-    - Refactor: go2epa hydrology selector for UD same as WS
-    - New button Workspace Manager
+changelog=Version 3.5.014
+    - Arc divide and replace feature: Check if user wants to keep map tool active or not
+    - Arc divide: possibility to disable warnings/log message
+    - Add current psector/workspace to a docker
+    - Bug fix: Manage translation of Admin button
+    - Add info log for Workspaces when select a row
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
