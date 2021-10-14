@@ -29,7 +29,7 @@ class GwEpaFileManager(GwTask):
         self.json_result = None
         self.rpt_result = None
         self.fid = 140
-        self.funtion_name = None
+        self.function_name = None
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
@@ -67,7 +67,7 @@ class GwEpaFileManager(GwTask):
         if self.go2epa_export_inp or self.go2epa_execute_epa:
             status = self._exec_function_pg2epa()
             if not status:
-                self.funtion_name = 'gw_fct_pg2epa_main'
+                self.function_name = 'gw_fct_pg2epa_main'
                 return False
 
         if self.go2epa_export_inp:
@@ -77,7 +77,7 @@ class GwEpaFileManager(GwTask):
             status = self._execute_epa()
 
         if status and self.go2epa_import_result:
-            self.funtion_name = 'gw_fct_rpt2pg_main'
+            self.function_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
         return status
@@ -95,7 +95,7 @@ class GwEpaFileManager(GwTask):
 
         # If PostgreSQL function returned null
         if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
-            msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
+            msg = f"Database returned null. Check postgres function '{self.function_name}'"
             tools_log.log_warning(msg)
 
         elif result:
@@ -118,6 +118,11 @@ class GwEpaFileManager(GwTask):
                                                         None, True, True, 1, True, close=False,
                                                         call_set_tabs_enabled=False)
                         self.message = self.rpt_result['message']['text']
+            sql = f"SELECT {self.function_name}("
+            if self.body:
+                sql += f"{self.body}"
+            sql += f");"
+            tools_gw.manage_json_response(self.complet_result, sql, None)
 
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
