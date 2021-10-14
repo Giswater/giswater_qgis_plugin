@@ -80,6 +80,9 @@ v_exportmodeval text;
 
 object_rec record;
 
+v_graphiclog boolean;
+
+
 BEGIN
 
 	--  Search path	
@@ -95,6 +98,7 @@ BEGIN
 
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -497,35 +501,53 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
 	
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (
-	SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid order by criticity desc, id asc
-	) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	IF v_graphiclog THEN
 
-	-- control nulls
-	v_options := COALESCE(v_options, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
+		--points
+		v_result = null;
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT node_id as feature_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+		v_result := COALESCE(v_result, '[]'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
-	IF v_fid::text = 227::text THEN
-		v_result_point = '{}';
+		-- arcs
+		v_result = null;
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		    'type',       'Feature',
+		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		   'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM 
+		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)) row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
 	END IF;
-	
+
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
+
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||
 			',"data":{"options":'||v_options||','||
-				'"info":'||v_result_info||'}'||
+				'"info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||'}'||
 			'}'||
 		'}')::json, 2858, null, null, null);
 
-	-- Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
