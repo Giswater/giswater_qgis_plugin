@@ -500,7 +500,15 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
-	
+
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid
+	order by criticity desc, id asc) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
 	IF v_graphiclog THEN
 
 		--points
@@ -512,7 +520,7 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT node_id as feature_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
+		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -526,14 +534,16 @@ BEGIN
 		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM 
-		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)) row) features;
+		FROM  (SELECT arc_id as id, fid,  'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 	END IF;
 
+	-- control nulls
+	v_options := COALESCE(v_options, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 

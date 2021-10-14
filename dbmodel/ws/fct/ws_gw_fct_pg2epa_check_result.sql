@@ -622,10 +622,6 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	-- control nulls
-	v_options := COALESCE(v_options, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-
 	IF v_graphiclog THEN
 
 		--points
@@ -635,11 +631,12 @@ BEGIN
 		SELECT jsonb_build_object(
 		 'type',       'Feature',
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
+		'properties', to_jsonb(row) - 'the_geom' 
 		) AS feature
-		FROM (SELECT node_id as feature_id, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
+		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 159
 			UNION
-		      SELECT node_id, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row) features;
+		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row
+		      ) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -654,12 +651,11 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM 
-		(SELECT arc_id, 'Disconnected arc'::text as descript, the_geom FROM arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)
+		(SELECT arc_id as id, fid, 'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139
 		  UNION
-		 SELECT arc_id, 'Dry arc'::text as descript, the_geom FROM arc WHERE arc_id IN 
-		 (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid =232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 139)
+		 SELECT arc_id, fid, 'Dry arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid =232 
 		  UNION
-		 SELECT arc_id, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+		 SELECT arc_id, fid, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
@@ -667,6 +663,9 @@ BEGIN
 
 	END IF;
 
+	-- control nulls
+	v_options := COALESCE(v_options, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
