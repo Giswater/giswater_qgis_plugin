@@ -1617,7 +1617,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     sql += f");"
 
     # Get log_sql for developers
-    dev_log_sql = get_config_parser('system', 'log_sql', "user", "init", False)
+    dev_log_sql = get_config_parser('log', 'log_sql', "user", "init", False)
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 

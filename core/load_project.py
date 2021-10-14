@@ -73,7 +73,7 @@ class GwLoadProject(QObject):
             global_vars.schema_name = schema_name.replace('"', '')
 
         # Check for developers options
-        value = tools_gw.get_config_parser('system', 'log_sql', "user", "init", False)
+        value = tools_gw.get_config_parser('log', 'log_sql', "user", "init", False)
         tools_qgis.user_parameters['log_sql'] = value
         value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value

@@ -162,9 +162,9 @@ class Giswater(QObject):
         tools_gw.user_params_to_userconfig()
 
         # Set logger parameters min_log_level and log_limit_characters
-        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
-        log_limit_characters = int(tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False))
-        log_db_limit_characters = int(tools_gw.get_config_parser('system', 'log_db_limit_characters', 'user', 'init', 200))
+        min_log_level = int(tools_gw.get_config_parser('log', 'log_level', 'user', 'init', False))
+        log_limit_characters = int(tools_gw.get_config_parser('log', 'log_limit_characters', 'user', 'init', False))
+        log_db_limit_characters = int(tools_gw.get_config_parser('log', 'log_db_limit_characters', 'user', 'init', 200))
         global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, log_db_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
