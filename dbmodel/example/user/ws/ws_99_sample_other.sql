@@ -594,3 +594,5 @@ UPDATE cat_feature_connec SET double_geom = '{"activated":true,"value":1}' WHERE
 UPDATE cat_connec SET dint = dnom::numeric;
 
 UPDATE node SET nodecat_id = 'TDN110-63 PN16' WHERE node_id = '1044';
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_status_vdefault', '4', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
