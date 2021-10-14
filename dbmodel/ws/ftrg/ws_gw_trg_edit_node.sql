@@ -101,7 +101,8 @@ BEGIN
 		-- Node ID	
 		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 		NEW.node_id:= (SELECT nextval('urn_id_seq'));
-			
+		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
+		
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node WHERE active IS TRUE) = 0) THEN

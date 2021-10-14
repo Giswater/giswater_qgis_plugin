@@ -160,7 +160,8 @@ BEGIN
 		-- Node ID
 		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 		NEW.node_id:= (SELECT nextval('urn_id_seq'));
-
+		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
+		
 		-- get sys type for parent table
 		IF v_man_table = 'parent' THEN
 			v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
