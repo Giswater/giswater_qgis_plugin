@@ -1562,7 +1562,10 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     attempt = 0
     while json_result is None and attempt < global_vars.max_retries:
         attempt += 1
-        tools_log.log_info(f"Attempt {attempt} of {global_vars.max_retries}")
+        if attempt == 1:
+            tools_log.log_info(f"Starting process...")
+        else:
+            tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.max_retries})...")
         json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
             is_thread, check_function)
         complet_result = json_result
