@@ -2760,6 +2760,9 @@ def manage_current_selections_docker(result, open=False):
         :param open: if it has to create a new docker or just update it
     """
 
+    if not result or 'body' not in result or 'data' not in result['body']:
+        return
+
     title = "Gw Selectors: "
     if 'userValues' in result['body']['data']:
         for user_value in result['body']['data']['userValues']:
