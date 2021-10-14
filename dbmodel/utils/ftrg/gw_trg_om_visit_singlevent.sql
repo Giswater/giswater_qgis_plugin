@@ -80,7 +80,7 @@ BEGIN
         END IF;
         
         -- event table           
-  	    -- Delete parameters in case of inconsistency againts visitclass and events (due class of visit have been changed)
+  	    -- Delete parameters in case of inconsistency against visitclass and events (due class of visit have been changed)
    	    DELETE FROM om_visit_event WHERE visit_id=NEW.visit_id AND parameter_id NOT IN 
         (SELECT parameter_id FROM config_visit_class_x_parameter WHERE class_id=NEW.class_id AND active IS TRUE);
 

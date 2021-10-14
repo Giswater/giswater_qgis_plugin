@@ -390,7 +390,7 @@ BEGIN
 			
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity,result_id, error_message, fcount)
-			VALUES (125, 1, '253','INFO: No features without concordance againts state and state_type.',v_count);
+			VALUES (125, 1, '253','INFO: No features without concordance against state and state_type.',v_count);
 		END IF;
 		
 	ELSIF v_project_type = 'WS' THEN
@@ -407,7 +407,7 @@ BEGIN
 			VALUES (125, 3, '253', concat('ERROR-253: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			VALUES (125, 1, '253', 'INFO: No features without concordance againts state and state_type.',v_count);
+			VALUES (125, 1, '253', 'INFO: No features without concordance against state and state_type.',v_count);
 		END IF;
 	END IF;
 

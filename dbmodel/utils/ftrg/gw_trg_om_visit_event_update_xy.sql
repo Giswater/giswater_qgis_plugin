@@ -32,7 +32,7 @@ BEGIN
 
 	IF v_the_geom IS NOT NULL AND NEW.position_value IS NOT NULL AND NEW.position_id IS NOT NULL THEN 
 	
-		-- control of the position_value againts arc length
+		-- control of the position_value against arc length
 		IF NEW.position_value <0 OR NEW.position_value> ST_length(v_the_geom) THEN
             EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3012", "function":"2498","debug_msg":"'||v_arc_id::text||'"}}$$);';

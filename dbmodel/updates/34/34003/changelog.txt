@@ -6,7 +6,7 @@
 - New variable to configure the possibility to fill customercode values using code values from feature
 - Refactor constraint anl_mincut_selector_valve using ON DELETE RESTRICT
 - Enhance peformance and bug fix for import inp files (EPANET and SWMM)
-- New trigger function to control proximity againts gullys
+- New trigger function to control proximity against gullys
 - New trigger function to control values on config tables
 - New variable to control label on api forms overwriting label with column_id
 - New constraint unique on man_addields_parameter (param_name, cat_feature_id)

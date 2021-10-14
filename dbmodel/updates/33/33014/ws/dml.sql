@@ -23,7 +23,7 @@ ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_typevalue_pumptype', 1, 'PRESSURE GROUP', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_typevalue_pumptype', 2, 'PUMP STATION', NULL);
 
--- adding constraint againts field and domain value table
+-- adding constraint against field and domain value table
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_pumptype', 'inp_pump', 'pump_type', NULL);
 
 

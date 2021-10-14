@@ -679,7 +679,7 @@ BEGIN
 					EXECUTE 'UPDATE arc t SET '||v_field||'  = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There are conflict againts ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' arc(s) affected.'));
+					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' arc(s) affected.'));
 
 					-- node
 					EXECUTE 'UPDATE node t SET '||v_field||'  = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
@@ -688,7 +688,7 @@ BEGIN
 					EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There are conflict againts ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' connec(s) affected.'));
+					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' connec(s) affected.'));
 
 					-- log
 					EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';

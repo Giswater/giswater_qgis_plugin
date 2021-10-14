@@ -248,7 +248,7 @@ BEGIN
 		ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat(
-				'INFO: Roughness values have been checked againts head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.'));
+				'INFO: Roughness values have been checked against head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.'));
 		END IF;
 
 		RAISE NOTICE '4 - Check for network mode';

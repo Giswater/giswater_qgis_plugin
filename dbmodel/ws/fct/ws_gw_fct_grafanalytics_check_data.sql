@@ -189,7 +189,7 @@ BEGIN
 			VALUES (211, 1, '268', 'INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
-		-- check coherence againts nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fid:  179)
+		-- check coherence against nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fid:  179)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
 		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
 		active FROM sector WHERE grafconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''SECTOR'' AND (a.node_id IS NULL
@@ -240,7 +240,7 @@ BEGIN
 			VALUES (211, 1, '269','INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 		
-		-- dma : check coherence againts nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fid:  180)
+		-- dma : check coherence against nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fid:  180)
 		v_querytext ='SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
 		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
 		active FROM dma WHERE grafconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''DMA'' AND (a.node_id IS NULL
@@ -292,7 +292,7 @@ BEGIN
 			VALUES (211, 1, '270','INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
-		-- dqa : check coherence againts nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fid:  181)
+		-- dqa : check coherence against nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fid:  181)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,  '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
 		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
 		active FROM dqa WHERE grafconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''DQA'' AND (a.node_id IS NULL
@@ -345,7 +345,7 @@ BEGIN
 			VALUES (211, 1, '271','INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
-		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fid:  182)
+		-- presszone : check coherence against nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fid:  182)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,'||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
 		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
 		active FROM presszone WHERE grafconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''PRESSZONE'' AND (a.node_id IS NULL

@@ -83,8 +83,8 @@ BEGIN
 	INSERT INTO temp_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam, parent)
 	SELECT 
 		vnode_id as node_id, 
-		t.top_elev::numeric(12,3), -- top_elev it's interpolated top_elev againts node1 and node2 of pipe
-		t.top_elev::numeric(12,3) - t.ymax::numeric(12,3),-- elev it's interpolated using top_elev-depth againts node1 and node2 of pipe
+		t.top_elev::numeric(12,3), -- top_elev it's interpolated top_elev against node1 and node2 of pipe
+		t.top_elev::numeric(12,3) - t.ymax::numeric(12,3),-- elev it's interpolated using top_elev-depth against node1 and node2 of pipe
 		'VNODE',
 		'VNODE',
 		'JUNCTION',

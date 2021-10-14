@@ -80,7 +80,7 @@ BEGIN
 	ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 	ALTER TABLE sys_foreignkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
-	-- create triggers for the oposite tables againts typevalues
+	-- create triggers for the oposite tables against typevalues
 	PERFORM gw_fct_admin_manage_triggers('fk','ALL');
 	
 	-- create notifications triggers

@@ -91,7 +91,7 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('MINCUT ANALYSIS'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('------------------------'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps againts other mincuts'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps against other mincuts'));
 
 
 	SELECT count(*) INTO v_count FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE;
@@ -253,7 +253,7 @@ BEGIN
 												
 					-- point: connecs affected
 					INSERT INTO anl_connec (fid, connec_id, descript, the_geom)
-					SELECT 216, connec_id, concat('Additional affected connecs for mincut ',v_mincutid, ' when has conflict againts other mincuts'), 
+					SELECT 216, connec_id, concat('Additional affected connecs for mincut ',v_mincutid, ' when has conflict against other mincuts'), 
 					the_geom FROM anl_connec WHERE fid = 131 AND result_id::integer = -2 AND cur_user = current_user;
 					
 				ELSE -- there is a overlap (temporal & spatial intersection) with additional network but without connecs affected
@@ -277,11 +277,11 @@ BEGIN
 
 				-- polygon: buffer over affected pipes
 				INSERT INTO anl_polygon (fid, pol_id, descript, the_geom)
-				SELECT 216, v_mincutid,  concat('Additional network area affected for current mincut ',v_mincutid,' when when has conflict againts other mincuts.'), 
+				SELECT 216, v_mincutid,  concat('Additional network area affected for current mincut ',v_mincutid,' when when has conflict against other mincuts.'), 
 				st_multi(st_buffer(st_collect(the_geom),5)) FROM anl_arc WHERE result_id = '-2' AND fid = 131 AND cur_user = current_user;
 
 
-			ELSE  -- when the number of affected arcs is the same, may exists a real overlap (intersect one againts other) without additional network affectations
+			ELSE  -- when the number of affected arcs is the same, may exists a real overlap (intersect one against other) without additional network affectations
 
 				FOREACH v_id IN ARRAY v_conflictarray
 				LOOP

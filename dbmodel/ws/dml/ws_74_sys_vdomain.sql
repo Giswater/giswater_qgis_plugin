@@ -185,7 +185,7 @@ INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_type', 'Mincut', 'Catalog of
 INSERT INTO audit_cat_table VALUES ('inp_valve', 'Hydraulic input data', 'Defines all control valve links contained in the network.', 'role_edit', 2, '=node WHERE epa_type= ''VALVE''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_arc', 'Hydraulic result data', 'Contains the results of arc elements', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_point', 'Analysis', 'View with the results of the topology process of arcs (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting against nodes (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_arc_x_node', 'User interface view', 'View that joins arcs and nodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_visit', 'User interface view', 'Shows the information of document related to visits. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -211,7 +211,7 @@ INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec', 'masterplan', 'View f
 INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec2', 'masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec3', 'masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catsoil', 'masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (arc results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node', 'Analysis', 'View with the results of the topology process of arcs interacting against nodes (arc results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_samplepoint', 'GIS feature', 'Shows editable information about samplepoints.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_sector', 'GIS feature', 'Shows editable information about sectors.', 'role_epa', 0, NULL, 'role_epa', 1, 'Custom forms values, basic data & input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('price_compost', 'masterplan', 'Table of compound prices', 'role_master', 0, NULL, 'role_master', 1, ' Masterplan value', NULL, NULL);
@@ -516,7 +516,7 @@ INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', 'Table wi
 INSERT INTO audit_cat_table VALUES ('audit_log_data', 'System', 'Result of the audit of check data', 'role_om', 0, NULL, NULL, 0, NULL, 'audit_log_data_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_cat_param_user', 'System', 'Catalog of user parameters', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_arc', 'Analysis', 'Table with the results of the topology process of arcs', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('anl_arc_x_node', 'Analysis', 'Table with the results of the topology process of arcs interacting againts nodes', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_x_node_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('anl_arc_x_node', 'Analysis', 'Table with the results of the topology process of arcs interacting against nodes', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_x_node_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_price_simple', 'System', 'Audit prices table. Traceability of the whole prices of db', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_psector_selector', 'masterplan', 'Selector of the current plan_psector', 'role_master', 0, NULL, NULL, 0, NULL, 'plan_psector_selector_id_seq', 'id');

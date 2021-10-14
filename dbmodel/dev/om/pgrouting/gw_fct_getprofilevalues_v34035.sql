@@ -438,7 +438,7 @@ BEGIN
 			v_compheight = (SELECT addparam->>'ydim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
 		END IF;
 
-		-- check dimensions againts scale
+		-- check dimensions against scale
 		IF v_scaletofit IS FALSE THEN
 			IF v_compheight < v_profheigtht THEN
 				v_level = 2;

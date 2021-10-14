@@ -159,7 +159,7 @@ INSERT INTO audit_cat_error VALUES (1106, 'Delete is not allowed. There is hydro
 INSERT INTO audit_cat_error VALUES (1108, 'Delete is not allowed. There is hydrometer_id on ...', NULL, 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1052, 'It''s impossible to divide an arc using node that has state=(0)', 'To divide an arc, the state of the node has to be 1', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2024, 'Feature is out of any municipality,feature_id:', 'Please review your data', 2, true, NULL);
-INSERT INTO audit_cat_error VALUES (2026, 'There are conflicts againts another planified mincut.', 'Please review your data', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (2026, 'There are conflicts against another planified mincut.', 'Please review your data', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1050, 'It''s impossible to divide an arc with state=(0)', 'To divide an arc, the state has to be 1', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1084, 'Nonexistent node_id:', NULL, 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1082, 'Nonexistent arc_id:', NULL, 2, true, NULL);

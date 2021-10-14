@@ -45,7 +45,7 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)
-VALUES (2814, 'gw_trg_gully_proximity', 'ud', 'trigger function', null, null, null,'Trigger function to control proximity againts gullys', 'role_edit',
+VALUES (2814, 'gw_trg_gully_proximity', 'ud', 'trigger function', null, null, null,'Trigger function to control proximity against gullys', 'role_edit',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 

@@ -7,4 +7,4 @@
 - Enhance functions managing scenario values (dwf, dscenario and hydrology)
 - Harmonize columns for inp_patterns on WS & UD projects
 - New check to control endpoint of link over nodarc 
-- New check to control network mnode againts demand type (WS)
+- New check to control network mnode against demand type (WS)

@@ -35,7 +35,7 @@ INSERT INTO audit_cat_function VALUES (2506, 'gw_fct_create_utils_trigger', 'edi
 
 
 --2018/10/15
-INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_pavement', 'Auxiliar layer', 'Layer to relate pavements againts arc', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_pavement', 'Auxiliar layer', 'Layer to relate pavements against arc', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 --2018/10/22
 DELETE FROM audit_cat_table WHERE id='audit_cat_table_x_column';

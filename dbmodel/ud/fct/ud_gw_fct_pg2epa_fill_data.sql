@@ -59,7 +59,7 @@ BEGIN
 	result_id_var,
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
-	FROM selector_sector, node  -- we need to use node to make more easy the relation sector againts exploitation
+	FROM selector_sector, node  -- we need to use node to make more easy the relation sector against exploitation
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id

@@ -224,8 +224,8 @@ INSERT INTO audit_cat_table VALUES ('v_anl_flow_hydrometer', 'Analysis', 'View w
 INSERT INTO audit_cat_table VALUES ('v_anl_flow_connec', 'Analysis', 'View with the result of flow trace and flow exit results (connec)', NULL, 0, NULL, 'role_om', 2, 'Flow trace tool', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_flow_arc', 'Analysis', 'View with the result of flow trace and flow exit results (arc)', NULL, 0, NULL, 'role_om', 2, 'Flow trace tool', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_connec', 'Analysis', 'View with the results of the topology process of connecs', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (point results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (arc results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting against nodes (point results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node', 'Analysis', 'View with the results of the topology process of arcs interacting against nodes (arc results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ext_address', 'Streeter', 'Shows information about entrance numbers', NULL, 0, NULL, 'role_basic', 2, 'Search button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_arc', 'User interface view', 'Shows the information of document related to arcs. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_vnode', 'GIS feature', 'Shows editable information about virtual nodes.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
@@ -510,7 +510,7 @@ INSERT INTO audit_cat_table VALUES ('v_ext_plot', 'Streeter', 'Shows information
 INSERT INTO audit_cat_table VALUES ('inp_snowmelt', 'Hydraulic input data', 'Snowmelt parameters are climatic variables that apply across the entire study area when simulating snowfall and snowmelt.', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_arc', 'Analysis', 'Table with the results of the topology process of arcs', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_arc_profile_value', 'Analysis', 'Table with the results of the analysis profile tool', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_arc_profile_value_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('anl_arc_x_node', 'Analysis', 'Table with the results of the topology process of arcs interacting againts nodes', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_x_node_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('anl_arc_x_node', 'Analysis', 'Table with the results of the topology process of arcs interacting against nodes', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_arc_x_node_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_connec', 'Analysis', 'Table with the results of the topology process of connecs', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_flow_arc', 'Analysis', 'Table with the result of flow trace and flow exit results', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_flow_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_flow_node', 'Analysis', 'Table with the result of flow trace and flow exit results', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_flow_node_id_seq', 'id');
