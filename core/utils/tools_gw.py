@@ -1549,7 +1549,7 @@ def get_actions_from_json(json_result, sql):
 def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
         is_thread=False, check_function=True):
     """ Manage execution of database function @function_name
-        If execution failed, try to execute it again up to the value indicated in parameter 'max_retries'
+        If execution failed, try to execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
     """
 
     # Define dictionary with results
@@ -1560,12 +1560,12 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     complet_result = None
 
     attempt = 0
-    while json_result is None and attempt < global_vars.max_retries:
+    while json_result is None and attempt < global_vars.exec_procedure_max_retries:
         attempt += 1
         if attempt == 1:
             tools_log.log_info(f"Starting process...")
         else:
-            tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.max_retries})...")
+            tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.exec_procedure_max_retries})...")
         json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
             is_thread, check_function)
         complet_result = json_result

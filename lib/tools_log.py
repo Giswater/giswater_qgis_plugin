@@ -27,7 +27,7 @@ class GwLogger(object):
         self.logger_file.setLevel(int(log_level))
         self.min_log_level = int(log_level)
         self.log_limit_characters = None
-        self.db_limit_characters = None
+        self.log_db_limit_characters = None
         self.tab_python = f"{global_vars.plugin_name.capitalize()} PY"
         self.tab_db = f"{global_vars.plugin_name.capitalize()} DB"
 
@@ -59,15 +59,15 @@ class GwLogger(object):
         self.add_file_handler()
 
 
-    def set_logger_parameters(self, min_log_level, log_limit_characters, db_limit_characters):
-        """ Set logger parameters min_log_level, log_limit_characters, db_limit_characters """
+    def set_logger_parameters(self, min_log_level, log_limit_characters, log_db_limit_characters):
+        """ Set logger parameters min_log_level, log_limit_characters, log_db_limit_characters """
 
         if isinstance(min_log_level, int):
             self.min_log_level = min_log_level
         if isinstance(log_limit_characters, int):
             self.log_limit_characters = log_limit_characters
-        if isinstance(db_limit_characters, int):
-            self.db_limit_characters = db_limit_characters
+        if isinstance(log_db_limit_characters, int):
+            self.log_db_limit_characters = log_db_limit_characters
 
 
     def add_file_handler(self):
@@ -200,8 +200,8 @@ def log_db(text=None, color="black", bold='', message_level=0, logger_file=True,
         text = json.dumps(text)
     msg = f'<font color="{color}"><{bold}>{text}</font>'
     limit = 200
-    if global_vars.logger and global_vars.logger.db_limit_characters:
-        limit = global_vars.logger.db_limit_characters
+    if global_vars.logger and global_vars.logger.log_db_limit_characters:
+        limit = global_vars.logger.log_db_limit_characters
     msg = (msg[:limit] + '...') if len(msg) > limit and bold == '' else msg
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
