@@ -543,6 +543,14 @@ BEGIN
 			VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check any CRITICAL ERROR or WARNING, execute a query using anl_arc or anl_node table and fid=error number. For example:');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_node WHERE fid=107');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+
 		-- start process
 		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role IN 
 		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
