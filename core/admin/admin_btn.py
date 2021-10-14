@@ -94,7 +94,7 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._init_show_database()
-        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog, layer_source=layer_source)
+        self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
@@ -223,7 +223,7 @@ class GwAdminButton:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             schema_name = self._get_schema_name()
-            sql = (f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;")
+            sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
             tools_db.execute_sql(sql)
             status = self.load_updates(project_type, update_changelog=True)
             if status:
@@ -570,7 +570,7 @@ class GwAdminButton:
         qm_gen.init_dialog()
 
 
-    def _info_show_database(self, connection_status=True, username=None, show_dialog=False, layer_source=None):
+    def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
         """"""
 
         self.message_update = ''
@@ -598,7 +598,6 @@ class GwAdminButton:
         tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
 
         # Set title
-        connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
@@ -637,7 +636,7 @@ class GwAdminButton:
         self._update_manage_ui()
         self.visit_manager()
 
-        if not tools_db.check_role(self.username) and not show_dialog:
+        if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
@@ -731,7 +730,11 @@ class GwAdminButton:
             tools_qgis.show_warning("GIS folder not set")
             return
 
+        qgis_file_type = self.dlg_create_gis_project.cmb_roletype.currentIndex()
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_type', qgis_file_type, prefix=False)
         tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
+        qgis_file_export = self.dlg_create_gis_project.chk_export_passwd.isChecked()
+        tools_gw.set_config_parser('btn_admin', 'qgis_file_export', qgis_file_export, prefix=False)
 
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
@@ -792,12 +795,22 @@ class GwAdminButton:
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
+        qgis_file_type = tools_gw.get_config_parser('btn_admin', 'qgis_file_type', "user", "session", prefix=False)
+        if qgis_file_type is not None:
+            try:
+                qgis_file_type = int(qgis_file_type)
+                self.dlg_create_gis_project.cmb_roletype.setCurrentIndex(qgis_file_type)
+            except Exception:
+                pass
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False)
         if qgis_file_path is None:
             qgis_file_path = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
+        qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False)
+        qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
+        self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         if self.is_service:
             self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
             self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
@@ -906,10 +919,10 @@ class GwAdminButton:
                 return False
 
             if self._process_folder(self.folderLocale, '') is False:
-                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'EN') is False:
+                if self._process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'en_US') is False:
                     return False
                 else:
-                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
+                    status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'en_US', True)
                     if status is False and self.dev_commit is False:
                         return False
             else:
@@ -1374,7 +1387,7 @@ class GwAdminButton:
 
         extras += ', "isToolbox":false'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, False)
+        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, commit=False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
         self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
@@ -1544,7 +1557,7 @@ class GwAdminButton:
             return self.bk_schema_name(list_schemas, project_name, i+1)
 
 
-    def _manage_process_result(self, project_name, project_type, is_test=False, is_utils=False):
+    def _manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
 
         status = (self.error_count == 0)
@@ -1565,6 +1578,9 @@ class GwAdminButton:
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+            tools_qgis.show_info("A rollback on schema will be done.")
+            if dlg:
+                tools_gw.close_dialog(dlg)
 
 
     def _rename_project_data_schema(self, schema, create_project=None):
@@ -1732,9 +1748,8 @@ class GwAdminButton:
             self._populate_data_schema_name(self.cmb_project_type)
             self._set_last_connection(connection_name)
 
-            # Check super_user
+            # Get username
             self.username = self._get_user_connection(connection_name)
-            super_user = tools_db.check_super_user(self.username)
 
             # Check PostgreSQL Version
             self.postgresql_version = tools_db.get_pg_version()
@@ -2351,7 +2366,7 @@ class GwAdminButton:
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info", force_action=True)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -2367,6 +2382,8 @@ class GwAdminButton:
         """"""
 
         if accepted:
+
+            self.dlg_import_inp.btn_run.setVisible(False)
 
             # Set wait cursor
             self.task1 = GwTask('Manage schema')
@@ -2400,7 +2417,7 @@ class GwAdminButton:
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = tools_gw.create_body(extras=extras)
-            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema)
+            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema, commit=False)
 
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2425,13 +2442,14 @@ class GwAdminButton:
 
             self.task1.setProgress(100)
             # Manage process result
-            self._manage_process_result(project_name, project_type)
-
+            self._manage_process_result(project_name, project_type, dlg=self.dlg_import_inp)
         else:
             msg = "A rollback on schema will be done."
             tools_qt.show_info_box(msg, "Info")
             global_vars.dao.rollback()
             self.error_count = 0
+            tools_gw.close_dialog(self.dlg_import_inp)
+            return
 
 
         # Hide button execute
@@ -2802,7 +2820,7 @@ class GwAdminButton:
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = "cat_feature_id = '" + form_name + "'"
+        expr_filter = f"cat_feature_id = '{form_name}'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
@@ -2828,7 +2846,7 @@ class GwAdminButton:
         if self.chk_multi_insert:
             expr_filter = "cat_feature_id IS NULL"
         else:
-            expr_filter = "cat_feature_id = '" + form_name + "'"
+            expr_filter = f"cat_feature_id = '{form_name}'"
 
         self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(dialog, qtable, tableview, schema_name=schema_name)
@@ -2852,7 +2870,7 @@ class GwAdminButton:
         else:
             sql = (f"SELECT DISTINCT(columnname), columnname "
                    f"FROM {schema_name}.ve_config_addfields "
-                   f"WHERE cat_feature_id = '" + form_name + "'")
+                   f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
@@ -2907,7 +2925,7 @@ class GwAdminButton:
         self._update_sys_fields()
 
 
-    def _manage_accept(self, action, form_name, model=None):
+    def _manage_accept(self, action, form_name):
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
@@ -2915,7 +2933,7 @@ class GwAdminButton:
         # Execute manage add fields function
         param_name = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
-               f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
+               f"WHERE param_name = '{param_name}' AND cat_feature_id = '{form_name}' ")
         row = tools_db.get_row(sql)
 
         if action == 'create':
@@ -3292,6 +3310,7 @@ class GwAdminButton:
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
         except Exception as e:
             tools_log.log_info(str(e))
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')

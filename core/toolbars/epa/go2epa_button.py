@@ -79,6 +79,9 @@ class GwGo2EpaButton(GwAction):
         self._set_signals()
         self.dlg_go2epa.btn_cancel.setEnabled(False)
 
+        # Set shortcut keys
+        self.dlg_go2epa.key_escape.connect(partial(tools_gw.close_docker))
+
         self.dlg_go2epa.btn_hs_ds.clicked.connect(
             partial(self._sector_selection))
 
@@ -473,6 +476,8 @@ class GwGo2EpaButton(GwAction):
         json_result = tools_gw.execute_procedure('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
+
+        tools_gw.manage_current_selections_docker(json_result)
 
         message = "Values has been updated"
         tools_qgis.show_info(message)

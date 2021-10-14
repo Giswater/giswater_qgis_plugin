@@ -50,13 +50,12 @@ class GwSearch:
 
         # If docker search is already opened, don't let user open another one
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
-        if docker_search and dlg_mincut is None:
+        if not load_project and docker_search and dlg_mincut is None:
             return
 
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
-            self._init_dialog()
 
         # If dlg_mincut is None we are not opening from mincut
         form = ""
@@ -122,6 +121,7 @@ class GwSearch:
 
         if self.is_mincut is False:
             tools_qt.manage_translation('search', self.dlg_search)
+            self._init_dialog()
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
@@ -364,6 +364,7 @@ class GwSearch:
         form_search_add = ''
         extras_search_add = ''
         result = None
+        line_edit = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)

@@ -21,7 +21,7 @@ from .... import global_vars
 
 
 class GwFeatureTypeChangeButton(GwMaptool):
-    """ Button 24: Change feature type
+    """ Button 28: Change feature type
     User select from drop-down button feature type: ARC, NODE, CONNEC.
     Snap to this feature type is activated.
     User selects a feature of that type from the map.
@@ -56,39 +56,13 @@ class GwFeatureTypeChangeButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
-    def canvasMoveEvent(self, event):
-
-        # Hide marker and get coordinates
-        self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-
-
-    def canvasReleaseEvent(self, event):
-
-        self._featuretype_change(event)
-
-
     def activate(self):
 
         self.project_type = tools_gw.get_project_type()
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -110,13 +84,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
             last_feature_type = "NODE"
 
         # Manage active layer
+        self._set_active_layer(last_feature_type)
         layer = self.iface.activeLayer()
-        if not layer:
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if tablename not in self.list_tables:
             self._set_active_layer(last_feature_type)
-        else:
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename not in self.list_tables:
-                self._set_active_layer(last_feature_type)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -125,6 +97,27 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if self.show_help:
             message = "Click on feature to change its type"
             tools_qgis.show_info(message)
+
+
+    def canvasMoveEvent(self, event):
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping layers 'v_edit_'
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename and 'v_edit' in tablename:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._featuretype_change(event)
+
 
     # endregion
 
@@ -229,11 +222,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if not is_valid:
             return
 
-        # Deactivate map tool
-        self.deactivate()
-        self.set_action_pan()
-
-        # self._open_custom_form(self.current_layer, expr)
+        # Check in init config file if user wants to keep map tool active or not
+        self.manage_active_maptool()
 
 
     def _open_custom_form(self, layer, expr):

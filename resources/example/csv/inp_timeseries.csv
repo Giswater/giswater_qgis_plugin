@@ -1,9 +1,9 @@
-timser_id; timser_type, times_type; date/time; hour/value;value
-example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:00;1.15
-example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:10;1.25
-example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:20;1.35
-example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:30;2.45
-example_timser_1;Rainfall;ABSOLUTE;01-01-2017;00:40;2.55
+timser_id; timser_type, times_type; date(M/D/Y)-time; hour-value;value
+example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:00;1.15
+example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:10;1.25
+example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:20;1.35
+example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:30;2.45
+example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:40;2.55
 example_timser_2;Rainfall;RELATIVE;00:00;3.15
 example_timser_2;Rainfall;RELATIVE;00:10;3.25
 example_timser_2;Rainfall;RELATIVE;00:20;3.35

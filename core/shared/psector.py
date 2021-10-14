@@ -343,6 +343,9 @@ class GwPsector:
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_status, str(result[1]), 1)
 
+            # Set check active True as default for new pesectors
+            tools_qt.set_checked(self.dlg_plan_psector, "active", True)
+
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
@@ -1088,6 +1091,7 @@ class GwPsector:
         extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
+        tools_gw.manage_current_selections_docker(json_result)
         return json_result
 
 
@@ -1394,7 +1398,6 @@ class GwPsector:
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
-
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
@@ -1640,13 +1643,19 @@ class GwPsector:
 
     def set_label_current_psector(self, dialog):
 
-        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+        sql = ("SELECT t1.psector_id, t1.name FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
         if not row:
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[1])
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{row[0]}, '
+                  f'"isAlone":"False", "disableParent":"False", '
+                  f'"value":"True"')
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure("gw_fct_setselectors", body)
+        tools_gw.manage_current_selections_docker(result)
 
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):

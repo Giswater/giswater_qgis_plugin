@@ -87,11 +87,11 @@ def check_column(tablename, columname, schemaname=None):
     return row
 
 
-def check_role(role_name):
+def check_role(role_name, is_admin=None):
     """ Check if @role_name exists """
 
     sql = f"SELECT * FROM pg_roles WHERE rolname = '{role_name}'"
-    row = get_row(sql, log_info=False)
+    row = get_row(sql, log_info=False, is_admin=is_admin)
     return row
 
 
@@ -334,13 +334,14 @@ def get_postgis_version():
     return postgis_version
 
 
-def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None):
+def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None, is_admin=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = _get_sql(sql, log_sql, params)
     row = global_vars.dao.get_row(sql, commit, aux_conn=aux_conn)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
-    if not row:
+
+    if not row and not is_admin:
         # Check if any error has been raised
         if global_vars.session_vars['last_error']:
             tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql)

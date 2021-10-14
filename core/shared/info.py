@@ -178,7 +178,10 @@ class GwInfo(QObject):
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
-            tools_qgis.show_message(json_result['message']['text'], level)
+            msg = f"Execution of {function_name} failed."
+            if 'text' in json_result['message']:
+                msg = json_result['message']['text']
+            tools_qgis.show_message(msg, level)
             return False, None
 
         self.complet_result = json_result
@@ -1716,6 +1719,7 @@ class GwInfo(QObject):
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
+                return None
             tools_gw.close_dialog(dialog)
             return None
 
@@ -1776,6 +1780,7 @@ class GwInfo(QObject):
                 if close_dlg:
                     if global_vars.session_vars['dialog_docker']:
                         tools_gw.close_docker()
+                        return True
                     tools_gw.close_dialog(dialog)
                 return True
 
@@ -3752,7 +3757,7 @@ class GwInfo(QObject):
             list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
-            tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
+            tools_log.log_info("NO FEATURE TYPE DEFINED")
 
         tools_gw.init_docker()
         global is_inserting

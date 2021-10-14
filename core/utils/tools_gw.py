@@ -19,12 +19,12 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication
+    QToolButton, QWidget, QApplication, QDockWidget
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
@@ -260,7 +260,7 @@ def create_body(form='', feature='', filter_fields='', extras=None):
 
     info_types = {'full': 1}
     info_type = info_types.get(global_vars.project_vars['info_type'])
-    lang = QgsApplication.locale().upper()
+    lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     client = f'$${{"client":{{"device":4, "lang":"{lang}"'
     if info_type is not None:
@@ -510,15 +510,15 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
             if counter > 0:
                 counter = len(data[k]['features'])
                 geometry_type = data[k]['geometryType']
+                aux_layer_name = layer_name
                 try:
                     if not layer_name:
-                        layer_name = data[k]['layerName']
+                        aux_layer_name = data[k]['layerName']
                 except KeyError:
-                    layer_name = 'Temporal layer'
+                    aux_layer_name = str(k)
                 if del_old_layers:
-                    tools_qgis.remove_layer_from_toc(layer_name, group)
-                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                layer_name = None
+                    tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
                 fill_layer_temp(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
@@ -2432,6 +2432,8 @@ def fill_tableview_rows(widget, field):
     for item in field['value']:
         row = []
         for value in item.values():
+            if value is None:
+                value = ""
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
             model.appendRow(row)
@@ -2751,6 +2753,37 @@ def open_dlg_help():
         return True
 
 
+def manage_current_selections_docker(result, open=False):
+    """
+    Manage labels for the current_selections docker
+        :param result: looks the data in result['body']['data']['userValues']
+        :param open: if it has to create a new docker or just update it
+    """
+
+    title = "Gw Selectors: "
+    if 'userValues' in result['body']['data']:
+        for user_value in result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['value']:
+                title += f"{user_value['value']} | "
+
+        if global_vars.session_vars['current_selections'] is None:
+            global_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
+        else:
+            global_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
+        if open:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
+
+
 def create_sqlite_conn(file_name):
     """ Creates an sqlite connection to a file """
 
@@ -2794,7 +2827,9 @@ def user_params_to_userconfig():
             # Manage if parameter need prefix and project_type is not defined
             if parameter.startswith("_") and global_vars.project_type is None:
                 continue
-
+            if parameter.startswith("#"):
+                continue
+                
             _pre = False
             inv_param = parameter
             # If it needs a prefix
@@ -2939,7 +2974,7 @@ def get_project_version(schemaname=None):
     """ Get project version from table 'version' """
 
     if schemaname in (None, 'null', ''):
-        schemaname = self.schema_name
+        schemaname = global_vars.schema_name
 
     project_version = None
     tablename = "sys_version"

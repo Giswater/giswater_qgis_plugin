@@ -39,6 +39,7 @@ class GwFlowTraceButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
+
         self._set_flow_trace(event)
 
 
@@ -49,8 +50,9 @@ class GwFlowTraceButton(GwMaptool):
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -77,12 +79,6 @@ class GwFlowTraceButton(GwMaptool):
             layer = tools_qgis.get_layer_by_tablename('v_edit_node')
             if layer:
                 self.iface.setActiveLayer(layer)
-
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
 
 
     # region private functions

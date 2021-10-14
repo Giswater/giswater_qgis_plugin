@@ -43,6 +43,8 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager = GwWorkspaceManagerUi()
         tools_gw.load_settings(self.dlg_workspace_manager)
 
+        self._check_workspace()
+
         self.filter_name = self.dlg_workspace_manager.findChild(QLineEdit, 'txt_name')
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
@@ -57,6 +59,8 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
+        selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
+        selection_model.selectionChanged.connect(partial(self._fill_info))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
 
         self.dlg_workspace_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_workspace_manager))
@@ -123,24 +127,51 @@ class GwWorkspaceManagerButton(GwAction):
         return complet_list
 
 
+    def _fill_info(self, selected, deselected):
+        """
+        Fill info text area with details from selected workspace.
+
+        Note: The parameters come from the selectionChanged signal.
+        """
+
+        # Get id of selected workspace
+        cols = selected.indexes()
+        if not cols:
+            return
+        workspace_id = cols[0].data()
+
+        action = "INFO"
+        extras = f'"action":"{action}", "id":"{workspace_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+
+        if result and result['status'] == "Accepted":
+            tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
+                                  force_tab=False, call_set_tabs_enabled=False, close=False)
+
+
     def _create_workspace(self):
         """ Create a workspace """
 
         name = self.new_workspace_name.text()
         descript = self.new_workspace_descript.toPlainText()
+        if descript == '':
+            descript = 'null'
+        else:
+            descript = f'"{descript}"'
         if len(name) == 0:
             tools_qt.set_stylesheet(self.new_workspace_name)
             return
         action = "CREATE"
 
-        extras = f'"action":"{action}", "name":"{name}", "descript":"{descript}"'
+        extras = f'"action":"{action}", "name":"{name}", "descript":{descript}'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
             self._fill_tbl(self.filter_name.text())
-            self._set_label_current_workspace(name=name)
+            self._set_labels_current_workspace(name=name, result=result)
 
 
     def _set_current_workspace(self):
@@ -164,7 +195,7 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            self._set_label_current_workspace(value)
+            self._set_labels_current_workspace(value, result=result)
             tools_qgis.refresh_map_canvas()  # First refresh all the layers
             global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
             tools_gw.refresh_selectors()
@@ -216,6 +247,23 @@ class GwWorkspaceManagerButton(GwAction):
 
             self._fill_tbl(self.filter_name.text())
 
+    def _check_workspace(self):
+        """ Reset the values of the selected workspace """
+
+        action = "CHECK"
+
+        extras = f'"action":"{action}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
+
+        if result and result['status'] == "Accepted":
+            value = "0"
+            if 'userValues' in result['body']['data']:
+                for user_value in result['body']['data']['userValues']:
+                    if user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
+                        value = user_value['value']
+            self._set_labels_current_workspace(value=value, result=result)
+
 
     def _check_exists(self, name=""):
         sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"
@@ -230,7 +278,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_name.setToolTip("")
 
 
-    def _set_label_current_workspace(self, value="", name=None):
+    def _set_labels_current_workspace(self, value="", name=None, result=None):
         """ Set the current workspace label with @value """
 
         if name is None:
@@ -242,5 +290,7 @@ class GwWorkspaceManagerButton(GwAction):
             name = row[0]
         text = f"Selected workspace: {name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
+        if result:
+            tools_gw.manage_current_selections_docker(result)
 
     # endregion

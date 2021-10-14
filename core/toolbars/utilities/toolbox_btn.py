@@ -129,6 +129,9 @@ class GwToolBoxButton(GwAction):
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
             tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
 
+        # Set shortcut keys
+        self.dlg_toolbox.key_escape.connect(partial(tools_gw.close_docker))
+
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if global_vars.session_vars['dialog_docker']:
@@ -232,7 +235,7 @@ class GwToolBoxButton(GwAction):
                     for row in range(numrows):
                         for column in range(numcols):
                             column_name = dict_keys[column]
-                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem((f"{field['value'][row][column_name]}")))
+                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{field['value'][row][column_name]}"))
 
                     continue
 
@@ -253,6 +256,12 @@ class GwToolBoxButton(GwAction):
             self.dlg_functions.progressBar.setVisible(False)
             self.dlg_functions.btn_cancel.hide()
             self.dlg_functions.btn_close.show()
+
+            # Set window icon
+            icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
+            giswater_icon = QIcon(icon_path)
+            self.dlg_functions.setWindowIcon(giswater_icon)
 
             self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
             self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
@@ -363,7 +372,7 @@ class GwToolBoxButton(GwAction):
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') is None:
+            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
@@ -393,6 +402,7 @@ class GwToolBoxButton(GwAction):
 
     def _execute_function(self, description, dialog, combo, result):
 
+        self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)

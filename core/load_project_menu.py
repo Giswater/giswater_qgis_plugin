@@ -41,14 +41,12 @@ class GwMenuLoad(QObject):
         self.main_menu.setObjectName("Giswater")
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         config_icon = QIcon(icon_path)
 
         # region Toolbar
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
@@ -68,7 +66,6 @@ class GwMenuLoad(QObject):
                 if index_action in project_exclusive:
                     continue
 
-                icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
                 button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
@@ -112,6 +109,15 @@ class GwMenuLoad(QObject):
 
         action_reset_dialogs.triggered.connect(self._reset_position_dialog)
 
+        action_open_selections = actions_menu.addAction(f"Show current selectors")
+        action_open_selections_shortcut = tools_gw.get_config_parser("system", f"open_selections_shortcut", "user", "init",
+                                                                    prefix=False)
+        if not action_open_selections_shortcut:
+            tools_gw.set_config_parser("system", f"open_selections_shortcut", f"{action_open_selections_shortcut}", "user",
+                                       "init", prefix=False)
+        action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
+        action_open_selections.triggered.connect(self._open_current_selections)
+
         action_help = actions_menu.addAction(f"Get help")
         action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
         if not action_help_shortcut:
@@ -129,23 +135,22 @@ class GwMenuLoad(QObject):
         action_reset_plugin.triggered.connect(self._reset_plugin)
         # endregion
 
-        # region Adavanced
+        # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
         action_manage_file.triggered.connect(self._open_manage_file)
-        folder_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}105.png")
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}105.png"
+        folder_icon = QIcon(icon_path)
         action_manage_file.setIcon(folder_icon)
         # endregion
 
         # region Open user folder
-
         log_folder = os.path.join(global_vars.user_folder_dir, 'log')
         size = tools_os.get_folder_size(log_folder)
         log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
 
-        folder_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}102.png")
-        action_open_path = self.main_menu.addAction(f"Open folder  ({log_folder_volume})")
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
+        folder_icon = QIcon(icon_path)
+        action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
 
         action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)
@@ -242,7 +247,8 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        files = [f for f in os.listdir(f"{global_vars.user_folder_dir}{os.sep}config")]
+        path = f"{global_vars.user_folder_dir}{os.sep}config"
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
@@ -310,6 +316,12 @@ class GwMenuLoad(QObject):
             tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
+
+
+    def _open_current_selections(self):
+
+        if global_vars.session_vars['current_selections']:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
 
 
     def _reset_plugin(self):

@@ -42,7 +42,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.menu = QMenu()
         self.menu.setObjectName("GW_replace_menu")
-        self._fill_replace_menu()
+        self._fill_action_menu()
 
         if toolbar is not None:
             self.action.setMenu(self.menu)
@@ -52,11 +52,46 @@ class GwFeatureReplaceButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
-    def keyPressEvent(self, event):
+    def activate(self):
 
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.set_snapping_status()
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.set_snapping_layers()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+        self.snapper_manager.config_snap_to_arc()
+        self.snapper_manager.set_snap_mode()
+
+        # Manage last feature type selected
+        last_feature_type = tools_gw.get_config_parser("btn_feature_replace", "last_feature_type", "user", "session")
+        if last_feature_type is None:
+            last_feature_type = "NODE"
+
+        # Manage active layer
+        self._set_active_layer(last_feature_type)
+        layer = self.iface.activeLayer()
+
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if tablename not in self.list_tables:
+            self._set_active_layer(last_feature_type)
+
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
+            tools_qgis.show_info(message)
 
 
     def canvasMoveEvent(self, event):
@@ -111,56 +146,13 @@ class GwFeatureReplaceButton(GwMaptool):
             self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
             self._init_replace_feature_form(snapped_feat)
 
-
-    def activate(self):
-
-        # Check button
-        self.action.setChecked(True)
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.config_snap_to_arc()
-        self.snapper_manager.set_snap_mode()
-
-        # Manage last feature type selected
-        last_feature_type = tools_gw.get_config_parser("btn_feature_replace", "last_feature_type", "user", "session")
-        if last_feature_type is None:
-            last_feature_type = "NODE"
-
-        # Manage active layer
-        layer = self.iface.activeLayer()
-
-        if not layer:
-            self._set_active_layer(last_feature_type)
-        else:
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename not in self.list_tables:
-                self._set_active_layer(last_feature_type)
-
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
-            tools_qgis.show_info(message)
-
     # endregion
 
 
     # region private functions
 
-    def _fill_replace_menu(self):
-        """ Fill replace feature menu """
+    def _fill_action_menu(self):
+        """ Fill action menu """
 
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
@@ -435,8 +427,8 @@ class GwFeatureReplaceButton(GwMaptool):
             if not complet_result:
                 message = "Error replacing feature"
                 tools_qgis.show_warning(message)
-                self.deactivate()
-                self.set_action_pan()
+                # Check in init config file if user wants to keep map tool active or not
+                self.manage_active_maptool()
                 tools_gw.close_dialog(dialog)
                 return
 
@@ -452,12 +444,11 @@ class GwFeatureReplaceButton(GwMaptool):
             for table in self.list_tables:
                 tools_qgis.set_layer_index(table)
 
-            # Deactivate map tool
-            self.deactivate()
-            self.set_action_pan()
-
             # Disable ok button at the end of process
             self.dlg_replace.btn_accept.setEnabled(False)
+
+            # Check in init config file if user wants to keep map tool active or not
+            self.manage_active_maptool()
 
 
     def _edit_change_elem_type_get_value(self, index):

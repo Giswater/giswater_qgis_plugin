@@ -9,16 +9,17 @@ import os
 
 from qgis.core import QgsProject, Qgis
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi
+from .ui.ui_manager import GwDialogTextUi, GwSearchUi
+from .shared.search import GwSearch
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
 
 class GwLoadProject(QObject):
@@ -97,6 +98,12 @@ class GwLoadProject(QObject):
         if status is False:
             return
 
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "init")
+        if tools_os.set_boolean(open_search):
+            dlg_search = GwSearchUi()
+            GwSearch().open_search(dlg_search, load_project=True)
+
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
@@ -158,10 +165,8 @@ class GwLoadProject(QObject):
         # Get version compatiblity from metadata.txt
         minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
         majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
-        recommendedQgisVersion = tools_qgis.get_plugin_metadata('recommendedQgisVersion', '3.16', global_vars.plugin_dir)
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
         majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
-        recommendedPgVersion = tools_qgis.get_plugin_metadata('recommendedPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if qgis_version is not None and minorQgisVersion is not None and majorQgisVersion is not None:

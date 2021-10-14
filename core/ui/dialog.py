@@ -16,6 +16,8 @@ from ..utils import tools_gw
 
 class GwDialog(QDialog):
 
+    key_escape = QtCore.pyqtSignal()
+
     def __init__(self, subtag=None):
 
         super().__init__()
@@ -39,3 +41,13 @@ class GwDialog(QDialog):
             global_vars.session_vars['last_focus'] = tag
             return True
         return False
+
+    def keyPressEvent(self, event):
+
+        try:
+            if event.key() == QtCore.Qt.Key_Escape:
+                self.key_escape.emit()
+                return super().keyPressEvent(event)
+        except RuntimeError:
+            # Multiples signals are emited when we use key_scape in order to close dialog
+            pass

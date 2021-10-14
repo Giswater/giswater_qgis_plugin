@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
-    QgsTolerance, QgsFeatureRequest, Qgis
+    QgsTolerance, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars

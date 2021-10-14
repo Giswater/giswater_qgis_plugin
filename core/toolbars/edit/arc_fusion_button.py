@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwArcFusionUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwArcFusionButton(GwMaptool):
@@ -24,29 +24,14 @@ class GwArcFusionButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
-    def canvasReleaseEvent(self, event):
-
-        self._get_arc_fusion(event)
-
-
-
 
     def activate(self):
 
         # Check button
-        self.action.setChecked(True)
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -67,12 +52,13 @@ class GwArcFusionButton(GwMaptool):
             tools_qgis.show_info(message)
 
 
-    def deactivate(self):
+    def canvasReleaseEvent(self, event):
 
-        # Call parent method
-        super().deactivate()
+        self._get_arc_fusion(event)
+
 
     # endregion
+
 
     # region private functions
 
@@ -91,17 +77,18 @@ class GwArcFusionButton(GwMaptool):
         if not result or result['status'] == 'Failed':
             return
 
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
+        text_result = None
+        log = tools_gw.get_config_parser("user_edit_tricks", "arc_fusion_disable_showlog", 'user', 'init')
+        if not tools_os.set_boolean(log, False):
+            text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
 
         if not text_result:
             self.dlg_fusion.close()
-        # Refresh map canvas
+
         self.refresh_map_canvas()
 
-        # Deactivate map tool
-        self.deactivate()
-
-        self.set_action_pan()
+        # Check in init config file if user wants to keep map tool active or not
+        self.manage_active_maptool()
 
 
     def _get_arc_fusion(self, event):

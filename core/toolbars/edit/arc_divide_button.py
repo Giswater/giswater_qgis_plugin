@@ -5,14 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis, tools_db
+from ....lib import tools_qt, tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 
@@ -24,21 +27,37 @@ class GwArcDivideButton(GwMaptool):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
+       # Create a menu and add all the actions
+        if toolbar is not None:
+            toolbar.removeAction(self.action)
+
+        # selected_action = 1: DRAG-DROP
+        # selected_action = 2: SELECT
+        self.selected_action = 1
+        self.menu = QMenu()
+        self.menu.setObjectName("GW_replace_menu")
+        self._fill_action_menu()
+
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
+
+        value = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init",
+                                           prefix=True)
+        self.keep_maptool_active = tools_os.set_boolean(value, False)
+
 
     # region QgsMapTools inherited
     """ QgsMapTool inherited event functions """
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
     def activate(self):
         """ Called when set as currently active map tool """
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
+        else:
+            self.selected_action = tools_gw.get_config_parser("btn_arc_divide", "last_action", "user", "session")
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -73,21 +92,65 @@ class GwArcDivideButton(GwMaptool):
     def deactivate(self):
         """ Called when map tool is being deactivated """
 
-        # Call parent method
         super().deactivate()
+
+        self.layer_arc.removeSelection()
 
         # Restore previous active layer
         if self.active_layer:
             self.iface.setActiveLayer(self.active_layer)
 
-        try:
-            self.reset_rubber_band("line")
-        except AttributeError:
-            pass
+        self.refresh_map_canvas()
+
+        self.reset()
 
 
     def canvasMoveEvent(self, event):
         """ Mouse movement event """
+
+        self._move_event(event)
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._release_event(event)
+
+
+    # endregion
+
+    # region private functions
+
+    def _fill_action_menu(self):
+        """ Fill action menu """
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+        ag = QActionGroup(self.iface.mainWindow())
+
+        actions = ['DRAG-DROP', 'SELECT']
+        for action in actions:
+            obj_action = QAction(f"{action}", ag)
+            self.menu.addAction(obj_action)
+            obj_action.triggered.connect(partial(super().clicked_event))
+            obj_action.triggered.connect(partial(self._get_selected_action, action))
+
+
+    def _get_selected_action(self, name):
+        """ Gets selected action """
+
+        if name == "DRAG-DROP":
+            self.selected_action = 1
+        else:
+            self.selected_action = 2
+
+        tools_gw.set_config_parser("btn_arc_divide", "last_action", self.selected_action, "user", "session")
+
+
+    def _move_event(self, event):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
@@ -95,149 +158,172 @@ class GwArcDivideButton(GwMaptool):
         y = event.pos().y()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snap to node
+        # First step: Any node selected -> Snap to node
         if self.snapped_feat is None:
+            self._move_event_snap_to_node(event_point, x, y)
 
-            # Make sure active layer is 'v_edit_node'
-            cur_layer = self.iface.activeLayer()
-            if cur_layer != self.layer_node:
-                self.iface.setActiveLayer(self.layer_node)
-            # Snapping
-            result = self.snapper_manager.snap_to_current_layer(event_point)
-            if result.isValid():
-                # Get the point and add marker on it
-                point = self.snapper_manager.add_marker(result, self.vertex_marker)
-            else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-
-            # Set a new point to go on with
-            self.rubber_band.movePoint(point)
-
-        # Snap to arc
+        # Second step: After a node is selected -> Snap to arc (only action "DRAG-DROP")
         else:
+            if self.selected_action == 1:
+                self._move_event_snap_to_arc(event_point, x, y)
 
-            # Make sure active layer is 'v_edit_arc'
-            cur_layer = self.iface.activeLayer()
-            if cur_layer != self.layer_arc:
-                self.iface.setActiveLayer(self.layer_arc)
 
-            # Snapping
-            result = self.snapper_manager.snap_to_current_layer(event_point)
+    def _move_event_snap_to_node(self, event_point, x, y):
+        """ Snap to node. First step: Any node selected """
 
-            # if result and result[0].snappedVertexNr == -1:
-            if result.isValid():
-                layer = self.snapper_manager.get_snapped_layer(result)
-                feature_id = self.snapper_manager.get_snapped_feature_id(result)
-                point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
-                # Select the arc
-                layer.removeSelection()
-                layer.select([feature_id])
-            else:
-                # Bring the rubberband to the cursor i.e. the clicked point
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+        # Make sure active layer is 'v_edit_node'
+        cur_layer = self.iface.activeLayer()
+        if cur_layer != self.layer_node:
+            self.iface.setActiveLayer(self.layer_node)
 
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            # Get the point and add marker on it
+            point = self.snapper_manager.add_marker(result, self.vertex_marker)
+        else:
+            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
+        # Set a new point to go on with
+        if self.selected_action == 1:
             self.rubber_band.movePoint(point)
 
 
-    def canvasReleaseEvent(self, event):
+    def _move_event_snap_to_arc(self, event_point, x, y):
+        """ Snap to arc. Second step: After a node is selected """
 
-        self._get_arc_divide(event)
+        # Make sure active layer is 'v_edit_arc'
+        cur_layer = self.iface.activeLayer()
+        if cur_layer != self.layer_arc:
+            self.iface.setActiveLayer(self.layer_arc)
 
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
 
+        # if result and result[0].snappedVertexNr == -1:
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            feature_id = self.snapper_manager.get_snapped_feature_id(result)
+            point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
+            # Select the arc
+            layer.removeSelection()
+            layer.select([feature_id])
+        else:
+            # Bring the rubberband to the cursor i.e. the clicked point
+            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
-    # endregion
+        self.rubber_band.movePoint(point)
 
-    # region private functions
 
     def _move_node(self, node_id, point):
         """ Move selected node to the current point """
 
-        srid = global_vars.data_epsg
-
         # Update node geometry
-        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
-        status = tools_db.execute_sql(sql)
+        status = tools_db.execute_sql(sql, log_sql=True)
+
         if status:
             feature_id = f'"id":["{node_id}"]'
             body = tools_gw.create_body(feature=feature_id)
             result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
-            if not result or result['status'] == 'Failed':
-                return
-            if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
-                self.dlg_dtext = GwDialogTextUi('arc_divide')
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
-                tools_gw.open_dialog(self.dlg_dtext)
-
+            if result and result['status'] == 'Accepted':
+                log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
+                if not tools_os.set_boolean(log, False):
+                    self.dlg_dtext = GwDialogTextUi('arc_divide')
+                    tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
+                    tools_gw.open_dialog(self.dlg_dtext)
         else:
             message = "Move node: Error updating geometry"
             tools_qgis.show_warning(message)
 
-        # Rubberband reset
-        self.reset()
+        # Check in init config file if user wants to keep map tool active or not
+        self.cancel_map_tool()
+        if self.keep_maptool_active:
+            self.clicked_event()
 
-        # Refresh map canvas
-        self.refresh_map_canvas()
 
-        # Deactivate map tool
-        self.deactivate()
-        self.set_action_pan()
+    def _release_event(self, event):
 
-    def _get_arc_divide(self, event):
-
-        if event.button() == Qt.LeftButton:
-
-            event_point = self.snapper_manager.get_event_point(event)
-
-            # Snap to node
-            if self.snapped_feat is None:
-
-                result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result.isValid():
-                    return
-
-                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                point = self.snapper_manager.get_snapped_point(result)
-
-                # Hide marker
-                self.vertex_marker.hide()
-
-                # Set a new point to go on with
-                self.rubber_band.addPoint(point)
-
-                # Add arc snapping
-                self.iface.setActiveLayer(self.layer_arc)
-
-            # Snap to arc
-            else:
-
-                result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result.isValid():
-                    return
-
-                layer = self.snapper_manager.get_snapped_layer(result)
-                point = self.snapper_manager.get_snapped_point(result)
-                point = self.toLayerCoordinates(layer, point)
-
-                # Get selected feature (at this moment it will have one and only one)
-                node_id = self.snapped_feat.attribute('node_id')
-
-                # Move selected node to the released point
-                # Show message before executing
-                message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
-                           "Please ensure that features has no undelete value on true.\n"
-                           "On the other hand you must know that traceability table will storage precedent information.")
-                title = "Info"
-                answer = tools_qt.show_question(message, title)
-                if answer:
-                    self._move_node(node_id, point)
-                    tools_qgis.set_layer_index('v_edit_arc')
-                    tools_qgis.set_layer_index('v_edit_connec')
-                    tools_qgis.set_layer_index('v_edit_gully')
-                    tools_qgis.set_layer_index('v_edit_node')
-
-        elif event.button() == Qt.RightButton:
+        if event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            return
+
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snap to node
+        if self.snapped_feat is None:
+            self._release_event_snap_to_node(event_point)
+            if int(self.selected_action) == 2:
+                is_valid, answer = self._release_event_snap_to_arc(event_point)
+                if not is_valid:
+                    msg = "Current node is not located over an arc. Please, select option 'DRAG-DROP'"
+                    tools_qgis.show_info(msg)
+                    self.cancel_map_tool()
+                    if self.keep_maptool_active:
+                        self.clicked_event()
+                    return
+                if not answer:
+                    self.cancel_map_tool()
+                    if self.keep_maptool_active:
+                        self.clicked_event()
+
+        # Snap to arc
+        else:
+            if self.selected_action == 1:
+                self._release_event_snap_to_arc(event_point)
+
+
+    def _release_event_snap_to_node(self, event_point):
+
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            return
+
+        self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        point = self.snapper_manager.get_snapped_point(result)
+
+        # Hide marker
+        self.vertex_marker.hide()
+
+        # Set a new point to go on with
+        self.rubber_band.addPoint(point)
+
+        # Add arc snapping
+        self.iface.setActiveLayer(self.layer_arc)
+
+
+    def _release_event_snap_to_arc(self, event_point):
+
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            return False, False
+
+        layer = self.snapper_manager.get_snapped_layer(result)
+        point = self.snapper_manager.get_snapped_point(result)
+        point = self.toLayerCoordinates(layer, point)
+
+        # Get selected feature (at this moment it will have one and only one)
+        node_id = self.snapped_feat.attribute('node_id')
+
+        # Move selected node to the released point
+        answer = True
+        ask = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_prev_warning", 'user', 'init')
+        if not tools_os.set_boolean(ask, False):
+            # Show message before executing
+            message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
+                       "Please ensure that features has no undelete value on true.\n"
+                       "On the other hand you must know that traceability table will storage precedent information.")
+            title = "Info"
+            answer = tools_qt.show_question(message, title)
+        if answer:
+            self._move_node(node_id, point)
+            tools_qgis.set_layer_index('v_edit_arc')
+            tools_qgis.set_layer_index('v_edit_connec')
+            tools_qgis.set_layer_index('v_edit_gully')
+            tools_qgis.set_layer_index('v_edit_node')
+
+        return True, answer
 
     # endregion
