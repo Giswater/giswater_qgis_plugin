@@ -257,12 +257,6 @@ class GwToolBoxButton(GwAction):
             self.dlg_functions.btn_cancel.hide()
             self.dlg_functions.btn_close.show()
 
-            # Set window icon
-            icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
-            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
-            giswater_icon = QIcon(icon_path)
-            self.dlg_functions.setWindowIcon(giswater_icon)
-
             self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
             self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
                                                                               self.dlg_functions.cmb_layers))
