@@ -193,7 +193,7 @@ class GwLoadProject(QObject):
     def _get_user_variables(self):
         """ Get config related with user variables """
 
-        global_vars.user_level['level'] = tools_gw.get_config_parser('system', 'user_level', "user", "init", False)
+        global_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
         global_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
         global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
         global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
