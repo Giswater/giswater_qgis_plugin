@@ -53,6 +53,12 @@ BEGIN
 		END LOOP;
 		keys = left(keys, -2);
 		_values = left(_values, -2);
+		
+		--control insert nulls insetad of ''
+		IF _values ilike '%$$$$%' THEN
+			_values=REPLACE(_values, '$$$$', 'NULL');
+		END IF;
+
 		query = CONCAT('INSERT INTO temp_csv (', keys, ') VALUES(',_values,')');
 		EXECUTE query;
 			
