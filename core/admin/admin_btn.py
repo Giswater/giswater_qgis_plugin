@@ -1706,11 +1706,11 @@ class GwAdminButton:
         self.is_service = credentials['service']
 
         sslmode_settings = settings.value('sslmode')
-        sslmode = sslmode_settings
-        if isinstance(sslmode_settings, str):
-            sslmode_settings = sslmode_settings.lower().replace("ssl", "")
-            sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
-            sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
+        try:
+            sslmode_dict = {0: 'prefer', 1: 'disable', 3: 'require'}
+            sslmode = sslmode_dict.get(sslmode_settings, 'prefer')
+        except ValueError:
+            sslmode = sslmode_settings
         credentials['sslmode'] = sslmode
         settings.endGroup()
 
