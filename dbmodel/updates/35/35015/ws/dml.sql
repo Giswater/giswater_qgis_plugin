@@ -567,3 +567,7 @@ def my_form_open(dialog, layer, feature):
   <layerGeometryType>0</layerGeometryType>
 </qgis>
 $$, true);
+
+
+--2021/10/15
+DELETE FROM sys_table WHERE id IN ('v_om_mincut_conflict_valve', 'v_om_mincut_conflict_arc', 'v_om_mincut_audit');
