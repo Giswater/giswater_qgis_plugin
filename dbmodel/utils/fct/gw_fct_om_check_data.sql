@@ -446,7 +446,8 @@ BEGIN
 			VALUES (125, 1, '254', 'INFO: No features (arc, node, connec, element) with NULL values on code found.',v_count);
 		END IF;
 	END IF;
-			
+
+/*
 	RAISE NOTICE '17 - Check for orphan polygons on polygon table (255)';
 	IF v_project_type ='UD' THEN
 
@@ -475,6 +476,7 @@ BEGIN
 			VALUES (125, 1, '255', 'INFO: No polygons without parent feature (register, tank, fountain) found.', v_count);
 		END IF;
 	END IF;
+*/
 
 	RAISE NOTICE '18 - Check for orphan rows on man_addfields values table (256)';
 	IF v_project_type ='UD' THEN
@@ -545,7 +547,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '20 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
-	IF (SELECT count(*) FROM arc ) < 20000 THEN -- too big
+	IF (SELECT count(*) FROM arc ) < 5000 THEN -- too big
 	
 		v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom, '||v_edit||'connec.expl_id
 			FROM '||v_edit||'link
@@ -923,6 +925,36 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (125, '391', 1, 'INFO: No arcs shorter than value set as node proximity.',v_count);
 	END IF;
+
+
+	RAISE NOTICE '33 - Check builtdate before 1900  (fid 406)';
+	IF v_project_type = 'WS' THEN
+		SELECT count(*) INTO v_count FROM 
+			(SELECT arc_id, 'ARC'::text FROM arc WHERE builtdate < '1900/01/01'::date
+			UNION 
+			SELECT  node_id, 'NODE'::text FROM node WHERE builtdate < '1900/01/01'::date
+			UNION  
+			SELECT  node_id, 'CONNEC'::text FROM node WHERE builtdate < '1900/01/01'::date)a;
+	ELSE
+		SELECT count(*) INTO v_count FROM 
+			(SELECT arc_id, 'ARC'::text FROM arc WHERE builtdate < '1900/01/01'::date
+			UNION 
+			SELECT  node_id, 'NODE'::text FROM node WHERE builtdate < '1900/01/01'::date
+			UNION  
+			SELECT  connec_id, 'CONNEC'::text FROM connec WHERE builtdate < '1900/01/01'::date
+			UNION  
+			SELECT  gully_id, 'GULLY'::text FROM gully WHERE builtdate < '1900/01/01'::date)a;
+	END IF;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (125, 406, 2, 
+		concat('WARNING-406: There is/are ',v_count,' features with builtdate before 1900. Please, check your data before continue'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (125, '406', 1, 'INFO: No feature with builtdate before 1900.',v_count);
+	END IF;
+
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
