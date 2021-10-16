@@ -59,7 +59,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'INFO: The analysis have been executed skipping arcs with ''VERIFIED'' on colum verified');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'If you are looking to remove results please set column verified with this value');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '')
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '');
 	
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
