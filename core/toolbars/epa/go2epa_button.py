@@ -259,6 +259,7 @@ class GwGo2EpaButton(GwAction):
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT', f"{chk_import_result}")
 
 
+
     def _sector_selection(self):
         """ Load the tables in the selection form """
 
@@ -310,7 +311,6 @@ class GwGo2EpaButton(GwAction):
             if self.chk_exec is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
             if self.txt_file_rpt is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
             if self.chk_import_result is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
-
 
 
     def _go2epa_select_file_inp(self):
