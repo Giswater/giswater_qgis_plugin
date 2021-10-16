@@ -112,6 +112,10 @@ WHERE id=2118;
 
 ALTER TABLE plan_psector ALTER COLUMN active SET DEFAULT TRUE;
 
+
+-- This delete is used to remove duplicated rows wich has formname, formtype, columnname the same and after next update tab (data, main) will be the same and pk will crash 
+DELETE FROM config_form_fields WHERE ctid IN (SELECT min(ctid) FROM config_form_fields GROUP BY formname, formtype, columnname HAVING count(*) > 1);
+
 UPDATE config_form_fields SET tabname='data' WHERE formname like 've_%';
 UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_node';
 UPDATE config_form_fields SET tabname='data' WHERE formname = 'v_edit_arc';
