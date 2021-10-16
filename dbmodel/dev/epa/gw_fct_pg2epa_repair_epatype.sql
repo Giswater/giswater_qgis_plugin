@@ -92,7 +92,7 @@ BEGIN
 		FOR rec_feature IN 
 		SELECT DISTINCT ON (cat_feature_node.id) cat_feature_node.*, cat_node.id as nodecat_id, s.epa_table FROM cat_node JOIN cat_feature_node ON cat_node.nodetype_id = cat_feature_node.id 
 		JOIN cat_feature ON cat_feature_node.id = cat_feature.id JOIN sys_feature_epa_type s ON cat_feature_node.epa_default = s.id
-		WHERE epa_default != 'UNDEFINED' AND cat_feature.active = true
+		WHERE epa_default != 'UNDEFINED' AND cat_feature.active = true AND s.feature_type = 'NODE'
 		LOOP
 
 			-- check if exists features with this cat_feature
