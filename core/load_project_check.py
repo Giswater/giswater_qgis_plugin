@@ -63,7 +63,7 @@ class GwLoadProjectCheck:
         result = self._execute_check_project_function(init_project, fields)
 
         # Manage 'current_selections' docker
-        open_docker = tools_gw.get_config_parser("current_selections", "open_docker", 'user', 'init')
+        open_docker = tools_gw.get_config_parser("dialogs_actions", "curselectors_open_loadproject", 'user', 'init')
         open_docker = tools_os.set_boolean(open_docker, False)
         tools_gw.manage_current_selections_docker(result, open=open_docker)
 

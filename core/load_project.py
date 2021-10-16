@@ -99,7 +99,7 @@ class GwLoadProject(QObject):
             return
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "init")
+        open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
         if tools_os.set_boolean(open_search):
             dlg_search = GwSearchUi()
             GwSearch().open_search(dlg_search, load_project=True)
