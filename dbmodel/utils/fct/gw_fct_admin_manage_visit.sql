@@ -301,7 +301,8 @@ BEGIN
 				INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, layoutname,
 				iseditable, ismandatory, dv_querytext, hidden)
 				VALUES (v_viewname, 'visit', v_param_name,v_layoutorder,  v_data_type, v_widgettype, v_param_name, 'data_1',
-				v_iseditable, v_ismandatory, v_dv_querytext, false);
+				v_iseditable, v_ismandatory, v_dv_querytext, false)
+				ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (219, null, 4, concat('Insert new parameter definition into config_form_fields.'));
@@ -482,7 +483,7 @@ raise notice 'v_config_fields,%',v_config_fields;
 						raise notice 'rec.id,%',rec;
 						EXECUTE 'INSERT INTO config_form_fields (formname,'||v_config_fields||')
 						SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields  WHERE formname='''||rec.formname||'''
-						and columnname = '''||rec.columnname||''';';
+						and columnname = '''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
 						raise notice 'multi -  config_form_fields ';
 					END LOOP;
 				ELSE
@@ -490,7 +491,7 @@ raise notice 'v_config_fields,%',v_config_fields;
 					LOOP
 						EXECUTE 'INSERT INTO config_form_fields (formname,'||v_config_fields||')
 						SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields  WHERE formname='''||rec.formname||'''
-						and columnname = '''||rec.columnname||''';';
+						and columnname = '''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
 					END LOOP;
 				END IF;
 
@@ -537,7 +538,8 @@ raise notice 'v_config_fields,%',v_config_fields;
 					INSERT INTO config_form_fields  (formname, formtype, column_id, layout_id, layout_order, datatype, widgettype, label, layout_name,
 					iseditable, ismandatory)
 					VALUES (v_viewname, 'visit', rec.parameter_id,1,v_layout_order, v_data_type, v_widgettype, rec.parameter_id, 'data_1',
-					true, false);
+					true, false)
+					ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 				END LOOP;
 				
 				--create a new class view

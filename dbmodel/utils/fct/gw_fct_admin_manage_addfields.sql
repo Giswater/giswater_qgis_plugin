@@ -370,7 +370,8 @@ BEGIN
 				VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
 				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
 				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
-				v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden);
+				v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
+				 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (218, null, 4, 'Insert parameter into config_form_fields.');
@@ -621,7 +622,8 @@ BEGIN
 			VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
 			v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
-			v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden);
+			v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
+			 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
