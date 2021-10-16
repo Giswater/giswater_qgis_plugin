@@ -698,7 +698,7 @@ BEGIN
 	SELECT count (*) INTO v_count FROM cat_connec where dint is null;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '400', concat('ERROR-400: There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 3, '400', concat('ERROR-400: There is/are ',v_count,
 		' connec catalogs with null values on dint'),v_count);
 		v_count=0;
 	ELSE
