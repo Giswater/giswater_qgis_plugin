@@ -609,8 +609,9 @@ VALUES ('inp_typevalue', 'inp_typevalue_raingage', 'inp_dscenario_raingage', 'rg
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('inp_typevalue', 'inp_typevalue_raingage', 'inp_dscenario_raingage', 'form_type');
 
-
+ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 UPDATE arc SET inverted_slope = FALSE WHERE inverted_slope IS NULL;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, 

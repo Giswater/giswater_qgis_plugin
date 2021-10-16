@@ -8,8 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/10/05
-UPDATE arc SET inverted_slope = FALSE WHERE inverted_slope IS NULL;
-
 DELETE FROM sys_param_user WHERE id = 'inp_scenario_dwf';
 DELETE FROM sys_param_user WHERE id = 'inp_scenario_hydrology';
 

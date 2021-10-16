@@ -56,6 +56,9 @@ INSERT INTO cat_dwf_scenario VALUES (1, 'Default values') ON CONFLICT (id) DO NO
 
 UPDATE inp_dwf SET dwfscenario_id = 1 WHERE dwfscenario_id IS NULL;
 
+-- This delete is used to remove duplicated rows wich has formname, formtype, columnname the same and after next change on primary key it will afect
+DELETE FROM inp_dwf WHERE ctid IN (SELECT min(ctid) FROM inp_dwf GROUP BY node_id, dwfscenario_id HAVING count(*) > 1);
+
 ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pkey;
 ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pkey PRIMARY KEY(node_id, dwfscenario_id);
 
