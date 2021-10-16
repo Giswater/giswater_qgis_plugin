@@ -220,7 +220,7 @@ BEGIN
 		ELSIF v_view='vi_coverages' THEN 
 			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
 			
-			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id, hydrology_id) ON CONFLICT  (landus_id, 1) DO NOTHING;
+			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id, 1) ON CONFLICT  (landus_id, hydrology_id) DO NOTHING;
 
 		ELSIF v_view='vi_buildup' THEN
 			INSERT INTO inp_buildup_land_x_pol(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
