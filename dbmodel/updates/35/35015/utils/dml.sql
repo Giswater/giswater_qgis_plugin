@@ -26,3 +26,6 @@ INSERT INTO sys_fprocess VALUES (405, 'Repair nodes duplicated', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
 UPDATE sys_function SET sys_role = 'role_epa' WHERE id  = 3032;
+
+INSERT INTO sys_fprocess VALUES (406, 'Builddate before 1900', 'utils')
+ON CONFLICT (fid) DO NOTHING;
