@@ -949,7 +949,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (125, 406, 2, 
-		concat('WARNING-406: There is/are ',v_count,' features with builtdate before 1900. Please, check your data before continue'),v_count);
+		concat('WARNING-406: There is/are ',v_count,' features with built date before 1900.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (125, '406', 1, 'INFO: No feature with builtdate before 1900.',v_count);

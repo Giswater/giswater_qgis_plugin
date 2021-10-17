@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
--- fid: 114, 159, 297. Number 227 is passed by input parameters
+-- fid: 114, 159, 297, 396, 404, 400, 405. Number 227 is passed by input parameters
 
 */
 
@@ -608,6 +608,22 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
 
+	RAISE NOTICE '14- Dint for cat_connec';
+
+	IF v_networkmode = 4 THEN
+	
+		SELECT count (*) INTO v_count FROM cat_connec where dint is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '400', concat('ERROR-400: There is/are ',v_count,
+			' connec catalogs with null values on dint'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 1, '499', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
+		END IF;
+	END IF;
+
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
@@ -635,7 +651,9 @@ BEGIN
 		) AS feature
 		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
 			UNION
-		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233) row
+		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
+		        UNION
+		      SELECT node_id, fid, 'Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297) row
 		      ) features;
 
 		v_result := COALESCE(v_result, '[]'); 
