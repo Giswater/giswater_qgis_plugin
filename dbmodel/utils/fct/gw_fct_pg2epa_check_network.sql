@@ -325,7 +325,7 @@ BEGIN
 		END LOOP;
 
 		IF v_fid = 139 THEN 
-			-- insert arc results
+			-- dry arcs
 			INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
 			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Dry arc')  
 				FROM temp_anlgraf a
@@ -334,7 +334,17 @@ BEGIN
 				GROUP BY a.arc_id,the_geom
 				having max(water) = 0;
 				
-			-- insert into result table dry nodes with demands (error)
+			-- dry nodes
+			INSERT INTO anl_node (fid, node_id, the_geom, descript)
+			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM rpt_inp_node n
+				JOIN
+				(
+				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				UNION
+				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				)
+				a USING (node_id)
+				WHERE result_id = v_result_id;
 
 			-- removed demands
 			INSERT INTO anl_node (fid, node_id, the_geom, descript)
@@ -362,6 +372,17 @@ BEGIN
 				JOIN temp_arc b ON a.arc_id=b.arc_id
 				GROUP BY a.arc_id,the_geom
 				having max(water) = 0;
+
+			-- insert into result table dry nodes
+			INSERT INTO anl_node (fid, node_id, the_geom, descript)
+			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM temp_node n
+				JOIN
+				(
+				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				UNION
+				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				)
+				a USING (node_id);
 
 			-- insert into result table dry nodes with demands (error)
 			INSERT INTO anl_node (fid, node_id, the_geom, descript)
@@ -452,9 +473,9 @@ BEGIN
 				'WARNING-227: {removeDemandsOnDryNetwork} is enabled and demand from ',v_count,' nodes have been removed'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result, 1, concat(
-				'INFO: {removeDemandsOnDryNetwork} is enabled but no dry nodes have been found.'));
+				VALUES (v_fid, v_result, 1, concat('INFO: {removeDemandsOnDryNetwork} is enabled but no dry nodes have been found.'));
 			END IF;
+			DELETE FROM audit_check_data WHERE fid = 227 AND error_message like '%Dry node(s) with demand%' AND cur_user = current_user;
 		END IF;
 	END IF;
 

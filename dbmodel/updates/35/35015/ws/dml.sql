@@ -9,6 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/10/14
+DELETE FROM sys_foreignkey WHERE target_table = 'inp_curve' AND target_field = 'curve_type';
+
 DELETE FROM sys_style WHERE id  = 109;
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('109', 'INP result point', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
