@@ -52,6 +52,9 @@ v_version text;
 v_networkstats json;
 v_sumlength numeric (12,2);
 v_linkoffsets text;
+v_delnetwork boolean;
+v_removedemands boolean;
+
 
 BEGIN
 	-- Search path
@@ -67,6 +70,10 @@ BEGIN
 	
 	-- get options data
 	SELECT value INTO v_linkoffsets FROM config_param_user WHERE parameter = 'inp_options_link_offsets' AND cur_user = current_user;
+
+	-- get user variables
+	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_removedemands = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -412,6 +419,46 @@ BEGIN
 		END IF;	
 
 	END IF;
+
+
+	-- updating values on result
+	IF v_fid = 227 THEN
+
+		IF v_delnetwork THEN
+			DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
+			GET DIAGNOSTICS v_count = row_count;
+
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result, 2, 
+				concat('WARNING-227: {removeDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result, 1, 
+				concat('INFO: {removeDisconnectNetwork} is enabled but nothing have been removed.'));
+			END IF;
+
+			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
+			DELETE FROM audit_check_data WHERE fid = 227 AND error_message like '%topological disconnected from any%' AND cur_user = current_user;
+		END IF;
+
+		IF v_removedemands THEN
+			UPDATE temp_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) 
+			FROM anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
+			GET DIAGNOSTICS v_count = row_count;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result, 2, concat(
+				'WARNING-227: {removeDemandsOnDryNetwork} is enabled and demand from ',v_count,' nodes have been removed'));
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result, 1, concat(
+				'INFO: {removeDemandsOnDryNetwork} is enabled but no dry nodes have been found.'));
+			END IF;
+		END IF;
+	END IF;
+
+	
 
 	RAISE NOTICE '7 - Stats';
 	

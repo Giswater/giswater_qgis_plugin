@@ -41,12 +41,10 @@ v_onlyexport boolean;
 v_checkdata boolean;
 v_checknetwork boolean;
 v_vdefault boolean;
-v_delnetwork boolean;
 v_fid integer = 227;
 v_error_context text;
 v_breakpipes boolean;
 v_count integer;
-v_removedemands boolean;
 	
 BEGIN
 
@@ -68,8 +66,6 @@ BEGIN
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_removedemands = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- check sector selector
@@ -224,24 +220,9 @@ BEGIN
 	END IF;
 
 	-- when delete network is enabled (variable of inp_options_debug)
-	IF v_delnetwork THEN
-		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
-		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes'
-		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
-		
-		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '18 - Delete disconnected arcs with associated nodes'
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
+
 			
-		RAISE NOTICE '19 - Delete orphan nodes';
-		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '19 - Delete orphan nodes'
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 107 AND cur_user=current_user);
-
-		RAISE NOTICE '20 - Delete arcs without extremal nodes';
-		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '20 - Delete arcs without extremal nodes'
-		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
-	END IF;
-
-	-- update values from inp_*_importinp tables
+	RAISE NOTICE '20- update values from inp_*_importinp tables';
 	UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
 	addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
 	FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
@@ -250,21 +231,6 @@ BEGIN
 	addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern":"',pattern,'", "energyparam":"',energyparam,'", "status":"',b.status,'", "energyvalue":"',b.energyvalue,'"}')
 	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
-	-- when is forced to remove demand on disconnected nodes (variable of inp_options_debug)
-	RAISE NOTICE '21 Set demand = 0 for dry nodes';
-	IF v_removedemands THEN
-		UPDATE temp_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) FROM anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
-		GET DIAGNOSTICS v_count = row_count;
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result, 2, concat(
-			'WARNING-227: Variabe to force remove demand on dry nodes and ',v_count,' dry nodes with demand have found wich demand have automaticly been removed'));
-		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result, 1, concat(
-			'INFO: Variabe to force remove demand on dry nodes is enabled but no dry nodes with demand have been found.'));
-		END IF;
-	END IF;
 
 	RAISE NOTICE '22 - Check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
