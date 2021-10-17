@@ -119,8 +119,11 @@ BEGIN
 	DELETE FROM audit_check_data WHERE id < 0;
 
 	-- get user parameters
-	v_hydroscenarioval = (SELECT value FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
+	v_hydroscenarioval = (SELECT name FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user);
 	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
+	IF v_dwfscenarioval IS NULL THEN
+		v_dwfscenarioval = 'No dwf scenario choosed';
+	END IF;
 
 	-- get settings values
 	v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);

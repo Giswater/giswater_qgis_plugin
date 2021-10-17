@@ -9,6 +9,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/10/14
+UPDATE sys_function SET 
+descript = 'Function to manage values of defined target hydrology catalog (delete or copy from another one). It works with all ojects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater'
+WHERE  id = 3100;
+
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('110', 'INP result line', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" readOnly="0" version="3.16.7-Hannover" simplifyDrawingTol="1" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" minScale="100000000" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1">

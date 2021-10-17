@@ -30,7 +30,7 @@ UPDATE sys_function SET sys_role = 'role_epa' WHERE id  = 3032;
 INSERT INTO sys_fprocess VALUES (406, 'Builddate before 1900', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (407 'EPA outlayer values', 'utils')
+INSERT INTO sys_fprocess VALUES (407, 'EPA outlayer values', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, descript, project_type) VALUES('epa_outlayer_values', '{"elevation":{"min":-10, "max":6000}}', 'Epa outlayer values to check results','utils')

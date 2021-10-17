@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2021/10/14
-CREATE TRIGGER gw_trg_cat_dscenario AFTER INSERT ON ws.cat_dscenario
-FOR EACH ROW EXECUTE PROCEDURE ws.gw_trg_cat_dscenario();
+--2021/10/17
+CREATE TRIGGER gw_trg_cat_dscenario AFTER INSERT ON cat_dscenario
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_cat_dscenario();
 

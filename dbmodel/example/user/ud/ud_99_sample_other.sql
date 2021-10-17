@@ -451,14 +451,16 @@ INSERT INTO inp_dscenario_conduit VALUES (1,'217', 'CC100', 'Concret', 0.016, 2,
 INSERT INTO inp_dscenario_conduit VALUES (1,'175', 'CC060', 'Concret', null, 2, null,0.1, 0.1, 0.1);
 INSERT INTO inp_dscenario_conduit VALUES (1,'216', 'CC040', NULL, 0.020, 2, null,0.1, 0.1, 0.1);
 
-INSERT INTO inp_dscenario_junction VALUES (1,'235',2);
-INSERT INTO inp_dscenario_junction VALUES (1,'250',2);
-INSERT INTO inp_dscenario_junction VALUES (1,'301',2);
-INSERT INTO inp_dscenario_junction VALUES (1,'50',2);
+INSERT INTO inp_dscenario_junction VALUES (1,'235',1);
+INSERT INTO inp_dscenario_junction VALUES (1,'250',1);
+INSERT INTO inp_dscenario_junction VALUES (1,'301',1);
+INSERT INTO inp_dscenario_junction VALUES (1,'50',1);
 
 INSERT INTO inp_dscenario_raingage VALUES (1,'RG-01',null,null,null,null,'T10-5m');
 INSERT INTO inp_dscenario_raingage VALUES (2,'RG-01',null,null,null,null,'T10-5m');
 INSERT INTO inp_dscenario_raingage VALUES (3,'RG-01',null,null,null,null,'T10-5m');
+
+DELETE FROM selector_inp_dscenario; -- delete selectors because of trigger on cat_dscenario it inserts
 
 UPDATE inp_dwf SET value = 0.0001;
 
