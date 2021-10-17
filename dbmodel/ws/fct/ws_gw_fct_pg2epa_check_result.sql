@@ -77,6 +77,8 @@ v_count2 integer;
 v_periodtype integer;
 object_rec record;
 v_graphiclog boolean;
+v_outlayer_elevation json;
+
 
 BEGIN
 
@@ -89,6 +91,7 @@ BEGIN
 
 	-- select system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT value::json->>'elevation' INTO v_outlayer_elevation FROM config_param_system WHERE parameter = 'epa_outlayer_values';
 	
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -608,7 +611,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
 
-	RAISE NOTICE '14- Dint for cat_connec';
+	RAISE NOTICE '14- Dint for cat_connec (400)';
 
 	IF v_networkmode = 4 THEN
 	
@@ -617,12 +620,25 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 			VALUES (v_fid, v_result_id, 3, '400', concat('ERROR-400: There is/are ',v_count,
 			' connec catalogs with null values on dint'),v_count);
-			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 1, '499', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
+			VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
 		END IF;
 	END IF;
+
+	RAISE NOTICE '15 - EPA Outlayer values (407)';
+
+	-- elevation
+	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_node) a 
+	WHERE elev < (v_outlayer_elevation->>'min')::float OR elev > (v_outlayer_elevation->>'max')::float;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '407', concat('ERROR-407: There is/are ',v_count,' node(s) with otulayer values on elevation column'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All nodes has elevation without outlayer values.'),v_count);
+	END IF;
+
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
