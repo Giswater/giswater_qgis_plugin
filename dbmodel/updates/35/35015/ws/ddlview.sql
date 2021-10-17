@@ -11,3 +11,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP VIEW IF EXISTS v_om_mincut_conflict_valve;
 DROP VIEW IF EXISTS v_om_mincut_conflict_arc;
 DROP VIEW IF EXISTS v_om_mincut_audit;
+
+
+
+CREATE OR REPLACE VIEW vi_emitters AS 
+SELECT inp_emitter.node_id,
+	   inp_emitter.coef
+   FROM inp_emitter
+   JOIN temp_node USING (node_id)
+   WHERE (addparam::json->>'removedDemand')::boolean is not true;
