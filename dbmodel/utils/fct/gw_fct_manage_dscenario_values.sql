@@ -197,7 +197,7 @@ BEGIN
 						VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					ELSIF v_count2 > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					END IF;	
 
 				ELSIF v_action = 'DELETE-ONLY' THEN

@@ -43,12 +43,11 @@ BEGIN
 
 		-- moving connec demands to temp_demand
 		INSERT INTO temp_demand (feature_id, demand, pattern_id)
-		SELECT n.node_id, sum(d.demand), d.pattern_id 
+		SELECT n.node_id, (d.demand), d.pattern_id 
 		FROM  inp_dscenario_demand d ,temp_node n
 		JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand > 0 
-		AND dscenario_id IN (SELECT unnest(v_userscenario))
-		GROUP BY n.node_id, d.pattern_id;
+		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		-- update demands
 		IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
@@ -58,18 +57,8 @@ BEGIN
 
 			-- moving node demands to temp_demand
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
-			SELECT DISTINCT ON (feature_id) feature_id, n.demand, n.pattern_id 
-			FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
-
-			-- moving connec demands to temp_demand
-			INSERT INTO temp_demand (feature_id, demand, pattern_id)
-			SELECT n.node_id, sum(d.demand), d.pattern_id 
-			FROM  inp_dscenario_demand d ,temp_node n
-			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
-			WHERE c.connec_id = d.feature_id AND d.demand > 0 
-			AND dscenario_id IN (SELECT unnest(v_userscenario))
-			GROUP BY n.node_id, d.pattern_id;
+			SELECT node_id, demand, pattern_id 
+			FROM temp_node WHERE demand > 0;
 
 		END IF;
 		

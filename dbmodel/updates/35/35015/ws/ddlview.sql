@@ -18,4 +18,14 @@ SELECT inp_emitter.node_id,
    inp_emitter.coef
    FROM inp_emitter
    JOIN temp_node t USING (node_id)
-   WHERE t.node_id NOT IN (SELECT node_id FROM anl_node WHERE fid = 232 AND cur_user = current_user);   
+   WHERE t.node_id NOT IN (SELECT node_id FROM anl_node WHERE fid = 232 AND cur_user = current_user);
+
+
+CREATE OR REPLACE VIEW vi_demands AS 
+SELECT temp_demand.feature_id,
+    temp_demand.demand,
+    temp_demand.pattern_id,
+    temp_demand.demand_type
+   FROM temp_demand 
+   JOIN temp_node ON feature_id = node_id
+    ORDER BY temp_demand.feature_id   
