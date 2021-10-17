@@ -35,3 +35,7 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, descript, project_type) VALUES('epa_outlayer_values', '{"elevation":{"min":-10, "max":6000}}', 'Epa outlayer values to check results','utils')
 ON CONFLICT (parameter) DO NOTHING;
+
+
+INSERT INTO sys_function VALUES (3082, 'gw_trg_cat_dscenario', 'utils', 'trigger function', null, null , 'Trigger to activate scenario when is created', 'role_epa')
+ON CONFLICT (id) DO NOTHING;
