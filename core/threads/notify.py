@@ -33,13 +33,15 @@ class GwNotify(QObject):
         QObject.__init__(self)
 
 
-    def start_listening(self, list_channels):
+    def start_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be listened
         """
 
-        self.list_channels = list_channels
-        for channel_name in list_channels:
+        tools_log.log_info("Notifiy started")
+        if list_channels:
+            self.list_channels = list_channels
+        for channel_name in self.list_channels:
             tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
         thread = threading.Thread(target=self._wait_notifications)
@@ -72,12 +74,15 @@ class GwNotify(QObject):
             raise exception
 
 
-    def stop_listening(self, list_channels):
+    def stop_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be unlistened
         """
 
-        for channel_name in list_channels:
+        tools_log.log_info("Notifiy stopped")
+        if list_channels:
+            self.list_channels = list_channels
+        for channel_name in self.list_channels:
             tools_db.execute_sql(f'UNLISTEN "{channel_name}";')
 
 
@@ -94,7 +99,12 @@ class GwNotify(QObject):
 
             # Check if any notification to process
             dao = global_vars.dao
-            dao.get_poll()
+            status = dao.get_poll()
+
+            # If connection has been restarted then reset notify
+            if not status:
+                self.start_listening()
+                tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
 
             executed_notifies = []
             while dao.conn.notifies:

@@ -379,9 +379,8 @@ class GwMenuLoad(QObject):
         """ Reset notify class """
 
         if global_vars.notify:
-            list_channels = ['desktop', global_vars.current_user]
-            global_vars.notify.stop_listening(list_channels)
-            global_vars.notify.start_listening(list_channels)
+            global_vars.notify.stop_listening()
+            global_vars.notify.start_listening()
 
 
     # endregion

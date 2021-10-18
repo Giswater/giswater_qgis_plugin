@@ -273,6 +273,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     global_vars.dao = tools_pgdao.GwPgDao()
     global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
     status = global_vars.dao.init_db()
+    tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
     if not status:
         msg = "Database connection error (psycopg2). Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(msg)
@@ -313,6 +314,7 @@ def connect_to_database_service(service, sslmode=None):
         global_vars.dao = tools_pgdao.GwPgDao()
         global_vars.dao.set_conn_string(conn_string)
         status = global_vars.dao.init_db()
+        tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
         if not status:
             msg = "Service database connection error (psycopg2). Please open plugin log file to get more details"
             global_vars.session_vars['last_error'] = tools_qt.tr(msg)
