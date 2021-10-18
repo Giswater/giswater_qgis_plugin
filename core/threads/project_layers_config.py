@@ -184,33 +184,52 @@ class GwProjectLayersConfig(GwTask):
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
-                # Manage new values in ValueMap
-                if field['widgettype'] == 'combo':
-                    if 'comboIds' in field:
-                        # Set values
-                        for i in range(0, len(field['comboIds'])):
-                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
-                    # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'check':
-                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
-                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'datetime':
-                    config = {'allow_null': True,
-                              'calendar_popup': True,
-                              'display_format': 'yyyy-MM-dd',
-                              'field_format': 'yyyy-MM-dd',
-                              'field_iso_format': False}
-                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'textarea':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                # Manage ValueRelation configuration
+                if 'widgetcontrols' in field and field['widgetcontrols'] \
+                        and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']:
+                    value_relation = field['widgetcontrols']['valueRelation']
+                    if 'activated' in value_relation and value_relation['activated']:
+                        vr_layer = value_relation['layer']
+                        vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                        vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                        vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                        vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression
+
+                        # Create and apply ValueRelation config
+                        editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                     'Key': f'{vr_key_column}',
+                                                                                     'Value': f'{vr_value_column}',
+                                                                                     'FilterExpression': f'{vr_filter_expression}'})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
                 else:
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    # Manage new values in ValueMap
+                    if field['widgettype'] == 'combo':
+                        if 'comboIds' in field:
+                            # Set values
+                            for i in range(0, len(field['comboIds'])):
+                                valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                        # Set values into valueMap
+                        editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'check':
+                        config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                        editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'datetime':
+                        config = {'allow_null': True,
+                                  'calendar_popup': True,
+                                  'display_format': 'yyyy-MM-dd',
+                                  'field_format': 'yyyy-MM-dd',
+                                  'field_iso_format': False}
+                        editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'textarea':
+                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    else:
+                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
                 if field['widgettype'] == 'text':
