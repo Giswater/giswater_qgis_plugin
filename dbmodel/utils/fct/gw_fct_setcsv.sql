@@ -31,6 +31,7 @@ _value text;
 keys text;
 _values text;
 query text;
+v_separator text;
 
 BEGIN
 
@@ -39,6 +40,9 @@ BEGIN
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
+	--get decimal separator
+	v_separator = ((p_data ->>'data')::json->>'separator')::text;
+
 	-- getting input data values	
 	v_fields = ((p_data ->>'data')::json->>'values')::json;
 	FOR rec IN SELECT json_array_elements(v_fields) LOOP
@@ -48,6 +52,13 @@ BEGIN
 		FOR _key, _value IN SELECT * FROM json_each_text(rec) LOOP
 			raise notice '_value-->%',_value;
 			keys = concat(_key,', ',keys);
+
+			IF v_separator = ',' THEN
+				IF split_part(_value, ',',1) ~ '^[0-9]' and split_part(_value, ',',2) ~ '^[0-9]' and split_part(_value, ',',3) ='' THEN
+					_value=replace(_value,',','.');
+				END IF;
+			END IF;
+
 			_values = concat('$$',_value,'$$, ',_values);
 		
 		END LOOP;
