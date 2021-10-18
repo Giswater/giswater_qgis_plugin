@@ -89,16 +89,18 @@ class GwCreateSchemaTask(GwTask):
                     self.setProgress(100)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
+                if not self.is_test:
+                    self.setProgress(80)
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
+            elif self.admin.rdb_sample_dev.isChecked():
                 if not self.is_test:
                     self.setProgress(80)
-            elif self.admin.rdb_sample_dev.isChecked():
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
-                self.admin._load_dev_data(project_type=project_type)
                 if not self.is_test:
-                    self.setProgress(80)
+                    self.setProgress(90)
+                self.admin._load_dev_data(project_type=project_type)
             elif self.admin.rdb_data.isChecked():
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
