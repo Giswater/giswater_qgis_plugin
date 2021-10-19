@@ -20,14 +20,15 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
+    QIntValidator, QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QDockWidget
-from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
-    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, Qgis, QgsVectorFileWriter, \
+from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
+    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
@@ -957,6 +958,12 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                             pass
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                if 'datatype' in field:
+                    tools_log.log_info(field['datatype'])
+                    if field['datatype'] == 'int':
+                        widget.setValidator(QIntValidator())
+                    elif field['datatype'] == 'float':
+                        widget.setValidator(QDoubleValidator())
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
@@ -1546,10 +1553,10 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None, aux_conn=None,
-        is_thread=False, check_function=True):
+def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None,
+        aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution of database function @function_name
-        If execution failed, try to execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
+        If execution failed, execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
     """
 
     # Define dictionary with results
@@ -2080,7 +2087,6 @@ def manage_layer_manager(json_result, sql=None):
             snapper_manager.set_snap_mode()
             del snapper_manager
 
-
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
@@ -2468,16 +2474,19 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
             message = "Widget not found"
             tools_log.log_info(message, parameter=widget_name)
             return None
+
     elif type(table_object) is QTableView:
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
         tools_log.log_info(msg)
         return None
+
     table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     if widget_name is not None:
         set_tablemodel_config(dialog, widget_name, table_name)
+
     return expr
 
 
@@ -2716,9 +2725,7 @@ def set_epsg():
 
 
 def refresh_selectors(tab_name=None):
-    """
-    Refreshes the selectors' UI if it's open
-    """
+    """ Refreshes the selectors' UI if it's open """
 
     # Get the selector UI if it's open
     windows = [x for x in QApplication.allWidgets() if not x.isHidden() and (issubclass(type(x), GwSelectorUi))]
@@ -2735,10 +2742,7 @@ def refresh_selectors(tab_name=None):
 
 
 def open_dlg_help():
-    """
-    Opens the help page for the last focused dialog
-        :return:
-    """
+    """ Opens the help page for the last focused dialog """
 
     parser = configparser.ConfigParser()
     path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
