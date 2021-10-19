@@ -38,7 +38,7 @@ BEGIN
 	SET search_path = 'SCHEMA_NAME', public;
 
 	-- getting parameters
-	If p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT style FROM config_function where id = p_fnumber); END IF;
+	If p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT returnmanager FROM config_function where id = p_fnumber); END IF;
 	If p_layermanager IS NOT NULL THEN v_layermanager = p_layermanager; ELSE v_layermanager = (SELECT layermanager FROM config_function where id = p_fnumber); END IF;
 	If p_actions IS NOT NULL THEN v_actions = p_actions; ELSE v_actions = (SELECT actions FROM config_function where id = p_fnumber); END IF;
 
