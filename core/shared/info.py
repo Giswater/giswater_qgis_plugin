@@ -2073,12 +2073,12 @@ class GwInfo(QObject):
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
-                widget.dateChanged.connect(partial(self._clean_my_json, widget))
-                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.dateChanged.connect(partial(
+                widget.valueChanged.connect(partial(self._clean_my_json, widget))
+                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
-                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
 

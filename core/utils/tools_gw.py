@@ -987,7 +987,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'value' in field and field['value'] not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                 widget.setDate(date)
-                widget.dateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()

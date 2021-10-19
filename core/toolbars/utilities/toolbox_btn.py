@@ -217,7 +217,7 @@ class GwToolBoxButton(GwAction):
                     widget.stateChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'datetime':
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    widget.dateChanged.connect(partial(self._update_tbl_reports))
+                    widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
