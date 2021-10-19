@@ -96,7 +96,7 @@ def initialize_parsers():
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
-                      chk_user_params=True, get_none=False) -> str:
+                      chk_user_params=True, get_none=False, force_reload=False) -> str:
     """ Load a simple parser value """
 
     if config_type not in ("user", "project"):
@@ -115,7 +115,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         parser.read(path)
 
     # If project has already been loaded and filename is 'init' or 'session', always read and parse file
-    if global_vars.project_loaded and file_name in ('init', 'session'):
+    if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
