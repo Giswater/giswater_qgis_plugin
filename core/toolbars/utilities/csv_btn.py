@@ -162,8 +162,9 @@ class GwCSVButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-            msg = result['message']['text']
-            tools_qt.show_info_box(msg)
+            if 'message' in result:
+                msg = result['message']['text']
+                tools_qt.show_info_box(msg)
 
 
     def _update_info(self, dialog):
@@ -305,7 +306,7 @@ class GwCSVButton(GwAction):
 
             for x in range(0, len(row)):
                 value = row[x].strip().replace("\n", "")
-                field[f"csv{x + 1}"] = f"{value}"
+                field[f"csv{x + 1}"] = f"{value}" if value else None
             fields.append(field)
             cont += 1
             progress = (100 * cont) / row_count

@@ -73,7 +73,7 @@ class GwLoadProject(QObject):
             global_vars.schema_name = schema_name.replace('"', '')
 
         # Check for developers options
-        value = tools_gw.get_config_parser('system', 'log_sql', "user", "init", False)
+        value = tools_gw.get_config_parser('log', 'log_sql', "user", "init", False)
         tools_qgis.user_parameters['log_sql'] = value
         value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value
@@ -99,7 +99,7 @@ class GwLoadProject(QObject):
             return
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "init")
+        open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
         if tools_os.set_boolean(open_search):
             dlg_search = GwSearchUi()
             GwSearch().open_search(dlg_search, load_project=True)
@@ -193,7 +193,7 @@ class GwLoadProject(QObject):
     def _get_user_variables(self):
         """ Get config related with user variables """
 
-        global_vars.user_level['level'] = tools_gw.get_config_parser('system', 'user_level', "user", "init", False)
+        global_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
         global_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
         global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
         global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)

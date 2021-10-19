@@ -97,27 +97,7 @@ class GwMenuLoad(QObject):
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
 
-        action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
-        log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
-        if not log_sql_shortcut:
-            tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
-                                       prefix=False)
-        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
-        action_set_log_sql.triggered.connect(self._set_log_sql)
-
-        action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
-
-        action_reset_dialogs.triggered.connect(self._reset_position_dialog)
-
-        action_open_selections = actions_menu.addAction(f"Show current selectors")
-        action_open_selections_shortcut = tools_gw.get_config_parser("system", f"open_selections_shortcut", "user", "init",
-                                                                    prefix=False)
-        if not action_open_selections_shortcut:
-            tools_gw.set_config_parser("system", f"open_selections_shortcut", f"{action_open_selections_shortcut}", "user",
-                                       "init", prefix=False)
-        action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
-        action_open_selections.triggered.connect(self._open_current_selections)
-
+        # Action 'Get help'
         action_help = actions_menu.addAction(f"Get help")
         action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
         if not action_help_shortcut:
@@ -126,6 +106,11 @@ class GwMenuLoad(QObject):
         action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
         action_help.triggered.connect(tools_gw.open_dlg_help)
 
+        # Action 'Reset dialogs'
+        action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
+        action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+
+        # Action 'Reset plugin
         action_reset_plugin = actions_menu.addAction(f"Reset plugin")
         action_reset_plugin_shortcut = tools_gw.get_config_parser("system", f"reset_plugin_shortcut", "user", "init", prefix=False)
         if not action_reset_plugin_shortcut:
@@ -133,6 +118,26 @@ class GwMenuLoad(QObject):
                                        "init", prefix=False)
         action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
         action_reset_plugin.triggered.connect(self._reset_plugin)
+
+        # Action 'Show current selectors'
+        action_open_selections = actions_menu.addAction(f"Show current selectors")
+        action_open_selections_shortcut = tools_gw.get_config_parser("system", f"open_selections_shortcut", "user", "init",
+                                                                     prefix=False)
+        if not action_open_selections_shortcut:
+            tools_gw.set_config_parser("system", f"open_selections_shortcut", f"{action_open_selections_shortcut}", "user",
+                                       "init", prefix=False)
+        action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
+        action_open_selections.triggered.connect(self._open_current_selections)
+
+        # Action 'Toggle Log DB'
+        action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
+        log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
+        if not log_sql_shortcut:
+            tools_gw.set_config_parser("log", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
+                                       prefix=False)
+        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+        action_set_log_sql.triggered.connect(self._set_log_sql)
+
         # endregion
 
         # region Advanced
@@ -307,13 +312,13 @@ class GwMenuLoad(QObject):
 
     def _set_log_sql(self):
 
-        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init", False, get_none=True)
+        log_sql = tools_gw.get_config_parser("log", f"log_sql", "user", "init", False, get_none=True)
         if log_sql in ("False", "None"):
             message = "Variable log_sql from user config file has been enabled."
-            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init", prefix=False)
+            tools_gw.set_config_parser("log", "log_sql", "True", file_name="init", prefix=False)
         else:
             message = "Variable log_sql from user config file has been disabled."
-            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
+            tools_gw.set_config_parser("log", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
 
@@ -331,6 +336,7 @@ class GwMenuLoad(QObject):
         self._reset_all_rubberbands()
         self.iface.actionPan().trigger()
         self._reload_layers()
+        self._reset_notify()
 
 
     def _reload_layers(self):
@@ -367,5 +373,15 @@ class GwMenuLoad(QObject):
         for i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)
+
+
+    def _reset_notify(self):
+        """ Reset notify class """
+
+        if global_vars.notify:
+            list_channels = ['desktop', global_vars.current_user]
+            global_vars.notify.stop_listening(list_channels)
+            global_vars.notify.start_listening(list_channels)
+
 
     # endregion

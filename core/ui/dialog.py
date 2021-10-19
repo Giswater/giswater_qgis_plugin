@@ -5,10 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
 
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDialog, QShortcut
-from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtGui import QKeySequence, QIcon
 
 from ... import global_vars
 from ..utils import tools_gw
@@ -27,6 +28,11 @@ class GwDialog(QDialog):
         action_help_shortcut = tools_gw.get_config_parser("system", f"help_shortcut", "user", "init", prefix=False)
         sh = QShortcut(QKeySequence(f"{action_help_shortcut}"), self)
         sh.activated.connect(tools_gw.open_dlg_help)
+        # Set window icon
+        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
+        giswater_icon = QIcon(icon_path)
+        self.setWindowIcon(giswater_icon)
         # Enable event filter
         self.installEventFilter(self)
 

@@ -226,6 +226,10 @@ class GwGo2EpaSelectorButton(GwAction):
                 tools_gw.set_config_parser('btn_go2epa_selector', 'com_date', f'{com_date}', prefix=False)
                 tools_gw.set_config_parser('btn_go2epa_selector', 'com_time', f'{com_time}', prefix=False)
 
+        # Force a map refresh
+        tools_qgis.refresh_map_canvas()  # First refresh all the layers
+        global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+
         # Show message to user
         message = "Values has been updated"
         tools_qgis.show_info(message)

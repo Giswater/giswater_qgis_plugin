@@ -31,10 +31,6 @@ class GwNotify(QObject):
         """ Class to control notify from PostgresSql """
 
         QObject.__init__(self)
-        self.iface = global_vars.iface
-        self.canvas = global_vars.canvas
-        self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
 
 
     def start_listening(self, list_channels):
@@ -112,7 +108,7 @@ class GwNotify(QObject):
 
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
-                tools_log.log_info(msg)
+                tools_log.log_info(msg, tab_name="Giswater Notify")
                 try:
                     complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                     self._execute_functions(complet_result)
@@ -142,11 +138,12 @@ class GwNotify(QObject):
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
-            try:
+            if hasattr(tools_backend_calls, function_name):
+                tools_log.log_info(f"Execute function: {function_name} {params}", tab_name="Giswater Notify")
                 getattr(tools_backend_calls, function_name)(**params)
-            except AttributeError as e:
-                # If function_name not exist as python function
-                tools_log.log_warning(f"Exception error: {e}")
+            else:
+                tools_log.log_warning(f"Python function not found: {function_name}", tab_name="Giswater Notify")
+
         global_vars.session_vars['threads'].remove(self)
         self.task_finished.emit()
 

@@ -513,11 +513,11 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
             credentials['service'] = settings.value('service')
 
             sslmode_settings = settings.value('sslmode')
-            sslmode = sslmode_settings
-            if isinstance(sslmode_settings, str):
-                sslmode_settings = sslmode_settings.lower().replace("ssl", "")
-                sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
-                sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
+            try:
+                sslmode_dict = {0: 'prefer', 1: 'disable', 3: 'require'}
+                sslmode = sslmode_dict.get(sslmode_settings, sslmode_default)
+            except ValueError:
+                sslmode = sslmode_settings
             credentials['sslmode'] = sslmode
             settings.endGroup()
 

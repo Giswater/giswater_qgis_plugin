@@ -162,19 +162,18 @@ class Giswater(QObject):
         tools_gw.user_params_to_userconfig()
 
         # Set logger parameters min_log_level and log_limit_characters
-        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
-        log_limit_characters = int(tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False))
-        db_limit_characters = int(tools_gw.get_config_parser('system', 'db_limit_characters', 'user', 'init', 200))
-        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, db_limit_characters)
+        min_log_level = int(tools_gw.get_config_parser('log', 'log_level', 'user', 'init', False))
+        log_limit_characters = int(tools_gw.get_config_parser('log', 'log_limit_characters', 'user', 'init', False))
+        log_db_limit_characters = int(tools_gw.get_config_parser('log', 'log_db_limit_characters', 'user', 'init', 200))
+        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, log_db_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
-        # Set init parameter 'max_retries'
-        max_retries = int(tools_gw.get_config_parser('system', 'max_retries', 'user', 'init', False))
-        global_vars.max_retries = max_retries
+        # Set init parameter 'exec_procedure_max_retries'
+        global_vars.exec_procedure_max_retries = int(tools_gw.get_config_parser('system', 'exec_procedure_max_retries', 'user', 'init', False))
 
         # Create the GwSignalManager
         self._create_signal_manager()

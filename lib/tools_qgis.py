@@ -716,6 +716,9 @@ def remove_layer_from_toc(layer_name, group_name):
                 root.removeChildNode(group)
         remove_layer_from_toc(layer_name, group_name)
 
+    # Force a map refresh
+    refresh_map_canvas()  # First refresh all the layers
+    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
 def clean_layer_group_from_toc(group_name):
     """
