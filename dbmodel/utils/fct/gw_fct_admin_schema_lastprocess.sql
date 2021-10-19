@@ -281,11 +281,11 @@ BEGIN
 	ELSIF v_isnew IS FALSE THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '---------------------');
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
 		
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO');     -- Info is 2 because we are inserting previously (updat sql) some info message for user using 1
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '-----------');
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '----');
 		
 		v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
 
