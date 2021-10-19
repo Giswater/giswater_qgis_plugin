@@ -33,7 +33,12 @@ BEGIN
     	INTO query_aux;
     END IF;
 
-	IF query_aux = 't' or query_aux = 'true' THEN
+    IF  query_aux = 't' or query_aux = 'true' THEN
+    	EXECUTE 'SELECT value::boolean FROM config_param_system WHERE parameter=''admin_utils_schema'';'
+    	INTO query_aux;
+    END IF;
+
+	IF query_aux = 't' or query_aux = 'true'  THEN
 		
 		--DROP FK
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_muni_id_fkey"; 
