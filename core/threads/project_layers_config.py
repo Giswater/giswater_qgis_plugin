@@ -193,7 +193,9 @@ class GwProjectLayersConfig(GwTask):
                         vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
                         vr_key_column = value_relation['keyColumn']  # Get 'Key'
                         vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                        vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression
+                        vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                        if vr_filter_expression is None:
+                            vr_filter_expression = ''
 
                         # Create and apply ValueRelation config
                         editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
