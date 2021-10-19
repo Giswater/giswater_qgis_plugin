@@ -9,6 +9,14 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/01/22
-ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS gully_type_id_fkey;
-ALTER TABLE cat_feature_gully ADD CONSTRAINT cat_feature_gully_fkey FOREIGN KEY (id)
+ALTER TABLE cat_feature_arc DROP CONSTRAINT IF EXISTS arc_type_id_fkey;
+ALTER TABLE cat_feature_arc  ADD CONSTRAINT cat_feature_arc_fkey FOREIGN KEY (id)
+REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE cat_feature_connec DROP CONSTRAINT IF EXISTS  connec_type_id_fkey;
+ALTER TABLE cat_feature_connec  ADD CONSTRAINT cat_feature_connec_fkey FOREIGN KEY (id)
+REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE cat_feature_node DROP CONSTRAINT IF EXISTS  node_type_id_fkey;
+ALTER TABLE cat_feature_node ADD CONSTRAINT cat_feature_node_fkey FOREIGN KEY (id)
 REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

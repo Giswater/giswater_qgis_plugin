@@ -14,8 +14,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psect
 DROP VIEW IF EXISTS v_edit_review_audit_arc;
 DROP VIEW IF EXISTS v_edit_review_arc;
 
-ALTER TABLE review_arc DROP CONSTRAINT review_arc_pkey;
-ALTER TABLE review_arc RENAME TO _review_arc2_;
+ALTER TABLE IF EXISTS review_arc DROP CONSTRAINT review_arc_pkey;
+ALTER TABLE IF EXISTS review_arc RENAME TO _review_arc2_;
 
 
 CREATE TABLE review_arc
@@ -36,9 +36,9 @@ CREATE TABLE review_arc
   CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
 
-ALTER TABLE review_audit_arc DROP CONSTRAINT review_audit_arc_pkey;
-ALTER TABLE review_audit_arc RENAME TO _review_audit_arc2_;
-ALTER SEQUENCE review_audit_arc_id_seq RENAME TO review_audit_arc_id_seq_old;
+ALTER TABLE IF EXISTS review_audit_arc DROP CONSTRAINT review_audit_arc_pkey;
+ALTER TABLE IF EXISTS review_audit_arc RENAME TO _review_audit_arc2_;
+ALTER SEQUENCE IF EXISTS review_audit_arc_id_seq RENAME TO review_audit_arc_id_seq_old;
 
 
 CREATE TABLE review_audit_arc
@@ -73,8 +73,8 @@ CREATE TABLE review_audit_arc
 DROP VIEW IF EXISTS v_edit_review_audit_gully;
 DROP VIEW IF EXISTS v_edit_review_gully;
 
-ALTER TABLE review_gully DROP CONSTRAINT review_gully_pkey;
-ALTER TABLE review_gully RENAME TO _review_gully2_;
+ALTER TABLE IF EXISTS review_gully DROP CONSTRAINT review_gully_pkey;
+ALTER TABLE IF EXISTS review_gully RENAME TO _review_gully2_;
 
 
 CREATE TABLE review_gully
@@ -100,9 +100,9 @@ CREATE TABLE review_gully
   CONSTRAINT review_gully_pkey PRIMARY KEY (gully_id)
 );
 
-ALTER TABLE review_audit_gully DROP CONSTRAINT review_audit_gully_pkey;
-ALTER TABLE review_audit_gully RENAME TO _review_audit_gully2_;
-ALTER SEQUENCE review_audit_gully_id_seq RENAME TO review_audit_gully_id_seq_old;
+ALTER TABLE IF EXISTS review_audit_gully DROP CONSTRAINT review_audit_gully_pkey;
+ALTER TABLE IF EXISTS review_audit_gully RENAME TO _review_audit_gully2_;
+ALTER SEQUENCE IF EXISTS review_audit_gully_id_seq RENAME TO review_audit_gully_id_seq_old;
 
 
 CREATE TABLE review_audit_gully
@@ -146,8 +146,8 @@ CREATE TABLE review_audit_gully
 DROP VIEW IF EXISTS v_edit_review_audit_node;
 DROP VIEW IF EXISTS v_edit_review_node;
 
-ALTER TABLE review_node DROP CONSTRAINT review_node_pkey;
-ALTER TABLE review_node RENAME TO _review_node2_;
+ALTER TABLE IF EXISTS review_node DROP CONSTRAINT review_node_pkey;
+ALTER TABLE IF EXISTS review_node RENAME TO _review_node2_;
 
 
 CREATE TABLE review_node
@@ -168,9 +168,9 @@ CREATE TABLE review_node
   CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
 
-ALTER TABLE review_audit_node DROP CONSTRAINT review_audit_node_pkey;
-ALTER TABLE review_audit_node RENAME TO _review_audit_node2_;
-ALTER SEQUENCE review_audit_node_id_seq RENAME TO review_audit_node_id_seq_old;
+ALTER TABLE IF EXISTS review_audit_node DROP CONSTRAINT review_audit_node_pkey;
+ALTER TABLE IF EXISTS review_audit_node RENAME TO _review_audit_node2_;
+ALTER SEQUENCE IF EXISTS review_audit_node_id_seq RENAME TO review_audit_node_id_seq_old;
 
 CREATE TABLE review_audit_node
 (
@@ -203,8 +203,8 @@ CREATE TABLE review_audit_node
 DROP VIEW IF EXISTS v_edit_review_audit_connec;
 DROP VIEW IF EXISTS v_edit_review_connec;
 
-ALTER TABLE review_connec DROP CONSTRAINT review_connec_pkey;
-ALTER TABLE review_connec RENAME TO _review_connec2_;
+ALTER TABLE IF EXISTS review_connec DROP CONSTRAINT review_connec_pkey;
+ALTER TABLE IF EXISTS review_connec RENAME TO _review_connec2_;
 
 CREATE TABLE review_connec
 (
@@ -224,9 +224,9 @@ CREATE TABLE review_connec
   CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
 );
 
-ALTER TABLE review_audit_connec DROP CONSTRAINT review_audit_connec_pkey;
-ALTER TABLE review_audit_connec RENAME TO _review_audit_connec2_;
-ALTER SEQUENCE review_audit_connec_id_seq RENAME TO review_audit_connec_id_seq_old;
+ALTER TABLE IF EXISTS review_audit_connec DROP CONSTRAINT review_audit_connec_pkey;
+ALTER TABLE IF EXISTS review_audit_connec RENAME TO _review_audit_connec2_;
+ALTER SEQUENCE IF EXISTS review_audit_connec_id_seq RENAME TO review_audit_connec_id_seq_old;
 
 CREATE TABLE review_audit_connec
 (
