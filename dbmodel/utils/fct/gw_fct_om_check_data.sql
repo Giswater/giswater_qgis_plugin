@@ -447,7 +447,7 @@ BEGIN
 		END IF;
 	END IF;
 
-/*
+
 	RAISE NOTICE '17 - Check for orphan polygons on polygon table (255)';
 	IF v_project_type ='UD' THEN
 
@@ -458,10 +458,10 @@ BEGIN
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (125, 2, '255', concat('WARNING-255: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp).  We recommend you to clean data before continue.'),v_count);
+			VALUES (125, 2, '255', concat('WARNING-255: There is/are ',v_count,' polygons without parent. Check your data before continue.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			VALUES (125, 1, '255','INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.',v_count);
+			VALUES (125, 1, '255','INFO: No polygons without parent feature found.',v_count);
 		END IF;
 	ELSIF v_project_type='WS' THEN
 		v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT node_id FROM node UNION SELECT connec_id FROM connec)) a';
@@ -470,13 +470,12 @@ BEGIN
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (125, 2, '255', concat('WARNING-255: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'), v_count);
+			VALUES (125, 2, '255', concat('WARNING-255: There is/are ',v_count,' polygons without parent. Check your data before continue.'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			VALUES (125, 1, '255', 'INFO: No polygons without parent feature (register, tank, fountain) found.', v_count);
+			VALUES (125, 1, '255', 'INFO: No polygons without parent feature found.', v_count);
 		END IF;
 	END IF;
-*/
 
 	RAISE NOTICE '18 - Check for orphan rows on man_addfields values table (256)';
 	IF v_project_type ='UD' THEN
