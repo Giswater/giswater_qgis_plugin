@@ -18,5 +18,3 @@ ALTER TABLE temp_arc ALTER COLUMN state DROP NOT NULL;
 ALTER TABLE temp_node ALTER COLUMN result_id DROP NOT NULL;
 ALTER TABLE temp_node ALTER COLUMN sector_id DROP NOT NULL;
 ALTER TABLE temp_node ALTER COLUMN state DROP NOT NULL;
-
-ALTER TABLE config_function RENAME COLUMN returnmanager TO style;
