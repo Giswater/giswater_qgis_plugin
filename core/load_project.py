@@ -161,53 +161,6 @@ class GwLoadProject(QObject):
 
     # region private functions
 
-    def _config_layers(self):
-        """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
-
-        status = self._manage_layers()
-        if not status:
-            return False
-
-        # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        # Set background task 'ConfigLayerFields'
-        schema_name = global_vars.schema_name.replace('"', '')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-               f"UNION "
-               f"SELECT DISTINCT(child_layer) FROM cat_feature "
-               f"WHERE child_layer IN ("
-               f"     SELECT table_name FROM information_schema.tables"
-               f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql)
-        description = f"ConfigLayerFields"
-        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": global_vars.project_vars['info_type']}
-        self.task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(self.task_get_layers)
-        QgsApplication.taskManager().triggerTask(self.task_get_layers)
-
-        return True
-
-
-    def _manage_layers(self):
-        """ Get references to project main layers """
-
-        # Check if we have any layer loaded
-        layers = tools_qgis.get_project_layers()
-        if len(layers) == 0:
-            return False
-
-        if global_vars.project_type in ('ws', 'ud'):
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project = GwLoadProjectCheck()
-
-            # check project
-            status, result = self.check_project.fill_check_project_table(layers, "true")
-            QApplication.restoreOverrideCursor()
-            return status
-
-        return True
-
-
     def _check_version_compatibility(self):
 
         # Get current QGIS and PostgreSQL versions
@@ -489,6 +442,111 @@ class GwLoadProject(QObject):
         if global_vars.feature_cat is None:
             self._enable_button("01", False)
             self._enable_button("02", False)
+
+
+    def _config_layers(self):
+        """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
+
+        status = self._manage_layers()
+        if not status:
+            return False
+
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        # Set background task 'ConfigLayerFields'
+        schema_name = global_vars.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql)
+        description = f"ConfigLayerFields"
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
+
+        return True
+
+
+    def _manage_layers(self):
+        """ Get references to project main layers """
+
+        # Check if we have any layer loaded
+        layers = tools_qgis.get_project_layers()
+        if len(layers) == 0:
+            return False
+
+        if global_vars.project_type in ('ws', 'ud'):
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            self.check_project = GwLoadProjectCheck()
+
+            # check project
+            status, result = self.check_project.fill_check_project_table(layers, "true")
+            try:
+                if 'variables' in result['body']:
+                    if 'useGuideMap' in result['body']['variables']:
+                        guided_map = result['body']['variables']['useGuideMap']
+                        if guided_map:
+                            tools_log.log_info("manage_guided_map")
+                            self._manage_guided_map()
+            except Exception as e:
+                tools_log.log_info(str(e))
+            finally:
+                QApplication.restoreOverrideCursor()
+                return status
+
+        return True
+
+
+    def _manage_guided_map(self):
+        """ Guide map works using ext_municipality """
+
+        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
+        if self.layer_muni is None:
+            return
+
+        self.iface.setActiveLayer(self.layer_muni)
+        tools_qgis.set_layer_visible(self.layer_muni)
+        self.layer_muni.selectAll()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+        self.iface.actionSelect().trigger()
+        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
+        cursor = tools_gw.get_cursor_multiple_selection()
+        if cursor:
+            self.iface.mapCanvas().setCursor(cursor)
+
+
+    def _selection_changed(self):
+        """ Get selected muni_id and execute function setselectors """
+
+        muni_id = None
+        features = self.layer_muni.getSelectedFeatures()
+        for feature in features:
+            muni_id = feature["muni_id"]
+            tools_log.log_info(f"Selected muni_id: {muni_id}")
+            break
+
+        self.iface.mapCanvas().selectionChanged.disconnect()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+
+        if muni_id is None:
+            return
+
+        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
+        body = tools_gw.create_body(extras=extras)
+        complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        if complet_result:
+            self.iface.mapCanvas().refreshAllLayers()
+            self.layer_muni.triggerRepaint()
+            self.iface.actionPan().trigger()
+            self.iface.actionZoomIn().trigger()
+            tools_gw.set_style_mapzones()
 
 
     def _enable_toolbars(self, visible=True):
