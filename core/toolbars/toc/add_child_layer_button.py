@@ -10,11 +10,9 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
-from qgis.core import QgsApplication
 
 from ..dialog import GwAction
 from ...load_project_check import GwLoadProjectCheck
-from ...threads.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
 from .... import global_vars
@@ -26,11 +24,11 @@ class GwAddChildLayerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self._config_layers()
 
 
     def clicked_event(self):
 
+        self._config_layers()
         self._add_child_layer()
 
 
@@ -127,23 +125,6 @@ class GwAddChildLayerButton(GwAction):
         if not status:
             return False
 
-        # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        # Set background task 'ConfigLayerFields'
-        schema_name = self.schema_name.replace('"', '')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-               f"UNION "
-               f"SELECT DISTINCT(child_layer) FROM cat_feature "
-               f"WHERE child_layer IN ("
-               f"     SELECT table_name FROM information_schema.tables"
-               f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql)
-        description = f"ConfigLayerFields"
-        params = {"project_type": self.project_type, "schema_name": self.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": global_vars.project_vars['info_type']}
-        self.task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(self.task_get_layers)
-        QgsApplication.taskManager().triggerTask(self.task_get_layers)
-
         return True
 
 
@@ -162,9 +143,9 @@ class GwAddChildLayerButton(GwAction):
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                if 'actions' in result['body']:
-                    if 'useGuideMap' in result['body']['actions']:
-                        guided_map = result['body']['actions']['useGuideMap']
+                if 'variables' in result['body']:
+                    if 'useGuideMap' in result['body']['variables']:
+                        guided_map = result['body']['variables']['useGuideMap']
                         if guided_map:
                             tools_log.log_info("manage_guided_map")
                             self._manage_guided_map()

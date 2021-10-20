@@ -7,9 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsProject, Qgis
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel
+from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -17,6 +17,8 @@ from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
+from .load_project_check import GwLoadProjectCheck
+from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
@@ -117,11 +119,14 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
+        # call dynamic mapzones repaint
+        tools_gw.set_style_mapzones()
+
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # call dynamic mapzones repaint
-        tools_gw.set_style_mapzones()
+        # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
+        self._config_layers()
 
         # Create a thread to listen selected database channels
         global_vars.notify = GwNotify()
@@ -155,6 +160,53 @@ class GwLoadProject(QObject):
 
 
     # region private functions
+
+    def _config_layers(self):
+        """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
+
+        status = self._manage_layers()
+        if not status:
+            return False
+
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        # Set background task 'ConfigLayerFields'
+        schema_name = global_vars.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql)
+        description = f"ConfigLayerFields"
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
+
+        return True
+
+
+    def _manage_layers(self):
+        """ Get references to project main layers """
+
+        # Check if we have any layer loaded
+        layers = tools_qgis.get_project_layers()
+        if len(layers) == 0:
+            return False
+
+        if global_vars.project_type in ('ws', 'ud'):
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            self.check_project = GwLoadProjectCheck()
+
+            # check project
+            status, result = self.check_project.fill_check_project_table(layers, "true")
+            QApplication.restoreOverrideCursor()
+            return status
+
+        return True
+
 
     def _check_version_compatibility(self):
 
