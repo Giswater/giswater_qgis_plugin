@@ -715,6 +715,16 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="btn_set_to_arc">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

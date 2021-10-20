@@ -100,6 +100,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34")
@@ -254,6 +255,8 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
             self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
+            if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
+                self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
@@ -273,6 +276,7 @@ class GwPsector:
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(partial(
                 tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+            self.qtbl_connec.clicked.connect(partial(self._enable_set_to_arc))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
@@ -280,6 +284,7 @@ class GwPsector:
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(partial(
                     tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                self.qtbl_gully.clicked.connect(partial(self._enable_set_to_arc))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -386,6 +391,8 @@ class GwPsector:
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
+        self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
+            partial(self._set_to_arc))
 
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
@@ -393,6 +400,8 @@ class GwPsector:
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._enable_arc_replace))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(self._enable_set_to_arc))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -1734,6 +1743,97 @@ class GwPsector:
         return all_checked
 
 
+    def _set_to_arc(self):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
+        self.emit_point.canvasClicked.connect(partial(self._set_arc_id))
+
+
+    def _set_arc_id(self, point):
+
+        # Check if there is a connec/gully selected
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        selected_rows = []
+        selected_qtbl = None
+        if tab_idx == 2:
+            selected_rows = self.qtbl_connec.selectionModel().selectedRows()
+            selected_qtbl = self.qtbl_connec
+            if len(selected_rows) == 0:
+                message = "Any record selected"
+                tools_qgis.show_warning(message)
+                return
+        elif tab_idx == 3:
+            selected_rows = self.qtbl_gully.selectionModel().selectedRows()
+            selected_qtbl = self.qtbl_gully
+            if len(selected_rows) == 0:
+                message = "Any record selected"
+                tools_qgis.show_warning(message)
+                return
+
+        # Get the point
+        event_point = self.snapper_manager.get_event_point(point=point)
+        self.arc_id = None
+
+        # Manage current psector
+        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        current_psector = row[0]
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+        if str(current_psector) != str(selected_psector):
+            message = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(message)
+
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{selected_psector}' "
+                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+            tools_db.execute_sql(sql)
+
+        # Snap point
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_arc:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.arc_id = snapped_feat.attribute('arc_id')
+                self.arc_cat_id = snapped_feat.attribute('arccat_id')
+
+                # Set highlight
+                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
+                try:
+                    geometry = feature.geometry()
+                    self.rubber_band.setToGeometry(geometry, None)
+                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band.setWidth(5)
+                    self.rubber_band.show()
+                except AttributeError:
+                    pass
+
+        if self.arc_id is None: return
+
+        for row in selected_rows:
+            cell = row.siblingAtColumn(tools_qt.get_col_index_by_col_name(selected_qtbl, 'arc_id'))
+            selected_qtbl.model().setData(cell, self.arc_id)
+
+
     def _replace_arc(self):
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -1823,6 +1923,7 @@ class GwPsector:
         # Open form
         tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
 
+
     def _set_plan_replace_feature(self):
 
         new_arc_cat = f'"{tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)}"'
@@ -1859,10 +1960,21 @@ class GwPsector:
 
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
 
+        self.dlg_plan_psector.btn_select_arc.setEnabled(False)
         if tab_idx == 0:
             self.dlg_plan_psector.btn_select_arc.setEnabled(True)
-        else:
-            self.dlg_plan_psector.btn_select_arc.setEnabled(False)
+
+
+    def _enable_set_to_arc(self):
+
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+        elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+
 
     def _mouse_move_arc(self, point):
 
