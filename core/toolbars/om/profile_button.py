@@ -1223,7 +1223,7 @@ class GwProfileButton(GwAction):
 
         # Draw main text
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(0.5) * self.height_row - self.height_row / 2,
-                 'REFERENCE: ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                 f"{self.profile_json['body']['data']['legend']['referencePlane']}: {round(self.min_top_elev - 1 * self.height_row, 2)}\n ",
                  fontsize=8.5,
                  color=text_color, fontweight=text_weight,
                  verticalalignment='center')
