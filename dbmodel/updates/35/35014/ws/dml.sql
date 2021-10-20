@@ -1237,5 +1237,5 @@ def my_form_open(dialog, layer, feature):
 </qgis>
 $$, true);
 
-UPDATE config_function SET returnmanager = $${"style":{"point":{"style":"qml", "id":"109"}, "line":{"style":"qml", "id":"108"}}}$$
+UPDATE config_function SET style = $${"style":{"point":{"style":"qml", "id":"109"}, "line":{"style":"qml", "id":"108"}}}$$
 WHERE id = '2848';
