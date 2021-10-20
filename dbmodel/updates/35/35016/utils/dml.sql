@@ -90,3 +90,4 @@ UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL 
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_dscenario", "keyColumn":"dscenario_id", "valueColumn":"name", "filterExpression":null}}'::jsonb END 
 WHERE  formtype = 'form_feature' AND formname !='cat_dscenario' AND columnname='dscenario_id';
 
+update plan_psector set active=true WHERE active is null;
