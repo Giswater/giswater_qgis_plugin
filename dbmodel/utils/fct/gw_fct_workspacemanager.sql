@@ -63,6 +63,7 @@ v_audit_result text;
 v_version text;
 v_result_info json;
 v_uservalues json;
+v_querytext text;
 
 BEGIN
 
@@ -108,7 +109,7 @@ BEGIN
 		SELECT jsonb_build_object('inp',i.inp_conf) INTO v_workspace_config FROM
 		(SELECT json_object_agg(parameter, value) as inp_conf
 		FROM config_param_user WHERE 
-		(parameter ilike 'inp_options%' OR parameter ilike 'inp_report%') AND 
+		(parameter ilike 'inp_options%' OR parameter ilike 'inp_report%' or parameter ilike  'inp_times%') AND 
 		parameter NOT IN ('inp_options_buildup_supply', 'inp_options_advancedsettings','inp_options_debug','inp_options_vdefault') 
 		AND cur_user=current_user) i;
 		--save configuration from config_param_user (parameters with json values)
@@ -217,9 +218,9 @@ BEGIN
 	ELSIF v_action = 'CURRENT' THEN
 		
 		--save workspace in config_param_user
+		DELETE FROM config_param_user WHERE parameter = 'utils_workspace_vdefault' AND cur_user = current_user;
 		INSERT INTO config_param_user (parameter,value, cur_user)
-		VALUES ('utils_workspace_vdefault', v_workspace_id, current_user)
-		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
+		VALUES ('utils_workspace_vdefault', v_workspace_id, current_user);
 		
 		--capture config of selected workspace
 		SELECT config INTO v_workspace_config FROM cat_workspace WHERE id=v_workspace_id;
@@ -299,21 +300,18 @@ BEGIN
 			INSERT INTO audit_check_data (fid, error_message) SELECT v_fid, replace(jsonb_build_object(key, value)::text,'\','') from json_each_text(v_config_values);
 			
 			IF v_action = 'CURRENT' THEN
-				UPDATE config_param_user SET value = a.value,  cur_user = current_user 
-				FROM  (SELECT key, value from json_each_text(v_config_values))a
-				WHERE parameter=a.key;
+				v_querytext = 'DELETE FROM config_param_user WHERE parameter IN (SELECT key from json_each_text('||quote_literal(v_config_values)||')) AND cur_user = current_user';
+				EXECUTE v_querytext;
 				
-				INSERT INTO config_param_user (parameter, value, cur_user) 
+				v_querytext =  'INSERT INTO config_param_user (parameter, value, cur_user) 
 				SELECT key, valor, current_user FROM 
-				(SELECT key, value as valor from json_each_text(v_config_values)) a
-				ON CONFLICT DO NOTHING;
+				(SELECT key, value as valor from json_each_text('||quote_literal(v_config_values)||')) a';
+				EXECUTE v_querytext;				
 			END IF;
 		END LOOP;
 
 		v_return_msg = 'Workspace changed successfully';
 	END IF;
-
-	
 				
 	IF v_audit_result is null THEN
 		v_return_status = 'Accepted';
