@@ -135,7 +135,7 @@ class GwLoadProject(QObject):
 
         # Check parameter 'force_tab_expl'
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
-        if tools_os.set_boolean(force_tab_expl):
+        if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
 
         # Set global_vars.project_epsg
