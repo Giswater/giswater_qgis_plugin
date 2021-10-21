@@ -569,7 +569,7 @@ def set_action_checked(action, enabled, dialog=None):
 
 def set_calendar_empty(widget):
     """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
-    widget.setEmpty()
+    widget.displayNull(False)  # False is for 'updateCalendar' parameter. If True it sets a default date instead of NULL
 
 
 def add_horizontal_spacer():
