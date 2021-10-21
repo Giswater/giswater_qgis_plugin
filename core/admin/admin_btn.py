@@ -31,7 +31,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_config
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
@@ -70,7 +70,6 @@ class GwAdminButton:
         default_connection = self._populate_combo_connections()
         # Bug #733 was here
         # Check if connection is still False
-        layer_source = None
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
@@ -87,10 +86,10 @@ class GwAdminButton:
             self.form_enabled = False
 
         # Set label status connection
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
-        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
-        self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
+        self.icon_folder = f"{self.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
+        self.status_ok = QPixmap(f"{self.icon_folder}status_ok.png")
+        self.status_ko = QPixmap(f"{self.icon_folder}status_ko.png")
+        self.status_no_update = QPixmap(f"{self.icon_folder}status_not_updated.png")
 
         # Create the dialog and signals
         self._init_show_database()
@@ -3245,22 +3244,13 @@ class GwAdminButton:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self._set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self._set_credentials, self.dlg_credentials, new_connection=True))
-        self.dlg_credentials.cmb_sslmode.currentIndexChanged.connect(
-            partial(self._set_user_sslmode))
 
         sslmode_list = [['disable', 'disable'], ['allow', 'allow'], ['prefer', 'prefer'], ['require', 'require'],
                         ['verify - ca', 'verify - ca'], ['verify - full', 'verify - full']]
         tools_qt.fill_combo_values(self.dlg_credentials.cmb_sslmode, sslmode_list, 0)
-        sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
-        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 'prefer')
 
         tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
-
-
-    def _set_user_sslmode(self):
-
-        sslmode = tools_qt.get_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 1)
-        tools_config.set_config_parser_value('system', 'sslmode', sslmode.strip("'"))
 
 
     def _manage_user_params(self):

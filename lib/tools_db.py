@@ -10,7 +10,7 @@ from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
-from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao, tools_os
+from . import tools_log, tools_qt, tools_qgis, tools_pgdao, tools_os
 
 
 def create_list_for_completer(sql):
@@ -480,10 +480,17 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
 
         not_version = False
         credentials = tools_qgis.get_layer_source(layer)
-        # Get sslmode from user init config file
-        tools_config.manage_init_config_file()
-        sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_default)
-        credentials['sslmode'] = sslmode
+
+        # If sslmode is not defined
+        sslmode = sslmode_default
+        if not credentials['sslmode']:
+            # If service is defined: get sslmode from .pg_service file
+            if credentials['service']:
+                tools_log.log_info(f"Getting sslmode from .pg_service file")
+                credentials_service = tools_os.manage_pg_service(credentials['service'])
+                sslmode = credentials_service['sslmode'] if credentials_service['sslmode'] else sslmode_default
+            credentials['sslmode'] = sslmode
+
         global_vars.schema_name = credentials['schema']
         conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
         status, credentials = connect_to_database_credentials(credentials, conn_info)
