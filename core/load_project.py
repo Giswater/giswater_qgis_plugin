@@ -133,9 +133,10 @@ class GwLoadProject(QObject):
         list_channels = ['desktop', global_vars.current_user]
         global_vars.notify.start_listening(list_channels)
 
-        # Reset some session/init user variables as vdefault
-        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init', prefix=False):
-            self._manage_reset_user_variables()
+        # Check parameter 'force_tab_expl'
+        force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
+        if tools_os.set_boolean(force_tab_expl):
+            self._force_tab_exploitation()
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
@@ -595,9 +596,9 @@ class GwLoadProject(QObject):
                 self._enable_button(index_action, enable)
 
 
-    def _manage_reset_user_variables(self):
+    def _force_tab_exploitation(self):
+        """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
-        # Set dlg_selector_basic as tab_exploitation
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
 
     # endregion
