@@ -1638,7 +1638,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # Get json result
     json_result = row[0]
     if log_sql:
-        tools_log.log_db(json_result)
+        tools_log.log_db(json_result, header="SERVER RESPONSE")
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:

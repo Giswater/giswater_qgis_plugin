@@ -123,8 +123,8 @@ class GwNotify(QObject):
                 executed_notifies.append(notify)
 
                 if self.log_sql:
-                    msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
-                    msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
+                    msg = f'<font color="blue"><b>GOT SERVER NOTIFY: </font>'
+                    msg += f'<font color="black"><b>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                     tools_log.log_info(msg, tab_name="Giswater Notify")
 
                 try:
@@ -158,11 +158,14 @@ class GwNotify(QObject):
             params = function['parameters']
             if hasattr(tools_backend_calls, function_name):
                 getattr(tools_backend_calls, function_name)(**params)
-                msg = f"Execute function: {function_name} {params}"
+                msg = f'<font color="blue">CLIENT EXECUTION: </font>'
+                msg += f'<font color="black">{function_name} {params}</font>'
+                if self.log_sql:
+                    tools_log.log_info(msg, tab_name="Giswater Notify")
             else:
-                msg = f"Python function not found: {function_name}"
-            if self.log_sql:
-                tools_log.log_info(msg, tab_name="Giswater Notify")
+                msg = f'<font color="red">Python function not found: {function_name}</font>'
+                if self.log_sql:
+                    tools_log.log_warning(msg, tab_name="Giswater Notify")
 
         global_vars.session_vars['threads'].remove(self)
         self.task_finished.emit()
