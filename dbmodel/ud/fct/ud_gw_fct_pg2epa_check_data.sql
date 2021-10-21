@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 107,111,113,164,175,187,188,294,295,379
+	other: 106,107,111,113,164,175,187,188,294,295,379
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -41,6 +41,7 @@ v_result_id text;
 v_defaultdemand	float;
 v_error_context text;
 v_fid integer;
+v_nodetolerance float;
 
 BEGIN
 
@@ -50,6 +51,7 @@ BEGIN
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
+	v_nodetolerance :=  (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
 
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -63,7 +65,7 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (188, 284) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 111, 113, 164, 175, 187, 379) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 175, 187, 379) AND cur_user=current_user;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -391,6 +393,25 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '383', concat('INFO: Manning coefficient on cat_mat_arc is filled for those materials used on real arcs (not varcs).'),v_count);
 	END IF;	
 
+	
+	RAISE NOTICE '16- Duplicated nodes';
+
+	v_querytext = 'SELECT * FROM (
+		SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
+		FROM selector_sector s, v_edit_node AS t1 JOIN v_edit_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		WHERE t1.node_id != t2.node_id 
+		AND s.sector_id = t1.sector_id AND cur_user = current_user 
+		ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '106' ,concat('WARNING-106: There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
+	END IF;
+
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
@@ -421,7 +442,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 164, 175, 187, 381, 382)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 175, 187, 381, 382)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 

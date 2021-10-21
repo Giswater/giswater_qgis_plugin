@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379, 380
+		other: 106,107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379, 380
 
 */
 
@@ -39,6 +39,7 @@ v_result_id text;
 v_defaultdemand	float;
 v_error_context text;
 v_fid integer;
+v_nodetolerance float;
 
 BEGIN
 
@@ -51,6 +52,7 @@ BEGIN
 	
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	v_nodetolerance :=  (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
 
 	-- init variables
 	v_count=0;
@@ -60,7 +62,7 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 225 AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 169, 170, 171, 198, 292, 293, 294, 379) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (106, 107, 187, 164, 165, 166, 167, 169, 170, 171, 198, 292, 293, 294, 379) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (188, 229, 230, 295) AND cur_user=current_user;
 	
 
@@ -694,6 +696,24 @@ BEGIN
 	VALUES (v_fid, 1, '380','INFO: All arc materials are defined on cat_mat_rougnhess table.',v_count);
 	END IF;
 
+	RAISE NOTICE '28- Duplicated nodes';
+
+	v_querytext = 'SELECT * FROM (
+		SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
+		FROM selector_sector s, v_edit_node AS t1 JOIN v_edit_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		WHERE t1.node_id != t2.node_id 
+		AND s.sector_id = t1.sector_id AND cur_user = current_user 
+		ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '106' ,concat('WARNING-106: There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
+	END IF;
+	
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
@@ -724,7 +744,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
