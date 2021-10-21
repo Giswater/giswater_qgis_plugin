@@ -9,3 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/10/20
 ALTER TABLE config_function RENAME COLUMN returnmanager TO style;
+
+ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_name_unique UNIQUE (name);
