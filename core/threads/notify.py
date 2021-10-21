@@ -46,10 +46,6 @@ class GwNotify(QObject):
         for channel_name in self.list_channels:
             tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
-        # Check parameter 'log_sql'
-        log_sql = tools_gw.get_config_parser("log", f"log_sql", "user", "init", False, get_none=True)
-        self.log_sql = tools_os.set_boolean(log_sql, False)
-
         thread = threading.Thread(target=self._wait_notifications)
         thread.start()
 
@@ -121,6 +117,10 @@ class GwNotify(QObject):
                 if notify in executed_notifies:
                     continue
                 executed_notifies.append(notify)
+
+                # Check parameter 'log_sql'
+                log_sql = tools_gw.get_config_parser("log", f"log_sql", "user", "init", False, get_none=True)
+                self.log_sql = tools_os.set_boolean(log_sql, False)
 
                 if self.log_sql:
                     msg = f'<font color="blue"><b>GOT SERVER NOTIFY: </font>'
