@@ -19,6 +19,5 @@ VALUES (3104, 'gw_fct_create_dscenario_from_toc', 'ws', 'function', 'json',
 
 INSERT INTO config_toolbox VALUES (3104, 'Create Dscenario with values from ToC','{"featureType":["node", "arc"]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
-  {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = 'inp_typevalue_dscenario'", "selectedId":""}]',
-  NULL,TRUE
-  ON CONFLICT (id) DO NOTHING;
+  {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""}]',
+  NULL,TRUE)  ON CONFLICT (id) DO NOTHING;
