@@ -120,6 +120,11 @@ class GwArcFusionButton(GwMaptool):
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, True)
 
+            # Fill ComboBox cmb_statetype
+            sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, 1, add_empty=True)
+
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
             tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
