@@ -111,6 +111,10 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion = GwArcFusionUi()
             tools_gw.load_settings(self.dlg_fusion)
 
+            # Fill ComboBox cmb_nodeaction
+            rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
+            tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, 1, sort_by=0)
+
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = tools_db.get_rows(sql)
@@ -120,11 +124,26 @@ class GwArcFusionButton(GwMaptool):
             current_date = QDate.currentDate()
             tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
+            # Disable some widgets
+            self.dlg_fusion.workcat_id_end.setEnabled(False)
+            self.dlg_fusion.cmb_statetype.setEnabled(False)
+
             # Set signals
+            self.dlg_fusion.cmb_nodeaction.currentIndexChanged.connect(partial(self._manage_nodeaction))
             self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
             self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
             tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+
+
+    def _manage_nodeaction(self, index):
+
+        if index == 1:
+            self.dlg_fusion.workcat_id_end.setEnabled(True)
+            self.dlg_fusion.cmb_statetype.setEnabled(True)
+        else:
+            self.dlg_fusion.workcat_id_end.setEnabled(False)
+            self.dlg_fusion.cmb_statetype.setEnabled(False)
 
     # endregion
