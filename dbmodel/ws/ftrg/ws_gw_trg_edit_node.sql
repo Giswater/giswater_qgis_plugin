@@ -672,7 +672,7 @@ BEGIN
 			v_inp_table:= 'inp_inlet';  
 		    END IF;
 		    IF v_inp_table IS NOT NULL THEN
-			v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||') ON CONFLICT (node_id) DO NOTHING';
 			EXECUTE v_sql;
 		    END IF;
 		END IF;

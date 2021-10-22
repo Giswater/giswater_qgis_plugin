@@ -460,9 +460,9 @@ BEGIN
 
 			-- insert into new inp table
 			IF (NEW.epa_type = 'PIPE') THEN
-				INSERT INTO inp_pipe VALUES (NEW.arc_id);
+				INSERT INTO inp_pipe VALUES (NEW.arc_id) ON CONFLICT (arc_id) DO NOTHING;
 			ELSIF (NEW.epa_type = 'VIRTUALVALVE') THEN
-				INSERT INTO inp_virtualvalve (arc_id, status, valv_type) VALUES (NEW.arc_id, 'ACTIVE', 'FCV');
+				INSERT INTO inp_virtualvalve (arc_id, status, valv_type) VALUES (NEW.arc_id, 'ACTIVE', 'FCV') ON CONFLICT (arc_id) DO NOTHING;
 			END IF;
 		END IF;
 	
