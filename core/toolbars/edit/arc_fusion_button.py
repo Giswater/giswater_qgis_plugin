@@ -85,6 +85,8 @@ class GwArcFusionButton(GwMaptool):
         if not tools_os.set_boolean(log, False):
             text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
 
+        self._save_dlg_values()
+
         if not text_result:
             self.dlg_fusion.close()
 
@@ -117,6 +119,9 @@ class GwArcFusionButton(GwMaptool):
             # Fill ComboBox cmb_nodeaction
             rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
             tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, 1, sort_by=0)
+            node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
+            if node_action not in (None, 'None', ''):
+                tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
 
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
@@ -127,14 +132,18 @@ class GwArcFusionButton(GwMaptool):
             sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, 1, add_empty=True)
+            state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
+            if state_type not in (None, 'None', ''):
+                tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
             tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
             # Disable some widgets
-            self.dlg_fusion.workcat_id_end.setEnabled(False)
-            self.dlg_fusion.cmb_statetype.setEnabled(False)
+            if self.dlg_fusion.cmb_nodeaction.currentIndex() != 1:
+                self.dlg_fusion.workcat_id_end.setEnabled(False)
+                self.dlg_fusion.cmb_statetype.setEnabled(False)
 
             # Set signals
             self.dlg_fusion.cmb_nodeaction.currentIndexChanged.connect(partial(self._manage_nodeaction))
@@ -153,5 +162,18 @@ class GwArcFusionButton(GwMaptool):
         else:
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
+
+
+    def _save_dlg_values(self):
+
+        # Save combo 'Node action'
+        node_action = tools_qt.get_text(self.dlg_fusion, "cmb_nodeaction")
+        if node_action:
+            tools_gw.set_config_parser("btn_arc_fusion", "cmb_nodeaction", node_action)
+
+        # Save combo 'State type'
+        state_type = tools_qt.get_text(self.dlg_fusion, "cmb_statetype")
+        if state_type:
+            tools_gw.set_config_parser("btn_arc_fusion", "cmb_statetype", state_type)
 
     # endregion
