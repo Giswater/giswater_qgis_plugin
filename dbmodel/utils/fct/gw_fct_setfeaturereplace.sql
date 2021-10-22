@@ -255,10 +255,11 @@ BEGIN
 			ELSIF v_feature_type='connec' THEN
 				v_epa_table = 'inp_connec';
 			END IF;
-		
-			v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
-			execute v_query_string_insert;
 			
+			IF v_epa_table IS NOT NULL THEN
+				v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
+				execute v_query_string_insert;
+			END IF;
 		END IF;
 		
 		-- updating values on feature parent table from values of old feature
@@ -302,9 +303,9 @@ BEGIN
 				
 			END LOOP;
 		END IF;
-		
+			
 		-- updating values on table epa_table from values of old feature
-		IF v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS') THEN
+		IF (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) and v_epa_table is not null THEN
 			v_sql:='select column_name  FROM information_schema.columns 
 								where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 								table_name='''||v_epa_table||''') and column_name!='''||v_id_column||''';';
