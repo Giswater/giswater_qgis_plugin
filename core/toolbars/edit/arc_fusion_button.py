@@ -65,6 +65,7 @@ class GwArcFusionButton(GwMaptool):
     def _fusion_arc(self):
 
         state_type = tools_qt.get_combo_value(self.dlg_fusion, "cmb_statetype")
+        keep_operative = self.dlg_fusion.cmb_nodeaction.currentIndex() == 0
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
@@ -74,6 +75,8 @@ class GwArcFusionButton(GwMaptool):
             extras += f', "workcat_id_end":"{workcat_id_end}"'
         if state_type:
             extras += f', "state_type": {state_type}'
+        if keep_operative:
+            extras += f', "keep_operative": "{keep_operative}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
