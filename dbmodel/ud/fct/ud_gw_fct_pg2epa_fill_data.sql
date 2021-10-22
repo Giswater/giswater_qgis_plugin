@@ -103,7 +103,8 @@ BEGIN
 
 	-- Insert on arc rpt_inp table
 	INSERT INTO temp_arc 
-	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope)
+	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope,
+	culvert, kentry, kexit, kavg, flap, seepage)
 	SELECT
 	result_id_var,
 	a.arc_id, node_1, node_2, a.sys_elev1, a.sys_elev2, a.arc_type, arccat_id, epa_type, a.sector_id, a.state, 
@@ -121,7 +122,8 @@ BEGIN
 	q0,
 	qmax,
 	barrels,
-	slope
+	slope,
+	culvert, kentry, kexit, kavg, flap, seepage
 	FROM selector_sector, v_arc a
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id
