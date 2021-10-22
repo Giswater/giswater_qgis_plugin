@@ -193,6 +193,7 @@ class GwMenuLoad(QObject):
 
         tools_qgis.set_cursor_wait()
         self.dlg_manage_menu = GwLoadMenuUi()
+        tools_gw.load_settings(self.dlg_manage_menu)
 
         # Manage widgets
         self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
@@ -202,7 +203,8 @@ class GwMenuLoad(QObject):
         self._fill_tbl_config_files()
 
         # Listeners
-        self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
+        self.btn_close.clicked.connect(partial(self.dlg_manage_menu.reject))
+        self.dlg_manage_menu.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
 
         tools_qgis.restore_cursor()
 
@@ -267,7 +269,7 @@ class GwMenuLoad(QObject):
                 subitem = QTreeWidgetItem([f"{section}"])
                 item.addChild(subitem)
                 for parameter in parser[section]:
-                    if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
+                    if parameter[0:2] in project_types and global_vars.project_type != parameter[0:2]:
                         continue
                     value = parser[section][parameter]
                     values = {}
