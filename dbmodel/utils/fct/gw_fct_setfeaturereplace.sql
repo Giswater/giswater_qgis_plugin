@@ -37,6 +37,7 @@ v_value text;
 v_state integer;
 v_state_type integer;
 v_epa_type text;
+v_epa_type_new text;
 rec_arc record;	
 v_old_featuretype varchar;
 v_old_featurecat varchar;
@@ -45,6 +46,7 @@ v_dma_id integer;
 v_expl_id integer;
 v_man_table varchar;
 v_epa_table varchar;
+v_epa_table_new varchar;
 v_code_autofill boolean;
 v_code	int8;
 v_id int8;
@@ -148,10 +150,25 @@ BEGIN
 
 	--capture old feature values for basic attributes
 	IF v_feature_type IN ('node', 'arc') THEN
-		EXECUTE 'SELECT epa_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''' '
-		INTO v_epa_type;
+		EXECUTE 'SELECT epa_type, epa_table FROM '||v_feature_layer||' c JOIN sys_feature_epa_type s ON epa_type=s.id 
+		WHERE '||v_feature_type||'_type='||quote_literal(v_old_featuretype)||' AND feature_type IN (''NODE'', ''ARC'')
+		AND '||v_id_column||'='||quote_literal(v_old_feature_id)||' limit 1'
+		INTO v_epa_type,v_epa_table;
+
+		EXECUTE 'SELECT epa_default, epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id 
+		WHERE c.id='||quote_literal(v_feature_type_new)||' AND feature_type IN (''NODE'', ''ARC'')'
+		INTO v_epa_type_new, v_epa_table_new;
+
+		IF v_old_featuretype=v_feature_type_new THEN
+			v_epa_type_new=v_epa_type;
+			v_epa_table_new=v_epa_table;
+		END IF;
+		IF  v_feature_type='node' AND v_old_feature_id NOT IN (SELECT node_1 FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc) THEN
+			v_epa_type_new='UNDEFINED';
+			v_epa_table_new = NULL;
+		END IF;
 	END IF;
-	
+
 	EXECUTE 'SELECT sector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
 	INTO v_sector_id;
 	EXECUTE 'SELECT state_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
@@ -191,16 +208,15 @@ BEGIN
 		IF v_code_autofill IS TRUE THEN
 			v_code = v_id;
 		END IF;
-
 		-- inserting new feature on parent tables
 		IF v_feature_type='node' THEN
 			IF v_project_type='WS' then
 				INSERT INTO node (node_id, code, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
-				VALUES (v_id, v_code, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id,  
+				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id,  
 				0, v_state_type, v_workcat_id_end, v_the_geom);
 			ELSE 
 				INSERT INTO node (node_id, code, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
-				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 
+				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 
 				0, v_state_type, v_workcat_id_end, v_the_geom);
 			END IF;
 
@@ -210,10 +226,10 @@ BEGIN
 		ELSIF v_feature_type='arc' THEN
 			IF v_project_type='WS' then
 				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
-				VALUES (v_id, v_code, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
+				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
 			ELSE 
 				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
-				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
+				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -243,21 +259,22 @@ BEGIN
 		-- inserting new feature on table man_table / epa table
 		IF v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS') THEN
 	
-			EXECUTE 'SELECT man_table FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
+			EXECUTE 'SELECT man_table FROM cat_feature c JOIN sys_feature_cat s ON c.system_id = s.id WHERE c.id='''||v_feature_type_new||''';'
 			INTO v_man_table;
+	
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 
-			IF v_feature_type='node' or v_feature_type='arc' THEN
+			/*IF v_feature_type='node' or v_feature_type='arc' THEN
 				EXECUTE 'SELECT epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id WHERE c.id='||quote_literal(v_old_featuretype)||' 
 				AND feature_type IN (''NODE'', ''ARC'')'
-				INTO v_epa_table;
-			ELSIF v_feature_type='connec' THEN
-				v_epa_table = 'inp_connec';
+				INTO v_epa_table;*/
+			IF v_feature_type='connec' THEN
+				v_epa_table_new = 'inp_connec';
 			END IF;
 			
-			IF v_epa_table IS NOT NULL THEN
-				v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
+			IF v_epa_table_new IS NOT NULL THEN
+				v_query_string_insert='INSERT INTO '||v_epa_table_new||' VALUES ('||v_id||');';
 				execute v_query_string_insert;
 			END IF;
 		END IF;
@@ -284,7 +301,7 @@ BEGIN
 		END LOOP;
 
 		-- updating values on table man_table from values of old feature
-		IF v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS') THEN
+		IF v_old_featuretype = v_feature_type_new AND (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) THEN
 			v_sql:='select column_name    FROM information_schema.columns 
 								where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 								table_name='''||v_man_table||''') and column_name!='''||v_id_column||''';';
@@ -305,7 +322,8 @@ BEGIN
 		END IF;
 			
 		-- updating values on table epa_table from values of old feature
-		IF (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) and v_epa_table is not null THEN
+		IF (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) and v_epa_table is not null AND 
+		v_epa_type_new = v_epa_type THEN
 			v_sql:='select column_name  FROM information_schema.columns 
 								where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 								table_name='''||v_epa_table||''') and column_name!='''||v_id_column||''';';
