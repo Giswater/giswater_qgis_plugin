@@ -1,2 +1,4 @@
 3.5.016
 *************
+- Buf fix from prev commits
+- Add new controls on go2epa for ws. (Check mandatory nodarcs and shortpipe nodarcs over other epa nodes (411, 412)
