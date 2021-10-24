@@ -29,3 +29,6 @@ VALUES (411, 'Mandatory nodarc over other EPA node','ws', null, null) ON CONFLIC
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (412, 'Shortpipe nodarc over other EPA node','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (413, 'EPA connec over EPA node','ws', null, null) ON CONFLICT (fid) DO NOTHING;
+
