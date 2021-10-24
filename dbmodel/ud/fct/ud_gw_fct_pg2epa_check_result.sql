@@ -142,7 +142,7 @@ BEGIN
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-10, v_fid, v_result_id, 4,
 	concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message)
-	VALUES (-9, v_fid, v_result_id, 4, '---------------------------------------------------------------------------------');
+	VALUES (-9, v_fid, v_result_id, 4, '--------------------------------------------------------------------------------------');
 
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-8, v_fid, v_result_id, 3, 'CRITICAL ERRORS');
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-7, v_fid, v_result_id, 3, '----------------------');
