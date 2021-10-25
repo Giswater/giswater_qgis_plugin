@@ -58,7 +58,7 @@ v_node_1 text;
 v_man_table text;
 v_epa_table text;
 v_state_type integer;
-v_keep_operative boolean;
+v_action_mode integer;
 
 BEGIN
 
@@ -79,12 +79,13 @@ BEGIN
     v_workcat_id_end = (((p_data ->>'data')::json->>'workcat_id_end')::text);
     v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
     v_state_type = ((p_data ->>'data')::json->>'state_type')::integer;
-    v_keep_operative = ((p_data ->>'data')::json->>'keep_operative')::boolean;
+    v_action_mode = ((p_data ->>'data')::json->>'action_mode')::integer;
   
     -- Get state_type from default value if this isn't on input json
     IF v_state_type IS NULL THEN
         SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
     END IF;
+    v_action_mode = COALESCE(v_action_mode, 1);
 
 
     -- delete old values on result table
@@ -372,9 +373,15 @@ BEGIN
 				IF v_state_type IS NULL THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3134", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
-				ELSIF v_keep_operative IS FALSE THEN
+				ELSIF v_action_mode = 1 THEN
 					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
 					UPDATE node SET state=0, state_type=v_state_type, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+				END IF;
+
+				-- Delete node if action is 'DELETE NODE'
+				IF v_action_mode = 2 THEN
+					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete node ',v_node_id));
+					DELETE FROM node WHERE node_id = v_node_id;
 				END IF;
 			    
 			ELSIF v_state_node = 2 THEN
@@ -388,6 +395,8 @@ BEGIN
 				DELETE FROM node WHERE node_id = v_node_id;
 			
 			END IF;
+
+			
 		    
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
