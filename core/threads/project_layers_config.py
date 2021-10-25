@@ -60,6 +60,8 @@ class GwProjectLayersConfig(GwTask):
         if result:
             if self.exception:
                 tools_log.log_warning(f"Last exception on task {self.description()}: {self.exception}")
+                if self.message:
+                    tools_log.log_warning(f"Message from task {self.description()}: {self.message}")
                 raise self.exception
             return
 
@@ -209,11 +211,10 @@ class GwProjectLayersConfig(GwTask):
                                                                                          'Value': f'{vr_value_column}',
                                                                                          'FilterExpression': f'{vr_filter_expression}'})
                             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                        except AttributeError as e:
-                            self.exception = e
-                            use_vr = False
                         except Exception as e:
                             self.exception = e
+                            self.message = f"Error configuring ValueRelation for " \
+                                           f"layer '{layer_name}' - field '{field['columnname']}'"
                             use_vr = False
 
                 if not use_vr:
