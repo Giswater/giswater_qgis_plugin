@@ -58,11 +58,15 @@ class GwProjectLayersConfig(GwTask):
             return
 
         if result:
+            if self.exception:
+                tools_log.log_warning(f"Last exception on task {self.description()}: {self.exception}")
+                raise self.exception
             return
 
         # If sql function return null
         if result is False:
-            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Task failed: {self.description()}. This is probably a DB error, check postgres function" \
+                  f" 'gw_fct_getinfofromid'."
             tools_log.log_warning(msg)
 
         if self.exception:
@@ -185,26 +189,34 @@ class GwProjectLayersConfig(GwTask):
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 # Manage ValueRelation configuration
-                if 'widgetcontrols' in field and field['widgetcontrols'] \
-                        and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']:
+                use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
+                         and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+                if use_vr:
                     value_relation = field['widgetcontrols']['valueRelation']
                     if 'activated' in value_relation and value_relation['activated']:
-                        vr_layer = value_relation['layer']
-                        vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
-                        vr_key_column = value_relation['keyColumn']  # Get 'Key'
-                        vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                        vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
-                        if vr_filter_expression is None:
-                            vr_filter_expression = ''
+                        try:
+                            vr_layer = value_relation['layer']
+                            vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                            vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                            vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                            vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                            if vr_filter_expression is None:
+                                vr_filter_expression = ''
 
-                        # Create and apply ValueRelation config
-                        editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                     'Key': f'{vr_key_column}',
-                                                                                     'Value': f'{vr_value_column}',
-                                                                                     'FilterExpression': f'{vr_filter_expression}'})
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                            # Create and apply ValueRelation config
+                            editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                         'Key': f'{vr_key_column}',
+                                                                                         'Value': f'{vr_value_column}',
+                                                                                         'FilterExpression': f'{vr_filter_expression}'})
+                            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                        except AttributeError as e:
+                            self.exception = e
+                            use_vr = False
+                        except Exception as e:
+                            self.exception = e
+                            use_vr = False
 
-                else:
+                if not use_vr:
                     # Manage new values in ValueMap
                     if field['widgettype'] == 'combo':
                         if 'comboIds' in field:
