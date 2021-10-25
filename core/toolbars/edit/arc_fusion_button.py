@@ -116,6 +116,14 @@ class GwArcFusionButton(GwMaptool):
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
+            self.node_state = snapped_feat.attribute('state')
+
+            # If the node has state 0 (obsolete) don't open arc fusion dlg
+            if self.node_state is not None and self.node_state == 0:
+                msg = "The node is obsolete, this tool doesn't work with obsolete nodes."
+                tools_qgis.show_warning(msg, title="Arc fusion")
+                return
+
             self.dlg_fusion = GwArcFusionUi()
             tools_gw.load_settings(self.dlg_fusion)
 
@@ -143,8 +151,14 @@ class GwArcFusionButton(GwMaptool):
             current_date = QDate.currentDate()
             tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
+            # If the node has state 2 (planified) only allow remove node
+            if self.node_state is not None and self.node_state == 2:
+                self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
+                self.dlg_fusion.cmb_nodeaction.setEnabled(False)
+                tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
             # Disable some widgets
             if self.dlg_fusion.cmb_nodeaction.currentIndex() != 1:
+                self.dlg_fusion.enddate.setEnabled(False)
                 self.dlg_fusion.workcat_id_end.setEnabled(False)
                 self.dlg_fusion.cmb_statetype.setEnabled(False)
 
@@ -160,9 +174,11 @@ class GwArcFusionButton(GwMaptool):
     def _manage_nodeaction(self, index):
 
         if index == 1:
+            self.dlg_fusion.enddate.setEnabled(True)
             self.dlg_fusion.workcat_id_end.setEnabled(True)
             self.dlg_fusion.cmb_statetype.setEnabled(True)
         else:
+            self.dlg_fusion.enddate.setEnabled(False)
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
 
