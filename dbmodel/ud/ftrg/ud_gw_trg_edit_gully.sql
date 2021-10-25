@@ -76,16 +76,16 @@ BEGIN
 		v_matfromcat = true;
 	END IF;
 
-	--check if feature is double geom	
-	EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-	FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
-	INTO v_doublegeometry, v_unitsfactor;
-
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		--check if feature is double geom	
+		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+		FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
+		INTO v_doublegeometry, v_unitsfactor;
+
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
@@ -807,12 +807,12 @@ BEGIN
     
 
     ELSIF TG_OP = 'DELETE' THEN
-	
+
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
 
 		-- delete from polygon table (before the deletion of gully)
-		DELETE FROM polygon WHERE gully_id=OLD.gully_id;
+		DELETE FROM polygon WHERE feature_id=OLD.gully_id AND sys_type='GULLY';
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
