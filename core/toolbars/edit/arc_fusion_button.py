@@ -73,10 +73,10 @@ class GwArcFusionButton(GwMaptool):
         extras = f'"enddate":"{enddate_str}"'
         if workcat_id_end not in (None, 'null', ''):
             extras += f', "workcat_id_end":"{workcat_id_end}"'
-        if state_type:
-            extras += f', "state_type": {state_type}'
-        if action_mode:
+        if action_mode is not None:
             extras += f', "action_mode": {action_mode}'
+            if action_mode == 1 and state_type is not None:
+                extras += f', "state_type": {state_type}'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
