@@ -50,6 +50,7 @@ BEGIN
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
+	ALTER DEFAULT PRIVILEGES IN SCHEMA SCHEMA_NAME GRANT SELECT ON TABLES TO role_basic;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_om';
 	IF v_roleexists is null THEN
