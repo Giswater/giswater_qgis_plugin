@@ -97,3 +97,5 @@ UPDATE sys_function SET source=null WHERE source='giswater';
 UPDATE config_toolbox SET 
 	inputparams = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT result_id as id, result_id as idval FROM rpt_cat_result WHERE status > 0","layoutname":"grl_option_parameters","layoutorder":1,"selectedId":"$userInpResult"}]'
 	WHERE id IN (2848, 2858);
+
+UPDATE sys_table SET sys_role='role_basic' WHERE source='selector_sector';
