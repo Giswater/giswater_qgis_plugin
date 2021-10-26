@@ -206,7 +206,7 @@ BEGIN
 	END LOOP;
 
 	FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
-	FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL;'
+	FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id::integer > 0;'
 	LOOP
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (249, 2, concat('Mapzone not configured for header: ', rec.undone_mapzone_id,'. Closest arcs do not have good values.'));
