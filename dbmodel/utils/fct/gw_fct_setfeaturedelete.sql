@@ -137,20 +137,15 @@ BEGIN
 		END IF;
 
 		--delete related polygon
-		IF v_man_table IN ('man_tank', 'man_register', 'man_wwtp', 'man_storage','man_netgully','man_chamber') THEN
-			EXECUTE 'SELECT pol_id FROM polygon where pol_id IN (SELECT pol_id FROM '||v_man_table||' 
-			WHERE node_id = '''||v_feature_id||''')'
-			into v_related_id;
+		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';'
+		into v_related_id;
 
-			IF v_related_id IS NOT NULL THEN
-			 	EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM '||v_man_table||' 
-				WHERE node_id = '''||v_feature_id||'''); ';
+		IF v_related_id IS NOT NULL THEN
+			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
 
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (152, v_result_id, concat('Removed polygon:', v_related_id ));
 			END IF;
-
-		END IF;
 
 		--find if there is an arc related to node
 		SELECT string_agg(v_arc.arc_id,',')  INTO v_arc_id FROM v_arc 
@@ -233,25 +228,15 @@ BEGIN
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
 
 		--check related polygon
-		IF v_man_table = 'man_fountain' THEN
-			EXECUTE 'SELECT pol_id FROM '||v_man_table||' where connec_id= '''||v_feature_id||''''
-			INTO v_related_id;
+		EXECUTE 'SELECT pol_id FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';'
+		into v_related_id;
 
-			IF v_related_id IS NOT NULL THEN
-		 		EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM '||v_man_table||' where 
-		 		connec_id= '''||v_feature_id||''');';
-		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Removed polygon: ',v_related_id ));
-		 	END IF;
-		ELSIF v_feature_type='gully' THEN
-			EXECUTE 'SELECT pol_id FROM gully where gully_id= '''||v_feature_id||''''
-			INTO v_related_id;
-			
-			IF v_related_id IS NOT NULL THEN 
-				EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully where 
-		 		gully_id= '''||v_feature_id||''');';
-		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Removed polygon: ',v_related_id ));
+		IF v_related_id IS NOT NULL THEN
+			 	EXECUTE 'DELETE FROM polygon WHERE feature_id = '||quote_literal(v_feature_id)||' AND featurecat_id = '||quote_literal(v_featurecat)||';';
+
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (152, v_result_id, concat('Removed polygon:', v_related_id ));
 			END IF;
-		END IF;
 
 		--remove links related to connec/gully 
 		IF v_feature_type='connec' THEN
