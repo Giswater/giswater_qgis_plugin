@@ -46,6 +46,10 @@ select * from exploitation
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "exploitation":[1], "checkData":false,
+"updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false}}}');
+
+
 hieracy
 -------
 if floodfromnode not exits 
@@ -951,12 +955,12 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||'}'||'}}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null);
+
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
