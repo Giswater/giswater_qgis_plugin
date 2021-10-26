@@ -32,6 +32,8 @@ VALUES (412, 'Shortpipe nodarc over other EPA node','ws', null, null) ON CONFLIC
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (413, 'EPA connec over EPA node','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'PRESSZONE', false) WHERE parameter = ''
+
 --2021/10/26
 UPDATE config_function SET actions = $$[{"funcName": "set_style_mapzones", "params": {}}]$$ WHERE id = 2710;
 
@@ -39,3 +41,11 @@ UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL 
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"v_edit_inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'::jsonb END 
 WHERE formtype = 'form_feature' AND formname !='inp_pattern' AND (columnname='pattern_id' or columnname='pattern');
 
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["DMA","PRESSZONE","SECTOR"],"comboNames":["District Metering Areas (DMA)","Pressure zones (PRESSZONE)", "Inlet sectors (SECTOR)"], "selectedId":""}, {"widgetname":"mapzoneField", "label":"Mapzone field name:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":2, "value":""}]'
+WHERE id = 2970;
+
+UPDATE sys_function SET descript = 'Function to configure mapzones. 
+To execute it, system has two requirements:
+ - Mapzone need to be created
+ - Closest arcs need appropiate values on mapzonefield'
+WHERE id = 2970;

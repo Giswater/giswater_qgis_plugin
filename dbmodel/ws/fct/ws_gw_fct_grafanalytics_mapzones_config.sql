@@ -93,11 +93,11 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 4, 'CONFIGURE MAPZONES');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 1, '-------');
 
 	--find delimiter node types
 	EXECUTE 'SELECT string_agg(quote_literal(id), '','') FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||''
@@ -106,7 +106,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
-	FOR rec IN EXECUTE '(SELECT node_id::text FROM v_edit_node WHERE nodetype_id IN (SELECT id FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||'))' 
+
+	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE nodetype_id IN (SELECT id FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||'))' 
 	LOOP	
 		--find defined sector value of node
 		EXECUTE 'SELECT '||v_mapzonefield||' FROM node WHERE node_id = '||rec.node_id||'::text'
@@ -208,12 +209,21 @@ BEGIN
 	FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL;'
 	LOOP
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (249, 2, concat('Mapzone not configured for : ', rec.undone_mapzone_id,' - ',rec.undone_mapzone_name,'.'));
+		VALUES (249, 2, concat('Mapzone not configured for header: ', rec.undone_mapzone_id,'. Closest arcs do not have good values.'));
 	END LOOP;
 
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 1, '');
+	
+
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fid=249 ORDER BY criticity desc, id asc) row;
+	FROM (SELECT * FROM (SELECT DISTINCT ON (error_message, criticity) id, criticity, error_message as message FROM audit_check_data 
+	WHERE cur_user="current_user"() AND fid=249 GROUP BY id, message)b
+	ORDER BY criticity desc, id asc) row;
+
+	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'||quote_literal(v_graf_class)||', true) WHERE parameter = ''utils_grafanalytics_status''';
 	
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
