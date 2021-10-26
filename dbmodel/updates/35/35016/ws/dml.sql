@@ -32,3 +32,5 @@ VALUES (412, 'Shortpipe nodarc over other EPA node','ws', null, null) ON CONFLIC
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (413, 'EPA connec over EPA node','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
+--2021/10/26
+UPDATE config_function SET actions = $$[{"funcName": "set_style_mapzones", "params": {}}]$$ WHERE id = 2710;
