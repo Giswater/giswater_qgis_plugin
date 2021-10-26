@@ -279,11 +279,15 @@ BEGIN
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 			--node
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('TANK','TANK','NODE', 'v_edit_node', 'Tank') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('RESERVOIR','SOURCE','NODE', 'v_edit_node', 'Reservoir') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('TANK','TANK','NODE', 'v_edit_node', 'Tank', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('RESERVOIR','SOURCE','NODE', 'v_edit_node', 'Reservoir', true) ON CONFLICT (id) DO NOTHING;
 			--arc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS arc)
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
@@ -317,9 +321,9 @@ BEGIN
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
 			VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
-			VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
+			VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump', true) ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
-			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project') 
+			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project', true) 
 			ON CONFLICT (id) DO NOTHING;
 			
 
@@ -338,17 +342,17 @@ BEGIN
 
 			--cat_feature_node
 			--node
-			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'SOURCE', 'RESERVOIR', 1, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('FCV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('GPV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PBV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PSV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('TCV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PRV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, FALSE, 'NONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, FALSE, 'SECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'SOURCE', 'RESERVOIR', 1, FALSE), 'SECTOR' ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('FCV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('GPV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PBV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PSV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TCV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PRV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 			--Materials
@@ -691,6 +695,16 @@ BEGIN
 			-- delete from arc
 			DELETE FROM arc WHERE state = 0;
 
+			-- config graf
+			INSERT INTO config_graf_inlet SELECT node_id, 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
+			INSERT INTO config_graf_valve VALUES ('SHORTPIPE', true);
+			INSERT INTO config_graf_valve VALUES ('PRV', true);
+			INSERT INTO config_graf_valve VALUES ('PSV', true);
+			INSERT INTO config_graf_valve VALUES ('FCV', true);
+			INSERT INTO config_graf_valve VALUES ('GPV', true);
+			INSERT INTO config_graf_valve VALUES ('PBV', true);
+			INSERT INTO config_graf_valve VALUES ('TCV', true);
+			
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
 			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
@@ -708,13 +722,7 @@ BEGIN
 			UPDATE arc SET code = arc_id WHERE code is null;
 			
 			UPDATE config_param_user SET value = null WHERE parameter = 'inp_options_pattern';
-			
-			-- config graf
-			INSERT INTO config_graf_inlet SELECT node_id 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
-			INSERT INTO config_graf_valve VALUES ('SHORTPIPE', true);
-			INSERT INTO config_graf_valve VALUES ('VALVE', true);
-			
-			I
+						
 			INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
@@ -768,6 +776,7 @@ BEGIN
 		{"message":'||to_json(v_error_context)||'},
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

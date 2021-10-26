@@ -163,16 +163,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (211, 1, '177', 'INFO: It seems config_graf_inlet table is well configured. At least, table is filled with nodes from all exploitations.',v_count);
 	END IF;
-			
-	-- nodetype.graf_delimiter values (267)
-	SELECT count(*) INTO v_count FROM cat_feature_node where graf_delimiter IS NULL;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (211, 2, '267',concat('WARNING-267: There is/are ',v_count,' rows on the cat_feature_node table with null values on graf_delimiter. Please check your data before continue'),v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (211, 1, '267','INFO: The graf_delimiter column on cat_feature_node table has values for all rows.',v_count);
-	END IF;
+
 
 	-- grafanalytics sector (268)
 	IF v_sector IS TRUE AND (v_grafclass = 'SECTOR' OR v_grafclass = 'ALL') THEN
