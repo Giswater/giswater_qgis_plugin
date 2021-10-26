@@ -285,17 +285,18 @@ BEGIN
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE 
-		v_uservalues = json_extract_path_text(p_data,'data','userValues');
-		v_uservalues := COALESCE(v_uservalues, '{}');
+		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'), '{}');
+		v_action := json_extract_path_text(p_data,'data','action');
+		IF v_action = '' THEN v_action = NULL; END IF;
 		
 		-- Return formtabs
-		RETURN ('{"status":"Accepted", "version":'||v_version||
+		RETURN gw_fct_json_create_return('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
 			'}'||
-		    '}')::json;
+		    '}')::json,2796, null, null, v_action;
 	END IF;
 
 	-- Exception handling

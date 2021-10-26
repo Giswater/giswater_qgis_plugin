@@ -54,6 +54,7 @@ v_name text;
 v_disableparent boolean;
 v_fid integer = 397;
 v_uservalues json;
+v_action text = '';
 
 BEGIN
 
@@ -293,6 +294,7 @@ BEGIN
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 		FROM (SELECT the_geom FROM exploitation where expl_id=v_id) b) a;
+		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
 	END IF;
 
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
@@ -318,8 +320,8 @@ BEGIN
 	v_uservalues := COALESCE(v_uservalues, '{}');
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"userValues":'||v_uservalues||', "geometry":',
-	v_geometry,', "useAtlas":"',v_useatlas,'", "selectorType":"',v_selectortype,'"}}');
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
+	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":"',v_action,'", "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	
