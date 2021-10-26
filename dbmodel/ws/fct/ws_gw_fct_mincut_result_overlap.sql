@@ -94,24 +94,26 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps against other mincuts'));
 
 
-	SELECT count(*) INTO v_count FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE;
-	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer 
-	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
-
-	IF v_count > 0 THEN
+	IF v_usepsectors THEN
+	
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been unselected on current exploitation in order to execute this mincut without planned network.'));
+		VALUES (216, concat ('INFO: Psectors have been used to execute this mincut in order to calculate mincut affectations with planned network.'));
+	
 	ELSE
-		IF v_usepsectors THEN
+		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, error_message)
-			VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been used to execute this mincut in order to calculate mincut affectations with planned network.'));
+			VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been unselected on current exploitation in order to execute this mincut without planned network.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, error_message)
-			VALUES (216, concat ('INFO: ', ' Mincut have been executed without planned network.'));
+			VALUES (216, concat ('INFO: Mincut have been executed without planned network.'));
 		END IF;
 	END IF;
 
 	-- log for hydrometer's state
+	SELECT count(*) INTO v_count FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE;
+	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer 
+	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
+
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (216, concat ('WARNING-216: There are not values selected for hydrometer''s state with is_operative True. As result no hydrometer have been attached to this mincut'));
