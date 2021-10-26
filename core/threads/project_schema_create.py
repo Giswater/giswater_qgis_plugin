@@ -86,7 +86,7 @@ class GwCreateSchemaTask(GwTask):
                 self.finish_execution['import_data'] = True
                 # TODO:
                 if not self.is_test:
-                    self.setProgress(100)
+                    self.setProgress(90)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
                 if not self.is_test:
@@ -115,10 +115,10 @@ class GwCreateSchemaTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
-        self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
         if self.isCanceled():
+            self.setProgress(100)
             return
 
         # Handle exception
@@ -139,4 +139,5 @@ class GwCreateSchemaTask(GwTask):
         else:
             self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                               is_test=self.is_test)
+        self.setProgress(100)
 
