@@ -81,20 +81,20 @@ BEGIN
 	v_debugmode := ((p_data ->>'data')::json->>'parameters')::json->>'debugMode'::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 239;
+	DELETE FROM aSCHEMA_NAMEt_check_data WHERE cur_user="current_user"() AND fid = 239;
 	
 	-- create a header
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP SWMM FILE');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '-------------------------------');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP SWMM FILE');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 4, '-------------------------------');
 	
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERRORS');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '------------');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERRORS');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, '------------');
 
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '---------------');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNINGS');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, '---------------');
 
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '-------');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, '-------');
 
 	IF v_debugmode IS NOT TRUE THEN
 
@@ -159,14 +159,14 @@ BEGIN
 		-- check for network object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[OUTFALLS]','[JUNCTIONS]','[STORAGES]','[DIVIDERS]','[CONDUITS]','[PUMPS]','[ORIFICES]','[WEIRS]','[OUTLETS]') AND csv1 NOT LIKE ';%');
 		IF v_count < 13 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All network id''s (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) have less than 13 digits');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All network id''s (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) have less than 13 digits');
 
 		ELSIF v_count > 12 AND v_count < 17 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, 
 			'WARNING-239: There are at least one network id (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) with more than 12 digits but less than 17. This might crash using during the ''on-the-fly'' transformations');
 
 		ELSIF v_count > 16 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, 
 			'ERROR-239: There are at least one network id (outfall, junctions, storages, dividers, conduits, pumps, orifices, weirs & outlets) with more than 16 digits. Please check your data before continue');
 			v_status = 'Failed';
 		END IF;
@@ -174,29 +174,29 @@ BEGIN
 		-- check for hydrology object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[SUBCATCHMENTS]', '[AQUIFERS]', '[RAINGAGE]', '[SNOWPACKS]', '[LID_CONTROLS]') AND csv1 NOT LIKE ';%');
 		IF v_count > 0 AND v_count < 17 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All hydrology objects (subcatchments aquifers, snowpacks, lidcontrols & raingages) id''s have a maximun of 16 digits');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All hydrology objects (subcatchments aquifers, snowpacks, lidcontrols & raingages) id''s have a maximun of 16 digits');
 
 		ELSIF v_count > 16 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
 			v_status = 'Failed';
 		END IF;
 
 		-- check for quuality object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]') AND csv1 NOT LIKE ';%');
 		IF v_count > 0 AND v_count < 17 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All quality objects (pollutants, landuses & coverages) id''s have a maximun of 16 digits');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All quality objects (pollutants, landuses & coverages) id''s have a maximun of 16 digits');
 
 		ELSIF v_count > 16 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
 			v_status = 'Failed';
 		END IF;
 		 
 		-- check for non visual object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[CURVES]','[PATTERNS]','[TIMESERIES]') AND csv1 NOT LIKE ';%');
 		IF v_count < 17 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All non visual objects (curves & patterns & timeseries) id''s have a maximum of 16 digits');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All non visual objects (curves & patterns & timeseries) id''s have a maximum of 16 digits');
 		ELSIF v_count > 16 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, 
 			'ERROR-239: There are at least one non visual objects (curves & patterns & timeseries) id with more than 16 digits. Please check your data before continue');
 			v_status = 'Failed';
 		END IF;
@@ -204,10 +204,10 @@ BEGIN
 		IF v_status = 'Accepted' THEN
 
 			RAISE NOTICE 'step 1/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Constraints of schema temporary disabled -> Done');
 			
 			RAISE NOTICE 'step 2/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data from inp file to temp_csv table -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data from inp file to temp_csv table -> Done');
 
 			UPDATE temp_csv SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
 			csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
@@ -237,7 +237,7 @@ BEGIN
 
 
 			RAISE NOTICE 'step 3/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating map zones and catalogs -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating map zones and catalogs -> Done');
 
 			-- MAPZONES
 			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
@@ -255,32 +255,30 @@ BEGIN
 			INSERT INTO config_param_user(parameter,value, cur_user) VALUES ('inp_options_hydrology_scenario','1', current_user);
 			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Setting selectors -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Setting selectors -> Done');
 
 			-- CATALOGS
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 			--node
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('OUTFALL','OUTFALL','NODE', 'v_edit_node');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('STORAGE','STORAGE','NODE', 'v_edit_node');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('DIVIDER','DIVIDER','NODE', 'v_edit_node');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('OUTFALL','OUTFALL','NODE', 'v_edit_node', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('STORAGE','STORAGE','NODE', 'v_edit_node', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('MANHOLE','MANHOLE','NODE', 'v_edit_node', TRUE);
 
-			
 			--arc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc', TRUE);
 			--nodarc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('WEIR','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('PUMP','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('ORIFICE','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('OUTLET','VARC','ARC', 'v_edit_arc');
-
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('WEIR','VARC','ARC', 'v_edit_arc', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('PUMP','VARC','ARC', 'v_edit_arc', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('ORIFICE','VARC','ARC', 'v_edit_arc', TRUE);
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('OUTLET','VARC','ARC', 'v_edit_arc', TRUE);
 
 			INSERT INTO cat_dwf_scenario VALUES (1, 'default');
 			
 			--arc_type
 			--arc
-			INSERT INTO cat_feature_arc VALUES ('EPACOND', 'CONDUIT', 'CONDUIT');
+			INSERT INTO cat_feature_arc VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT');
 			INSERT INTO cat_feature_arc VALUES ('WEIR', 'VARC', 'WEIR');
 			INSERT INTO cat_feature_arc VALUES ('ORIFICE', 'VARC', 'ORIFICE');
 			INSERT INTO cat_feature_arc VALUES ('PUMP', 'VARC', 'PUMP');
@@ -290,7 +288,7 @@ BEGIN
 			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, TRUE, TRUE, TRUE, 1);
 			INSERT INTO cat_feature_node VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 1, TRUE, TRUE, TRUE, 0);
 			INSERT INTO cat_feature_node VALUES ('STORAGE', 'STORAGE', 'STORAGE', 9, TRUE, TRUE, TRUE, 2);
-			INSERT INTO cat_feature_node VALUES ('DIVIDER', 'DIVIDER', 'DIVIDER', 3, TRUE, TRUE, TRUE, 2);
+			INSERT INTO cat_feature_node VALUES ('MANHOLE', 'MANHOLE', 'DIVIDER', 3, TRUE, TRUE, TRUE, 2);
 			
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 			
@@ -301,7 +299,7 @@ BEGIN
 			INSERT INTO cat_node (id, node_type, active) VALUES ('JUNCTION', 'JUNCTION', TRUE);
 			INSERT INTO cat_node (id, node_type, active) VALUES ('OUTFALL', 'OUTFALL', TRUE);
 			INSERT INTO cat_node (id, node_type, active) VALUES ('STORAGE', 'STORAGE', TRUE);
-			INSERT INTO cat_node (id, node_type, active) VALUES ('DIVIDER', 'DIVIDER', TRUE);
+			INSERT INTO cat_node (id, node_type, active) VALUES ('MANHOLE', 'MANHOLE', TRUE);
 
 
 			-- cat_arc
@@ -333,7 +331,7 @@ BEGIN
 
 			-- improve velocity for conduits using directly tables in spite of vi_conduits view
 			INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, elev1, elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
-			SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'EPACOND', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
+			SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'CONDUIT', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO man_conduit(arc_id) SELECT csv1
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
@@ -423,9 +421,9 @@ BEGIN
 			ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 			RAISE NOTICE 'step 4/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls');
 
 			-- Create arc geom
 			v_querytext = 'SELECT * FROM arc ';
@@ -451,8 +449,10 @@ BEGIN
 			END LOOP;
 
 			RAISE NOTICE 'step 5/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Link geometries like ORIFICE, WEIRS, PUMPS AND OULETS will not be transformed, using reverse node2arc strategy, into nodes. They will stay as arc');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) 
+			VALUES (239, 1, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) 
+			VALUES (239, 2, 'WARNING-239: Link geometries like ORIFICE, WEIRS, PUMPS AND OULETS will not be transformed, using reverse node2arc strategy, into nodes. They will stay as arc');
 
 			
 			-- Subcatchments geometry
@@ -498,7 +498,7 @@ BEGIN
 
 
 			RAISE NOTICE 'step-6/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating subcathcment polygons -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating subcathcment polygons -> Done');
 					
 			-- Mapzones geometry
 			--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
@@ -514,9 +514,9 @@ BEGIN
 			
 			-- check for integer or varchar id's
 			IF v_count =v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+				INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
 			ELSIF v_count < v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+				INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
 				v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 			END IF;
 
@@ -525,22 +525,21 @@ BEGIN
 			v_count := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a WHERE fid ~ '^\d+$');
 
 			IF v_count =v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+				INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
 			ELSIF v_count < v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+				INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
 				v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 			END IF;
 			
 			-- last process. Harmonize values
 			UPDATE node SET top_elev = elev+ymax;
-			UPDATE cat_arc SET arc_type = 'EPACOND' WHERE arc_type IS NULL;
+			UPDATE cat_arc SET arc_type = 'CONDUIT' WHERE arc_type IS NULL;
 			UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
 			UPDATE cat_hydrology SET name = 'Default';
 			UPDATE cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
 			UPDATE node SET code = node_id WHERE code is null;
 			UPDATE arc SET code = arc_id WHERE code is null;
 			UPDATE cat_arc SET shape=UPPER(shape);
-
 				
 			-- Enable constraints
 			PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);	
@@ -555,28 +554,28 @@ BEGIN
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT node_type FROM node) AND feature_type = 'NODE';
 
 			RAISE NOTICE 'step-7/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
+			INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
 
 		END IF;
 		
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message) 
+		INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) 
 		VALUES (239, 4, 'Variable import_epa_debug is True. As result import have been partially sucessfull.');
-		INSERT INTO audit_check_data (fid, criticity, error_message) 
+		INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) 
 		VALUES (239, 4, 'Inp file data is stored on temp_csv table. To debug import process take a look on https://github.com/Giswater/giswater_dbmodel/wiki/import-inp-file-debug-mode');
 	END IF;
 
 	-- insert spacers on log
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
-	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 4, '');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 3, '');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 2, '');
+	INSERT INTO aSCHEMA_NAMEt_check_data (fid, criticity, error_message) VALUES (239, 1, '');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
+	FROM (SELECT error_message as message FROM aSCHEMA_NAMEt_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

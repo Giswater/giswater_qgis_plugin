@@ -88,7 +88,7 @@ BEGIN
 			
 		ELSIF v_view='vi_outfalls' THEN
 			INSERT INTO node (node_id, elev,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev,'EPAOUTF','EPAOUTF-CAT','OUTFALL',1,1,1,1,2);
+			VALUES (NEW.node_id, NEW.elev,'OUTFALL','OUTFALL','OUTFALL',1,1,1,1,2);
 			INSERT INTO man_outfall (node_id) VALUES (NEW.node_id);
 			
 			IF NEW.outfall_type  like 'FREE' or NEW.outfall_type  like 'NORMAL' THEN
@@ -108,7 +108,7 @@ BEGIN
 			
 		ELSIF v_view='vi_dividers' THEN
 			INSERT INTO node (node_id, elev, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev, 'DIVIDER', 'DIVIDER', 'DIVIDER', 1, 1, 1, 1, 2);
+			VALUES (NEW.node_id, NEW.elev, 'MANHOLE', 'MANHOLE', 'DIVIDER', 1, 1, 1, 1, 2);
 
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
