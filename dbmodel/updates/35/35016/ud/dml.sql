@@ -24,28 +24,24 @@ UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL 
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_grate", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END 
 WHERE formtype = 'form_feature' AND  (columnname='gratecat_id' or columnname='gratecat2_id');
 
-UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_mat_gully", "keyColumn":"id", "valueColumn":"descript", "filterExpression":null}}'
-ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_mat_gully", "keyColumn":"id", "valueColumn":"descript", "filterExpression":null}}'::jsonb END 
-WHERE (formname='v_edit_gully' OR formname ilike 've_gully%') AND columnname='matcat_id';
-
 UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN  '{"valueRelation":{"activated":true, "layer":"cat_connec", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_connec", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END 
 WHERE (formname='v_edit_gully' OR formname ilike 've_gully%') AND columnname='connec_arccat_id';
 
-UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature_gully", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'
-ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature_gully", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END 
+UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''GULLY''"}}'
+ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''GULLY''"}}'::jsonb END 
 WHERE (formname='cat_grate' OR formname='v_edit_gully' OR formname ilike 've_gully%') AND columnname='gully_type';
 
 UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature_node", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature_node", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END
 WHERE (formname='v_edit_node' OR formname ILIKE 've_node%') and columnname='node_type';
 
-UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature_arc", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'
-ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature_arc", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END
+UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''ARC''"}}'
+ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''ARC''"}}'::jsonb END
 WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc%') and columnname='arc_type';
 
-UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature_connec", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'
-ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature_connec", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END
+UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''CONNEC''"}}'
+ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_feature", "keyColumn":"id", "valueColumn":"id", "filterExpression":"feature_type=''CONNEC''"}}'::jsonb END
 WHERE (formname='v_edit_connec' OR formname ILIKE 've_connec%') and columnname='connec_type';
 
 UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_mat_node", "keyColumn":"id", "valueColumn":"descript", "filterExpression":null}}'
