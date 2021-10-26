@@ -308,6 +308,7 @@ BEGIN
 			VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS node)
+		
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
 			VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
@@ -342,17 +343,17 @@ BEGIN
 
 			--cat_feature_node
 			--node
-			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, FALSE, 'NONE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, FALSE, 'SECTOR') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'SOURCE', 'RESERVOIR', 1, FALSE), 'SECTOR' ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('FCV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('GPV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PBV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PSV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('TCV', 'VALVE', 'VALVE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PRV', 'VALVE', 'VALVE', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, FALSE, TRUE, 'NONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, FALSE, TRUE, 'SECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'SOURCE', 'RESERVOIR', 1, FALSE, TRUE, 'SECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('FCV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('GPV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PBV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PSV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TCV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PRV', 'VALVE', 'VALVE', 2, FALSE, TRUE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE, TRUE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE, TRUE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 			--Materials
@@ -764,7 +765,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 	    '}}')::json, 2522, null, null, null);
-	
+	/*
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
@@ -776,7 +777,7 @@ BEGIN
 		{"message":'||to_json(v_error_context)||'},
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-	
+	*/
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
