@@ -36,7 +36,7 @@ CREATE OR REPLACE VIEW vi_subcatch2node AS
      LEFT JOIN v_node ON v_node.node_id::text = s1.outlet_id::text;
 
 
- DROP VIEW IF EXISTS vi_subcatchcentroid;
+DROP VIEW IF EXISTS vi_subcatchcentroid;
 CREATE OR REPLACE VIEW vi_subcatchcentroid AS 
  SELECT v_edit_inp_subcatchment.subc_id,
   hydrology_id,
