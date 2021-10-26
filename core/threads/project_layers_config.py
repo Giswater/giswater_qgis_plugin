@@ -30,12 +30,14 @@ class GwProjectLayersConfig(GwTask):
         self.db_layers = params['db_layers']
         self.body = None
         self.json_result = None
+        self.vr_errors = None
 
 
     def run(self):
 
         super().run()
         self.setProgress(0)
+        self.vr_errors = set()
         self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
@@ -211,8 +213,8 @@ class GwProjectLayersConfig(GwTask):
                             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                         except Exception as e:
                             self.exception = e
-                            self.message = f"Error configuring ValueRelation for " \
-                                           f"layer '{layer_name}' - field '{field['columnname']}'"
+                            self.vr_errors.add(layer_name)
+                            self.message = f"Error configuring ValueRelation for layers {self.vr_errors}'"
                             use_vr = False
 
                 if not use_vr:
