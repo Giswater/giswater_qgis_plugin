@@ -62,7 +62,6 @@ class GwProjectLayersConfig(GwTask):
                 tools_log.log_warning(f"Last exception on task {self.description()}: {self.exception}")
                 if self.message:
                     tools_log.log_warning(f"Message from task {self.description()}: {self.message}")
-                raise self.exception
             return
 
         # If sql function return null
@@ -74,7 +73,6 @@ class GwProjectLayersConfig(GwTask):
         if self.exception:
             tools_log.log_info(f"Task aborted: {self.description()}")
             tools_log.log_warning(f"Exception: {self.exception}")
-            raise self.exception
 
 
     # region private functions
@@ -198,20 +196,19 @@ class GwProjectLayersConfig(GwTask):
                     if 'activated' in value_relation and value_relation['activated']:
                         try:
                             vr_layer = value_relation['layer']
-                            if tools_qgis.get_layer_by_tablename(vr_layer) is not None:
-                                vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
-                                vr_key_column = value_relation['keyColumn']  # Get 'Key'
-                                vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                                vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
-                                if vr_filter_expression is None:
-                                    vr_filter_expression = ''
+                            vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                            vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                            vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                            vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                            if vr_filter_expression is None:
+                                vr_filter_expression = ''
 
-                                # Create and apply ValueRelation config
-                                editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                             'Key': f'{vr_key_column}',
-                                                                                             'Value': f'{vr_value_column}',
-                                                                                             'FilterExpression': f'{vr_filter_expression}'})
-                                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                            # Create and apply ValueRelation config
+                            editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                         'Key': f'{vr_key_column}',
+                                                                                         'Value': f'{vr_value_column}',
+                                                                                         'FilterExpression': f'{vr_filter_expression}'})
+                            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                         except Exception as e:
                             self.exception = e
                             self.message = f"Error configuring ValueRelation for " \
