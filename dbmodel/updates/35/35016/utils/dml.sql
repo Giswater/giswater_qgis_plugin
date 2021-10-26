@@ -82,10 +82,6 @@ UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL 
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"v_edit_inp_curve", "keyColumn":"id", "valueColumn":"id", "filterExpression":null}}'::jsonb END
 WHERE formtype = 'form_feature' AND columnname='curve_id';
 
-UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'
-ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'::jsonb END 
-WHERE formtype = 'form_feature' AND formname !='inp_pattern' AND (columnname='pattern_id' or columnname='pattern');
-
 UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"cat_dscenario", "keyColumn":"dscenario_id", "valueColumn":"name", "filterExpression":null}}'
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_dscenario", "keyColumn":"dscenario_id", "valueColumn":"name", "filterExpression":null}}'::jsonb END 
 WHERE  formtype = 'form_feature' AND formname !='cat_dscenario' AND columnname='dscenario_id';

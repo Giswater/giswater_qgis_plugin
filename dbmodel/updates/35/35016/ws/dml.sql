@@ -34,3 +34,8 @@ VALUES (413, 'EPA connec over EPA node','ws', null, null) ON CONFLICT (fid) DO N
 
 --2021/10/26
 UPDATE config_function SET actions = $$[{"funcName": "set_style_mapzones", "params": {}}]$$ WHERE id = 2710;
+
+UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"v_edit_inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'
+ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"v_edit_inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'::jsonb END 
+WHERE formtype = 'form_feature' AND formname !='inp_pattern' AND (columnname='pattern_id' or columnname='pattern');
+

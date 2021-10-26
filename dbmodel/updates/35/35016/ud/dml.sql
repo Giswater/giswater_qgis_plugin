@@ -52,6 +52,10 @@ UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL 
 ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"cat_mat_arc", "keyColumn":"id", "valueColumn":"descript", "filterExpression":null}}'::jsonb END
 WHERE (formname='v_edit_arc' OR formname ilike 've_arc%') AND columnname='matcat_id';
 
+UPDATE config_form_fields SET widgetcontrols = CASE WHEN widgetcontrols IS NULL THEN '{"valueRelation":{"activated":true, "layer":"inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'
+ELSE widgetcontrols::jsonb ||'{"valueRelation":{"activated":true, "layer":"inp_pattern", "keyColumn":"pattern_id", "valueColumn":"pattern_id", "filterExpression":null}}'::jsonb END 
+WHERE formtype = 'form_feature' AND formname !='inp_pattern' AND (columnname='pattern_id' or columnname='pattern');
+
 --2021/10/26
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"insertIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1,"value":"true"},
 {"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layoutorder":2,"value":0.01},
