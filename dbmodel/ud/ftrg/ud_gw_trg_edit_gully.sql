@@ -71,16 +71,17 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
-	-- managing matcat
-	IF (SELECT matcat_id FROM cat_grate WHERE id = NEW.gratecat_id) IS NOT NULL THEN
-		v_matfromcat = true;
-	END IF;
-
-	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+		v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+
+		-- managing matcat
+		IF (SELECT matcat_id FROM cat_grate WHERE id = NEW.gratecat_id) IS NOT NULL THEN
+			v_matfromcat = true;
+		END IF;
+		
 		--check if feature is double geom	
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 		FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
