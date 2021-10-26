@@ -146,7 +146,7 @@ class GwConnectLinkButton(GwMaptool):
                 number_connec_features += layer_connec.selectedFeatureCount()
             if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
                 message = "Number of features selected in the group of"
-                title = "Interpolate value - Do you want to update values"
+                title = "Connect to network"
                 answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
                 if answer:
                     # Create link
@@ -199,7 +199,7 @@ class GwConnectLinkButton(GwMaptool):
             number_features += layer_gully.selectedFeatureCount()
             if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
                 message = "Number of features selected in the group of"
-                title = "Interpolate value - Do you want to update values"
+                title = "Connect to network"
                 answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
                 if answer:
                     # Create link
