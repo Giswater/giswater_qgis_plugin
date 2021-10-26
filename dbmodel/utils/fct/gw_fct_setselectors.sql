@@ -54,7 +54,7 @@ v_name text;
 v_disableparent boolean;
 v_fid integer = 397;
 v_uservalues json;
-v_action text = '';
+v_action text = null;
 
 BEGIN
 
@@ -294,7 +294,6 @@ BEGIN
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 		FROM (SELECT the_geom FROM exploitation where expl_id=v_id) b) a;
-		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
 	END IF;
 
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
@@ -310,6 +309,10 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
 
+	IF v_tabname = 'tab_exploitation' THEN
+		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
+	END IF;
+
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
@@ -318,10 +321,11 @@ BEGIN
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
+	v_action := COALESCE(v_action, 'null');
 
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
-	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":"',v_action,'", "selectorType":"',v_selectortype,'"}}');
+	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	

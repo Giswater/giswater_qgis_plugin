@@ -66,6 +66,7 @@ v_count_selector integer;
 v_useatlas boolean;
 v_message text;
 v_uservalues json;
+v_action text;
 
 BEGIN
 
@@ -290,13 +291,13 @@ BEGIN
 		IF v_action = '' THEN v_action = NULL; END IF;
 		
 		-- Return formtabs
-		RETURN gw_fct_json_create_return('{"status":"Accepted", "version":'||v_version||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
 			'}'||
-		    '}')::json,2796, null, null, v_action;
+		    '}')::json,2796, null, null, v_action::json);
 	END IF;
 
 	-- Exception handling

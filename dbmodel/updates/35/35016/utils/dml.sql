@@ -109,3 +109,5 @@ UPDATE config_form_tableview SET columnindex=3 WHERE location_type = 'epa_toolba
 UPDATE config_form_tableview SET columnindex=4, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'export_options';
 UPDATE config_form_tableview SET columnindex=6, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'inp_options';
 UPDATE config_form_tableview SET columnindex=5, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'network_stats';
+
+INSERT INTO config_function (id, function_name) VALUES (2796, 'gw_fct_getselectors');
