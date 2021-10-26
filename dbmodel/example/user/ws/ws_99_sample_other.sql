@@ -81,12 +81,6 @@ UPDATE cat_feature_node SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
 UPDATE cat_feature_node SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
 UPDATE cat_feature_node SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
-INSERT INTO config_graf_valve VALUES('CHECK_VALVE');
-INSERT INTO config_graf_valve VALUES('FL_CONTR_VALVE');
-INSERT INTO config_graf_valve VALUES('GEN_PURP_VALVE');
-INSERT INTO config_graf_valve VALUES('THROTTLE_VALVE');
-
-
 update ext_rtc_hydrometer SET state_id=1;
 
 INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
