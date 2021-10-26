@@ -169,16 +169,17 @@ BEGIN
 	--check if all nodes have value on field isprofilesurface (310)
 	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE isprofilesurface IS NULL;
 
-	IF v_count > 0 THEN
-		v_errortext=concat('ERROR-310: There is/are ',v_count,' nodes without value on field "isprofilesurface" from cat_feature_node. Features - ',v_feature_list::text,'.');
+	IF v_project_type = 'UD' THEN
+		IF v_count > 0 THEN
+			v_errortext=concat('ERROR-310: There is/are ',v_count,' nodes without value on field "isprofilesurface" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3,'310', v_errortext, v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '310','INFO: All nodes have value on field "isprofilesurface"', 0);
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (195, 3,'310', v_errortext, v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (195, 1, '310','INFO: All nodes have value on field "isprofilesurface"', 0);
+		END IF;
 	END IF;
-	
 
 	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
 	--list active cat_feature

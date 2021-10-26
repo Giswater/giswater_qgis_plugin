@@ -269,7 +269,7 @@ BEGIN
 			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
 			SELECT 177, node_id, nodecat_id, ''Tanks not defined in config_graf_inlet'', the_geom, expl_id FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125,'177', 2, concat('WARNING-177: There is/are ',v_count,' tanks which are not defined on config_graf_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
+			VALUES (125,'177', 3, concat('ERROR-177: There is/are ',v_count,' tank(s) which are not defined on config_graf_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (125, '177', 1, 'INFO: All tanks are defined in config_graf_inlet.',v_count);
