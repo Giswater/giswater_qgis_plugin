@@ -19,8 +19,8 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
-from qgis.core import QgsProject, QgsTask, QgsApplication
+    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget
+from qgis.core import QgsProject, QgsTask, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
@@ -216,6 +216,11 @@ class GwAdminButton:
         msg = "Are you sure to update the project schema to last version?"
         result = tools_qt.show_question(msg, "Info")
         if result:
+            # Manage Log Messages panel and open tab Giswater PY
+            message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+            message_log.setVisible(True)
+            QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
+
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
