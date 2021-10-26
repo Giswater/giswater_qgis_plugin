@@ -374,11 +374,15 @@ BEGIN
 					DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
 					DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
-					-- Moving to obsolete the previous node
-					IF v_state_type IS NULL THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3134", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
-					ELSIF v_action_mode = 1 THEN
+					-- Moving to obsolete the previous node				
+					IF v_action_mode = 1 THEN
+					
+						-- control if state_type is null
+						IF v_state_type IS NULL THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3134", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
+						END IF;
+					
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
 						UPDATE node SET state=0, state_type=v_state_type, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
 					END IF;
