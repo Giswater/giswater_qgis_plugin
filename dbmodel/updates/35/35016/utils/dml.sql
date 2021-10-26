@@ -99,3 +99,13 @@ UPDATE config_toolbox SET
 	WHERE id IN (2848, 2858);
 
 UPDATE sys_table SET sys_role='role_basic' WHERE source='selector_sector';
+
+-- 26/10/2021
+UPDATE config_form_tableview SET columnindex=1 WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'cur_user';
+UPDATE config_form_tableview SET columnindex=2 WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'exec_date';
+UPDATE config_form_tableview SET columnindex=0 WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'result_id';
+UPDATE config_form_tableview SET columnindex=7 WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'rpt_stats';
+UPDATE config_form_tableview SET columnindex=3 WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'status';
+UPDATE config_form_tableview SET columnindex=4, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'export_options';
+UPDATE config_form_tableview SET columnindex=6, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'inp_options';
+UPDATE config_form_tableview SET columnindex=5, visible = False WHERE location_type = 'epa_toolbar' AND tablename = 'v_ui_rpt_cat_result' and columnname = 'network_stats';
