@@ -186,7 +186,9 @@ BEGIN
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;	
-			ALTER TABLE config_graf_inlet DROP COLUMN if exists _to_arc;	
+			ALTER TABLE config_graf_inlet DROP COLUMN if exists _to_arc;
+			ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
+			ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
 		ELSE
 			ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;	
 			ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;	
