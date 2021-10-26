@@ -288,7 +288,7 @@ class GwWorkspaceManagerButton(GwAction):
             if not row:
                 return
             name = row[0]
-        text = f"Selected workspace: {name}"
+        text = f"{name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
         if result:
             tools_gw.manage_current_selections_docker(result)
