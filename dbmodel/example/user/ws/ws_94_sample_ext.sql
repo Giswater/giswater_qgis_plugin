@@ -10412,7 +10412,7 @@ INSERT INTO ext_hydrometer_category VALUES (4, 'Shops', NULL);
 INSERT INTO ext_hydrometer_category VALUES (5, 'business', NULL);
 
 
-update ext_rtc_hydrometer SET  priority_id=a.priority_id, category_id=a.category_id, hydrometer_category=null
+update ext_rtc_hydrometer SET  priority_id=a.priority_id, category_id=a.category_id
 	FROM (SELECT id, CASE WHEN random()<0.6 then 1 when random()<0.9 then 2 else 3 end as priority_id,
 			CASE WHEN random()<0.2 then 1 when random()<0.4 then 2 when random()<0.6 then 3 when random()<0.8 then 4 else 5 end as category_id
 			FROM ext_rtc_hydrometer) a 	
