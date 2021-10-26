@@ -48,3 +48,6 @@ To execute it, system has two requirements:
  - Mapzone need to be created
  - Closest arcs need appropiate values on mapzonefield'
 WHERE id = 2970;
+
+INSERT INTO config_param_system (parameter, value, descript, project_type) 
+VALUES ('utils_grafanalytics_automatic_config', 'FALSE', 'Variable to automatize inserts into config_graf_valve acording with graf_delimiter value of cat_feature_node', 'ws');

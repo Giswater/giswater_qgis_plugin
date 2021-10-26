@@ -698,13 +698,6 @@ BEGIN
 
 			-- config graf
 			INSERT INTO config_graf_inlet SELECT node_id, 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
-			INSERT INTO config_graf_valve VALUES ('SHORTPIPE', true);
-			INSERT INTO config_graf_valve VALUES ('PRV', true);
-			INSERT INTO config_graf_valve VALUES ('PSV', true);
-			INSERT INTO config_graf_valve VALUES ('FCV', true);
-			INSERT INTO config_graf_valve VALUES ('GPV', true);
-			INSERT INTO config_graf_valve VALUES ('PBV', true);
-			INSERT INTO config_graf_valve VALUES ('TCV', true);
 			
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
@@ -765,7 +758,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 	    '}}')::json, 2522, null, null, null);
-	/*
+	
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
@@ -777,7 +770,7 @@ BEGIN
 		{"message":'||to_json(v_error_context)||'},
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-	*/
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

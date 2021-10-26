@@ -279,6 +279,9 @@ BEGIN
 		UPDATE sys_param_user SET ismandatory = true, vdefault ='TRUE' WHERE id = 'edit_noderotation_update_dsbl';
 
 		v_message='Project sucessfully created';
+		
+		-- automatize graf analytics config for ws
+		UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
 
 	ELSIF v_isnew IS FALSE THEN
 
