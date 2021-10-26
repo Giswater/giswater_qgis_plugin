@@ -286,24 +286,40 @@ BEGIN
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe') ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS arc)
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCCHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCTCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCCHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCTCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS node)
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('GPV','VALVE','NODE', 'v_edit_node','General purpose valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PBV','VALVE','NODE', 'v_edit_node','Presure break valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PSV','VALVE','NODE', 'v_edit_node','Presure sustain valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PRV','VALVE','NODE', 'v_edit_node','Presure reduction valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project') 
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('GPV','VALVE','NODE', 'v_edit_node','General purpose valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('PBV','VALVE','NODE', 'v_edit_node','Presure break valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('PSV','VALVE','NODE', 'v_edit_node','Presure sustain valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('PRV','VALVE','NODE', 'v_edit_node','Presure reduction valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project') 
 			ON CONFLICT (id) DO NOTHING;
 			
 
@@ -413,7 +429,7 @@ BEGIN
 			LOOP
 				--identifing the number of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
-				where table_name=v_rec_table.tablename AND table_schema='wsi'
+				where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 				LOOP	
 					-- profilactic control for postgis specific datatypes
 					IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
@@ -687,8 +703,18 @@ BEGIN
 			UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;
 			UPDATE node SET presszone_id = '1' WHERE presszone_id is null;
 			UPDATE arc SET presszone_id = '1' WHERE presszone_id is null;
+			
+			UPDATE node SET code = node_id  WHERE code is null;
+			UPDATE arc SET code = arc_id WHERE code is null;
+			
 			UPDATE config_param_user SET value = null WHERE parameter = 'inp_options_pattern';
 			
+			-- config graf
+			INSERT INTO config_graf_inlet SELECT node_id 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
+			INSERT INTO config_graf_valve VALUES ('SHORTPIPE', true);
+			INSERT INTO config_graf_valve VALUES ('VALVE', true);
+			
+			I
 			INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
