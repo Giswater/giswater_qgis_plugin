@@ -261,17 +261,19 @@ BEGIN
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 			--node
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAMANH','JUNCTION','NODE', 'v_edit_node');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTF','OUTFALL','NODE', 'v_edit_node');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPASTOR','STORAGE','NODE', 'v_edit_node');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('OUTFALL','OUTFALL','NODE', 'v_edit_node');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('STORAGE','STORAGE','NODE', 'v_edit_node');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('DIVIDER','DIVIDER','NODE', 'v_edit_node');
+
 			
 			--arc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACOND','CONDUIT','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc');
 			--nodarc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAWEIR','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAORIF','VARC','ARC', 'v_edit_arc');
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTL','VARC','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('WEIR','VARC','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('PUMP','VARC','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('ORIFICE','VARC','ARC', 'v_edit_arc');
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('OUTLET','VARC','ARC', 'v_edit_arc');
 
 
 			INSERT INTO cat_dwf_scenario VALUES (1, 'default');
@@ -279,15 +281,16 @@ BEGIN
 			--arc_type
 			--arc
 			INSERT INTO cat_feature_arc VALUES ('EPACOND', 'CONDUIT', 'CONDUIT');
-			INSERT INTO cat_feature_arc VALUES ('EPAWEIR', 'VARC', 'WEIR');
-			INSERT INTO cat_feature_arc VALUES ('EPAORIF', 'VARC', 'ORIFICE');
-			INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP');
-			INSERT INTO cat_feature_arc VALUES ('EPAOUTL', 'VARC', 'OUTLET');
+			INSERT INTO cat_feature_arc VALUES ('WEIR', 'VARC', 'WEIR');
+			INSERT INTO cat_feature_arc VALUES ('ORIFICE', 'VARC', 'ORIFICE');
+			INSERT INTO cat_feature_arc VALUES ('PUMP', 'VARC', 'PUMP');
+			INSERT INTO cat_feature_arc VALUES ('OUTLET', 'VARC', 'OUTLET');
 
 			--node_type
-			INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 9, TRUE, TRUE, TRUE, 1);
-			INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 1, TRUE, TRUE, TRUE, 0);
-			INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 9, TRUE, TRUE, TRUE, 2);
+			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, TRUE, TRUE, TRUE, 1);
+			INSERT INTO cat_feature_node VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 1, TRUE, TRUE, TRUE, 0);
+			INSERT INTO cat_feature_node VALUES ('STORAGE', 'STORAGE', 'STORAGE', 9, TRUE, TRUE, TRUE, 2);
+			INSERT INTO cat_feature_node VALUES ('DIVIDER', 'DIVIDER', 'DIVIDER', 3, TRUE, TRUE, TRUE, 2);
 			
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 			
@@ -295,15 +298,17 @@ BEGIN
 			INSERT INTO cat_mat_arc VALUES ('VIRTUAL', 'VIRTUAL');
 			
 			--cat_node
-			INSERT INTO cat_node (id, node_type, active) VALUES ('EPAMANH-CAT', 'EPAMANH', TRUE);
-			INSERT INTO cat_node (id, node_type, active) VALUES ('EPAOUTF-CAT', 'EPAOUTF', TRUE);
-			INSERT INTO cat_node (id, node_type, active) VALUES ('EPASTOR-CAT', 'EPASTOR', TRUE);
+			INSERT INTO cat_node (id, node_type, active) VALUES ('JUNCTION', 'JUNCTION', TRUE);
+			INSERT INTO cat_node (id, node_type, active) VALUES ('OUTFALL', 'OUTFALL', TRUE);
+			INSERT INTO cat_node (id, node_type, active) VALUES ('STORAGE', 'STORAGE', TRUE);
+			INSERT INTO cat_node (id, node_type, active) VALUES ('DIVIDER', 'DIVIDER', TRUE);
+
 
 			-- cat_arc
-			INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAWEIR-CAT', TRUE, 'EPAWEIR');
-			INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAORIF-CAT', TRUE, 'EPAORIF');
-			INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAPUMP-CAT', TRUE, 'EPAPUMP');
-			INSERT INTO cat_arc (id, active, arc_type) VALUES ('EPAOUTL-CAT', TRUE, 'EPAOUTL');
+			INSERT INTO cat_arc (id, active, arc_type) VALUES ('WEIR', TRUE, 'WEIR');
+			INSERT INTO cat_arc (id, active, arc_type) VALUES ('ORIFICE', TRUE, 'ORIFICE');
+			INSERT INTO cat_arc (id, active, arc_type) VALUES ('PUMP', TRUE, 'PUMP');
+			INSERT INTO cat_arc (id, active, arc_type) VALUES ('OUTLET', TRUE, 'OUTLET');
 			
 			UPDATE cat_arc SET geom5=null, geom6=null, geom7=null, geom8=null;
 			UPDATE cat_arc SET geom2=null WHERE geom2=0;
@@ -319,7 +324,7 @@ BEGIN
 
 			-- improve velocity for junctions using directly tables in spite of vi_junctions view
 			INSERT INTO node (node_id, code, elev, ymax, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			SELECT csv1, csv1, csv2::numeric(12,3), csv3::numeric(12,3), 'EPAMANH', 'EPAMANH-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
+			SELECT csv1, csv1, csv2::numeric(12,3), csv3::numeric(12,3), 'JUNCTION', 'JUNCTION', 'JUNCTION', 1, 1, 1, 1, 2 
 			FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO inp_junction (node_id, y0, ysur, apond) 
 			SELECT csv1, csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3) FROM temp_csv where source='[JUNCTIONS]' AND fid =239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;

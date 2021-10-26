@@ -262,7 +262,6 @@ BEGIN
 			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
 			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (presszone_id) DO NOTHING;
 
-
 			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
 			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1) ON CONFLICT (expl_id) DO NOTHING;
 			INSERT INTO sector(sector_id,name) VALUES(1,'sector1') ON CONFLICT (sector_id) DO NOTHING;
@@ -271,102 +270,108 @@ BEGIN
 			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (presszone_id) DO NOTHING;
 			INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1') ON CONFLICT (muni_id) DO NOTHING;
 
+			-- SELECTORS
+			INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user) ON CONFLICT (expl_id,cur_user) do nothing;
+			INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user) ON CONFLICT (state_id,cur_user) do nothing;
+			INSERT INTO selector_sector(sector_id,cur_user) VALUES (1,current_user) ON CONFLICT (sector_id,cur_user) do nothing;
 
 			-- CATALOGS
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 			--node
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAJUN','JUNCTION','NODE', 'v_edit_node', 'Junction') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATAN','TANK','NODE', 'v_edit_node', 'Tank') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPARES','SOURCE','NODE', 'v_edit_node', 'Reservoir') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('TANK','TANK','NODE', 'v_edit_node', 'Tank') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('RESERVOIR','SOURCE','NODE', 'v_edit_node', 'Reservoir') ON CONFLICT (id) DO NOTHING;
 			--arc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPIPE','PIPE','ARC', 'v_edit_arc', 'Pipe') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe') ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS arc)
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPACHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCCHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCTCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)') ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS node)
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPACHVA2N','VALVE','NODE', 'v_edit_node','Check valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAFCVA2N','VALVE','NODE', 'v_edit_node','Flow control valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAGPVA2N','VALVE','NODE', 'v_edit_node','General purpose valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPBVA2N','VALVE','NODE', 'v_edit_node','Presure break valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPSVA2N','VALVE','NODE', 'v_edit_node','Presure sustain valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPRVA2N','VALVE','NODE', 'v_edit_node','Presure reduction valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPATCVA2N','VALVE','NODE', 'v_edit_node','Throttle control valve') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('EPAPUMPA2N','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('GPV','VALVE','NODE', 'v_edit_node','General purpose valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PBV','VALVE','NODE', 'v_edit_node','Presure break valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PSV','VALVE','NODE', 'v_edit_node','Presure sustain valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PRV','VALVE','NODE', 'v_edit_node','Presure reduction valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project') 
+			ON CONFLICT (id) DO NOTHING;
+			
 
 			--arc_type
 			--arc
-			INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('PIPE', 'PIPE', 'PIPE') ON CONFLICT (id) DO NOTHING;
 			--nodarc
-			INSERT INTO cat_feature_arc VALUES ('EPACHV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAGPV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAPBV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAPSV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCCHV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCFCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCGPV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPBV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPSV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPRV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCTCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
 			--cat_feature_node
 			--node
-			INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 9, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPATAN', 'TANK', 'TANK', 9, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 1, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_node VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 9, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'SOURCE', 'RESERVOIR', 1, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('FCV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('GPV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PBV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PSV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('TCV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PRV', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 			--Materials
 			INSERT INTO cat_mat_arc 
 			SELECT DISTINCT csv6, csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
 			DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
-			INSERT INTO cat_mat_node VALUES ('EPAMAT', 'EPAMAT') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_mat_arc VALUES ('EPAMAT', 'EPAMAT');
+			INSERT INTO cat_mat_node VALUES ('MAT', 'MAT') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_mat_arc VALUES ('MAT', 'MAT');
 
 			--Roughness
 			INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
-			SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='EPAMAT';
+			SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='MAT';
 
 			--cat_arc
 			--pipe
 			INSERT INTO cat_arc( id, arctype_id, matcat_id,  dint)
-			SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'EPAPIPE', csv6, csv5::float FROM temp_csv WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
+			SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'PIPE', csv6, csv5::float FROM temp_csv WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPUMP-CAT', 'EPAPUMP', 'EPAMAT', TRUE)  ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPACHV-CAT', 'EPACHV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAFCV-CAT', 'EPAFCV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAGPV-CAT', 'EPAGPV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPBV-CAT', 'EPAPBV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPSV-CAT', 'EPAPSV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPATCV-CAT', 'EPATCV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPRV-CAT', 'EPAPRV', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPUMP', 'ARCPUMP', 'MAT', TRUE)  ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCCHV', 'ARCCHV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCFCV', 'ARCFCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCGPV', 'ARCGPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPBV', 'ARCPBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPSV', 'ARCPSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCTCV', 'ARCTCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPRV', 'ARCPRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
 
 			--cat_node
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAJUN-CAT', 'EPAJUN', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPATAN-CAT', 'EPATAN', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPARES-CAT', 'EPARES', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPACHV-CATA2N', 'EPACHVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAFCV-CATA2N', 'EPAFCVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAGPV-CATA2N', 'EPAGPVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPBV-CATA2N', 'EPAPBVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPSV-CATA2N', 'EPAPSVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPATCV-CATA2N', 'EPATCVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('JUNCTION', 'JUNCTION', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('TANK', 'TANK', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('RESERVOIR', 'RESERVOIR', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('FCV', 'FCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('GPV', 'GPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PBV', 'PBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PSV', 'PSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('TCV', 'TCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PRV', 'PRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PUMP', 'PUMP', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('SHORTPIPE', 'SHORTPIPE', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
 
 
 			-- insert other catalog tables
@@ -382,7 +387,7 @@ BEGIN
 
 			-- improve velocity for junctions using directy tables in spite of vi_junctions view
 			INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
-			SELECT csv1, csv2::numeric(12,3), 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2, 1
+			SELECT csv1, csv2::numeric(12,3), 'JUNCTION', 'JUNCTION', 1, 1, 1, 1, 2, 1
 			FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 			INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO man_junction SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
@@ -408,7 +413,7 @@ BEGIN
 			LOOP
 				--identifing the number of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
-				where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+				where table_name=v_rec_table.tablename AND table_schema='wsi'
 				LOOP	
 					-- profilactic control for postgis specific datatypes
 					IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
@@ -454,30 +459,40 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If controls exists, it would have been related to the whole sector');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If rules exits, it would have been related to the whole sector');
 
-					
 			IF v_isgwproject THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 
 				-- to_arc on pumps
 				UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
-				(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
-					JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
-					WHERE arc.epa_type IN ('PUMP-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
-				WHERE b.node_id = inp_pump_importinp.arc_id;
+					(select a.arc_id, n.arc_id AS to_arc from inp_pump_importinp 
+					JOIN arc a USING (arc_id) 
+					JOIN (SELECT arc_id, node_1 FROM arc)n ON a.node_2 = n.node_1
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
+					AND a.arc_id != n.arc_id)b
+				WHERE  b.arc_id = inp_pump_importinp.arc_id;
 
 				-- to_arc on valves
 				UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
-				(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
-					JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
-					WHERE arc.epa_type IN ('VALVE-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
-				WHERE b.node_id = inp_valve_importinp.arc_id;
+					(select a.arc_id, n.arc_id AS to_arc from inp_valve_importinp 
+					JOIN arc a USING (arc_id) 
+					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_valve_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
+					AND a.arc_id != n.arc_id)b
+				WHERE  b.arc_id = inp_valve_importinp.arc_id;
 
-				FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE-IMPORTINP','PUMP-IMPORTINP')
+
+				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a'
 				LOOP
 					-- transforming epa_type
 					IF v_data.epa_type = 'VALVE-IMPORTINP' THEN 
+						v_nodecat = (SELECT valv_type FROM inp_valve_importinp WHERE arc_id = v_data.arc_id);
 						v_epatype = 'VALVE';
+						
 					ELSIF v_data.epa_type = 'PUMP-IMPORTINP' THEN 
+						v_nodecat = 'PUMP';
 						v_epatype = 'PUMP';
+					ELSE 
+						v_nodecat = 'SHORTPIPE';
+						v_epatype = 'SHORTPIPE';
 					END IF;
 					
 					-- getting man_table to work with
@@ -486,7 +501,6 @@ BEGIN
 
 					-- defining new node parameters
 					v_node_id = replace(v_data.arc_id, '_n2a', '');
-					v_nodecat = concat(v_data.arccat_id, 'A2N');
 							
 					-- defining geometry of new node
 					SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
@@ -514,11 +528,14 @@ BEGIN
 					IF v_epatablename = 'inp_pump' THEN
 						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue, to_arc)
 						SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
-						DELETE FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
 						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
+
+					ELSE						
+						INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
+						
 					END IF;
 						
 					-- get old nodes
@@ -538,35 +555,42 @@ BEGIN
 					-- update elevation of new node
 					UPDATE node SET elevation = v_elevation WHERE node_id=v_node_id;
 
-				END LOOP;	
-				
-				-- transform pump additional from node to inp_pump_additional table		
-				FOR v_data IN SELECT node_1 as nodarc_id, count 
-				from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0 AND epa_type='PUMP-IMPORTINP')a group by node_1 order by 2 desc)b where count>1
-				LOOP
-					-- migrate additional from inp_pump to inp_pump_additional
-					LOOP
-						-- nodarc_id: 
-						INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status)
-						SELECT v_data.nodarc_id, i, power, curve_id, speed, pattern, status FROM inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
-						DELETE FROM node WHERE node_id=concat(v_data.nodarc_id,i);
-						DELETE FROM man_pump WHERE node_id=concat(v_data.nodarc_id,i);
-						DELETE FROM inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
-						i=i+1;
-						EXIT WHEN i = v_data.count;
-					END LOOP;
 				END LOOP;
-				
-				DELETE FROM inp_valve_importinp;
+		
+				-- to_arc on shortpipes
+				UPDATE inp_shortpipe SET to_arc = b.to_arc FROM
+					(
+					select a.arc_id, n.arc_id AS to_arc from inp_pipe
+					JOIN arc a USING (arc_id)
+					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
+					WHERE 
+					a.arc_id != n.arc_id
+					and status = 'CV')b
+				WHERE  b.arc_id = concat(inp_shortpipe.node_id,'_n2a');
+
+				-- transform pump additional from node to inp_pump_additional table		
+				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status, energyparam, energyvalue)
+				select 
+				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
+				(substring(reverse(arc_id),0,2))::integer,
+				power, curve_id, speed, pattern, status, energyparam, energyvalue
+				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$';
+
+				-- update state=0 pump additionals 
+				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_pump_importinp);
+							
+				-- delete objects
 				DELETE FROM inp_pump_importinp;
+				DELETE FROM inp_valve_importinp;
+				DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_';
 
 				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 
 				'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 			END IF;
 
+
 			RAISE NOTICE 'step 5/7';
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-
 
 			-- Create arc geom
 			IF v_isgwproject THEN
@@ -592,18 +616,6 @@ BEGIN
 				UPDATE arc SET the_geom=ST_MakeLine(geom_array) where arc_id=v_data.arc_id;
 
 			END LOOP;
-
-			--update toarc field
-			IF v_isgwproject THEN
-				FOR v_data IN SELECT * FROM arc WHERE state=0
-				LOOP
-					v_node_id = replace(v_data.arc_id,'_n2a','');
-					v_arc_id = (SELECT arc_id FROM arc WHERE state=1 AND ST_DWithin (the_geom, st_endpoint(v_data.the_geom), 0.01));
-					UPDATE inp_pump SET to_arc=v_arc_id WHERE node_id=v_node_id;
-					UPDATE inp_shortpipe SET to_arc=v_arc_id WHERE node_id=v_node_id;
-					UPDATE inp_valve SET to_arc=v_arc_id WHERE node_id=v_node_id;
-				END LOOP;
-			END IF;
 
 			--mapzones
 			EXECUTE 'SELECT ST_Multi(ST_ConvexHull(ST_Collect(the_geom))) FROM arc;'
@@ -660,9 +672,10 @@ BEGIN
 				v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
 			END IF;
 
+			-- delete from arc
+			DELETE FROM arc WHERE state = 0;
 
 			-- purge catalog tables
-			DELETE FROM arc WHERE state=0;
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
 			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
 			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_arc);
@@ -681,7 +694,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
 
 		END IF;
-	
+
 	ELSE
 	
 		INSERT INTO audit_check_data (fid, criticity, error_message) 

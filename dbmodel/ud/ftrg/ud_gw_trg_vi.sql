@@ -108,7 +108,7 @@ BEGIN
 			
 		ELSIF v_view='vi_dividers' THEN
 			INSERT INTO node (node_id, elev, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev, 'EPAMANH', 'EPAMANH-CAT', 'DIVIDER', 1, 1, 1, 1, 2);
+			VALUES (NEW.node_id, NEW.elev, 'DIVIDER', 'DIVIDER', 'DIVIDER', 1, 1, 1, 1, 2);
 
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
@@ -127,7 +127,7 @@ BEGIN
 			
 		ELSIF v_view='vi_storage' THEN
 			INSERT INTO node (node_id, elev, ymax,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev, NEW.ymax, 'EPASTOR', 'EPASTOR-CAT', 'STORAGE', 1, 1, 1, 1, 2);
+			VALUES (NEW.node_id, NEW.elev, NEW.ymax, 'STORAGE', 'STORAGE', 'STORAGE', 1, 1, 1, 1, 2);
 			INSERT INTO man_storage (node_id) VALUES (NEW.node_id);
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
@@ -141,25 +141,25 @@ BEGIN
 			
 		ELSIF v_view='vi_pumps' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP','EPAPUMP-CAT','PUMP',1,1,1,1,2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'PUMP','PUMP','PUMP',1,1,1,1,2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_pump (arc_id, curve_id, status, startup, shutoff) VALUES (NEW.arc_id, NEW.curve_id, NEW.status, NEW.startup, NEW.shutoff);
 			
 		ELSIF v_view='vi_orifices' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAORIF','EPAORIF-CAT','ORIFICE', 1, 1, 1, 1, 2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'ORIFICE','ORIFICE','ORIFICE', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_orifice (arc_id, ori_type, "offset", cd, flap, orate) VALUES (NEW.arc_id, NEW.ori_type, NEW."offset", NEW.cd, NEW.flap, NEW.orate);
 			
 		ELSIF v_view='vi_weirs' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAWEIR','EPAWEIR-CAT','WEIR', 1, 1, 1, 1, 2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'WEIR','WEIR','WEIR', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_weir (arc_id, weir_type, "offset", cd, flap, ec, cd2, surcharge) VALUES (NEW.arc_id, NEW.weir_type, NEW."offset", NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge);
 			
 		ELSIF v_view='vi_outlets' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAOUTL','EPAOUTL-CAT','OUTLET', 1, 1, 1, 1, 2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'OUTLET','OUTLET','OUTLET', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			
 			IF NEW.outlet_type LIKE 'FUNCTIONAL%' THEN
