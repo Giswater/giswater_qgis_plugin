@@ -99,9 +99,9 @@ class GwMenuLoad(QObject):
 
         # Action 'Get help'
         action_help = actions_menu.addAction(f"Get help")
-        action_help_shortcut = tools_gw.get_config_parser("action_shortcuts", f"shortcut_help", "user", "init", prefix=False)
+        action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
         if not action_help_shortcut:
-            tools_gw.set_config_parser("action_shortcuts", f"shortcut_help", f"{action_help_shortcut}", "user", "init",
+            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_help", f"{action_help_shortcut}", "user", "init",
                                        prefix=False)
         action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
         action_help.triggered.connect(tools_gw.open_dlg_help)
@@ -112,29 +112,29 @@ class GwMenuLoad(QObject):
 
         # Action 'Reset plugin
         action_reset_plugin = actions_menu.addAction(f"Reset plugin")
-        action_reset_plugin_shortcut = tools_gw.get_config_parser("action_shortcuts", f"shortcut_reset_plugin",
+        action_reset_plugin_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
             "user", "init", prefix=False)
         if not action_reset_plugin_shortcut:
-            tools_gw.set_config_parser("action_shortcuts", f"shortcut_reset_plugin",
+            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
                 f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
         action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
         action_reset_plugin.triggered.connect(self._reset_plugin)
 
         # Action 'Show current selectors'
         action_open_selections = actions_menu.addAction(f"Show current selectors")
-        action_open_selections_shortcut = tools_gw.get_config_parser("action_shortcuts",
+        action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
             f"shortcut_open_curselectors", "user", "init", prefix=False)
         if not action_open_selections_shortcut:
-            tools_gw.set_config_parser("action_shortcuts", f"shortcut_open_curselectors",
+            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_open_curselectors",
                 f"{action_open_selections_shortcut}", "user", "init", prefix=False)
         action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
         action_open_selections.triggered.connect(self._open_current_selections)
 
         # Action 'Toggle Log DB'
         action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
-        log_sql_shortcut = tools_gw.get_config_parser("action_shortcuts", f"shortcut_toggle_log_db", "user", "init", prefix=False)
+        log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", "user", "init", prefix=False)
         if not log_sql_shortcut:
-            tools_gw.set_config_parser("action_shortcuts", f"shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
+            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
                 "init", prefix=False)
         action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
         action_set_log_sql.triggered.connect(self._set_log_sql)
