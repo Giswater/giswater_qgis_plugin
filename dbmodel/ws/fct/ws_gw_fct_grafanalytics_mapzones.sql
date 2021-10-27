@@ -871,9 +871,9 @@ BEGIN
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
 			FROM 
-			(SELECT arc_id, arccat_id, state, expl_id, 'Disconnected arc'::text as descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)
+			(SELECT arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)
 			UNION
-			SELECT arc_id, arccat_id, state, expl_id, 'On conflict mapzone'::text as descript, the_geom FROM v_edit_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid AND descript = '-1')
+			SELECT arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid AND descript = '-1')
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
@@ -889,9 +889,9 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, 'Disconnected connec'::text as descript, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)
+			FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)
 			UNION
-			SELECT connec_id, connecat_id, state, expl_id, 'On conflict mapzone'::text as descript, the_geom FROM v_edit_connec c WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid AND descript = '-1')
+			SELECT connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid AND descript = '-1')
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
