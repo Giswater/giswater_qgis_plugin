@@ -55,6 +55,7 @@ v_disableparent boolean;
 v_fid integer = 397;
 v_uservalues json;
 v_action text = null;
+v_sector integer;
 
 BEGIN
 
@@ -311,6 +312,18 @@ BEGIN
 
 	IF v_tabname = 'tab_exploitation' THEN
 		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
+	END IF;
+	
+	--set sector as vdefault if only one value on selector. 
+	IF (SELECT count (*) FROM selector_sector WHERE cur_user = current_user) = 1 THEN
+	
+		v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
+		
+		INSERT INTO config_param_user(parameter, value, cur_user)
+		VALUES ('edit_sector_vdefault', v_sector, current_user) ON CONFLICT (parameter, cur_user) 
+		DO UPDATE SET value = v_sector WHERE config_param_user.parameter = 'edit_sector_vdefault' AND config_param_user.cur_user = current_user;
+	ELSE -- delete if more than one value on selector
+		DELETE FROM config_param_user WHERE parameter = 'edit_sector_vdefault' AND cur_user = current_user;
 	END IF;
 
 	-- get uservalues
