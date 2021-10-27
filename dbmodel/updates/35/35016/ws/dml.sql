@@ -51,3 +51,8 @@ WHERE id = 2970;
 
 INSERT INTO config_param_system (parameter, value, descript, project_type) 
 VALUES ('utils_grafanalytics_automatic_config', 'FALSE', 'Variable to automatize inserts into config_graf_valve acording with graf_delimiter value of cat_feature_node', 'ws');
+
+
+--2021/10/27
+UPDATE config_function SET style = $${"style": {"point": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 3, "values": [{"id": "Disconnected", "color": [255,1,1]}, {"id": "Conflict", "color": [255,1,1]}]},
+"line": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 3, "values": [{"id": "Disconnected", "color": [255,80,1]}, {"id": "Conflict", "color": [255,80,1]}]}}}$$ WHERE id = 2710;
