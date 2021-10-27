@@ -1825,12 +1825,14 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         if 'transparency' in return_manager['style'][key]['values']:
                             opacity = return_manager['style'][key]['values']['transparency']
                     if style_type[key]['style'] == 'categorized':
+                        if 'transparency' in return_manager['style'][key]:
+                            opacity = return_manager['style'][key]['transparency']
                         color_values = {}
                         for item in json_result['body']['returnManager']['style'][key]['values']:
-                            color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity * 255)
+                            color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
-                        size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                        size = style_type[key]['width'] if 'width' in style_type[key] and style_type[key]['width'] else 2
                         tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
 
                     elif style_type[key]['style'] == 'random':
