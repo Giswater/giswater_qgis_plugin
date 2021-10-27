@@ -125,9 +125,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
-        self._config_layers()
-
         # Create a thread to listen selected database channels
         global_vars.notify = GwNotify()
         list_channels = ['desktop', global_vars.current_user]
@@ -158,6 +155,9 @@ class GwLoadProject(QObject):
 
         # Manage compatibility version of Giswater
         self._check_version_compatibility()
+
+        # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
+        self._config_layers()
 
 
     # region private functions
