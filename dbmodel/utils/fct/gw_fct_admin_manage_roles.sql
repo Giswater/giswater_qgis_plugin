@@ -37,20 +37,21 @@ BEGIN
 
 	-- creation
 	IF v_action = 'CREATE' THEN
+		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_crm') IS NULL THEN CREATE ROLE "role_crm" SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;END IF;
 		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_basic') IS NULL THEN CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION; END IF;
 		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_om') IS NULL THEN CREATE ROLE "role_om" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;END IF;
 		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_edit') IS NULL THEN CREATE ROLE "role_edit" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;END IF;
 		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_epa') IS NULL THEN CREATE ROLE "role_epa" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;END IF;
 		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_master') IS NULL THEN CREATE ROLE "role_master" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;END IF;
-		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_admin') IS NULL THEN CREATE ROLE "role_admin" SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;END IF;
-		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_crm') IS NULL THEN CREATE ROLE "role_crm" SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;END IF;
-
-		GRANT role_basic TO role_om;
-		GRANT role_om TO role_crm;
-		GRANT role_om TO role_edit;
-		GRANT role_edit TO role_epa;
-		GRANT role_epa TO role_master;
-		GRANT role_master TO role_admin;
+		IF (SELECT rolname FROM pg_roles WHERE rolname = 'role_admin') IS NULL THEN 
+			CREATE ROLE "role_admin" SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;
+			GRANT role_basic TO role_om;
+			GRANT role_om TO role_crm;
+			GRANT role_om TO role_edit;
+			GRANT role_edit TO role_epa;
+			GRANT role_epa TO role_master;
+			GRANT role_master TO role_admin;
+		END IF;	
 	END IF;
 				
 	--return definition for v_audit_check_result
