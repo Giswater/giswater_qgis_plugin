@@ -30,12 +30,16 @@ class GwProjectLayersConfig(GwTask):
         self.db_layers = params['db_layers']
         self.body = None
         self.json_result = None
+        self.vr_errors = None
+        self.vr_missing = None
 
 
     def run(self):
 
         super().run()
         self.setProgress(0)
+        self.vr_errors = set()
+        self.vr_missing = set()
         self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
@@ -58,17 +62,20 @@ class GwProjectLayersConfig(GwTask):
             return
 
         if result:
+            if self.exception:
+                if self.message:
+                    tools_log.log_warning(f"Message from task {self.description()}: {self.message}")
             return
 
         # If sql function return null
         if result is False:
-            msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
+            msg = f"Task failed: {self.description()}. This is probably a DB error, check postgres function" \
+                  f" 'gw_fct_getinfofromid'."
             tools_log.log_warning(msg)
 
         if self.exception:
             tools_log.log_info(f"Task aborted: {self.description()}")
             tools_log.log_warning(f"Exception: {self.exception}")
-            raise self.exception
 
 
     # region private functions
@@ -184,33 +191,64 @@ class GwProjectLayersConfig(GwTask):
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
-                # Manage new values in ValueMap
-                if field['widgettype'] == 'combo':
-                    if 'comboIds' in field:
-                        # Set values
-                        for i in range(0, len(field['comboIds'])):
-                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
-                    # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'check':
-                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
-                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'datetime':
-                    config = {'allow_null': True,
-                              'calendar_popup': True,
-                              'display_format': 'yyyy-MM-dd',
-                              'field_format': 'yyyy-MM-dd',
-                              'field_iso_format': False}
-                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                elif field['widgettype'] == 'textarea':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                else:
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                # Manage ValueRelation configuration
+                use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
+                         and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+                if use_vr:
+                    value_relation = field['widgetcontrols']['valueRelation']
+                    if 'activated' in value_relation and value_relation['activated']:
+                        try:
+                            vr_layer = value_relation['layer']
+                            vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                            vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                            vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                            vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                            if vr_filter_expression is None:
+                                vr_filter_expression = ''
+
+                            # Create and apply ValueRelation config
+                            editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                         'Key': f'{vr_key_column}',
+                                                                                         'Value': f'{vr_value_column}',
+                                                                                         'FilterExpression': f'{vr_filter_expression}'})
+                            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                        except Exception as e:
+                            self.exception = e
+                            self.vr_errors.add(layer_name)
+                            if 'layer' in value_relation:
+                                self.vr_missing.add(value_relation['layer'])
+                            self.message = f"ValueRelation for {self.vr_errors} switched to ValueMap because " \
+                                           f"layers {self.vr_missing} are not present on QGIS project"
+                            use_vr = False
+
+                if not use_vr:
+                    # Manage new values in ValueMap
+                    if field['widgettype'] == 'combo':
+                        if 'comboIds' in field:
+                            # Set values
+                            for i in range(0, len(field['comboIds'])):
+                                valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                        # Set values into valueMap
+                        editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'check':
+                        config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                        editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'datetime':
+                        config = {'allow_null': True,
+                                  'calendar_popup': True,
+                                  'display_format': 'yyyy-MM-dd',
+                                  'field_format': 'yyyy-MM-dd',
+                                  'field_iso_format': False}
+                        editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    elif field['widgettype'] == 'textarea':
+                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+                    else:
+                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
                 if field['widgettype'] == 'text':

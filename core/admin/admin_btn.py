@@ -19,8 +19,8 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
-from qgis.core import QgsProject, QgsTask, QgsApplication
+    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget
+from qgis.core import QgsProject, QgsTask, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
@@ -31,7 +31,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os, tools_config
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
@@ -58,9 +58,9 @@ class GwAdminButton:
         self.form_enabled = True
 
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                                       "giswater", False))
+                                                                       "giswater", False, force_reload=True))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                                       "giswater", False))
+                                                                       "giswater", False, force_reload=True))
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -70,7 +70,6 @@ class GwAdminButton:
         default_connection = self._populate_combo_connections()
         # Bug #733 was here
         # Check if connection is still False
-        layer_source = None
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
@@ -87,10 +86,10 @@ class GwAdminButton:
             self.form_enabled = False
 
         # Set label status connection
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
-        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
-        self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
+        self.icon_folder = f"{self.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
+        self.status_ok = QPixmap(f"{self.icon_folder}status_ok.png")
+        self.status_ko = QPixmap(f"{self.icon_folder}status_ko.png")
+        self.status_no_update = QPixmap(f"{self.icon_folder}status_not_updated.png")
 
         # Create the dialog and signals
         self._init_show_database()
@@ -217,6 +216,11 @@ class GwAdminButton:
         msg = "Are you sure to update the project schema to last version?"
         result = tools_qt.show_question(msg, "Info")
         if result:
+            # Manage Log Messages panel and open tab Giswater PY
+            message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+            message_log.setVisible(True)
+            QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
+
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -322,14 +326,18 @@ class GwAdminButton:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session", False))
-        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session", False))
-        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session", False)
+        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session",
+                                                             False, force_reload=True))
+        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session",
+                                                                 False, force_reload=True))
+        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session", False,
+                                                        force_reload=True)
         if create_schema_type:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
             chk_widget.setChecked(True)
-        if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False) not in ('null', None):
-            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False))
+        if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False, force_reload=True) not in ('null', None):
+            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False,
+                                                              force_reload=True))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -359,7 +367,7 @@ class GwAdminButton:
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
         tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
-        locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False)
+        locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
         # Set shortcut keys
@@ -477,7 +485,7 @@ class GwAdminButton:
         self.folderPath = ''
 
         # Check if user have commit permissions
-        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False)
+        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False, force_reload=True)
         self.dev_commit = tools_os.set_boolean(self.dev_commit)
 
         # Create dialog object
@@ -489,7 +497,8 @@ class GwAdminButton:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
 
-        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False)
+        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
+                                                        force_reload=True)
         self.project_types = self.project_types.split(',')
 
         # Populate combo types
@@ -551,6 +560,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
+        self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
         self.dlg_readsql.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_readsql))
 
         self.dlg_readsql.btn_create_utils.clicked.connect(partial(self._create_utils))
@@ -647,7 +657,8 @@ class GwAdminButton:
 
         # Check super_user
         super_user = tools_db.check_super_user(self.username)
-        force_superuser = tools_gw.get_config_parser('system', 'force_superuser', 'user', 'init', False)
+        force_superuser = tools_gw.get_config_parser('system', 'force_superuser', 'user', 'init', False,
+                                                     force_reload=True)
         if not super_user and not force_superuser:
             message = "You don't have permissions to administrate project schemas on this connection"
             self.form_enabled = False
@@ -690,9 +701,15 @@ class GwAdminButton:
 
         # Load last schema name selected and project type
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                 tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False))
+                                 tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False,
+                                                            force_reload=True))
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                 tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False))
+                                 tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False,
+                                                            force_reload=True))
+
+        # Set custom sql path
+        folder_path = tools_gw.get_config_parser("btn_admin", "custom_sql_path", "user", "session", force_reload=True)
+        tools_qt.set_widget_text(self.dlg_readsql, "custom_path_folder", folder_path)
 
         if show_dialog:
             self._manage_docker()
@@ -795,7 +812,8 @@ class GwAdminButton:
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
-        qgis_file_type = tools_gw.get_config_parser('btn_admin', 'qgis_file_type', "user", "session", prefix=False)
+        qgis_file_type = tools_gw.get_config_parser('btn_admin', 'qgis_file_type', "user", "session", prefix=False,
+                                                    force_reload=True)
         if qgis_file_type is not None:
             try:
                 qgis_file_type = int(qgis_file_type)
@@ -804,11 +822,13 @@ class GwAdminButton:
                 pass
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
-        qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False)
+        qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False,
+                                                    force_reload=True)
         if qgis_file_path is None:
             qgis_file_path = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
-        qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False)
+        qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False,
+                                                      force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
         if self.is_service:
@@ -2394,7 +2414,7 @@ class GwAdminButton:
             self._insert_inp_into_db(self.file_inp)
 
             # Get the debugMode. If it's None it will be False
-            debug_mode = tools_gw.get_config_parser('system', 'import_inp_debug_mode', "user", "init") or False
+            debug_mode = tools_gw.get_config_parser('system', 'import_inp_debug_mode', "user", "init", force_reload=True) or False
 
             # Execute import data
             if project_type.lower() == 'ws':
@@ -2475,12 +2495,14 @@ class GwAdminButton:
             self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
             # Get values
-            self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False)
+            self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False,
+                                                          force_reload=True)
             self.folder_path = self.folder_path.replace('"', '')
             self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project",
-                                                                  "dev", False)
+                                                                  "dev", False, force_reload=True)
             self.text_replace_labels = self.text_replace_labels.split(',')
-            self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev", False)
+            self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev", False,
+                                                             force_reload=True)
             self.xml_set_labels = self.xml_set_labels.split(',')
 
             if not os.path.exists(self.folder_path):
@@ -2506,7 +2528,7 @@ class GwAdminButton:
                     for text_replace in self.text_replace_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_text_replace', text_replace,
-                                                                       "project", "dev", False)
+                                                                       "project", "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         # TODO:: Keep replace or remove it and declare 'qgis_project_text_replace' from 'config/dev.config' without '"'.
@@ -2517,7 +2539,7 @@ class GwAdminButton:
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
-                                                                       "dev", False)
+                                                                       "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         # TODO:: Keep replace or remove it and declare 'qgis_project_xml_set' from 'config/dev.config' without '"'.
@@ -3227,22 +3249,13 @@ class GwAdminButton:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self._set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self._set_credentials, self.dlg_credentials, new_connection=True))
-        self.dlg_credentials.cmb_sslmode.currentIndexChanged.connect(
-            partial(self._set_user_sslmode))
 
         sslmode_list = [['disable', 'disable'], ['allow', 'allow'], ['prefer', 'prefer'], ['require', 'require'],
                         ['verify - ca', 'verify - ca'], ['verify - full', 'verify - full']]
         tools_qt.fill_combo_values(self.dlg_credentials.cmb_sslmode, sslmode_list, 0)
-        sslmode = tools_config.get_user_setting_value('system', 'sslmode', 'prefer')
-        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, sslmode)
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 'prefer')
 
         tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials')
-
-
-    def _set_user_sslmode(self):
-
-        sslmode = tools_qt.get_text(self.dlg_credentials, self.dlg_credentials.cmb_sslmode, 1)
-        tools_config.set_config_parser_value('system', 'sslmode', sslmode.strip("'"))
 
 
     def _manage_user_params(self):
@@ -3297,6 +3310,14 @@ class GwAdminButton:
         sql = f"SELECT locale as id, name as idval FROM locales WHERE active = 1"
         sqlite_cursor.execute(sql)
         return sqlite_cursor.fetchall()
+
+
+    def _save_custom_sql_path(self, dialog):
+
+        folder_path = tools_qt.get_text(dialog, "custom_path_folder")
+        if folder_path == "null":
+            folder_path = None
+        tools_gw.set_config_parser("btn_admin", "custom_sql_path", f"{folder_path}", "user", "session")
 
 
     def _manage_docker(self):

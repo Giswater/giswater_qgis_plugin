@@ -86,19 +86,21 @@ class GwCreateSchemaTask(GwTask):
                 self.finish_execution['import_data'] = True
                 # TODO:
                 if not self.is_test:
-                    self.setProgress(100)
+                    self.setProgress(90)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
+                if not self.is_test:
+                    self.setProgress(80)
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
+            elif self.admin.rdb_sample_dev.isChecked():
                 if not self.is_test:
                     self.setProgress(80)
-            elif self.admin.rdb_sample_dev.isChecked():
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
-                self.admin._load_dev_data(project_type=project_type)
                 if not self.is_test:
-                    self.setProgress(80)
+                    self.setProgress(90)
+                self.admin._load_dev_data(project_type=project_type)
             elif self.admin.rdb_data.isChecked():
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
@@ -113,10 +115,10 @@ class GwCreateSchemaTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
-        self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
         if self.isCanceled():
+            self.setProgress(100)
             return
 
         # Handle exception
@@ -137,4 +139,5 @@ class GwCreateSchemaTask(GwTask):
         else:
             self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                               is_test=self.is_test)
+        self.setProgress(100)
 

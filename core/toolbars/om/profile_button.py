@@ -1222,8 +1222,12 @@ class GwProfileButton(GwAction):
         geom1 = self.nodes[self.n - 1].geom
 
         # Draw main text
+        try:
+            reference_plane = self.profile_json['body']['data']['legend']['referencePlane']
+        except KeyError:
+            reference_plane = "REFERENCE"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(0.5) * self.height_row - self.height_row / 2,
-                 'REFERENCE: ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                 f"{reference_plane}: {round(self.min_top_elev - 1 * self.height_row, 2)}\n ",
                  fontsize=8.5,
                  color=text_color, fontweight=text_weight,
                  verticalalignment='center')

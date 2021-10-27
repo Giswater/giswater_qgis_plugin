@@ -315,7 +315,13 @@ class GwCSVButton(GwAction):
         if not fields:
             return False
 
-        values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
+        decimal_sep = "null"
+        if dialog.rb_dec_comma.isChecked():
+            decimal_sep = '","'
+        elif dialog.rb_dec_period.isChecked():
+            decimal_sep = '"."'
+
+        values = f'"separator": {decimal_sep}, "values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
         result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 

@@ -137,18 +137,6 @@ class GwToolBoxTask(GwTask):
         if not self.json_result or self.json_result is None:
             return False
 
-        try:
-            # getting simbology capabilities
-            if 'setStyle' in self.json_result['body']['data']:
-                set_sytle = self.json_result['body']['data']['setStyle']
-                if set_sytle == "Mapzones":
-                    # call function to simbolize mapzones
-                    tools_gw.set_style_mapzones()
-
-        except KeyError as e:
-            self.exception = e
-            return False
-
         return True
 
 

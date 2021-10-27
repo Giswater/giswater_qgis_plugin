@@ -138,7 +138,8 @@ class GwWorkspaceManagerButton(GwAction):
         cols = selected.indexes()
         if not cols:
             return
-        workspace_id = cols[0].data()
+        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
+        workspace_id = json.loads(cols[col_ind].data())
 
         action = "INFO"
         extras = f'"action":"{action}", "id":"{workspace_id}"'
@@ -288,7 +289,7 @@ class GwWorkspaceManagerButton(GwAction):
             if not row:
                 return
             name = row[0]
-        text = f"Selected workspace: {name}"
+        text = f"{name}"
         tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
         if result:
             tools_gw.manage_current_selections_docker(result)

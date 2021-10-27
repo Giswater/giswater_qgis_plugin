@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+
 from functools import partial
 
 from qgis.PyQt.QtCore import QRegExp
@@ -53,12 +55,57 @@ class GwGo2EpaManagerButton(GwAction):
         # Set signals
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'rpt_cat_result', 'result_id'))
+        selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
+        selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.editTextChanged.connect(self._filter_by_result_id)
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
+
+    def _fill_txt_infolog(self, selected):
+        """
+        Fill txt_infolog from epa_result_manager form with current data selected for columns:
+            'export_options'
+            'network_stats'
+            'inp_options'
+        """
+
+        # Get id of selected row
+        row = selected.indexes()
+        if not row:
+            return
+
+        msg = ""
+
+        # Get column index for column export_options
+        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
+        export_options = json.loads(row[col_ind].data())
+
+        # Get column index for column network_stats
+        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
+        network_stats = json.loads(row[col_ind].data())
+
+        # Get column index for column inp_options
+        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
+        inp_options = json.loads(row[col_ind].data())
+
+        # Construct message with all data rows
+        msg += f"<b>Export Options: </b> <br>"
+        for text in export_options:
+            msg += f"{text} : {export_options[text]} <br>"
+
+        msg += f" <br> <b>Network Status: </b> <br>"
+        for text in network_stats:
+            msg += f"{text} : {network_stats[text]} <br>"
+
+        msg += f" <br> <b>Inp Options: </b> <br>"
+        for text in inp_options:
+            msg += f"{text} : {inp_options[text]} <br>"
+
+        # Set message text into widget
+        tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', msg)
 
 
     def _fill_combo_result_id(self):

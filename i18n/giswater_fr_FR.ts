@@ -2146,7 +2146,7 @@
 		</message>
 		<message>
 			<source>btn_custom_load_file</source>
-			<translation>Load file</translation>
+			<translation>Load SQL files</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_custom_load_file</source>

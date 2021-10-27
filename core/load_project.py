@@ -7,9 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsProject, Qgis
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel
+from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -17,6 +17,8 @@ from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
+from .load_project_check import GwLoadProjectCheck
+from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
@@ -117,20 +119,21 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
-        # Check roles of this user to show or hide toolbars
-        self._check_user_roles()
-
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
+
+        # Check roles of this user to show or hide toolbars
+        self._check_user_roles()
 
         # Create a thread to listen selected database channels
         global_vars.notify = GwNotify()
         list_channels = ['desktop', global_vars.current_user]
         global_vars.notify.start_listening(list_channels)
 
-        # Reset some session/init user variables as vdefault
-        if tools_gw.get_config_parser('system', 'reset_user_variables', 'user', 'init', prefix=False):
-            self._manage_reset_user_variables()
+        # Check parameter 'force_tab_expl'
+        force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
+        if tools_os.set_boolean(force_tab_expl, False):
+            self._force_tab_exploitation()
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
@@ -152,6 +155,9 @@ class GwLoadProject(QObject):
 
         # Manage compatibility version of Giswater
         self._check_version_compatibility()
+
+        # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
+        self._config_layers()
 
 
     # region private functions
@@ -439,6 +445,115 @@ class GwLoadProject(QObject):
             self._enable_button("02", False)
 
 
+    def _config_layers(self):
+        """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
+
+        status, result = self._manage_layers()
+        if not status:
+            return False
+        if result and 'variables' in result['body']:
+            if 'setQgisLayers' in result['body']['variables']:
+                if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
+                    return
+
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        # Set background task 'ConfigLayerFields'
+        schema_name = global_vars.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql)
+        description = f"ConfigLayerFields"
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        self.task_get_layers = GwProjectLayersConfig(description, params)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
+
+        return True
+
+
+    def _manage_layers(self):
+        """ Get references to project main layers """
+
+        # Check if we have any layer loaded
+        layers = tools_qgis.get_project_layers()
+        if len(layers) == 0:
+            return False
+
+        if global_vars.project_type in ('ws', 'ud'):
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            self.check_project = GwLoadProjectCheck()
+
+            # check project
+            status, result = self.check_project.fill_check_project_table(layers, "true")
+            try:
+                if 'variables' in result['body']:
+                    if 'useGuideMap' in result['body']['variables']:
+                        guided_map = result['body']['variables']['useGuideMap']
+                        if guided_map:
+                            tools_log.log_info("manage_guided_map")
+                            self._manage_guided_map()
+            except Exception as e:
+                tools_log.log_info(str(e))
+            finally:
+                QApplication.restoreOverrideCursor()
+                return status, result
+
+        return True
+
+
+    def _manage_guided_map(self):
+        """ Guide map works using ext_municipality """
+
+        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
+        if self.layer_muni is None:
+            return
+
+        self.iface.setActiveLayer(self.layer_muni)
+        tools_qgis.set_layer_visible(self.layer_muni)
+        self.layer_muni.selectAll()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+        self.iface.actionSelect().trigger()
+        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
+        cursor = tools_gw.get_cursor_multiple_selection()
+        if cursor:
+            self.iface.mapCanvas().setCursor(cursor)
+
+
+    def _selection_changed(self):
+        """ Get selected muni_id and execute function setselectors """
+
+        muni_id = None
+        features = self.layer_muni.getSelectedFeatures()
+        for feature in features:
+            muni_id = feature["muni_id"]
+            tools_log.log_info(f"Selected muni_id: {muni_id}")
+            break
+
+        self.iface.mapCanvas().selectionChanged.disconnect()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+
+        if muni_id is None:
+            return
+
+        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
+        body = tools_gw.create_body(extras=extras)
+        complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        if complet_result:
+            self.iface.mapCanvas().refreshAllLayers()
+            self.layer_muni.triggerRepaint()
+            self.iface.actionPan().trigger()
+            self.iface.actionZoomIn().trigger()
+            tools_gw.set_style_mapzones()
+
+
     def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
 
@@ -485,9 +600,9 @@ class GwLoadProject(QObject):
                 self._enable_button(index_action, enable)
 
 
-    def _manage_reset_user_variables(self):
+    def _force_tab_exploitation(self):
+        """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
-        # Set dlg_selector_basic as tab_exploitation
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
 
     # endregion

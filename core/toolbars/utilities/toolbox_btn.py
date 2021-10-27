@@ -217,7 +217,7 @@ class GwToolBoxButton(GwAction):
                     widget.stateChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'datetime':
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    widget.dateChanged.connect(partial(self._update_tbl_reports))
+                    widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
@@ -469,8 +469,12 @@ class GwToolBoxButton(GwAction):
                f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
                f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
                f"UNION SELECT child_layer, feature_type, 2 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}') as t "
-               f"ORDER BY c, tablename")
+               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
+               F" UNION "
+               f"SELECT concat('v_edit_',epa_table), feature_type as type, 9 as c FROM sys_feature_epa_type "
+               f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
+               f" AND feature_type = '{feature_type.upper()}') as t"
+               f" ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:

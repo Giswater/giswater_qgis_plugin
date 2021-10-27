@@ -187,7 +187,8 @@ class GwEpaFileManager(GwTask):
 
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
-        extras += f', "dumpSubcatch":"{self.export_subcatch}"'
+        if global_vars.project_type == 'ud':
+            extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = tools_gw.create_body(extras=extras)
         dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
         self.function_failed = dict_result['function_failed']

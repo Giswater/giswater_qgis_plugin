@@ -31,6 +31,13 @@ def set_layer_index(**kwargs):
             tools_qgis.set_layer_index(layer_name)
 
 
+def set_style_mapzones(**kwargs):
+    """ A bridge function to call tools_gw->set_style_mapzones """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    tools_gw.set_style_mapzones()
+
+
 def refresh_attribute_table(**kwargs):
     """ Set layer fields configured according to client configuration.
         At the moment manage:

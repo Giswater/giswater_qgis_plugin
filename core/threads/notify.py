@@ -13,7 +13,8 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..utils import tools_backend_calls
 from ... import global_vars
-from ...lib import tools_log, tools_db
+from ...lib import tools_log, tools_db, tools_os
+from ..utils import tools_gw
 
 
 class GwNotify(QObject):
@@ -23,6 +24,7 @@ class GwNotify(QObject):
     # Notify cannot use 'iface', directly or indirectly or open dialogs
     conn_failed = False
     list_channels = None
+    log_sql = None
     task_start = pyqtSignal()
     task_finished = pyqtSignal()
 
@@ -33,13 +35,15 @@ class GwNotify(QObject):
         QObject.__init__(self)
 
 
-    def start_listening(self, list_channels):
+    def start_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be listened
         """
 
-        self.list_channels = list_channels
-        for channel_name in list_channels:
+        tools_log.log_info("Notifiy started")
+        if list_channels:
+            self.list_channels = list_channels
+        for channel_name in self.list_channels:
             tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
         thread = threading.Thread(target=self._wait_notifications)
@@ -72,12 +76,15 @@ class GwNotify(QObject):
             raise exception
 
 
-    def stop_listening(self, list_channels):
+    def stop_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be unlistened
         """
 
-        for channel_name in list_channels:
+        tools_log.log_info("Notifiy stopped")
+        if list_channels:
+            self.list_channels = list_channels
+        for channel_name in self.list_channels:
             tools_db.execute_sql(f'UNLISTEN "{channel_name}";')
 
 
@@ -94,7 +101,12 @@ class GwNotify(QObject):
 
             # Check if any notification to process
             dao = global_vars.dao
-            dao.get_poll()
+            status = dao.get_poll()
+
+            # If connection has been restarted then reset notify
+            if not status:
+                self.start_listening()
+                tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
 
             executed_notifies = []
             while dao.conn.notifies:
@@ -106,9 +118,15 @@ class GwNotify(QObject):
                     continue
                 executed_notifies.append(notify)
 
-                msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
-                msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
-                tools_log.log_info(msg, tab_name="Giswater Notify")
+                # Check parameter 'log_sql'
+                log_sql = tools_gw.get_config_parser("log", f"log_sql", "user", "init", False, get_none=True)
+                self.log_sql = tools_os.set_boolean(log_sql, False)
+
+                if self.log_sql:
+                    msg = f'<font color="blue"><b>GOT SERVER NOTIFY: </font>'
+                    msg += f'<font color="black"><b>{notify.pid}, {notify.channel}, {notify.payload} </font>'
+                    tools_log.log_info(msg, tab_name="Giswater Notify")
+
                 try:
                     complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                     self._execute_functions(complet_result)
@@ -139,10 +157,15 @@ class GwNotify(QObject):
             function_name = function['name']
             params = function['parameters']
             if hasattr(tools_backend_calls, function_name):
-                tools_log.log_info(f"Execute function: {function_name} {params}", tab_name="Giswater Notify")
                 getattr(tools_backend_calls, function_name)(**params)
+                msg = f'<font color="blue">CLIENT EXECUTION: </font>'
+                msg += f'<font color="black">{function_name} {params}</font>'
+                if self.log_sql:
+                    tools_log.log_info(msg, tab_name="Giswater Notify")
             else:
-                tools_log.log_warning(f"Python function not found: {function_name}", tab_name="Giswater Notify")
+                msg = f'<font color="red">Python function not found: {function_name}</font>'
+                if self.log_sql:
+                    tools_log.log_warning(msg, tab_name="Giswater Notify")
 
         global_vars.session_vars['threads'].remove(self)
         self.task_finished.emit()

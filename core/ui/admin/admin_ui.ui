@@ -853,7 +853,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Load file</string>
+                    <string>Load SQL files</string>
                    </property>
                   </widget>
                  </item>

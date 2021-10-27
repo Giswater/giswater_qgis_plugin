@@ -8,16 +8,12 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QPoint, Qt
-from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.PyQt.QtGui import QCursor
-from qgis.core import QgsApplication
 
 from ..dialog import GwAction
-from ...load_project_check import GwLoadProjectCheck
-from ...threads.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_log, tools_db
-from .... import global_vars
+from ....lib import tools_qgis, tools_db
 
 
 class GwAddChildLayerButton(GwAction):
@@ -26,7 +22,6 @@ class GwAddChildLayerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self._config_layers()
 
 
     def clicked_event(self):
@@ -119,109 +114,5 @@ class GwAddChildLayerButton(GwAction):
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 tools_qgis.remove_layer_from_toc(tablename, group)
-
-
-    def _config_layers(self):
-
-        status = self._manage_layers()
-        if not status:
-            return False
-
-        # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        # Set background task 'ConfigLayerFields'
-        schema_name = self.schema_name.replace('"', '')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-               f"UNION "
-               f"SELECT DISTINCT(child_layer) FROM cat_feature "
-               f"WHERE child_layer IN ("
-               f"     SELECT table_name FROM information_schema.tables"
-               f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql)
-        description = f"ConfigLayerFields"
-        params = {"project_type": self.project_type, "schema_name": self.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": global_vars.project_vars['info_type']}
-        self.task_get_layers = GwProjectLayersConfig(description, params)
-        QgsApplication.taskManager().addTask(self.task_get_layers)
-        QgsApplication.taskManager().triggerTask(self.task_get_layers)
-
-        return True
-
-
-    def _manage_layers(self):
-        """ Get references to project main layers """
-
-        # Check if we have any layer loaded
-        layers = tools_qgis.get_project_layers()
-        if len(layers) == 0:
-            return False
-
-        if self.project_type in ('ws', 'ud'):
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project = GwLoadProjectCheck()
-
-            # check project
-            status, result = self.check_project.fill_check_project_table(layers, "true")
-            try:
-                if 'actions' in result['body']:
-                    if 'useGuideMap' in result['body']['actions']:
-                        guided_map = result['body']['actions']['useGuideMap']
-                        if guided_map:
-                            tools_log.log_info("manage_guided_map")
-                            self._manage_guided_map()
-            except Exception as e:
-                tools_log.log_info(str(e))
-            finally:
-                QApplication.restoreOverrideCursor()
-                return status
-
-        return True
-
-
-    def _manage_guided_map(self):
-        """ Guide map works using ext_municipality """
-
-        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
-        if self.layer_muni is None:
-            return
-
-        self.iface.setActiveLayer(self.layer_muni)
-        tools_qgis.set_layer_visible(self.layer_muni)
-        self.layer_muni.selectAll()
-        self.iface.actionZoomToSelected().trigger()
-        self.layer_muni.removeSelection()
-        self.iface.actionSelect().trigger()
-        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
-        cursor = tools_gw.get_cursor_multiple_selection()
-        if cursor:
-            self.iface.mapCanvas().setCursor(cursor)
-
-
-    def _selection_changed(self):
-        """ Get selected muni_id and execute function setselectors """
-
-        muni_id = None
-        features = self.layer_muni.getSelectedFeatures()
-        for feature in features:
-            muni_id = feature["muni_id"]
-            tools_log.log_info(f"Selected muni_id: {muni_id}")
-            break
-
-        self.iface.mapCanvas().selectionChanged.disconnect()
-        self.iface.actionZoomToSelected().trigger()
-        self.layer_muni.removeSelection()
-
-        if muni_id is None:
-            return
-
-        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
-        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
-        body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
-        if complet_result:
-            self.iface.mapCanvas().refreshAllLayers()
-            self.layer_muni.triggerRepaint()
-            self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
-            tools_gw.set_style_mapzones()
 
     # endregion
