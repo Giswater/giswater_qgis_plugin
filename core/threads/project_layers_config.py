@@ -31,6 +31,7 @@ class GwProjectLayersConfig(GwTask):
         self.body = None
         self.json_result = None
         self.vr_errors = None
+        self.vr_missing = None
 
 
     def run(self):
@@ -38,6 +39,7 @@ class GwProjectLayersConfig(GwTask):
         super().run()
         self.setProgress(0)
         self.vr_errors = set()
+        self.vr_missing = set()
         self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
@@ -61,7 +63,6 @@ class GwProjectLayersConfig(GwTask):
 
         if result:
             if self.exception:
-                tools_log.log_warning(f"Last exception on task {self.description()}: {self.exception}")
                 if self.message:
                     tools_log.log_warning(f"Message from task {self.description()}: {self.message}")
             return
@@ -214,7 +215,10 @@ class GwProjectLayersConfig(GwTask):
                         except Exception as e:
                             self.exception = e
                             self.vr_errors.add(layer_name)
-                            self.message = f"Error configuring ValueRelation for layers {self.vr_errors}'"
+                            if 'layer' in value_relation:
+                                self.vr_missing.add(value_relation['layer'])
+                            self.message = f"ValueRelation for {self.vr_errors} switched to ValueMap because " \
+                                           f"layers {self.vr_missing} are not present on QGIS project"
                             use_vr = False
 
                 if not use_vr:
