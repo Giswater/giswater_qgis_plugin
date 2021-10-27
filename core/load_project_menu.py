@@ -335,11 +335,11 @@ class GwMenuLoad(QObject):
     def _reset_plugin(self):
         """ Called in reset plugin action """
 
+        self._reset_notify()
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
         self.iface.actionPan().trigger()
         self._reload_layers()
-        self._reset_notify()
 
 
     def _reload_layers(self):
