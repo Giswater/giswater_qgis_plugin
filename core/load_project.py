@@ -448,9 +448,13 @@ class GwLoadProject(QObject):
     def _config_layers(self):
         """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
 
-        status = self._manage_layers()
+        status, result = self._manage_layers()
         if not status:
             return False
+        if result and 'variables' in result['body']:
+            if 'setQgisLayers' in result['body']['variables']:
+                if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
+                    return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Set background task 'ConfigLayerFields'
@@ -497,7 +501,7 @@ class GwLoadProject(QObject):
                 tools_log.log_info(str(e))
             finally:
                 QApplication.restoreOverrideCursor()
-                return status
+                return status, result
 
         return True
 
