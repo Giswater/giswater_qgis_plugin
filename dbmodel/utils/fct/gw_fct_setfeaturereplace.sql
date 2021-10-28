@@ -86,6 +86,8 @@ v_featurecat_id_new text;
 v_mapzone_old text;
 v_mapzone_new text;
 v_fid integer = 143;
+v_gully_proximity_value text;
+v_gully_proximity_active text;
 
 BEGIN
 
@@ -123,6 +125,13 @@ BEGIN
 		SELECT  value::json->>'value' as value INTO v_connec_proximity_value FROM config_param_system where parameter = 'edit_connec_proximity';
 		SELECT  value::json->>'activated' INTO v_connec_proximity_active FROM config_param_system where parameter = 'edit_connec_proximity';
 		UPDATE config_param_system SET value ='{"activated":false,"value":0.1}' WHERE parameter='edit_connec_proximity';
+	END IF;
+
+	--deactivate gully proximity control
+	IF v_feature_type='gully' THEN
+		SELECT value::json->>'value' as value INTO v_gully_proximity_value FROM config_param_system WHERE parameter = 'edit_gully_proximity';
+		SELECT value::json->>'activated' INTO v_gully_proximity_active FROM config_param_system WHERE parameter = 'edit_gully_proximity';
+		UPDATE config_param_system SET value = '{"activated":false,"value":0.1}' WHERE parameter = 'edit_gully_proximity';
 	END IF;
 
 	--define columns used for feature_cat
@@ -486,7 +495,7 @@ BEGIN
 		ELSIF v_feature_type='node' THEN
 			UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
 		ELSIF v_feature_type='gully' THEN
-			-- todo
+			UPDATE config_param_system SET value = concat('{"activated":',v_gully_proximity_active,', "value":',v_gully_proximity_value,'}') WHERE parameter = 'edit_gully_proximity';
 		END IF;
 		
 	
