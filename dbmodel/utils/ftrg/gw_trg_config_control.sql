@@ -43,10 +43,9 @@ BEGIN
 			END IF;
 			
 			--check if all featurecat are present on table cat_feature
-			IF NEW.featurecat_id IS NOT NULL AND NEW.feature_type<>'ELEMENT' THEN
+			IF NEW.featurecat_id IS NOT NULL THEN
 				IF NEW.featurecat_id NOT ILIKE '{%}' THEN
 					NEW.featurecat_id = concat('{',NEW.featurecat_id,'}');
-					raise notice 'CHANGE,%',NEW.featurecat_id;
 				END IF;
 
 				FOREACH rec_feature IN array(NEW.featurecat_id::text[]) LOOP
