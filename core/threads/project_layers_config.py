@@ -64,7 +64,7 @@ class GwProjectLayersConfig(GwTask):
         if result:
             if self.exception:
                 if self.message:
-                    tools_log.log_warning(f"Message from task {self.description()}: {self.message}")
+                    tools_log.log_warning(f"{self.message}")
             return
 
         # If sql function return null
