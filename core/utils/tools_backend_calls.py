@@ -235,6 +235,18 @@ def load_qml(**kwargs):
     return True
 
 
+def update_catfeaturevalues(**kwargs):
+    """
+    Reload global_vars.feature_cat
+
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[
+                              {"name":"update_catfeaturevalues", "parameters":{}}]} ,
+                              "user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+                IN TRIGGER -> gw_trg_cat_feature
+    """
+    global_vars.feature_cat = tools_gw.manage_feature_cat()
+
+
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
         widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget)) """
