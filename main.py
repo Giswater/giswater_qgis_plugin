@@ -57,47 +57,77 @@ class Giswater(QObject):
         """
 
         try:
-
             # Reset values for global_vars.project_vars
             global_vars.project_vars['info_type'] = None
             global_vars.project_vars['add_schema'] = None
             global_vars.project_vars['main_schema'] = None
             global_vars.project_vars['project_role'] = None
             global_vars.project_vars['project_type'] = None
+        except Exception as e:
+            print(f"Exception in unload when reset values for global_vars.project_vars: {e}")
 
+        try:
             # Remove Giswater dockers
             self._remove_dockers()
+        except Exception as e:
+            print(f"Exception in unload when self._remove_dockers(): {e}")
 
+        try:
             # Close all open dialogs
             self._close_open_dialogs()
+        except Exception as e:
+            print(f"Exception in unload when self._close_open_dialogs(): {e}")
+            raise e
 
+        try:
             # Force action pan
             self.iface.actionPan().trigger()
+        except Exception as e:
+            print(f"Exception in unload when self.iface.actionPan().trigger(): {e}")
 
+        try:
             # Remove 'Main Info button'
             self._unset_info_button()
+        except Exception as e:
+            print(f"Exception in unload when self._unset_info_button(): {e}")
 
+        try:
             # Remove 'Add child layer button'
             self._unset_child_layer_button()
+        except Exception as e:
+            print(f"Exception in unload when self._unset_child_layer_button(): {e}")
 
+        try:
             # Remove file handler when reloading
             if hide_gw_button:
                 global_vars.logger.close_logger()
+        except Exception as e:
+            print(f"Exception in unload when global_vars.logger.close_logger(): {e}")
 
+        try:
             # Remove 'Giswater menu'
             self._unset_giswater_menu()
+        except Exception as e:
+            print(f"Exception in unload when self._unset_giswater_menu(): {e}")
 
+        try:
             # Set 'Main Info button' if project is unload or project don't have layers
             layers = QgsProject.instance().mapLayers().values()
             if hide_gw_button is False and len(layers) == 0:
                 self._set_info_button()
+        except Exception as e:
+            print(f"Exception in unload when self._set_info_button(): {e}")
 
+        try:
             # Unlisten notify channel and stop thread
             if hasattr(global_vars, 'notify'):
                 list_channels = ['desktop', global_vars.current_user]
                 if global_vars.notify:
                     global_vars.notify.stop_listening(list_channels)
+        except Exception as e:
+            print(f"Exception in unload when global_vars.notify.stop_listening(list_channels): {e}")
 
+        try:
             # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
             if self.load_project:
                 global_vars.project_type = None
@@ -105,7 +135,10 @@ class Giswater(QObject):
                     for button in list(self.load_project.buttons.values()):
                         self.iface.removePluginMenu(self.plugin_name, button.action)
                         self.iface.removeToolBarIcon(button.action)
+        except Exception as e:
+            print(f"Exception in unload when self.iface.removePluginMenu(self.plugin_name, button.action): {e}")
 
+        try:
             # Check if project is current loaded and remove giswater toolbars from qgis
             if self.load_project:
                 if self.load_project.plugin_toolbars:
@@ -113,11 +146,10 @@ class Giswater(QObject):
                         if plugin_toolbar.enabled:
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
-
         except Exception as e:
-            print(f"Exception in unload: {e}")
-        finally:
-            self.load_project = None
+            print(f"Exception in unload when del plugin_toolbar.toolbar: {e}")
+
+        self.load_project = None
 
 
     # region private functions
@@ -369,10 +401,13 @@ class Giswater(QObject):
 
         # Only keep Giswater widgets that are currently open
         windows = [x for x in allwidgets if
-                   not x.isHidden() and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
+                   not getattr(x, "isHidden", False) and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
 
         # Close them
         for window in windows:
-            tools_gw.close_dialog(window)
+            try:
+                tools_gw.close_dialog(window)
+            except Exception as e:
+                print(f"Exception in _close_open_dialogs: {e}")
 
     # endregion
