@@ -412,6 +412,9 @@ class GwProfileButton(GwAction):
                     # Set action pan
                     self.iface.actionPan().trigger()
 
+                    # Next profile will be done from scratch
+                    self.first_node = True
+
 
     def _draw_profile(self, arcs, nodes, terrains):
         """ Parent function - Draw profiles """
