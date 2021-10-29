@@ -366,12 +366,13 @@ def get_combo_value(dialog, widget, index=0, add_quote=False):
     return value
 
 
-def set_combo_value(combo, value, item1):
+def set_combo_value(combo, value, item1, add_new=True):
     """
     Set text to combobox populate with more than 1 item for row
         :param combo: QComboBox widget to manage
         :param value: element to show
         :param item1: element to compare
+        :param add_new: if True it will add the value even if it's not in the combo
     """
 
     for i in range(0, combo.count()):
@@ -381,7 +382,7 @@ def set_combo_value(combo, value, item1):
             return True
 
     # Add new value if @value not in combo
-    if value not in ("", None, 'None', 'none', '-1', -1):
+    if add_new and value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
         # Control if the QComboBox has been previously filled
         if combo.count() > 0:
