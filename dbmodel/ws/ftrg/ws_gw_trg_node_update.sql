@@ -10,23 +10,24 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger AS
 $BODY$
 DECLARE 
 
-    rec_node record;
-    rec_arc Record; 
-    rec_node1 Record; 
-    rec_node2 Record; 
-    v_numNodes numeric; 
-	v_querystring Varchar; 
-    v_xvar double precision;
-    v_yvar double precision;
-    v_pol_id varchar;
-    v_psector_id integer;
-    v_arc record;
-    v_arcrecord "SCHEMA_NAME".v_edit_arc;
-    v_plan_statetype_ficticius int2;
-    v_querytext text;
-	v_node_proximity_control boolean;
-	v_node_proximity double precision;
-	v_dsbl_error boolean;
+rec_node record;
+rec_arc Record; 
+rec_node1 Record; 
+rec_node2 Record; 
+
+v_numNodes numeric; 
+v_querystring Varchar; 
+v_xvar double precision;
+v_yvar double precision;
+v_pol_id varchar;
+v_psector_id integer;
+v_arc record;
+v_arcrecord "SCHEMA_NAME".v_edit_arc;
+v_plan_statetype_ficticius int2;
+v_querytext text;
+v_node_proximity_control boolean;
+v_node_proximity double precision;
+v_dsbl_error boolean;
 
 BEGIN
 

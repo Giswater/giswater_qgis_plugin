@@ -12,24 +12,24 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update()
 $BODY$
 DECLARE 
     
-    rec_node record;
-    rec_arc Record; 
+rec_node record;
+rec_arc Record; 
 
-	v_querystring Varchar; 
-    v_nodeRecord1 Record; 
-    v_nodeRecord2 Record; 
-	v_numNodes numeric;
-    v_z1 double precision;
-    v_z2 double precision;
-	v_xvar double precision;
-    v_yvar double precision;
-	v_pol_id varchar;
-	v_top_elev double precision;
-	v_psector_id integer;
-	v_arc record;
-	v_arcrecord "SCHEMA_NAME".v_edit_arc;
-	v_node_proximity_control boolean;
-	v_node_proximity double precision;
+v_querystring Varchar; 
+v_nodeRecord1 Record; 
+v_nodeRecord2 Record; 
+v_numNodes numeric;
+v_z1 double precision;
+v_z2 double precision;
+v_xvar double precision;
+v_yvar double precision;
+v_pol_id varchar;
+v_top_elev double precision;
+v_psector_id integer;
+v_arc record;
+v_arcrecord "SCHEMA_NAME".v_edit_arc;
+v_node_proximity_control boolean;
+v_node_proximity double precision;
 
 
 BEGIN
