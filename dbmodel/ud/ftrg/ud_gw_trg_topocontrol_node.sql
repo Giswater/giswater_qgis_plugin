@@ -130,7 +130,6 @@ BEGIN
 						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
 							
 						-- refactoring values for new one
-						PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
 						v_arcrecordtb.code = v_arcrecordtb.arc_id;
 						v_arcrecordtb.state=2;
