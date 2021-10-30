@@ -53,8 +53,9 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
     
 		-- Arc ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.arc_id != (SELECT last_value::text FROM urn_id_seq) THEN
+			NEW.arc_id = (SELECT nextval('urn_id_seq'));
+		END IF;
 
 		-- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN

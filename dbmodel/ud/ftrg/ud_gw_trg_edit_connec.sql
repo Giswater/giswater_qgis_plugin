@@ -74,8 +74,9 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- connec ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.connec_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.connec_id != (SELECT last_value::text FROM urn_id_seq) THEN
+			NEW.connec_id = (SELECT nextval('urn_id_seq'));
+		END IF;
 
 		-- connec type
 		IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN

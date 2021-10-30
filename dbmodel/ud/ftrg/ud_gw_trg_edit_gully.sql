@@ -103,9 +103,10 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
-		-- gully ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.gully_id:= (SELECT nextval('urn_id_seq'));
+		-- Gully ID
+		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) THEN
+			NEW.gully_id = (SELECT nextval('urn_id_seq'));
+		END IF;
 		
 		-- gully type 
 		IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN

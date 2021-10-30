@@ -62,9 +62,10 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN   
 
 		-- Arc ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.arc_id:= (SELECT nextval('urn_id_seq'));
-
+		IF NEW.arc_id != (SELECT last_value::text FROM urn_id_seq) THEN
+			NEW.arc_id = (SELECT nextval('urn_id_seq'));
+		END IF;
+		
 		 -- Arc type
 		IF (NEW.arc_type IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_feature_arc JOIN cat_feature USING (id) WHERE active IS TRUE) = 0) THEN
