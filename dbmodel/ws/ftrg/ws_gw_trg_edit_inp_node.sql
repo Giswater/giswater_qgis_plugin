@@ -11,14 +11,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_node()
 RETURNS trigger AS 
 $BODY$
 DECLARE 
-    v_node_table varchar;
-    v_man_table varchar;
-    v_sql varchar;
-    v_old_nodetype varchar;
-    v_new_nodetype varchar;
-    v_tablename varchar;
-    v_pol_id varchar;
-    v_node_id varchar;
+v_node_table varchar;
+v_man_table varchar;
+v_sql varchar;
+v_old_nodetype varchar;
+v_new_nodetype varchar;
+v_tablename varchar;
+v_pol_id varchar;
+v_node_id varchar;
 
 BEGIN
 
@@ -34,20 +34,20 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-	-- elevation
-	IF (NEW.elevation != OLD.elevation) OR (NEW.elevation IS NULL AND OLD.elevation IS NOT NULL) OR (NEW.elevation IS NOT NULL AND OLD.elevation IS NULL) THEN
-		UPDATE node SET elevation=NEW.elevation WHERE node_id = OLD.node_id;
-	END IF;
+		-- elevation
+		IF (NEW.elevation != OLD.elevation) OR (NEW.elevation IS NULL AND OLD.elevation IS NOT NULL) OR (NEW.elevation IS NOT NULL AND OLD.elevation IS NULL) THEN
+			UPDATE node SET elevation=NEW.elevation WHERE node_id = OLD.node_id;
+		END IF;
 
-	-- depth
-	IF (NEW.depth != OLD.depth) OR (NEW.depth IS NULL AND OLD.depth IS NOT NULL) OR (NEW.depth IS NOT NULL AND OLD.depth IS NULL) THEN
-		UPDATE node SET depth=NEW.depth WHERE node_id = OLD.node_id;
-	END IF;
-	
-	-- State
-	IF (NEW.state::text != OLD.state::text) THEN
-		UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
-	END IF;
+		-- depth
+		IF (NEW.depth != OLD.depth) OR (NEW.depth IS NULL AND OLD.depth IS NOT NULL) OR (NEW.depth IS NOT NULL AND OLD.depth IS NULL) THEN
+			UPDATE node SET depth=NEW.depth WHERE node_id = OLD.node_id;
+		END IF;
+		
+		-- State
+		IF (NEW.state::text != OLD.state::text) THEN
+			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+		END IF;
 
 		-- The geom
 		IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
@@ -92,26 +92,32 @@ BEGIN
 
         IF v_node_table = 'inp_junction' THEN
             UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor WHERE node_id=OLD.node_id;
+			
         ELSIF v_node_table = 'inp_reservoir' THEN
             UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;  
+			
         ELSIF v_node_table = 'inp_tank' THEN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
+			
         ELSIF v_node_table = 'inp_pump' THEN          
             UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, status=NEW.status , pump_type=NEW.pump_type WHERE node_id=OLD.node_id;
+			
         ELSIF v_node_table = 'inp_valve' THEN     
             UPDATE inp_valve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status, custom_dint=NEW.custom_dint, add_settings = NEW.add_settings WHERE node_id=OLD.node_id;
+			
         ELSIF v_node_table = 'inp_shortpipe' THEN     
             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;  
+			
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,
             pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
+			
         END IF;
 
         UPDATE node 
         SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
         WHERE node_id=OLD.node_id;
-
 
 		RETURN NEW;
         
