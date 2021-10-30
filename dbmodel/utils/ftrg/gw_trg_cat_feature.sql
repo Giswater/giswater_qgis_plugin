@@ -31,6 +31,7 @@ DECLARE
 	v_new_child_layer text;
 	v_old_child_layer text;
 	v_isrenameview boolean;
+    v_channel text;
 
 BEGIN	
 
@@ -45,6 +46,9 @@ BEGIN
 	--  Get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
+    -- Get notify channel
+    v_channel = replace(current_user,'.','_');
+
 	IF v_table = 'cat_feature_node' THEN
 
 		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_config') IS TRUE THEN
@@ -55,8 +59,6 @@ BEGIN
 				DELETE FROM config_graf_valve WHERE id = NEW.id;
 			END IF;
 		END IF;
-		
-		RETURN NEW;
 	ELSE
 
 		SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system 
@@ -173,8 +175,6 @@ BEGIN
 				INSERT INTO config_info_layer_x_type (tableinfo_id,infotype_id,tableinfotype_id)
 				VALUES (NEW.child_layer,1,NEW.child_layer);
 			END IF;
-		
-			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
 			SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
@@ -336,8 +336,6 @@ BEGIN
 		
 			END IF;
 
-			RETURN NEW;
-
 		ELSIF TG_OP = 'DELETE' THEN
 
 			-- delete child views
@@ -352,9 +350,16 @@ BEGIN
 			-- delete sys_param_user parameters
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 
-			RETURN NULL;
 		END IF;
 	END IF;
+    
+    -- Ask python to update catfeaturevalues list
+    PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[{"name":"update_catfeaturevalues", "parameters":{}}]} ,"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+    IF TG_OP = 'DELETE' THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
 
 END;
 $BODY$
