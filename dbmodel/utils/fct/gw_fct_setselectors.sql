@@ -57,6 +57,7 @@ v_uservalues json;
 v_action text = null;
 v_sector integer;
 v_sectorfromexpl boolean;
+v_explfromsector boolean;
 v_sectorfrommacroexpl boolean;
 
 BEGIN
@@ -111,6 +112,7 @@ BEGIN
 	v_table = v_parameter_selector->>'table';
 	v_tableid = v_parameter_selector->>'table_id';
 	v_sectorfromexpl = v_parameter_selector->>'sectorFromExpl';
+	v_explfromsector = v_parameter_selector->>'explFromSector';
 	v_sectorfrommacroexpl = v_parameter_selector->>'sectorFromMacroexpl';
 
 
@@ -324,12 +326,17 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
 
+	-- trigger getmapzones
 	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation') THEN
 
 		-- force mapzones
 		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
 
-		-- force sector
+	END IF;
+
+	-- manage cross-reference tables
+	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation', 'tab_sector') THEN
+
 		IF v_sectorfromexpl  THEN
 
 			-- checking actually sector id exists with same id than expl_id
@@ -346,6 +353,15 @@ BEGIN
 				INSERT INTO selector_sector VALUES (v_id, current_user);
 			END IF;
 		END IF;	
+		
+		IF v_explfromsector  THEN
+			-- checking actually expl id exists with same id than sector_id
+			IF (SELECT count(*) FROM exploitation WHERE expl_id = v_id) = 1 THEN
+				DELETE FROM selector_expl WHERE cur_user = current_user;
+				INSERT INTO selector_expl VALUES (v_id, current_user);
+			END IF;
+		END IF;	
+		
 	END IF;
 	
 	--set sector as vdefault if only one value on selector. 

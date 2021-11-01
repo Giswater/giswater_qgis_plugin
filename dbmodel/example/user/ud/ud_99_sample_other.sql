@@ -6,10 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromExpl', 'True'::boolean) WHERE parameter = 'basic_selector_tab_exploitation';
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromMacroexpl', 'True'::boolean) WHERE parameter = 'basic_selector_tab_macroexploitation';
-
-
 INSERT INTO inp_gully (gully_id, isepa, efficiency)
 SELECT gully_id, true, 1 FROM gully where state > 0;
 

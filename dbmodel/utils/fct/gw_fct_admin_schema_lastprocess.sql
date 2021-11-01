@@ -231,7 +231,14 @@ BEGIN
 
 		--update value of rename_view_x_id parameter
 		UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
-				
+		
+		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromExpl', 'True'::boolean) 
+		WHERE parameter = 'basic_selector_tab_exploitation';
+		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromMacroexpl', 'True'::boolean) 
+		WHERE parameter = 'basic_selector_tab_macroexploitation';
+		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromSector', 'True'::boolean) 
+		WHERE parameter = 'basic_selector_tab_sector';
+
 		-- fk for ext tables or utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  
 		
