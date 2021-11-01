@@ -38,7 +38,7 @@ BEGIN
 		-- moving node demands to temp_demand
 		INSERT INTO temp_demand (feature_id, demand, pattern_id)
 		SELECT DISTINCT ON (feature_id) feature_id, d.demand, d.pattern_id 
-		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand > 0 
+		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		-- moving connec demands to temp_demand
@@ -46,7 +46,7 @@ BEGIN
 		SELECT n.node_id, (d.demand), d.pattern_id 
 		FROM  inp_dscenario_demand d ,temp_node n
 		JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
-		WHERE c.connec_id = d.feature_id AND d.demand > 0 
+		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		-- update demands
@@ -58,7 +58,7 @@ BEGIN
 			-- moving node demands to temp_demand
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
 			SELECT node_id, demand, pattern_id 
-			FROM temp_node WHERE demand > 0;
+			FROM temp_node WHERE demand IS NOT NULL AND demand <> 0 ;
 
 		END IF;
 		
