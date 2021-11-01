@@ -56,6 +56,8 @@ v_fid integer = 397;
 v_uservalues json;
 v_action text = null;
 v_sector integer;
+v_sectorfromexpl boolean;
+v_sectorfrommacroexpl boolean;
 
 BEGIN
 
@@ -107,7 +109,10 @@ BEGIN
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id'; 
 	v_table = v_parameter_selector->>'table';
-	v_tableid = v_parameter_selector->>'table_id';	
+	v_tableid = v_parameter_selector->>'table_id';
+	v_sectorfromexpl = v_parameter_selector->>'sectorFromExpl';
+	v_sectorfrommacroexpl = v_parameter_selector->>'sectorFromMacroexpl';
+
 
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
@@ -123,19 +128,26 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';	
 	END IF;
 
+/*
+	This part of code have been comented due performance issues and also does not work well. Need to be review
+
 	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'sectorfromexpl')::boolean 
 		FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_exploitation' THEN
 
 		IF  v_value='True' THEN
+
 			IF v_isalone IS TRUE THEN
 				EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user';
 				EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 			END IF;
+
 			EXECUTE 'INSERT INTO selector_sector (sector_id, cur_user) 
 			SELECT sector_id, current_user FROM exploitation e, sector s 
 			WHERE e.active IS TRUE AND st_dwithin(st_buffer(e.the_geom,0.5,''side=right''), s.the_geom,0) 
 			AND expl_id = '||v_id||' ON CONFLICT (sector_id,cur_user) DO NOTHING;';
+			
 		ELSE
+
 			EXECUTE 'DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id IN
 			(SELECT sector_id FROM exploitation e, sector s 
 			WHERE e.active IS TRUE  AND st_dwithin(st_buffer(e.the_geom,0.5,''side=right''), s.the_geom,0) 
@@ -155,6 +167,7 @@ BEGIN
 			AND macroexpl_id = '||v_id||';';
 		END IF;
 	END IF;
+
 
 	IF (v_checkall IS NULL OR v_checkall IS FALSE) AND (SELECT json_extract_path_text(value::json,'explfromsector')::boolean 
 		FROM config_param_system WHERE parameter = 'basic_selector_mapzone_relation') IS TRUE AND v_tabname='tab_sector' THEN
@@ -178,6 +191,7 @@ BEGIN
 
 	END IF;
 
+*/
 	-- manage check all
 	IF v_checkall THEN
 		IF v_table ='plan_psector' THEN -- to manage only those psectors related to selected exploitations
@@ -271,7 +285,7 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
-
+	
 	-- get envelope over arcs or over exploitation if arcs dont exist
 	IF v_tabname='tab_sector' THEN
 		SELECT row_to_json (a) 
@@ -310,8 +324,28 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
 
-	IF v_tabname = 'tab_exploitation' THEN
+	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation') THEN
+
+		-- force mapzones
 		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
+
+		-- force sector
+		IF v_sectorfromexpl  THEN
+
+			-- checking actually sector id exists with same id than expl_id
+			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
+				DELETE FROM selector_sector WHERE cur_user = current_user;
+				INSERT INTO selector_sector VALUES (v_id, current_user);
+			END IF;
+		END IF;
+
+		IF v_sectorfrommacroexpl  THEN
+			-- checking actually sector id exists with same id than expl_id
+			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
+				DELETE FROM selector_sector WHERE cur_user = current_user;
+				INSERT INTO selector_sector VALUES (v_id, current_user);
+			END IF;
+		END IF;	
 	END IF;
 	
 	--set sector as vdefault if only one value on selector. 
