@@ -422,6 +422,22 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
+	
+
+	RAISE NOTICE '17 - Check pjoint_id/pjoint_type on gullies (416)';
+	SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
+	WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '416',concat(
+		'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.');
+	END IF;	
+	
 
 	-- get results
 	-- info
