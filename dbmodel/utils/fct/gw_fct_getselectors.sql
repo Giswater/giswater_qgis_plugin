@@ -255,8 +255,6 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
-
-		raise notice 'v_formTabsAux %', v_formTabsAux;
 	
 		-- Create tabs array
 		IF v_firsttab THEN
