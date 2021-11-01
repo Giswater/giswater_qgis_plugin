@@ -54,7 +54,7 @@ BEGIN
 	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
-		WHERE ve_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
+		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text '
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id
@@ -69,7 +69,10 @@ BEGIN
 			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id
 			FROM selector_sector, v_edit_inp_connec c
 			JOIN value_state_type ON id = state_type
-			WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
+			WHERE c.sector_id = selector_sector.sector_id 
+			AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL
+			AND epa_type = ''JUNCTION''
+			AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype;		
 	END IF;
 
@@ -167,11 +170,9 @@ BEGIN
 				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-				AND epa_type != ''UNDEFINED''';
+				AND epa_type = ''JUNCTION''
+				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
-
-
-        raise notice 'updating inp_pipe';
         
 	-- update child param for inp_pipe
 	UPDATE temp_arc SET 
