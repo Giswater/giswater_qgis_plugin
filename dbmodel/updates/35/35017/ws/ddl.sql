@@ -11,9 +11,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE cat_arc ALTER COLUMN shape SET DEFAULT 'CIRCULAR';
 
 ALTER TABLE inp_tags DROP CONSTRAINT inp_tags_pkey;
-ALTER TABLE inp_tags RENAME COLUMN object TO feature_type;
-ALTER TABLE inp_tags RENAME COLUMN node_id TO feature_id;
-ALTER TABLE inp_tags DROP COLUMN id;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_tags", "column":"object", "newName":"feature_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_tags", "column":"node_id", "newName":"feature_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_tags", "column":"id"}}$$);
+
 ALTER TABLE inp_tags ADD CONSTRAINT inp_tags_pkey PRIMARY KEY(feature_type, feature_id);
 
 
