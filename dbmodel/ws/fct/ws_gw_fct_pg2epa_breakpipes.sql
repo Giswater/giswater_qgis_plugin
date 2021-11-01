@@ -21,7 +21,8 @@ v_total double precision = 0;
 v_maxlength json;
 v_breaklegth double precision = 10;
 v_removevnodebuffer double precision = 1;
-
+v_count integer = 0;
+i integer = 0;
 rec_arc record;
 
 BEGIN
@@ -38,12 +39,18 @@ BEGIN
 
 	-- profilactic control
 	IF v_breaklegth = NULL THEN v_breaklegth = 1000; END IF;
+	
+	-- count
+	SELECT count(*) INTO v_count FROM (SELECT arc_id, v_breaklegth/st_length(the_geom) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1;
 
 	-- insert into vnode table with state  = 0
 	FOR rec_arc IN EXECUTE ' SELECT * FROM (SELECT arc_id, '||v_breaklegth||'/st_length(the_geom) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1'
 	LOOP
-		RAISE NOTICE 'ARC: %', rec_arc;
+		-- counter
+		i = i+1;
+		RAISE NOTICE 'Counter % / %', i, v_count;
 		v_total = 0;
+		
 		LOOP
 			EXIT WHEN v_total > 1;
 
