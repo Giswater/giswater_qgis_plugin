@@ -13,3 +13,19 @@ VALUES (415, 'Connec without pjoint_id or pjoint_type','utils', null, null) ON C
 
 --2021/11/02
 UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"update_catfeaturevalues", "enabled":"true", "trg_fields":"id","featureType":[]}]'::json WHERE id='cat_feature';
+
+UPDATE config_param_user SET value = $${"title":{"text":{"color":"black", "weight":"bold", "size":10}},
+"terrain":{"color":"gray", "width":1.5, "style":"dashdot"}, 
+"infra":{"real":{"color":"black", "width":1, "style":"solid"}, 
+"interpolated":{"color":"black", "width":1.5,"style":"dashed"}},
+"grid":{"boundary":{"color":"gray","style":"solid", "width":1}, "lines":{"color":"lightgray","style":"solid", "width":1},"text":{"color":"black", "weight":"normal"}},
+"guitar":{"lines":{"color":"black", "style":"solid", "width":1}, "auxiliarlines":{"color":"gray","style":"solid", "width":1}, "text":{"color":"black", "weight":"normal"}}}$$
+WHERE parameter = 'om_profile_stylesheet';
+
+UPDATE sys_param_user SET vdefault = $${"title":{"text":{"color":"black", "weight":"bold", "size":10}},
+"terrain":{"color":"gray", "width":1.5, "style":"dashdot"}, 
+"infra":{"real":{"color":"black", "width":1, "style":"solid"}, 
+"interpolated":{"color":"black", "width":1.5,"style":"dashed"}},
+"grid":{"boundary":{"color":"gray","style":"solid", "width":1}, "lines":{"color":"lightgray","style":"solid", "width":1},"text":{"color":"black", "weight":"normal"}},
+"guitar":{"lines":{"color":"black", "style":"solid", "width":1}, "auxiliarlines":{"color":"gray","style":"solid", "width":1}, "text":{"color":"black", "weight":"normal"}}}$$
+WHERE id = 'om_profile_stylesheet';
