@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/01
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
