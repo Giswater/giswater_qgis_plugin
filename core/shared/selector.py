@@ -289,9 +289,9 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
-		
+
+        # Reload selectors dlg
         self.open_selector()
-        #self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
