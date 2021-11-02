@@ -7,9 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2021/11/01
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
-VALUES (415, 'Connec without pjoint_id or pjoint_type','utils', null, null) ON CONFLICT (fid) DO NOTHING;
-
 --2021/11/02
-UPDATE sys_table SET notify_action='[{"channel":"desktop","name":"update_catfeaturevalues", "enabled":"true", "trg_fields":"id","featureType":[]}]'::json WHERE id='cat_feature';
+DROP TRIGGER IF EXISTS gw_trg_notify ON cat_feature;
+CREATE TRIGGER gw_trg_notify AFTER INSERT OR DELETE OR UPDATE OF id ON cat_feature 
+    FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('cat_feature');

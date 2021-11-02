@@ -143,7 +143,13 @@ BEGIN
 			--transform notifications without input parameters
 				v_parameters = '"parameters":{}';
 				
-				v_notification_data = '{"name":"'||v_name||'",'||v_parameters||'}';
+				IF v_channel = 'desktop' THEN
+					v_notification_data_desktop = '{"name":"'||v_name||'",'||v_parameters||'}';
+				ELSIF v_channel = 'user' then
+					v_notification_data_user = '{"name":"'||v_name||'",'||v_parameters||'}';
+				ELSE
+					v_notification_data = '{"name":"'||v_name||'",'||v_parameters||'}';
+				END IF;
 				
 			END IF;
 			
@@ -156,6 +162,7 @@ BEGIN
 			ELSE 
 				v_notification_all_desktop=v_notification_data_desktop;
 			END IF;
+			v_notification_data_desktop = null;
 
 		ELSIF v_channel = 'user' THEN
 			IF v_notification_all_user is not null then
@@ -164,6 +171,7 @@ BEGIN
 			ELSE 
 				v_notification_all_user=v_notification_data_user;
 			END IF;
+			v_notification_data_user = null;
 
 		ELSE
 			IF v_notification_all is not null then
@@ -173,6 +181,7 @@ BEGIN
 			ELSE 
 				v_notification_all=v_notification_data;
 			END IF;
+			v_notification_data = null;
 		END IF;		
 	
 	END LOOP;
