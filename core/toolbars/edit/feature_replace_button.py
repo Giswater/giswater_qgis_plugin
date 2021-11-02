@@ -237,9 +237,10 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
-        # Avoid to replace obsolete or planned features
+        # Avoid to replace obsolete or planified features
         if feature.attribute('state') in (0, 2):
-            message = "Current feature has state 0 or 2. Therefore it is not replaceable"
+            state = 'OBSOLETE' if feature.attribute('state') == 0 else 'PLANIFIED'
+            message = f"Current feature has state '{state}'. Therefore it is not replaceable"
             tools_qt.show_info_box(message, "Info")
             return
 
