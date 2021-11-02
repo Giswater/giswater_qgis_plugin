@@ -46,7 +46,7 @@ v_sector_name text;
 
 BEGIN
 
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
