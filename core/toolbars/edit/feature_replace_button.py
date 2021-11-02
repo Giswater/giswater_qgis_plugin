@@ -470,23 +470,22 @@ class GwFeatureReplaceButton(GwMaptool):
         if feature_type_new == 'null':
             return
 
+        sql = ""
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
         elif self.project_type == 'ud':
-            self.dlg_replace.featurecat_id.clear()
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL "
                    f"AND (active IS TRUE OR active IS NULL) "
                    f"ORDER BY id")
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
     # endregion
