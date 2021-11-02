@@ -406,8 +406,10 @@ class GwProfileButton(GwAction):
                     self.id_list = [i.id() for i in it]
                     self.layer_arc.selectByIds(self.id_list)
 
-                    # Center shortest path in canvas - ZOOM SELECTION
-                    self.canvas.zoomToSelected(self.layer_arc)
+                    # Set default value if no title is given
+                    if tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False) in (None, 'null', ''):
+                        tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
+                                                 f"PROFILE {self.initNode} - {self.endNode}")
 
                     # Set action pan
                     self.iface.actionPan().trigger()
@@ -749,7 +751,7 @@ class GwProfileButton(GwAction):
         # Print title
         title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
-                 title.upper(), fontsize=title_size, color=title_color, fontweight=title_weight,
+                 title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
 
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
