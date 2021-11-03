@@ -46,7 +46,8 @@ BEGIN
 	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.005; END IF;
 	
 	IF v_nod2arc < 0.001 THEN
-		RAISE EXCEPTION 'The nodarc values is close to cero. Please make bigger your shorter pipes. If your pipes has the appropriate length may be the problem is some arc with wrong geometry.';
+		RAISE EXCEPTION 'There is/are some pipe(s) with small length (less than 0.02). Check it using toolbox algotithm and repair it. 
+		If all your pipes have the appropriate length may be the problem is some arc with wrong geometry. Contact with your system administrator';
 	END IF;
 
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
