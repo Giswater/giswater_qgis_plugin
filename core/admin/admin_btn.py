@@ -1412,6 +1412,9 @@ class GwAdminButton:
             return False
         self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_import_inp)
+
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
@@ -1909,6 +1912,9 @@ class GwAdminButton:
 
         if str(self.message_update) == '':
             self.dlg_readsql_show_info.btn_update.setEnabled(False)
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_readsql_show_info)
 
         # Set listeners
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_show_info))

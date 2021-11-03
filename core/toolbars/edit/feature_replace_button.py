@@ -275,6 +275,9 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_replace)
+
         # Set buttons signals
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))

@@ -83,6 +83,9 @@ class GwCSVButton(GwAction):
             self._preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_csv)
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
 

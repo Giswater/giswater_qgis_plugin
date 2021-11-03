@@ -838,6 +838,9 @@ class GwInfo(QObject):
         dlg_interpolate.rejected.connect(partial(tools_gw.save_settings, dlg_interpolate))
         dlg_interpolate.rejected.connect(partial(self._remove_interpolate_rb, rb_interpolate))
 
+        # Disable tab log
+        tools_gw.disable_tab_log(dlg_interpolate)
+
         tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
         # Set circle vertex marker

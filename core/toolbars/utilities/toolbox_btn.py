@@ -277,6 +277,10 @@ class GwToolBoxButton(GwAction):
                 tools_qgis.show_message(message, parameter=self.function_selected)
                 return
 
+            # Disable tab log
+            tools_gw.disable_tab_log(self.dlg_functions)
+
+            # Connect signals
             self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
                 self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data']['processes']))
             self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))

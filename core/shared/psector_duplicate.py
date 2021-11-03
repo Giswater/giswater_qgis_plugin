@@ -38,6 +38,9 @@ class GwPsectorDuplicate(QObject):
         # Set QComboBox with selected psector
         tools_qt.set_combo_value(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_duplicate_psector)
+
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_duplicate_psector))
         self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self._duplicate_psector))

@@ -315,6 +315,9 @@ class GwMincut:
         self.dlg_mincut.btn_cancel_task.hide()
         self.dlg_mincut.btn_cancel.show()
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_mincut)
+
         self.search = GwSearch()
         self.search.open_search(None, self.dlg_mincut)
 

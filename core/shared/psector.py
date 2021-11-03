@@ -1915,6 +1915,9 @@ class GwPsector:
         self.snapper_manager.recover_snapping_options()
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_replace_arc)
+
         # Triggers
         self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
         self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))

@@ -603,6 +603,12 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     return text, change_tab
 
 
+def disable_tab_log(dialog):
+    qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
+
+
 def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
     """
     :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
@@ -757,6 +763,7 @@ def set_tabs_enabled(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     for x in range(0, qtabwidget.count() - 1):
         qtabwidget.widget(x).setEnabled(False)
+    qtabwidget.setTabEnabled(qtabwidget.count()-1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
     if btn_accept:

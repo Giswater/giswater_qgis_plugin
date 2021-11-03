@@ -48,6 +48,9 @@ class GwFeatureDeleteButton(GwAction):
         # Hide button delete another feature
         self.dlg_feature_delete.btn_delete_another.setVisible(False)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_feature_delete)
+
         # Configure feature_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
