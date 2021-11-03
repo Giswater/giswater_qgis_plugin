@@ -79,6 +79,9 @@ class GwGo2EpaButton(GwAction):
         self._set_signals()
         self.dlg_go2epa.btn_cancel.setEnabled(False)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_go2epa)
+
         # Set shortcut keys
         self.dlg_go2epa.key_escape.connect(partial(tools_gw.close_docker))
 

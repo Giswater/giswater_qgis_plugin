@@ -576,6 +576,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
         if call_set_tabs_enabled:
