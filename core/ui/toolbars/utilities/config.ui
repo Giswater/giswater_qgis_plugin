@@ -456,9 +456,6 @@
               <zorder>grb_gully</zorder>
               <zorder>grb_connec</zorder>
               <zorder>grb_utils</zorder>
-              <zorder>grb_gully</zorder>
-              <zorder>grb_connec</zorder>
-              <zorder>grb_utils</zorder>
               <zorder>grb_node</zorder>
              </widget>
             </item>
@@ -487,92 +484,21 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
-         <widget class="QScrollArea" name="scrollArea_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
+         <widget class="QScrollArea" name="scrollArea_6">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents_3">
+          <widget class="QWidget" name="scrollAreaWidgetContents_6">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>293</width>
-             <height>404</height>
+             <width>291</width>
+             <height>402</height>
             </rect>
            </property>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <item row="0" column="2">
-             <widget class="QFrame" name="frame_5">
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_33">
-               <item row="0" column="0">
-                <widget class="QGroupBox" name="grb_category_type">
-                 <property name="title">
-                  <string>Category type</string>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_27">
-                  <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_category_type"/>
-                  </item>
-                  <item row="1" column="0">
-                   <spacer name="verticalSpacer_11">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QGroupBox" name="grb_function_type">
-                 <property name="title">
-                  <string>Function type</string>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_26">
-                  <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_function_type"/>
-                  </item>
-                  <item row="1" column="0">
-                   <spacer name="verticalSpacer_13">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="0" column="1">
+           <layout class="QGridLayout" name="gridLayout_36">
+            <item row="0" column="0">
              <widget class="QFrame" name="frame_4">
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
@@ -634,7 +560,69 @@
               </layout>
              </widget>
             </item>
-            <item row="1" column="1" colspan="2">
+            <item row="0" column="1">
+             <widget class="QFrame" name="frame_5">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_33">
+               <item row="0" column="0">
+                <widget class="QGroupBox" name="grb_category_type">
+                 <property name="title">
+                  <string>Category type</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_27">
+                  <item row="0" column="0">
+                   <layout class="QGridLayout" name="lyt_category_type"/>
+                  </item>
+                  <item row="1" column="0">
+                   <spacer name="verticalSpacer_11">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QGroupBox" name="grb_function_type">
+                 <property name="title">
+                  <string>Function type</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_26">
+                  <item row="0" column="0">
+                   <layout class="QGridLayout" name="lyt_function_type"/>
+                  </item>
+                  <item row="1" column="0">
+                   <spacer name="verticalSpacer_13">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
