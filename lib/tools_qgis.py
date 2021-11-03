@@ -503,12 +503,19 @@ def refresh_map_canvas(_restore_cursor=False):
 
 def set_cursor_wait():
     """ Change cursor to 'WaitCursor' """
+    while get_override_cursor() is not None:
+        restore_cursor()
     QApplication.setOverrideCursor(Qt.WaitCursor)
+
+
+def get_override_cursor():
+    return QApplication.overrideCursor()
 
 
 def restore_cursor():
     """ Restore to previous cursors """
-    QApplication.restoreOverrideCursor()
+    while get_override_cursor() is not None:
+        QApplication.restoreOverrideCursor()
 
 
 def disconnect_signal_selection_changed():
