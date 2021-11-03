@@ -19,3 +19,6 @@ ALTER TABLE inp_tags ADD CONSTRAINT inp_tags_pkey PRIMARY KEY(feature_type, feat
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (414, 'Cat connec rows without dint','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
+--2021/11/03
+update sys_param_user set layoutname='lyt_edit', layoutorder=1 where id='edit_elementcat_vdefault';
+
