@@ -592,7 +592,24 @@ BEGIN
 			END IF;
 
 			UPDATE link SET state = NEW.state WHERE link_id=NEW.link_id;
-						
+
+			-- force reconnection 
+			IF NEW.feature_type = 'CONNEC' THEN
+				IF NEW.exit_type ='VNODE' THEN -- link_class = 3
+					UPDATE connec SET pjoint_type = 'VNODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+				ELSIF NEW.exit_type ='NODE' THEN
+					UPDATE connec SET pjoint_type = 'NODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+				END IF;
+				
+			ELSIF NEW.feature_type = 'GULLY' THEN
+				IF NEW.exit_type ='VNODE' THEN -- link_class = 3
+					UPDATE gully SET pjoint_type = 'VNODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+				ELSIF NEW.exit_type ='NODE' THEN
+					UPDATE gully SET pjoint_type = 'NODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+				END IF;
+				
+			END IF;
+		
 		ELSE -- if geometry comes from psector_plan tables then  (link_class 2 or 3)
 			
 			-- if geometry have changed by user 
