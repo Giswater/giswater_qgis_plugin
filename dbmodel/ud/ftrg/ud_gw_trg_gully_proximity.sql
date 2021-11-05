@@ -11,6 +11,7 @@ RETURNS trigger AS
 $BODY$
 DECLARE 
 v_numConnecs numeric;
+v_arc text;
 v_gully_proximity double precision;
 v_gully_proximity_control boolean;
 v_dsbl_error boolean;
@@ -28,11 +29,32 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing gullys  
-		v_numConnecs:= (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
+		v_numConnecs:= (SELECT COUNT(*) FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom, v_gully_proximity) AND v_edit_gully.gully_id != NEW.gully_id);
+		
+		-- Existing arc
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+
+		-- If there is an arc
+		IF v_arc IS NOT NULL THEN
+			NEW.pjoint_type = 'GULLY';
+			NEW.pjoint_id = NEW.gully_id;
+			NEW.arc_id = v_arc;
+		END IF;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		-- Existing gullys  
-		v_numConnecs := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom, v_gully_proximity) AND gully.gully_id != NEW.gully_id);
+		v_numConnecs := (SELECT COUNT(*) FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom, v_gully_proximity) AND v_edit_gully.gully_id != NEW.gully_id);
+		
+		-- Existing arc
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		IF v_arc IS NOT NULL THEN
+			UPDATE gully SET pjoint_type = 'GULLY', pjoint_id = NEW.gully_id, arc_id = v_arc WHERE gully_id = OLD.gully_id;
+		ELSE
+			IF OLD.pjoint_type = 'GULLY' THEN
+				UPDATE gully SET pjoint_type = NULL, pjoint_id = NULL, arc_id = NULL WHERE gully_id = OLD.gully_id;
+			END IF;	
+		END IF;
+		
 	END IF;
 
 	-- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error

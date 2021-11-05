@@ -11,6 +11,7 @@ RETURNS trigger AS
 $BODY$
 DECLARE 
 v_numConnecs numeric;
+v_arc text;
 v_connec_proximity double precision;
 v_connec_proximity_control boolean;
 v_dsbl_error boolean;
@@ -27,11 +28,33 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing connecs  
-		v_numConnecs:= (SELECT COUNT(*) FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom, v_connec_proximity) AND connec.connec_id != NEW.connec_id);
+		v_numConnecs:= (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
 
+		-- Existing arc
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+
+		-- If there is an arc
+		IF v_arc IS NOT NULL THEN
+			NEW.pjoint_type = 'CONNEC';
+			NEW.pjoint_id = NEW.connec_id;
+			NEW.arc_id = v_arc;
+		END IF;
+		
 	ELSIF TG_OP = 'UPDATE' THEN
+	
 		-- Existing connecs  
-		v_numConnecs := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom, v_connec_proximity) AND connec.connec_id != NEW.connec_id);
+		v_numConnecs := (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
+
+		-- Existing arc
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		IF v_arc IS NOT NULL THEN
+			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc WHERE connec_id = OLD.connec_id;
+		ELSE
+			IF OLD.pjoint_type = 'CONNEC' THEN
+				UPDATE connec SET pjoint_type = NULL, pjoint_id = NULL, arc_id = NULL WHERE connec_id = OLD.connec_id;
+			END IF;	
+		END IF;
+		
 	END IF;
 
 	-- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
@@ -45,6 +68,7 @@ BEGIN
 			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (105, NEW.connec_id, v_message);
 		END IF;
 	END IF;
+
 
 	RETURN NEW;    
 END;
