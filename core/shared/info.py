@@ -1734,6 +1734,7 @@ class GwInfo(QObject):
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
+        newfeature_id = complet_result['body']['feature']['id']
         parent_fields = complet_result['body']['data']['parentFields']
         fields_reload = ""
         list_mandatory = []
@@ -1760,6 +1761,7 @@ class GwInfo(QObject):
 
         # If we create a new feature
         if self.new_feature_id is not None:
+            new_feature.setAttribute(id_name, newfeature_id)
             after_insert = True
             for k, v in list(_json.items()):
                 if k in parent_fields:

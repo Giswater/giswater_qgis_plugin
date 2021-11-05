@@ -1,4 +1,4 @@
-general]
+[general]
 name=giswater
 qgisMinimumVersion=3.10
 qgisMaximumVersion=3.99
