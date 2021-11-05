@@ -644,6 +644,7 @@ class GwMincut:
         tools_gw.close_dialog(self.dlg_mincut)
 
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         self._remove_selection()
         tools_qgis.refresh_map_canvas()
 
@@ -744,7 +745,8 @@ class GwMincut:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Activate snapping of node and arcs
-        self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc, 'mincut', 'real_end_xyCoordinates_mouse_move_node_arc')
+        # self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self._snapping_node_arc_real_location)
 
 
@@ -1698,7 +1700,9 @@ class GwMincut:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc, 'mincut',
+                                'auto_mincut_xyCoordinates_mouse_move_node_arc')
+        # self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self._auto_mincut_snapping)
 
 
@@ -1992,7 +1996,8 @@ class GwMincut:
         self.current_layer = self.layer
 
         # Waiting for signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_valve)
+        # self.canvas.xyCoordinates.connect(self._mouse_move_valve)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_valve, 'mincut', 'custom_mincut_xyCoordinates_mouse_move_valve')
         self.emit_point.canvasClicked.connect(partial(self._custom_mincut_snapping, action))
 
 
@@ -2364,7 +2369,9 @@ class GwMincut:
         self.current_layer = self.layer
 
         # Waiting for signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_valve)
+        # self.canvas.xyCoordinates.connect(self._mouse_move_valve)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_valve, 'mincut',
+                                'change_valve_status_xyCoordinates_mouse_move_valve')
         self.emit_point.canvasClicked.connect(partial(self._custom_mincut_snapping, action))
 
 

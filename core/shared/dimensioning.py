@@ -240,6 +240,7 @@ class GwDimensioning:
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
+        # tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move, 'dimensioning', 'snapping_xyCoordinates_mouse_move')
         self.canvas.xyCoordinates.connect(self._mouse_move)
         emit_point.canvasClicked.connect(partial(self._click_button_snapping, action, emit_point))
 

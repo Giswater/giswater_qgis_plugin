@@ -269,18 +269,20 @@ def connect_signal(obj, pfunc, name1, signal_name):
 
     if name1 not in global_vars.active_signals:
         global_vars.active_signals[name1] = {}
-    if signal_name in global_vars.active_signals:
+    if signal_name in global_vars.active_signals[name1]:
+        _, signal, _ = global_vars.active_signals[name1][signal_name]
+        return signal
         pass  # TODO: If the signal is already connected, disconnect it? Ignoring it is not a good idea...
     try:
         signal = obj.connect(pfunc)
         global_vars.active_signals[name1][signal_name] = (obj, signal, pfunc)
         return signal
     except Exception as e:
-        print(e)
+        pass
     return None
 
 
-def disconnect_signal(name1, signal_name):
+def disconnect_signal(name1, signal_name=None, pop=True):
     """
     Disconnects a signal
         :param name1: the name of the parent category
@@ -289,17 +291,28 @@ def disconnect_signal(name1, signal_name):
                  (None, None) if it couldn't find the signal
     """
 
-    if name1 not in global_vars.active_signals or signal_name not in global_vars.active_signals[name1]:
+    if name1 not in global_vars.active_signals:
+        return None, None
+
+    if signal_name is None:
+        old_signals = []
+        for signal in global_vars.active_signals[name1]:
+            old_signals.append(disconnect_signal(name1, signal, False))
+        for signal in old_signals:
+            global_vars.active_signals[name1].pop(signal, None)
+    if signal_name not in global_vars.active_signals[name1]:
         return None, None
 
     obj, signal, pfunc = global_vars.active_signals[name1][signal_name]
     try:
         obj.disconnect(signal)
-        global_vars.active_signals[name1].pop(signal_name, None)  # Should this be done even if we couldn't disconnect the signal?
-        return obj, pfunc
     except Exception as e:
-        print(e)
-    return None, None  # If the signal is found but couldn't disconnect it (weird) should it return Nones or obj, pfunc?
+        pass
+    finally:
+        if pop:
+            global_vars.active_signals[name1].pop(signal_name, None)
+            return obj, pfunc
+        return signal_name
 
 
 def reconnect_signal(name1, signal_name):

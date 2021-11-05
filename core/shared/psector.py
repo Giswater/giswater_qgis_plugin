@@ -949,6 +949,7 @@ class GwPsector:
         self.reset_model_psector("other")
         tools_gw.close_dialog(self.dlg_plan_psector)
         tools_qgis.disconnect_snapping()
+        tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -1758,7 +1759,9 @@ class GwPsector:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'set_to_arc_xyCoordinates_mouse_move_arc')
+        # self.canvas.xyCoordinates.connect(self._mouse_move_arc)
         self.emit_point.canvasClicked.connect(partial(self._set_arc_id))
 
 
@@ -1849,7 +1852,9 @@ class GwPsector:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'replace_arc_xyCoordinates_mouse_move_arc')
+        # self.canvas.xyCoordinates.connect(self._mouse_move_arc)
         self.emit_point.canvasClicked.connect(self._open_arc_replace_form)
 
 
@@ -1914,6 +1919,7 @@ class GwPsector:
         # Disconnect Snapping
         self.snapper_manager.recover_snapping_options()
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('psector')
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_replace_arc)

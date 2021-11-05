@@ -108,6 +108,7 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self._remove_selection, actionpan=True))
         self.dlg_draw_profile.dlg_closed.connect(partial(self._reset_profile_variables))
+        self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.disconnect_signal, 'profile'))
 
         # Set shortcut keys
         self.dlg_draw_profile.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_draw_profile))
@@ -324,7 +325,8 @@ class GwProfileButton(GwAction):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.xyCoordinates.connect(self._mouse_move)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move, 'profile', 'xyCoordinates_mouse_move')
+        # self.canvas.xyCoordinates.connect(self._mouse_move)
         self.emit_point.canvasClicked.connect(partial(self._snapping_node))
 
 
