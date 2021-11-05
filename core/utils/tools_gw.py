@@ -254,6 +254,7 @@ def close_dialog(dlg):
     save_settings(dlg)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
+    dlg.deleteLater()
 
 
 def connect_signal(obj, pfunc, name1, signal_name):
