@@ -192,7 +192,7 @@ BEGIN
 		UPDATE temp_arc SET length=0.05 WHERE length=0;
 	END IF;
 
-	RAISE NOTICE '13 - Try to set demands & patterns';
+	RAISE NOTICE '13 - Set demands & patterns';
 
 	TRUNCATE temp_demand;
 	IF v_setdemand THEN
