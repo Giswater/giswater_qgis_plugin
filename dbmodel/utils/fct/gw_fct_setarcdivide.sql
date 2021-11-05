@@ -231,12 +231,18 @@ BEGIN
 						END IF;
 					END IF;
 
+					-- reset the urn
+					IF (SELECT gw_fct_setvalurn()) > (SELECT last_value::integer FROM urn_id_seq) THEN
+						PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+					END IF;
+
 					-- Get arc data
 					SELECT * INTO rec_aux1 FROM arc WHERE arc_id = v_arc_id;
 					SELECT * INTO rec_aux2 FROM arc WHERE arc_id = v_arc_id;
 
 					-- Update values of new arc_id (1)
 					rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+					
 					IF v_set_old_code IS TRUE THEN
 						rec_aux1.code := v_code;
 					ELSE 
@@ -903,9 +909,9 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
---	EXCEPTION WHEN OTHERS THEN
---	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
---	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
