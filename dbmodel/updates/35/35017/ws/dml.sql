@@ -10,12 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/10/30
 ALTER TABLE cat_arc ALTER COLUMN shape SET DEFAULT 'CIRCULAR';
 
-ALTER TABLE inp_tags DROP CONSTRAINT inp_tags_pkey;
-ALTER TABLE inp_tags RENAME COLUMN object TO feature_type;
-ALTER TABLE inp_tags RENAME COLUMN node_id TO feature_id;
-ALTER TABLE inp_tags DROP COLUMN id;
-ALTER TABLE inp_tags ADD CONSTRAINT inp_tags_pkey PRIMARY KEY(feature_type, feature_id);
-
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (414, 'Cat connec rows without dint','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
