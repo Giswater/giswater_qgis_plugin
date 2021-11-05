@@ -725,6 +725,10 @@ BEGIN
 			UNION
 		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
 		        UNION
+		      SELECT node_id, fid, 'Mandatory nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 411
+			UNION
+		      SELECT node_id, fid, 'Shortpipe nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 412
+			UNION
 		      SELECT node_id, fid, 'Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297
 			UNION
 		      SELECT node_id, fid, 'EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
