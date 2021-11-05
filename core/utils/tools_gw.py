@@ -256,6 +256,66 @@ def close_dialog(dlg):
     dlg.close()
 
 
+def connect_signal(obj, pfunc, name1, signal_name):
+    """
+    Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
+    :param obj: the object to which the signal will be connected
+    :param pfunc: the partial object containing the function to connect and the arguments if needed
+    :param name1: the name of the parent category
+    :param signal_name: the name of the signal
+    :return: the signal. If failed to connect it will return None
+    """
+
+    if name1 not in global_vars.active_signals:
+        global_vars.active_signals[name1] = {}
+    if signal_name in global_vars.active_signals:
+        pass  # TODO: If the signal is already connected, disconnect it? Ignoring it is not a good idea...
+    try:
+        signal = obj.connect(pfunc)
+        global_vars.active_signals[name1][signal_name] = (obj, signal, pfunc)
+        return signal
+    except Exception as e:
+        print(e)
+    return None
+
+
+def disconnect_signal(name1, signal_name):
+    """
+    Disconnects a signal
+        :param name1: the name of the parent category
+        :param signal_name: the name of the signal
+        :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
+                 (None, None) if it couldn't find the signal
+    """
+
+    if name1 not in global_vars.active_signals or signal_name not in global_vars.active_signals[name1]:
+        return None, None
+
+    obj, signal, pfunc = global_vars.active_signals[name1][signal_name]
+    try:
+        obj.disconnect(signal)
+        global_vars.active_signals[name1].pop(signal_name, None)  # Should this be done even if we couldn't disconnect the signal?
+        return obj, pfunc
+    except Exception as e:
+        print(e)
+    return None, None  # If the signal is found but couldn't disconnect it (weird) should it return Nones or obj, pfunc?
+
+
+def reconnect_signal(name1, signal_name):
+    """
+    Disconnects and reconnects a signal
+        :param name1: the name of the parent category
+        :param signal_name: the name of the signal
+        :return: True if successfully reconnected, False otherwise (bool)
+    """
+
+    obj, pfunc = disconnect_signal(name1, signal_name)
+    if obj is not None and pfunc is not None:
+        connect_signal(obj, pfunc, name1, signal_name)
+        return True
+    return False
+
+
 def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
 

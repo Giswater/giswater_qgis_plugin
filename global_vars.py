@@ -79,6 +79,7 @@ session_vars['logged_status'] = None       # An instance of connection status. C
 session_vars['last_focus'] = None          # An instance of the last focused dialog's tag
 snappers = []                              # A list of all the snapper managers, used to disable them in 'Reset plugin' action
 active_rubberbands = []                    # A list of all active rubber bands, used to disable them in 'Reset plugin' action
+active_signals = {}                        # A dictionary containing all connected signals, first key is dlg_name/file_name, then there are all the signal names.
 # endregion
 
 
