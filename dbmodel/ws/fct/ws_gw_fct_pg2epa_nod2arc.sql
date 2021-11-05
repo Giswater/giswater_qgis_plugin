@@ -45,10 +45,12 @@ BEGIN
 
 	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.005; END IF;
 	
+	/* Commented on 2021/11/05 because fid 411 and 412 on gw_fct_pg2epa_check_data which are more sofisticated than this
 	IF v_nod2arc < 0.001 THEN
 		RAISE EXCEPTION 'There is/are some pipe(s) with small length (less than 0.02). Check it using toolbox algotithm and repair it. 
 		If all your pipes have the appropriate length may be the problem is some arc with wrong geometry. Contact with your system administrator';
 	END IF;
+	*/
 
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	IF v_roughness is null then v_roughness = 0; END IF;
