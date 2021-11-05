@@ -41,9 +41,16 @@ BEGIN
 	(n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3),
 	(CASE WHEN (n1.depth - locate*(n1.depth-n1.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n1.depth)) END)::numeric (12,3) as depth
 	FROM (
+		SELECT  vnode_id, arc_id, locate
+
+			-- select node_1 and node_2 (locate 0 & 1)
+			FROM (
+				SELECT node_1 as vnode_id, arc_id,  0 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK')
+				)z
+		UNION
 			SELECT  vnode_id, arc_id, locate
 			FROM (
-				SELECT node_1 as vnode_id, arc_id,  0 as locate FROM temp_arc WHERE arc_type != 'NODE2ARC'
+			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') 
 				)z
 		UNION	
 			-- real vnode coming from link
@@ -67,17 +74,25 @@ BEGIN
 			FROM temp_arc , temp_table
 			WHERE st_dwithin ( temp_arc.the_geom, geom_point, 0.01) 
 			AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_arc.state > 0
-
-		UNION
-			SELECT  vnode_id, arc_id, locate
-			FROM (
-			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') 
-			)z
+		UNION 
+			-- connec over arc
+			SELECT distinct on (node_id) concat('VN',node_id) as vnode_id, 
+			arc_id, 
+			case 	
+				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
+				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
+				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
+			FROM temp_arc , temp_node AS vnode
+			WHERE node_type = 'CONNEC' AND st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) 
+			AND vnode.state > 0 AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK')
 		) a
 	JOIN arc USING (arc_id)
 	JOIN node n1 ON node_1 = node_id
 	JOIN node n2 ON node_2 = n2.node_id
 	ORDER BY arc_id, locate;
+
+	-- delete connec over arcs
+	DELETE FROM temp_node WHERE node_type = 'CONNEC'; 
 
 	RAISE NOTICE 'new nodes on temp_node table ';
 	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
