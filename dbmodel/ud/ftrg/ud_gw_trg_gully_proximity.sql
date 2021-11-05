@@ -16,6 +16,8 @@ v_gully_proximity double precision;
 v_gully_proximity_control boolean;
 v_dsbl_error boolean;
 v_message text;
+v_id integer;
+v_type text;
 
 
 BEGIN
@@ -49,6 +51,10 @@ BEGIN
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
 		IF v_arc IS NOT NULL THEN
 			UPDATE gully SET pjoint_type = 'GULLY', pjoint_id = NEW.gully_id, arc_id = v_arc WHERE gully_id = OLD.gully_id;
+			DELETE FROM link WHERE feature_id = OLD.gully_id AND feature_type ='GULLY' RETURNING exit_id, exit_type INTO v_id, v_type;
+			IF v_type = 'VNODE' THEN
+				DELETE FROM vnode WHERE vnode_id = v_id;
+			END IF;
 		ELSE
 			IF OLD.pjoint_type = 'GULLY' THEN
 				UPDATE gully SET pjoint_type = NULL, pjoint_id = NULL, arc_id = NULL WHERE gully_id = OLD.gully_id;

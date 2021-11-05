@@ -16,6 +16,8 @@ v_connec_proximity double precision;
 v_connec_proximity_control boolean;
 v_dsbl_error boolean;
 v_message text;
+v_id integer;
+v_type text;
     
 BEGIN
 
@@ -49,12 +51,15 @@ BEGIN
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
 		IF v_arc IS NOT NULL THEN
 			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc WHERE connec_id = OLD.connec_id;
+			DELETE FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC' RETURNING exit_id, exit_type INTO v_id, v_type;
+			IF v_type = 'VNODE' THEN
+				DELETE FROM vnode WHERE vnode_id = v_id;
+			END IF;
 		ELSE
 			IF OLD.pjoint_type = 'CONNEC' THEN
 				UPDATE connec SET pjoint_type = NULL, pjoint_id = NULL, arc_id = NULL WHERE connec_id = OLD.connec_id;
 			END IF;	
 		END IF;
-		
 	END IF;
 
 	-- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
