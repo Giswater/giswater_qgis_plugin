@@ -114,6 +114,9 @@ BEGIN
 
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
+
+	PERFORM setval('link_link_id_seq', (SELECT max(link_id) FROM link),true);
+	PERFORM setval('vnode_vnode_id_seq', (SELECT max(vnode_id) FROM vnode),true);
 	
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP	
@@ -145,6 +148,7 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
 				VALUES (217, null, 4, concat('Link not created because connect ',v_connect_id,' has state 2 and also has link'));
 
+				/*
 				IF v_feature_type = 'CONNEC' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3052", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
@@ -154,6 +158,7 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 				END IF;
+				*/
 			ELSE
 
 				-- get arc_id (if feature does not have) using buffer  
