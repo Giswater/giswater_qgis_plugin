@@ -41,6 +41,7 @@ INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
 
+
 SELECT gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["3103","3104","3014","114461","114462","114463"]},
@@ -594,3 +595,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_sta
 DELETE FROM selector_inp_dscenario; -- delete selectors because of trigger on cat_dscenario it inserts
 
 DELETE FROM connec WHERE connec_id = '3175';
+
+-- fill missed data for connecs
+UPDATE v_edit_connec SET epa_type = 'JUNCTION';
+UPDATE connec SET sector_id = a.sector_id FROM arc a WHERE a.arc_id = connec.arc_id;
