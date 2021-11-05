@@ -757,59 +757,6 @@ BEGIN
 		VALUES (v_fid, 1, '412','INFO: All shortpipe nodarcs are not on the same position than other EPA nodes.',v_count);
 	END IF;
 	
-
-	RAISE NOTICE '30- Epa connecs over epa node (413)';
-	v_querytext = 'SELECT * FROM (
-		SELECT DISTINCT t2.connec_id, t2.connecat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
-		t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Epa connec over other EPA node'' as descript
-		FROM selector_expl e, selector_sector s, node AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.1) 
-		WHERE s.sector_id = t1.sector_id AND s.cur_user = current_user
-		aND e.expl_id = t1.expl_id AND e.cur_user = current_user 
-		AND t1.epa_type != ''UNDEFINED'' 
-		AND t2.epa_type = ''JUNCTION'') a where a.state1 > 0 AND a.state2 > 0 ORDER BY dist' ;
-
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '413' ,concat('WARNING-413: There is/are ',v_count,' EPA connec(s) over other EPA nodes.'),v_count);
-
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript) SELECT * FROM ('||v_querytext||') a';
-
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 1, '413','INFO: All EPA connecs are not on the same position than other EPA nodes.',v_count);
-	END IF;
-
-
-	RAISE NOTICE '31 - Check matcat_id for connec (414)';
-	SELECT count(*) INTO v_count FROM (SELECT * FROM cat_connec WHERE matcat_id IS NULL)a1;
-
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '414',concat(
-		'ERROR-414: There is/are ',v_count,' register(s) with missed matcat_id on cat_connec table. This will crash inp exportations using PJOINT/CONNEC method.'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '414','INFO: No registers found without material on cat_connec table.');
-	END IF;	
-
-
-	RAISE NOTICE '32 - Check pjoint_id/pjoint_type on connecs (415)';
-	SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_connec c, selector_sector s 
-	WHERE c.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
-
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '415',concat(
-		'ERROR-415: There is/are ',v_count,' connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '415','INFO: No connecs found without pjoint_id or pjoint_type values.');
-	END IF;	
-
-
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');

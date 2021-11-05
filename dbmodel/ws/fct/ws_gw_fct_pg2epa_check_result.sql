@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
--- fid: 114, 159, 297, 396, 404, 400, 405, 413. Number 227 is passed by input parameters
+-- fid: 114, 159, 297, 396, 404, 400, 405, 413, 414, 415. Number 227 is passed by input parameters
 
 */
 
@@ -267,6 +267,62 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat(
 				'INFO: The network exportation mode (PJOINT & CONNEC WITH ALL NODARCS) is compatible with demand type choosed (CONNEC ESTIMATED)'));
 			END IF;		
+
+
+			RAISE NOTICE '4.1- Epa connecs over epa node (413)';
+			v_querytext = 'SELECT * FROM (
+				SELECT DISTINCT t2.connec_id, t2.connecat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
+				t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Epa connec over other EPA node'' as descript
+				FROM selector_expl e, selector_sector s, node AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.1) 
+				WHERE s.sector_id = t1.sector_id AND s.cur_user = current_user
+				aND e.expl_id = t1.expl_id AND e.cur_user = current_user 
+				AND t1.epa_type != ''UNDEFINED'' 
+				AND t2.epa_type = ''JUNCTION'') a where a.state1 > 0 AND a.state2 > 0 ORDER BY dist' ;
+
+			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+				VALUES (v_fid, 2, '413' ,concat('WARNING-413: There is/are ',v_count,' EPA connec(s) over other EPA nodes.'),v_count);
+
+				EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript) SELECT * FROM ('||v_querytext||') a';
+
+			ELSE
+				INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+				VALUES (v_fid, 1, '413','INFO: All EPA connecs are not on the same position than other EPA nodes.',v_count);
+			END IF;
+
+
+			RAISE NOTICE '4.2 - Check matcat_id for connec (414)';
+			SELECT count(*) INTO v_count FROM (SELECT * FROM cat_connec WHERE matcat_id IS NULL)a1;
+
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+				VALUES (v_fid, v_result_id, 3, '414',concat(
+				'ERROR-414: There is/are ',v_count,' register(s) with missed matcat_id on cat_connec table. This will crash inp exportations using PJOINT/CONNEC method.'),v_count);
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+				VALUES (v_fid, v_result_id , 1,  '414','INFO: No registers found without material on cat_connec table.');
+			END IF;	
+
+
+			RAISE NOTICE '4.3 - Check pjoint_id/pjoint_type on connecs (415)';
+			SELECT count(*) INTO v_count FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s 
+			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+				VALUES (v_fid, v_result_id, 3, '415',concat(
+				'ERROR-415: There is/are ',v_count,' connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
+				INSERT INTO anl_node (fid, node_id, descript, the_geom) 
+				SELECT 415, connec_id, 'Connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type', the_geom
+				FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s WHERE c.sector_id = s.sector_id AND cur_user=current_user 
+				AND pjoint_id IS NULL OR pjoint_type IS NULL)a;
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+				VALUES (v_fid, v_result_id , 1,  '415','INFO: No connecs found without pjoint_id or pjoint_type values.');
+			END IF;			
 		END IF;
 
 		RAISE NOTICE '5 - Check for demand type';	
@@ -666,12 +722,14 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom' 
 		) AS feature
 		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
-				UNION
+			UNION
 		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
 		        UNION
 		      SELECT node_id, fid, 'Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297
-				UNION
-		      SELECT node_id, fid, 'EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413) row
+			UNION
+		      SELECT node_id, fid, 'EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
+			UNION
+		      SELECT node_id, fid, 'Connec AS JUNCTION without pjoint', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 415) row
 		      ) features;
 
 		v_result := COALESCE(v_result, '[]'); 
@@ -686,13 +744,16 @@ BEGIN
 		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM 
-		(SELECT arc_id as id, fid, 'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139
+		FROM (
+		SELECT arc_id, fid, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		  UNION
-		 SELECT arc_id, fid, 'Dry arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid =232 
+		SELECT a.arc_id as id, a.fid, 'Disconnected arc'::text as descript, a.the_geom FROM anl_arc a
+		WHERE a.cur_user="current_user"() AND a.fid = 139
 		  UNION
-		 SELECT arc_id, fid, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
-		) row) features;
+		SELECT arc_id, fid, 'Dry arc'::text as descript, the_geom FROM anl_arc JOIN
+		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+		EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139) a USING (arc_id)
+		WHERE cur_user="current_user"() AND fid =232) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
