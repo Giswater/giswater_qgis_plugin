@@ -191,7 +191,7 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '5 - Check disconnected network';	
+	RAISE NOTICE '5 - Check disconnected network (139)';	
 
 	IF v_fid = 227 THEN
 	
@@ -276,7 +276,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 
-		RAISE NOTICE '6 - Check dry network';	
+		RAISE NOTICE '6 - Check dry network (232)';	
 		DELETE FROM temp_anlgraf;
 		v_cont = 0;
 
@@ -398,7 +398,7 @@ BEGIN
 		END IF;
 
 		-- counting arcs
-		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user;
+		SELECT count(*) FROM (SELECT arc_id FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user EXCEPT SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user)a;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING-232: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
