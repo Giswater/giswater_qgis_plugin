@@ -765,7 +765,10 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) 
 		VALUES (239, 4, 'Inp file data is stored on temp_csv table. To debug import process take a look on https://github.com/Giswater/giswater_dbmodel/wiki/import-inp-file-debug-mode');
 	END IF;
-	
+
+	-- check project (to initialize config_param_user among others)
+	PERFORM gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"filterFields":{}, "fid":101}}$$);
+
 	-- insert spacers on log
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
@@ -778,9 +781,6 @@ BEGIN
 	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-	-- check project (to initialize config_param_user among others)
-	PERFORM SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"filterFields":{}, "fid":101}}$$);
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
