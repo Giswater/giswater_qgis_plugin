@@ -50,6 +50,7 @@ BEGIN
 		v_record_a1.epa_type =  'VALVE';
 		v_record_a1.node_2 = v_record.node_id;
 		v_record_a1.length = v_record_a1.length/2;
+		v_record_a1.status = 'ACTIVE';
 		v_record_a1.the_geom := ST_LineSubstring(v_record_a1.the_geom,0.5,1);
 		v_record_a1.addparam = concat('{"pressure":0.01}');
 		INSERT INTO temp_arc	(result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam)
