@@ -599,3 +599,11 @@ DELETE FROM connec WHERE connec_id = '3175';
 -- fill missed data for connecs
 UPDATE v_edit_connec SET epa_type = 'JUNCTION';
 UPDATE connec SET sector_id = a.sector_id FROM arc a WHERE a.arc_id = connec.arc_id;
+
+UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id IN ('PVC', 'PE-HD', 'PE-LD');
+UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
+
+
+UPDATE inp_pump SET pump_type = 'PRESSPUMP' WHERE node_id = '113951';
+UPDATE inp_pump SET pump_type = 'FLOWPUMP' WHERE node_id = '1105';
+
