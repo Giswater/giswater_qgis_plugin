@@ -329,14 +329,17 @@ BEGIN
 			INSERT INTO man_manhole 
 			SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+
 			-- improve velocity for conduits using directly tables in spite of vi_conduits view
-			INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, elev1, elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
-			SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'CONDUIT', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
+			INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, elev1, elev2, sys_elev1, sys_elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type, slope) 
+			SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'CONDUIT', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO man_conduit(arc_id) SELECT csv1
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO inp_conduit (arc_id, q0, qmax) SELECT csv1, csv8::numeric(12,3), csv9::numeric(12,3)
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+
+			UPDATE arc SET sys_slope = (sys_elev1-sys_elev2)/st_length(the_geom);
 
 			-- insert other catalog tables
 			INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
@@ -565,6 +568,9 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) 
 		VALUES (239, 4, 'Inp file data is stored on temp_csv table. To debug import process take a look on https://github.com/Giswater/giswater_dbmodel/wiki/import-inp-file-debug-mode');
 	END IF;
+
+	-- check project (to initialize config_param_user among others)
+	PERFORM gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"filterFields":{}, "fid":101}}$$);
 
 	-- insert spacers on log
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
