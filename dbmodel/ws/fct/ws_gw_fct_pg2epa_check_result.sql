@@ -114,7 +114,7 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (159, 297) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (159, 297, 413, 415) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (297) AND cur_user=current_user;
 
 	-- get user parameters
@@ -256,18 +256,7 @@ BEGIN
 
 		RAISE NOTICE '4 - Check for network mode';
 		IF v_networkmode = 4 THEN
-
-			-- check demandtype only operative 2 (405)
-			IF v_demandtype::text != '2' THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-405: There export method only is operative with demandtype = CONNEC ESTIMATED'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat(
-				'INFO: The network exportation mode (PJOINT & CONNEC WITH ALL NODARCS) is compatible with demand type choosed (CONNEC ESTIMATED)'));
-			END IF;		
-
+		
 
 			RAISE NOTICE '4.1- Epa connecs over epa node (413)';
 			v_querytext = 'SELECT * FROM (
@@ -322,7 +311,29 @@ BEGIN
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '415','INFO: No connecs found without pjoint_id or pjoint_type values.');
-			END IF;			
+			END IF;
+			
+			RAISE NOTICE '4.4 check dint for cat_connec (400)';
+			SELECT count (*) INTO v_count FROM cat_connec where dint is null;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+				VALUES (v_fid, v_result_id, 3, '400', concat('ERROR-400: There is/are ',v_count,
+				' connec catalogs with null values on dint'),v_count);
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+				VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
+			END IF;
+	
+			RAISE NOTICE '4.5 check demandtype only operative 2 (405)';
+			IF v_demandtype::text != '2' THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 3, concat(
+				'ERROR-405: There export method only is operative with demandtype = CONNEC ESTIMATED'));
+			ELSE
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 1, concat(
+				'INFO: The network exportation mode (PJOINT & CONNEC WITH ALL NODARCS) is compatible with demand type choosed (CONNEC ESTIMATED)'));
+			END IF;
 		END IF;
 
 		RAISE NOTICE '5 - Check for demand type';	
@@ -667,22 +678,8 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
 
-	RAISE NOTICE '14- Dint for cat_connec (400)';
 
-	IF v_networkmode = 4 THEN
-	
-		SELECT count (*) INTO v_count FROM cat_connec where dint is null;
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '400', concat('ERROR-400: There is/are ',v_count,
-			' connec catalogs with null values on dint'),v_count);
-		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
-		END IF;
-	END IF;
-
-	RAISE NOTICE '15 - EPA Outlayer values (407)';
+	RAISE NOTICE '14 - EPA Outlayer values (407)';
 
 	-- elevation
 	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_node) a 
