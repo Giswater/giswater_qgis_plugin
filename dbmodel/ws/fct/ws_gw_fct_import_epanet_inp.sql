@@ -62,6 +62,9 @@ v_record record;
 v_epatype text;
 v_count_total integer;
 v_status text = 'Accepted';
+v_pumptype text;
+v_newnode text;
+v_oldarc text;
 
 BEGIN
 
@@ -174,6 +177,7 @@ BEGIN
 			DELETE FROM rpt_inp_arc;
 			DELETE FROM rpt_inp_node;
 			DELETE FROM rpt_cat_result;
+			DELETE FROM config_graf_inlet;
 		ELSE 
 			-- Disable constraints
 			PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
@@ -261,6 +265,11 @@ BEGIN
 			INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dma_id) DO NOTHING;
 			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
 			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (presszone_id) DO NOTHING;
+
+			INSERT INTO sector(sector_id,name) VALUES(-1,'Conflict') ON CONFLICT (sector_id) DO NOTHING;
+			INSERT INTO dma(dma_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (dma_id) DO NOTHING;
+			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (dqa_id) DO NOTHING;
+			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (presszone_id) DO NOTHING;
 
 			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
 			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1) ON CONFLICT (expl_id) DO NOTHING;
@@ -500,15 +509,27 @@ BEGIN
 					AND a.arc_id != n.arc_id)b
 				WHERE  b.arc_id = inp_valve_importinp.arc_id;
 
+				-- to_arc on pressurepump
+				UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
+					(select a.arc_id, n.arc_id AS to_arc from inp_pump_importinp 
+					JOIN arc a USING (arc_id) 
+					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_pump_importinp WHERE substring(reverse(arc_id),0,4) ~ '^\d+$')
+					AND a.arc_id != n.arc_id)b
+				WHERE  b.arc_id = inp_pump_importinp.arc_id;
 
-				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a'
+				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a' OR arc_id like '%_n2a_5'
 				LOOP
-					-- transforming epa_type
 					IF v_data.epa_type = 'VALVE-IMPORTINP' THEN 
 						v_nodecat = (SELECT valv_type FROM inp_valve_importinp WHERE arc_id = v_data.arc_id);
 						v_epatype = 'VALVE';
 						
 					ELSIF v_data.epa_type = 'PUMP-IMPORTINP' THEN 
+						IF v_data.arc_id like '%_n2a_5' THEN 
+							v_pumptype  = 'PRESSPUMP';	
+						ELSE 
+							v_pumptype  = 'FLOWPUMP';
+						END IF;
 						v_nodecat = 'PUMP';
 						v_epatype = 'PUMP';
 					ELSE 
@@ -519,10 +540,7 @@ BEGIN
 					-- getting man_table to work with
 					SELECT type, epa_table INTO v_mantype, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id 
 					WHERE epa_default = v_epatype;
-
-					-- defining new node parameters
-					v_node_id = replace(v_data.arc_id, '_n2a', '');
-							
+					
 					-- defining geometry of new node
 					SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 					FOR rpt_rec IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid and source='[VERTICES]' AND csv1=v_data.arc_id order by id
@@ -541,14 +559,18 @@ BEGIN
 					-- point geometry
 					v_thegeom=ST_LineInterpolatePoint(v_thegeom, 0.5);
 
+					-- defining new node parameters
+					v_node_id = replace(v_data.arc_id, '_n2a_5', '');
+					v_node_id = replace(v_node_id, '_n2a', '');
+
 					-- Introducing new node transforming line into point
 					INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_epatype,1,1,1,1,2, v_thegeom) ;
 
 					EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 					IF v_epatablename = 'inp_pump' THEN
-						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue, to_arc)
-						SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, pump_type)
+						SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
@@ -575,8 +597,8 @@ BEGIN
 							
 					-- update elevation of new node
 					UPDATE node SET elevation = v_elevation WHERE node_id=v_node_id;
-
-				END LOOP;
+					
+				END LOOP;			
 		
 				-- to_arc on shortpipes
 				UPDATE inp_shortpipe SET to_arc = b.to_arc FROM
@@ -595,14 +617,14 @@ BEGIN
 				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
 				(substring(reverse(arc_id),0,2))::integer,
 				power, curve_id, speed, pattern, status, energyparam, energyvalue
-				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$';
+				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
 				-- update state=0 pump additionals 
 				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_pump_importinp);
 							
 				-- delete objects
-				DELETE FROM inp_pump_importinp;
-				DELETE FROM inp_valve_importinp;
+				--DELETE FROM inp_pump_importinp;
+				--DELETE FROM inp_valve_importinp;
 				DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_';
 
 				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 
@@ -658,9 +680,20 @@ BEGIN
 
 			IF v_isgwproject THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 
+				-- reconnect presspumps
+				FOR v_node_id, v_newnode, v_oldarc IN SELECT  node_id, replace (node_id, '_n2a_2', ''), replace (node_id, '_n2a_2', '_n2a_4') FROM node where substring(reverse(node_id),1,2) = '2_'
+				LOOP
+					UPDATE arc SET node_1=v_newnode WHERE node_1=v_node_id;
+					UPDATE arc SET node_2=v_newnode WHERE node_2=v_node_id;
+					DELETE FROM node WHERE node_id = v_node_id;
+					DELETE FROM arc WHERE arc_id = v_oldarc;
+					
+					UPDATE node SET the_geom = the_geom WHERE node_id = v_newnode;
+				END LOOP;
+
 				-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
 				UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='edit_arc_searchnodes';
-
+				
 				-- delete old nodes
 				UPDATE arc SET node_1=null where node_1 IN (SELECT node_id FROM node WHERE state=0);
 				UPDATE arc SET node_2=null where node_2 IN (SELECT node_id FROM node WHERE state=0);
@@ -721,6 +754,8 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
 
+			UPDATE inp_pump SET status ='OPEN' WHERE status is null;
+
 		END IF;
 
 	ELSE
@@ -744,6 +779,8 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
+	-- check project (to initialize config_param_user among others)
+	PERFORM SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"filterFields":{}, "fid":101}}$$);
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -770,6 +807,7 @@ BEGIN
 		{"message":'||to_json(v_error_context)||'},
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 	
 END;
 $BODY$
