@@ -51,9 +51,8 @@ BEGIN
     RAISE NOTICE 'Starting additional pumps process.';
 	
 	--  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional JOIN temp_arc ON concat(node_id,'_n2a')=arc_id)
+    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'FLOWPUMP')
     LOOP
-
 		SELECT * INTO arc_rec FROM temp_arc WHERE arc_id=concat(node_id_aux,'_n2a');
 
 		-- Loop for additional pumps
@@ -73,7 +72,7 @@ BEGIN
 				angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))-1.57;
 			end if;
 
-            pump_order = (pump_rec.order_id);
+			pump_order = (pump_rec.order_id);
 
 			-- Copiyng values from patter arc
 			record_new_arc.node_1 = arc_rec.node_1;
