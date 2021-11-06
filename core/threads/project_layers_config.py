@@ -202,6 +202,7 @@ class GwProjectLayersConfig(GwTask):
                             vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
                             vr_key_column = value_relation['keyColumn']  # Get 'Key'
                             vr_value_column = value_relation['valueColumn']  # Get 'Value'
+	                        vr_allow_nullvalue = value_relation['nullValue']  # Get null values
                             vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
                             if vr_filter_expression is None:
                                 vr_filter_expression = ''
@@ -210,6 +211,7 @@ class GwProjectLayersConfig(GwTask):
                             editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
                                                                                          'Key': f'{vr_key_column}',
                                                                                          'Value': f'{vr_value_column}',
+                                                                                         'AllowNull': f'{vr_allow_nullvalue}',
                                                                                          'FilterExpression': f'{vr_filter_expression}'})
                             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                         except Exception as e:
