@@ -112,27 +112,27 @@ INSERT INTO connec_type VALUES ('PONTO_IRRIGACAO', 'GREENTAP', 'man_greentap', T
 
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO element_type VALUES ('REGISTER', true, true, 'REGISTER', NULL);
-INSERT INTO element_type VALUES ('MANHOLE', true, true, 'MANHOLE', NULL);
-INSERT INTO element_type VALUES ('COVER', true, true, 'COVER', NULL);
-INSERT INTO element_type VALUES ('STEP', true, true, 'STEP', NULL);
-INSERT INTO element_type VALUES ('PROTECT_BAND', true, true, 'PROTECT BAND', NULL);
-INSERT INTO element_type VALUES ('HYDRANT_PLATE', true, true, 'HYDRANT_PLATE', NULL);
+INSERT INTO element_type VALUES ('REGISTRO', true, true, 'REGISTRO', NULL);
+INSERT INTO element_type VALUES ('PV', true, true, 'PV', NULL);
+INSERT INTO element_type VALUES ('CAPA', true, true, 'CAPA', NULL);
+INSERT INTO element_type VALUES ('BATENTE', true, true, 'BATENTE', NULL);
+INSERT INTO element_type VALUES ('PROTECAO_DE_BANDA', true, true, 'PROTECAO DE BANDA', NULL);
+INSERT INTO element_type VALUES ('PLACA_HIDRANTE', true, true, 'PLACA_HIDRANTE', NULL);
 
 -- Records of mincut
 -- ----------------------------
 INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA_PARADA');
 
-INSERT INTO anl_mincut_cat_cause VALUES ('Accidental', NULL);
-INSERT INTO anl_mincut_cat_cause VALUES ('Planified', NULL);
+INSERT INTO anl_mincut_cat_cause VALUES ('Acidental', NULL);
+INSERT INTO anl_mincut_cat_cause VALUES ('Planejado', NULL);
 
-INSERT INTO anl_mincut_cat_class VALUES (1, 'Network mincut', NULL);
-INSERT INTO anl_mincut_cat_class VALUES (2, 'Connec mincut', NULL);
-INSERT INTO anl_mincut_cat_class VALUES (3, 'Hydrometer mincut', NULL);
+INSERT INTO anl_mincut_cat_class VALUES (1, 'Corte na Rede', NULL);
+INSERT INTO anl_mincut_cat_class VALUES (2, 'Corte em Ligacao Predial', NULL);
+INSERT INTO anl_mincut_cat_class VALUES (3, 'Corte em hidrometro', NULL);
 
-INSERT INTO anl_mincut_cat_state VALUES (1, 'In Progress', NULL);
-INSERT INTO anl_mincut_cat_state VALUES (2, 'Finished', NULL);
-INSERT INTO anl_mincut_cat_state VALUES (0, 'Planified', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (1, 'Em Andamento', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (2, 'Finalizado', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (0, 'Planejado', NULL);
 
 
 INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
