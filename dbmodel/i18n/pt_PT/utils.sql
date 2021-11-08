@@ -59,9 +59,9 @@ INSERT INTO price_value_unit VALUES ('t');
 
 -- Records of value_priority
 -- ----------------------------
-INSERT INTO value_priority VALUES ('PRIORIDADE ALTA');
-INSERT INTO value_priority VALUES ('PRIORIDADE NORMAL');
-INSERT INTO value_priority VALUES ('PRIORIDADE BAIXA');
+INSERT INTO value_priority VALUES ('ALTA');
+INSERT INTO value_priority VALUES ('NORMAL');
+INSERT INTO value_priority VALUES ('BAIXA');
 
 -- Records of plan_result_type
 -- ----------------------------
