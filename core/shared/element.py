@@ -289,7 +289,12 @@ class GwElement:
     def _set_default_values(self):
         """ Set default values """
 
-        self._manage_combo(self.dlg_add_element.element_type, 'edit_elementcat_vdefault')
+        row = tools_gw.get_config_value("edit_elementcat_vdefault")
+        if row:
+            sql = f"SELECT elementtype_id, elementtype_id FROM cat_element WHERE id = '{row[0]}'"
+            element_type = tools_db.get_row(sql)
+            tools_qt.set_combo_value(self.dlg_add_element.element_type, element_type[0], 0)
+
         self._manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
         self._manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self._manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
