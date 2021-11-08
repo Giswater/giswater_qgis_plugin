@@ -61,6 +61,9 @@ class GwArcAddButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
+        # Update featurecatvalues
+        global_vars.feature_cat = tools_gw.manage_feature_cat()
+
         # Get list of different arc types
         features_cat = global_vars.feature_cat
         if features_cat is not None:
