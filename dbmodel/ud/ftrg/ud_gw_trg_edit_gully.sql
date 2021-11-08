@@ -770,7 +770,7 @@ BEGIN
 			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id, connec_arccat_id = NEW.connec_arccat_id, gratecat2_id = NEW.gratecat2_id
+			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id
 			WHERE gully_id = OLD.gully_id;
 
 		END IF;
