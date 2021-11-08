@@ -342,10 +342,6 @@ BEGIN
 			INSERT INTO inp_conduit (arc_id, q0, qmax) SELECT csv1, csv8::numeric(12,3), csv9::numeric(12,3)
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
-			-- update arc values
-			UPDATE arc SET sys_elev1 = elev1, sys_elev2 = elev2;
-			UPDATE arc SET sys_slope = (elev1-elev2)/st_length(the_geom) WHERE st_length(the_geom) > 0.001;
-
 			-- insert other catalog tables
 			INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
@@ -414,11 +410,15 @@ BEGIN
 			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
 			IF v_linkoffsets != 'ELEVATION' THEN
 				UPDATE arc SET elev1 = b.a1,  elev2 = b.a2 FROM 
-				(SELECT a.arc_id, n1.sys_elev - elev1 AS a1, n2.sys_elev - elev2 AS a2 FROM arc a 
+				(SELECT a.arc_id, n1.sys_elev + elev1 AS a1, n2.sys_elev + elev2 AS a2 FROM arc a 
 				JOIN v_edit_node n1 ON n1.node_id = node_1 
 				JOIN v_edit_node n2 ON n2.node_id = node_2) b
 				WHERE b.arc_id = arc.arc_id;
 			END IF;
+
+			-- update arc values
+			UPDATE arc SET sys_elev1 = elev1, sys_elev2 = elev2;
+			UPDATE arc SET sys_slope = (elev1-elev2)/st_length(the_geom) WHERE st_length(the_geom) > 0.001;
 
 			-- update coordinates
 			UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)
