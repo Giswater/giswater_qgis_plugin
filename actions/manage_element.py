@@ -197,8 +197,13 @@ class ManageElement(ParentManage):
 
     def set_default_values(self):
         """ Set default values """
+        
+        row = self.controller.get_config("edit_elementcat_vdefault")
+        if row:
+            sql = f"SELECT elementtype_id, elementtype_id FROM cat_element WHERE id = '{row[0]}'"
+            element_type = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.dlg_add_element.element_type, element_type[0], 0)
 
-        self.manage_combo(self.dlg_add_element.element_type, 'edit_elementcat_vdefault')
         self.manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
         self.manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
         self.manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
