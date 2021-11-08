@@ -23,7 +23,7 @@ SELECT gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,187,188,196,197,201,202,203,204,205,257,296,372
+	other: 104,187,188,196,197,201,202,203,204,205,257,296,372,417,418,419
 
 */
 
@@ -76,8 +76,8 @@ BEGIN
 	
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103, 196, 197, 188, 223,202,372 );
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187, 202, 296);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187,202,296);
 	DELETE FROM temp_arc;
 
 	-- Starting process
@@ -883,13 +883,13 @@ BEGIN
 	-- update node_1
 	UPDATE temp_arc t SET node_1 = node_id, state = 9 FROM (
 	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
-	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.10) group by 1,2 ORDER BY 1 DESC,3 DESC
+	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
 	)a where t.arc_id = a.arc_id AND t.node_1 != a.node_id;
 	
 	--update node_2
 	UPDATE temp_arc t SET node_2 = node_id, state = 9 FROM (
 	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_endpoint(arc.the_geom))) as d FROM node, arc 
-	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.10) group by 1,2 ORDER BY 1 DESC,3 DESC
+	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
 	)a where t.arc_id = a.arc_id AND t.node_2 != a.node_id;
 
 	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 9'
@@ -955,6 +955,69 @@ BEGIN
 	END IF;
 
 
+	RAISE NOTICE '34 - Check operative links with wrong topology (417, 418)';
+
+	-- connec_id (417)
+	DELETE FROM temp_arc;
+	INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state) SELECT link_id, feature_id, '417', sector_id, state FROM v_edit_link WHERE state > 0 and feature_type = 'CONNEC';
+
+	UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
+	SELECT link.link_id, connec.connec_id, (ST_Distance(connec.the_geom, ST_startpoint(link.the_geom))) as d FROM connec, link 
+	WHERE link.state = 1 and connec.state = 1 and ST_DWithin(ST_startpoint(link.the_geom), connec.the_geom, 0.05) group by 1,2 ORDER BY 1 DESC,3 DESC
+	)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
+
+	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 1'
+	INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
+		SELECT 417, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with connec '',t.node_1), t.the_geom, a.expl_id 
+		FROM temp_arc t JOIN v_edit_connec a ON node_1 = connec_id WHERE t.state = 1';
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '417', concat('ERROR-417: There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec)'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '417','INFO: All connec links has connec on startpoint',v_count);
+	END IF;
+
+	-- gullys (418)
+	IF v_project_type = 'UD' THEN
+		DELETE FROM temp_arc;
+		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state) SELECT link_id, feature_id, '418', sector_id, state FROM v_edit_link WHERE state > 0 and feature_type = 'GULLY' ;
+
+		UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
+		SELECT link.link_id, gully.gully_id, (ST_Distance(gully.the_geom, ST_startpoint(link.the_geom))) as d FROM gully, link 
+		WHERE link.state = 1 and gully.state = 1 and ST_DWithin(ST_startpoint(link.the_geom), gully.the_geom, 0.05) group by 1,2 ORDER BY 1 DESC,3 DESC
+		)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
+
+		EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 1'
+		INTO v_count;
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
+			SELECT 418, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with gully '',t.node_1), t.the_geom, a.expl_id 
+			FROM temp_arc t JOIN v_edit_gully a ON node_1 = gully_id WHERE t.state = 1';
+			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+			VALUES (125, 3, '418', concat('ERROR-418: There is/are ',v_count,' links related to gully with wrong topology, startpoint does not fit gully)'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+			VALUES (125, 1, '418','INFO: All gully links has gully on startpoint',v_count);
+		END IF;
+	END IF;
+
+	RAISE NOTICE '35 - Check hydrometer related to more than one connec (419)';
+	v_querytext = 'SELECT hydrometer_id, count(*) FROM v_rtc_hydrometer  group by hydrometer_id having count(*)> 1 ';
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+	INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 2, '419', concat('WARNING-419: There is/are ',v_count,' hydrometer related to more than one connec.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 2, '419', concat('HINT-419: Type ''SELECT hydrometer_id, count(*) FROM v_rtc_hydrometer  group by hydrometer_id having count(*)> 1'''),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '419','INFO: All hydrometeres are related to a unique connec',v_count);
+	END IF;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');
@@ -1002,7 +1065,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
@@ -1037,7 +1100,6 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
 
 END;
 $BODY$
