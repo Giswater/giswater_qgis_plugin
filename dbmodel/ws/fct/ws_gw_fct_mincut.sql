@@ -317,7 +317,8 @@ BEGIN
 	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
 	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	WHERE result_id=result_id_arg AND is_operative=TRUE;
+	JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
+	WHERE result_id=result_id_arg AND is_operative=TRUE AND v_rtc_hydrometer.connec_id=om_mincut_connec.connec_id;
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
@@ -401,7 +402,7 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json; 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json; 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
