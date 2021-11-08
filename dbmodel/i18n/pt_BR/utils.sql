@@ -9,43 +9,43 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Records of value_state
 -- ----------------------------
-INSERT INTO "value_state" VALUES (0,'OBSOLETE');
-INSERT INTO "value_state" VALUES (1,'ON_SERVICE');
-INSERT INTO "value_state" VALUES (2,'PLANIFIED');
+INSERT INTO "value_state" VALUES (0,'OBSOLETO');
+INSERT INTO "value_state" VALUES (1,'EM SERVICO');
+INSERT INTO "value_state" VALUES (2,'PLANIFICADO');
 
 -- Records of value_state_type
 -- ----------------------------
-INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETE', false, false);
-INSERT INTO value_state_type VALUES (2, 1, 'ON_SERVICE', true, true);
-INSERT INTO value_state_type VALUES (3, 2, 'PLANIFIED', true, true);
-INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUCT', true, false);
-INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
+INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETO', false, false);
+INSERT INTO value_state_type VALUES (2, 1, 'EM SERVICO', true, true);
+INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICADO', true, true);
+INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIR', true, false);
+INSERT INTO value_state_type VALUES (5, 1, 'PROVISORIO', false, true);
 
 -- Records of value_verified
 -- ----------------------------
-INSERT INTO "value_verified" VALUES ('TO REVIEW');
-INSERT INTO "value_verified" VALUES ('VERIFIED');
+INSERT INTO "value_verified" VALUES ('REVER');
+INSERT INTO "value_verified" VALUES ('VERIFICADO');
 
 -- Records of value_yesno
 -- ----------------------------
-INSERT INTO "value_yesno" VALUES ('NO');
-INSERT INTO "value_yesno" VALUES ('YES');
+INSERT INTO "value_yesno" VALUES ('NAO');
+INSERT INTO "value_yesno" VALUES ('SIM');
 
 -- Records of event om_visit_parameter_type table
 -- ----------------------------
-INSERT INTO om_visit_parameter_type VALUES ('INSPECTION');
-INSERT INTO om_visit_parameter_type VALUES ('REHABIT');
-INSERT INTO om_visit_parameter_type VALUES ('RECONST');
-INSERT INTO om_visit_parameter_type VALUES ('OTHER');
+INSERT INTO om_visit_parameter_type VALUES ('INSPECAO');
+INSERT INTO om_visit_parameter_type VALUES ('REHABILITACAO');
+INSERT INTO om_visit_parameter_type VALUES ('RECONSTRUCAO');
+INSERT INTO om_visit_parameter_type VALUES ('OUTRO');
 
 
 -- Records of doc type table
 -- ----------------------------
 INSERT INTO doc_type VALUES ('AS_BUILT');
-INSERT INTO doc_type VALUES ('INCIDENT');
-INSERT INTO doc_type VALUES ('WORK RAPPORT');
-INSERT INTO doc_type VALUES ('OTHER');
-INSERT INTO doc_type VALUES ('PICTURE');
+INSERT INTO doc_type VALUES ('INCIDENTE');
+INSERT INTO doc_type VALUES ('RELATORIO DE TRABALHO');
+INSERT INTO doc_type VALUES ('OUTRO');
+INSERT INTO doc_type VALUES ('FOTOGRAFIA');
 
 -- Records of price_value_unit
 -- ----------------------------
@@ -59,36 +59,36 @@ INSERT INTO price_value_unit VALUES ('t');
 
 -- Records of value_priority
 -- ----------------------------
-INSERT INTO value_priority VALUES ('HIGH_PRIORITY');
-INSERT INTO value_priority VALUES ('NORMAL_PRIORITY');
-INSERT INTO value_priority VALUES ('LOW_PRIORITY');
+INSERT INTO value_priority VALUES ('PRIORIDADE ALTA');
+INSERT INTO value_priority VALUES ('PRIORIDADE NORMAL');
+INSERT INTO value_priority VALUES ('PRIORIDADE BAIXA');
 
 -- Records of plan_result_type
 -- ----------------------------
-INSERT INTO plan_result_type VALUES (1,'Reconstruction');
-INSERT INTO plan_result_type VALUES (2,'Rehabilitation');
+INSERT INTO plan_result_type VALUES (1,'Reconstrucao');
+INSERT INTO plan_result_type VALUES (2,'Rehabilitacao');
 
 -- Records of plan_psector_cat_type
 -- ----------------------------
-INSERT INTO plan_psector_cat_type VALUES (1,'Planified');
+INSERT INTO plan_psector_cat_type VALUES (1,'Planificado');
 
 -- Records of om_psector_cat_type
 -- ----------------------------
-INSERT INTO om_psector_cat_type VALUES (1,'Reconstruction');
-INSERT INTO om_psector_cat_type VALUES (2,'Rehabilitation');
+INSERT INTO om_psector_cat_type VALUES (1,'Reconstrucao');
+INSERT INTO om_psector_cat_type VALUES (2,'Rehabilitacao');
 
 -- Records of value_review_validation table
 -- ----------------------------
-INSERT INTO value_review_validation VALUES (0, 'Rejected');
-INSERT INTO value_review_validation VALUES (1, 'Accepted');
-INSERT INTO value_review_validation VALUES (2, 'To review');
+INSERT INTO value_review_validation VALUES (0, 'Rejeitado');
+INSERT INTO value_review_validation VALUES (1, 'Aceite');
+INSERT INTO value_review_validation VALUES (2, 'Rever');
 
 -- Records of value_review_status table
 -- ----------------------------
-INSERT INTO value_review_status VALUES (0, 'There are no changes above or below the tolerance values', 'No changes');
-INSERT INTO value_review_status VALUES (1, 'New element inserted in the review', 'new element');
-INSERT INTO value_review_status VALUES (2, 'Geometry modified in the review. Other data can also be modified', 'Geometry modified');
-INSERT INTO value_review_status VALUES (3, 'Changes in the data, not in the geometry', 'Data modified');
+INSERT INTO value_review_status VALUES (0, 'Nao ha alteracoes acima ou abaixo dos valores de tolerancia', 'Sem alteracoes');
+INSERT INTO value_review_status VALUES (1, 'Novo elemento inserido na revisao', 'novo elemento');
+INSERT INTO value_review_status VALUES (2, 'Geometria modificada na revisao. Outros dados tambem podem ser modificados', 'Geometria modificada');
+INSERT INTO value_review_status VALUES (3, 'Mudancas nos dados, nao na geometria', 'Dados modificados');
 
 -- Records of sys_csv2pg_cat table
 -- ----------------------------
