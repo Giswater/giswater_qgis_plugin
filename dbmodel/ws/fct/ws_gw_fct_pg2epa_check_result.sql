@@ -686,7 +686,7 @@ BEGIN
 	WHERE elev < (v_outlayer_elevation->>'min')::float OR elev > (v_outlayer_elevation->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '407', concat('ERROR-407: There is/are ',v_count,' node(s) with otulayer values on elevation column'),v_count);
+		VALUES (v_fid, v_result_id, 3, '407', concat('ERROR-407: There is/are ',v_count,' node(s) with outlayer values on elevation column'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All nodes has elevation without outlayer values.'),v_count);
