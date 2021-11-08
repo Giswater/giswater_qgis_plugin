@@ -749,7 +749,7 @@ class GwProfileButton(GwAction):
                  verticalalignment='center')
 
         # Print title
-        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
