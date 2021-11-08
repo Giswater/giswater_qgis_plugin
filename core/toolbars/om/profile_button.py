@@ -406,11 +406,6 @@ class GwProfileButton(GwAction):
                     self.id_list = [i.id() for i in it]
                     self.layer_arc.selectByIds(self.id_list)
 
-                    # Set default value if no title is given
-                    if tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False) in (None, 'null', ''):
-                        tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                                 f"PROFILE {self.initNode} - {self.endNode}")
-
                     # Set action pan
                     self.iface.actionPan().trigger()
 
@@ -750,6 +745,9 @@ class GwProfileButton(GwAction):
 
         # Print title
         title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
+        # Set default value if no title is given
+        if title in ('', None):
+            title = f"PROFILE {self.initNode} - {self.endNode}"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
