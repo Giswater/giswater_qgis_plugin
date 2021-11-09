@@ -10,18 +10,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/09
 
-SELECT 
-CASE WHEN (select lower(value) from config_param_system where parameter = 'admin_utils_schema') ='false' THEN
-gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_rtc_hydrometer_x_connec","v_ui_hydrometer","vi_parent_hydrometer","v_rtc_hydrometer"], 
-"action":"SAVE-VIEW","hasChilds":"False"}}$$)
-end;
+"action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_hydrometer", "column":"plot_code", "dataType":"varchar(30)", "type":"VARCHAR(30)", "isUtils":"True"}}$$);
 
-SELECT 
-CASE WHEN (select lower(value) from config_param_system where parameter = 'admin_utils_schema') ='false' THEN
-gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_rtc_hydrometer", "vi_parent_hydrometer", "v_rtc_hydrometer_x_connec","v_ui_hydrometer"], 
-"action":"RESTORE-VIEW","hasChilds":"False"}}$$)
-end;
+"action":"RESTORE-VIEW","hasChilds":"False"}}$$);

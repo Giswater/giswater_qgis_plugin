@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue_"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"addvalue"}}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"addvalue", "type":"VARCHAR(30)"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"addvalue", "dataType":"varchar(16)}}$$)
 
 */
 
@@ -52,7 +52,6 @@ BEGIN
 	v_datatype = (p_data->>'data')::json->>'dataType';
 	v_isutils = (p_data->>'data')::json->>'isUtils';
 	v_newname = (p_data->>'data')::json->>'newName';
-	v_type = (p_data->>'data')::json->>'type';
 
 	-- manage utils schema
 	IF v_isutils THEN
@@ -84,7 +83,7 @@ BEGIN
 
 	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL THEN
 
-		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_type||' USING '||quote_ident(v_column)||'::'||v_type;
+		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
 		EXECUTE v_querytext;
 	ELSE 
 		RAISE NOTICE 'Process not executed. Check data';
