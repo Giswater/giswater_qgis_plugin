@@ -39,7 +39,7 @@ BEGIN
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id, vnode_id, locate,
 	case when vnode_elevation is null then (n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3) ELSE vnode_elevation END as elevation,
-	(CASE WHEN (n1.depth - locate*(n1.depth-n1.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n1.depth)) END)::numeric (12,3) as depth
+	(CASE WHEN (n1.depth - locate*(n1.depth-n2.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n2.depth)) END)::numeric (12,3) as depth
 	FROM (
 		SELECT  vnode_id, arc_id, locate, vnode_elevation
 
