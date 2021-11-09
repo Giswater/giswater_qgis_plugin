@@ -39,7 +39,7 @@ BEGIN
 
 	-- getting parameters
 	IF (SELECT 1 FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name='config_function' AND column_name='returnmanager') = 1 THEN
-		IF p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT style FROM config_function where id = p_fnumber); END IF;
+		IF p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT returnmanager FROM config_function where id = p_fnumber); END IF;
 	ELSE
 		IF p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT style FROM config_function where id = p_fnumber); END IF;
 	END IF;
