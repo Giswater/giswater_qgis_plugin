@@ -220,8 +220,6 @@ BEGIN
 	END IF;
 
 	-- when delete network is enabled (variable of inp_options_debug)
-
-			
 	RAISE NOTICE '20- update values from inp_*_importinp tables';
 	UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
 	addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
@@ -238,8 +236,8 @@ BEGIN
 	RAISE NOTICE '23 - Profilactic last control';
 
 	-- arcs without nodes
-	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
-	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
+	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a LEFT JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
+	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a LEFT JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
 
 	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
 	SELECT v_fid, arc_id, 'ARC', '23 - Profilactic last delete' FROM temp_arc WHERE epa_type  ='TODELETE';

@@ -38,19 +38,19 @@ BEGIN
 	RAISE NOTICE '2 - insert data on temp_table';
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id, vnode_id, locate,
-	(n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3),
+	case when vnode_elevation is null then (n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3) ELSE vnode_elevation END as elevation,
 	(CASE WHEN (n1.depth - locate*(n1.depth-n1.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n1.depth)) END)::numeric (12,3) as depth
 	FROM (
-		SELECT  vnode_id, arc_id, locate
+		SELECT  vnode_id, arc_id, locate, vnode_elevation
 
 			-- select node_1 and node_2 (locate 0 & 1)
 			FROM (
-				SELECT node_1 as vnode_id, arc_id,  0 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK')
+				SELECT node_1 as vnode_id, arc_id,  0 as locate, null::numeric as vnode_elevation FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK')
 				)z
 		UNION
-			SELECT  vnode_id, arc_id, locate
+			SELECT  vnode_id, arc_id, locate, elevation
 			FROM (
-			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') 
+			SELECT node_2 as vnode_id, arc_id,  1 as locate, null::numeric as elevation FROM temp_arc WHERE arc_type NOT IN ('NODE2ARC', 'LINK') 
 				)z
 		UNION	
 			-- real vnode coming from link
@@ -59,7 +59,8 @@ BEGIN
 			case 	
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
-				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
+				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate,
+			a.vnode_topelev as elevation
 			FROM temp_arc , v_vnode AS vnode
 			JOIN link a ON vnode_id=exit_id::integer
 			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND a.state > 0
@@ -70,7 +71,8 @@ BEGIN
 			case 	
 				when st_linelocatepoint (temp_arc.the_geom , geom_point) > 0.9999 then 0.9999
 				when st_linelocatepoint (temp_arc.the_geom , geom_point) < 0.0001 then 0.0001
-				else (st_linelocatepoint (temp_arc.the_geom , geom_point))::numeric(12,4) end as locate
+				else (st_linelocatepoint (temp_arc.the_geom , geom_point))::numeric(12,4) end as locate,
+			null::numeric as elevation
 			FROM temp_arc , temp_table
 			WHERE st_dwithin ( temp_arc.the_geom, geom_point, 0.01) 
 			AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_arc.state > 0
@@ -81,7 +83,8 @@ BEGIN
 			case 	
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
-				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
+				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate,
+			vnode.elevation
 			FROM temp_arc , temp_node AS vnode
 			WHERE node_type = 'CONNEC' AND st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) 
 			AND vnode.state > 0 AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK')
@@ -92,7 +95,8 @@ BEGIN
 	ORDER BY arc_id, locate;
 
 	-- delete connec over arcs
-	DELETE FROM temp_node WHERE node_type = 'CONNEC'; 
+	UPDATE temp_node SET epa_type = 'TODELETE' FROM v_edit_arc arc WHERE node_type = 'CONNEC' AND st_dwithin ( arc.the_geom, temp_node.the_geom, 0.01);
+	DELETE FROM temp_node WHERE epa_type = 'TODELETE';
 
 	RAISE NOTICE 'new nodes on temp_node table ';
 	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
