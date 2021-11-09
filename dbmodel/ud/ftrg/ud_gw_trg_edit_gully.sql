@@ -104,7 +104,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- Gully ID
-		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) THEN
+		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
 			NEW.gully_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 		

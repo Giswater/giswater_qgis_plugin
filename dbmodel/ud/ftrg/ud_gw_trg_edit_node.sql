@@ -159,8 +159,11 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- Node ID
-		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) OR node_id IS NULL THEN
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+		
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 		
 		-- get sys type for parent table
