@@ -39,6 +39,9 @@ def set_style_mapzones(**kwargs):
 
 
 def add_query_layer(**kwargs):
+    """ Create and add a QueryLayer to ToC """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
     query = kwargs['query']
     layer_name = kwargs['layerName'] if 'layerName' in kwargs else 'QueryLayer'
     group = kwargs['group'] if 'group' in kwargs else 'GW Layers'
