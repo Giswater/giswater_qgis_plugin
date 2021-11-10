@@ -13,3 +13,6 @@ VALUES (417, 'Links without connec on startpoint','utils', null, null) ON CONFLI
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (419, 'Duplicated hydrometer related to more than one connec','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+
+--2021/11/10
+UPDATE sys_function SET descript ='Check topology assistant. Helps user to identify nodes connected with more/less arcs compared to num_arcs field of cat_feature_node table' WHERE id IN (2212, 2302);
