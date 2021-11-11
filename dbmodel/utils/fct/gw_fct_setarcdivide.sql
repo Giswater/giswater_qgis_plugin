@@ -231,11 +231,6 @@ BEGIN
 						END IF;
 					END IF;
 
-					-- reset the urn
-					IF (SELECT gw_fct_setvalurn()) > (SELECT last_value::integer FROM urn_id_seq) THEN
-						PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-					END IF;
-
 					-- Get arc data
 					SELECT * INTO rec_aux1 FROM arc WHERE arc_id = v_arc_id;
 					SELECT * INTO rec_aux2 FROM arc WHERE arc_id = v_arc_id;

@@ -40,7 +40,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_table = 'inp_curve' THEN
-			UPDATE inp_curve SET curve_type=NEW.curve_type, descript=NEW.descript, sector_id=NEW.sector_id
+			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, sector_id=NEW.sector_id
 			WHERE id=OLD.id;
 
 		ELSIF v_table = 'inp_curve_value' THEN

@@ -478,7 +478,6 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 				
-				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
@@ -726,7 +725,6 @@ BEGIN
 						p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 						INTO v_the_geom_pol;
 
-					PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 					v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
 					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN

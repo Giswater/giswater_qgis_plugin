@@ -81,8 +81,6 @@ BEGIN
 	
 	v_type_man_table=v_man_table;
 	
-	
-
 	--Get data from config table
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_edit_node_reduction_auto_d1d2 = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');

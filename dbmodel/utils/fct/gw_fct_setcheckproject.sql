@@ -208,39 +208,15 @@ BEGIN
 	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
 		
 	
-	-- Reset urn sequence
-	IF v_project_type='WS' THEN
-		SELECT GREATEST (
-		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
-		) INTO v_max_seq_id;
-	ELSIF v_project_type='UD' THEN
-		SELECT GREATEST (
-		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(gully_id::int8) FROM gully WHERE gully_id ~ '^\d+$'),
-		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
-		) INTO v_max_seq_id;
-	END IF;	
-
 	v_errortext=concat('Logged as ', current_user,' on ', now());
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
+	/*
 	IF v_max_seq_id IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
 	END IF;
-	
-	-- Special cases (doc_seq. inp_vertice_seq)
-	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into v_max_seq_id;
-	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||v_max_seq_id||', true)';
-	END IF;
+	*/
 	
 	--Set hydrology_selector when null values from user
 	IF v_project_type='UD' THEN

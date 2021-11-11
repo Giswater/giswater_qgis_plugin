@@ -41,8 +41,6 @@ BEGIN
 			
 		-- dimension_id
 		IF (NEW.id IS NULL) THEN
-			SELECT max(id) INTO dimensions_id_seq FROM dimensions;
-			PERFORM setval('dimensions_id_seq',dimensions_id_seq,true);
 			NEW.id:= (SELECT nextval('dimensions_id_seq'));
 		END IF;
 		

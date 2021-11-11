@@ -207,12 +207,7 @@ BEGIN
 
 		v_id := v_old_feature_id;
 	ELSE
-	
-		-- reset the urn
-		IF (SELECT gw_fct_setvalurn()) > (SELECT last_value::integer FROM urn_id_seq) THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-		END IF;
-	
+		
 		-- new feature_id
 		v_id := (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 

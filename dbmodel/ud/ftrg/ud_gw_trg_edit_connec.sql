@@ -418,8 +418,8 @@ BEGIN
 		
 		-- set and get id for polygon
 		IF (v_doublegeometry IS TRUE) THEN
+		
 				IF (v_pol_id IS NULL) THEN
-					PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 					v_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 					
