@@ -99,7 +99,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- Node ID	
-		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) THEN
+		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.node_id IS NULL THEN
 			NEW.node_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 		
