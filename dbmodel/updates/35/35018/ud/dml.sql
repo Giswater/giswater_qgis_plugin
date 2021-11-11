@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/11/08
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (418, 'Links without gully on startpoint','ud', null, null) ON CONFLICT (fid) DO NOTHING;
+
+--2021/11/11
+INSERT INTO config_function(id, function_name) VALUES (3104, 'gw_fct_import_istram');
