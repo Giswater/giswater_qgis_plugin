@@ -212,12 +212,6 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
-	/*
-	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
-	END IF;
-	*/
-	
 	--Set hydrology_selector when null values from user
 	IF v_project_type='UD' THEN
 		IF (SELECT hydrology_id FROM cat_hydrology LIMIT 1) IS NOT NULL THEN

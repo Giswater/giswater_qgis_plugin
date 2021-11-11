@@ -647,7 +647,6 @@ BEGIN
 
 			-- getting id from URN
 			IF v_id IS NULL AND v_islayer is not true THEN
-				--PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 			END IF;
 
