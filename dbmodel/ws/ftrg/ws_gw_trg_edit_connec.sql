@@ -550,7 +550,8 @@ BEGIN
 			IF NEW.epa_type = 'UNDEFINED' THEN
 				DELETE FROM inp_connec WHERE connec_id = NEW.connec_id;
 			ELSIF NEW.epa_type = 'JUNCTION' THEN
-				INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
+				INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id) 
+				ON CONFLICT (connec_id) DO NOTHING;
 			END IF;
 		END IF;
 
@@ -702,7 +703,7 @@ BEGIN
 			district_id =NEW.district_id, descript=NEW.descript, verified=NEW.verified, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
-			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure,
+			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type
 			WHERE connec_id=OLD.connec_id;
 			
