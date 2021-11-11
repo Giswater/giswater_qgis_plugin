@@ -39,6 +39,9 @@ v_srid integer;
 v_expl_id integer;
 v_dma_id integer;
 v_sector_id integer;
+v_action text;
+v_action_params text;
+
 BEGIN
 
 	--  Search path
@@ -121,6 +124,8 @@ BEGIN
 			
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Create import istream mapzones.'));
 
+			v_action_params = '"query": "SELECT node_id, top_elev, sys_elev FROM SCHEMA_NAME.v_edit_node ", "layerName":"Nodes", "group": "ISTRAM"';
+
 		ELSIF v_fid = 409 THEN
 			
 			SELECT count(node_id) INTO v_count FROM node WHERE code = (SELECT csv2 FROM temp_csv WHERE fid=409 LIMIT 1);
@@ -167,6 +172,8 @@ BEGIN
 	 
 	      INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count,' arcs'));
 
+	      v_action_params = '"query": "SELECT arc_id, sys_elev1, sys_elev2, cat_shape, matcat_id, cat_geom1, cat_geom2 FROM SCHEMA_NAME.v_edit_arc ", "layerName":"Arcs", "group": "ISTRAM"';
+
 	  	END IF;
 		END IF;
 		
@@ -192,16 +199,17 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_action = concat('[{"funcName": "add_query_layer", "params": {', v_action_params, '}}]');
 				
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	
 	-- Return
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
             ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||'}}'||
-	    '}')::json;
+	    '}')::json, 3104, null, null, v_action::json);
 	    
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
