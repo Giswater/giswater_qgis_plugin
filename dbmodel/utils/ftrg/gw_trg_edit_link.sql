@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1116
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION ws_sample.gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 
@@ -538,7 +538,7 @@ BEGIN
 	
 	-- upsert process	
 	IF TG_OP ='INSERT' THEN
-	
+
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND state > 0 LIMIT 1) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
