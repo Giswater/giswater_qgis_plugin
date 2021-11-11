@@ -171,7 +171,10 @@ BEGIN
 			);
 		END IF;
 	END IF;
-		
+	
+	-- profilactic control on feat vdefault parameters on sys_param_user table
+	UPDATE sys_param_user set project_type = v_project_type where project_type IS NULL;
+
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=101 AND cur_user=current_user;
 	
