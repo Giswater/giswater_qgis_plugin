@@ -471,3 +471,5 @@ UPDATE cat_feature_node SET double_geom = '{"activated":true,"value":2}' WHERE i
 UPDATE cat_feature_gully SET double_geom = '{"activated":true,"value":1}' WHERE id = 'GULLY';
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_status_vdefault', '4', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
+
+SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);

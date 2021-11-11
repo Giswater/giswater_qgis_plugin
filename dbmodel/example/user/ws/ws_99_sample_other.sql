@@ -607,3 +607,4 @@ UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
 UPDATE inp_pump SET pump_type = 'PRESSPUMP' WHERE node_id = '113951';
 UPDATE inp_pump SET pump_type = 'FLOWPUMP' WHERE node_id = '1105';
 
+SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
