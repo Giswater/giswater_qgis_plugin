@@ -291,7 +291,7 @@ BEGIN
 		v_idarg := v_combo->>'id';
 		v_name := v_combo->>'name';
 		v_edittext := ((p_data->>'data')::json)->>'hydro_search';
-		v_textarg := concat(v_edittext->>'text' ,'%');
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		-- Fix exploitation vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
