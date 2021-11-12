@@ -257,75 +257,77 @@ def close_dialog(dlg):
     dlg.deleteLater()
 
 
-def connect_signal(obj, pfunc, name1, signal_name):
+def connect_signal(obj, pfunc, section, signal_name):
     """
     Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
     :param obj: the object to which the signal will be connected
     :param pfunc: the partial object containing the function to connect and the arguments if needed
-    :param name1: the name of the parent category
+    :param section: the name of the parent category
     :param signal_name: the name of the signal
     :return: the signal. If failed to connect it will return None
     """
 
-    if name1 not in global_vars.active_signals:
-        global_vars.active_signals[name1] = {}
-    if signal_name in global_vars.active_signals[name1]:
-        _, signal, _ = global_vars.active_signals[name1][signal_name]
+    if section not in global_vars.active_signals:
+        global_vars.active_signals[section] = {}
+    # If the signal is already connected, don't reconnect it, just return it.
+    if signal_name in global_vars.active_signals[section]:
+        _, signal, _ = global_vars.active_signals[section][signal_name]
         return signal
-        pass  # TODO: If the signal is already connected, disconnect it? Ignoring it is not a good idea...
+    # Try to connect signal and save it in the dict
     try:
         signal = obj.connect(pfunc)
-        global_vars.active_signals[name1][signal_name] = (obj, signal, pfunc)
+        global_vars.active_signals[section][signal_name] = (obj, signal, pfunc)
         return signal
     except Exception as e:
         pass
     return None
 
 
-def disconnect_signal(name1, signal_name=None, pop=True):
+def disconnect_signal(section, signal_name=None, pop=True):
     """
     Disconnects a signal
-        :param name1: the name of the parent category
+        :param section: the name of the parent category
         :param signal_name: the name of the signal
+        :param pop: should always be True, if False it won't remove the signal from the dict.
         :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
                  (None, None) if it couldn't find the signal
     """
 
-    if name1 not in global_vars.active_signals:
+    if section not in global_vars.active_signals:
         return None, None
 
     if signal_name is None:
         old_signals = []
-        for signal in global_vars.active_signals[name1]:
-            old_signals.append(disconnect_signal(name1, signal, False))
+        for signal in global_vars.active_signals[section]:
+            old_signals.append(disconnect_signal(section, signal, False))
         for signal in old_signals:
-            global_vars.active_signals[name1].pop(signal, None)
-    if signal_name not in global_vars.active_signals[name1]:
+            global_vars.active_signals[section].pop(signal, None)
+    if signal_name not in global_vars.active_signals[section]:
         return None, None
 
-    obj, signal, pfunc = global_vars.active_signals[name1][signal_name]
+    obj, signal, pfunc = global_vars.active_signals[section][signal_name]
     try:
         obj.disconnect(signal)
     except Exception as e:
         pass
     finally:
         if pop:
-            global_vars.active_signals[name1].pop(signal_name, None)
+            global_vars.active_signals[section].pop(signal_name, None)
             return obj, pfunc
         return signal_name
 
 
-def reconnect_signal(name1, signal_name):
+def reconnect_signal(section, signal_name):
     """
     Disconnects and reconnects a signal
-        :param name1: the name of the parent category
+        :param section: the name of the parent category
         :param signal_name: the name of the signal
         :return: True if successfully reconnected, False otherwise (bool)
     """
 
-    obj, pfunc = disconnect_signal(name1, signal_name)
+    obj, pfunc = disconnect_signal(section, signal_name)  # Disconnect the signal
     if obj is not None and pfunc is not None:
-        connect_signal(obj, pfunc, name1, signal_name)
+        connect_signal(obj, pfunc, section, signal_name)  # Reconnect it
         return True
     return False
 
