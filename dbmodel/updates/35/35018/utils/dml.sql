@@ -16,3 +16,14 @@ VALUES (419, 'Duplicated hydrometer related to more than one connec','utils', nu
 
 --2021/11/10
 UPDATE sys_function SET descript ='Check topology assistant. Helps user to identify nodes connected with more/less arcs compared to num_arcs field of cat_feature_node table' WHERE id IN (2212, 2302);
+
+-- 2021/11/12
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_maxcheck';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_maxcheck';
+
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_trials';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_trials';
+
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_unbalanced_n';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_unbalanced_n';
+
