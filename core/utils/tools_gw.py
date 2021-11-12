@@ -998,8 +998,11 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
-                    widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'spinboxDecimals' in field['widgetcontrols']:
+                        widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                    if 'maximumNumber' in field['widgetcontrols']:
+                        widget.setMaximum(field['widgetcontrols']['maximumNumber'])
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
