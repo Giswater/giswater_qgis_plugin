@@ -362,6 +362,16 @@ class GwGo2EpaButton(GwAction):
     def _go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
+        # Manage if task is already running
+        if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+            try:
+                if self.go2epa_task.isActive():
+                    message = "Go2Epa task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         # Save user values
         self._save_user_values()
 

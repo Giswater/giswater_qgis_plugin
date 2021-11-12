@@ -400,6 +400,16 @@ class GwToolBoxButton(GwAction):
 
     def _execute_function(self, description, dialog, combo, result):
 
+        # Manage if task is already running
+        if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+            try:
+                if self.toolbox_task.isActive():
+                    message = "Toolbox task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
