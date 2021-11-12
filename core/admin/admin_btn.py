@@ -665,6 +665,9 @@ class GwAdminButton:
 
         elif self.form_enabled:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+            if any(x in global_vars.dao_db_credentials['db'] for x in ('.', ',')):
+                message = "Database name contains special characters that are not supported"
+                self.form_enabled = False
             if schema_name == 'null':
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
@@ -1752,7 +1755,10 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
-            if str(self.plugin_version) > str(self.project_version):
+            if any(x in credentials['db'] for x in ('.', ',')):
+                message = 'Database name contains special characters that are not supported'
+                self.form_enabled = False
+            elif str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is lower than plugin version, please update schema)')
