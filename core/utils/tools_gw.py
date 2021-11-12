@@ -967,7 +967,6 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 if 'datatype' in field:
-                    tools_log.log_info(field['datatype'])
                     if field['datatype'] == 'int':
                         widget.setValidator(QIntValidator())
                     elif field['datatype'] == 'float':
@@ -1093,8 +1092,17 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
+
+    # Search for the widget and remove it if it's in the list
+    idx_del = None
+    for i in range(len(list)):
+        if list[i]['widget'] == elem['widget']:
+            idx_del = i
+            break
+    if idx_del is not None:
+        list.pop(idx_del)
+
     list.append(elem)
-    tools_log.log_info(str(list))
 
 
 def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
