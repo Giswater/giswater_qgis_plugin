@@ -279,7 +279,7 @@ BEGIN
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
 
 					IF v_project_type = 'WS' THEN
-					--check if final nodes may be graf delimiters
+					--check if final nodes maybe graf delimiters
 						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
 						JOIN v_edit_node n1 ON n1.node_id=node_1
 						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 

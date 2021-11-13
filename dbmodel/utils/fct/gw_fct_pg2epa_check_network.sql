@@ -129,7 +129,7 @@ BEGIN
 		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, v_result_id, concat('ERROR-228: There is/are ',v_count,
-		' node''s orphan on this result. This could be because closests arcs may have UNDEFINED epa_type or because on-the-fly transformations. Fix it before continue.'),v_count);
+		' node''s orphan on this result. This could be because closests arcs maybe UNDEFINED among others.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,  error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No orphan node(s) found on this result. ', v_count);
@@ -146,7 +146,7 @@ BEGIN
 		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-290: There is/are ',v_count,
-		' node(s) duplicated on this result. It means that there is a topological jump on that point (state 0-1-2). Please check your network'));
+		' node(s) duplicated on this result. Reason maybe some (connec, node or vnode) over other (connec, node or vnode) due wrong (state)topology issue.'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No duplicated node(s) found on this result.');
@@ -268,7 +268,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-',v_fid,': There is/are ',v_count,' arc(s) topological disconnected from any ', v_boundaryelem
-		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'));
+		,'. Main reasons maybe: state_type, epa_type, sector_id or expl_id or some node not connected'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem));
