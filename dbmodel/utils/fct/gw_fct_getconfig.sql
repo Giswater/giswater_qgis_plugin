@@ -108,7 +108,10 @@ BEGIN
 
 		-- Get all parameters from audit_cat param_user
 		v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (
-					
+
+			SELECT label, widgetname, value , datatype, widgettype, layoutorder, layoutname,iseditable,orderby, isparent, sys_role, project_type, widgetcontrols::json,
+			checked, placeholder, tooltip, dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue FROM (
+			
 				SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
 					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
 					row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols::text,
@@ -118,6 +121,7 @@ BEGIN
 					LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
 					WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 					AND formname =',quote_literal(lower(v_formname)),'
+					AND (epaversion::json->>''from''= ',quote_literal(v_epaversion),' or formname !=''epaoptions'')
 					AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),')
 					AND isenabled IS TRUE
 					AND sys_param_user.id NOT LIKE ''feat_%''
@@ -136,7 +140,7 @@ BEGIN
 					AND isenabled IS TRUE
 					AND active IS TRUE
 					AND sys_param_user.id LIKE ''feat_%''			
-					ORDER by 2) a');
+					ORDER by orderby) b) a');
 					
 		v_debug_vars := json_build_object('v_formname', v_formname, 'v_epaversion', v_epaversion, 'v_project_type', v_project_type);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 10);
