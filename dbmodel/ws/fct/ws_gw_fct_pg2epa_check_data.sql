@@ -473,7 +473,7 @@ BEGIN
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '229', 'INFO: Standard minimun length checked. No values less than 0.2 meters missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '229', 'INFO: Standard minimun length checked. No values less than 0.2 meters found.',v_count);
 	END IF;
 	
 	
@@ -485,13 +485,13 @@ BEGIN
 		SELECT 230, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '230',concat('WARNING-230: There is/are ',v_count,
-		' pipe(s) with length less than 0.05 meters. Check it before continue.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '230',concat('ERROR-230: There is/are ',v_count,
+		' pipe(s) with length less than 0.05 meters which are not exported.'),v_count);
 		v_count=0;
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.05 meters missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.05 meters found.',v_count);
 	END IF;
 	
 	
