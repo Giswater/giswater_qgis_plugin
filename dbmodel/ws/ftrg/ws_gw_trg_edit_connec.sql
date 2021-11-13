@@ -43,6 +43,7 @@ v_disable_linktonetwork boolean;
 v_system_id text;
 v_featurecat_id text;
 v_pol_id text;
+v_arc text;
 
 BEGIN
 
@@ -85,6 +86,15 @@ BEGIN
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.connec_id, v_message);				
 				END IF;
 			END IF;
+		END IF;
+		
+		-- setting pjoint_id, pjoint_type and arc_id and removing link in case of connec is over arc
+		v_arc = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
+		IF v_arc IS NOT NULL THEN
+			NEW.arc_id = v_arc;
+			NEW.pjoint_id = NEW.connec_id;
+			NEW.pjoint_type = 'CONNEC';
+			DELETE FROM link WHERE feature_id = NEW.connec_id;
 		END IF;
 	END IF;
 	
@@ -423,7 +433,7 @@ BEGIN
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-		END IF; 
+		END IF;
 
 		IF NEW.epa_type IS NULL THEN
 			NEW.epa_type ='JUNCTION';
@@ -433,13 +443,13 @@ BEGIN
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
-		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, adate, adescript, accessibility, lastupdate, lastupdate_user,
-		asset_id, epa_type)		
+		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
+		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type)		
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
-		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure,
+		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type);
 		
 
@@ -569,6 +579,14 @@ BEGIN
 			--update associated geometry of element (if exists)
 			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
 			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);		
+
+			-- setting pjoint_id, pjoint_type and arc_id and removing link in case of connec is over arc
+			v_arc = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
+			IF v_arc IS NULL AND OLD.pjoint_type = 'CONNEC' THEN
+				NEW.arc_id = NULL;
+				NEW.pjoint_id = NULL;
+				NEW.pjoint_type = NULL;
+			END IF;
 		
 		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
