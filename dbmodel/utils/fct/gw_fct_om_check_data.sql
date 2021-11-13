@@ -23,7 +23,7 @@ SELECT gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,187,188,196,197,201,202,203,204,205,257,296,372,417,418,419
+	other: 104,187,188,196,197,201,202,203,204,205,257,296,372,417,418,419,421,422,423,424
 
 */
 
@@ -137,7 +137,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
-		SELECT 196, arc_id, arccat_id, ''Arc with state=1 using nodes with state = 0'', the_geom FROM ', v_querytext);
+		SELECT 196, arc_id, arccat_id, ''Arc with state=1 using nodes with state = 0'', the_geom, expl_id FROM ', v_querytext);
 
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 3,'196', concat('ERROR-196: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'),v_count);
@@ -1018,10 +1018,120 @@ BEGIN
 		VALUES (125, 1, '419','INFO: All hydrometeres are related to a unique connec',v_count);
 	END IF;
 
+	RAISE NOTICE '36- Check category_type values which do not exists on man_type table (421)';
+	IF v_project_type = 'WS' THEN
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+	ELSE
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'GULLY', gully_id, category_type FROM gully WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+	END IF;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '421', concat('ERROR-421: There is/are ',v_count,' features with category_type does not exists on man_type_category table.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '421','INFO: All features has category_type informed on man_type_category table',v_count);
+	END IF;
+
+	RAISE NOTICE '37- Check function_type values which do not exists on man_type table (422)';
+	IF v_project_type = 'WS' THEN
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+	ELSE
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, function_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'GULLY', gully_id, function_type FROM gully WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+	END IF;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '422', concat('ERROR-422: There is/are ',v_count,' features with function_type does not exists on man_type_category table.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '422','INFO: All features has function_type informed on man_type_function table',v_count);
+	END IF;
+
+
+	RAISE NOTICE '38- Check fluid_type values which do not exists on man_type table (423)';
+	IF v_project_type = 'WS' THEN
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+	ELSE
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'GULLY', gully_id, fluid_type FROM gully WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+	END IF;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '423', concat('ERROR-423: There is/are ',v_count,' features with fluid_type does not exists on man_type_category table.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '423','INFO: All features has fluid_type informed on fluid_type_category table',v_count);
+	END IF;
+
+	RAISE NOTICE '39- Check location_type values which do not exists on man_type table (424)';
+	IF v_project_type = 'WS' THEN
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+	ELSE
+		SELECT count(*) INTO v_count FROM (
+		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		UNION
+		SELECT 'GULLY', gully_id, location_type FROM gully WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+	END IF;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '424', concat('ERROR-424: There is/are ',v_count,' features with location_type does not exists on man_type_category table.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '424','INFO: All features has location_type informed on man_type_location table',v_count);
+	END IF;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 1, '');
+
 	
 	-- get results
 	-- info
