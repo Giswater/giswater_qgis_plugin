@@ -17,7 +17,7 @@ GOAL:
 Function with the goal to update ext_rtc_dma_period using daily process, values from CRM in  order to have updated it to make a good hydraulic model
 Table ext_rtc_dma_period is inserted value when first register of that cat_period_id is inserted (dma_id, period_id)
 Fields updated here are: m3_total_period, m3_total_period_hdyro, effc=1 . As you can see  (m3_total_period = m3_total_period_hdyro) is updated without losses 
-After that function table may be re-updated by function csv2pg_import_patterns updating effc, min, max and pattern values
+After that function table maybe re-updated by function csv2pg_import_patterns updating effc, min, max and pattern values
 
 */
 

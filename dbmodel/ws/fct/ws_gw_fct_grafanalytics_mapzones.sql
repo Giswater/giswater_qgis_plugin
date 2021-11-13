@@ -569,7 +569,7 @@ BEGIN
 			-- update feature atributes
 			IF v_updatefeature THEN
 
-				-- flood from node may be a header or not. In case of won't be a header by this process we can get header from any node
+				-- flood from node maybe a header or not. In case of won't be a header by this process we can get header from any node
 				IF v_floodfromnode IS NOT NULL THEN
 
 					-- getting node header	
