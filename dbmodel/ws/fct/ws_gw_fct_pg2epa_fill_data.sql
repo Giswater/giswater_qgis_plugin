@@ -148,7 +148,8 @@ BEGIN
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-			AND epa_type != ''UNDEFINED''';
+			AND epa_type != ''UNDEFINED''
+			AND st_length(v_arc.the_geom) > 0.049';
 
 	IF v_networkmode =  4 THEN
 
