@@ -271,7 +271,7 @@ BEGIN
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-				VALUES (v_fid, 2, '413' ,concat('WARNING-413: There is/are ',v_count,' EPA connec(s) over other EPA nodes.'),v_count);
+				VALUES (v_fid, 3, '413' ,concat('ERROR-413: There is/are ',v_count,' EPA connec(s) over other EPA nodes.'),v_count);
 
 				EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript) SELECT * FROM ('||v_querytext||') a';
 
@@ -454,7 +454,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_node WHERE fid = 297 AND cur_user = current_user;
 		IF  v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-297: There is/are ',v_count,' nodes with epa_type UNDEFINED on this exportation. If are disconnected, may be have been deleted.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-297: There is/are ',v_count,' nodes with epa_type UNDEFINED on this exportation. If are disconnected, maybe have been deleted.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes have epa_type defined.'));
@@ -718,19 +718,21 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom' 
 		) AS feature
-		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
+		FROM (SELECT node_id as id, fid, 'ERROR-228: Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
 			UNION
-		      SELECT node_id, fid, 'Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
+		      SELECT node_id, fid, 'ERROR-223: Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
 		        UNION
-		      SELECT node_id, fid, 'Mandatory nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 411
+		      SELECT node_id, fid, 'ERROR-411: Mandatory nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 411
 			UNION
-		      SELECT node_id, fid, 'Shortpipe nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 412
+		      SELECT node_id, fid, 'ERROR-412: Shortpipe nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 412
 			UNION
-		      SELECT node_id, fid, 'Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297
+		      SELECT node_id, fid, 'ERROR-290: Duplicated node. Maybe topological jump problem (0-1-2)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 290
 			UNION
-		      SELECT node_id, fid, 'EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
+		      SELECT node_id, fid, 'ERROR-297: Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297
 			UNION
-		      SELECT node_id, fid, 'Connec AS JUNCTION without pjoint', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 415) row
+		      SELECT node_id, fid, 'ERROR-413: EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
+			UNION
+		      SELECT node_id, fid, 'ERROR-415: Connec AS JUNCTION without pjoint', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 415) row
 		      ) features;
 
 		v_result := COALESCE(v_result, '[]'); 
@@ -746,12 +748,14 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (
-		SELECT arc_id, fid, 'Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+		SELECT arc_id as id, fid, 'ERROR-230: Length less than 5 cm.'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=230
 		  UNION
-		SELECT a.arc_id as id, a.fid, 'Disconnected arc'::text as descript, a.the_geom FROM anl_arc a
+		SELECT arc_id as id, fid, 'ERROR-404: Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+		  UNION
+		SELECT a.arc_id as id, a.fid, 'ERROR-139: Disconnected arc'::text as descript, a.the_geom FROM anl_arc a
 		WHERE a.cur_user="current_user"() AND a.fid = 139
 		  UNION
-		SELECT arc_id, fid, 'Dry arc'::text as descript, the_geom FROM anl_arc JOIN
+		SELECT arc_id, fid, 'WARNING-232: Dry arc'::text as descript, the_geom FROM anl_arc JOIN
 		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139) a USING (arc_id)
 		WHERE cur_user="current_user"() AND fid =232) row) features;
