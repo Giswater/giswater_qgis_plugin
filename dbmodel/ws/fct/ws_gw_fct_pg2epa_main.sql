@@ -134,7 +134,16 @@ BEGIN
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
 
 		RAISE NOTICE '4 - Call gw_fct_pg2epa_nod2arc function';
-		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc);
+		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
+
+		IF v_response = 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (v_fid, v_result_id, 1, 'INFO: All nodarcs have been created');
+
+		ELSIF v_response = 1 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (v_fid, v_result_id, 3,'HINT: Please use function Check nodarcs inconsistency to identify it');
+		END IF;
 
 		RAISE NOTICE '5 - Call gw_fct_pg2epa_doublenod2arc';
 		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
@@ -158,17 +167,7 @@ BEGIN
 
 			-- execute vnodetrim arcs
 			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
-			
-			-- setting first message again on user's pannel
-			IF v_response = 0 THEN
-				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
-			ELSE
-				v_message = concat ('WARNING-159: vnodes over nodarcs have been checked. In order to keep inlet flow from connecs using vnode_id, ' , 
-				v_response, ' nodarc nodes have been renamed using vnode_id');
-			END IF;
-		ELSE
-			-- setting first message on user's pannel
-			v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
+
 		END IF;
 
 		RAISE NOTICE '9 - Execute buildup model';

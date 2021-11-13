@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('r1')
 DECLARE
 
 v_count integer = 0;
-v_result integer = 0;
+v_fid integer = 0;
 v_record record;
 v_count2 integer = 0;
      
@@ -185,7 +185,7 @@ BEGIN
 	-- step 2
 	DELETE FROM temp_node WHERE epa_type ='TODELETE';
  
-RETURN v_result;
+RETURN 0;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

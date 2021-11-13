@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_duplicated(p_data json) RETURNS json AS 
 $BODY$
+
 /*EXAMPLE
 SELECT gw_fct_anl_node_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
