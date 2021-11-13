@@ -37,15 +37,12 @@ INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, activ
 VALUES (3106,'Check nodarc inconsistency', '{"featureType":[]}', NULL, NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
---2021/11/13
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
-VALUES (421, 'Check category_type values exists on man_ table','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_maxcheck';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_maxcheck';
 
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
-VALUES (422, 'Check function_type values exists on man_ table','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_trials';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_trials';
 
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
-VALUES (423, 'Check fluid_type values exists on man_ table','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'spinboxDecimals'::text, 0::integer) WHERE id = 'inp_options_unbalanced_n';
+UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols::json, 'maximumNumber'::text, 999::integer) WHERE id = 'inp_options_unbalanced_n';
 
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
-VALUES (424, 'Check location_type values exists on man_ table','utils', null, null) ON CONFLICT (fid) DO NOTHING;

@@ -14,7 +14,12 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"0"}}$$) -- FULL PROCESS
+
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$) -- STRUCTURE DATA (GRAF AND BOUNDARY)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$) -- ANALYZE GRAF
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$) -- CREATE JSON RETURN
+
 
 --fid: 227
 
@@ -32,7 +37,6 @@ v_response integer;
 v_message text;
 v_setdemand boolean;
 v_buildupmode integer;
-v_usenetworkgeom boolean;
 v_inpoptions json;
 v_advancedsettings boolean;
 v_file json;
@@ -45,6 +49,7 @@ v_fid integer = 227;
 v_error_context text;
 v_breakpipes boolean;
 v_count integer;
+v_step integer=0;
 	
 BEGIN
 
@@ -53,8 +58,9 @@ BEGIN
 	
 	-- get input data
 	v_result = (p_data->>'data')::json->>'resultId';
-	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';  -- use network previously defined
-
+	v_step = (p_data->>'data')::json->>'step';  -- use network previously defined
+	IF v_step is null then v_step = 0; END IF;
+	
 	-- get user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
@@ -62,11 +68,26 @@ BEGIN
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 	
 	-- get debug parameters (settings)
-	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
+	IF v_step=3 THEN
+
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
+		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
+		'"message":{"level":1, "text":"Step-3: Create JSON of inp export done succesfully"}')::json;
+		RETURN v_return;
+		
+	ELSIF v_step=2 THEN
+	
+		PERFORM gw_fct_pg2epa_check_network(v_input);	
+		v_return = '{"message":{"level":1, "text":"Step-2: Analyze graf of inp export done succesfully"}}'::json;
+		RETURN v_return;
+	END IF;
+
 
 	-- check sector selector
 	SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user;
@@ -74,9 +95,10 @@ BEGIN
 		RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 	END IF;
 
-	-- delete audit table
+	-- delete used tables
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
+	DELETE FROM temp_table;
 	
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -84,32 +106,16 @@ BEGIN
 	
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
-	
 	IF v_networkmode = 1 THEN 
 		v_onlymandatory_nodarc = TRUE;
 	END IF;
-
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
-		
-	IF v_onlyexport THEN
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
-		SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
-		
-		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
-		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-		v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
-		v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
-		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
-		RETURN v_return;
-	END IF;
 
 	-- check consistency for user options 
 	SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
 	IF v_return->>'status' = 'Failed' THEN
-		--v_return = replace(v_return::text, 'Failed', 'Accepted');
 		RETURN v_return;
 	END IF;
 	
@@ -119,80 +125,71 @@ BEGIN
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
-	-- when existing network is used (check on go2epa dialog)
-	IF v_usenetworkgeom IS NOT TRUE THEN
+	-- repair inp tables
+	PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
-		-- repair inp tables
-		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-
-		RAISE NOTICE '2 - check system data';
-		IF v_checkdata THEN
-			PERFORM gw_fct_pg2epa_check_data(v_input);
-		END IF;
-
-		RAISE NOTICE '3 - Fill inprpt tables';
-		PERFORM gw_fct_pg2epa_fill_data(v_result);
-
-		RAISE NOTICE '4 - Call gw_fct_pg2epa_nod2arc function';
-		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
-
-		IF v_response = 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-			VALUES (v_fid, v_result_id, 1, 'INFO: All nodarcs have been created');
-
-		ELSIF v_response = 1 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-			VALUES (v_fid, v_result_id, 3,'HINT: Please use function Check nodarcs inconsistency to identify it');
-		END IF;
-
-		RAISE NOTICE '5 - Call gw_fct_pg2epa_doublenod2arc';
-		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
-				
-		RAISE NOTICE '6 - Call gw_fct_pg2epa_pump_additional function';
-		PERFORM gw_fct_pg2epa_pump_additional(v_result);
-
-		RAISE NOTICE '7 - manage varcs';
-		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
-
-		RAISE NOTICE '8 - Try to trim arcs with vnode';
-		IF v_networkmode IN (3,4) THEN
-		
-			-- profilactic control on temp_table
-			TRUNCATE temp_table;
-
-			-- create ficticius vnode to tream pipes using debug variable breakPipes
-			IF v_breakpipes THEN
-				PERFORM gw_fct_pg2epa_breakpipes(v_result);
-			END IF;
-
-			-- execute vnodetrim arcs
-			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
-
-		END IF;
-
-		RAISE NOTICE '9 - Execute buildup model';
-		IF v_buildupmode = 1 THEN
-			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
-			
-		ELSIF v_buildupmode = 2 THEN
-			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
-		END IF;
-
-		RAISE NOTICE '10 - Set default values';
-		IF v_vdefault THEN
-			PERFORM gw_fct_pg2epa_vdefault(v_input);
-		END IF;
-
-		RAISE NOTICE '11 - Set ceros';
-		UPDATE temp_node SET elevation = 0 WHERE elevation IS NULL;
-		UPDATE temp_node SET addparam = replace (addparam, '""','null');
-		
-		RAISE NOTICE '12 - Set length > 0.05 when length is 0';
-		UPDATE temp_arc SET length=0.05 WHERE length=0;
+	RAISE NOTICE '2 - check system data';
+	IF v_checkdata THEN
+		PERFORM gw_fct_pg2epa_check_data(v_input);
 	END IF;
 
-	RAISE NOTICE '13 - Set demands & patterns';
+	RAISE NOTICE '3 - Fill temp tables';
+	PERFORM gw_fct_pg2epa_fill_data(v_result);
 
+	RAISE NOTICE '4 - Call gw_fct_pg2epa_nod2arc function';
+	PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
+
+	IF v_response = 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+		VALUES (v_fid, v_result_id, 1, 'INFO: All nodarcs have been created');
+
+	ELSIF v_response = 1 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+		VALUES (v_fid, v_result_id, 3,'HINT: Please use function Check nodarcs inconsistency to identify it');
+	END IF;
+
+	RAISE NOTICE '5 - Call gw_fct_pg2epa_doublenod2arc';
+	PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
+			
+	RAISE NOTICE '6 - Call gw_fct_pg2epa_pump_additional function';
+	PERFORM gw_fct_pg2epa_pump_additional(v_result);
+
+	RAISE NOTICE '7 - manage varcs';
+	PERFORM gw_fct_pg2epa_manage_varc(v_result);	
+
+	RAISE NOTICE '8 - Trim arcs';
+	IF v_networkmode IN (3,4) THEN
+	
+		IF v_breakpipes THEN
+			PERFORM gw_fct_pg2epa_breakpipes(v_result);
+		END IF;
+
+		-- execute vnodetrim arcs
+		SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
+
+	END IF;
+
+	RAISE NOTICE '9 - Execute buildup model';
+	IF v_buildupmode = 1 THEN
+		PERFORM gw_fct_pg2epa_buildup_supply(v_result);
+		
+	ELSIF v_buildupmode = 2 THEN
+		PERFORM gw_fct_pg2epa_buildup_transport(v_result);
+	END IF;
+
+	RAISE NOTICE '10 - Set default values';
+	IF v_vdefault THEN
+		PERFORM gw_fct_pg2epa_vdefault(v_input);
+	END IF;
+
+	RAISE NOTICE '11 - Set ceros';
+	UPDATE temp_node SET elevation = 0 WHERE elevation IS NULL;
+	UPDATE temp_node SET addparam = replace (addparam, '""','null');
+	
+	RAISE NOTICE '12 - Set length > 0.05 when length is 0';
+	UPDATE temp_arc SET length=0.05 WHERE length=0;
+
+	RAISE NOTICE '13 - Set demands & patterns';
 	TRUNCATE temp_demand;
 	IF v_setdemand THEN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
@@ -201,25 +198,21 @@ BEGIN
 	RAISE NOTICE '14 - Setting dscenarios';
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 	
-	-- when existing network is not used (check on go2epa dialog)
-	IF v_usenetworkgeom IS NOT TRUE THEN
-
-		RAISE NOTICE '15 - Setting valve status';
-		PERFORM gw_fct_pg2epa_valve_status(v_result);
+	RAISE NOTICE '15 - Setting valve status';
+	PERFORM gw_fct_pg2epa_valve_status(v_result);
 		
-		RAISE NOTICE '16 - Advanced settings';
-		IF v_advancedsettings THEN
-			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
-		END IF;
+	RAISE NOTICE '16 - Advanced settings';
+	IF v_advancedsettings THEN
+		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+	END IF;
 	
-		RAISE NOTICE '17 - Check result network';
-		IF v_checknetwork THEN
-			PERFORM gw_fct_pg2epa_check_network(v_input);	
-		END IF;
+	RAISE NOTICE '17 - Check result network';
+	IF v_step = 0 THEN
+		PERFORM gw_fct_pg2epa_check_network(v_input);	
 	END IF;
 
 	-- when delete network is enabled (variable of inp_options_debug)
-	RAISE NOTICE '20- update values from inp_*_importinp tables';
+	RAISE NOTICE '18- update values from inp_*_importinp tables';
 	UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
 	addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
 	FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
@@ -228,11 +221,10 @@ BEGIN
 	addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern":"',pattern,'", "energyparam":"',energyparam,'", "status":"',b.status,'", "energyvalue":"',b.energyvalue,'"}')
 	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
-
-	RAISE NOTICE '22 - Check result previous exportation';
+	RAISE NOTICE '19 - Check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	RAISE NOTICE '23 - Profilactic last control';
+	RAISE NOTICE '20 - Profilactic last control';
 
 	-- arcs without nodes
 	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a LEFT JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
@@ -278,7 +270,7 @@ BEGIN
 		UPDATE temp_node n SET pattern_id  = ';VNODE BRKPIPE' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
 	END IF;
 
-	RAISE NOTICE '24 - Move from temp tables to rpt_inp tables';
+	RAISE NOTICE '21 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition)
@@ -288,16 +280,21 @@ BEGIN
 	SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent 
 	FROM temp_arc;
 
-	RAISE NOTICE '25 - Getting inp file';	
-	SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
+	RAISE NOTICE '22 - Manage return';
+	IF v_step=1 THEN
+	
+		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary of inp export done succesfully"}}'::json;
+		RETURN v_return;	
 
-	-- manage return
-	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
-	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-	'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
-
-	RETURN v_return;
+	ELSIF v_step=0 THEN
+	
+		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
+		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}',
+		'"message":{"level":1, "text":"Full process of inp export done succesfully"}')::json;
+		RETURN v_return;	
+	END IF;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
