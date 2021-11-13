@@ -30,8 +30,8 @@ VALUES (423, 'Check fluid_type values exists on man_ table','utils', null, null)
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (424, 'Check location_type values exists on man_ table','utils', null, null) ON CONFLICT (fid) DO NOTHING;
 
-UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(value, 'step', '0'::integer) WHERE id = 'inp_options_debug';
-UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(value, 'onlyExport', 'checkData', 'checkNetwork') WHERE id = 'inp_options_debug';
+UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'steps', '0'::integer) WHERE id = 'inp_options_debug';
+UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(vdefault::json, 'onlyExport', 'checkData', 'checkNetwork') WHERE id = 'inp_options_debug';
 
-UPDATE config_param_user SET value = gw_fct_json_object_set_key(value, 'step', '0'::integer) WHERE parameter = 'inp_options_debug';
-UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value, 'onlyExport', 'checkData', 'checkNetwork') WHERE parameter = 'inp_options_debug';
+UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'steps', '0'::integer) WHERE parameter = 'inp_options_debug';
+UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value::json, 'onlyExport', 'checkData', 'checkNetwork') WHERE parameter = 'inp_options_debug';
