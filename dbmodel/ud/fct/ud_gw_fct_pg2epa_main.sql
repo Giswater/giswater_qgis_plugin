@@ -50,7 +50,8 @@ BEGIN
 	-- get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
-	
+	v_step = (p_data->>'data')::json->>'step';
+		
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 	
 	-- get user parameters
@@ -112,9 +113,7 @@ BEGIN
 	PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
 	RAISE NOTICE '2 - check system data';
-	IF v_checkdata THEN
-		PERFORM gw_fct_pg2epa_check_data(v_input);
-	END IF;
+	PERFORM gw_fct_pg2epa_check_data(v_input);
 	
 	RAISE NOTICE '3 - Fill temp tables';
 	PERFORM gw_fct_pg2epa_fill_data(v_result);
