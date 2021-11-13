@@ -262,14 +262,15 @@ BEGIN
 		EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fid  = 124 and cur_user = current_user ) b
 		  WHERE b.node_id  = temp_node.node_id';
 
-		RAISE NOTICE ' Update geometries of existing arcs' ;
-		EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_arc.the_geom)) , 1) 
+		RAISE NOTICE ' Update geometries and topology for existing arcs' ;
+		EXECUTE 'UPDATE temp_arc SET node_1 = node_id, the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_arc.the_geom)) , 1) 
 			FROM temp_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
 
-		EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_arc.the_geom)))
+		EXECUTE 'UPDATE temp_arc SET node_2 = node_id, the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_arc.the_geom)))
 			FROM temp_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
 
-		RAISE NOTICE ' update node_1 & node_2';
+/*
+		RAISE NOTICE ' update node_1';
 		EXECUTE 'UPDATE temp_arc a SET node_1 = node_id FROM (
 				WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_startpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_startpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
 				SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
@@ -279,6 +280,7 @@ BEGIN
 				WHERE a.arc_id = b.arc_id
 				AND node_1 IN (SELECT node_id FROM temp_node WHERE epa_type =''TODELETE'')'; 
 				
+		RAISE NOTICE ' update node_2';
 		EXECUTE 'UPDATE temp_arc a SET node_2 = node_id FROM (
 				WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_endpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_endpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
 				SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
@@ -287,7 +289,7 @@ BEGIN
 				)b
 				WHERE a.arc_id = b.arc_id
 				AND node_2 IN (SELECT node_id FROM  temp_node WHERE epa_type =''TODELETE'')';
-				
+*/			
 	ELSE -- checking for inconsistencies
 
 		RAISE NOTICE ' Mark old node from node table';
@@ -334,7 +336,7 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-	VALUES (417, result_id_var, 3, 'ERROR-417: At least one nodarc have been crashed. Some reasons may be minimun distance againts nodes or some wrong topology fof closest arcs');	
+	VALUES (417, result_id_var, 3, 'ERROR-417: At least one nodarc have been crashed. Some reasons maybe minimun distance againts nodes or some wrong topology fof closest arcs');	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
 	VALUES (417, result_id_var, 3, concat('DETAIL-417: ', SQLERRM, 'Context:',v_error_context));
 	RETURN 1;
