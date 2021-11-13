@@ -7,7 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2316
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean, p_check boolean) 
+RETURNS integer 
 AS $BODY$
 
 /*example
@@ -17,6 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeo
 
 DECLARE
 
+rec_arc record;
 v_nod2arc float;
 v_querytext text;
 v_arcsearchnodes float;
@@ -28,6 +31,8 @@ v_limit integer = 5000;
 v_count integer = 0;
 v_diameter float = 200;
 v_roughness float;
+v_querystring text;
+v_error_context text;
 
 BEGIN
 
@@ -45,13 +50,6 @@ BEGIN
 
 	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.005; END IF;
 	
-	/* Commented on 2021/11/05 because fid 411 and 412 on gw_fct_pg2epa_check_data which are more sofisticated than this
-	IF v_nod2arc < 0.001 THEN
-		RAISE EXCEPTION 'There is/are some pipe(s) with small length (less than 0.02). Check it using toolbox algotithm and repair it. 
-		If all your pipes have the appropriate length may be the problem is some arc with wrong geometry. Contact with your system administrator';
-	END IF;
-	*/
-
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	IF v_roughness is null then v_roughness = 0; END IF;
 
@@ -199,20 +197,52 @@ BEGIN
 		WHERE id IN (SELECT id FROM temp_node WHERE node_id = v_node.node_id LIMIT 1);
 	END LOOP;
 
-	RAISE NOTICE 'new arcs when numarcs = 1';
-	EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
-		status, the_geom, minorloss, addparam)
-			WITH result AS (SELECT * FROM temp_node)
+	IF p_check IS FALSE THEN
+	
+		RAISE NOTICE 'new arcs when numarcs = 1';
+		EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
+			status, the_geom, minorloss, addparam)
+				WITH result AS (SELECT * FROM temp_node)
+				SELECT DISTINCT ON (a.nodeparent)
+				a.result_id,
+				concat (a.nodeparent, ''_n2a'') as arc_id,
+				b.node_id,
+				a.node_id,
+				''NODE2ARC-1'', 
+				a.nodecat_id as arccat_id, 
+				c.epa_type,
+				a.sector_id, 
+				a.expl_id,
+				a.state,
+				a.state_type,
+				case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else NULL end as diameter,
+				case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
+				a.annotation,
+				st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
+				c.addparam::json->>''status'' status,
+				st_makeline(a.the_geom, b.the_geom) AS the_geom,
+				case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
+				c.addparam
+				FROM 	result a,
+					result b
+					LEFT JOIN result c ON c.node_id = b.nodeparent
+					WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
+
+		RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
+		EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
+			status, the_geom, minorloss, addparam)
+
+			WITH result AS (SELECT * FROM temp_node) 
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
 			concat (a.nodeparent, ''_n2a'') as arc_id,
 			b.node_id,
 			a.node_id,
-			''NODE2ARC-1'', 
+			''NODE2ARC-2'', 
 			a.nodecat_id as arccat_id, 
 			c.epa_type,
-			a.sector_id, 
-			a.expl_id,
+			c.sector_id, 
+			c.expl_id,
 			a.state,
 			a.state_type,
 			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else NULL end as diameter,
@@ -226,68 +256,69 @@ BEGIN
 			FROM 	result a,
 				result b
 				LEFT JOIN result c ON c.node_id = b.nodeparent
-				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
+				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';		
 
-	RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
-	EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
-		status, the_geom, minorloss, addparam)
-
-		WITH result AS (SELECT * FROM temp_node) 
-		SELECT DISTINCT ON (a.nodeparent)
-		a.result_id,
-		concat (a.nodeparent, ''_n2a'') as arc_id,
-		b.node_id,
-		a.node_id,
-		''NODE2ARC-2'', 
-		a.nodecat_id as arccat_id, 
-		c.epa_type,
-		c.sector_id, 
-		c.expl_id,
-		a.state,
-		a.state_type,
-		case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else NULL end as diameter,
-		case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
-		a.annotation,
-		st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
-		c.addparam::json->>''status'' status,
-		st_makeline(a.the_geom, b.the_geom) AS the_geom,
-		case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
-		c.addparam
-		FROM 	result a,
-			result b
-			LEFT JOIN result c ON c.node_id = b.nodeparent
-			WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
-			
-	RAISE NOTICE ' Mark old node from node table';
-	EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fid  = 124 and cur_user = current_user ) b
+		RAISE NOTICE ' Mark old node from node table';
+		EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fid  = 124 and cur_user = current_user ) b
 		  WHERE b.node_id  = temp_node.node_id';
 
-	RAISE NOTICE ' Update geometries';
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_arc.the_geom)) , 1) 
-		FROM temp_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
+		RAISE NOTICE ' Update geometries of existing arcs' ;
+		EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / st_length(temp_arc.the_geom)) , 1) 
+			FROM temp_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
 
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_arc.the_geom)))
-		FROM temp_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
+		EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' /  st_length(temp_arc.the_geom)))
+			FROM temp_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE'' AND geometrytype(temp_arc.the_geom) =''LINESTRING''';
+
+		RAISE NOTICE ' update node_1 & node_2';
+		EXECUTE 'UPDATE temp_arc a SET node_1 = node_id FROM (
+				WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_startpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_startpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
+				SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
+				JOIN (SELECT * FROM qt)b USING (id)
+				where min = d
+				)b
+				WHERE a.arc_id = b.arc_id
+				AND node_1 IN (SELECT node_id FROM temp_node WHERE epa_type =''TODELETE'')'; 
+				
+		EXECUTE 'UPDATE temp_arc a SET node_2 = node_id FROM (
+				WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_endpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_endpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
+				SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
+				JOIN (SELECT * FROM qt)b USING (id)
+				where min = d
+				)b
+				WHERE a.arc_id = b.arc_id
+				AND node_2 IN (SELECT node_id FROM  temp_node WHERE epa_type =''TODELETE'')';
+				
+	ELSE -- checking for inconsistencies
+
+		RAISE NOTICE ' Mark old node from node table';
+		EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fid  = 124 and cur_user = current_user ) b
+		  WHERE b.node_id  = temp_node.node_id';
+
+		-- check node distance (on temp_node in exception of 'TODELETE' nodes)
+		INSERT INTO anl_node (fid, node_id, descript, the_geom)
+		SELECT 417, node_id, 'Node close to other node. Maybe nodarc has some problems with closest linestrings. Try to redraw it', the_geom
+		FROM (SELECT DISTINCT t1.node_id, t1.epa_type as epatype1, t2.node_id as node_id_aux, t2.epa_type as epatype2, 106, t1.the_geom
+				FROM temp_node AS t1 JOIN temp_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 2) 
+				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.epatype1 != 'TODELETE' AND a.epatype2 != 'TODELETE';
 
 
-	RAISE NOTICE ' update node_1 & node_2';
-	EXECUTE 'UPDATE temp_arc a SET node_1 = node_id FROM (
-			WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_startpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_startpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
-			SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
-			JOIN (SELECT * FROM qt)b USING (id)
-			where min = d
-			)b
-			WHERE a.arc_id = b.arc_id
-			AND node_1 IN (SELECT node_id FROM temp_node WHERE epa_type =''TODELETE'')'; 
-			
-	EXECUTE 'UPDATE temp_arc a SET node_2 = node_id FROM (
-			WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_endpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_endpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
-			SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
-			JOIN (SELECT * FROM qt)b USING (id)
-			where min = d
-			)b
-			WHERE a.arc_id = b.arc_id
-			AND node_2 IN (SELECT node_id FROM  temp_node WHERE epa_type =''TODELETE'')';
+		-- check wrong linestring for node_1. If this crashes sql will be inserted on audit log table....
+		FOR rec_arc IN SELECT a.arc_id, a.the_geom FROM temp_arc a JOIN temp_node n ON n.node_id = a.node_1 WHERE n.epa_type = 'TODELETE'
+		LOOP 
+			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, ('||0.5*v_nod2arc||' / st_length(a.the_geom)) , 1) WHERE arc_id = '||rec_arc.arc_id||'::text';
+			EXECUTE  v_querystring;
+
+		END LOOP;
+
+		-- check wrong linestring for node_2. If this crashes sql will be inserted on audit log table....
+		FOR rec_arc IN SELECT a.arc_id, a.the_geom FROM temp_arc a JOIN temp_node n ON n.node_id = a.node_2 WHERE n.epa_type = 'TODELETE'
+		LOOP 
+			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, 0, (1 - '||0.5*v_nod2arc||' / st_length(a.the_geom))) WHERE arc_id = '||rec_arc.arc_id||'::text';
+			EXECUTE  v_querystring;
+
+		END LOOP;
+
+	END IF;
 
 	RAISE NOTICE ' Delete old node from node table';
 	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''TODELETE''';
@@ -296,8 +327,16 @@ BEGIN
 	
 	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
 	UPDATE temp_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
-
 	
+	RETURN 0;
+	
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+	VALUES (417, result_id_var, 3, 'ERROR-417: At least one nodarc have been crashed. Some reasons may be minimun distance againts nodes or some wrong topology fof closest arcs');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+	VALUES (417, result_id_var, 3, concat('DETAIL-417: ', SQLERRM, 'Context:',v_error_context));
 	RETURN 1;
 		
 END;
