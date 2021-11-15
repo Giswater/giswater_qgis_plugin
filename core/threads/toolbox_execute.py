@@ -129,7 +129,6 @@ class GwToolBoxTask(GwTask):
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
         self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
                                                       aux_conn=self.aux_conn, is_thread=True)
-        self.json_result = dict_result['json_result']
 
         if self.isCanceled():
             return False
