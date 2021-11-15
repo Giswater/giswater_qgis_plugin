@@ -2995,7 +2995,7 @@ def hide_widgets_form(dialog, dlg_name):
     if row:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
-            if widget.objectName() and widget.objectName() in row[0]:
+            if widget.objectName() and f'"{widget.objectName()}"' in row[0]:
                 lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
                 if lbl_widget:
                     lbl_widget.setVisible(False)
