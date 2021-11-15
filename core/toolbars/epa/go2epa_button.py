@@ -384,6 +384,7 @@ class GwGo2EpaButton(GwAction):
                 tools_qt.show_info_box(msg)
                 return
 
+        self.dlg_go2epa.btn_accept.setEnabled(False)
         self.dlg_go2epa.btn_cancel.setEnabled(True)
 
         # Set background task 'Go2Epa'

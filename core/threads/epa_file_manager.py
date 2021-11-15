@@ -91,6 +91,7 @@ class GwEpaFileManager(GwTask):
             return
 
         self._close_file()
+        self.dlg_go2epa.btn_accept.setEnabled(True)
 
         # If PostgreSQL function returned null
         if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
