@@ -54,7 +54,6 @@ class GwEpaFileManager(GwTask):
         self.go2epa_export_inp = self.go2epa.export_inp
         self.go2epa_execute_epa = self.go2epa.exec_epa
         self.go2epa_import_result = self.go2epa.import_result
-        self.net_geom = self.go2epa.net_geom
         self.export_subcatch = self.go2epa.export_subcatch
 
 
@@ -186,7 +185,6 @@ class GwEpaFileManager(GwTask):
         self.setProgress(0)
 
         extras = f'"resultId":"{self.result_name}"'
-        extras += f', "useNetworkGeom":"{self.net_geom}"'
         if global_vars.project_type == 'ud':
             extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         self.body = tools_gw.create_body(extras=extras)
