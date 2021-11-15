@@ -35,3 +35,5 @@ UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(vdefault::js
 
 UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'steps', '0'::integer) WHERE parameter = 'inp_options_debug';
 UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value::json, 'onlyExport', 'checkData', 'checkNetwork') WHERE parameter = 'inp_options_debug';
+
+UPDATE config_form_fields SET iseditable=TRUE WHERE formname LIKE 've_node%' AND columnname='arc_id';
