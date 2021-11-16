@@ -67,7 +67,6 @@ def open_file(file_path):
         return False, None
 
 
-
 def get_relative_path(filepath, levels=1):
 
     common = filepath
@@ -125,6 +124,16 @@ def get_folder_size(folder):
             size += os.path.getsize(filepath)
 
     return size
+
+
+def get_number_of_files(folder):
+    """ Get number of files of @folder and its subfolders """
+
+    if not os.path.exists(folder):
+        return 0
+
+    file_count = sum(len(files) for _, _, files in os.walk(folder))
+    return file_count
 
 
 def manage_pg_service(section):
