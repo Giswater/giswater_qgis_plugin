@@ -24,7 +24,6 @@ class GwCreateSchemaTask(GwTask):
         self.params = params
 
 
-
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
@@ -46,32 +45,27 @@ class GwCreateSchemaTask(GwTask):
             if not status and self.admin.dev_commit is False:
                 return False
 
-            if not self.is_test:
-                self.setProgress(10)
+            self.set_progress(10)
             status = self.admin._update_30to31(new_project=True, project_type=project_type)
             if not status and self.admin.dev_commit is False:
                 return False
 
-            if not self.is_test:
-                self.setProgress(20)
+            self.set_progress(20)
             status = self.admin._load_views(project_type=project_type)
             if not status and self.admin.dev_commit is False:
                 return False
 
-            if not self.is_test:
-                self.setProgress(30)
+            self.set_progress(30)
             status = self.admin._load_trg(project_type=project_type)
             if not status and self.admin.dev_commit is False:
                 return False
 
-            if not self.is_test:
-                self.setProgress(40)
+            self.set_progress(40)
             status = self.admin._update_31to39(new_project=True, project_type=project_type)
             if not status and self.admin.dev_commit is False:
                 return False
 
-            if not self.is_test:
-                self.setProgress(60)
+            self.set_progress(60)
 
             status = True
             if exec_last_process:
@@ -85,21 +79,17 @@ class GwCreateSchemaTask(GwTask):
             if self.admin.rdb_import_data.isChecked():
                 self.finish_execution['import_data'] = True
                 # TODO:
-                if not self.is_test:
-                    self.setProgress(90)
+                self.set_progress(90)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
-                if not self.is_test:
-                    self.setProgress(80)
+                self.set_progress(80)
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
             elif self.admin.rdb_sample_dev.isChecked():
-                if not self.is_test:
-                    self.setProgress(80)
+                self.set_progress(80)
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
-                if not self.is_test:
-                    self.setProgress(90)
+                self.set_progress(90)
                 self.admin._load_dev_data(project_type=project_type)
             elif self.admin.rdb_data.isChecked():
                 tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
@@ -140,4 +130,10 @@ class GwCreateSchemaTask(GwTask):
             self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                               is_test=self.is_test)
         self.setProgress(100)
+
+
+    def set_progress(self, value):
+
+        if not self.is_test:
+            self.setProgress(value)
 
