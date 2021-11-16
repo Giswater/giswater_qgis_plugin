@@ -959,7 +959,7 @@ class GwAdminButton:
         return True
 
 
-    def _update_minor31to39(self, folder_update, new_project, no_ct):
+    def _update_minor31to39(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_update, os.sep + 'utils' + os.sep) is True:
@@ -1004,20 +1004,20 @@ class GwAdminButton:
                     if new_project:
                         if self.dev_commit is True:
                             if str(sub_folder) > '31100':
-                                self._update_minor31to39(folder_update, new_project, no_ct)
+                                self._update_minor31to39(folder_update, new_project, project_type, no_ct)
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                self._update_minor31to39(folder_update, new_project, no_ct)
+                                self._update_minor31to39(folder_update, new_project, project_type, no_ct)
 
                     else:
                         if self.dev_commit is True:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                                self._update_minor31to39(folder_update, new_project, no_ct)
+                                self._update_minor31to39(folder_update, new_project, project_type, no_ct)
 
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                self._update_minor31to39(folder_update, new_project, no_ct)
+                                self._update_minor31to39(folder_update, new_project, project_type, no_ct)
 
         else:
 
