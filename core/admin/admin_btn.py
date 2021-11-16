@@ -878,65 +878,24 @@ class GwAdminButton:
         if str(project_type) not in ('ws', 'ud'):
             return True
 
-        folder = self.folder_utils + self.file_pattern_ddl
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
+        list_folders = []
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddl))
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_dml))
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_fct))
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ftrg))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddl))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlrule))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_dml))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_tablect))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_fct))
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ftrg))
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_tablect))
+        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlrule))
 
-        folder = self.folder_utils + self.file_pattern_dml
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_utils + self.file_pattern_fct
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_utils + self.file_pattern_ftrg
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_ddl
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_ddlrule
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_dml
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_tablect
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_fct
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_software + self.file_pattern_ftrg
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_utils + self.file_pattern_tablect
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_utils + self.file_pattern_ddlrule
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
+        for folder in list_folders:
+            status = self._execute_files(folder)
+            if not status and self.dev_commit is False:
+                return False
 
         return True
 
@@ -1101,19 +1060,12 @@ class GwAdminButton:
     def _load_views(self, project_type=False):
         """"""
 
+        list_folders = []
+        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlview))
         if str(project_type) in ('ws', 'ud'):
-            folder = self.folder_software + self.file_pattern_ddlview
-            status = self._execute_files(folder)
-            if not status and self.dev_commit is False:
-                return False
+            list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlview))
 
-            folder = self.folder_utils + self.file_pattern_ddlview
-            status = self._execute_files(folder)
-            if not status and self.dev_commit is False:
-                return False
-
-        else:
-            folder = self.folder_software + self.file_pattern_ddlview
+        for folder in list_folders:
             status = self._execute_files(folder)
             if not status and self.dev_commit is False:
                 return False
@@ -1329,19 +1281,14 @@ class GwAdminButton:
     def _load_trg(self, project_type=False):
         """"""
 
+        list_folders = []
         if str(project_type) in ('ws', 'ud'):
-            folder = self.folder_utils + self.file_pattern_trg
-            status = self._execute_files(folder)
-            if not status and self.dev_commit is False:
-                return False
-
-            folder = self.folder_software + self.file_pattern_trg
-            status = self._execute_files(folder)
-            if not status and self.dev_commit is False:
-                return False
-
+            list_folders.append(os.path.join(self.folder_utils, self.file_pattern_trg))
+            list_folders.append(os.path.join(self.folder_software, self.file_pattern_trg))
         else:
-            folder = self.folder_software + self.file_pattern_trg
+            list_folders.append(os.path.join(self.folder_utils, self.file_pattern_trg))
+
+        for folder in list_folders:
             status = self._execute_files(folder)
             if not status and self.dev_commit is False:
                 return False
