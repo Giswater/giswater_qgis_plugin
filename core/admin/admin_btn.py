@@ -959,6 +959,33 @@ class GwAdminButton:
         return True
 
 
+    def _update_minor31to39(self, folder_update, new_project, no_ct):
+
+        folder_utils = os.path.join(folder_update, 'utils')
+        if self._process_folder(folder_update, os.sep + 'utils' + os.sep) is True:
+            status = self._load_sql(folder_utils, no_ct)
+            if status is False:
+                return False
+
+        if new_project:
+            folder_project = project_type
+        else:
+            folder_project = self.project_type_selected
+        folder_project_type = os.path.join(folder_update, folder_project)
+        if self._process_folder(folder_project_type, ''):
+            status = self._load_sql(folder_project_type, no_ct)
+            if status is False:
+                return False
+
+        folder_locale = os.path.join(folder_update, 'i18n', self.locale)
+        if self._process_folder(folder_locale, '') is True:
+            status = self._execute_files(folder_locale, True)
+            if status is False:
+                return False
+
+        return True
+
+
     def _update_31to39(self, new_project=False, project_type=False, no_ct=False):
         """"""
 
@@ -968,91 +995,29 @@ class GwAdminButton:
                 tools_qgis.show_message("The update folder was not found in sql folder")
                 self.error_count = self.error_count + 1
                 return
+
             folders = sorted(os.listdir(self.folder_updates + ''))
             for folder in folders:
                 sub_folders = sorted(os.listdir(self.folder_updates + folder))
                 for sub_folder in sub_folders:
+                    folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                     if new_project:
                         if self.dev_commit is True:
                             if str(sub_folder) > '31100':
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
-                                    status = self._load_sql(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), '') is True:
-                                    status = self._execute_files(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
+                                self._update_minor31to39(folder_update, new_project, no_ct)
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
-                                    status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                            sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), ''):
-                                    status = self._execute_files(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
+                                self._update_minor31to39(folder_update, new_project, no_ct)
 
                     else:
                         if self.dev_commit is True:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                            sub_folder + os.sep + 'utils' + os.sep)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep,
-                                        '') is True:
-                                    status = self._load_sql(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder +
-                                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                        '') is True:
-                                    status = self._execute_files(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
+                                self._update_minor31to39(folder_update, new_project, no_ct)
 
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                            sub_folder + os.sep + 'utils' + os.sep)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep,
-                                        '') is True:
-                                    status = self._load_sql(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
-                                    if status is False:
-                                        return False
-                                if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
-                                    status = self._execute_files(
-                                        self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
+                                self._update_minor31to39(folder_update, new_project, no_ct)
 
         else:
 
