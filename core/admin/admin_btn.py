@@ -938,6 +938,11 @@ class GwAdminButton:
         if not status and self.dev_commit is False:
             return False
 
+        return True
+
+
+    def _load_locale(self):
+
         if self._process_folder(self.folder_locale, '') is False:
             folder_locale = f"{self.sql_dir}{os.sep}i18n{os.sep}en_US"
             if self._process_folder(folder_locale) is False:
@@ -1131,7 +1136,7 @@ class GwAdminButton:
     def _load_views(self, project_type=False):
         """"""
 
-        if str(project_type) == 'ws' or str(project_type) == 'ud':
+        if str(project_type) in ('ws', 'ud'):
             folder = self.folder_software + self.file_pattern_ddlview
             status = self._execute_files(folder)
             if not status and self.dev_commit is False:

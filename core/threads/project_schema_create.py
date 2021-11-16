@@ -91,27 +91,31 @@ class GwCreateSchemaTask(GwTask):
         project_locale = self.params['project_locale']
         project_srid = self.params['project_srid']
 
-        status = self.admin._load_base(project_type=project_type)
+        status = self.admin._load_base(project_type)
+        if not status and self.admin.dev_commit is False:
+            return False
+
+        status = self.admin._load_locale()
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(10)
-        status = self.admin._update_30to31(new_project=True, project_type=project_type)
+        status = self.admin._update_30to31(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(20)
-        status = self.admin._load_views(project_type=project_type)
+        status = self.admin._load_views(project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(30)
-        status = self.admin._load_trg(project_type=project_type)
+        status = self.admin._load_trg(project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(40)
-        status = self.admin._update_31to39(new_project=True, project_type=project_type)
+        status = self.admin._update_31to39(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
