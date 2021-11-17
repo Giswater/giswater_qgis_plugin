@@ -1080,54 +1080,51 @@ class GwAdminButton:
                 self.error_count = self.error_count + 1
                 return True
 
-            folders = sorted(os.listdir(self.folder_updates + ''))
-            for folder in folders:
-                sub_folders = sorted(os.listdir(self.folder_updates + folder))
-                for sub_folder in sub_folders:
-                    if new_project:
-                        if str(sub_folder) <= '31100':
-                            if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                        sub_folder + os.sep + 'utils' + os.sep)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.folder_updates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                                status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                        sub_folder + os.sep + project_type + os.sep)
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folder_updates + folder + os.sep + sub_folder +
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
-                                if status is False:
-                                    return False
-                    else:
-                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
-                            if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                        sub_folder + os.sep + 'utils' + os.sep)
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep,
-                                    '') is True:
-                                status = self._load_sql(
-                                    self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folder_updates + folder + os.sep + sub_folder +
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
-                                if status is False:
-                                    return False
+            # Process only subfolders of folder '31'
+            folder = os.path.join(self.folder_updates, '31')
+            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
+            tools_log.log_info(f"sub_folders: {sub_folders}")
+            for sub_folder in sub_folders:
+                if new_project:
+                    if str(sub_folder) <= '31100':
+                        folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
+                        if self._process_folder(folderpath, '') is True:
+                            status = self._load_sql(folderpath)
+                            if status is False:
+                                return False
+                        folderpath = os.path.join(self.folder_updates, folder, sub_folder, project_type)
+                        if self._process_folder(folderpath, '') is True:
+                            status = self._load_sql(folderpath)
+                            if status is False:
+                                return False
+                        folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
+                        if self._process_folder(folderpath, '') is True:
+                            status = self._execute_files(folderpath, True)
+                            if status is False:
+                                return False
+                else:
+                    if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
+                        if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
+                            status = self._load_sql(self.folder_updates + folder + os.sep +
+                                                    sub_folder + os.sep + 'utils' + os.sep)
+                            if status is False:
+                                return False
+                        if self._process_folder(
+                                self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep,
+                                '') is True:
+                            status = self._load_sql(
+                                self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
+                            if status is False:
+                                return False
+                        if self._process_folder(
+                                self.folder_updates + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                '') is True:
+                            status = self._execute_files(
+                                self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
+                                    self.locale + os.sep), True)
+                            if status is False:
+                                return False
 
         else:
 
