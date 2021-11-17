@@ -921,7 +921,7 @@ class GwAdminButton:
     def _update_minor31to39(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
-        if self._process_folder(folder_update, os.sep + 'utils' + os.sep) is True:
+        if self._process_folder(folder_utils, '') is True:
             status = self._load_sql(folder_utils, no_ct)
             if status is False:
                 return False
