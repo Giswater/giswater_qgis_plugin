@@ -287,24 +287,7 @@ class GwAdminButton:
         return status
 
 
-    """ Other functions """
-
-    def visit_manager(self):
-        """"""
-        # TODO:: Remove tab visitclas. WIP
-        tools_qt.remove_tab(self.dlg_readsql.tab_main, "visitclass")
-        return
-        # Populate visit class
-        # TODO:: Populate combo from visitclass manager and wip
-        # sql = ("SELECT id, idval FROM config_visit_class")
-        # rows = tools_db.get_rows(sql, commit=True)
-        # qt_tools.fill_combo_values(self.dlg_readsql.cmb_visit_class, rows, 1)
-
-        # Set listeners
-        # self.dlg_readsql.btn_visit_create.clicked.connect(partial(self._create_visit_param))
-        # self.dlg_readsql.btn_visit_update.clicked.connect(partial(self.update_visit))
-        # self.dlg_readsql.btn_visit_delete.clicked.connect(partial(self.delete_visit))
-
+    # region Other functions
 
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
@@ -636,7 +619,6 @@ class GwAdminButton:
         self._populate_data_schema_name(self.cmb_project_type)
         self._set_info_project()
         self._update_manage_ui()
-        self.visit_manager()
 
         if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
@@ -1519,50 +1501,6 @@ class GwAdminButton:
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
-        return
-
-
-    # FIXME: Function is entirely commented
-    def _create_visit_param(self):
-        """"""
-        """
-        # Create the dialog and signals
-        self.dlg_manage_visit_param = MainVisitParamUi()
-        tools_gw.load_settings(self.dlg_manage_visit_param)
-
-        # Manage widgets
-        sql = "SELECT id, id as idval FROM om_visit_parameter_type"
-        rows = tools_db.get_rows(sql, commit=True)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_param.parameter_type, rows, 1)
-
-        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
-        rows = tools_db.get_rows(sql, commit=True)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_param.data_type, rows, 1)
-
-        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
-        rows = tools_db.get_rows(sql, commit=True)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_param.form_type, rows, 1)
-
-        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
-        rows = tools_db.get_rows(sql, commit=True)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_param.widget_type, rows, 1)
-
-        # Set listeners
-
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_visit_param, dlg_name='admin_visitparam')
-        """
-
-        return
-
-
-    def _update_visit(self):
-        """"""
-        return
-
-
-    def _delete_visit(self):
-        """"""
         return
 
 
