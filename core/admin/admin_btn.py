@@ -2083,10 +2083,12 @@ class GwAdminButton:
         """"""
 
         if not os.path.exists(filedir):
-            tools_log.log_info("Folder not found", parameter=filedir)
+            tools_log.log_info(f"Folder not found: {filedir}")
             return True
+
         if log_folder:
-            tools_log.log_info("Processing folder", parameter=filedir)
+            tools_log.log_info(f"Processing folder: {filedir}")
+
         filelist = sorted(os.listdir(filedir))
         status = True
         if utils_schema_name:
@@ -2097,30 +2099,25 @@ class GwAdminButton:
         else:
             schema_name = self.schema.replace('"', '')
         self.project_epsg = str(self.project_epsg).replace('"', '')
+
         if i18n:
+            files_to_execute = [f"{self.project_type_selected}.sql", "utils.sql", "ddl.sql", "ddlview.sql", "dml.sql",
+                                "tablect.sql", "trg.sql"]
             for file in filelist:
-                if "utils.sql" in file:
+                status = True
+                if file in files_to_execute:
                     if log_files:
-                        tools_log.log_info(str(filedir + os.sep + 'utils.sql'))
-                    status = self._read_execute_file(filedir, os.sep + 'utils.sql', schema_name, self.project_epsg)
-                elif str(self.project_type_selected) + ".sql" in file:
-                    if log_files:
-                        tools_log.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
-                    status = self._read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql',
-                        schema_name, self.project_epsg)
-                elif file in ("ddl.sql", "ddlview.sql", "dml.sql", "tablect.sql", "trg.sql"):
-                    if log_files:
-                        tools_log.log_info(str(filedir + os.sep + file))
+                        tools_log.log_info(os.path.join(filedir, file))
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                 if not status and self.dev_commit is False:
                     return False
-        else:
 
+        else:
             for file in filelist:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         if log_files:
-                            tools_log.log_info(str(filedir + os.sep + file))
+                            tools_log.log_info(os.path.join(filedir, file))
                         status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                         if not status and self.dev_commit is False:
                             return False
@@ -2134,7 +2131,7 @@ class GwAdminButton:
         status = False
         f = None
         try:
-            filepath = filedir + os.sep + file
+            filepath = os.path.join(filedir, file)
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
