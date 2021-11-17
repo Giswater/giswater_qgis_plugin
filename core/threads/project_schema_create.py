@@ -71,8 +71,8 @@ class GwCreateSchemaTask(GwTask):
             tools_qt.show_info_box(msg, "Info")
             self.admin._execute_import_data(self.params['project_name_schema'], self.params['project_type'])
         else:
-            self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'],
-                                              is_test=self.is_test)
+            self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
+                                             is_test=self.is_test)
         self.setProgress(100)
 
 
@@ -91,31 +91,31 @@ class GwCreateSchemaTask(GwTask):
         project_locale = self.params['project_locale']
         project_srid = self.params['project_srid']
 
-        status = self.admin._load_base(project_type)
+        status = self.admin.load_base(project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
-        status = self.admin._load_locale()
+        status = self.admin.load_locale()
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(10)
-        status = self.admin._update_30to31(True, project_type)
+        status = self.admin.update_30to31(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(20)
-        status = self.admin._load_views(project_type)
+        status = self.admin.load_views()
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(30)
-        status = self.admin._load_trg()
+        status = self.admin.load_trg()
         if not status and self.admin.dev_commit is False:
             return False
 
         self.set_progress(40)
-        status = self.admin._update_31to39(True, project_type)
+        status = self.admin.update_31to39(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
@@ -123,8 +123,8 @@ class GwCreateSchemaTask(GwTask):
 
         status = True
         if exec_last_process:
-            status = self.admin._execute_last_process(True, project_name_schema, self.admin.schema_type,
-                                                      project_locale, project_srid)
+            status = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
+                                                     project_locale, project_srid)
 
         if not status and self.admin.dev_commit is False:
             return False
@@ -146,13 +146,13 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_sample.isChecked() and example_data:
             self.set_progress(80)
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
-            self.admin._load_sample_data(project_type=project_type)
+            self.admin.load_sample_data(project_type=project_type)
         elif self.admin.rdb_sample_dev.isChecked():
             self.set_progress(80)
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
-            self.admin._load_sample_data(project_type=project_type)
+            self.admin.load_sample_data(project_type=project_type)
             self.set_progress(90)
-            self.admin._load_dev_data(project_type=project_type)
+            self.admin.load_dev_data(project_type=project_type)
         elif self.admin.rdb_data.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
