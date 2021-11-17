@@ -118,7 +118,7 @@ class GwAdminButton:
         self.schema_type = project_type
         self.project_epsg = project_srid
         self.locale = project_locale
-        self.folder_locale = f"{self.sql_dir}{os.sep}i18n{os.sep}{self.locale}{os.sep}"
+        self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -444,11 +444,9 @@ class GwAdminButton:
         """ Initialization code of the form (to be executed only once) """
 
         # Get SQL folder and check if exists
-        folder_name = os.path.dirname(os.path.abspath(__file__))
-        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + '..'\
-                       + os.sep + 'dbmodel'
+        self.sql_dir = os.path.normpath(os.path.join(global_vars.plugin_dir, 'dbmodel'))
         if not os.path.exists(self.sql_dir):
-            tools_qgis.show_message("SQL folder not found", parameter=self.sql_dir)
+            tools_qgis.show_message(f"SQL folder not found: {self.sql_dir}")
             return
 
         self.project_version = '0'
@@ -468,15 +466,14 @@ class GwAdminButton:
 
         # Declare all folders
         if self.schema_name is not None and self.project_type is not None:
-            self.folder_software = f"{self.sql_dir}{os.sep}{self.project_type}{os.sep}"
+            self.folder_software = os.path.join(self.sql_dir, self.project_type)
         else:
             self.folder_software = ""
 
-        self.folder_locale = f"{self.sql_dir}{os.sep}i18n{os.sep}{self.locale}{os.sep}"
-        self.folder_utils = f"{self.sql_dir}{os.sep}utils{os.sep}"
-        self.folder_updates = f"{self.sql_dir}{os.sep}updates{os.sep}"
-        self.folder_example = f"{self.sql_dir}{os.sep}example{os.sep}"
-        self.folderPath = ''
+        self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
+        self.folder_utils = os.path.join(self.sql_dir, 'utils')
+        self.folder_updates = os.path.join(self.sql_dir, 'updates')
+        self.folder_example = os.path.join(self.sql_dir, 'example')
 
         # Check if user have commit permissions
         self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False, force_reload=True)
@@ -903,8 +900,8 @@ class GwAdminButton:
     def _load_locale(self):
 
         if self._process_folder(self.folder_locale, '') is False:
-            folder_locale = f"{self.sql_dir}{os.sep}i18n{os.sep}en_US"
-            if self._process_folder(folder_locale) is False:
+            folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
+            if self._process_folder(folder_locale, '') is False:
                 return False
             else:
                 status = self._execute_files(folder_locale, True)
@@ -957,7 +954,7 @@ class GwAdminButton:
 
             folders = sorted(os.listdir(self.folder_updates + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.folder_updates + folder))
+                sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
                 for sub_folder in sub_folders:
                     folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                     if new_project:
@@ -2100,9 +2097,9 @@ class GwAdminButton:
             schema_name = self.schema.replace('"', '')
         self.project_epsg = str(self.project_epsg).replace('"', '')
 
+        # Manage folders 'i18n'
         manage_i18n = i18n
         if 'i18n' in filedir:
-            tools_log.log_warning("CONTAINS i18n")
             manage_i18n = True
 
         if manage_i18n:
