@@ -973,7 +973,7 @@ class GwAdminButton:
         return True
 
 
-    def _load_views(self, project_type=False):
+    def _load_views(self):
         """"""
 
         list_folders = []
@@ -1091,23 +1091,7 @@ class GwAdminButton:
         return True
 
 
-    def _load_tablect(self, project_type=False):
-        """"""
-
-        folder = self.folder_software + self.file_pattern_tablect
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        folder = self.folder_utils + self.file_pattern_tablect
-        status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
-            return False
-
-        return True
-
-
-    def _load_trg(self, project_type=False):
+    def _load_trg(self):
         """"""
 
         list_folders = []
@@ -1323,7 +1307,7 @@ class GwAdminButton:
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
         status = tools_db.execute_sql(sql, commit=False)
         if status:
-            self._reload_fct_ftrg(project_type=self.project_type_selected)
+            self._reload_fct_ftrg()
             self.task1.setProgress(40)
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
@@ -1375,19 +1359,14 @@ class GwAdminButton:
         return schema_name
 
 
-    def _reload_tablect(self, project_type=False):
+    def _reload_tablect(self):
         """"""
-        self._load_tablect(project_type=project_type)
+        self._load_tablect()
 
 
-    def _reload_fct_ftrg(self, project_type=False):
+    def _reload_fct_ftrg(self):
         """"""
-        self._load_fct_ftrg(project_type=project_type)
-
-
-    def _reload_trg(self, project_type=False):
-        """"""
-        self._load_trg(project_type)
+        self._load_fct_ftrg()
 
 
     """ Create new connection when change combo connections """
@@ -1829,7 +1808,7 @@ class GwAdminButton:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
-            self._reload_fct_ftrg(self.project_type_selected)
+            self._reload_fct_ftrg()
             self.task1.setProgress(100)
 
         status = (self.error_count == 0)

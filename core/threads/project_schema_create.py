@@ -110,7 +110,7 @@ class GwCreateSchemaTask(GwTask):
             return False
 
         self.set_progress(30)
-        status = self.admin._load_trg(project_type)
+        status = self.admin._load_trg()
         if not status and self.admin.dev_commit is False:
             return False
 
