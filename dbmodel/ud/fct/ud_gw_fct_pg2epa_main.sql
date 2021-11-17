@@ -51,6 +51,7 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
 	v_step = (p_data->>'data')::json->>'step';
+	IF v_step IS NULL THEN v_step = 0; END IF;
 		
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 	
@@ -75,6 +76,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
 		v_return = '{"message":{"level":1, "text":"Step-2: Analyze graf of inp export done succesfully"}}'::json;
 		RETURN v_return;
+		
 	END IF;
 
 	-- check sector selector
@@ -185,7 +187,8 @@ BEGIN
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', '"message":{"level":1, "text":"Inp export done succesfully"}')::json;
-		RETURN v_return;	
+		RETURN v_return;
+		
 	END IF;
 
 	--  Exception handling
