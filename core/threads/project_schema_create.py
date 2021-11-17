@@ -135,6 +135,7 @@ class GwCreateSchemaTask(GwTask):
     def custom_execution(self):
         """ Custom execution """
 
+        project_type = self.params['project_type']
         example_data = self.params['example_data']
 
         if self.admin.rdb_import_data.isChecked():
