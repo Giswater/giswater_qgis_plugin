@@ -2100,7 +2100,12 @@ class GwAdminButton:
             schema_name = self.schema.replace('"', '')
         self.project_epsg = str(self.project_epsg).replace('"', '')
 
-        if i18n:
+        manage_i18n = i18n
+        if 'i18n' in filedir:
+            tools_log.log_warning("CONTAINS i18n")
+            manage_i18n = True
+
+        if manage_i18n:
             files_to_execute = [f"{self.project_type_selected}.sql", "utils.sql", "ddl.sql", "ddlview.sql", "dml.sql",
                                 "tablect.sql", "trg.sql"]
             for file in filelist:
