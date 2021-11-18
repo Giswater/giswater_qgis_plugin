@@ -278,6 +278,10 @@ class ManageWorkcatEnd(ParentManage):
                     f"SET state = '0', state_type = '{self.statetype_id_end}', workcat_id_end = '{self.workcat_id_end}', "
                     f"enddate = '{self.enddate}' "
                     f"WHERE {geom_type}_id = '{id_}';\n")
+            sql += (f"UPDATE element e "
+                    f"SET state = '0', state_type = '{self.statetype_id_end}', workcat_id_end = '{self.workcat_id_end}', "
+                    f"enddate = '{self.enddate}' FROM element_x_{geom_type} f "
+                    f"WHERE f.element_id=e.element_id AND {geom_type}_id = '{id_}';\n")
         if sql != "":
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
