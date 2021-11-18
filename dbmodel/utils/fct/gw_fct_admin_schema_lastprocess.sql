@@ -238,6 +238,9 @@ BEGIN
 		WHERE parameter = 'basic_selector_tab_macroexploitation';
 		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromSector', 'True'::boolean) 
 		WHERE parameter = 'basic_selector_tab_sector';
+		
+		-- remove deprecated parameters on config_param_system
+		DELETE FROM config_param_system WHERE parameter = 'om_mincut_enable_alerts';
 
 		-- fk for ext tables or utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  
