@@ -1661,7 +1661,6 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        tools_log.log_warning(f"Function error: {function_name}")
         manage_json_exception(json_result, sql)
         return False
 
