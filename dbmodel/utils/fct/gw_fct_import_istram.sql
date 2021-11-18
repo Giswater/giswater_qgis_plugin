@@ -40,7 +40,7 @@ v_expl_id integer;
 v_dma_id integer;
 v_sector_id integer;
 v_action text;
-v_action_params text;
+v_action_params json;
 
 BEGIN
 
@@ -124,8 +124,6 @@ BEGIN
 			
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Create import istream mapzones.'));
 
-			v_action_params = '"query": "SELECT node_id, top_elev, sys_elev FROM SCHEMA_NAME.v_edit_node ", "layerName":"Nodes", "group": "ISTRAM"';
-
 		ELSIF v_fid = 409 THEN
 			
 			SELECT count(node_id) INTO v_count FROM node WHERE code = (SELECT csv2 FROM temp_csv WHERE fid=409 LIMIT 1);
@@ -172,13 +170,13 @@ BEGIN
 	 
 	      INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count,' arcs'));
 
-	      v_action_params = '"query": "SELECT arc_id, sys_elev1, sys_elev2, cat_shape, matcat_id, cat_geom1, cat_geom2 FROM SCHEMA_NAME.v_edit_arc ", "layerName":"Arcs", "group": "ISTRAM"';
-
 	  	END IF;
 		END IF;
 		
 
 	END IF;
+
+	SELECT addparam INTO v_action_params FROM config_csv WHERE fid=v_fid;
 
 	-- get log 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -199,7 +197,7 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_action = concat('[{"funcName": "add_query_layer", "params": {', v_action_params, '}}]');
+	v_action = concat('[{"funcName": "add_query_layer", "params":', v_action_params, '}]');
 				
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
