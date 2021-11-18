@@ -158,7 +158,9 @@ BEGIN
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 
 	RAISE NOTICE '12 - check result previous exportation';
-	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+	IF v_step=0 THEN
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+	END IF;
 
 	RAISE NOTICE '13 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;

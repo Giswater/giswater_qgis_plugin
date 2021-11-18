@@ -66,7 +66,9 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
-	
+
+	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
+
 	-- get debug parameters (settings)
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -105,7 +107,6 @@ BEGIN
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	
 	-- setting variables
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 	IF v_networkmode = 1 THEN 
 		v_onlymandatory_nodarc = TRUE;
 	END IF;
@@ -222,7 +223,9 @@ BEGIN
 	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
 	RAISE NOTICE '19 - Check result previous exportation';
-	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+	IF v_step=0 THEN
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+	END IF;
 
 	RAISE NOTICE '20 - Profilactic last control';
 
