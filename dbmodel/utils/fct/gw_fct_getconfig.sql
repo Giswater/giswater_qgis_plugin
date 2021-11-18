@@ -109,12 +109,12 @@ BEGIN
 		-- Get all parameters from audit_cat param_user
 		v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (
 
-			SELECT label, widgetname, value , datatype, widgettype, layoutorder, layoutname,iseditable,orderby, isparent, sys_role, project_type, widgetcontrols::json,
+			SELECT label, widgetname, value , datatype, widgettype, layoutorder, layoutname,iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols::json,
 			checked, placeholder, tooltip, dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue FROM (
 			
 				SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
 					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
-					row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols::text,
+					isparent, sys_role, project_type, widgetcontrols::text,
 					(CASE WHEN value IS NOT NULL AND value != ''false'' THEN True ELSE False END) AS checked, placeholder, descript AS tooltip, 
 					dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 					FROM sys_param_user 
@@ -128,7 +128,7 @@ BEGIN
 					UNION
 				SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
 					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
-					row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols::text,
+					isparent, sys_role, project_type, widgetcontrols::text,
 					(CASE WHEN value IS NOT NULL AND value != ''false'' THEN True ELSE False END) AS checked, placeholder, sys_param_user.descript AS tooltip, 
 					dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 					FROM sys_param_user 
@@ -139,8 +139,8 @@ BEGIN
 					AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),')
 					AND isenabled IS TRUE
 					AND active IS TRUE
-					AND sys_param_user.id LIKE ''feat_%''			
-					ORDER by orderby) b) a');
+					AND sys_param_user.id LIKE ''feat_%'')b			
+					ORDER by orderby) a');
 					
 		v_debug_vars := json_build_object('v_formname', v_formname, 'v_epaversion', v_epaversion, 'v_project_type', v_project_type);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 10);
@@ -214,9 +214,10 @@ BEGIN
 					combo_json = array_to_json(v_array);
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
-					-- Get selected value
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');      
+					raise notice ' PARENTTTTTTTTTTTTTTTTT % ', fields_array[(aux_json->>'orderby')::INT];
 
+					-- Get selected value
+					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value'); 
 				END IF;
 
 				-- looking for childs 
@@ -309,6 +310,8 @@ BEGIN
 							END IF;
 							raise notice 'parent % v_selected_id % aux_json_child %', (aux_json->>'widgetname'), v_selected_id, aux_json_child;
 						END IF;
+
+						raise notice ' CHILDDDDDDDDDDDDDDDD % ', fields_array[(aux_json_child->>'orderby')::INT];
 					END LOOP;
 				END IF;			    
 			END IF;	
@@ -316,6 +319,8 @@ BEGIN
 			--removing the not used fields
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 			'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'sys_role', 'project_type');
+
+			raise notice ' aux_json %', aux_json;
 		
 		END LOOP;
 		 
