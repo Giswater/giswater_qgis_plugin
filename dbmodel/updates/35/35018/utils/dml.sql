@@ -37,3 +37,9 @@ UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'st
 UPDATE config_param_user SET value = gw_fct_json_object_delete_keys(value::json, 'onlyExport', 'checkData', 'checkNetwork') WHERE parameter = 'inp_options_debug';
 
 UPDATE config_form_fields SET iseditable=TRUE WHERE formname LIKE 've_node%' AND columnname='arc_id';
+
+--2021/11/18
+update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_node.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_node%';
+update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_arc.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_arc%';
+update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_connec.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_connec%';
+

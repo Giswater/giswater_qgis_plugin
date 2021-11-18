@@ -80,4 +80,4 @@ update config_param_system set layoutname='lyt_admin_other', layoutorder=10, ise
 update config_param_system set layoutname='lyt_admin_other', layoutorder=11, isenabled=false, widgettype='text', label='Plan statetype planned:' where "parameter"='plan_statetype_planned';
 update config_param_system set layoutname='lyt_admin_other', layoutorder=12, isenabled=false, widgettype='text', label='Plan statetype reconstruct:' where "parameter"='plan_statetype_reconstruct';
 
-
+update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_grate.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_grate%';
