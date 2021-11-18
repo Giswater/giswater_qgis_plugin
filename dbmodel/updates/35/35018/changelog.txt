@@ -1,0 +1,8 @@
+3.5.018
+*************
+- Refactor of tab admin for config
+- Check Duplicated hydrometer related to more than one connec (419)
+- Check function / category / fluid / location types (421,422,423,424,245)
+- Clean code for vnode elevation & topelevations
+- Minor bug fix from prev releases
+- Enhance performance to export huge inp files

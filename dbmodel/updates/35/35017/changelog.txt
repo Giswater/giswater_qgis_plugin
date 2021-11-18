@@ -1,6 +1,5 @@
 3.5.017
 *************
 - Buf fix from prev commits
-- Add new controls on go2epa for ws. Check mandatory nodarcs and shortpipe nodarcs over other epa nodes (411, 412)
-- Check connec over nodes (413) and control matcat_id on connecs (414)
+- Check matcat_id on connecs (414)
 - Check pjoint_id and pjoint_type nulls for connecs/gullies (415 & 416)
