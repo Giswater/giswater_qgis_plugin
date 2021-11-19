@@ -12,6 +12,7 @@ import operator
 import sys
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
@@ -1266,6 +1267,10 @@ class GwPsector:
             1: OnRowChange
             2: OnManualSubmit
         """
+
+        # Manage exception if dialog is closed
+        if isdeleted(dialog):
+            return
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
