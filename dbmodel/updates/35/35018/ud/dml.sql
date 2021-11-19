@@ -81,3 +81,7 @@ update config_param_system set layoutname='lyt_admin_other', layoutorder=11, ise
 update config_param_system set layoutname='lyt_admin_other', layoutorder=12, isenabled=false, widgettype='text', label='Plan statetype reconstruct:' where "parameter"='plan_statetype_reconstruct';
 
 update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_grate.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_grate%';
+
+--2021/11/19
+DELETE FROM config_param_user WHERE parameter ='edit_gully_doublegeom';
+DELETE FROM sys_param_user WHERE parameter ='edit_gully_doublegeom';
