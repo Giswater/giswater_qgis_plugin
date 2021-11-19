@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
@@ -23,14 +23,26 @@ class GwCreateSchemaTask(GwTask):
         self.admin = admin
         self.params = params
 
+        # Manage buttons & other dlg-related widgets
+        # Disable dlg_readsql_create_project buttons
+        self.admin.dlg_readsql_create_project.btn_cancel_task.show()
+        self.admin.dlg_readsql_create_project.btn_accept.hide()
+        self.admin.dlg_readsql_create_project.btn_close.setEnabled(False)
+        try:
+            self.admin.dlg_readsql_create_project.key_escape.disconnect()
+        except TypeError:
+            pass
+        # Disable red 'X' from dlg_readsql_create_project
+        self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.admin.dlg_readsql_create_project.show()
+        # Disable dlg_readsql buttons
+        self.admin.dlg_readsql.btn_close.setEnabled(False)
 
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         super().run()
-        self.admin.dlg_readsql_create_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_project.btn_accept.hide()
         self.is_test = self.params['is_test']
         project_type = self.params['project_type']
         exec_last_process = self.params['exec_last_process']
@@ -115,8 +127,16 @@ class GwCreateSchemaTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
+        # Enable dlg_readsql_create_project buttons
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
+        self.admin.dlg_readsql_create_project.btn_close.setEnabled(True)
+        # Enable red 'X' from dlg_readsql_create_project
+        self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
+        self.admin.dlg_readsql_create_project.show()
+        # Disable dlg_readsql buttons
+        self.admin.dlg_readsql.btn_close.setEnabled(True)
+
         if self.isCanceled():
             self.setProgress(100)
             return
