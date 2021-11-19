@@ -321,13 +321,16 @@ class GwProfileButton(GwAction):
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
         # Create the appropriate map tool and connect the gotPoint() signal.
+        if hasattr(self, "emit_point") and self.emit_point is not None:
+            tools_gw.disconnect_signal('profile', 'ep_canvasClicked_snapping_node')
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move, 'profile', 'xyCoordinates_mouse_move')
-        # self.canvas.xyCoordinates.connect(self._mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self._snapping_node))
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move,
+                                'profile', 'activate_snapping_node_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._snapping_node),
+                                'profile', 'ep_canvasClicked_snapping_node')
 
 
     def _mouse_move(self, point):
@@ -369,6 +372,7 @@ class GwProfileButton(GwAction):
                 else:
                     self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                    tools_gw.disconnect_signal('profile')
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                     self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
