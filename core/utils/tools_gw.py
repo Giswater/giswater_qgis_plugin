@@ -263,7 +263,7 @@ def connect_signal(obj, pfunc, section, signal_name):
     :param obj: the object to which the signal will be connected
     :param pfunc: the partial object containing the function to connect and the arguments if needed
     :param section: the name of the parent category
-    :param signal_name: the name of the signal
+    :param signal_name: the name of the signal. Should be {functionname}_{obj}_{pfunc} like -> {replace_arc}_{xyCoordinates}_{mouse_move_arc}
     :return: the signal. If failed to connect it will return None
     """
 
