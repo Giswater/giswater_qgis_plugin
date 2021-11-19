@@ -76,8 +76,10 @@ BEGIN
 
 	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
-	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+	FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
+	INTO v_doublegeometry, v_doublegeom_buffer;
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -95,9 +97,12 @@ BEGIN
 		END IF;
 	END IF;
 
+
 	-- manage netgully doublegeom in case of exists
 	IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') AND v_doublegeometry AND v_man_table = 'man_netgully' THEN
 
+		v_unitsfactor = v_doublegeom_buffer;
+		
 		--set rotation field
 		WITH index_query AS(
 		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
@@ -497,10 +502,6 @@ BEGIN
 		--check if feature is double geom	
 		SELECT system_id INTO v_system_id FROM cat_feature WHERE cat_feature.id=NEW.node_type;
 
-		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-		FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
-		INTO v_doublegeometry, v_doublegeom_buffer;
-		
 		-- set and get id for polygon
 		IF (v_doublegeometry IS TRUE) THEN
 				IF (v_pol_id IS NULL) THEN
