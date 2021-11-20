@@ -43,3 +43,11 @@ update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_node.activ
 update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_arc.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_arc%';
 update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_connec.active IS TRUE') where id like 'feat%' and dv_querytext like '%cat_connec%';
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (426, 'Check planned feature with state=0 on psector tables','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (428, 'Check expl.geom is not null when raster DEM is enabled','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (429, 'Check that EPA OBJECTS (curves and others) name do not contain spaces','utils', null, null) ON CONFLICT (fid) DO NOTHING;
