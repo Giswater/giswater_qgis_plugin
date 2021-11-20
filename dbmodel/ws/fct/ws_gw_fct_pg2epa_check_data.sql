@@ -541,9 +541,9 @@ BEGIN
 	END IF;
 	
 		
-	RAISE NOTICE '20 - tanks (fid: 198)';
+	RAISE NOTICE '20 - tanks and inlets with null mandatory values(fid: 198)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 198, a.node_id, nodecat_id, the_geom, 'Tanks with null mandatory values' FROM v_edit_inp_tank a
+	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values' FROM v_edit_inp_tank a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
@@ -555,6 +555,21 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id , 1,  '198','INFO: Tanks checked. No mandatory values missed.',v_count);
+	END IF;	
+
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
+	SELECT 198, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values' FROM v_edit_inp_inlet a
+	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
+	
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '198',concat(
+		'ERROR-198: There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '198','INFO: Inlets checked. No mandatory values missed.',v_count);
 	END IF;		
 
 	RAISE NOTICE '21 - pumps with more than two arcs (292)';
@@ -768,6 +783,25 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '425', concat('INFO: Minlength value (',v_minlength,') is well configured.',v_count));
 	END IF;
+
+	RAISE NOTICE '31 - Check EPA OBJECTS (curves and patterns have not spaces on names (fid: 429)';
+	SELECT count(*) INTO v_count FROM inp_curve WHERE id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' curve(s) has/have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All curves checked has/have names without spaces.'),v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM inp_pattern WHERE pattern_id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' pattern(s) have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All patterns checked have names without spaces.'),v_count);
+	END IF;
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
@@ -778,6 +812,8 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
+
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
