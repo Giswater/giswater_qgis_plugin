@@ -260,7 +260,8 @@ BEGIN
 
 			-- MAPZONES
 			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(0,'undefined') ON CONFLICT (macroexpl_id) DO NOTHING;
-			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(0,'undefined',1) ON CONFLICT (expl_id) DO NOTHING;
+			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(0,'undefined',0) ON CONFLICT (expl_id) DO NOTHING;
+			
 			INSERT INTO sector(sector_id,name) VALUES(0,'undefined') ON CONFLICT (sector_id) DO NOTHING;
 			INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dma_id) DO NOTHING;
 			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
