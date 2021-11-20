@@ -11,13 +11,14 @@ RETURNS trigger AS
 $BODY$
 DECLARE 
 flw_type_aux text;
-
+v_minlength float;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	flw_type_aux= TG_ARGV[0];
 
-    flw_type_aux= TG_ARGV[0];
+	v_minlength := (SELECT value FROM config_param_user WHERE parameter = 'inp_options_minlength' AND cur_user = current_user);
 	
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
@@ -31,7 +32,7 @@ BEGIN
 		"data":{"message":"2074", "function":"2420","debug_msg":null}}$$);';
 	END IF;
 	
-	IF (NEW.flwreg_length)>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
+	IF (NEW.flwreg_length + v_minlength) >= (SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3048", "function":"2420","debug_msg":null}}$$);';
 	END IF;
