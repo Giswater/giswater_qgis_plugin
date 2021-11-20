@@ -12,13 +12,15 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_rpt(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt($${"data":{"resultId":"r1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"test1"}}$$)
 
 --fid:140
+
 
 */
 
 DECLARE
+i integer = 0;
 units_rec record;
 element_rec record;
 addfields_rec record;
@@ -39,6 +41,7 @@ v_path text;
 v_result_id text;
 v_error_context text;
 v_epaversion text;
+v_poll text;
 
 BEGIN
 
@@ -69,7 +72,6 @@ BEGIN
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
 
-
 	-- delete trash rows
 	DELETE FROM temp_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
 		
@@ -85,6 +87,10 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Total' and csv2='Total';
 	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Precip' and csv2='Runon';
 	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='mm';
+
+	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
+	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
+	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1=(SELECT poll_id FROM vi_pollutants LIMIT 1);
 	
 	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
 	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
@@ -120,10 +126,10 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
 
-	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Outfall' and csv2='Loading';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Flow' and csv2='Avg.';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Freq.' and csv2='Flow';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallload_sum' and csv1='Outfall' and csv2='Node';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Loading';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Flow' and csv2='Avg.';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Freq.' and csv2='Flow';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Node';
 	
 	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
 	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Occurrence';
@@ -146,6 +152,7 @@ BEGIN
 	
 	FOR rpt_rec IN SELECT * FROM temp_csv order by id
 	LOOP
+		i = 0;
 		IF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
 		ELSE
@@ -263,14 +270,47 @@ BEGIN
 				VALUES (v_result_id, rpt_rec.csv1, rpt_rec.csv2::numeric, rpt_rec.csv3::numeric, rpt_rec.csv4::numeric, rpt_rec.csv5::numeric, rpt_rec.csv8::numeric,
 				rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,rpt_rec.csv13::numeric,rpt_rec.csv14::numeric,
 				rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
-
 			ELSE
 				INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
 				VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 				rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
 				rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);
-
 			END IF;
+
+		ELSIF  type_aux='rpt_subcatchwashoff_sum' then 
+		
+			LOOP		
+				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
+				i = i+1;
+
+				EXIT WHEN v_poll IS NULL;
+
+				IF i = 1 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv2::numeric;
+				ELSIF i = 2 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
+				ELSIF i = 3 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
+				ELSIF i = 4 THEN	
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
+				ELSIF i = 5 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
+				ELSIF i = 6 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
+				ELSIF i = 7 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
+				ELSIF i = 8 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
+				ELSIF i = 9 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
+				ELSIF i = 10 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
+				ELSIF i = 11 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
+				ELSIF i = 12 THEN
+					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
+				END IF;
+			END LOOP;	
 
 		ELSIF type_aux='rpt_nodedepth_sum' then
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
@@ -294,8 +334,43 @@ BEGIN
 			rpt_rec.csv7::numeric);
 
 		ELSIF type_aux='rpt_outfallflow_sum' then
+
 			INSERT INTO rpt_outfallflow_sum(result_id, node_id, flow_freq, avg_flow, max_flow, total_vol)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
+
+			-- relocate pollutants using the order by of polluntant to get the name. It works if nobody modifies inp file changing the order or polluntants
+			LOOP
+				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
+				i = i+1;
+				
+				EXIT WHEN v_poll IS NULL;
+
+				IF i = 1 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
+				ELSIF i = 2 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
+				ELSIF i = 3 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
+				ELSIF i = 4 THEN	
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;	
+				ELSIF i = 5 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
+				ELSIF i = 6 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
+				ELSIF i = 7 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
+				ELSIF i = 8 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
+				ELSIF i = 9 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv14::numeric;
+				ELSIF i = 10 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv15::numeric;
+				ELSIF i = 11 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv16::numeric;
+				ELSIF i = 12 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv17::numeric;
+				END IF;
+			END LOOP;
 		
 		ELSIF type_aux='rpt_storagevol_sum' then
 
