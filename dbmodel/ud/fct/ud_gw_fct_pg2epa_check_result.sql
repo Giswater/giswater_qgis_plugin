@@ -537,7 +537,10 @@ BEGIN
 		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM  (SELECT arc_id as id, fid,  'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139) row) features;
+		FROM  (SELECT arc_id as id, fid, 'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139
+				UNION
+			   SELECT arc_id as id, fid, 'Flow regulator length do not fits with target arc', the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 427
+		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

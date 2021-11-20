@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379
+	other: 106,107,111,113,164,175,187,188,294,295,379,427
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -42,6 +42,8 @@ v_defaultdemand	float;
 v_error_context text;
 v_fid integer;
 v_nodetolerance float;
+v_minlength float = 0;
+v_queryext text;
 
 BEGIN
 
@@ -52,6 +54,7 @@ BEGIN
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 	v_nodetolerance :=  (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
+	v_minlength := (SELECT value FROM config_param_user WHERE parameter = 'inp_options_minlength' AND cur_user = current_user);
 
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -64,7 +67,7 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 284) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (188, 284, 427) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 175, 187, 379) AND cur_user=current_user;
 
 	-- Header
@@ -412,18 +415,11 @@ BEGIN
 		VALUES (v_fid, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
 	END IF;
 
-	-- insert spacers for log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 1, '');
-	
 	IF v_result_id IS NULL THEN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
 	
-
 	RAISE NOTICE '17 - Check pjoint_id/pjoint_type on gullies (416)';
 	SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
 	WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
@@ -438,7 +434,141 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.');
 	END IF;	
 	
+	RAISE NOTICE '18 - Check EPA OBJECTS (curves, patterns, timeseries, lids, polluntats and snowpacks) have not spaces on names (fid: 429)';
+	SELECT count(*) INTO v_count FROM inp_curve WHERE id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' curve(s) has/have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All curves checked has/have names without spaces.'),v_count);
+	END IF;
 
+	SELECT count(*) INTO v_count FROM inp_pattern WHERE pattern_id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' pattern(s) have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All patterns checked have names without spaces.'),v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM inp_timeseries WHERE id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' timeseries have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All timeseries checked have names without spaces.'),v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM inp_lid_control WHERE lidco_id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' lid(s) have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All lids checked have names without spaces.'),v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM inp_pollutant WHERE poll_id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' pollutant(s) have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All pollutants checked have names without spaces.'),v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM inp_snowpack WHERE snow_id like'% %';
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' snowpack(s) have name with spaces. Please fix it!'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All snowpacks checked have names without spaces.'),v_count);
+	END IF;
+
+	RAISE NOTICE '19 - Check flow regulator length fits on destination arc (427)';
+
+	v_queryext = 'SELECT 427, arc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_orifice f, selector_sector s 
+			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength'|| < st_length(a.the_geom)';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
+	
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-427: There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All orifice flow regulators has lengh wich fits target arc.');
+	END IF;	
+
+	v_queryext = 'SELECT 427, arc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_weir f, selector_sector s 
+			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength'|| < st_length(a.the_geom)';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
+	
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-427: There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All weir flow regulators has lengh wich fits target arc.');
+	END IF;	
+
+	v_queryext = 'SELECT 427, arc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_outlet f, selector_sector s 
+			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength'|| < st_length(a.the_geom)';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
+	
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-427: There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.');
+	END IF;	
+
+	v_queryext = 'SELECT 427, arc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_pump f, selector_sector s 
+			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength'|| < st_length(a.the_geom)';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
+	
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-427: There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.');
+	END IF;	
+
+	-- insert spacers for log
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 1, '');
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -473,7 +603,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 427)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
