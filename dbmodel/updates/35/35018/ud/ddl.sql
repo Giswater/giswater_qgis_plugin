@@ -33,3 +33,7 @@ CREATE OR REPLACE VIEW v_vnode AS
              JOIN vnode v ON l.exit_id::integer = v.vnode_id
           WHERE l.exit_type::text = 'VNODE'::text
           ORDER BY l.link_class DESC) a;
+
+ALTER TABLE inp_snowpack RENAME to inp_snowpack_values;
+ALTER TABLE inp_snowpack_id RENAME to inp_snowpack;
+ALTER TABLE rpt_subcathrunoff_sum RENAME to rpt_subcatchrunoff_sum;
