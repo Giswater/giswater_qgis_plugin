@@ -473,3 +473,8 @@ UPDATE cat_feature_gully SET double_geom = '{"activated":true,"value":1}' WHERE 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_status_vdefault', '4', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl', false) WHERE parameter = 'basic_selector_tab_exploitation';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector', false) WHERE parameter = 'basic_selector_tab_sector';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromMacroexpl', false) WHERE parameter = 'basic_selector_tab_macroexploitation';
+
