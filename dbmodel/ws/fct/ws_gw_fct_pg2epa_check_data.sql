@@ -41,6 +41,8 @@ v_defaultdemand	float;
 v_error_context text;
 v_fid integer;
 v_nodetolerance float;
+v_minlength float;
+v_nodeproximity float;
 
 BEGIN
 	--  Search path	
@@ -53,6 +55,9 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_nodetolerance :=  (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
+	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
+	v_nodeproximity := (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
+
 
 	-- init variables
 	v_count=0;
@@ -459,39 +464,37 @@ BEGIN
 	END IF;	
 	
 	
-	RAISE NOTICE '16 - Check pipes with less than 0.2 mts (fid: 229)';
-	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < 0.20;
+	RAISE NOTICE '16 - Check pipes with less than node proximity values (fid: 229)';
+	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_nodeproximity;
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 229, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe 
-		WHERE st_length(the_geom) < 0.2;
+		SELECT 229, arc_id, arccat_id , the_geom, concat('Length less than node proximity: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe 
+		WHERE st_length(the_geom) < v_nodeproximity;
+		
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '229', concat('WARNING-229: There is/are ',v_count,
-		' pipe(s) with length less than 0.2 meters. Check it before continue.'),v_count);
+		VALUES (v_fid, v_result_id, 2, '229', concat('WARNING-229: There is/are ',v_count,' pipe(s) with length less than node proximity distance (',v_nodeproximity,') configured.'),v_count);
 		v_count=0;
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '229', 'INFO: Standard minimun length checked. No values less than 0.2 meters found.',v_count);
+		VALUES (v_fid, v_result_id, 1, '229', concat('INFO: Standard minimun length checked. No values less than node proximity distance (',v_nodeproximity,') configured.'),v_count);
 	END IF;
 	
-	
-	RAISE NOTICE '17 - Check pipes with less than 0.05 mts (fid: 230)';
-	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < 0.05;
+	RAISE NOTICE '17 - Check pipes with less than min length configured (fid: 230)';
+	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_minlength;
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 230, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
+		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '230',concat('ERROR-230: There is/are ',v_count,
-		' pipe(s) with length less than 0.05 meters which are not exported.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '230',concat('ERROR-230: There is/are ',v_count,' pipe(s) with length less than configured minimum length (',v_minlength,') which are not exported.'),v_count);
 		v_count=0;
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.05 meters found.',v_count);
+		VALUES (v_fid, v_result_id, 1, '230', concat('INFO: Critical minimun length checked. No values less than configured minimum length (',v_minlength,') found.',v_count));
 	END IF;
 	
 	
@@ -755,6 +758,15 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 1, '412','INFO: All shortpipe nodarcs are not on the same position than other EPA nodes.',v_count);
+	END IF;
+
+	RAISE NOTICE '30 - Check minlength less than 0.01 or more than node proximity (fid: 425)';
+	IF (v_minlength < 0.01 OR v_minlength >= v_nodeproximity) THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '425',concat('ERROR-425: Minlength value (',v_minlength,') is bad configured (more than node proximity or less than 0.01)'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '425', concat('INFO: Minlength value (',v_minlength,') is well configured.',v_count));
 	END IF;
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');

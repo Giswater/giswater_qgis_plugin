@@ -21,6 +21,7 @@ v_buildupmode integer;
 v_statetype text;
 v_isoperative boolean;
 v_networkmode integer;
+v_minlength float;
 
 BEGIN
 
@@ -31,6 +32,7 @@ BEGIN
 	v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
+	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -149,7 +151,7 @@ BEGIN
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''
-			AND st_length(v_arc.the_geom) > 0.049';
+			AND st_length(v_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode =  4 THEN
 

@@ -108,5 +108,10 @@ update config_param_system set layoutname='lyt_admin_other', layoutorder=10, ise
 update config_param_system set layoutname='lyt_admin_other', layoutorder=11, isenabled=false, widgettype='text', label='Plan statetype planned:' where "parameter"='plan_statetype_planned';
 update config_param_system set layoutname='lyt_admin_other', layoutorder=12, isenabled=false, widgettype='text', label='Plan statetype reconstruct:' where "parameter"='plan_statetype_reconstruct';
 
+INSERT INTO config_param_system (parameter, value, descript, project_type, isenabled) 
+VALUES ('epa_arc_minlength', '0.02', 'Minimum length used to export arcs in order to prevent nod2arc function crash', 'ws', TRUE)
+ON CONFLICT (parameter) DO NOTHING;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (425, 'Check minlength less than 0.01 or more than node proximity','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 

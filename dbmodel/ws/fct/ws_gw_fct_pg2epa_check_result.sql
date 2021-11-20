@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
--- fid: 114, 159, 297, 396, 404, 400, 405, 413, 414, 415. Number 227 is passed by input parameters
+-- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415. Number 227 is passed by input parameters
 
 */
 
@@ -78,6 +78,7 @@ v_periodtype integer;
 object_rec record;
 v_graphiclog boolean;
 v_outlayer_elevation json;
+v_minlength float;
 
 
 BEGIN
@@ -92,6 +93,7 @@ BEGIN
 	-- select system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::json->>'elevation' INTO v_outlayer_elevation FROM config_param_system WHERE parameter = 'epa_outlayer_values';
+	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 	
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -702,8 +704,9 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid
-	order by criticity desc, id asc) row; 
+	FROM (
+	SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid order by criticity desc, id asc
+	) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -748,7 +751,7 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (
-		SELECT arc_id as id, fid, 'ERROR-230: Length less than 5 cm.'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=230
+		SELECT arc_id as id, fid, concat('ERROR-230: Length less than min length allowed (',v_minlength,' ).')::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=230
 		  UNION
 		SELECT arc_id as id, fid, 'ERROR-404: Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 		  UNION
