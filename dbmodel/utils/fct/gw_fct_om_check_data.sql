@@ -20,6 +20,7 @@ SELECT gw_fct_om_check_data($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)
 
+
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
@@ -574,17 +575,17 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-			v_querytext = 'SELECT  '||v_edit||'gully.gully_id,  '||v_edit||'gully.gratecat_id,  '||v_edit||'gully.the_geom, '||v_edit||'gully.expl_id
-						FROM '||v_edit||'link
-						LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
-						INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
-						WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'gully.arc_id or '||v_edit||'gully.arc_id is null) 
-						AND '||v_edit||'link.feature_type = ''GULLY'' AND arc.state=1 AND '||v_edit||'gully.gully_id IS NOT NULL
-						and '||v_edit||'link.feature_id NOT IN (SELECT gully_id FROM node,link
-						LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
-						LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
+			v_querytext = 'SELECT  gully.gully_id,  gully.gratecat_id,  gully.the_geom, gully.expl_id
+						FROM link
+						LEFT JOIN gully ON link.feature_id = gully.gully_id 
+						INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint(link.the_geom), 0.01)
+						WHERE exit_type = ''VNODE'' AND (arc.arc_id <> gully.arc_id or gully.arc_id is null) 
+						AND link.feature_type = ''GULLY'' AND arc.state=1 AND gully.gully_id IS NOT NULL
+						and link.feature_id NOT IN (SELECT gully_id FROM node,link
+						LEFT JOIN gully ON link.feature_id = gully.gully_id 
+						LEFT JOIN vnode ON link.exit_id=vnode.vnode_id::text
 						WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-						ORDER BY '||v_edit||'link.feature_type, link_id';
+						ORDER BY link.feature_type, link_id';
 
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -959,7 +960,8 @@ BEGIN
 
 	-- connec_id (417)
 	DELETE FROM temp_arc;
-	INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state) SELECT link_id, feature_id, '417', sector_id, state FROM v_edit_link WHERE state > 0 and feature_type = 'CONNEC';
+	INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', sector_id, link.state, link.the_geom 
+	FROM link JOIN connec ON feature_id = connec_id WHERE link.state = 1 and link.feature_type = 'CONNEC';
 
 	UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
 	SELECT link.link_id, connec.connec_id, (ST_Distance(connec.the_geom, ST_startpoint(link.the_geom))) as d FROM connec, link 
@@ -973,7 +975,7 @@ BEGIN
 		SELECT 417, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with connec '',t.node_1), t.the_geom, a.expl_id 
 		FROM temp_arc t JOIN v_edit_connec a ON node_1 = connec_id WHERE t.state = 1';
 		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-		VALUES (125, 3, '417', concat('ERROR-417: There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec)'),v_count);
+		VALUES (125, 3, '417', concat('ERROR-417: There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
 		VALUES (125, 1, '417','INFO: All connec links has connec on startpoint',v_count);
@@ -982,7 +984,8 @@ BEGIN
 	-- gullys (418)
 	IF v_project_type = 'UD' THEN
 		DELETE FROM temp_arc;
-		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state) SELECT link_id, feature_id, '418', sector_id, state FROM v_edit_link WHERE state > 0 and feature_type = 'GULLY' ;
+		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', sector_id, link.state, link.the_geom 
+		FROM link JOIN gully ON feature_id = gully_id WHERE link.state = 1 and link.feature_type = 'GULLY' ;
 
 		UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
 		SELECT link.link_id, gully.gully_id, (ST_Distance(gully.the_geom, ST_startpoint(link.the_geom))) as d FROM gully, link 
@@ -1127,6 +1130,18 @@ BEGIN
 		VALUES (125, 1, '424','INFO: All features has location_type informed on man_type_location table',v_count);
 	END IF;
 
+	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (429)';
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter ='admin_raster_dem') IS true THEN
+		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+			VALUES (125, 2, '429', concat('WARNING-429: There is/are ',v_count,' exploitation(s) without geometry wich may create some gap on ext_raster view (DEM strategy is enabled).'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+			VALUES (125, 1, '429','INFO: All exploitations have geometry wich will no have problems with raster DEM enabled strategy.',v_count);
+		END IF;
+	END IF;
+	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');
@@ -1151,10 +1166,10 @@ BEGIN
 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom FROM anl_node WHERE cur_user="current_user"()
+  	FROM (SELECT node_id as id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"()
 	AND fid IN (177,187, 202)
 	UNION
-	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
+	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (110,201,202,204,205,206,291,296)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
@@ -1174,8 +1189,9 @@ BEGIN
 	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418)) row) features;
+  	FROM (
+  	SELECT id, arccat_id, state, expl_id, descript, fid, the_geom FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418)
+  	) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
