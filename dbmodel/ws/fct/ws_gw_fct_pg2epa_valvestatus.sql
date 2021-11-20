@@ -30,9 +30,6 @@ BEGIN
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_mincutresult :=(SELECT value::integer from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode_mincut_result') ;
 
-	-- update inp_valves (allways the same)
-	UPDATE temp_arc SET status=inp_valve.status FROM inp_valve WHERE temp_arc.arc_id=concat(inp_valve.node_id,'_n2a');
-
 	-- update shut-off valves
 	IF v_networkmode = 1 THEN -- Because shut-off valves are not exported as a shortpipe, pipes closer shut-off valves will be setted
 
@@ -50,6 +47,10 @@ BEGIN
 					UNION
 				    SELECT temp_arc.arc_id from temp_arc join man_valve ON node_id=node_2  where closed is true) a 
 				WHERE a.arc_id=temp_arc.arc_id;
+				
+			-- open those valves wich are open on inventory but closed on epa tables
+			UPDATE temp_arc SET status='OPEN' FROM inp_valve JOIN man_valve USING (node_id) 
+			WHERE temp_arc.arc_id=concat(inp_valve.node_id,'_n2a') AND inp_valve.status='CLOSED' AND man_valve.closed = false ;
 
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc SET status=a.status 
@@ -76,17 +77,21 @@ BEGIN
 			FROM om_mincut_valve v
 			WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE);
 			
+			
 		ELSIF v_valvemode = 2 THEN -- inventory
+
+	
 			EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
 			EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
-		
+
+			UPDATE temp_arc a SET status='OPEN'  -- open those valves wich are open on inventory but closed on epa tables
+				FROM  man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed=false AND a.status = 'CLOSED';
+
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc a SET status=p.status 
 			FROM inp_shortpipe p
 				WHERE a.arc_id=concat(p.node_id,'_n2a');
-		
 		END IF;
-	
     END IF;
     
     -- all that not are closed are open
