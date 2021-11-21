@@ -86,8 +86,8 @@ BEGIN
 
 
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
-	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
-			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
+	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM 
+			(SELECT node_id FROM v_edit_node EXCEPT (SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN node USING (node_id)
 			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
 			WHERE epa_type != ''UNDEFINED'' and is_operative = true and cur_user = current_user ) b';		
@@ -759,7 +759,7 @@ BEGIN
 		WHERE t1.node_id != t2.node_id 
 		AND s.sector_id = t1.sector_id AND s.cur_user = current_user
 		AND e.expl_id = t1.expl_id AND e.cur_user = current_user 
-		AND (t1.epa_type = ''SHORTPIPE'' AND t2.epa_type !=''UNDEFINED'') OR (t2.epa_type = ''SHORTPIPE'' AND t1.epa_type !=''UNDEFINED'')
+		AND ((t1.epa_type = ''SHORTPIPE'' AND t2.epa_type !=''UNDEFINED'') OR (t2.epa_type = ''SHORTPIPE'' AND t1.epa_type !=''UNDEFINED''))
 		AND t1.node_id =''SHORTPIPE''
 		ORDER BY t1.node_id) a where a.state1 > 0 AND a.state2 > 0 ORDER BY dist' ;
 
