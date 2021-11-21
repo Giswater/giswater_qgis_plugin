@@ -32,7 +32,7 @@ BEGIN
 		"data":{"message":"2074", "function":"2420","debug_msg":null}}$$);';
 	END IF;
 	
-	IF (NEW.flwreg_length + v_minlength) >= (SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
+	IF (NEW.flwreg_length) >= (SELECT st_length(arc.the_geom) FROM arc WHERE arc_id=NEW.to_arc) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3048", "function":"2420","debug_msg":null}}$$);';
 	END IF;

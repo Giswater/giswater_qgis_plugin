@@ -84,7 +84,7 @@ update sys_param_user set dv_querytext=concat(dv_querytext, ' AND cat_grate.acti
 
 --2021/11/19
 DELETE FROM config_param_user WHERE parameter ='edit_gully_doublegeom';
-DELETE FROM sys_param_user WHERE parameter ='edit_gully_doublegeom';
+DELETE FROM sys_param_user WHERE id ='edit_gully_doublegeom';
 
 --2021/11/20
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
