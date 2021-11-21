@@ -39,16 +39,15 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  Looking for nodarc values
+	-- Profilactic controls for nodarc value
 	SELECT min(st_length(the_geom)) FROM temp_arc JOIN selector_sector ON selector_sector.sector_id=temp_arc.sector_id
 		INTO v_nodarc_min;
-
 	v_nod2arc := (SELECT value::float FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' and cur_user=current_user limit 1)::float;
 	IF v_nod2arc is null then 
 		v_nod2arc = 0.3;
 	END IF;
-
 	IF v_nod2arc > v_nodarc_min THEN v_nod2arc = v_nodarc_min-0.005; END IF;
+	IF v_nod2arc < 0.009 THEN v_nod2arc = 0.01; END IF;
 	
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	IF v_roughness is null then v_roughness = 0; END IF;
@@ -280,14 +279,15 @@ BEGIN
 		INSERT INTO anl_node (fid, node_id, descript, the_geom)
 		SELECT 417, node_id, 'Node close to other node. Maybe nodarc has some problems with closest linestrings. Try to redraw it', the_geom
 		FROM (SELECT DISTINCT t1.node_id, t1.epa_type as epatype1, t2.node_id as node_id_aux, t2.epa_type as epatype2, 106, t1.the_geom
-				FROM temp_node AS t1 JOIN temp_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 2) 
+				FROM temp_node AS t1 JOIN temp_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.02) 
 				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.epatype1 != 'TODELETE' AND a.epatype2 != 'TODELETE';
 
 
 		-- check wrong linestring for node_1. If this crashes sql will be inserted on audit log table....
 		FOR rec_arc IN SELECT a.arc_id, a.the_geom FROM temp_arc a JOIN temp_node n ON n.node_id = a.node_1 WHERE n.epa_type = 'TODELETE'
 		LOOP 
-			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, ('||0.5*v_nod2arc||' / st_length(a.the_geom)) , 1) WHERE arc_id = '||rec_arc.arc_id||'::text';
+			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, ('||0.5*v_nod2arc||' / st_length(a.the_geom)) , 1) 
+			WHERE arc_id = '||quote_literal(rec_arc.arc_id)||'::text';
 			EXECUTE  v_querystring;
 
 		END LOOP;
@@ -295,7 +295,8 @@ BEGIN
 		-- check wrong linestring for node_2. If this crashes sql will be inserted on audit log table....
 		FOR rec_arc IN SELECT a.arc_id, a.the_geom FROM temp_arc a JOIN temp_node n ON n.node_id = a.node_2 WHERE n.epa_type = 'TODELETE'
 		LOOP 
-			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, 0, (1 - '||0.5*v_nod2arc||' / st_length(a.the_geom))) WHERE arc_id = '||rec_arc.arc_id||'::text';
+			v_querystring = 'UPDATE temp_arc a SET the_geom = ST_linesubstring(a.the_geom, 0, (1 - '||0.5*v_nod2arc||' / st_length(a.the_geom))) 
+			WHERE arc_id = '||quote_literal(rec_arc.arc_id)||'::text';
 			EXECUTE  v_querystring;
 		END LOOP;
 	END IF;
@@ -310,15 +311,6 @@ BEGIN
 	UPDATE temp_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
 	
 	RETURN 0;
-	
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-	VALUES (417, result_id_var, 3, 'ERROR-417: At least one nodarc have been crashed. Some reasons maybe minimun distance againts nodes or some wrong topology fof closest arcs');	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-	VALUES (417, result_id_var, 3, concat('DETAIL-417: ', SQLERRM, 'Context:',v_error_context));
-	RETURN 1;
 		
 END;
 $BODY$

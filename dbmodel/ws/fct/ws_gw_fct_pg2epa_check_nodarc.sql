@@ -72,7 +72,7 @@ BEGIN
 
 	IF v_response = 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-		VALUES (v_fid, v_result_id, 1, 'INFO: All nodarcs have been analyzed Check results');
+		VALUES (v_fid, v_result, 1, 'INFO: All nodarcs have been analyzed Check results');
 
 	ELSIF v_response = 1 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 

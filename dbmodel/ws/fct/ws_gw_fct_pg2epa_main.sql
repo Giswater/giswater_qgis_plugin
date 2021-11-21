@@ -138,15 +138,6 @@ BEGIN
 	RAISE NOTICE '4 - Call gw_fct_pg2epa_nod2arc function';
 	PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
 
-	IF v_response = 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-		VALUES (v_fid, v_result_id, 1, 'INFO: All nodarcs have been created');
-
-	ELSIF v_response = 1 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-		VALUES (v_fid, v_result_id, 3,'HINT: Please use function Check nodarcs inconsistency to identify it');
-	END IF;
-
 	RAISE NOTICE '5 - Call gw_fct_pg2epa_doublenod2arc';
 	PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
 			
