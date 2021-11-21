@@ -78,7 +78,7 @@ BEGIN
 			AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_arc.state > 0
 		UNION 
 			-- connec over arc
-			SELECT distinct on (node_id) concat('VN',node_id) as vnode_id, 
+			SELECT distinct on (node_id) concat('VNC',node_id) as vnode_id, 
 			temp_arc.arc_id, 
 			case 	
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
@@ -86,8 +86,6 @@ BEGIN
 				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate,
 			vnode.elevation
 			FROM temp_arc , temp_node AS vnode
-			JOIN connec ON node_id =connec_id 
-			WHERE pjoint_id IS NULL AND st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) 
 			WHERE node_type = 'CONNEC' AND st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) 
 			AND vnode.state > 0 AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK')
 		) a
