@@ -208,6 +208,10 @@ class GwEpaFileManager(GwTask):
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                 json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+
+        elif steps == 1:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
         else:  # steps == 0
             extras += f', "step": 0'
             self.body = tools_gw.create_body(extras=extras)
