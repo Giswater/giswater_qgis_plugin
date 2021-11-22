@@ -494,7 +494,7 @@ BEGIN
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '230', concat('INFO: Critical minimun length checked. No values less than configured minimum length (',v_minlength,') found.',v_count));
+		VALUES (v_fid, v_result_id, 1, '230', concat('INFO: Critical minimun length checked. No values less than configured minimum length (',v_minlength,') found.'), v_count);
 	END IF;
 	
 	
@@ -781,7 +781,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 3, '425',concat('ERROR-425: Minlength value (',v_minlength,') is bad configured (more than node proximity or less than 0.01)'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '425', concat('INFO: Minlength value (',v_minlength,') is well configured.',v_count));
+		VALUES (v_fid, v_result_id, 1, '425', concat('INFO: Minlength value (',v_minlength,') is well configured.'), v_count);
 	END IF;
 
 	RAISE NOTICE '31 - Check EPA OBJECTS (curves and patterns have not spaces on names (fid: 429)';
