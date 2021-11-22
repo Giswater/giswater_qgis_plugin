@@ -127,8 +127,8 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2]
         extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
-        dict_result = tools_gw.exec_pg_function(self.function_name, self.body, log_sql=True, is_thread=True)
-        self.json_result = dict_result['json_result']
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
+                                                      aux_conn=self.aux_conn, is_thread=True)
 
         if self.isCanceled():
             return False
@@ -166,7 +166,7 @@ class GwToolBoxTask(GwTask):
         elif result is False and global_vars.session_vars['last_error_msg'] is not None:
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
         elif result:
-            tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
+            tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, False, False)
         # If sql function return null
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"

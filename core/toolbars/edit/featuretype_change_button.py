@@ -198,6 +198,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
                            f"WHERE {self.feature_type}_id = '{self.feature_id}'")
                     tools_db.execute_sql(sql)
 
+                tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
+                tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
                 message = "Values has been updated"
                 tools_qgis.show_info(message)
 
@@ -261,6 +263,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
             rows = tools_db.get_rows(sql, log_sql=True)
             tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
 
+            # Set default value
+            featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
+            if featurecat_id not in (None, "None"):
+                tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
+
         # Get feature type from current feature
         feature_type = feature.attribute(self.feature_edit_type)
         self.dlg_change.feature_type.setText(feature_type)
@@ -272,8 +279,13 @@ class GwFeatureTypeChangeButton(GwMaptool):
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
         rows.insert(0, ['', ''])
+        feature_type_new = tools_gw.get_config_parser("btn_featuretype_change", "feature_type_new", "user", "session")
         tools_qt.fill_combo_values(self.dlg_change.feature_type_new, rows)
-        tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type, 0)
+        if feature_type_new in (None, "None"):
+            feature_type_new = feature_type
+        in_combo = tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type_new, 0, add_new=False)
+        if not in_combo:
+            tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type, 0)
 
         # Set buttons signals
         self.dlg_change.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
@@ -297,6 +309,9 @@ class GwFeatureTypeChangeButton(GwMaptool):
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
+        featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
+        if featurecat_id not in (None, "None"):
+            tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
 
 
     def _featuretype_change(self, event):

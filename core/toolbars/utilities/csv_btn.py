@@ -83,6 +83,9 @@ class GwCSVButton(GwAction):
             self._preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_csv)
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
 
@@ -229,7 +232,7 @@ class GwCSVButton(GwAction):
         """ Load QGIS settings related with csv options """
 
         value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "session")
-        tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
+        tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0, add_new=False)
 
         value = tools_gw.get_config_parser('btn_csv2pg', 'txt_import', "user", "session")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)

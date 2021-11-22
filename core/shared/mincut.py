@@ -315,6 +315,9 @@ class GwMincut:
         self.dlg_mincut.btn_cancel_task.hide()
         self.dlg_mincut.btn_cancel.show()
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_mincut)
+
         self.search = GwSearch()
         self.search.open_search(None, self.dlg_mincut)
 
@@ -1718,6 +1721,16 @@ class GwMincut:
     def _auto_mincut_snapping(self, point, btn):
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
 
+        # Manage if task is already running
+        if hasattr(self, 'mincut_task') and self.mincut_task is not None:
+            try:
+                if self.mincut_task.isActive():
+                    message = "Mincut task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         if btn == Qt.RightButton:
             self.action_mincut.setChecked(False)
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
@@ -1893,6 +1906,16 @@ class GwMincut:
 
     def _refresh_mincut(self):
         """ B2-125: Refresh current mincut """
+
+        # Manage if task is already running
+        if hasattr(self, 'mincut_task') and self.mincut_task is not None:
+            try:
+                if self.mincut_task.isActive():
+                    message = "Mincut task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
 
         # Uncheck actions
         self.action_mincut.setChecked(False)

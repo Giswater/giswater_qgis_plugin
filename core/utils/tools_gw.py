@@ -576,6 +576,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
         if call_set_tabs_enabled:
@@ -601,6 +602,12 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
             pass
 
     return text, change_tab
+
+
+def disable_tab_log(dialog):
+    qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
 def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
@@ -757,6 +764,7 @@ def set_tabs_enabled(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     for x in range(0, qtabwidget.count() - 1):
         qtabwidget.widget(x).setEnabled(False)
+    qtabwidget.setTabEnabled(qtabwidget.count()-1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
     if btn_accept:
@@ -959,7 +967,6 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 if 'datatype' in field:
-                    tools_log.log_info(field['datatype'])
                     if field['datatype'] == 'int':
                         widget.setValidator(QIntValidator())
                     elif field['datatype'] == 'float':
@@ -991,8 +998,11 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
-                    widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'spinboxDecimals' in field['widgetcontrols']:
+                        widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                    if 'maximumNumber' in field['widgetcontrols']:
+                        widget.setMaximum(field['widgetcontrols']['maximumNumber'])
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
@@ -1085,8 +1095,17 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
+
+    # Search for the widget and remove it if it's in the list
+    idx_del = None
+    for i in range(len(list)):
+        if list[i]['widget'] == elem['widget']:
+            idx_del = i
+            break
+    if idx_del is not None:
+        list.pop(idx_del)
+
     list.append(elem)
-    tools_log.log_info(str(list))
 
 
 def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
@@ -1642,7 +1661,6 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        tools_log.log_warning(f"Function error: {function_name}")
         manage_json_exception(json_result, sql)
         return False
 
@@ -2730,7 +2748,8 @@ def refresh_selectors(tab_name=None):
     """ Refreshes the selectors' UI if it's open """
 
     # Get the selector UI if it's open
-    windows = [x for x in QApplication.allWidgets() if not x.isHidden() and (issubclass(type(x), GwSelectorUi))]
+    windows = [x for x in QApplication.allWidgets() if not getattr(x, "isHidden", False)
+               and (issubclass(type(x), GwSelectorUi))]
 
     if windows:
         try:
@@ -2975,7 +2994,7 @@ def hide_widgets_form(dialog, dlg_name):
     if row:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
-            if widget.objectName() and widget.objectName() in row[0]:
+            if widget.objectName() and f'"{widget.objectName()}"' in row[0]:
                 lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
                 if lbl_widget:
                     lbl_widget.setVisible(False)

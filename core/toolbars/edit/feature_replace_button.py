@@ -237,9 +237,10 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
-        # Avoid to replace obsolete or planned features
+        # Avoid to replace obsolete or planified features
         if feature.attribute('state') in (0, 2):
-            message = "Current feature has state 0 or 2. Therefore it is not replaceable"
+            state = 'OBSOLETE' if feature.attribute('state') == 0 else 'PLANIFIED'
+            message = f"Current feature has state '{state}'. Therefore it is not replaceable"
             tools_qt.show_info_box(message, "Info")
             return
 
@@ -273,6 +274,9 @@ class GwFeatureReplaceButton(GwMaptool):
         rows.insert(0, ['', ''])
         tools_qt.fill_combo_values(self.dlg_replace.feature_type_new, rows)
         tools_qt.set_combo_value(self.dlg_replace.feature_type_new, feature_type, 0)
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_replace)
 
         # Set buttons signals
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
@@ -401,9 +405,14 @@ class GwFeatureReplaceButton(GwMaptool):
         featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
 
         # Check null values
-        if feature_type_new in (None, 'null') or featurecat_id in (None, 'null'):
-            message = "Mandatory fields are missing. Please, set values"
-            tools_qgis.show_warning(message, parameter='Workcat id, New feature type and Catalog id')
+        if feature_type_new in (None, 'null'):
+            message = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(message, parameter="'New feature type'")
+            return
+
+        if featurecat_id in (None, 'null'):
+            message = "Mandatory field is missing. Please, set a value for field"
+            tools_qgis.show_warning(message, parameter="'Catalog id'")
             return
 
         # Ask question before executing
@@ -464,23 +473,22 @@ class GwFeatureReplaceButton(GwMaptool):
         if feature_type_new == 'null':
             return
 
+        sql = ""
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
         elif self.project_type == 'ud':
-            self.dlg_replace.featurecat_id.clear()
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL "
                    f"AND (active IS TRUE OR active IS NULL) "
                    f"ORDER BY id")
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
     # endregion

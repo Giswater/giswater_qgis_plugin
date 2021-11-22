@@ -33,9 +33,8 @@ class GwSelector:
         dlg_selector.setProperty('GwSelector', self)
 
         # Get the name of the last tab used by the user
-        selector_vars = {}
         current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
-        self.get_selector(dlg_selector, selector_type, current_tab=current_tab, selector_vars=selector_vars)
+        self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
 
         if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
@@ -57,8 +56,7 @@ class GwSelector:
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
-                     is_setselector=None, selector_vars={}):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -82,128 +80,114 @@ class GwSelector:
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
-        if is_setselector is None:
-            # Built querytext
-            form = f'"currentTab":"{current_tab}"'
-            extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
-            body = tools_gw.create_body(form=form, extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
+        # Built querytext
+        form = f'"currentTab":"{current_tab}"'
+        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+        body = tools_gw.create_body(form=form, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
 
-            if not json_result or json_result['status'] == 'Failed':
-                return False
+        if not json_result or json_result['status'] == 'Failed':
+            return False
 
-            for form_tab in json_result['body']['form']['formTabs']:
+        for form_tab in json_result['body']['form']['formTabs']:
 
-                if filter and form_tab['tabName'] != str(current_tab):
-                    continue
+            if filter and form_tab['tabName'] != str(current_tab):
+                continue
 
-                selection_mode = form_tab['selectionMode']
+            selection_mode = form_tab['selectionMode']
 
-                # Create one tab for each form_tab and add to QTabWidget
-                tab_widget = QWidget(main_tab)
-                tab_widget.setObjectName(form_tab['tabName'])
-                tab_widget.setProperty('selector_type', form_tab['selectorType'])
-                if filter:
-                    main_tab.removeTab(index)
-                    main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+            # Create one tab for each form_tab and add to QTabWidget
+            tab_widget = QWidget(main_tab)
+            tab_widget.setObjectName(form_tab['tabName'])
+            tab_widget.setProperty('selector_type', form_tab['selectorType'])
+            if filter:
+                main_tab.removeTab(index)
+                main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+            else:
+                main_tab.addTab(tab_widget, form_tab['tabLabel'])
+
+            # Create a new QGridLayout and put it into tab
+            gridlayout = QGridLayout()
+            gridlayout.setObjectName("lyt" + form_tab['tabName'])
+            tab_widget.setLayout(gridlayout)
+            field = {}
+            i = 0
+
+            if 'typeaheadFilter' in form_tab:
+                label = QLabel()
+                label.setObjectName('lbl_filter')
+                label.setText('Filter:')
+                if tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                    widget = QLineEdit()
+                    widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
+                                                       widget=widget, current_tab=current_tab))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+
                 else:
-                    main_tab.addTab(tab_widget, form_tab['tabLabel'])
+                    widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
-                # Create a new QGridLayout and put it into tab
-                gridlayout = QGridLayout()
-                gridlayout.setObjectName("lyt" + form_tab['tabName'])
-                tab_widget.setLayout(gridlayout)
-                field = {}
-                i = 0
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                tools_gw.add_widget(dialog, field, label, widget)
+                widget.setFocus()
 
-                if 'typeaheadFilter' in form_tab:
-                    label = QLabel()
-                    label.setObjectName('lbl_filter')
-                    label.setText('Filter:')
-                    if tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
-                        widget = QLineEdit()
-                        widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
-                        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                        selector_vars[f"var_txt_filter_{form_tab['tabName']}"] = ''
-                        widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
-                                                           widget=widget, current_tab=current_tab,
-                                                           selector_vars=selector_vars))
-                        widget.textChanged.connect(partial(self._manage_filter, dialog, widget, 'save', selector_vars))
+            if 'manageAll' in form_tab:
+                if (form_tab['manageAll']).lower() == 'true':
+                    if tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                        label = QLabel()
+                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
+                        label.setText('Check all')
+                    else:
+                        label = tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+
+                    if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                        widget = QCheckBox()
+                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
+                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
                         widget.setLayoutDirection(Qt.RightToLeft)
 
                     else:
-                        widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName']))
-
+                        widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
                     tools_gw.add_widget(dialog, field, label, widget)
-                    widget.setFocus()
 
-                if 'manageAll' in form_tab:
-                    if (form_tab['manageAll']).lower() == 'true':
-                        if tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
-                            label = QLabel()
-                            label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
-                            label.setText('Check all')
-                        else:
-                            label = tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+            for order, field in enumerate(form_tab['fields']):
+                try:
+                    label = QLabel()
+                    label.setObjectName('lbl_' + field['label'])
+                    label.setText(field['label'])
 
-                        if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
-                            widget = QCheckBox()
-                            widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                            widget.stateChanged.connect(partial(self._manage_all, dialog, widget, selector_vars))
-                            widget.setLayoutDirection(Qt.RightToLeft)
+                    widget = tools_gw.add_checkbox(field)
+                    widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
+                    widget.setLayoutDirection(Qt.RightToLeft)
 
-                        else:
-                            widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
-                        field['layoutname'] = gridlayout.objectName()
-                        field['layoutorder'] = i
-                        i = i + 1
-                        tools_gw.add_widget(dialog, field, label, widget)
+                    field['layoutname'] = gridlayout.objectName()
+                    field['layoutorder'] = order + i
+                    tools_gw.add_widget(dialog, field, label, widget)
+                except Exception:
+                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+                          f"widgetname='{field['widgetname']}'"
+                    tools_qgis.show_message(msg, 2)
 
-                for order, field in enumerate(form_tab['fields']):
-                    try:
-                        label = QLabel()
-                        label.setObjectName('lbl_' + field['label'])
-                        label.setText(field['label'])
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
 
-                        widget = tools_gw.add_checkbox(field)
-                        widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode, selector_vars))
-                        widget.setLayoutDirection(Qt.RightToLeft)
+        # Set last tab used by user as current tab
+        tabname = json_result['body']['form']['currentTab']
+        tab = main_tab.findChild(QWidget, tabname)
 
-                        field['layoutname'] = gridlayout.objectName()
-                        field['layoutorder'] = order + i
-                        tools_gw.add_widget(dialog, field, label, widget)
-                    except Exception:
-                        msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
-                              f"widgetname='{field['widgetname']}'"
-                        tools_qgis.show_message(msg, 2)
-
-                vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-                gridlayout.addItem(vertical_spacer1)
-
-            # Set last tab used by user as current tab
-            tabname = json_result['body']['form']['currentTab']
-            tab = main_tab.findChild(QWidget, tabname)
-
-            if tab:
-                main_tab.setCurrentWidget(tab)
-        else:
-            widget = dialog.main_tab.findChild(QLineEdit, f"txt_filter_{is_setselector['body']['form']['currentTab']}")
-            if widget:
-                widget.blockSignals(True)
-                index = dialog.main_tab.currentIndex()
-                tab_name = dialog.main_tab.widget(index).objectName()
-                if f"var_txt_filter_{tab_name}" in selector_vars:
-                    value = selector_vars[f"var_txt_filter_{tab_name}"]
-                    tools_qt.set_widget_text(dialog, widget, f'{value}')
-                widget.blockSignals(False)
+        if tab:
+            main_tab.setCurrentWidget(tab)
 
     # region private functions
 
-    def _set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
+    def _set_selection_mode(self, dialog, widget, selection_mode):
         """
         Manage selection mode
             :param dialog: QDialog where search all checkbox
@@ -233,10 +217,10 @@ class GwSelector:
                 widget_all.blockSignals(False)
             self._remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self._set_selector(dialog, widget, is_alone, selector_vars, disable_parent)
+        self._set_selector(dialog, widget, is_alone, disable_parent)
 
 
-    def _set_selector(self, dialog, widget, is_alone, selector_vars, disable_parent):
+    def _set_selector(self, dialog, widget, is_alone, disable_parent):
         """
         Send values to DB and reload selectors
             :param dialog: QDialog
@@ -289,7 +273,9 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
-        self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
+
+        # Reload selectors dlg
+        self.open_selector()
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
@@ -323,17 +309,7 @@ class GwSelector:
                 tools_qt.set_checked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
-
-    def _manage_filter(self, dialog, widget, action, selector_vars):
-        index = dialog.main_tab.currentIndex()
-        tab_name = dialog.main_tab.widget(index).objectName()
-        if action == 'save':
-            selector_vars[f"var_txt_filter_{tab_name}"] = tools_qt.get_text(dialog, widget)
-        else:
-            selector_vars[f"var_txt_filter_{tab_name}"] = ''
-
-
-    def _manage_all(self, dialog, widget_all, selector_vars):
+    def _manage_all(self, dialog, widget_all):
 
         status = tools_qt.is_checked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
@@ -352,6 +328,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self._set_selector(dialog, widget_all, False, selector_vars, disable_parent)
+        self._set_selector(dialog, widget_all, False, disable_parent)
 
     # endregion

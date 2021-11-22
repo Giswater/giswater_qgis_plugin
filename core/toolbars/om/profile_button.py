@@ -326,6 +326,9 @@ class GwProfileButton(GwAction):
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self._mouse_move)
         self.emit_point.canvasClicked.connect(partial(self._snapping_node))
+        # To activate action pan and not move the canvas accidentally we have to override the canvasReleaseEvent.
+        # The "e" is the QgsMapMouseEvent given by the function
+        self.emit_point.canvasReleaseEvent = lambda e: self._action_pan()
 
 
     def _mouse_move(self, point):
@@ -406,11 +409,14 @@ class GwProfileButton(GwAction):
                     self.id_list = [i.id() for i in it]
                     self.layer_arc.selectByIds(self.id_list)
 
-                    # Center shortest path in canvas - ZOOM SELECTION
-                    self.canvas.zoomToSelected(self.layer_arc)
+                    # Next profile will be done from scratch
+                    self.first_node = True
 
-                    # Set action pan
-                    self.iface.actionPan().trigger()
+
+    def _action_pan(self):
+        if self.first_node:
+            # Set action pan
+            self.iface.actionPan().trigger()
 
 
     def _draw_profile(self, arcs, nodes, terrains):
@@ -744,9 +750,12 @@ class GwProfileButton(GwAction):
                  verticalalignment='center')
 
         # Print title
-        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
+        # Set default value if no title is given
+        if title in ('', None):
+            title = f"PROFILE {self.initNode} - {self.endNode}"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
-                 title.upper(), fontsize=title_size, color=title_color, fontweight=title_weight,
+                 title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
 
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)

@@ -162,6 +162,9 @@ class GwArcFusionButton(GwMaptool):
                 self.dlg_fusion.workcat_id_end.setEnabled(False)
                 self.dlg_fusion.cmb_statetype.setEnabled(False)
 
+            # Disable tab log
+            tools_gw.disable_tab_log(self.dlg_fusion)
+
             # Set signals
             self.dlg_fusion.cmb_nodeaction.currentIndexChanged.connect(partial(self._manage_nodeaction))
             self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)

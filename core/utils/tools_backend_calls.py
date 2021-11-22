@@ -9,11 +9,11 @@ import os
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 
 from ... import global_vars
 from ..utils import tools_gw
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 
 def set_layer_index(**kwargs):
@@ -36,6 +36,26 @@ def set_style_mapzones(**kwargs):
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     tools_gw.set_style_mapzones()
+
+
+def add_query_layer(**kwargs):
+    """ Create and add a QueryLayer to ToC """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    query = kwargs['query']
+    layer_name = kwargs['layerName'] if 'layerName' in kwargs else 'QueryLayer'
+    group = kwargs['group'] if 'group' in kwargs else 'GW Layers'
+
+    uri = tools_db.get_uri()
+
+    querytext = f"(SELECT row_number() over () AS _uid_,* FROM ({query}) AS query_table)"
+    pk = '_uid_'
+
+    uri.setDataSource("", querytext, None, "", pk)
+    vlayer = QgsVectorLayer(uri.uri(False), f'{layer_name}', "postgres")
+
+    if vlayer.isValid():
+        tools_qt.add_layer_to_toc(vlayer, group)
 
 
 def refresh_attribute_table(**kwargs):
@@ -233,6 +253,18 @@ def load_qml(**kwargs):
     layer.triggerRepaint()
 
     return True
+
+
+def update_catfeaturevalues(**kwargs):
+    """
+    Reload global_vars.feature_cat
+
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[
+                              {"name":"update_catfeaturevalues", "parameters":{}}]} ,
+                              "user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+                IN TRIGGER -> gw_trg_cat_feature
+    """
+    global_vars.feature_cat = tools_gw.manage_feature_cat()
 
 
 def open_url(widget):

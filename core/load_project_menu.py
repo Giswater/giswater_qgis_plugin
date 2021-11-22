@@ -338,12 +338,23 @@ class GwMenuLoad(QObject):
         self._reset_notify()
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
-        self.iface.actionPan().trigger()
-        self._reload_layers()
+        tools_qgis.restore_cursor()  # Restore cursor in case it's stuck with an overridden one
+        self.iface.actionPan().trigger()  # Force actionPan action
+        self._reload_layers()  # Execute GwProjectLayersConfig thread
 
 
     def _reload_layers(self):
         """ Reloads all the layers """
+
+        # Manage if task is already running
+        if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
+            try:
+                if self.task_get_layers.isActive():
+                    message = "ConfigLayerFields task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
 
         schema_name = global_vars.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "

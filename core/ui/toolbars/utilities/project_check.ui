@@ -27,13 +27,6 @@
        <item row="0" column="0">
         <widget class="QTextEdit" name="txt_infolog"/>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="chk_hide_form">
-         <property name="text">
-          <string>Don't show this dialog again</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_qgis_projlog">

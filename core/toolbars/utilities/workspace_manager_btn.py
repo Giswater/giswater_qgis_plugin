@@ -53,6 +53,9 @@ class GwWorkspaceManagerButton(GwAction):
         self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
         self._fill_tbl()
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_workspace_manager)
+
         # Connect main dialog signals
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))

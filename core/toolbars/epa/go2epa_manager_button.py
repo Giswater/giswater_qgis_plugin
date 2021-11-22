@@ -43,6 +43,7 @@ class GwGo2EpaManagerButton(GwAction):
         # Manage widgets
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
+        self.dlg_manager.txt_infolog.setReadOnly(True)
 
         # Fill combo box and table view
         self._fill_combo_result_id()

@@ -82,154 +82,160 @@ class GwInfo(QObject):
         :return:
         """
 
-        # Manage tab signal
-        self.tab_element_loaded = False
-        self.tab_relations_loaded = False
-        self.tab_connections_loaded = False
-        self.tab_hydrometer_loaded = False
-        self.tab_hydrometer_val_loaded = False
-        self.tab_visit_loaded = False
-        self.tab_event_loaded = False
-        self.tab_document_loaded = False
-        self.tab_rpt_loaded = False
-        self.tab_plan_loaded = False
-        self.dlg_is_destroyed = False
-        self.layer = None
-        self.feature = None
-        self.my_json = {}
-        self.tab_type = tab_type
-
-        # Get project variables
-        qgis_project_add_schema = global_vars.project_vars['add_schema']
-        qgis_project_main_schema = global_vars.project_vars['main_schema']
-        qgis_project_role = global_vars.project_vars['project_role']
-
-        self.new_feature = new_feature
-
-        # Check for query layer and/or bad layer
-        if not tools_qgis.check_query_layer(self.iface.activeLayer()) or self.iface.activeLayer() is None or \
-                type(self.iface.activeLayer()) != QgsVectorLayer:
-            active_layer = ""
-        else:
-            active_layer = tools_qgis.get_layer_source_table_name(self.iface.activeLayer())
-
-        # Used by action_interpolate
-        last_click = self.canvas.mouseLastXY()
-        self.last_point = QgsMapToPixel.toMapCoordinates(
-            self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
-
-        extras = ""
-        if tab_type == 'inp':
-            extras = '"toolBar":"epa"'
-        elif tab_type == 'data':
-            extras = '"toolBar":"basic"'
-
-
-        function_name = None
-        body = None
-
-        # Insert new feature
-        if point and feature_cat:
-            self.feature_cat = feature_cat
-            self.new_feature_id = new_feature_id
-            self.layer_new_feature = layer_new_feature
-            self.iface.actionPan().trigger()
-            feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
-            extras += f', "coordinates":{{{point}}}'
-            body = tools_gw.create_body(feature=feature, extras=extras)
-            function_name = 'gw_fct_getfeatureinsert'
-
-        # Click over canvas
-        elif point:
-            visible_layer = tools_qgis.get_visible_layers(as_str_list=True)
-            scale_zoom = self.iface.mapCanvas().scale()
-            extras += f', "activeLayer":"{active_layer}"'
-            extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "mainSchema":"{qgis_project_main_schema}"'
-            extras += f', "addSchema":"{qgis_project_add_schema}"'
-            extras += f', "projecRole":"{qgis_project_role}"'
-            extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
-            body = tools_gw.create_body(extras=extras)
-            function_name = 'gw_fct_getinfofromcoordinates'
-
-        # Comes from QPushButtons node1 or node2 from custom form or RightButton
-        elif feature_id:
-            if is_add_schema:
-                add_schema = global_vars.project_vars['add_schema']
-                extras = f'"addSchema":"{add_schema}"'
-            else:
-                extras = '"addSchema":""'
-            feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            body = tools_gw.create_body(feature=feature, extras=extras)
-            function_name = 'gw_fct_getinfofromid'
-
-        if function_name is None:
-            return False, None
-
-        tools_qgis.set_cursor_wait()
-        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
-        tools_qgis.restore_cursor()
-
-        if json_result in (None, False):
-            return False, None
-
-        # Manage status failed
-        if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
-            level = 1
-            if 'level' in json_result['message']:
-                level = int(json_result['message']['level'])
-            msg = f"Execution of {function_name} failed."
-            if 'text' in json_result['message']:
-                msg = json_result['message']['text']
-            tools_qgis.show_message(msg, level)
-            return False, None
-
-        self.complet_result = json_result
         try:
-            template = self.complet_result['body']['form']['template']
-        except Exception as e:
-            tools_log.log_info(str(e))
-            return False, None
+            # Manage tab signal
+            self.tab_element_loaded = False
+            self.tab_relations_loaded = False
+            self.tab_connections_loaded = False
+            self.tab_hydrometer_loaded = False
+            self.tab_hydrometer_val_loaded = False
+            self.tab_visit_loaded = False
+            self.tab_event_loaded = False
+            self.tab_document_loaded = False
+            self.tab_rpt_loaded = False
+            self.tab_plan_loaded = False
+            self.dlg_is_destroyed = False
+            self.layer = None
+            self.feature = None
+            self.my_json = {}
+            self.tab_type = tab_type
 
-        if template == 'info_generic':
-            result, dialog = self._open_generic_form(self.complet_result)
-            # Fill self.my_json for new qgis_feature
-            if feature_cat is not None:
-                self._manage_new_feature(self.complet_result, dialog)
-            return result, dialog
+            # Get project variables
+            qgis_project_add_schema = global_vars.project_vars['add_schema']
+            qgis_project_main_schema = global_vars.project_vars['main_schema']
+            qgis_project_role = global_vars.project_vars['project_role']
 
-        elif template == 'dimensioning':
-            self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
-            if self.lyr_dim:
-                self.dimensioning = GwDimensioning()
-                feature_id = self.complet_result['body']['feature']['id']
-                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
-                    feature_id, self.rubber_band)
+            self.new_feature = new_feature
+
+            # Check for query layer and/or bad layer
+            if not tools_qgis.check_query_layer(self.iface.activeLayer()) or self.iface.activeLayer() is None or \
+                    type(self.iface.activeLayer()) != QgsVectorLayer:
+                active_layer = ""
+            else:
+                active_layer = tools_qgis.get_layer_source_table_name(self.iface.activeLayer())
+
+            # Used by action_interpolate
+            last_click = self.canvas.mouseLastXY()
+            self.last_point = QgsMapToPixel.toMapCoordinates(
+                self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
+
+            extras = ""
+            if tab_type == 'inp':
+                extras = '"toolBar":"epa"'
+            elif tab_type == 'data':
+                extras = '"toolBar":"basic"'
+
+
+            function_name = None
+            body = None
+
+            # Insert new feature
+            if point and feature_cat:
+                self.feature_cat = feature_cat
+                self.new_feature_id = new_feature_id
+                self.layer_new_feature = layer_new_feature
+                self.iface.actionPan().trigger()
+                feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
+                extras += f', "coordinates":{{{point}}}'
+                body = tools_gw.create_body(feature=feature, extras=extras)
+                function_name = 'gw_fct_getfeatureinsert'
+
+            # Click over canvas
+            elif point:
+                visible_layer = tools_qgis.get_visible_layers(as_str_list=True)
+                scale_zoom = self.iface.mapCanvas().scale()
+                extras += f', "activeLayer":"{active_layer}"'
+                extras += f', "visibleLayer":{visible_layer}'
+                extras += f', "mainSchema":"{qgis_project_main_schema}"'
+                extras += f', "addSchema":"{qgis_project_add_schema}"'
+                extras += f', "projecRole":"{qgis_project_role}"'
+                extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+                body = tools_gw.create_body(extras=extras)
+                function_name = 'gw_fct_getinfofromcoordinates'
+
+            # Comes from QPushButtons node1 or node2 from custom form or RightButton
+            elif feature_id:
+                if is_add_schema:
+                    add_schema = global_vars.project_vars['add_schema']
+                    extras = f'"addSchema":"{add_schema}"'
+                else:
+                    extras = '"addSchema":""'
+                feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
+                body = tools_gw.create_body(feature=feature, extras=extras)
+                function_name = 'gw_fct_getinfofromid'
+
+            if function_name is None:
+                return False, None
+
+            tools_qgis.set_cursor_wait()
+            json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+            tools_qgis.restore_cursor()
+
+            if json_result in (None, False):
+                return False, None
+
+            # Manage status failed
+            if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                msg = f"Execution of {function_name} failed."
+                if 'text' in json_result['message']:
+                    msg = json_result['message']['text']
+                tools_qgis.show_message(msg, level)
+                return False, None
+
+            self.complet_result = json_result
+            try:
+                template = self.complet_result['body']['form']['template']
+            except Exception as e:
+                tools_log.log_info(str(e))
+                return False, None
+
+            if template == 'info_generic':
+                result, dialog = self._open_generic_form(self.complet_result)
+                # Fill self.my_json for new qgis_feature
+                if feature_cat is not None:
+                    self._manage_new_feature(self.complet_result, dialog)
                 return result, dialog
 
-        elif template == 'info_feature':
-            sub_tag = None
-            if feature_cat:
-                if feature_cat.feature_type.lower() == 'arc':
-                    sub_tag = 'arc'
-                else:
-                    sub_tag = 'node'
-            feature_id = self.complet_result['body']['feature']['id']
-            result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
-                new_feature=new_feature)
-            if feature_cat is not None:
-                self._manage_new_feature(self.complet_result, dialog)
-            return result, dialog
+            elif template == 'dimensioning':
+                self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
+                if self.lyr_dim:
+                    self.dimensioning = GwDimensioning()
+                    feature_id = self.complet_result['body']['feature']['id']
+                    result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
+                        feature_id, self.rubber_band)
+                    return result, dialog
 
-        elif template == 'visit':
-            visit_id = self.complet_result['body']['feature']['id']
-            manage_visit = GwVisit()
-            manage_visit.get_visit(visit_id=visit_id, tag='info')
-            dlg_add_visit = manage_visit.get_visit_dialog()
-            dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+            elif template == 'info_feature':
+                sub_tag = None
+                if feature_cat:
+                    if feature_cat.feature_type.lower() == 'arc':
+                        sub_tag = 'arc'
+                    else:
+                        sub_tag = 'node'
+                feature_id = self.complet_result['body']['feature']['id']
+                result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
+                    new_feature=new_feature)
+                if feature_cat is not None:
+                    self._manage_new_feature(self.complet_result, dialog)
+                return result, dialog
 
-        else:
-            tools_log.log_warning(f"template not managed: {template}")
+            elif template == 'visit':
+                visit_id = self.complet_result['body']['feature']['id']
+                manage_visit = GwVisit()
+                manage_visit.get_visit(visit_id=visit_id, tag='info')
+                dlg_add_visit = manage_visit.get_visit_dialog()
+                dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+
+            else:
+                tools_log.log_warning(f"template not managed: {template}")
+                return False, None
+        except Exception as e:
+            tools_qgis.show_warning("Exception in info", parameter=e)
+            self._disconnect_signals()  # Disconnect signals
+            tools_qgis.restore_cursor()  # Restore overridden cursor
             return False, None
 
 
@@ -837,6 +843,9 @@ class GwInfo(QObject):
         dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
         dlg_interpolate.rejected.connect(partial(tools_gw.save_settings, dlg_interpolate))
         dlg_interpolate.rejected.connect(partial(self._remove_interpolate_rb, rb_interpolate))
+
+        # Disable tab log
+        tools_gw.disable_tab_log(dlg_interpolate)
 
         tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
@@ -1725,6 +1734,7 @@ class GwInfo(QObject):
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
+        newfeature_id = complet_result['body']['feature']['id']
         parent_fields = complet_result['body']['data']['parentFields']
         fields_reload = ""
         list_mandatory = []
@@ -1751,6 +1761,7 @@ class GwInfo(QObject):
 
         # If we create a new feature
         if self.new_feature_id is not None:
+            new_feature.setAttribute(id_name, newfeature_id)
             after_insert = True
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -2039,8 +2050,9 @@ class GwInfo(QObject):
                 value = field["value"]
                 if str(cur_value) != str(value):
                     widget.setText(value)
-                    widget.setStyleSheet("border: 2px solid #3ED396")
-                    if widget.isReadOnly():
+                    if not isinstance(widget, QPushButton):
+                        widget.setStyleSheet("border: 2px solid #3ED396")
+                    if getattr(widget, 'isReadOnly', False):
                         widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
                                              "border: 2px solid #3ED396}")
 
