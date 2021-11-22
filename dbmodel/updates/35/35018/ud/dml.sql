@@ -96,3 +96,5 @@ UPDATE config_fprocess SET tablename = 'rpt_subcatchrunoff_sum' WHERE tablename 
 INSERT INTO config_fprocess VALUES (140, 'rpt_subcatchwashoff_sum', 'Subcatchment Washoff', null, 24); 
 
 UPDATE sys_table SET id = 'rpt_subcatchrunoff_sum' WHERE id = 'rpt_subcathrunoff_sum';
+
+DELETE FROM config_toolbox WHERE id IN (2858);

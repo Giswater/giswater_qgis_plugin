@@ -115,3 +115,4 @@ ON CONFLICT (parameter) DO NOTHING;
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (425, 'Check minlength less than 0.01 or more than node proximity','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
+DELETE FROM config_toolbox WHERE id IN (2524,2846,3106);
