@@ -2050,8 +2050,9 @@ class GwInfo(QObject):
                 value = field["value"]
                 if str(cur_value) != str(value):
                     widget.setText(value)
-                    widget.setStyleSheet("border: 2px solid #3ED396")
-                    if widget.isReadOnly():
+                    if not isinstance(widget, QPushButton):
+                        widget.setStyleSheet("border: 2px solid #3ED396")
+                    if getattr(widget, 'isReadOnly', False):
                         widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
                                              "border: 2px solid #3ED396}")
 
