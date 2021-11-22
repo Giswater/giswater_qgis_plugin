@@ -569,27 +569,22 @@ class GwAdminButton:
                         status = self._execute_files(folderpath, True)
                         if status is False:
                             return False
+
             else:
                 if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
-                    if self._process_folder(self.folder_updates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                        status = self._load_sql(self.folder_updates + folder + os.sep +
-                                                sub_folder + os.sep + 'utils' + os.sep)
+                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
+                    if self._process_folder(folderpath) is True:
+                        status = self._load_sql(folderpath)
                         if status is False:
                             return False
-                    if self._process_folder(
-                            self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep,
-                            '') is True:
-                        status = self._load_sql(
-                            self.folder_updates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
+                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, self.project_type_selected)
+                    if self._process_folder(folderpath, '') is True:
+                        status = self._load_sql(folderpath)
                         if status is False:
                             return False
-                    if self._process_folder(
-                            self.folder_updates + folder + os.sep + sub_folder +
-                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                            '') is True:
-                        status = self._execute_files(
-                            self.folder_updates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                self.locale + os.sep), True)
+                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
+                    if self._process_folder(folderpath, '') is True:
+                        status = self._execute_files(folderpath, True)
                         if status is False:
                             return False
 
@@ -1822,6 +1817,7 @@ class GwAdminButton:
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
 
+        tools_log.log_info(f"Processing folder: {filedir}")
         filelist = sorted(os.listdir(filedir))
         status = True
         if utils_schema_name:
@@ -1878,14 +1874,14 @@ class GwAdminButton:
 
                 if status is False:
                     self.error_count = self.error_count + 1
-                    tools_log.log_info(str("_read_execute_file error"), parameter=filepath)
-                    tools_log.log_info(str('Message: ' + str(global_vars.session_vars['last_error'])))
+                    tools_log.log_info(f"_read_execute_file error {filepath}")
+                    tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
                     if self.dev_commit is True:
                         global_vars.dao.rollback()
                     return False
         except Exception as e:
             self.error_count = self.error_count + 1
-            tools_log.log_info(str("_read_execute_file exception"), parameter=file)
+            tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
             if self.dev_commit is True:
                 global_vars.dao.rollback()
@@ -3040,19 +3036,19 @@ class GwAdminButton:
 
     def _load_base_utils(self):
 
-        folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}utils"
+        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils')
         status = self._execute_files(folder, utils_schema_name='utils')
         if not status and self.dev_commit is False:
             return False
-        folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}utils{os.sep}fct"
+        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils', 'fct')
         status = self._execute_files(folder, utils_schema_name='utils')
         if not status and self.dev_commit is False:
             return False
-        folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}ws"
+        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ws')
         status = self._execute_files(folder, utils_schema_name=self.ws_project_name)
         if not status and self.dev_commit is False:
             return False
-        folder = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}ud"
+        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ud')
         status = self._execute_files(folder, utils_schema_name=self.ud_project_name)
         if not status and self.dev_commit is False:
             return False
@@ -3062,50 +3058,46 @@ class GwAdminButton:
 
     def _update_utils_schema(self, schema_version=None):
 
-        folderUtilsUpdates = f"{self.sql_dir}{os.sep}corporate{os.sep}utils{os.sep}updates{os.sep}"
+        folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
 
-        if not os.path.exists(folderUtilsUpdates):
+        if not os.path.exists(folder_utils_updates):
             tools_qgis.show_message("The update folder was not found in sql folder")
             self.error_count = self.error_count + 1
             return False
 
-        folders = sorted(os.listdir(folderUtilsUpdates + ''))
+        folders = sorted(os.listdir(folder_utils_updates + ''))
         for folder in folders:
-            sub_folders = sorted(os.listdir(folderUtilsUpdates + folder))
+            sub_folders = sorted(os.listdir(folder_utils_updates + folder))
             for sub_folder in sub_folders:
-                if (schema_version is None and sub_folder < str(self.ws_project_result[0]).replace('.', '')) \
-                        or schema_version is not None and (schema_version < str(sub_folder) < str(self.ws_project_result[0]).replace('.', '')):
-                    if self._process_folder(folderUtilsUpdates + folder + os.sep + sub_folder,
+                aux = str(self.ws_project_result[0]).replace('.', '')
+                if (schema_version is None and sub_folder < aux) \
+                    or schema_version is not None and (schema_version < sub_folder < aux):
+
+                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
+                    if self._process_folder(folder_utils_updates + folder + os.sep + sub_folder,
                                             os.sep + 'utils' + os.sep):
-                        status = self._load_sql(folderUtilsUpdates + folder + os.sep +
+                        status = self._load_sql(folder_utils_updates + folder + os.sep +
                                                 sub_folder + os.sep + 'utils' + os.sep,
                                                 utils_schema_name='utils')
                         if status is False:
                             return False
-                    if self._process_folder(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
-                            ''):
-                        status = self._load_sql(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ws' + os.sep,
-                            utils_schema_name=self.ws_project_name)
+
+                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
+                    if self._process_folder(folder_update, ''):
+                        status = self._load_sql(folder_update, utils_schema_name=self.ws_project_name)
                         if status is False:
                             return False
-                    if self._process_folder(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
-                            ''):
-                        status = self._load_sql(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'ud' + os.sep,
-                            utils_schema_name=self.ud_project_name)
+                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
+                    if self._process_folder(folder_update, ''):
+                        status = self._load_sql(folder_update, utils_schema_name=self.ud_project_name)
                         if status is False:
                             return False
-                    if self._process_folder(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                self.locale + os.sep), '') is True:
-                        status = self._execute_files(
-                            folderUtilsUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                self.locale + os.sep), True)
+                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
+                    if self._process_folder(folder_update, '') is True:
+                        status = self._execute_files(folder_update, True)
                         if status is False:
                             return False
+
         return True
 
     # endregion
