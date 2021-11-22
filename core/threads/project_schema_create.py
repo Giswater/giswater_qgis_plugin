@@ -176,3 +176,81 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_data.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
+
+    def calculate_number_of_files(self):
+        """ Calculate total number of SQL to execute """
+
+        total_sql_files = 0
+        dict_process = {}
+        list_process = ['load_base', 'load_locale', 'update_30to31', 'load_views', 'load_trg', 'update_31to39']
+
+        for process in list_process:
+            dict_folders, total = self.get_number_of_files_process(process)
+            total_sql_files += total
+            tools_log.log_info(f"Number of SQL files '{process}': {total}")
+            dict_process[process] = total
+            self.dict_folders_process[process] = dict_folders
+
+        return total_sql_files
+
+
+    def get_number_of_files_process(self, process_name: str):
+        """ Calculate number of files of all folders of selected @process_name """
+
+        dict_folders = self.get_folders_process(process_name)
+        if dict_folders is None:
+            return dict_folders, 0
+
+        number_of_files = 0
+        for folder in dict_folders.keys():
+            file_count = sum(len(files) for _, _, files in os.walk(folder))
+            number_of_files += file_count
+            dict_folders[folder] = file_count
+
+        return dict_folders, number_of_files
+
+
+    def get_folders_process(self, process_name):
+        """ Get list of folders related with this @process_name """
+
+        dict_folders = {}
+        if process_name == 'load_base':
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ddl)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_dml)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_fct)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ftrg)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ddl)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ddlrule)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_dml)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_tablect)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_fct)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ftrg)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_tablect)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ddlrule)] = 0
+
+        elif process_name == 'load_locale':
+            dict_folders[self.admin.folder_locale] = 0
+
+        elif process_name == 'update_30to31':
+            dict_folders[os.path.join(self.admin.folder_updates, '31', '31100')] = 0
+
+        elif process_name == 'load_views':
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_ddlview)] = 0
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_ddlview)] = 0
+
+        elif process_name == 'load_trg':
+            dict_folders[os.path.join(self.admin.folder_utils, self.admin.file_pattern_trg)] = 0
+            dict_folders[os.path.join(self.admin.folder_software, self.admin.file_pattern_trg)] = 0
+
+        elif process_name == 'update_31to39':
+            dict_folders[os.path.join(self.admin.folder_updates, '31', '31103')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '31', '31105')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '31', '31109')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '31', '31110')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '32')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '33')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '34')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '35')] = 0
+
+        return dict_folders
+
