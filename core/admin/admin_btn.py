@@ -1815,15 +1815,12 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=True, utils_schema_name=None):
+    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None):
         """"""
 
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
-
-        if log_folder:
-            tools_log.log_info(f"Processing folder: {filedir}")
 
         filelist = sorted(os.listdir(filedir))
         status = True
@@ -1847,8 +1844,7 @@ class GwAdminButton:
             for file in filelist:
                 status = True
                 if file in files_to_execute:
-                    if log_files:
-                        tools_log.log_info(os.path.join(filedir, file))
+                    tools_log.log_info(os.path.join(filedir, file))
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                 if not status and self.dev_commit is False:
                     return False
@@ -1857,8 +1853,7 @@ class GwAdminButton:
             for file in filelist:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
-                        if log_files:
-                            tools_log.log_info(os.path.join(filedir, file))
+                        tools_log.log_info(os.path.join(filedir, file))
                         status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                         if not status and self.dev_commit is False:
                             return False
