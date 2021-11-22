@@ -1319,7 +1319,7 @@ class GwPsector:
         # Get table name via current tab name (arc, node, connec or gully)
         index_tab = self.dlg_plan_psector.tab_feature.currentIndex()
         tab_name = self.dlg_plan_psector.tab_feature.tabText(index_tab)
-        table_name = tab_name.toLower()
+        table_name = tab_name.lower()
 
         # Get selected feature's state
         feature_id = record.value(f'{table_name}_id')  # Get the id
