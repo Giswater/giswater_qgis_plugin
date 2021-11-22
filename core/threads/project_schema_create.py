@@ -7,6 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 
+import os
+
 from .task import GwTask
 from ..utils import tools_gw
 from ...lib import tools_qt, tools_log
@@ -21,6 +23,7 @@ class GwCreateSchemaTask(GwTask):
         super().__init__(description)
         self.admin = admin
         self.params = params
+        self.dict_folders_process = {}
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_create_project buttons
@@ -31,31 +34,31 @@ class GwCreateSchemaTask(GwTask):
             self.admin.dlg_readsql_create_project.key_escape.disconnect()
         except TypeError:
             pass
+
         # Disable red 'X' from dlg_readsql_create_project
         self.admin.dlg_readsql_create_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_create_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
 
+
     def run(self):
 
         super().run()
         self.is_test = self.params['is_test']
         self.finish_execution = {'import_data': False}
+        self.dict_folders_process = {}
+        self.admin.total_sql_files = 0
+        self.admin.current_sql_file = 0
+        self.admin.progress_value = 0
 
-        try:
-            status = self.main_execution()
-            if not status:
-                tools_log.log_info("Function main_execution returned False")
-                return False
-
-            self.custom_execution()
-            return True
-
-        except KeyError as e:
-            print(f"{type(e).__name__} --> {e}")
-            self.exception = e
+        status = self.main_execution()
+        if not status:
+            tools_log.log_info("Function main_execution returned False")
             return False
+
+        self.custom_execution()
+        return True
 
 
     def finished(self, result):
@@ -105,13 +108,18 @@ class GwCreateSchemaTask(GwTask):
     def main_execution(self):
         """ Main common execution """
 
+        self.set_progress(0)
+
         project_type = self.params['project_type']
         exec_last_process = self.params['exec_last_process']
         project_name_schema = self.params['project_name_schema']
         project_locale = self.params['project_locale']
         project_srid = self.params['project_srid']
 
-        status = self.admin.load_base(project_type)
+        self.admin.total_sql_files = self.calculate_number_of_files()
+        tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
+
+        status = self.admin.load_base(self.dict_folders_process['load_base'])
         if not status and self.admin.dev_commit is False:
             return False
 
@@ -119,27 +127,21 @@ class GwCreateSchemaTask(GwTask):
         if not status and self.admin.dev_commit is False:
             return False
 
-        self.set_progress(10)
         status = self.admin.update_30to31(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
 
-        self.set_progress(20)
         status = self.admin.load_views()
         if not status and self.admin.dev_commit is False:
             return False
 
-        self.set_progress(30)
         status = self.admin.load_trg()
         if not status and self.admin.dev_commit is False:
             return False
 
-        self.set_progress(40)
         status = self.admin.update_31to39(True, project_type)
         if not status and self.admin.dev_commit is False:
             return False
-
-        self.set_progress(60)
 
         status = True
         if exec_last_process:

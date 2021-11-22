@@ -56,11 +56,13 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
-
         self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
                                                                        "giswater", False, force_reload=True))
         self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
                                                                        "giswater", False, force_reload=True))
+        self.total_sql_files = 0    # Total number of SQL files to process
+        self.current_sql_file = 0   # Current number of SQL file
+        self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -422,24 +424,11 @@ class GwAdminButton:
 
     # region 'Create Project'
 
-    def load_base(self, project_type=False):
+    def load_base(self, dict_folders):
         """"""
 
-        list_folders = []
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddl))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_dml))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_fct))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ftrg))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddl))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlrule))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_dml))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_tablect))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_fct))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ftrg))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_tablect))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlrule))
-
-        for folder in list_folders:
+        self.task_create_schema.set_progress(5)
+        for folder in dict_folders.keys():
             status = self._execute_files(folder)
             if not status and self.dev_commit is False:
                 return False
@@ -1841,6 +1830,7 @@ class GwAdminButton:
                 status = True
                 if file in files_to_execute:
                     tools_log.log_info(os.path.join(filedir, file))
+                    self.current_sql_file += 1
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                 if not status and self.dev_commit is False:
                     return False
@@ -1850,6 +1840,7 @@ class GwAdminButton:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         tools_log.log_info(os.path.join(filedir, file))
+                        self.current_sql_file += 1
                         status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                         if not status and self.dev_commit is False:
                             return False
@@ -1863,6 +1854,11 @@ class GwAdminButton:
         status = False
         f = None
         try:
+
+            # Manage progress bar
+            self.progress_value = (float(self.current_sql_file / self.total_sql_files) * 100)
+            self.task_create_schema.set_progress(self.progress_value)
+
             filepath = os.path.join(filedir, file)
             f = open(filepath, 'r', encoding="utf8")
             if f:
@@ -1879,6 +1875,7 @@ class GwAdminButton:
                     if self.dev_commit is True:
                         global_vars.dao.rollback()
                     return False
+
         except Exception as e:
             self.error_count = self.error_count + 1
             tools_log.log_info(f"_read_execute_file exception: {file}")
@@ -1886,6 +1883,7 @@ class GwAdminButton:
             if self.dev_commit is True:
                 global_vars.dao.rollback()
             status = False
+
         finally:
             if f:
                 f.close()
