@@ -163,6 +163,12 @@ class GwElement:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows, 1)
 
+        # Set explotation vdefault for combo expl_id
+        sql = "SELECT value FROM config_param_user WHERE parameter='edit_exploitation_vdefault' AND cur_user=current_user"
+        row = tools_db.get_row(sql)
+        if row is not None:
+            tools_qt.set_combo_value(self.dlg_add_element.expl_id, row[0], 0)
+
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
