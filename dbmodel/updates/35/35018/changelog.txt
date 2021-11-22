@@ -6,4 +6,7 @@
 - Clean code for vnode elevation & topelevations
 - Minor bug fix from prev releases
 - Enhance performance to export huge inp files
+- Enhance import epanet file managing double nodarcs of Giswater
 - New fid process to check models (426,427,428,429)
+- Improve the strategy to use urn sequence for corporate environments
+- Prevent error on insert of hydrometers to om_mincut_hydrometer
