@@ -288,9 +288,11 @@ class GwMincut:
 
         try:
             if option == "mincut_connec":
-                global_vars.canvas.selectionChanged.connect(partial(self._snapping_selection_connec))
+                tools_gw.connect_signal(global_vars.canvas.selectionChanged, partial(self._snapping_selection_connec),
+                                        'mincut_selection_changed', 'connect_signal_selection_changed_canvas_selectionChanged_snapping_selection_connec')
             elif option == "mincut_hydro":
-                global_vars.canvas.selectionChanged.connect(partial(self._snapping_selection_hydro))
+                tools_gw.connect_signal(global_vars.canvas.selectionChanged, partial(self._snapping_selection_hydro),
+                                        'mincut_selection_changed', 'connect_signal_selection_changed_canvas_selectionChanged_snapping_selection_hydro')
         except Exception:
             pass
 
@@ -745,9 +747,10 @@ class GwMincut:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Activate snapping of node and arcs
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc, 'mincut', 'real_end_xyCoordinates_mouse_move_node_arc')
-        # self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
-        self.emit_point.canvasClicked.connect(self._snapping_node_arc_real_location)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc,
+                                'mincut', 'real_end_xyCoordinates_mouse_move_node_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._snapping_node_arc_real_location,
+                                'mincut', 'real_end_ep_canvasClicked_snapping_node_arc_real_location')
 
 
     def _accept_save_data(self):
@@ -890,6 +893,7 @@ class GwMincut:
 
         # Close dialog and disconnect snapping
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
@@ -1426,6 +1430,7 @@ class GwMincut:
         """
 
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('mincut_selection_changed')
 
         # Get 'connec_id' from selected 'customer_code'
         customer_code = tools_qt.get_text(self.dlg_connec, self.dlg_connec.connec_id)
@@ -1520,6 +1525,7 @@ class GwMincut:
         """ Delete selected rows of the table """
 
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('mincut_selection_changed')
 
         # Get selected rows
         widget = self.dlg_connec.tbl_mincut_connec
@@ -1675,6 +1681,7 @@ class GwMincut:
         if is_checked is False:
             # Disconnect snapping and related signals
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
             self.snapper_manager.recover_snapping_options()
             return
@@ -1702,8 +1709,8 @@ class GwMincut:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc, 'mincut',
                                 'auto_mincut_xyCoordinates_mouse_move_node_arc')
-        # self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
-        self.emit_point.canvasClicked.connect(self._auto_mincut_snapping)
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._auto_mincut_snapping,
+                                'mincut', 'auto_mincut_ep_canvasClicked_auto_mincut_snapping')
 
 
     def _mouse_move_node_arc(self, point):
@@ -1728,6 +1735,7 @@ class GwMincut:
         if btn == Qt.RightButton:
             self.action_mincut.setChecked(False)
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
             return
 
         # Get coordinates
@@ -1772,6 +1780,7 @@ class GwMincut:
 
         self.action_mincut.setChecked(False)
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         self.mincut_task.cancel()
 
 
@@ -1796,6 +1805,7 @@ class GwMincut:
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
 
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         self.iface.actionPan().trigger()
 
         if not result.isValid():
@@ -1890,6 +1900,7 @@ class GwMincut:
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
@@ -1960,6 +1971,7 @@ class GwMincut:
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
@@ -1977,12 +1989,14 @@ class GwMincut:
         if is_checked is False:
             # Disconnect snapping and related signals
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
             self.snapper_manager.recover_snapping_options()
             return
 
         # Disconnect other snapping and signals in case wrong user clicks
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
@@ -1996,9 +2010,10 @@ class GwMincut:
         self.current_layer = self.layer
 
         # Waiting for signals
-        # self.canvas.xyCoordinates.connect(self._mouse_move_valve)
-        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_valve, 'mincut', 'custom_mincut_xyCoordinates_mouse_move_valve')
-        self.emit_point.canvasClicked.connect(partial(self._custom_mincut_snapping, action))
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_valve, 'mincut',
+                                'custom_mincut_xyCoordinates_mouse_move_valve')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._custom_mincut_snapping, action),
+                                'mincut', 'custom_mincut_ep_canvasClicked_custom_mincut_snapping')
 
 
     def _mouse_move_valve(self, point):
@@ -2019,6 +2034,7 @@ class GwMincut:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
             tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
             global_vars.iface.actionPan().trigger()
             return
 
@@ -2061,6 +2077,7 @@ class GwMincut:
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut')
 
 
     def _remove_selection(self):
@@ -2347,6 +2364,7 @@ class GwMincut:
         if is_checked is False:
             # Disconnect snapping and related signals
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
             self.snapper_manager.recover_snapping_options()
             return
@@ -2369,10 +2387,10 @@ class GwMincut:
         self.current_layer = self.layer
 
         # Waiting for signals
-        # self.canvas.xyCoordinates.connect(self._mouse_move_valve)
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_valve, 'mincut',
                                 'change_valve_status_xyCoordinates_mouse_move_valve')
-        self.emit_point.canvasClicked.connect(partial(self._custom_mincut_snapping, action))
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._custom_mincut_snapping, action),
+                                'mincut', 'change_valve_status_ep_canvasClicked_custom_mincut_snapping')
 
 
     def _change_valve_status_execute(self, elem_id):
