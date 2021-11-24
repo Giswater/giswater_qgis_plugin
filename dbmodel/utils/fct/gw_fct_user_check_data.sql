@@ -178,7 +178,14 @@ BEGIN
 		EXECUTE 'INSERT INTO '||v_selector_name||'
 		SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''')';
 	END LOOP;
-
+	
+	--copy errors results from project check
+	IF v_log_project = 'Project' THEN
+		INSERT INTO audit_fid_log (fid, fcount, criticity)
+		SELECT result_id::integer, fcount, criticity
+		FROM audit_check_data
+		WHERE fid=101 AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') ;
+	END IF;
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
