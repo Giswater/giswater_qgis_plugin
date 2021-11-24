@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/11/23
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'typeaheadForced', 'true'::boolean) 
 WHERE parameter IN ('basic_selector_tab_sector', 'basic_selector_tab_psector', 'basic_selector_tab_macroexploitation', 'basic_selector_tab_exploitation');
+
+--2021/11/24
+DELETE FROM sys_param_user WHERE id='om_visit_class_vdefault';
+DELETE FROM config_param_user WHERE parameter='om_visit_class_vdefault';
