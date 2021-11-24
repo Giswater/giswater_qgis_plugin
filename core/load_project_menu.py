@@ -34,7 +34,7 @@ class GwMenuLoad(QObject):
     def read_menu(self, project_loaded):
         """  """
         print(f"READ MENU")
-        tools_gw.unset_giswater_menu()
+        # tools_gw.unset_giswater_menu()
 
         actions = self.iface.mainWindow().menuBar().actions()
         last_action = actions[-1]

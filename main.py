@@ -113,14 +113,6 @@ class Giswater(QObject):
             print(f"Exception in unload when tools_gw.unset_giswater_menu(): {e}")
 
         try:
-            # Set 'Main Info button' if project is unload or project don't have layers
-            layers = QgsProject.instance().mapLayers().values()
-            if hide_gw_button is False and len(layers) == 0:
-                self._set_info_button()
-        except Exception as e:
-            print(f"Exception in unload when self._set_info_button(): {e}")
-
-        try:
             # Unlisten notify channel and stop thread
             if hasattr(global_vars, 'notify'):
                 list_channels = ['desktop', global_vars.current_user]
@@ -150,6 +142,16 @@ class Giswater(QObject):
                             del plugin_toolbar.toolbar
         except Exception as e:
             print(f"Exception in unload when del plugin_toolbar.toolbar: {e}")
+
+        try:
+            # Set 'Main Info button' if project is unload or project don't have layers
+            layers = QgsProject.instance().mapLayers().values()
+            if hide_gw_button is False and len(layers) == 0:
+                self._set_info_button()
+                print(f"Load Project - CREATE MENU AAAA")
+                tools_gw.create_giswater_menu(False)
+        except Exception as e:
+            print(f"Exception in unload when self._set_info_button(): {e}")
 
         self.load_project = None
 
@@ -315,11 +317,6 @@ class Giswater(QObject):
 
         # Unload plugin when create new QGIS project
         self.unload(False)
-
-        print(f"Load Project - CREATE MENU AAAA")
-        if global_vars.load_project_menu is None:
-            global_vars.load_project_menu = GwMenuLoad()
-        global_vars.load_project_menu.read_menu(False)
 
 
     def _project_read(self, show_warning=True, hide_gw_button=True):

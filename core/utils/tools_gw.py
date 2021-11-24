@@ -38,6 +38,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
+from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -3079,12 +3080,20 @@ def get_vertex_flag(default_value):
     return vertex_flag
 
 
+def create_giswater_menu(project_loaded=False):
+    """ Create Giswater menu """
+    if global_vars.load_project_menu is None:
+        global_vars.load_project_menu = GwMenuLoad()
+    global_vars.load_project_menu.read_menu(project_loaded)
+
+
 def unset_giswater_menu():
     """ Unset Giswater menu (when plugin is disabled or reloaded) """
 
     menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
     print(f"UNSET QMENU Giswater -> {menu_giswater}")
     if menu_giswater not in (None, "None"):
+        menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
         menu_giswater.deleteLater()
         global_vars.load_project_menu = None
 
