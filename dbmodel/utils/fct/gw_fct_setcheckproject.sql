@@ -196,12 +196,12 @@ BEGIN
 	--check plugin and db version (349)
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('Giswater version: ',v_version,'.');
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (101, 4, v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, error_message,fcount)
+		VALUES (101, 4, v_errortext,0);
 	ELSE
 		v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (101, 3, '349',v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (101, 3, '349',v_errortext, 1);
 	END IF;
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL versión: ',(SELECT version())));

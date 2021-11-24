@@ -76,8 +76,8 @@ BEGIN
 	--check cat_arc active column (323)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE active IS NULL;
 	IF v_count>0 THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled, error_message)
-		VALUES (115, '323', 'cat_arc', 'active', 3, FALSE, concat('ERROR-323: There are ',v_count,' row(s) without values on cat_arc.active column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled, error_message, fcount)
+		VALUES (115, '323', 'cat_arc', 'active', 3, FALSE, concat('ERROR-323: There are ',v_count,' row(s) without values on cat_arc.active column.'), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '323', 1,'INFO: There is/are no row(s) without values on cat_arc.active column.',v_count);
@@ -86,8 +86,8 @@ BEGIN
 	--check cat_arc cost column (324)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '324', 'cat_arc', 'cost', 2, FALSE, concat('WARNING-324: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '324', 'cat_arc', 'cost', 2, FALSE, concat('WARNING-324: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -97,8 +97,8 @@ BEGIN
 	--check cat_arc m2bottom_cost column (325)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE m2bottom_cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '325', 'cat_arc', 'm2bottom_cost', 2, FALSE, concat('WARNING-325: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m2bottom_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '325', 'cat_arc', 'm2bottom_cost', 2, FALSE, concat('WARNING-325: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m2bottom_cost column.'),(v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -108,8 +108,8 @@ BEGIN
 	--check cat_arc m3protec_cost column (326)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE m3protec_cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '326', 'cat_arc', 'm3protec_cost', 2, FALSE, concat('WARNING-326: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m3protec_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '326', 'cat_arc', 'm3protec_cost', 2, FALSE, concat('WARNING-326: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m3protec_cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -122,8 +122,8 @@ BEGIN
 	--check cat_node active column (327)
 	SELECT count(*) INTO v_count FROM cat_node WHERE active IS NULL;
 	IF v_count>0 THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '327', 'cat_node', 'active', 3, FALSE, concat('ERROR-327: There are ',v_count,' row(s) without values on cat_node.active column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '327', 'cat_node', 'active', 3, FALSE, concat('ERROR-327: There are ',v_count,' row(s) without values on cat_node.active column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -133,8 +133,8 @@ BEGIN
 	--check cat_node cost column (328)
 	SELECT count(*) INTO v_count FROM cat_node WHERE cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '328', 'cat_node', 'cost', 2, FALSE, concat('WARNING-328: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '328', 'cat_node', 'cost', 2, FALSE, concat('WARNING-328: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -144,8 +144,8 @@ BEGIN
 	--check cat_node cost_unit column (329)
 	SELECT count(*) INTO v_count FROM cat_node WHERE cost_unit IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '329', 'cat_node', 'cost_unit', 2, FALSE, concat('WARNING-329: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost_unit column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '329', 'cat_node', 'cost_unit', 2, FALSE, concat('WARNING-329: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost_unit column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -156,8 +156,8 @@ BEGIN
 		--check cat_node estimated_depth column (330)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_depth IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-			VALUES (115, '330', 'cat_node', 'estimated_depth', 2, FALSE, concat('WARNING-330: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_depth column.'));
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '330', 'cat_node', 'estimated_depth', 2, FALSE, concat('WARNING-330: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_depth column.'), (v_table_count-v_count));
 		ELSE
 			v_count = 0;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -168,8 +168,8 @@ BEGIN
 		 --check cat_nodeestimated_y column (331)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_y IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-			VALUES (115, '331', 'cat_node', 'estimated_y', 2, FALSE, concat('WARNING-331: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_y column.'));
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '331', 'cat_node', 'estimated_y', 2, FALSE, concat('WARNING-331: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_y column.'), (v_table_count-v_count));
 		ELSE
 			v_count = 0;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -183,8 +183,8 @@ BEGIN
 	--check cat_connec active column (332)
 	SELECT count(*) INTO v_count FROM cat_connec WHERE active IS NULL;
 	IF v_count>0 THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '332', 'cat_connec', 'active', 3, FALSE, concat('ERROR-332: There are ',v_count,' row(s) without values on cat_connec.active column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '332', 'cat_connec', 'active', 3, FALSE, concat('ERROR-332: There are ',v_count,' row(s) without values on cat_connec.active column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -194,8 +194,8 @@ BEGIN
 	--check cat_connec cost_ut column (333)
 	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_ut IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '333', 'cat_connec', 'cost_ut', 2, FALSE, concat('WARNING-333: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ut column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '333', 'cat_connec', 'cost_ut', 2, FALSE, concat('WARNING-333: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ut column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -205,8 +205,8 @@ BEGIN
 	--check cat_connec cost_ml column (334)
 	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_ml IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '334', 'cat_connec', 'cost_ml', 2, FALSE, concat('WARNING-334: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ml column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '334', 'cat_connec', 'cost_ml', 2, FALSE, concat('WARNING-334: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ml column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -216,8 +216,8 @@ BEGIN
 	--check cat_connec cost_m3 column (335)
 	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_m3 IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '335', 'cat_connec', 'cost_m3', 2, FALSE, concat('WARNING-335: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_m3 column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '335', 'cat_connec', 'cost_m3', 2, FALSE, concat('WARNING-335: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_m3 column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -230,8 +230,8 @@ BEGIN
 	--check cat_pavement thickness column (336)
 	SELECT count(*) INTO v_count FROM cat_pavement WHERE thickness IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '336', 'cat_pavement', 'thickness', 2, FALSE, concat('WARNING-336: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.thickness column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '336', 'cat_pavement', 'thickness', 2, FALSE, concat('WARNING-336: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.thickness column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -241,8 +241,8 @@ BEGIN
 	--check cat_pavement m2cost column (337)
 	SELECT count(*) INTO v_count FROM cat_pavement WHERE m2_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '337', 'cat_pavement', 'm2_cost', 2, FALSE, concat('WARNING-337: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.m2_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '337', 'cat_pavement', 'm2_cost', 2, FALSE, concat('WARNING-337: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.m2_cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -255,8 +255,8 @@ BEGIN
 	--check cat_soil y_param column (338)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE y_param IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '338', 'cat_soil', 'y_param', 2, FALSE, concat('WARNING-338: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.y_param column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '338', 'cat_soil', 'y_param', 2, FALSE, concat('WARNING-338: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.y_param column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -266,8 +266,8 @@ BEGIN
 	--check cat_soil b column (339)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE b IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '339', 'cat_soil', 'b', 2, FALSE, concat('WARNING-339: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.b column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '339', 'cat_soil', 'b', 2, FALSE, concat('WARNING-339: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.b column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -277,8 +277,8 @@ BEGIN
 	--check cat_soil m3exc_cost column (340)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3exc_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '340', 'cat_soil', 'm3exc_cost', 2, FALSE, concat('WARNING-340: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3exc_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '340', 'cat_soil', 'm3exc_cost', 2, FALSE, concat('WARNING-340: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3exc_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -288,8 +288,8 @@ BEGIN
 	--check cat_soil m3fill_cost column (341)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3fill_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '341', 'cat_soil', 'm3fill_cost', 2, FALSE, concat('WARNING-341: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3fill_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '341', 'cat_soil', 'm3fill_cost', 2, FALSE, concat('WARNING-341: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3fill_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -299,8 +299,8 @@ BEGIN
 	--check cat_soil m3excess_cost column (342)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3excess_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '342', 'cat_soil', 'm3excess_cost', 2, FALSE, concat('WARNING-342: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3excess_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '342', 'cat_soil', 'm3excess_cost', 2, FALSE, concat('WARNING-342: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3excess_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -310,8 +310,8 @@ BEGIN
 	--check cat_soil m2trenchl_cost column (343)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m2trenchl_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '343', 'cat_soil', 'm2trenchl_cost', 2, FALSE, concat('WARNING-343: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m2trenchl_cost column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '343', 'cat_soil', 'm2trenchl_cost', 2, FALSE, concat('WARNING-343: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m2trenchl_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -326,8 +326,8 @@ BEGIN
 		--check cat_grate active column (344)
 		SELECT count(*) INTO v_count FROM cat_grate WHERE active IS NULL;
 		IF v_count>0 THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-			VALUES (115, '344', 'cat_grate', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_grate.active column.'));
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '344', 'cat_grate', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_grate.active column.'), v_count);
 		ELSE
 			v_count = 0;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -338,8 +338,8 @@ BEGIN
 		--check cat_grate cost_ut column (345)
 		SELECT count(*) INTO v_count FROM cat_grate WHERE cost_ut IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-			VALUES (115, '345', 'cat_grate', 'cost_ut', 2, FALSE, concat('WARNING-345: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.cost_ut column.'));
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '345', 'cat_grate', 'cost_ut', 2, FALSE, concat('WARNING-345: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.cost_ut column.'), v_count);
 		ELSE
 			v_count = 0;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -354,8 +354,8 @@ BEGIN
 	--check plan_arc_x_pavement rows number (346)
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is lower than the arc table.');
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -366,8 +366,8 @@ BEGIN
 	SELECT count(*) INTO v_table_count FROM plan_arc_x_pavement;
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement WHERE pavcat_id IS NOT NULL;
 	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message)
-		VALUES (115, '347', 'plan_arc_x_pavement', 'pavcat_id', 2, FALSE, concat('WARNING-347: There are ',(v_table_count-v_count),' row(s) without values on plan_arc_x_pavement.pavcat_id column.'));
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '347', 'plan_arc_x_pavement', 'pavcat_id', 2, FALSE, concat('WARNING-347: There are ',(v_table_count-v_count),' row(s) without values on plan_arc_x_pavement.pavcat_id column.'),(v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)

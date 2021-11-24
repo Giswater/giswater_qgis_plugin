@@ -303,13 +303,13 @@ BEGIN
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=294 AND cur_user=current_user;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '294',concat(
-		'ERROR-294: There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'));
+		'ERROR-294: There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '294','INFO: Epa type for node features checked. No inconsistencies aganints epa table found.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '294','INFO: Epa type for node features checked. No inconsistencies aganints epa table found.', v_count);
 	END IF;	
 
 	RAISE NOTICE '11 - Inconsistency on inp arc tables (295)';
@@ -329,13 +329,13 @@ BEGIN
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=295 AND cur_user=current_user;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
-		'ERROR-295: There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'));
+		'ERROR-295: There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.', v_count);
 	END IF;	
 
 
@@ -430,8 +430,8 @@ BEGIN
 		'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.', v_count);
 	END IF;	
 	
 	RAISE NOTICE '18 - Check EPA OBJECTS (curves, patterns, timeseries, lids, polluntats and snowpacks) have not spaces on names (fid: 429)';
@@ -505,8 +505,8 @@ BEGIN
 		'ERROR-427: There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '427','INFO: All orifice flow regulators has lengh wich fits target arc.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All orifice flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
 	v_queryext = 'SELECT 427, arc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_weir f, selector_sector s 
@@ -523,8 +523,8 @@ BEGIN
 		'ERROR-427: There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '427','INFO: All weir flow regulators has lengh wich fits target arc.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All weir flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
 	v_queryext = 'SELECT 427, arc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_outlet f, selector_sector s 
@@ -541,8 +541,8 @@ BEGIN
 		'ERROR-427: There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fç)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
 	v_queryext = 'SELECT 427, arc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_pump f, selector_sector s 
@@ -559,8 +559,8 @@ BEGIN
 		'ERROR-427: There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
-		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
 	-- insert spacers for log
