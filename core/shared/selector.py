@@ -56,8 +56,6 @@ class GwSelector:
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
-        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-            self.get_selector, dlg_selector, selector_type=selector_type, filter=True, disconect_tab_event=True))
 
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
@@ -75,7 +73,7 @@ class GwSelector:
                 widget.setFocus()
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, disconect_tab_event=False):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -108,9 +106,6 @@ class GwSelector:
 
         if not json_result or json_result['status'] == 'Failed':
             return False
-
-        if disconect_tab_event:
-            dialog.findChild(QTabWidget, 'main_tab').currentChanged.disconnect()
 
         color_rows = False
         row = tools_gw.get_config_value('qgis_form_selector_stylesheet')
@@ -212,11 +207,6 @@ class GwSelector:
         if tab:
             main_tab.setCurrentWidget(tab)
 
-        if disconect_tab_event:
-            dialog.findChild(QTabWidget, 'main_tab').currentChanged.connect(
-                partial(self.get_selector, dialog, selector_type=selector_type, filter=True, test=True))
-
-
     # region private functions
 
     def _set_selection_mode(self, dialog, widget, selection_mode):
@@ -307,7 +297,7 @@ class GwSelector:
         tools_qgis.refresh_map_canvas()
 
         # Reload selectors dlg
-        self.get_selector(dialog, f'"{selector_type}"', filter=True)
+        self.open_selector()
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
