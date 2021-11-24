@@ -8,9 +8,9 @@ or (at your option) any later version.
 import json
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QRect
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
-    QWidget, QApplication, QFrame
+    QWidget, QApplication
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
@@ -107,10 +107,11 @@ class GwSelector:
         if not json_result or json_result['status'] == 'Failed':
             return False
 
+        # Get styles
+        stylesheet = json_result['body']['form']['style']
         color_rows = False
-        row = tools_gw.get_config_value('qgis_form_selector_stylesheet')
-        if row:
-            stylesheet = json.loads(row[0])
+        if stylesheet:
+            # Color selectors zebra-styled
             if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
                 color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
 
