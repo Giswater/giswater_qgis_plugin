@@ -5,11 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QRect
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
-    QWidget, QApplication
+    QWidget, QApplication, QFrame
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
@@ -111,6 +112,13 @@ class GwSelector:
         if disconect_tab_event:
             dialog.findChild(QTabWidget, 'main_tab').currentChanged.disconnect()
 
+        color_rows = False
+        row = tools_gw.get_config_value('qgis_form_selector_stylesheet')
+        if row:
+            stylesheet = json.loads(row[0])
+            if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
+                color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
+
         for form_tab in json_result['body']['form']['formTabs']:
 
             if filter and form_tab['tabName'] != str(current_tab):
@@ -160,39 +168,35 @@ class GwSelector:
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    if tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
-                        label = QLabel()
-                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
-                        label.setText('Check all')
-                    else:
-                        label = tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
-
                     if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                         widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                        widget.setLayoutDirection(Qt.RightToLeft)
-
+                        widget.setLayoutDirection(Qt.LeftToRight)
                     else:
                         widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
+                    widget.setText('Check all')
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
-                    tools_gw.add_widget(dialog, field, label, widget)
+                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
 
             for order, field in enumerate(form_tab['fields']):
                 try:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['label'])
-                    label.setText(field['label'])
-
+                    # Create checkbox
                     widget = tools_gw.add_checkbox(field)
+                    widget.setText(field['label'])
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
-                    widget.setLayoutDirection(Qt.RightToLeft)
+                    widget.setLayoutDirection(Qt.LeftToRight)
 
+                    # Set background color every other item (if enabled)
+                    if color_rows and order % 2 == 0:
+                        widget.setStyleSheet(f"background-color: #E9E7E3")
+
+                    # Add widget to layout
                     field['layoutname'] = gridlayout.objectName()
-                    field['layoutorder'] = order + i
-                    tools_gw.add_widget(dialog, field, label, widget)
+                    field['layoutorder'] = order + i + 1
+                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
                 except Exception:
                     msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
                           f"widgetname='{field['widgetname']}'"
