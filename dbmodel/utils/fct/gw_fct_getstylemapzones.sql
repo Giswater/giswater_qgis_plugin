@@ -59,7 +59,7 @@ BEGIN
 
 		-- get mapzone values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0) row' INTO v_sector ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id , stylesheet::json FROM v_edit_presszone WHERE presszone_id::integer > 0) row' INTO v_presszone ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id , stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'')) row' INTO v_presszone ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0) row' INTO v_dma ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0) row' INTO v_dqa ;
 
