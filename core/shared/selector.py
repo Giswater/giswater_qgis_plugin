@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_db
+from ...lib import tools_qgis, tools_qt, tools_os, tools_db
 
 
 class GwSelector:
@@ -51,11 +51,27 @@ class GwSelector:
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             self.get_selector, dlg_selector, selector_type=selector_type, filter=True, disconect_tab_event=True))
+
+        # Set typeahead focus if configured
+        self._set_focus(dlg_selector)
+
+
+    def _set_focus(self, dialog):
+        """ Sets the focus to the typeahead filter if it's configured in DB """
+
+        index = dialog.main_tab.currentIndex()
+        tab = dialog.main_tab.widget(index)
+        if tools_os.set_boolean(tab.property('typeahead_forced'), False):
+            tab_name = dialog.main_tab.widget(index).objectName()
+            widget = dialog.main_tab.widget(index).findChild(QLineEdit, f"txt_filter_{str(tab_name)}")
+            if widget:
+                widget.setFocus()
 
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, disconect_tab_event=False):
@@ -111,6 +127,8 @@ class GwSelector:
                 main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
             else:
                 main_tab.addTab(tab_widget, form_tab['tabLabel'])
+            if 'typeaheadForced' in form_tab and form_tab['typeaheadForced'] is not None:
+                tab_widget.setProperty('typeahead_forced', form_tab['typeaheadForced'])
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
