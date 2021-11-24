@@ -24,10 +24,16 @@ class GwSelector:
         pass
 
 
-    def open_selector(self, selector_type='"selector_basic"'):
+    def open_selector(self, selector_type='"selector_basic"', reload_dlg=None):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
+
+        if reload_dlg:
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+            reload_dlg.main_tab.clear()
+            self.get_selector(reload_dlg, selector_type, current_tab=current_tab)
+            return
 
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
@@ -66,7 +72,7 @@ class GwSelector:
 
         index = dialog.main_tab.currentIndex()
         tab = dialog.main_tab.widget(index)
-        if tools_os.set_boolean(tab.property('typeahead_forced'), False):
+        if tab and tools_os.set_boolean(tab.property('typeahead_forced'), False):
             tab_name = dialog.main_tab.widget(index).objectName()
             widget = dialog.main_tab.widget(index).findChild(QLineEdit, f"txt_filter_{str(tab_name)}")
             if widget:
@@ -159,7 +165,8 @@ class GwSelector:
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
-                tools_gw.add_widget(dialog, field, label, widget)
+                gridlayout.addWidget(label, int(field['layoutorder']), 0)
+                gridlayout.addWidget(widget, int(field['layoutorder']), 2)
                 widget.setFocus()
 
             if 'manageAll' in form_tab:
@@ -298,7 +305,7 @@ class GwSelector:
         tools_qgis.refresh_map_canvas()
 
         # Reload selectors dlg
-        self.open_selector()
+        self.open_selector(reload_dlg=dialog)
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
