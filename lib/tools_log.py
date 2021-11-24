@@ -200,8 +200,11 @@ def log_db(text=None, color="black", bold='', header="SERVER EXECUTION", message
     if type(text) is dict:
         text = json.dumps(text)
 
-    msg = (f'<font color="blue"><{bold}>{header}: </font>'
-           f'<font color="{color}"><{bold}>{text}</font>')
+
+
+    # msg = (f'<font color="blue"><{bold}>{header}: </font>'
+    #        f'<font color="{color}"><{bold}>{text}</font>')
+    msg = text
     limit = 200
     if global_vars.logger and global_vars.logger.log_db_limit_characters:
         limit = global_vars.logger.log_db_limit_characters

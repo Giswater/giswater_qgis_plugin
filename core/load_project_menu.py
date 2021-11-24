@@ -31,8 +31,10 @@ class GwMenuLoad(QObject):
         self.iface = global_vars.iface
 
 
-    def read_menu(self):
+    def read_menu(self, project_loaded):
         """  """
+        print(f"READ MENU")
+        tools_gw.unset_giswater_menu()
 
         actions = self.iface.mainWindow().menuBar().actions()
         last_action = actions[-1]
@@ -45,101 +47,103 @@ class GwMenuLoad(QObject):
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         config_icon = QIcon(icon_path)
 
-        # region Toolbar
-        toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
-        toolbars_icon = QIcon(icon_path)
-        toolbars_menu.setIcon(toolbars_icon)
-        self.main_menu.addMenu(toolbars_menu)
+        if project_loaded:
 
-        for toolbar in global_vars.giswater_settings.value(f"toolbars/list_toolbars"):
-            toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
-            toolbars_menu.addMenu(toolbar_submenu)
-            buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-            project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
-                                                           "project", "giswater")
-            if project_exclusive not in (None, 'None'):
-                project_exclusive = project_exclusive.replace(' ', '').split(',')
+            # region Toolbar
+            toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
+            toolbars_icon = QIcon(icon_path)
+            toolbars_menu.setIcon(toolbars_icon)
+            self.main_menu.addMenu(toolbars_menu)
 
-            for index_action in buttons_toolbar:
+            for toolbar in global_vars.giswater_settings.value(f"toolbars/list_toolbars"):
+                toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
+                toolbars_menu.addMenu(toolbar_submenu)
+                buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
+                project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                                                               "project", "giswater")
+                if project_exclusive not in (None, 'None'):
+                    project_exclusive = project_exclusive.replace(' ', '').split(',')
 
-                if index_action in project_exclusive:
-                    continue
+                for index_action in buttons_toolbar:
 
-                icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
-                icon = QIcon(icon_path)
-                button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
-                text = ""
-                if button_def:
-                    text = self._translate(f'{index_action}_text')
-                parent = self.iface.mainWindow()
-                ag = QActionGroup(parent)
-                ag.setProperty('gw_name', 'gw_QActionGroup')
-                if button_def is None:
-                    continue
+                    if index_action in project_exclusive:
+                        continue
 
-                # Check if the class associated to the button definition exists
-                if hasattr(buttons, button_def):
-                    button_class = getattr(buttons, button_def)
-                    action_function = button_class(icon_path, button_def, text, None, ag)
-                    action = toolbar_submenu.addAction(icon, f"{text}")
-                    shortcut_key = tools_gw.get_config_parser("toolbars_shortcuts", f"{index_action}", "user", "init", prefix=False)
-                    if shortcut_key:
-                        action.setShortcuts(QKeySequence(f"{shortcut_key}"))
-                        global_vars.shortcut_keys.append(shortcut_key)
-                    action.triggered.connect(partial(self._clicked_event, action_function))
-                else:
-                    tools_log.log_warning(f"Class '{button_def}' not imported in file '{buttons.__file__}'")
-        # endregion
+                    icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
+                    icon = QIcon(icon_path)
+                    button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
+                    text = ""
+                    if button_def:
+                        text = self._translate(f'{index_action}_text')
+                    parent = self.iface.mainWindow()
+                    ag = QActionGroup(parent)
+                    ag.setProperty('gw_name', 'gw_QActionGroup')
+                    if button_def is None:
+                        continue
 
-        # region Actions
-        actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
-        actions_menu.setIcon(config_icon)
-        self.main_menu.addMenu(actions_menu)
+                    # Check if the class associated to the button definition exists
+                    if hasattr(buttons, button_def):
+                        button_class = getattr(buttons, button_def)
+                        action_function = button_class(icon_path, button_def, text, None, ag)
+                        action = toolbar_submenu.addAction(icon, f"{text}")
+                        shortcut_key = tools_gw.get_config_parser("toolbars_shortcuts", f"{index_action}", "user", "init", prefix=False)
+                        if shortcut_key:
+                            action.setShortcuts(QKeySequence(f"{shortcut_key}"))
+                            global_vars.shortcut_keys.append(shortcut_key)
+                        action.triggered.connect(partial(self._clicked_event, action_function))
+                    else:
+                        tools_log.log_warning(f"Class '{button_def}' not imported in file '{buttons.__file__}'")
+            # endregion
 
-        # Action 'Get help'
-        action_help = actions_menu.addAction(f"Get help")
-        action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
-        if not action_help_shortcut:
-            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_help", f"{action_help_shortcut}", "user", "init",
-                                       prefix=False)
-        action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
-        action_help.triggered.connect(tools_gw.open_dlg_help)
+            # region Actions
+            actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
+            actions_menu.setIcon(config_icon)
+            self.main_menu.addMenu(actions_menu)
 
-        # Action 'Reset dialogs'
-        action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
-        action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+            # Action 'Get help'
+            action_help = actions_menu.addAction(f"Get help")
+            action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
+            if not action_help_shortcut:
+                tools_gw.set_config_parser("actions_shortcuts", f"shortcut_help", f"{action_help_shortcut}", "user", "init",
+                                           prefix=False)
+            action_help.setShortcuts(QKeySequence(f"{action_help_shortcut}"))
+            action_help.triggered.connect(tools_gw.open_dlg_help)
 
-        # Action 'Reset plugin
-        action_reset_plugin = actions_menu.addAction(f"Reset plugin")
-        action_reset_plugin_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
-            "user", "init", prefix=False)
-        if not action_reset_plugin_shortcut:
-            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
-                f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
-        action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
-        action_reset_plugin.triggered.connect(self._reset_plugin)
+            # Action 'Reset dialogs'
+            action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
+            action_reset_dialogs.triggered.connect(self._reset_position_dialog)
 
-        # Action 'Show current selectors'
-        action_open_selections = actions_menu.addAction(f"Show current selectors")
-        action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
-            f"shortcut_open_curselectors", "user", "init", prefix=False)
-        if not action_open_selections_shortcut:
-            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_open_curselectors",
-                f"{action_open_selections_shortcut}", "user", "init", prefix=False)
-        action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
-        action_open_selections.triggered.connect(self._open_current_selections)
+            # Action 'Reset plugin
+            action_reset_plugin = actions_menu.addAction(f"Reset plugin")
+            action_reset_plugin_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
+                "user", "init", prefix=False)
+            if not action_reset_plugin_shortcut:
+                tools_gw.set_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
+                    f"{action_reset_plugin_shortcut}", "user", "init", prefix=False)
+            action_reset_plugin.setShortcuts(QKeySequence(f"{action_reset_plugin_shortcut}"))
+            action_reset_plugin.triggered.connect(self._reset_plugin)
 
-        # Action 'Toggle Log DB'
-        action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
-        log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", "user", "init", prefix=False)
-        if not log_sql_shortcut:
-            tools_gw.set_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
-                "init", prefix=False)
-        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
-        action_set_log_sql.triggered.connect(self._set_log_sql)
+            # Action 'Show current selectors'
+            action_open_selections = actions_menu.addAction(f"Show current selectors")
+            action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
+                f"shortcut_open_curselectors", "user", "init", prefix=False)
+            if not action_open_selections_shortcut:
+                tools_gw.set_config_parser("actions_shortcuts", f"shortcut_open_curselectors",
+                    f"{action_open_selections_shortcut}", "user", "init", prefix=False)
+            action_open_selections.setShortcuts(QKeySequence(f"{action_open_selections_shortcut}"))
+            action_open_selections.triggered.connect(self._open_current_selections)
 
-        # endregion
+            # Action 'Toggle Log DB'
+            action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
+            log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", "user", "init", prefix=False)
+            if not log_sql_shortcut:
+                tools_gw.set_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
+                    "init", prefix=False)
+            action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+            action_set_log_sql.triggered.connect(self._set_log_sql)
+
+            # endregion
 
         # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
@@ -162,6 +166,7 @@ class GwMenuLoad(QObject):
         action_open_path.triggered.connect(self._open_config_path)
         # endregion
 
+        print(f"INSERT MENU")
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
 
 

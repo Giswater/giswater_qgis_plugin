@@ -21,6 +21,7 @@ from .core.utils.signal_manager import GwSignalManager
 from .lib import tools_qgis, tools_os, tools_log
 from .core.ui.dialog import GwDialog
 from .core.ui.main_window import GwMainWindow
+from .core.load_project_menu import GwMenuLoad
 
 
 class Giswater(QObject):
@@ -106,9 +107,10 @@ class Giswater(QObject):
 
         try:
             # Remove 'Giswater menu'
-            self._unset_giswater_menu()
+            print(f"UNLOAD")
+            tools_gw.unset_giswater_menu()
         except Exception as e:
-            print(f"Exception in unload when self._unset_giswater_menu(): {e}")
+            print(f"Exception in unload when tools_gw.unset_giswater_menu(): {e}")
 
         try:
             # Set 'Main Info button' if project is unload or project don't have layers
@@ -216,6 +218,8 @@ class Giswater(QObject):
         # Set main information button (always visible)
         self._set_info_button()
 
+        tools_qgis.enable_python_console()
+
         return True
 
 
@@ -306,19 +310,16 @@ class Giswater(QObject):
             action.deleteLater()
 
 
-    def _unset_giswater_menu(self):
-        """ Unset Giswater menu (when plugin is disabled or reloaded) """
-
-        menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
-        if menu_giswater not in (None, "None"):
-            menu_giswater.deleteLater()
-
-
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
         # Unload plugin when create new QGIS project
         self.unload(False)
+
+        print(f"Load Project - CREATE MENU AAAA")
+        if global_vars.load_project_menu is None:
+            global_vars.load_project_menu = GwMenuLoad()
+        global_vars.load_project_menu.read_menu(False)
 
 
     def _project_read(self, show_warning=True, hide_gw_button=True):

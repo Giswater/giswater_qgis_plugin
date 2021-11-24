@@ -111,8 +111,10 @@ class GwLoadProject(QObject):
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
+        print(f"Load Project - CREATE MENU BBBB")
+        if global_vars.load_project_menu is None:
+            global_vars.load_project_menu = GwMenuLoad()
+        global_vars.load_project_menu.read_menu(True)
 
         # Manage snapping layers
         self._manage_snapping_layers()
@@ -162,7 +164,9 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
+        print(f"111")
 
+        tools_log.log_info("")
 
     # region private functions
 

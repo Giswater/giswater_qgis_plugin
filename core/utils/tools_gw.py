@@ -25,7 +25,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
@@ -3077,6 +3077,16 @@ def get_vertex_flag(default_value):
         vertex_flag = default_value
 
     return vertex_flag
+
+
+def unset_giswater_menu():
+    """ Unset Giswater menu (when plugin is disabled or reloaded) """
+
+    menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
+    print(f"UNSET QMENU Giswater -> {menu_giswater}")
+    if menu_giswater not in (None, "None"):
+        menu_giswater.deleteLater()
+        global_vars.load_project_menu = None
 
 # endregion
 
