@@ -120,6 +120,9 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
+        # Manage "btn_updateall" from attribute table
+        self._manage_attribute_table()
+
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
 
@@ -205,6 +208,7 @@ class GwLoadProject(QObject):
         global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
         global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
         global_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
+        global_vars.user_level['disable_updateall_atttibutetable'] = tools_gw.get_config_parser('user_level', 'disable_updateall_atttibutetable', "user", "init", False)
         global_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
 
 
@@ -614,5 +618,38 @@ class GwLoadProject(QObject):
         """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
+
+    def _manage_attribute_table(self):
+
+        if global_vars.user_level['level'] in global_vars.user_level['disable_updateall_atttibutetable']:
+            # Connect function to "Open Attribute Table" button
+            for x in self.iface.attributesToolBar().actions():
+                # print(f"ACTIONS -> {x.objectName()}")
+                if x.objectName() == 'mActionOpenTable':
+                    x.triggered.connect(self._enable_btn_updateall)
+
+            # Connect function to "Toggle Editing" button
+            for x in self.iface.digitizeToolBar().actions():
+                if x.objectName() == 'mActionToggleEditing':
+                    x.triggered.connect(self._enable_btn_updateall)
+
+            # for x in self.iface.mapNavToolToolBar().actions():
+            #     print(f"ACTIONS -> {x.objectName()}")
+            #     if x.objectName() == 'mActionZoomIn':
+            #         x.triggered.connect(self._enable_btn_updateall)
+
+
+    def _enable_btn_updateall(self, enabled=False):
+        """"Define function to manage editability for button 'Update all' on attribute talbe form"""
+        print("RUN")
+        # Get layout Update Expression Box
+        main_layout = [d for d in QApplication.instance().allWidgets() if d.objectName() == u'mUpdateExpressionBox']
+        try:
+            for widget in main_layout[0].children():
+                if widget.objectName() == 'mRunFieldCalc':
+                    widget.setEnabled(enabled)
+        except IndexError:
+            pass
+
 
     # endregion
