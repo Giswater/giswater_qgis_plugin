@@ -2256,8 +2256,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
-    tools_log.log_info(class_object.list_ids[feature_type])
-
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
