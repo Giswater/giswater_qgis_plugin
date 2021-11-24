@@ -173,7 +173,9 @@ BEGIN
 	END IF;
 	
 	-- profilactic control on feat vdefault parameters on sys_param_user table
-	UPDATE sys_param_user set project_type = lower(v_project_type) where project_type IS NULL;
+	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+		UPDATE sys_param_user set project_type = lower(v_project_type) where project_type IS NULL;
+	END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=101 AND cur_user=current_user;
