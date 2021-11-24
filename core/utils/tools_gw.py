@@ -2899,6 +2899,9 @@ def user_params_to_userconfig():
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
+    if global_vars.user_folder_dir is None:
+        return
+
     init_parser = configparser.ConfigParser()
     session_parser = configparser.ConfigParser()
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
