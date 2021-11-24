@@ -107,6 +107,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
 
+    # Needed to avoid errors with giswater plugins
+    if path is None:
+        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        return None
+
     value = None
     raw_parameter = parameter
     if parser is None:
