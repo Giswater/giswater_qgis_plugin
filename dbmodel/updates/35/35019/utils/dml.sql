@@ -14,3 +14,6 @@ WHERE parameter IN ('basic_selector_tab_sector', 'basic_selector_tab_psector', '
 --2021/11/24
 DELETE FROM sys_param_user WHERE id='om_visit_class_vdefault';
 DELETE FROM config_param_user WHERE parameter='om_visit_class_vdefault';
+
+INSERT INTO config_param_system (parameter, value, descript, label, isenabled) VALUES
+('qgis_form_selector_stylesheet', '{"rowsColor":true}', 'Variable to customize the look of the selectors dialog', 'Selectors stylesheet:', FALSE);

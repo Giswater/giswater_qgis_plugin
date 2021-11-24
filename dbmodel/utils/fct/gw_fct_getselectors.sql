@@ -43,6 +43,7 @@ v_expl_x_user boolean;
 v_filter text;
 v_selectionMode text;
 v_typeaheadForced boolean=false;
+v_stylesheet json;
 v_errcontext text;
 v_currenttab text;
 v_tab record;
@@ -93,6 +94,7 @@ BEGIN
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
+	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 
 	-- when typeahead only one tab is executed
 	IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
@@ -278,6 +280,7 @@ BEGIN
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
+	v_stylesheet := COALESCE(v_stylesheet, '{}');
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -294,7 +297,7 @@ BEGIN
 		-- Return formtabs
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
-			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
+			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
 			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
 			'}'||
