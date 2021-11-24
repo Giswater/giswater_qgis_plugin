@@ -42,6 +42,7 @@ v_typeahead text;
 v_expl_x_user boolean;
 v_filter text;
 v_selectionMode text;
+v_typeaheadForced boolean=false;
 v_errcontext text;
 v_currenttab text;
 v_tab record;
@@ -130,6 +131,7 @@ BEGIN
 		v_selectionMode = v_tab.value::json->>'selectionMode';
 		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
+		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
 
 		-- profilactic control of v_orderby
 		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
@@ -255,6 +257,7 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
 	
 		-- Create tabs array
 		IF v_firsttab THEN
