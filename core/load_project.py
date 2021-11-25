@@ -16,7 +16,6 @@ from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
-from .load_project_menu import GwMenuLoad
 from .load_project_check import GwLoadProjectCheck
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.notify import GwNotify
@@ -111,8 +110,7 @@ class GwLoadProject(QObject):
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
+        tools_gw.create_giswater_menu(True)
 
         # Manage snapping layers
         self._manage_snapping_layers()
@@ -159,7 +157,6 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
-
 
     # region private functions
 
