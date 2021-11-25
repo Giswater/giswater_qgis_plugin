@@ -88,9 +88,11 @@ class GwLoadProjectCheck:
                 tools_qgis.show_warning(message)
 
         # Get log folder size
-        log_folder = os.path.join(global_vars.user_folder_dir, 'log')
-        size = tools_os.get_folder_size(log_folder)
-        log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
+        log_folder_volume = 0
+        if global_vars.user_folder_dir:
+            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            size = tools_os.get_folder_size(log_folder)
+            log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 
         extras = f'"version":"{plugin_version}"'
         extras += f', "fid":101'

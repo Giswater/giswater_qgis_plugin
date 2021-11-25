@@ -46,7 +46,6 @@ class GwMenuLoad(QObject):
         config_icon = QIcon(icon_path)
 
         if project_loaded:
-
             # region Toolbar
             toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
@@ -152,16 +151,15 @@ class GwMenuLoad(QObject):
         # endregion
 
         # region Open user folder
-        log_folder = os.path.join(global_vars.user_folder_dir, 'log')
-        size = tools_os.get_folder_size(log_folder)
-        log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
-
-        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
-        folder_icon = QIcon(icon_path)
-        action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
-
-        action_open_path.setIcon(folder_icon)
-        action_open_path.triggered.connect(self._open_config_path)
+        if global_vars.user_folder_dir:
+            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            size = tools_os.get_folder_size(log_folder)
+            log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
+            folder_icon = QIcon(icon_path)
+            action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
+            action_open_path.setIcon(folder_icon)
+            action_open_path.triggered.connect(self._open_config_path)
         # endregion
 
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)

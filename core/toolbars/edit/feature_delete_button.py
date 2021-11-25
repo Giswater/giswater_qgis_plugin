@@ -93,6 +93,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set delete feature tab as current index
         self.dlg_feature_delete.mainTab.setCurrentIndex(0)
+        tools_gw.disable_tab_log(self.dlg_feature_delete)
 
 
     def _filter_typeahead(self, widget, completer, model):
@@ -187,7 +188,6 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set visible button delete another feature
         self.dlg_feature_delete.btn_delete_another.setVisible(True)
-
 
         # Close dialog
         if not change_tab:

@@ -108,6 +108,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
 
+    # Needed to avoid errors with giswater plugins
+    if path is None:
+        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        return None
+
     value = None
     raw_parameter = parameter
     if parser is None:
@@ -607,7 +612,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
 def disable_tab_log(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
@@ -2257,8 +2262,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
-    tools_log.log_info(class_object.list_ids[feature_type])
-
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
@@ -2896,6 +2899,9 @@ def user_params_to_userconfig():
 
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
+
+    if global_vars.user_folder_dir is None:
+        return
 
     init_parser = configparser.ConfigParser()
     session_parser = configparser.ConfigParser()
