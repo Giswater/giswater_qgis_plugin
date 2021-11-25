@@ -18,7 +18,7 @@ class GwProjectLayersConfig(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def     __init__(self, description, params):
+    def __init__(self, description, params):
 
         super().__init__(description)
         self.exception = None
