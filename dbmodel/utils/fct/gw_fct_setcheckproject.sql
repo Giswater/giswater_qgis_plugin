@@ -520,10 +520,14 @@ BEGIN
 
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, try to execute a query using anl_arc or anl_node table and fid=error number. For example:');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_node WHERE fid=107');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '(Most of the errors will have values on these tables)');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, try to execute a query using anl_arc or anl_node table WHERE fid=error number AND current_user.');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_node WHERE fid=107 AND cur_user=current_user;');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Most of the errors will have values on these tables, but not all of them.');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To verify some errors you can also use Giswater Toolbox. Temporary layers will be loaded to view these errors.');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
