@@ -610,8 +610,8 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     :return:
     """
 
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
+    if global_vars.schema_name and global_vars.schema_name not in table_name:
+        table_name = f"{global_vars.schema_name}.{table_name}"
 
     # Set model
     model = QSqlTableModel(db=global_vars.qgis_db_credentials)
@@ -1186,8 +1186,8 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
         if not is_valid:
             return expr
 
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
+    if global_vars.schema_name and global_vars.schema_name not in table_name:
+        table_name = f"{global_vars.schema_name}.{table_name}"
 
     # Set a model with selected filter expression
     model = QSqlTableModel(db=global_vars.qgis_db_credentials)
