@@ -82,6 +82,7 @@ query_text text;
 v_qgis_project_type text;
 v_logfoldervolume text;
 v_uservalues json;
+v_user_expl text;
 
 BEGIN 
 
@@ -204,10 +205,10 @@ BEGIN
 		VALUES (101, 3, '349',v_errortext, 1);
 	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL versión: ',(SELECT version())));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
 	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
@@ -341,13 +342,21 @@ BEGIN
 		END IF;
 	END IF;
 
+
+	-- Check which exploitations have been checked
+	SELECT string_agg(name, ' / ') INTO v_user_expl FROM exploitation JOIN selector_expl USING (expl_id) WHERE cur_user=current_user;
+	v_errortext=concat('Checked exploitation/s: ', v_user_expl);
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+
+
+
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
 		
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
+			"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)';
 			-- insert results 
 			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
@@ -360,7 +369,7 @@ BEGIN
 
 				EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
+				"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":"ALL"}}}$$)';
 				-- insert results 
 				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
@@ -520,14 +529,13 @@ BEGIN
 
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, try to execute a query using anl_arc or anl_node table WHERE fid=error number AND current_user.');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_node WHERE fid=107 AND cur_user=current_user;');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Most of the errors will have values on these tables, but not all of them.');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To verify some errors you can also use Giswater Toolbox. Temporary layers will be loaded to view these errors.');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
