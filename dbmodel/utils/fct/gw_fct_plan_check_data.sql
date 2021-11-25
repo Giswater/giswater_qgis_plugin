@@ -52,9 +52,9 @@ BEGIN
 	
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (115,252);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (115,252);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (115,252);
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
 
 
 	-- Starting process
@@ -401,7 +401,7 @@ BEGIN
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Arcs state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''ARC''');
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252: There are ',v_count,' planified arcs without psector.'),v_count);
+			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
 		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''NODE'';'
 		INTO v_count; 
@@ -409,21 +409,21 @@ BEGIN
 			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Nodes state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''NODE''');
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252: There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
+			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''CONNEC'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Connecs state = 2 without psector'', b.the_geom,2 FROM (', v_query,')b  WHERE feature = ''CONNEC''');
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252: There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
+			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''GULLY'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_gully (fid, gully_id, gullycat_id, descript, the_geom, state)
+			EXECUTE concat ('INSERT INTO anl_connec (fid, gully_id, gullycat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Gullies state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''GULLY''');
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252: There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
+			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (anl_connec): There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
@@ -454,7 +454,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 354, c.arc_id, c.arccat_id, ''Arcs state = 2 without planned final nodes in psector'', c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
+		VALUES (115, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
@@ -478,7 +478,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 355, c.arc_id, c.arccat_id, concat(''Arcs state = 2 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '355', 3, FALSE, concat('ERROR-355: There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
+		VALUES (115, '355', 3, FALSE, concat('ERROR-355 (anl_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
@@ -526,7 +526,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

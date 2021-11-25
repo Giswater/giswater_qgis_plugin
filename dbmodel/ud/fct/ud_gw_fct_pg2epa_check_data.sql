@@ -67,8 +67,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 284, 427) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 175, 187, 379) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (188, 284, 295, 427) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 187, 294, 379) AND cur_user=current_user;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -95,7 +95,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 107, node_id, nodecat_id, ''Orphan node'',
 		the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107: There is/are ',v_count,' node''s orphan. Giswater filters may prevent export, if they are JUNCTION will be disabled on the exportation.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107 (anl_node): There is/are ',v_count,' node''s orphan. Giswater filters may prevent export, if they are JUNCTION will be disabled on the exportation.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'107', 'INFO: No node(s) orphan found.',v_count);
@@ -111,10 +111,8 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid, result_id,  criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '187', concat('WARNING-187: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'),
+		VALUES (v_fid, v_result_id, 2, '187', concat('WARNING-187 (anl_node): There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'),
 		v_count);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid=187 AND cur_user=current_user'), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '187', 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
@@ -129,10 +127,8 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom) SELECT 188, arc_id, arccat_id, ''arcs with state_type
 		isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '188', concat('WARNING-188: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),
+		VALUES (v_fid, v_result_id, 2, '188', concat('WARNING-188 (anl_arc): There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),
 		v_count);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_arc WHERE fid=188 AND cur_user=current_user'), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '188', 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
@@ -191,7 +187,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113: There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (anl_node): There is/are ',v_count,
 		' junction(s) type sink which means that junction only have entry arcs without any exit arc (FORCE_MAIN is not valid).'),v_count);
 
 		-- check nodes sink automaticly swiched to outfall (fuction gw_fct_anl_node_sink have been called on pg2epa_fill_data function)
@@ -200,7 +196,7 @@ BEGIN
 		
 		IF v_count_2 > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113:  ',v_count_2,' from ',v_count,
+			VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (anl_node):  ',v_count_2,' from ',v_count,
 			' junction(s) type sink has/have outfallparam field defined and has/have been switched to OUTFALL using defined parameters.'),v_count);
 		END IF;
 		v_count=0;
@@ -224,7 +220,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '111', concat('WARNING-111: There is/are ',v_count,' junction(s) with exits upper intro'),v_count);
+		VALUES (v_fid, v_result_id, 2, '111', concat('WARNING-111 (anl_node): There is/are ',v_count,' junction(s) with exits upper intro'),v_count);
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '111', concat('INFO: Any junction have been detected with exits upper intro.'),v_count);
@@ -240,7 +236,7 @@ BEGIN
 		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) 
 		WHERE epa_type !='UNDEFINED' AND sys_elev IS NULL AND cur_user = current_user;
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164: There is/are ',v_count,' EPA node(s) without sys_elevation values.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164 (anl_node): There is/are ',v_count,' EPA node(s) without sys_elevation values.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '164', 'INFO: No nodes with null values on field elevation have been found.',v_count);
@@ -251,7 +247,7 @@ BEGIN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom)
 		SELECT 284, arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284: There is/are ',v_count,' arc(s) without values on sys_elev1 or sys_elev2.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284 (anl_arc): There is/are ',v_count,' arc(s) without values on sys_elev1 or sys_elev2.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '284', 'INFO: No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.',v_count);
@@ -305,7 +301,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '294',concat(
-		'ERROR-294: There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'), v_count);
+		'ERROR-294 (anl_node): There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -327,11 +323,11 @@ BEGIN
 		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_virtual table') AS epa_table, a.the_geom FROM v_edit_inp_virtual JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL';
 
 		
-	SELECT count(*) FROM anl_node INTO v_count WHERE fid=295 AND cur_user=current_user;
+	SELECT count(*) FROM anl_arc INTO v_count WHERE fid=295 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
-		'ERROR-295: There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
+		'ERROR-295 (anl_arc): There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -350,9 +346,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('ERROR-379: There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
-		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 379 AND cur_user=current_user'),v_count);
+		VALUES (v_fid, 2, '379' ,concat('ERROR-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
@@ -409,7 +403,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '106' ,concat('WARNING-106: There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+		VALUES (v_fid, 3, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
@@ -502,7 +496,7 @@ BEGIN
 	
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427: There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -520,7 +514,7 @@ BEGIN
 	
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427: There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -538,7 +532,7 @@ BEGIN
 	
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427: There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fç)
@@ -556,7 +550,7 @@ BEGIN
 	
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427: There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -588,8 +582,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 175, 187, 381, 382)) row) features;
-
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 187, 294, 379)) row) features;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 
@@ -603,7 +596,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 427)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
