@@ -611,7 +611,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
 def disable_tab_log(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
