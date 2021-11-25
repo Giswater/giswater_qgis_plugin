@@ -9,7 +9,7 @@ import os
 
 from qgis.core import QgsProject, Qgis, QgsApplication
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -620,6 +620,8 @@ class GwLoadProject(QObject):
     def _manage_attribute_table(self):
 
         if global_vars.user_level['level'] in global_vars.user_level['disable_updateall_atttibutetable']:
+            QApplication.instance().focusChanged.connect(self._manage_focus_changed)
+            return
              # Connect function to "Open Attribute Table" button
             for x in self.iface.attributesToolBar().actions():
                 # print(f"ACTIONS -> {x.objectName()}")
@@ -649,5 +651,20 @@ class GwLoadProject(QObject):
                     widget.setEnabled(enabled)
         except IndexError:
             pass
+
+
+    def _manage_focus_changed(self, old, new):
+        print(f"focus changed: {old} -> {new}")
+        if isinstance(new, QTableView):
+            # this is less than ideal, but it works
+            table_dialog = new.parent().parent().parent().parent()
+            print(f"{table_dialog}")
+            try:
+                for widget in table_dialog.children():
+                    if widget.objectName() == 'mRunFieldCalc':
+                        widget.setEnabled(False)
+                        break
+            except IndexError:
+                pass
 
     # endregion
