@@ -21,7 +21,6 @@ from .core.utils.signal_manager import GwSignalManager
 from .lib import tools_qgis, tools_os, tools_log
 from .core.ui.dialog import GwDialog
 from .core.ui.main_window import GwMainWindow
-from .core.load_project_menu import GwMenuLoad
 
 
 class Giswater(QObject):
@@ -107,7 +106,6 @@ class Giswater(QObject):
 
         try:
             # Remove 'Giswater menu'
-            print(f"UNLOAD")
             tools_gw.unset_giswater_menu()
         except Exception as e:
             print(f"Exception in unload when tools_gw.unset_giswater_menu(): {e}")
@@ -148,7 +146,6 @@ class Giswater(QObject):
             layers = QgsProject.instance().mapLayers().values()
             if hide_gw_button is False and len(layers) == 0:
                 self._set_info_button()
-                print(f"Load Project - CREATE MENU AAAA")
                 tools_gw.create_giswater_menu(False)
         except Exception as e:
             print(f"Exception in unload when self._set_info_button(): {e}")
@@ -219,8 +216,6 @@ class Giswater(QObject):
 
         # Set main information button (always visible)
         self._set_info_button()
-
-        tools_qgis.enable_python_console()
 
         return True
 

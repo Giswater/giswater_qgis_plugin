@@ -33,8 +33,6 @@ class GwMenuLoad(QObject):
 
     def read_menu(self, project_loaded):
         """  """
-        print(f"READ MENU")
-        # tools_gw.unset_giswater_menu()
 
         actions = self.iface.mainWindow().menuBar().actions()
         last_action = actions[-1]
@@ -166,7 +164,6 @@ class GwMenuLoad(QObject):
         action_open_path.triggered.connect(self._open_config_path)
         # endregion
 
-        print(f"INSERT MENU")
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
 
 

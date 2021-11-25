@@ -3091,7 +3091,6 @@ def unset_giswater_menu():
     """ Unset Giswater menu (when plugin is disabled or reloaded) """
 
     menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
-    print(f"UNSET QMENU Giswater -> {menu_giswater}")
     if menu_giswater not in (None, "None"):
         menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
         menu_giswater.deleteLater()

@@ -110,7 +110,6 @@ class GwLoadProject(QObject):
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Create menu
-        print(f"Load Project - CREATE MENU BBBB")
         tools_gw.create_giswater_menu(True)
 
         # Manage snapping layers
@@ -161,9 +160,6 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
-        print(f"111")
-
-        tools_log.log_info("")
 
     # region private functions
 
@@ -642,7 +638,7 @@ class GwLoadProject(QObject):
 
     def _enable_btn_updateall(self, enabled=False):
         """"Define function to manage editability for button 'Update all' on attribute talbe form"""
-        print("RUN")
+
         # Get layout Update Expression Box
         main_layout = [d for d in QApplication.instance().allWidgets() if d.objectName() == u'mUpdateExpressionBox']
         try:
