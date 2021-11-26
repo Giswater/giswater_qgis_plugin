@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+from functools import partial
 
 from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.gui import QgsFieldExpressionWidget
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView, QDialog, QComboBox
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -654,17 +656,57 @@ class GwLoadProject(QObject):
 
 
     def _manage_focus_changed(self, old, new):
-        print(f"focus changed: {old} -> {new}")
-        if isinstance(new, QTableView):
+        # print(f"focus changed: {old} -> {new}")
+        if new is None:
+            return
+        print(f"{new.objectName()=}")
+        table_dialog = new.window()
+        if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith('QgsAttributeTableDialog'):
             # this is less than ideal, but it works
-            table_dialog = new.parent().parent().parent().parent()
-            print(f"{table_dialog}")
+            # table_dialog = new.parent().parent().parent().parent()
+            # print(new.window())
             try:
                 for widget in table_dialog.children():
-                    if widget.objectName() == 'mRunFieldCalc':
-                        widget.setEnabled(False)
+                    # print(f"{widget.objectName()}")
+                    if widget.objectName() == 'mUpdateExpressionBox':
+                        mRunFieldCalc = None
+                        for subwidget in widget.children():
+                            # print(f"{subwidget.objectName()}")
+                            if subwidget.objectName() == 'mRunFieldCalc':
+                                subwidget.setEnabled(False)
+                                mRunFieldCalc = subwidget
+                                # subwidget.clicked.connect(self._show_warning_message)
+                                # QApplication.instance().focusChanged.disconnect()
+                                # break
+                            if subwidget.objectName() == 'mUpdateExpressionText':
+                                print(isinstance(subwidget, QgsFieldExpressionWidget))
+                                # subwidget = QgsFieldExpressionWidget(subwidget)
+                                print(type(subwidget))
+
+                                # try:
+                                #     subwidget.currentTextChanged.disconnect()
+                                # except:
+                                #     pass
+                                # subwidget.currentTextChanged.connect(partial(self._disable_updateall_btn, subwidget))
+
+
+                                try:
+                                    subwidget.fieldChanged.disconnect()
+                                except:
+                                    pass
+                                subwidget.fieldChanged.connect(partial(self._disable_updateall_btn, mRunFieldCalc))
                         break
             except IndexError:
                 pass
 
+
+    def _show_warning_message(self):
+        tools_qt.show_question("Are you sure?")
+
+
+    def _disable_updateall_btn(self, widget):
+        print(f"a")
+        if widget:
+            widget.setEnabled(False)
+        print(f"b")
     # endregion
