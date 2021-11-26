@@ -641,8 +641,8 @@ class GwLoadProject(QObject):
                         widget_btn_updateall = None
                         for subwidget in widget.children():
                             if subwidget.objectName() == 'mRunFieldCalc':  # This is for the button itself
-                                subwidget.setEnabled(False)
                                 widget_btn_updateall = subwidget
+                                tools_qt.set_widget_enabled(None, widget_btn_updateall, False)
                             if subwidget.objectName() == 'mUpdateExpressionText':  # This is the expression text field
                                 try:
                                     subwidget.fieldChanged.disconnect()
@@ -650,15 +650,10 @@ class GwLoadProject(QObject):
                                     pass
                                 # When you type something in the expression text field, the button "Update all" is
                                 # enabled. This will disable it again.
-                                subwidget.fieldChanged.connect(partial(self._disable_updateall_btn, widget_btn_updateall))
+                                subwidget.fieldChanged.connect(partial(
+                                    tools_qt.set_widget_enabled, None, widget_btn_updateall, False))
                         break
             except IndexError:
                 pass
-
-
-    def _disable_updateall_btn(self, widget):
-        if widget:
-            widget.setEnabled(False)
-
 
     # endregion
