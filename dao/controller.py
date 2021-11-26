@@ -75,7 +75,8 @@ class DaoController(object):
 
         status = self.dao.check_cursor()
         if status:
-            self.start_notify()
+            # self.start_notify()
+            pass
         else:
             if self.dao.last_error:
                 self.manage_exception_db(self.dao.last_error)
@@ -115,7 +116,7 @@ class DaoController(object):
         """ Close database connection """
 
         if self.dao:
-            self.stop_notify()
+            # self.stop_notify()
             if not self.dao.close_db():
                 self.log_info(str(self.last_error))
             del self.dao

@@ -709,8 +709,8 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
-                self.controller.stop_notify()
+            # if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
+            #     self.controller.stop_notify()
 
             for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
@@ -980,9 +980,9 @@ class Giswater(QObject):
             self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
-        if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.controller.use_notify = True
-            self.controller.log_info("Notify enabled")
+        # if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
+            # self.controller.use_notify = True
+            # self.controller.log_info("Notify enabled")
 
         # Save toolbar position after save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)

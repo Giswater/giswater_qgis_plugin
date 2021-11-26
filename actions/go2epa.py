@@ -390,6 +390,9 @@ class Go2Epa(ApiParent):
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         # Save user values
         self.save_user_values()
 

@@ -1643,6 +1643,8 @@ class MincutParent(ParentAction):
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
+        self.controller.show_info("Abort task with Thread")
+        return
         self.task1 = GwTask('Calculating mincut')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)

@@ -1490,6 +1490,9 @@ class UpdateSQL(ApiParent):
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
 
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
             project_name_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
@@ -1664,6 +1667,9 @@ class UpdateSQL(ApiParent):
 
     def rename_project_data_schema(self, schema, create_project=None):
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         if create_project is None or create_project is False:
             close_dlg_rename = True
             self.schema = utils_giswater.getWidgetText(
@@ -1722,6 +1728,9 @@ class UpdateSQL(ApiParent):
 
     def load_custom_sql_files(self, dialog, widget):
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         folder_path = utils_giswater.getWidgetText(dialog, widget)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1742,6 +1751,9 @@ class UpdateSQL(ApiParent):
 
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
+
+        self.controller.show_info("Abort task with Thread")
+        return
 
         msg = "Are you sure to update the project schema to last version?"
         result = self.controller.ask_question(msg, "Info")
@@ -1774,6 +1786,9 @@ class UpdateSQL(ApiParent):
 
 
     def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
+
+        self.controller.show_info("Abort task with Thread")
+        return
 
         # Get current schema selected
         if schema_name is None:
@@ -2235,6 +2250,9 @@ class UpdateSQL(ApiParent):
 
     def schema_file_to_db(self):
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         if self.chk_schema_funcion.isChecked():
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2484,6 +2502,9 @@ class UpdateSQL(ApiParent):
 
     def copy_project_data_schema(self, schema):
 
+        self.controller.show_info("Abort task with Thread")
+        return
+
         new_schema_name = utils_giswater.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
@@ -2546,6 +2567,9 @@ class UpdateSQL(ApiParent):
     def execute_import_inp(self, accepted=False, schema_type='', is_test=False):
 
         if accepted:
+
+            self.controller.show_info("Abort task with Thread")
+            return
 
             # Set wait cursor
             self.task1 = GwTask('Manage schema')
@@ -2614,6 +2638,9 @@ class UpdateSQL(ApiParent):
 
 
     def create_qgis_template(self):
+
+        self.controller.show_info("Abort task with Thread")
+        return
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
