@@ -603,9 +603,9 @@ BEGIN
 				
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				IF NEW.exit_type ='VNODE' THEN -- link_class = 3
-					UPDATE gully SET pjoint_type = 'VNODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+					UPDATE gully SET pjoint_type = 'VNODE', pjoint_id = NEW.exit_id WHERE gully_id = NEW.feature_id;
 				ELSIF NEW.exit_type ='NODE' THEN
-					UPDATE gully SET pjoint_type = 'NODE', pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
+					UPDATE gully SET pjoint_type = 'NODE', pjoint_id = NEW.exit_id WHERE gully_id = NEW.feature_id;
 				END IF;
 				
 			END IF;
