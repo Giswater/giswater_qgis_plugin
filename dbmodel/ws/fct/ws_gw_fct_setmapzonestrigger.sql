@@ -101,12 +101,12 @@ BEGIN
 
 					-- getting mapzone id (indistinct side of valve) --> always with value
 					EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM arc WHERE arc_id IN (SELECT arc_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT arc_id FROM arc WHERE node_1 = '||v_id||'::text) 
-					AND '||lower(v_mapzone)||'_id::integer > 0 AND state = 1 LIMIT 1' 
+					AND '||lower(v_mapzone)||'_id NOT IN (''0'', ''-1'') AND state = 1 LIMIT 1' 
 					INTO v_mapzone_id;
 
 					-- looking for mapzones number (excluding 0 on both sides of valve)
 					EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1) AND '||lower(v_mapzone)||'_id::integer > 0) a '
+					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text AND state = 1 UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text AND state = 1) AND '||lower(v_mapzone)||'_id NOT IN (''0'', ''-1'')) a '
 					INTO v_count_2;
 
 					-- execute code
@@ -129,8 +129,8 @@ BEGIN
 					IF v_closedstatus IS TRUE THEN
 
 						-- looking for dry side using catching opposite node
-						EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 AND arc.state = 1 UNION SELECT node_1 
-						FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 AND arc.state = 1 LIMIT 1'
+						EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id = ''0'' AND arc.state = 1 UNION SELECT node_1 
+						FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id = ''0'' AND arc.state = 1 LIMIT 1'
 						INTO v_oppositenode;
 
 						IF v_oppositenode IS NOT NULL THEN
