@@ -16,4 +16,4 @@ DELETE FROM sys_param_user WHERE id='om_visit_class_vdefault';
 DELETE FROM config_param_user WHERE parameter='om_visit_class_vdefault';
 
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled) VALUES
-('qgis_form_selector_stylesheet', '{"rowsColor":true}', 'Variable to customize the look of the selectors dialog', 'Selectors stylesheet:', FALSE);
+('qgis_form_selector_stylesheet', '{"rowsColor":false}', 'Variable to customize the look of the selectors dialog', 'Selectors stylesheet:', FALSE);
