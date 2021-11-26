@@ -623,90 +623,42 @@ class GwLoadProject(QObject):
 
         if global_vars.user_level['level'] in global_vars.user_level['disable_updateall_atttibutetable']:
             QApplication.instance().focusChanged.connect(self._manage_focus_changed)
-            return
-             # Connect function to "Open Attribute Table" button
-            for x in self.iface.attributesToolBar().actions():
-                # print(f"ACTIONS -> {x.objectName()}")
-                if x.objectName() == 'mActionOpenTable':
-                    x.triggered.connect(self._enable_btn_updateall)
-
-            # Connect function to "Toggle Editing" button
-
-            for x in self.iface.digitizeToolBar().actions():
-
-                if x.objectName() == 'mActionToggleEditing':
-                    x.triggered.connect(self._enable_btn_updateall)
-            # for x in self.iface.mapNavToolToolBar().actions():
-            # print(f"ACTIONS -> {x.objectName()}")
-            # if x.objectName() == 'mActionZoomIn':
-            # x.triggered.connect(self._enable_btn_updateall)
-
-
-    def _enable_btn_updateall(self, enabled=False):
-        """"Define function to manage editability for button 'Update all' on attribute talbe form"""
-
-        # Get layout Update Expression Box
-        main_layout = [d for d in QApplication.instance().allWidgets() if d.objectName() == u'mUpdateExpressionBox']
-        try:
-            for widget in main_layout[0].children():
-                if widget.objectName() == 'mRunFieldCalc':
-                    widget.setEnabled(enabled)
-        except IndexError:
-            pass
 
 
     def _manage_focus_changed(self, old, new):
-        # print(f"focus changed: {old} -> {new}")
+        """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """
+
         if new is None:
             return
-        print(f"{new.objectName()=}")
+
         table_dialog = new.window()
+        # Check if focused widget's window is a QgsAttributeTableDialog
         if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith('QgsAttributeTableDialog'):
-            # this is less than ideal, but it works
-            # table_dialog = new.parent().parent().parent().parent()
-            # print(new.window())
             try:
+                # Look for the button "Update all"
                 for widget in table_dialog.children():
-                    # print(f"{widget.objectName()}")
                     if widget.objectName() == 'mUpdateExpressionBox':
-                        mRunFieldCalc = None
+                        widget_btn_updateall = None
                         for subwidget in widget.children():
-                            # print(f"{subwidget.objectName()}")
-                            if subwidget.objectName() == 'mRunFieldCalc':
+                            if subwidget.objectName() == 'mRunFieldCalc':  # This is for the button itself
                                 subwidget.setEnabled(False)
-                                mRunFieldCalc = subwidget
-                                # subwidget.clicked.connect(self._show_warning_message)
-                                # QApplication.instance().focusChanged.disconnect()
-                                # break
-                            if subwidget.objectName() == 'mUpdateExpressionText':
-                                print(isinstance(subwidget, QgsFieldExpressionWidget))
-                                # subwidget = QgsFieldExpressionWidget(subwidget)
-                                print(type(subwidget))
-
-                                # try:
-                                #     subwidget.currentTextChanged.disconnect()
-                                # except:
-                                #     pass
-                                # subwidget.currentTextChanged.connect(partial(self._disable_updateall_btn, subwidget))
-
-
+                                widget_btn_updateall = subwidget
+                            if subwidget.objectName() == 'mUpdateExpressionText':  # This is the expression text field
                                 try:
                                     subwidget.fieldChanged.disconnect()
                                 except:
                                     pass
-                                subwidget.fieldChanged.connect(partial(self._disable_updateall_btn, mRunFieldCalc))
+                                # When you type something in the expression text field, the button "Update all" is
+                                # enabled. This will disable it again.
+                                subwidget.fieldChanged.connect(partial(self._disable_updateall_btn, widget_btn_updateall))
                         break
             except IndexError:
                 pass
 
 
-    def _show_warning_message(self):
-        tools_qt.show_question("Are you sure?")
-
-
     def _disable_updateall_btn(self, widget):
-        print(f"a")
         if widget:
             widget.setEnabled(False)
-        print(f"b")
+
+
     # endregion
