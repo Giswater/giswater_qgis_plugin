@@ -824,7 +824,7 @@ class GwAdminButton:
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
-        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
+        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject', title=f'Create GIS project ({schema_name})')
 
 
     def _btn_constrains_changed(self, button, call_function=False):
