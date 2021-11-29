@@ -523,7 +523,6 @@ class GwLoadProject(QObject):
         self.iface.setActiveLayer(self.layer_muni)
         tools_qgis.set_layer_visible(self.layer_muni)
         self.layer_muni.selectAll()
-        self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
@@ -543,7 +542,6 @@ class GwLoadProject(QObject):
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
-        self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
 
         if muni_id is None:
@@ -557,7 +555,16 @@ class GwLoadProject(QObject):
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
+            # Zoom to feature
+            try:
+                x1 = complet_result['body']['data']['geometry']['x1']
+                y1 = complet_result['body']['data']['geometry']['y1']
+                x2 = complet_result['body']['data']['geometry']['x2']
+                y2 = complet_result['body']['data']['geometry']['y2']
+                if x1 is not None:
+                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            except KeyError:
+                pass
             tools_gw.set_style_mapzones()
 
 
