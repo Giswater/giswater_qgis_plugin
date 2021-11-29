@@ -276,27 +276,30 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        # Replace extension .inp
-        aditional_path = folder_path.replace('.inp', f'.gul')
-        aditional_file = open(aditional_path, "w")
-        read = True
-        save_file = False
-        for row in all_rows:
-            # Use regexp to check which targets to read (only TITLE and aditional target)
-            if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or row['text'] in ['GULLY', 'LINK', 'GRATE', 'LXSECTIONS']):
-                read = True
-                if row['text'] in ['GULLY', 'LINK', 'GRATE', 'LXSECTIONS']:
-                    save_file = True
-            elif bool(re.match('\[(.*?)\]', row['text'])):
-                read = False
-            if 'text' in row and row['text'] is not None and read:
-                line = row['text'].rstrip() + "\n"
-                aditional_file.write(line)
+        if f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
 
-        self._close_file(aditional_file)
+            # Replace extension .inp
+            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_file = open(aditional_path, "w")
+            read = True
+            save_file = False
+            for row in all_rows:
+                # Use regexp to check which targets to read (only TITLE and aditional target)
+                if bool(re.match('\[(.*?)\]', row['text'])) and \
+                        ('TITLE' in row['text'] or row['text'] in 'GULLY', 'LINK', 'GRATE', 'LXSECTIONS'):
+                    read = True
+                    if (row['text'] in 'GULLY', 'LINK', 'GRATE', 'LXSECTIONS'):
+                        save_file = True
+                elif bool(re.match('\[(.*?)\]', row['text'])):
+                    read = False
+                if 'text' in row and row['text'] is not None and read:
+                    line = row['text'].rstrip() + "\n"
+                    aditional_file.write(line)
 
-        if save_file is False:
-            os.remove(aditional_path)
+            self._close_file(aditional_file)
+
+            if save_file is False:
+                os.remove(aditional_path)
 
 
     def _execute_epa(self):
