@@ -268,6 +268,44 @@ class GwAdminButton:
         return result
 
 
+    def execute_import_inp_data(self, project_name, project_type):
+        """ Executed when option 'Import INP data' has been selected """
+
+        # Create dialog
+        self.dlg_import_inp = GwAdminImportUi()
+        tools_gw.load_settings(self.dlg_import_inp)
+
+        # Hide widgets
+        self.dlg_import_inp.progressBar.setVisible(False)
+
+        if project_type.lower() == 'ws':
+            extras = '"function":2522'
+        elif project_type.lower() == 'ud':
+            extras = '"function":2524'
+        else:
+            self.error_count = self.error_count + 1
+            return
+
+        schema_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
+
+        extras += ', "isToolbox":false'
+        body = tools_gw.create_body(extras=extras)
+        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, commit=False)
+        if not complet_result or complet_result['status'] == 'Failed':
+            return False
+        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_import_inp)
+
+        # Set listeners
+        self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
+        self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
+
+
     def cancel_task(self):
         self.task_create_schema.cancel()
 
@@ -1119,44 +1157,6 @@ class GwAdminButton:
 
 
     """ Functions execute process """
-
-    def _execute_import_data(self, project_name, project_type):
-        """"""
-
-        # Create dialog
-        self.dlg_import_inp = GwAdminImportUi()
-        tools_gw.load_settings(self.dlg_import_inp)
-
-        # Hide widgets
-        self.dlg_import_inp.progressBar.setVisible(False)
-
-        if project_type.lower() == 'ws':
-            extras = '"function":2522'
-        elif project_type.lower() == 'ud':
-            extras = '"function":2524'
-        else:
-            self.error_count = self.error_count + 1
-            return
-
-        schema_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
-
-        extras += ', "isToolbox":false'
-        body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, commit=False)
-        if not complet_result or complet_result['status'] == 'Failed':
-            return False
-        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
-
-        # Disable tab log
-        tools_gw.disable_tab_log(self.dlg_import_inp)
-
-        # Set listeners
-        self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
-        self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
-
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
-
 
     def _check_project_name(self, project_name, project_descript):
         """ Check if @project_name and @project_descript are is valid """
@@ -3072,11 +3072,8 @@ class GwAdminButton:
                     or schema_version is not None and (schema_version < sub_folder < aux):
 
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folder_utils_updates + folder + os.sep + sub_folder,
-                                            os.sep + 'utils' + os.sep):
-                        status = self._load_sql(folder_utils_updates + folder + os.sep +
-                                                sub_folder + os.sep + 'utils' + os.sep,
-                                                utils_schema_name='utils')
+                    if self._process_folder(folder_update):
+                        status = self._load_sql(folder_update, utils_schema_name='utils')
                         if status is False:
                             return False
 
