@@ -1962,6 +1962,32 @@ def get_project_type(schemaname=None):
     return project_type
 
 
+def get_project_info(schemaname=None):
+    """ Get project type from table 'version' """
+
+    # init variables
+    project_info_dict = None
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    # start process
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if exists:
+        sql = f"SELECT lower(project_type), epsg, giswater, language FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
+        row = tools_db.get_row(sql)
+        if row:
+            project_info_dict = {'project_type': row[0],
+                                 'project_epsg': row[1],
+                                 'project_version': row[2],
+                                 'project_language': row[3],
+                                 }
+
+    return project_info_dict
+
+
 def get_layers_from_feature_type(feature_type):
     """ Get layers of the group @feature_type """
 
