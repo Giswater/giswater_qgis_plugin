@@ -226,6 +226,8 @@ class GwDimensioning:
     def _snapping(self, action):
 
         # Set active layer and set signals
+        tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+        tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         if self._deactivate_signals(action, emit_point):
@@ -272,6 +274,8 @@ class GwDimensioning:
         if btn == Qt.RightButton:
             if btn == Qt.RightButton:
                 action.setChecked(False)
+                tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+                tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
                 self._deactivate_signals(action, emit_point)
                 return
 
@@ -324,12 +328,16 @@ class GwDimensioning:
             tools_qt.set_widget_text(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.restore_snap_options(self.previous_snapping)
+            tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+            tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
             self._deactivate_signals(action, emit_point)
             action.setChecked(False)
 
 
     def _orientation(self, action):
 
+        tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+        tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         if self._deactivate_signals(action, emit_point):
@@ -369,6 +377,8 @@ class GwDimensioning:
 
         if btn == Qt.RightButton:
             action.setChecked(False)
+            tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+            tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
             self._deactivate_signals(action, emit_point)
             return
 
@@ -378,6 +388,8 @@ class GwDimensioning:
         self.y_symbol.setText(str(int(point.y())))
 
         self.snapper_manager.restore_snap_options(self.previous_snapping)
+        tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+        tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
         self._deactivate_signals(action, emit_point)
         action.setChecked(False)
 
