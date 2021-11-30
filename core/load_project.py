@@ -137,8 +137,8 @@ class GwLoadProject(QObject):
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
-        QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
-
+        tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
+                                'load_project', 'project_read_crsChanged_set_epsg')
         global_vars.project_loaded = True
 
         # Manage versions of Giswater and PostgreSQL
@@ -519,7 +519,8 @@ class GwLoadProject(QObject):
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
-        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
+        tools_gw.connect_signal(self.iface.mapCanvas().selectionChanged, self._selection_changed,
+                                'load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
         cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
@@ -535,7 +536,7 @@ class GwLoadProject(QObject):
             tools_log.log_info(f"Selected muni_id: {muni_id}")
             break
 
-        self.iface.mapCanvas().selectionChanged.disconnect()
+        tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
 

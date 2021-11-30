@@ -86,6 +86,12 @@ class Giswater(QObject):
             print(f"Exception in unload when self.iface.actionPan().trigger(): {e}")
 
         try:
+            # Disconnect QgsProject.instance().crsChanged signal
+            tools_gw.disconnect_signal('load_project', 'project_read_crsChanged_set_epsg')
+        except Exception as e:
+            print(f"Exception in unload when disconnecting QgsProject.instance().crsChanged signal: {e}")
+
+        try:
             # Remove 'Main Info button'
             self._unset_info_button()
         except Exception as e:
