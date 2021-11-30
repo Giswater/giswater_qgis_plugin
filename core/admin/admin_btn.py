@@ -1972,18 +1972,6 @@ class GwAdminButton:
 
         result_list = []
         for row in rows:
-            # projects below 3.4
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT wsoftware FROM {row[0]}.version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
-                    elem = [row[0], row[0]]
-                    result_list.append(elem)
-            # projects upper 3.3
             sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
                    f"AND table_name = 'sys_version')")
@@ -3352,7 +3340,8 @@ class GwAdminButton:
             self.ud_project_result = row
 
         if self.ws_project_result[0] != self.ud_project_result[0]:
-            msg = f"You need to select same version for ws and ud projects. Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}"
+            msg = (f"You need to select same version for ws and ud projects. "
+                   f"Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}")
             tools_qgis.show_message(msg, 0)
             return
 
@@ -3360,7 +3349,6 @@ class GwAdminButton:
         sql = (f"SELECT schema_name FROM information_schema.schemata "
                f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
         row = tools_db.get_row(sql, commit=False)
-
         if row:
             msg = f"Schema Utils already exist."
             tools_qgis.show_message(msg, 0)

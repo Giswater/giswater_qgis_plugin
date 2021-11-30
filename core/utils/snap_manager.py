@@ -344,7 +344,7 @@ class GwSnapManager(object):
 
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
-            active_layer = tools_qgis.get_layer_by_tablename('version')
+            active_layer = tools_qgis.get_layer_by_tablename('sys_version')
             global_vars.iface.setActiveLayer(active_layer)
 
         # Snapper
