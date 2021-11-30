@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 
+import glob
 import os
 
 from .task import GwTask
@@ -184,16 +185,48 @@ class GwCreateSchemaTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_locale', 'update_30to31', 'load_views', 'load_trg', 'update_31to39']
+        list_process = ['load_base', 'load_locale', 'update_30to31', 'load_views', 'load_trg']
 
-        for process in list_process:
-            dict_folders, total = self.get_number_of_files_process(process)
+        for process_name in list_process:
+            dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
-            tools_log.log_info(f"Number of SQL files '{process}': {total}")
-            dict_process[process] = total
-            self.dict_folders_process[process] = dict_folders
+            tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
+            dict_process[process_name] = total
+            self.dict_folders_process[process_name] = dict_folders
+
+        # Manage process 'update_31to39'
+        process_name = 'update_31to39'
+        dict_folders = self.get_folders_process(process_name)
+        self.dict_folders_process[process_name] = dict_folders
+
+        total_folder_update = 0
+        list_folder_update_major = sorted(glob.glob(f"{self.admin.folder_updates}/*/"))
+        for folder_update_major in list_folder_update_major:
+            total_folder_update_major = 0
+            list_folder_update_minor = sorted(glob.glob(f"{folder_update_major}/*/"))
+            for folder_update_minor in list_folder_update_minor:
+                total_files_minor = self.get_number_of_files_folder_update_minor(folder_update_minor)
+                total_folder_update_major += total_files_minor
+            tools_log.log_info(f"Folder {folder_update_major}: {total_folder_update_major}")
+            total_folder_update += total_folder_update_major
+
+        tools_log.log_info(f"Number of SQL files '{process_name}': {total_folder_update}")
+        dict_process[process_name] = total_folder_update
+
+        total_sql_files += total_folder_update
 
         return total_sql_files
+
+
+    def get_number_of_files_folder_update_minor(self, folder_update_minor):
+
+        project_type = self.params['project_type']
+        files_project_type = list(glob.iglob(folder_update_minor + f'**/**/{project_type}/*.sql', recursive=True))
+        files_utils = list(glob.iglob(folder_update_minor + '**/**/utils/*.sql', recursive=True))
+        files_i18n = list(glob.iglob(folder_update_minor + '**/**/i18n/**/*.sql', recursive=True))
+        total = len(files_project_type) + len(files_utils) + len(files_i18n)
+
+        return total
 
 
     def get_number_of_files_process(self, process_name: str):
