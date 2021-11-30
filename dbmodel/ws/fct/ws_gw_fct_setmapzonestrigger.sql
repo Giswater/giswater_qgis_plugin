@@ -61,8 +61,9 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_closedstatus := json_extract_path_text (p_data,'data','fields', 'closed')::text;
 
-	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE';
-
+	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE'
+	AND graf_delimiter IS NOT NULL;
+	
 	-- getting exploitation
 	v_exploitation = (SELECT expl_id FROM node WHERE node_id = v_id);
 	
