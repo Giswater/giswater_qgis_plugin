@@ -66,6 +66,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
 		END IF;
+		
 	END IF;
 
 	-- check demand scenario compatibility
@@ -79,16 +80,14 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: There are ',v_count,' vnodes with more than one connec'));
 
 			-- check inconsistency on inp_connec: More than one connec with same vnode and different pattern on inp_connec table
-			IF v_patternmethod = 23 THEN
+			IF v_patternmethod = 23 AND v_networkmode = 3 THEN
 
 				v_count = (SELECT count(pjoint_id) FROM v_edit_inp_connec group by pjoint_id, pattern_id having count(pjoint_id) > 1 
 				AND count(pattern_id) < count(pjoint_id) order by 1 limit 1);
 
 				IF v_count > 0 THEN			
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-162: There are ',v_count,' connec with same vnode and different pattern on inp_connec table'));
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, 'HINT: Look for inp_connec table and modify some pattern on connecs with same vnode in order to force same pattern_id for all connecs with same vnode.');
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-162: There are ',v_count,' connec with same vnode and different pattern. Use PJOINT&CONNEC exportmode to solve it.'));
 				END IF;
 			END IF;
 

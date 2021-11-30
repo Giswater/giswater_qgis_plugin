@@ -544,30 +544,21 @@ BEGIN
 
 	END IF;
 	
-	RAISE NOTICE '11 - Check if there are features with sector_id = 0';
-	v_querytext = 'SELECT a.feature , count(*)  FROM  (
-				SELECT arc_id, ''ARC'' as feature FROM v_edit_arc WHERE sector_id = 0 UNION
-				SELECT node_id, ''NODE'' FROM v_edit_node WHERE sector_id = 0)a GROUP BY feature ';
+	RAISE NOTICE '11 - Check if there are features with sector_id = 0 (373)';
+	v_querytext = 'SELECT 373, arc_id, ''Arc with sector_id = 0'', the_geom FROM v_edit_arc WHERE sector_id = 0';
 	
-	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'
-	INTO v_count; 
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'INTO v_count; 
 
 		IF v_count > 0 THEN
-			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''ARC'';'
-			INTO v_count; 
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-373: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
-			END IF;
-			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
-			INTO v_count; 
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-373: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
-			END IF;
+			
+			EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
+
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, 
+			concat('WARNING-373 (anl_arc): There is/are ', v_count, ' arc on v_edit_arc with sector_id = 0 that didn''t take part in the simulation. Topological nodes will be exported if they are associated with some other exported arc.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: All features have sector_id different than 0.'));			
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs on v_edit_arc have sector_id different than 0.'));			
 			v_count=0;
 		END IF;
 
@@ -750,17 +741,17 @@ BEGIN
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (
-		SELECT arc_id as id, fid, concat('ERROR-230: Length less than min length allowed (',v_minlength,' ).')::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=230
-		  UNION
-		SELECT arc_id as id, fid, 'ERROR-404: Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
-		  UNION
-		SELECT a.arc_id as id, a.fid, 'ERROR-139: Disconnected arc'::text as descript, a.the_geom FROM anl_arc a
-		WHERE a.cur_user="current_user"() AND a.fid = 139
-		  UNION
-		SELECT arc_id, fid, 'WARNING-232: Dry arc'::text as descript, the_geom FROM anl_arc JOIN
-		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=404
-		EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139) a USING (arc_id)
-		WHERE cur_user="current_user"() AND fid =232) row) features;
+			SELECT arc_id as id, fid, concat('ERROR-230: Length less than min length allowed (',v_minlength,' ).')::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=230
+			UNION
+			SELECT arc_id as id, fid, 'ERROR-404: Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+			UNION
+			SELECT a.arc_id as id, a.fid, 'ERROR-139: Disconnected arc'::text as descript, a.the_geom FROM anl_arc a WHERE a.cur_user="current_user"() AND a.fid = 139
+			UNION
+			SELECT arc_id, fid, 'WARNING-232: Dry arc'::text as descript, the_geom FROM anl_arc JOIN
+			(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=404
+			EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139) a USING (arc_id)
+			WHERE cur_user="current_user"() AND fid =232
+		     ) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
