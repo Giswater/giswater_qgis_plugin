@@ -121,7 +121,7 @@ BEGIN
 
 		-- Updating polygon geometry in case of exists it
 		v_pol_id:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.connec_id);
-		IF (v_pol_id IS NOT NULL) THEN   
+		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE AND (OLD.pol_id IS NOT NULL) THEN
 			xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 			yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
 			UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=v_pol_id;
@@ -131,12 +131,10 @@ BEGIN
 	ELSIF v_featuretype='gully' THEN
 	
 		-- Updating polygon geometry in case of exists it
-		IF v_move_polgeom IS TRUE THEN
-			IF (OLD.pol_id IS NOT NULL) THEN   
-				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
-				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
-				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=OLD.pol_id;
-			END IF;  
+		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE AND v_move_polgeom IS TRUE AND (OLD.pol_id IS NOT NULL) THEN   
+			xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+			yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
+			UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=OLD.pol_id;
 		END IF;
 		
 		-- updating links geom
