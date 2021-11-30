@@ -1,0 +1,7 @@
+3.5.019
+*************
+- Prevent error on permision to sys_param_user
+- Add qgis_form_selector_stylesheet to config_param_system
+- Enhance setcheckproject function by only checking selected exploitations
+- Minor bug fix trg_edit_link
+- Bug fix on mapzones functions using presszone as integer
