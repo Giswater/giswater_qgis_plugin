@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,380,411,412
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,380,411,412,430
 
 */
 
@@ -694,16 +694,18 @@ BEGIN
 
 
 	RAISE NOTICE '26 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext =  'SELECT DISTINCT ON (node_id) n.node_id, nodecat_id, the_geom FROM selector_sector s, (SELECT node_1 node_id, sector_id FROM v_edit_arc 
-					UNION SELECT node_2, sector_id FROM v_edit_arc)a LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''NOT DEFINED'') n 
-					USING (node_id) WHERE n.node_id IS NOT NULL AND s.sector_id = a.sector_id AND cur_user = current_user';
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION 
+			   SELECT node_2, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' )a 
+		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
+		       JOIN selector_sector USING (sector_id) 
+		       WHERE n.node_id IS NOT NULL AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('ERROR-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
 		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 379 AND cur_user=current_user'),v_count);
 	ELSE
@@ -810,6 +812,19 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
+
+	RAISE NOTICE '32 - Check matcat not null on arc (430)';
+	SELECT count(*) INTO v_count FROM selector_sector s, v_edit_arc a JOIN cat_arc ON id = matcat_id WHERE a.sector_id = s.sector_id and cur_user=current_user AND matcat_id IS NULL;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-430: There is/are ',v_count,' arcs without matcat_id informed.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
+	END IF;	
 
 	
 	-- get results

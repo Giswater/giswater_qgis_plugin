@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -174,7 +174,7 @@ BEGIN
 	RAISE NOTICE '6- Nodes sink (113)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 	
-	SELECT 113, node_id, nodecat_id, v_edit_node.the_geom, 'Node sink' FROM v_edit_node WHERE node_id IN
+	SELECT 113, node_id, nodecat_id, v_edit_node.the_geom, 'Node sink' FROM v_edit_node WHERE epa_type !='UNDEFINED' AND node_id IN
 
 	-- those nodes as node_1 on arc no pump with negative slope except arcs with this node as node_1 and positive slope
 	(SELECT node_1 FROM (SELECT arc_id, node_1, node_2 FROM v_edit_arc JOIN cat_arc c ON c.id = arccat_id 
@@ -336,7 +336,8 @@ BEGIN
 
 
 	RAISE NOTICE '12 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc UNION SELECT node_2, sector_id FROM v_edit_arc)a 
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION 
+			   SELECT node_2, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' )a 
 		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
 		       JOIN selector_sector USING (sector_id) 
 		       WHERE n.node_id IS NOT NULL AND cur_user = current_user';
@@ -346,7 +347,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('ERROR-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
@@ -413,20 +414,6 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
-	
-	RAISE NOTICE '17 - Check pjoint_id/pjoint_type on gullies (416)';
-	SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
-	WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
-
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '416',concat(
-		'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.', v_count);
-	END IF;	
 	
 	RAISE NOTICE '18 - Check EPA OBJECTS (curves, patterns, timeseries, lids, polluntats and snowpacks) have not spaces on names (fid: 429)';
 	SELECT count(*) INTO v_count FROM inp_curve WHERE id like'% %';
@@ -535,7 +522,7 @@ BEGIN
 		'ERROR-427 (anl_arc): There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fç)
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
@@ -557,6 +544,20 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
+	RAISE NOTICE '20 - Check matcat not null on arc (430)';
+	SELECT count(*) INTO v_count FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user AND matcat_id IS NULL;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-430: There is/are ',v_count,' arcs without matcat_id informed.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
+	END IF;	
+
+	
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');

@@ -24,7 +24,7 @@ SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
 	DELETE FROM anl_node WHERE fid IN (159) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (103) AND cur_user=current_user;
 
--- fid: 114,227
+-- fid: 114,227,416
 
 */
 
@@ -77,6 +77,7 @@ v_default boolean;
 v_defaultval text;
 v_dwfscenarioval text;
 v_exportmodeval text;
+v_networkmode text;
 
 object_rec record;
 
@@ -99,6 +100,8 @@ BEGIN
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_networkmode = (SELECT (value::integer) FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user)::boolean;
+
 
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -163,6 +166,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Hidrology scenario: ', v_hydroscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DWF scenario: ',v_dwfscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));
+
 
 	UPDATE rpt_cat_result SET 
 	export_options = concat('{"Hydrology scenario": "', v_hydroscenarioval,'", "DWF scenario":"',v_dwfscenarioval,'"}')::json
@@ -449,7 +453,6 @@ BEGIN
 
 	
 	RAISE NOTICE '5 - Check if node_id and arc_id defined on CONTROLS exists (402)';
-
 	-- nodes
 	FOR object_rec IN SELECT json_array_elements_text('["NODE"]'::json) as tabname
 	LOOP
@@ -496,6 +499,22 @@ BEGIN
 	IF v_count = 0 AND i = 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
+	END IF;
+
+	RAISE NOTICE '6 - Check pjoint_id/pjoint_type on gullies (416)';
+	IF v_networkmode = 2 THEN
+		SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
+		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '416',concat(
+			'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.', v_count);
+		END IF;	
 	END IF;
 
 	-- insert spacers for log
