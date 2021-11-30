@@ -106,17 +106,9 @@ class Giswater(QObject):
 
         try:
             # Remove 'Giswater menu'
-            self._unset_giswater_menu()
+            tools_gw.unset_giswater_menu()
         except Exception as e:
-            print(f"Exception in unload when self._unset_giswater_menu(): {e}")
-
-        try:
-            # Set 'Main Info button' if project is unload or project don't have layers
-            layers = QgsProject.instance().mapLayers().values()
-            if hide_gw_button is False and len(layers) == 0:
-                self._set_info_button()
-        except Exception as e:
-            print(f"Exception in unload when self._set_info_button(): {e}")
+            print(f"Exception in unload when tools_gw.unset_giswater_menu(): {e}")
 
         try:
             # Unlisten notify channel and stop thread
@@ -148,6 +140,15 @@ class Giswater(QObject):
                             del plugin_toolbar.toolbar
         except Exception as e:
             print(f"Exception in unload when del plugin_toolbar.toolbar: {e}")
+
+        try:
+            # Set 'Main Info button' if project is unload or project don't have layers
+            layers = QgsProject.instance().mapLayers().values()
+            if hide_gw_button is False and len(layers) == 0:
+                self._set_info_button()
+                tools_gw.create_giswater_menu(False)
+        except Exception as e:
+            print(f"Exception in unload when self._set_info_button(): {e}")
 
         self.load_project = None
 
@@ -304,14 +305,6 @@ class Giswater(QObject):
         action = self.iface.mainWindow().findChild(QAction, "GwAddChildLayerButton")
         if action not in (None, "None"):
             action.deleteLater()
-
-
-    def _unset_giswater_menu(self):
-        """ Unset Giswater menu (when plugin is disabled or reloaded) """
-
-        menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
-        if menu_giswater not in (None, "None"):
-            menu_giswater.deleteLater()
 
 
     def _project_new(self):

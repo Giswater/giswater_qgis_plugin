@@ -25,7 +25,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
@@ -38,6 +38,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
+from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -106,6 +107,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
+
+    # Needed to avoid errors with giswater plugins
+    if path is None:
+        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        return None
 
     value = None
     raw_parameter = parameter
@@ -606,7 +612,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
 def disable_tab_log(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
@@ -1956,6 +1962,32 @@ def get_project_type(schemaname=None):
     return project_type
 
 
+def get_project_info(schemaname=None):
+    """ Get project type from table 'version' """
+
+    # init variables
+    project_info_dict = None
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    # start process
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if exists:
+        sql = f"SELECT lower(project_type), epsg, giswater, language FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
+        row = tools_db.get_row(sql)
+        if row:
+            project_info_dict = {'project_type': row[0],
+                                 'project_epsg': row[1],
+                                 'project_version': row[2],
+                                 'project_language': row[3],
+                                 }
+
+    return project_info_dict
+
+
 def get_layers_from_feature_type(feature_type):
     """ Get layers of the group @feature_type """
 
@@ -2255,8 +2287,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
-
-    tools_log.log_info(class_object.list_ids[feature_type])
 
 
 def remove_selection(remove_groups=True, layers=None):
@@ -2896,6 +2926,9 @@ def user_params_to_userconfig():
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
+    if global_vars.user_folder_dir is None:
+        return
+
     init_parser = configparser.ConfigParser()
     session_parser = configparser.ConfigParser()
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -3077,6 +3110,23 @@ def get_vertex_flag(default_value):
         vertex_flag = default_value
 
     return vertex_flag
+
+
+def create_giswater_menu(project_loaded=False):
+    """ Create Giswater menu """
+    if global_vars.load_project_menu is None:
+        global_vars.load_project_menu = GwMenuLoad()
+    global_vars.load_project_menu.read_menu(project_loaded)
+
+
+def unset_giswater_menu():
+    """ Unset Giswater menu (when plugin is disabled or reloaded) """
+
+    menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
+    if menu_giswater not in (None, "None"):
+        menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
+        menu_giswater.deleteLater()
+        global_vars.load_project_menu = None
 
 # endregion
 

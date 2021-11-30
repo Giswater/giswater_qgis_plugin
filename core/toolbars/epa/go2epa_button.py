@@ -106,6 +106,27 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self._go2epa_options)
+        self.dlg_go2epa.mainTab.currentChanged.connect(partial(self._manage_btn_accept))
+
+
+    def _manage_btn_accept(self, index):
+        """
+        Disable btn_accept when on tab info log and/or if go2epa_task is active
+            :param index: tab index (passed by signal)
+        """
+
+        if index == 1:
+            self.dlg_go2epa.btn_accept.setEnabled(False)
+        else:
+            # Disable if task is active, enabled otherwise
+            if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+                try:
+                    if self.go2epa_task.isActive():
+                        self.dlg_go2epa.btn_accept.setEnabled(False)
+                        return
+                except RuntimeError:
+                    pass
+            self.dlg_go2epa.btn_accept.setEnabled(True)
 
 
     def _check_inp_chk(self, file_inp):

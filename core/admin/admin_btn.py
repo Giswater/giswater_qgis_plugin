@@ -680,29 +680,6 @@ class GwAdminButton:
         qtable.setModel(model)
 
 
-    def _get_project_epsg(self, schemaname=None):
-        """ Get project epsg from table 'version' """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        project_epsg = None
-        tablename = "sys_version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if not exists:
-            tablename = "version"
-            exists = tools_db.check_table(tablename, schemaname)
-            if not exists:
-                return None
-
-        sql = f"SELECT epsg FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            project_epsg = row[0]
-
-        return project_epsg
-
-
     def _populate_combo_connections(self):
         """ Fill the combo with the connections that exist in QGis """
 
@@ -1666,11 +1643,11 @@ class GwAdminButton:
             self.software_version_info.setText(msg)
 
         else:
-            # TODO: Make just one SQL query
-            self.project_type = tools_gw.get_project_type(schemaname=schema_name)
-            self.project_epsg = self._get_project_epsg(schemaname=schema_name)
-            self.project_version = tools_gw.get_project_version(schemaname=schema_name)
-            self.project_language = self._get_project_language(schemaname=schema_name)
+            dict_info = tools_gw.get_project_info(schema_name)
+            self.project_type = dict_info['project_type']
+            self.project_epsg = dict_info['project_epsg']
+            self.project_version = dict_info['project_version']
+            self.project_language = dict_info['project_language']
 
             msg = (f'Database version: {self.postgresql_version}\n'
                    f'PostGis version: {self.postgis_version}\n \n'
@@ -2870,40 +2847,6 @@ class GwAdminButton:
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
         tools_db.execute_sql(sql)
-
-
-    def _get_project_language(self, schemaname=None):
-        """ Get project langugage from table 'version' """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        project_language = None
-        tablename = "sys_version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = tools_db.get_row(sql)
-            if row:
-                project_language = row[0]
-        else:
-            tablename = "version"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = tools_db.get_row(sql)
-                if row:
-                    project_language = row[0]
-
-        # profilactic control in order to upgrade all versionS to 3.5 new strategy of locale
-        if project_language == 'EN':
-            project_language = 'en_US'
-        elif project_language == 'ES':
-            project_language = 'es_ES'
-        elif project_language == 'CA':
-            project_language = 'ca_ES'
-
-        return project_language
 
 
     def _select_active_locales(self, sqlite_cursor):

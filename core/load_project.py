@@ -16,7 +16,6 @@ from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
-from .load_project_menu import GwMenuLoad
 from .load_project_check import GwLoadProjectCheck
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.notify import GwNotify
@@ -101,17 +100,17 @@ class GwLoadProject(QObject):
             return
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
-        if tools_os.set_boolean(open_search):
-            dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
+        # open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
+        # if tools_os.set_boolean(open_search):
+        #     self.dlg_search = GwSearchUi()
+        #     self.gw_search = GwSearch()
+        #     self.gw_search.open_search(self.dlg_search, load_project=True)
 
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
+        tools_gw.create_giswater_menu(True)
 
         # Manage snapping layers
         self._manage_snapping_layers()
@@ -158,7 +157,6 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
-
 
     # region private functions
 
@@ -525,7 +523,6 @@ class GwLoadProject(QObject):
         self.iface.setActiveLayer(self.layer_muni)
         tools_qgis.set_layer_visible(self.layer_muni)
         self.layer_muni.selectAll()
-        self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
@@ -545,7 +542,6 @@ class GwLoadProject(QObject):
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
-        self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
 
         if muni_id is None:
@@ -559,7 +555,16 @@ class GwLoadProject(QObject):
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
+            # Zoom to feature
+            try:
+                x1 = complet_result['body']['data']['geometry']['x1']
+                y1 = complet_result['body']['data']['geometry']['y1']
+                x2 = complet_result['body']['data']['geometry']['x2']
+                y2 = complet_result['body']['data']['geometry']['y2']
+                if x1 is not None:
+                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            except KeyError:
+                pass
             tools_gw.set_style_mapzones()
 
 

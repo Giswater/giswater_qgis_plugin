@@ -228,7 +228,7 @@ def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=N
         if parameter:
             msg += f": {parameter}"
 
-    if tab_name is None:
+    if tab_name is None and global_vars.logger:
         tab_name = global_vars.logger.tab_python
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel

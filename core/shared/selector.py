@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
@@ -14,7 +15,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_db
+from ...lib import tools_qgis, tools_qt, tools_os, tools_db
 
 
 class GwSelector:
@@ -23,10 +24,16 @@ class GwSelector:
         pass
 
 
-    def open_selector(self, selector_type='"selector_basic"'):
+    def open_selector(self, selector_type='"selector_basic"', reload_dlg=None):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
+
+        if reload_dlg:
+            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+            reload_dlg.main_tab.clear()
+            self.get_selector(reload_dlg, selector_type, current_tab=current_tab)
+            return
 
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
@@ -51,9 +58,25 @@ class GwSelector:
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+
+        # Set typeahead focus if configured
+        self._set_focus(dlg_selector)
+
+
+    def _set_focus(self, dialog):
+        """ Sets the focus to the typeahead filter if it's configured in DB """
+
+        index = dialog.main_tab.currentIndex()
+        tab = dialog.main_tab.widget(index)
+        if tab and tools_os.set_boolean(tab.property('typeahead_forced'), False):
+            tab_name = dialog.main_tab.widget(index).objectName()
+            widget = dialog.main_tab.widget(index).findChild(QLineEdit, f"txt_filter_{str(tab_name)}")
+            if widget:
+                widget.setFocus()
 
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
@@ -90,6 +113,14 @@ class GwSelector:
         if not json_result or json_result['status'] == 'Failed':
             return False
 
+        # Get styles
+        stylesheet = json_result['body']['form']['style'] if 'style' in json_result['body']['form'] else None
+        color_rows = False
+        if stylesheet:
+            # Color selectors zebra-styled
+            if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
+                color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
+
         for form_tab in json_result['body']['form']['formTabs']:
 
             if filter and form_tab['tabName'] != str(current_tab):
@@ -106,6 +137,8 @@ class GwSelector:
                 main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
             else:
                 main_tab.addTab(tab_widget, form_tab['tabLabel'])
+            if 'typeaheadForced' in form_tab and form_tab['typeaheadForced'] is not None:
+                tab_widget.setProperty('typeahead_forced', form_tab['typeaheadForced'])
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
@@ -132,44 +165,41 @@ class GwSelector:
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
-                tools_gw.add_widget(dialog, field, label, widget)
+                gridlayout.addWidget(label, int(field['layoutorder']), 0)
+                gridlayout.addWidget(widget, int(field['layoutorder']), 2)
                 widget.setFocus()
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    if tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
-                        label = QLabel()
-                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
-                        label.setText('Check all')
-                    else:
-                        label = tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
-
                     if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                         widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                        widget.setLayoutDirection(Qt.RightToLeft)
-
+                        widget.setLayoutDirection(Qt.LeftToRight)
                     else:
                         widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
+                    widget.setText('Check all')
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
-                    tools_gw.add_widget(dialog, field, label, widget)
+                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
 
             for order, field in enumerate(form_tab['fields']):
                 try:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['label'])
-                    label.setText(field['label'])
-
+                    # Create checkbox
                     widget = tools_gw.add_checkbox(field)
+                    widget.setText(field['label'])
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
-                    widget.setLayoutDirection(Qt.RightToLeft)
+                    widget.setLayoutDirection(Qt.LeftToRight)
 
+                    # Set background color every other item (if enabled)
+                    if color_rows and order % 2 == 0:
+                        widget.setStyleSheet(f"background-color: #E9E7E3")
+
+                    # Add widget to layout
                     field['layoutname'] = gridlayout.objectName()
-                    field['layoutorder'] = order + i
-                    tools_gw.add_widget(dialog, field, label, widget)
+                    field['layoutorder'] = order + i + 1
+                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
                 except Exception:
                     msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
                           f"widgetname='{field['widgetname']}'"
@@ -275,7 +305,7 @@ class GwSelector:
         tools_qgis.refresh_map_canvas()
 
         # Reload selectors dlg
-        self.open_selector()
+        self.open_selector(reload_dlg=dialog)
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)

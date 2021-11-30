@@ -88,9 +88,11 @@ class GwLoadProjectCheck:
                 tools_qgis.show_warning(message)
 
         # Get log folder size
-        log_folder = os.path.join(global_vars.user_folder_dir, 'log')
-        size = tools_os.get_folder_size(log_folder)
-        log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
+        log_folder_volume = 0
+        if global_vars.user_folder_dir:
+            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            size = tools_os.get_folder_size(log_folder)
+            log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 
         extras = f'"version":"{plugin_version}"'
         extras += f', "fid":101'
@@ -143,19 +145,7 @@ class GwLoadProjectCheck:
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
-            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self._update_config))
             tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
-
-
-    def _update_config(self, state):
-        """ Set qgis_form_initproject_hidden True or False into config_param_user """
-
-        value = {0: "False", 2: "True"}
-        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
-               f" ON CONFLICT  (parameter, cur_user) "
-               f" DO UPDATE SET value='{value[state]}'")
-        tools_db.execute_sql(sql)
 
 
     def _get_missing_layers(self, dialog, m_layers, critical_level):
