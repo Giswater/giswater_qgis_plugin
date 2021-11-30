@@ -63,6 +63,7 @@ class GwAdminButton:
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
+        self.progress_ratio = 0.8   # Ratio to apply to 'progress_value'
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -465,9 +466,8 @@ class GwAdminButton:
     def load_base(self, dict_folders):
         """"""
 
-        self.task_create_schema.set_progress(5)
         for folder in dict_folders.keys():
-            status = self._execute_files(folder)
+            status = self._execute_files(folder, set_progress_bar=True)
             if not status and self.dev_commit is False:
                 return False
 
@@ -481,11 +481,11 @@ class GwAdminButton:
             if self._process_folder(folder_locale, '') is False:
                 return False
             else:
-                status = self._execute_files(folder_locale, True)
+                status = self._execute_files(folder_locale, True, set_progress_bar=True)
                 if status is False and self.dev_commit is False:
                     return False
         else:
-            status = self._execute_files(self.folder_locale, True)
+            status = self._execute_files(self.folder_locale, True, set_progress_bar=True)
             if status is False and self.dev_commit is False:
                 return False
 
@@ -496,7 +496,7 @@ class GwAdminButton:
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils, '') is True:
-            status = self._load_sql(folder_utils, no_ct)
+            status = self._load_sql(folder_utils, no_ct, set_progress_bar=True)
             if status is False:
                 return False
 
@@ -506,13 +506,13 @@ class GwAdminButton:
             folder_project = self.project_type_selected
         folder_project_type = os.path.join(folder_update, folder_project)
         if self._process_folder(folder_project_type, ''):
-            status = self._load_sql(folder_project_type, no_ct)
+            status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
             if status is False:
                 return False
 
         folder_locale = os.path.join(folder_update, 'i18n', self.locale)
         if self._process_folder(folder_locale, '') is True:
-            status = self._execute_files(folder_locale, True)
+            status = self._execute_files(folder_locale, True, set_progress_bar=True)
             if status is False:
                 return False
 
@@ -560,14 +560,14 @@ class GwAdminButton:
         list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlview))
         list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlview))
         for folder in list_folders:
-            status = self._execute_files(folder)
+            status = self._execute_files(folder, set_progress_bar=True)
             if not status and self.dev_commit is False:
                 return False
 
         return True
 
 
-    def update_30to31(self, new_project=False, project_type=False):
+    def update_30to31(self, new_project=False, project_type=False, set_progress_bar=True):
         """"""
 
         if not os.path.exists(self.folder_updates):
@@ -583,17 +583,17 @@ class GwAdminButton:
                 if str(sub_folder) <= '31100':
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
                     if self._process_folder(folderpath, '') is True:
-                        status = self._load_sql(folderpath)
+                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, project_type)
                     if self._process_folder(folderpath, '') is True:
-                        status = self._load_sql(folderpath)
+                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
                     if self._process_folder(folderpath, '') is True:
-                        status = self._execute_files(folderpath, True)
+                        status = self._execute_files(folderpath, True, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
 
@@ -621,7 +621,7 @@ class GwAdminButton:
     def load_sample_data(self, project_type):
 
         folder = os.path.join(self.folder_example, 'user', project_type)
-        status = self._execute_files(folder)
+        status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
             return False
 
@@ -632,7 +632,7 @@ class GwAdminButton:
         """"""
 
         folder = os.path.join(self.folder_example, 'dev', project_type)
-        status = self._execute_files(folder)
+        status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
             return False
 
@@ -647,7 +647,7 @@ class GwAdminButton:
         list_folders.append(os.path.join(self.folder_software, self.file_pattern_trg))
 
         for folder in list_folders:
-            status = self._execute_files(folder)
+            status = self._execute_files(folder, set_progress_bar=True)
             if not status and self.dev_commit is False:
                 return False
 
@@ -1145,11 +1145,12 @@ class GwAdminButton:
                 tools_db.execute_sql(sql)
 
 
-    def _load_sql(self, path_folder, no_ct=False, utils_schema_name=None):
+    def _load_sql(self, path_folder, no_ct=False, utils_schema_name=None, set_progress_bar=False):
         """"""
 
         for (path, ficheros, archivos) in os.walk(path_folder):
-            status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name)
+            status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name,
+                                         set_progress_bar=set_progress_bar)
             if not status:
                 return False
 
@@ -1799,7 +1800,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None):
+    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None, set_progress_bar=False):
         """"""
 
         if not os.path.exists(filedir):
@@ -1831,7 +1832,7 @@ class GwAdminButton:
                 if file in files_to_execute:
                     tools_log.log_info(os.path.join(filedir, file))
                     self.current_sql_file += 1
-                    status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
+                    status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
                 if not status and self.dev_commit is False:
                     return False
 
@@ -1841,14 +1842,14 @@ class GwAdminButton:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         tools_log.log_info(os.path.join(filedir, file))
                         self.current_sql_file += 1
-                        status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
+                        status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
                         if not status and self.dev_commit is False:
                             return False
 
         return status
 
 
-    def _read_execute_file(self, filedir, file, schema_name, project_epsg):
+    def _read_execute_file(self, filedir, file, schema_name, project_epsg, set_progress_bar=False):
         """"""
 
         status = False
@@ -1856,8 +1857,10 @@ class GwAdminButton:
         try:
 
             # Manage progress bar
-            self.progress_value = (float(self.current_sql_file / self.total_sql_files) * 100)
-            self.task_create_schema.set_progress(self.progress_value)
+            if set_progress_bar:
+                self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
+                self.progress_value = int(self.progress_value * self.progress_ratio)
+                self.task_create_schema.set_progress(self.progress_value)
 
             filepath = os.path.join(filedir, file)
             f = open(filepath, 'r', encoding="utf8")

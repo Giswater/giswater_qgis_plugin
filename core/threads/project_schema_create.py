@@ -109,14 +109,13 @@ class GwCreateSchemaTask(GwTask):
     def main_execution(self):
         """ Main common execution """
 
-        self.set_progress(0)
-
         project_type = self.params['project_type']
         exec_last_process = self.params['exec_last_process']
         project_name_schema = self.params['project_name_schema']
         project_locale = self.params['project_locale']
         project_srid = self.params['project_srid']
 
+        self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
         tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
 
@@ -146,6 +145,7 @@ class GwCreateSchemaTask(GwTask):
 
         status = True
         if exec_last_process:
+            tools_log.log_info("Execute function 'gw_fct_admin_schema_lastprocess'")
             status = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
 
@@ -161,20 +161,19 @@ class GwCreateSchemaTask(GwTask):
         project_type = self.params['project_type']
         example_data = self.params['example_data']
 
+        tools_log.log_info("Execute 'custom_execution'")
+        self.admin.current_sql_file = 85
+        self.admin.total_sql_files = 100
+        self.admin.progress_ratio = 1.0
+
         if self.admin.rdb_import_data.isChecked():
             self.finish_execution['import_data'] = True
-            # TODO:
-            self.set_progress(90)
-            return True
         elif self.admin.rdb_sample.isChecked() and example_data:
-            self.set_progress(80)
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
         elif self.admin.rdb_sample_dev.isChecked():
-            self.set_progress(80)
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
-            self.set_progress(90)
             self.admin.load_dev_data(project_type=project_type)
         elif self.admin.rdb_data.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
