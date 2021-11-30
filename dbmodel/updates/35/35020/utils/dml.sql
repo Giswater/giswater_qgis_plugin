@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/11/30
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (430, 'Check matcat null for arcs','utils', null, null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (431, 'Check minimun length for arcs','ud', null, null) ON CONFLICT (fid) DO NOTHING;

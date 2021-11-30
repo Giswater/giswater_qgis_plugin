@@ -26,7 +26,7 @@ SELECT * FROM audit_check_data WHERE fid = 139
 SELECT * FROM temp_anlgraf;
 
 -- fid: main:139
-	other: 227,231,233,228,404
+	other: 227,231,233,228,404,431
 
 */
 
@@ -54,7 +54,7 @@ v_sumlength numeric (12,2);
 v_linkoffsets text;
 v_delnetwork boolean;
 v_removedemands boolean;
-
+v_minlength float;
 
 BEGIN
 	-- Search path
@@ -70,6 +70,8 @@ BEGIN
 	
 	-- get options data
 	SELECT value INTO v_linkoffsets FROM config_param_user WHERE parameter = 'inp_options_link_offsets' AND cur_user = current_user;
+	SELECT value INTO v_minlength FROM config_param_user WHERE parameter = 'inp_options_minlength' AND cur_user = current_user;
+
 
 	-- get user variables
 	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -91,7 +93,7 @@ BEGIN
 	END IF;
 	
 	TRUNCATE temp_anlgraf;
-	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404);
+	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404,431);
 	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 		
@@ -419,26 +421,20 @@ BEGIN
 
 	ELSE -- UD project
 
-		-- counting arcs with length less than 2m
-		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 2 and st_length(the_geom) > 0.49999 AND epa_type = 'CONDUIT';
+		-- counting arcs with length less than minlength
+		SELECT count(*) INTO v_count FROM temp_arc WHERE st_length(the_geom) < v_minlength AND epa_type = 'CONDUIT';
+
 		IF v_count > 0 THEN
+
+			INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
+			SELECT 431, arc_id, the_geom, concat('Arc with less length than minimum configured (',v_minlength,')') FROM temp_arc WHERE st_length(the_geom) < v_minlength AND epa_type = 'CONDUIT';
+		
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' arcs with length with length less than 2 meters'), v_count);
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-431 (anl_arc): There is/are ',v_count,' arcs with length with length less than ',v_minlength,' meters (minimum length configured).'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than 2 metres'), v_count);
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than ',v_minlength,' meters (minimum length configured).'), v_count);
 		END IF;	
-
-		-- counting arcs with length less than 0.5m
-		SELECT count(*) FROM temp_arc INTO v_count WHERE st_length(the_geom) < 0.5 AND epa_type = 'CONDUIT';
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' conduits with length with length less than 0.5 meters'), v_count);
-		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No conduits with length less than 0.5 metres'), v_count);
-		END IF;	
-
 	END IF;
 
 
@@ -609,9 +605,9 @@ BEGIN
 	    '}')::json, 2680, null, null, null);
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
 END;
 $BODY$
