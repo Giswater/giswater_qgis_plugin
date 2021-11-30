@@ -791,7 +791,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' curve(s) has/have name with spaces. Please fix it!'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All curves checked has/have names without spaces.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All curves checked have names without spaces.'),v_count);
 	END IF;
 
 	SELECT count(*) INTO v_count FROM inp_pattern WHERE pattern_id like'% %';
