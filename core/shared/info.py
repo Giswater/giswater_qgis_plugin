@@ -275,21 +275,19 @@ class GwInfo(QObject):
         self.snapper_manager.config_snap_to_connec()
         self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
-        self.iface.actionAddFeature().toggled.connect(self._action_is_checked)
+        tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
+                                'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
         if self.info_layer:
-            try:
-                # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
-                # realizes that he has made a mistake and selects another feature, without this try two features would
-                # be inserted. This disconnect signal avoids it
-                self.info_layer.featureAdded.disconnect(self._open_new_feature)
-            except Exception:
-                # If self._open_new_feature is not connected, cause an exception
-                pass
+            # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
+            # realizes that he has made a mistake and selects another feature, without this two features would
+            # be inserted. This disconnect signal avoids it
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
@@ -299,7 +297,8 @@ class GwInfo(QObject):
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            self.info_layer.featureAdded.connect(self._open_new_feature)
+            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature,
+                                    'info', 'add_feature_featureAdded_open_new_feature')
         else:
             message = "Layer not found"
             tools_qgis.show_warning(message, parameter=feature_cat.parent_layer)
@@ -792,29 +791,30 @@ class GwInfo(QObject):
     def _connect_signals(self):
 
         if not self.connected:
-            self.layer.editingStarted.connect(self.fct_start_editing)
+            tools_gw.connect_signal(self.layer.editingStarted, self.fct_start_editing,
+                                    'info', 'connect_signals_layer_editingStarted_fct_start_editing')
             action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
             if action_toggle_editing:
-                action_toggle_editing.triggered.connect(self.fct_block_action_edit)
+                tools_gw.connect_signal(action_toggle_editing.triggered, self.fct_block_action_edit,
+                                        'info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
             self.connected = True
 
 
     def _disconnect_signals(self):
 
         try:
-            self.layer.editingStarted.disconnect(self.fct_start_editing)
+            tools_gw.disconnect_signal('info', 'connect_signals_layer_editingStarted_fct_start_editing')
         except Exception:
             pass
 
         try:
-            self.layer.editingStopped.disconnect(self.fct_stop_editing)
+            # This signal isn't connected atm, might need to change the name depending on where it's connected
+            tools_gw.disconnect_signal('info', 'connect_signals_layer_editingStopped_fct_stop_editing')
         except Exception:
             pass
 
         try:
-            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
-            if action_toggle_editing:
-                action_toggle_editing.triggered.disconnect(self.fct_block_action_edit)
+            tools_gw.disconnect_signal('info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
         except Exception:
             pass
 
@@ -3748,7 +3748,7 @@ class GwInfo(QObject):
 
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
-            self.iface.actionAddFeature().toggled.disconnect(self._action_is_checked)
+            tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
 
     def _open_new_feature(self, feature_id):
