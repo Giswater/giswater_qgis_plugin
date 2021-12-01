@@ -3700,7 +3700,7 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dialog, widget, str(feat_id))
         elif option == 'set_to_arc':
             # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-            #       def set_to_arc(self, feat_id, child_type)
+            #       def _set_to_arc(self, feat_id, child_type)
             getattr(self, options[option][1])(feat_id, child_type)
         self.snapper_manager.recover_snapping_options()
         self._cancel_snapping_tool(dialog, action)
