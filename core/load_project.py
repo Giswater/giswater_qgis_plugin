@@ -624,7 +624,8 @@ class GwLoadProject(QObject):
 
         disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
         if tools_os.set_boolean(disable, False):
-            QApplication.instance().focusChanged.connect(self._manage_focus_changed)
+            tools_gw.connect_signal(QApplication.instance().focusChanged, self._manage_focus_changed,
+                                    'load_project', 'manage_attribute_table_focusChanged')
 
 
     def _manage_focus_changed(self, old, new):

@@ -67,11 +67,6 @@ class Giswater(QObject):
             print(f"Exception in unload when reset values for global_vars.project_vars: {e}")
 
         try:
-            QApplication.instance().focusChanged.disconnect()
-        except Exception as e:
-            print(f"Exception in unload when disconnecting focusChanged signal: {e}")
-
-        try:
             # Remove Giswater dockers
             self._remove_dockers()
         except Exception as e:
@@ -95,6 +90,11 @@ class Giswater(QObject):
             tools_gw.disconnect_signal('load_project', 'project_read_crsChanged_set_epsg')
         except Exception as e:
             print(f"Exception in unload when disconnecting QgsProject.instance().crsChanged signal: {e}")
+
+        try:
+            tools_gw.disconnect_signal('load_project', 'manage_attribute_table_focusChanged')
+        except Exception as e:
+            print(f"Exception in unload when disconnecting focusChanged signal: {e}")
 
         try:
             # Remove 'Main Info button'
