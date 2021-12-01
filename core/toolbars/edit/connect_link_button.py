@@ -85,6 +85,16 @@ class GwConnectLinkButton(GwMaptool):
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
 
+        # Manage if task is already running
+        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
+            try:
+                if self.connect_link_task.isActive():
+                    message = "Connect link task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         if event.button() == Qt.LeftButton:
 
             # Get coordinates
@@ -191,6 +201,16 @@ class GwConnectLinkButton(GwMaptool):
 
 
     def manage_gully_result(self):
+
+        # Manage if task is already running
+        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
+            try:
+                if self.connect_link_task.isActive():
+                    message = "Connect link task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
 
         layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
         if layer_gully:

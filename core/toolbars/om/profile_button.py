@@ -327,10 +327,14 @@ class GwProfileButton(GwAction):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
+
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move,
                                 'profile', 'activate_snapping_node_xyCoordinates_mouse_move')
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._snapping_node),
                                 'profile', 'ep_canvasClicked_snapping_node')
+        # To activate action pan and not move the canvas accidentally we have to override the canvasReleaseEvent.
+        # The "e" is the QgsMapMouseEvent given by the function
+        self.emit_point.canvasReleaseEvent = lambda e: self._action_pan()
 
 
     def _mouse_move(self, point):
@@ -412,16 +416,14 @@ class GwProfileButton(GwAction):
                     self.id_list = [i.id() for i in it]
                     self.layer_arc.selectByIds(self.id_list)
 
-                    # Set default value if no title is given
-                    if tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False) in (None, 'null', ''):
-                        tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                                 f"PROFILE {self.initNode} - {self.endNode}")
-
-                    # Set action pan
-                    self.iface.actionPan().trigger()
-
                     # Next profile will be done from scratch
                     self.first_node = True
+
+
+    def _action_pan(self):
+        if self.first_node:
+            # Set action pan
+            self.iface.actionPan().trigger()
 
 
     def _draw_profile(self, arcs, nodes, terrains):
@@ -755,7 +757,10 @@ class GwProfileButton(GwAction):
                  verticalalignment='center')
 
         # Print title
-        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
+        # Set default value if no title is given
+        if title in ('', None):
+            title = f"PROFILE {self.initNode} - {self.endNode}"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')

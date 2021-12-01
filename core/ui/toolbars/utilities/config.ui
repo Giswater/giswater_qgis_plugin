@@ -101,7 +101,7 @@
              <x>0</x>
              <y>0</y>
              <width>291</width>
-             <height>402</height>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -326,7 +326,7 @@
              <x>0</x>
              <y>0</y>
              <width>291</width>
-             <height>402</height>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -475,7 +475,7 @@
              <x>0</x>
              <y>0</y>
              <width>291</width>
-             <height>402</height>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_36">
@@ -644,7 +644,7 @@
              <x>0</x>
              <y>0</y>
              <width>291</width>
-             <height>402</height>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
@@ -701,7 +701,7 @@
              <x>0</x>
              <y>0</y>
              <width>291</width>
-             <height>402</height>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_8">
@@ -753,13 +753,13 @@
                 </widget>
                </item>
                <item row="1" column="0">
-                <widget class="QGroupBox" name="grb_review">
+                <widget class="QGroupBox" name="grb_admin_other">
                  <property name="title">
-                  <string>Review</string>
+                  <string>Other</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_32">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_review"/>
+                   <layout class="QGridLayout" name="lyt_admin_other"/>
                   </item>
                   <item row="1" column="0">
                    <spacer name="verticalSpacer_7">
@@ -790,13 +790,13 @@
               </property>
               <layout class="QGridLayout" name="gridLayout_35">
                <item row="0" column="0">
-                <widget class="QGroupBox" name="grb_builder">
+                <widget class="QGroupBox" name="grb_admin_om">
                  <property name="title">
-                  <string>Builder</string>
+                  <string>O&amp;&amp;M</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_30">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_builder"/>
+                   <layout class="QGridLayout" name="lyt_admin_om"/>
                   </item>
                   <item row="1" column="0">
                    <spacer name="verticalSpacer_6">

@@ -44,15 +44,6 @@ class GwGo2EpaButton(GwAction):
         """ Check if selected @result_id already exists """
 
         self.dlg_go2epa.txt_result_name.setStyleSheet(None)
-        result_id = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
-        sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
-               f" WHERE result_id = '{result_id}'")
-        row = tools_db.get_row(sql, log_info=False)
-        if not row:
-            self.dlg_go2epa.chk_only_check.setChecked(False)
-            self.dlg_go2epa.chk_only_check.setEnabled(False)
-        else:
-            self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
     # region private functions
@@ -115,6 +106,27 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self._go2epa_options)
+        self.dlg_go2epa.mainTab.currentChanged.connect(partial(self._manage_btn_accept))
+
+
+    def _manage_btn_accept(self, index):
+        """
+        Disable btn_accept when on tab info log and/or if go2epa_task is active
+            :param index: tab index (passed by signal)
+        """
+
+        if index == 1:
+            self.dlg_go2epa.btn_accept.setEnabled(False)
+        else:
+            # Disable if task is active, enabled otherwise
+            if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+                try:
+                    if self.go2epa_task.isActive():
+                        self.dlg_go2epa.btn_accept.setEnabled(False)
+                        return
+                except RuntimeError:
+                    pass
+            self.dlg_go2epa.btn_accept.setEnabled(True)
 
 
     def _check_inp_chk(self, file_inp):
@@ -229,8 +241,6 @@ class GwGo2EpaButton(GwAction):
         self.file_rpt = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_RPT', "user", "session")
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM', "user", "session")
-        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
         value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_INP', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
         value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_UD', "user", "session")
@@ -250,8 +260,6 @@ class GwGo2EpaButton(GwAction):
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_INP', f"{txt_file_inp}")
         txt_file_rpt = f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}"
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_RPT', f"{txt_file_rpt}")
-        chk_only_check = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}"
-        tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM', f"{chk_only_check}")
         chk_export = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}"
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_INP', f"{chk_export}")
         chk_export_subcatch = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}"
@@ -297,7 +305,6 @@ class GwGo2EpaButton(GwAction):
         if action == 'save':
             # Get widgets form values
             self.txt_result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
-            self.chk_only_check = self.dlg_go2epa.chk_only_check.isChecked()
             self.chk_export = self.dlg_go2epa.chk_export.isChecked()
             self.chk_export_subcatch = self.dlg_go2epa.chk_export_subcatch.isChecked()
             self.txt_file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
@@ -307,7 +314,6 @@ class GwGo2EpaButton(GwAction):
         elif action == 'restore':
             # Set widgets form values
             if self.txt_result_name is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, self.txt_result_name)
-            if self.chk_only_check is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, self.chk_only_check)
             if self.chk_export is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export, self.chk_export)
             if self.chk_export_subcatch is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, self.chk_export_subcatch)
             if self.txt_file_inp is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.txt_file_inp)
@@ -362,6 +368,16 @@ class GwGo2EpaButton(GwAction):
     def _go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
+        # Manage if task is already running
+        if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:
+            try:
+                if self.go2epa_task.isActive():
+                    message = "Go2Epa task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         # Save user values
         self._save_user_values()
 
@@ -373,7 +389,6 @@ class GwGo2EpaButton(GwAction):
 
         # Get widgets values
         self.result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        self.net_geom = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         self.export_inp = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         self.export_subcatch = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
         self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
@@ -390,6 +405,7 @@ class GwGo2EpaButton(GwAction):
                 tools_qt.show_info_box(msg)
                 return
 
+        self.dlg_go2epa.btn_accept.setEnabled(False)
         self.dlg_go2epa.btn_cancel.setEnabled(True)
 
         # Set background task 'Go2Epa'
@@ -410,8 +426,6 @@ class GwGo2EpaButton(GwAction):
             getting id's from selected @viewname
         """
 
-        result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
-
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -428,8 +442,6 @@ class GwGo2EpaButton(GwAction):
 
             model.setStringList(rows)
             self.completer.setModel(model)
-            if result_name in rows:
-                self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
     def _go2epa_options(self):

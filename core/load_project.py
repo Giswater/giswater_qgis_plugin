@@ -6,17 +6,18 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+from functools import partial
 
 from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.gui import QgsFieldExpressionWidget
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView, QDialog, QComboBox
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
-from .load_project_menu import GwMenuLoad
 from .load_project_check import GwLoadProjectCheck
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.notify import GwNotify
@@ -101,23 +102,26 @@ class GwLoadProject(QObject):
             return
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
-        if tools_os.set_boolean(open_search):
-            dlg_search = GwSearchUi()
-            GwSearch().open_search(dlg_search, load_project=True)
+        # open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
+        # if tools_os.set_boolean(open_search):
+        #     self.dlg_search = GwSearchUi()
+        #     self.gw_search = GwSearch()
+        #     self.gw_search.open_search(self.dlg_search, load_project=True)
 
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
+        tools_gw.create_giswater_menu(True)
 
         # Manage snapping layers
         self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
+
+        # Manage "btn_updateall" from attribute table
+        self._manage_attribute_table()
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
@@ -158,7 +162,6 @@ class GwLoadProject(QObject):
 
         # Call gw_fct_setcheckproject and create GwProjectLayersConfig thread
         self._config_layers()
-
 
     # region private functions
 
@@ -457,6 +460,15 @@ class GwLoadProject(QObject):
                     return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        # Manage if task is already running
+        if hasattr(self, 'task_get_layers') and self.task_get_layers is not None:
+            try:
+                if self.task_get_layers.isActive():
+                    message = "ConfigLayerFields task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
         # Set background task 'ConfigLayerFields'
         schema_name = global_vars.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
@@ -605,5 +617,45 @@ class GwLoadProject(QObject):
         """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
+
+
+    def _manage_attribute_table(self):
+        """ If configured, disable button "Update all" from attribute table """
+
+        disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
+        if tools_os.set_boolean(disable, False):
+            QApplication.instance().focusChanged.connect(self._manage_focus_changed)
+
+
+    def _manage_focus_changed(self, old, new):
+        """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """
+
+        if new is None:
+            return
+
+        table_dialog = new.window()
+        # Check if focused widget's window is a QgsAttributeTableDialog
+        if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith('QgsAttributeTableDialog'):
+            try:
+                # Look for the button "Update all"
+                for widget in table_dialog.children():
+                    if widget.objectName() == 'mUpdateExpressionBox':
+                        widget_btn_updateall = None
+                        for subwidget in widget.children():
+                            if subwidget.objectName() == 'mRunFieldCalc':  # This is for the button itself
+                                widget_btn_updateall = subwidget
+                                tools_qt.set_widget_enabled(None, widget_btn_updateall, False)
+                            if subwidget.objectName() == 'mUpdateExpressionText':  # This is the expression text field
+                                try:
+                                    subwidget.fieldChanged.disconnect()
+                                except:
+                                    pass
+                                # When you type something in the expression text field, the button "Update all" is
+                                # enabled. This will disable it again.
+                                subwidget.fieldChanged.connect(partial(
+                                    tools_qt.set_widget_enabled, None, widget_btn_updateall, False))
+                        break
+            except IndexError:
+                pass
 
     # endregion

@@ -281,6 +281,7 @@ class GwToolBoxButton(GwAction):
             tools_gw.disable_tab_log(self.dlg_functions)
 
             # Connect signals
+            self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
             self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
                 self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data']['processes']))
             self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
@@ -400,6 +401,16 @@ class GwToolBoxButton(GwAction):
 
     def _execute_function(self, description, dialog, combo, result):
 
+        # Manage if task is already running
+        if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+            try:
+                if self.toolbox_task.isActive():
+                    message = "Toolbox task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
@@ -413,6 +424,26 @@ class GwToolBoxButton(GwAction):
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
+
+
+    def _manage_btn_run(self, index):
+        """
+        Disable btn_accept when on tab info log and/or if toolbox_task is active
+            :param index: tab index (passed by signal)
+        """
+
+        if index == 1:
+            self.dlg_functions.btn_run.setEnabled(False)
+        else:
+            # Disable if task is active, enabled otherwise
+            if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+                try:
+                    if self.toolbox_task.isActive():
+                        self.dlg_functions.btn_run.setEnabled(False)
+                        return
+                except RuntimeError:
+                    pass
+            self.dlg_functions.btn_run.setEnabled(True)
 
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):

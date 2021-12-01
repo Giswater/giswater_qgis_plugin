@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 import os
 import re
 import subprocess
@@ -54,7 +55,6 @@ class GwEpaFileManager(GwTask):
         self.go2epa_export_inp = self.go2epa.export_inp
         self.go2epa_execute_epa = self.go2epa.exec_epa
         self.go2epa_import_result = self.go2epa.import_result
-        self.net_geom = self.go2epa.net_geom
         self.export_subcatch = self.go2epa.export_subcatch
 
 
@@ -63,9 +63,10 @@ class GwEpaFileManager(GwTask):
         super().run()
 
         self.initialize_variables()
+        steps = self._get_steps()
         status = True
         if self.go2epa_export_inp or self.go2epa_execute_epa:
-            status = self._exec_function_pg2epa()
+            status = self._exec_function_pg2epa(steps)
             if not status:
                 self.function_name = 'gw_fct_pg2epa_main'
                 return False
@@ -92,6 +93,7 @@ class GwEpaFileManager(GwTask):
             return
 
         self._close_file()
+        self.dlg_go2epa.btn_accept.setEnabled(True)
 
         # If PostgreSQL function returned null
         if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
@@ -127,7 +129,7 @@ class GwEpaFileManager(GwTask):
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
             if self.message is not None:
-                tools_qt.show_info_box(self.message)
+                tools_log.log_info(self.message)
             self.go2epa.check_result_id()
             return
 
@@ -180,22 +182,54 @@ class GwEpaFileManager(GwTask):
 
     # region private functions
 
-    def _exec_function_pg2epa(self):
+    def _exec_function_pg2epa(self, steps):
 
         self.json_result = None
+        status = False
         self.setProgress(0)
 
         extras = f'"resultId":"{self.result_name}"'
-        extras += f', "useNetworkGeom":"{self.net_geom}"'
         if global_vars.project_type == 'ud':
             extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        self.body = tools_gw.create_body(extras=extras)
-        dict_result = tools_gw.exec_pg_function('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
-        self.function_failed = dict_result['function_failed']
-        self.json_result = dict_result['json_result']
-        self.complet_result = dict_result['complet_result']
 
-        return dict_result['status']
+        if steps == 3:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if json_result is not None:
+                self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+                if json_result is not None:
+                    self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+                    json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                             is_thread=True)
+        elif steps == 2:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if json_result is not None:
+                self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+
+        elif steps == 1:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+        else:  # steps == 0
+            extras += f', "step": 0'
+            self.body = tools_gw.create_body(extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+
+        # Manage json result
+        self.json_result = json_result
+        self.complet_result = json_result
+        if json_result is None or not json_result:
+            self.function_failed = True
+        elif 'status' in json_result:
+            if json_result['status'] == 'Failed':
+                tools_log.log_warning(json_result)
+                self.function_failed = True
+            else:
+                status = True
+
+        return status
 
 
     def _export_inp(self):
@@ -465,5 +499,17 @@ class GwEpaFileManager(GwTask):
         self.common_msg += "Import RPT file finished."
 
         return True
+
+
+    def _get_steps(self):
+
+        value = tools_gw.get_config_value('inp_options_debug')
+        value = json.loads(value[0])
+        try:
+            steps = int(value['steps'])
+        except KeyError or ValueError:
+            steps = 0
+
+        return steps
 
     # endregion

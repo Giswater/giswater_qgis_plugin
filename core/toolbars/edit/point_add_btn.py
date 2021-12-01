@@ -61,6 +61,9 @@ class GwPointAddButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
+        # Update featurecatvalues
+        global_vars.feature_cat = tools_gw.manage_feature_cat()
+
         # Get list of different connec, gully and node types
         features_cat = global_vars.feature_cat
         project_type = tools_gw.get_project_type()

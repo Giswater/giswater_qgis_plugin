@@ -1287,6 +1287,7 @@ class GwPsector:
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
+        model.beforeUpdate.connect(partial(self.manage_update_state, model))
         model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
@@ -1315,6 +1316,34 @@ class GwPsector:
             row = selected_list[i].row()
             if str(widget.model().record(row).value('psector_id')) != tools_qt.get_text(dialog, 'psector_id'):
                 widget.hideRow(i)
+
+
+    def manage_update_state(self, model, row, record):
+        """
+        Manage new state of planned features.
+            :param model: QSqlModel of QTableView
+            :param row: index of updating row (passed by signal)
+            :param record: QSqlRecord (passed by signal)
+        """
+
+        # Get table name via current tab name (arc, node, connec or gully)
+        index_tab = self.dlg_plan_psector.tab_feature.currentIndex()
+        tab_name = self.dlg_plan_psector.tab_feature.tabText(index_tab)
+        table_name = tab_name.lower()
+
+        # Get selected feature's state
+        feature_id = record.value(f'{table_name}_id')  # Get the id
+        sql = f"SELECT {table_name}.state FROM {table_name} WHERE {table_name}_id='{feature_id}';"
+        sql_row = tools_db.get_row(sql)
+        if sql_row:
+            old_state = sql_row[0]  # Original state
+            new_state = record.value('state')  # New state
+            if old_state == 2 and new_state == 0:
+                msg = "This value is mandatory for planned feature. If you are looking to unlink feature from this " \
+                      "psector please delete row. If delete is not allowed its because feature is only used on this " \
+                      "psector and needs to be removed from canvas"
+                tools_qgis.show_warning(msg)
+                model.revert()
 
 
     def document_insert(self):

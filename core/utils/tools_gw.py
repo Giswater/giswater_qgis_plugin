@@ -25,7 +25,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
@@ -38,6 +38,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
+from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -106,6 +107,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
+
+    # Needed to avoid errors with giswater plugins
+    if path is None:
+        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        return None
 
     value = None
     raw_parameter = parameter
@@ -682,7 +688,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
 def disable_tab_log(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo'):
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
@@ -1043,7 +1049,6 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 if 'datatype' in field:
-                    tools_log.log_info(field['datatype'])
                     if field['datatype'] == 'int':
                         widget.setValidator(QIntValidator())
                     elif field['datatype'] == 'float':
@@ -1075,8 +1080,11 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
-                    widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'spinboxDecimals' in field['widgetcontrols']:
+                        widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                    if 'maximumNumber' in field['widgetcontrols']:
+                        widget.setMaximum(field['widgetcontrols']['maximumNumber'])
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
@@ -1169,8 +1177,17 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
+
+    # Search for the widget and remove it if it's in the list
+    idx_del = None
+    for i in range(len(list)):
+        if list[i]['widget'] == elem['widget']:
+            idx_del = i
+            break
+    if idx_del is not None:
+        list.pop(idx_del)
+
     list.append(elem)
-    tools_log.log_info(str(list))
 
 
 def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
@@ -1726,7 +1743,6 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        tools_log.log_warning(f"Function error: {function_name}")
         manage_json_exception(json_result, sql)
         return False
 
@@ -2321,8 +2337,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
-
-    tools_log.log_info(class_object.list_ids[feature_type])
 
 
 def remove_selection(remove_groups=True, layers=None):
@@ -2962,6 +2976,9 @@ def user_params_to_userconfig():
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
+    if global_vars.user_folder_dir is None:
+        return
+
     init_parser = configparser.ConfigParser()
     session_parser = configparser.ConfigParser()
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
@@ -3060,7 +3077,7 @@ def hide_widgets_form(dialog, dlg_name):
     if row:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
-            if widget.objectName() and widget.objectName() in row[0]:
+            if widget.objectName() and f'"{widget.objectName()}"' in row[0]:
                 lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
                 if lbl_widget:
                     lbl_widget.setVisible(False)
@@ -3143,6 +3160,23 @@ def get_vertex_flag(default_value):
         vertex_flag = default_value
 
     return vertex_flag
+
+
+def create_giswater_menu(project_loaded=False):
+    """ Create Giswater menu """
+    if global_vars.load_project_menu is None:
+        global_vars.load_project_menu = GwMenuLoad()
+    global_vars.load_project_menu.read_menu(project_loaded)
+
+
+def unset_giswater_menu():
+    """ Unset Giswater menu (when plugin is disabled or reloaded) """
+
+    menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
+    if menu_giswater not in (None, "None"):
+        menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
+        menu_giswater.deleteLater()
+        global_vars.load_project_menu = None
 
 # endregion
 
