@@ -207,7 +207,6 @@ class GwLoadProject(QObject):
         global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
         global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
         global_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
-        global_vars.user_level['disable_updateall_atttibutetable'] = tools_gw.get_config_parser('user_level','disable_updateall_atttibutetable',"user","init", False)
         global_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
 
 
@@ -620,8 +619,10 @@ class GwLoadProject(QObject):
 
 
     def _manage_attribute_table(self):
+        """ If configured, disable button "Update all" from attribute table """
 
-        if global_vars.user_level['level'] in global_vars.user_level['disable_updateall_atttibutetable']:
+        disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
+        if tools_os.set_boolean(disable, False):
             QApplication.instance().focusChanged.connect(self._manage_focus_changed)
 
 
