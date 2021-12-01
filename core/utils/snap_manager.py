@@ -351,10 +351,8 @@ class GwSnapManager(object):
         tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        # global_vars.canvas.xyCoordinates.connect(partial(self._get_mouse_move, vertex_marker))
         tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._get_mouse_move, vertex_marker),
                                 'snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
-        # emit_point.canvasClicked.connect(partial(self._get_xy, vertex_marker, emit_point))
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_xy, vertex_marker, emit_point),
                                 'snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
 
@@ -398,9 +396,7 @@ class GwSnapManager(object):
 
         message = "Geometry has been added!"
         tools_qgis.show_info(message)
-        # emit_point.canvasClicked.disconnect()
         tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
-        # global_vars.canvas.xyCoordinates.disconnect()
         tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
