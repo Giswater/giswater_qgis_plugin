@@ -276,7 +276,7 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        if f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
+        if global_vars.project_type == 'ud' and f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
 
             # Replace extension .inp
             aditional_path = folder_path.replace('.inp', f'.gul')
@@ -286,9 +286,11 @@ class GwEpaFileManager(GwTask):
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
                 if bool(re.match('\[(.*?)\]', row['text'])) and \
-                        ('TITLE' in row['text'] or row['text'] in 'GULLY', 'LINK', 'GRATE', 'LXSECTIONS'):
+                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
+                         'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
                     read = True
-                    if (row['text'] in 'GULLY', 'LINK', 'GRATE', 'LXSECTIONS'):
+                    if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
+                       'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
                         save_file = True
                 elif bool(re.match('\[(.*?)\]', row['text'])):
                     read = False
