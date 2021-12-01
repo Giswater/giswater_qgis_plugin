@@ -336,10 +336,15 @@ class GwInfo(QObject):
         elif option == 'node':
             self.snapper_manager.config_snap_to_node()
         # Set signals
-        self.canvas.xyCoordinates.connect(partial(self._mouse_moved, layer))
+        tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
+                                'info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+
+        tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self._get_id, dialog, action, option, emit_point, child_type))
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type),
+                                'info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
 
 
     # region private functions
@@ -865,8 +870,10 @@ class GwInfo(QObject):
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
-        global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
-        ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate))
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._mouse_move),
+                                'info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(ep.canvasClicked, partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate),
+                                'info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
 
 
     def _snapping_node(self, ep, dlg_interpolate, rb_interpolate, point, button):
@@ -1001,10 +1008,12 @@ class GwInfo(QObject):
     def _change_hemisphere(self, dialog, action):
 
         # Set map tool emit point and signals
+        tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self._action_rotation_canvas_clicked, dialog, action, emit_point))
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._action_rotation_canvas_clicked, dialog, action, emit_point),
+                                'info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
 
     def _action_rotation_canvas_clicked(self, dialog, action, emit_point, point, btn):
@@ -1053,20 +1062,22 @@ class GwInfo(QObject):
         action_widget = dialog.findChild(QAction, "actionRotation")
         if action_widget:
             action_widget.setChecked(False)
-        try:
-            emit_point.canvasClicked.disconnect()
-        except Exception as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+        tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
 
     def _manage_action_copy_paste(self, dialog, feature_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
         # Set map tool emit point and signals
+        tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(self._manage_action_copy_paste_mouse_move)
-        emit_point.canvasClicked.connect(partial(self._manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
+        tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, self._manage_action_copy_paste_mouse_move,
+                                'info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point),
+                                'info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
+
         self.feature_type = feature_type
 
         # Store user snapping configuration
@@ -1201,8 +1212,8 @@ class GwInfo(QObject):
         try:
             self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.vertex_marker.hide()
-            global_vars.canvas.xyCoordinates.disconnect()
-            emit_point.canvasClicked.disconnect()
+            tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+            tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         except Exception:
             pass
 
@@ -3671,7 +3682,6 @@ class GwInfo(QObject):
                    'set_to_arc': ['arc_id', '_set_to_arc']}
 
         if event == Qt.RightButton:
-            tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
             self._cancel_snapping_tool(dialog, action)
             return
 
@@ -3735,6 +3745,7 @@ class GwInfo(QObject):
     def _cancel_snapping_tool(self, dialog, action):
 
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('info_snapping')
         dialog.blockSignals(False)
         action.setChecked(False)
         self.signal_activate.emit()
