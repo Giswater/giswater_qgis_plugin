@@ -41,6 +41,8 @@ v_count integer;
 v_response text;
 v_message text;
 v_step integer=0;
+v_autorepair boolean;
+
 
 BEGIN
 
@@ -59,7 +61,7 @@ BEGIN
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
-	
+	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	IF v_step=3 THEN
 
@@ -112,8 +114,10 @@ BEGIN
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- repair inp tables
-	PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-
+	IF v_autorepair IS NOT FALSE THEN
+		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+	END IF;
+	
 	RAISE NOTICE '2 - check system data';
 	PERFORM gw_fct_pg2epa_check_data(v_input);
 	

@@ -20,7 +20,6 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$) -- ANALYZE GRAF
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$) -- CREATE JSON RETURN
 
-
 --fid: 227
 
 */
@@ -50,6 +49,7 @@ v_error_context text;
 v_breakpipes boolean;
 v_count integer;
 v_step integer=0;
+v_autorepair boolean;
 	
 BEGIN
 
@@ -72,6 +72,7 @@ BEGIN
 	-- get debug parameters (settings)
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	IF v_step=3 THEN
 
@@ -127,8 +128,10 @@ BEGIN
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- repair inp tables
-	PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-
+	IF v_autorepair IS NOT FALSE THEN
+		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+	END IF;
+	
 	RAISE NOTICE '2 - check system data';
 	PERFORM gw_fct_pg2epa_check_data(v_input);
 	
