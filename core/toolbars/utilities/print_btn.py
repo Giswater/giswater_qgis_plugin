@@ -105,7 +105,8 @@ class GwPrintButton(GwAction):
         # Control if no have composers
         if composers_list != '"{}"':
             self._accept(self.dlg_composer, self.my_json)
-            self.iface.mapCanvas().extentsChanged.connect(partial(self._accept, self.dlg_composer, self.my_json))
+            tools_gw.connect_signal(self.iface.mapCanvas().extentsChanged, partial(self._accept, self.dlg_composer, self.my_json),
+                                    'print', 'open_print_extentsChanged_accept')
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
@@ -188,6 +189,7 @@ class GwPrintButton(GwAction):
 
     def _destructor(self):
         self.iface.mapCanvas().setRotation(self.initial_rotation)
+        tools_gw.disconnect_signal('print')
         self.destroyed = True
         if self.rubber_band:
             self.iface.mapCanvas().scene().removeItem(self.rubber_band)
