@@ -92,12 +92,6 @@ class Giswater(QObject):
             print(f"Exception in unload when disconnecting QgsProject.instance().crsChanged signal: {e}")
 
         try:
-            # Disconnect 'main.py' signals
-            tools_gw.disconnect_signal('main')
-        except Exception as e:
-            print(f"Exception in unload when disconnecting main.py signals: {e}")
-
-        try:
             # Remove 'Main Info button'
             self._unset_info_button()
         except Exception as e:
@@ -264,6 +258,8 @@ class Giswater(QObject):
         """ Define iface event signals on Project Read / New Project / Save Project """
 
         try:
+            self._unset_signals()
+
             tools_gw.connect_signal(self.iface.projectRead, self._project_read,
                                     'main', 'projectRead')
             tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
@@ -271,6 +267,23 @@ class Giswater(QObject):
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
                                     'main', 'actionSaveProject')
         except AttributeError:
+            pass
+
+
+    def _unset_signals(self):
+        """ Disconnect iface event signals on Project Read / New Project / Save Project """
+
+        try:
+            self.iface.projectRead.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.iface.newProjectCreated.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.iface.actionSaveProject().triggered.disconnect()
+        except TypeError:
             pass
 
 
