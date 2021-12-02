@@ -182,6 +182,8 @@ BEGIN
 	INSERT INTO config_param_user (value, parameter, cur_user)
 	VALUES (txid_current(),'utils_cur_trans',current_user );
 
+	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
+
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	
@@ -364,8 +366,7 @@ BEGIN
 					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 FROM v_edit_connec v WHERE v.connec_id = connec.connec_id ';
 					EXECUTE v_querytext;
 				ELSE
-					EXECUTE 'SELECT '||quote_ident(v_field)||' FROM v_edit_node WHERE node_id = '||quote_literal(v_floodfromnode)
-					INTO v_nodemapzone;
+					EXECUTE 'SELECT '||quote_ident(v_field)||' FROM node WHERE node_id = '||quote_literal(v_floodfromnode) INTO v_nodemapzone;
 					IF v_nodemapzone IS NOT NULL THEN
 						v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
 						EXECUTE v_querytext;
@@ -375,6 +376,8 @@ BEGIN
 						EXECUTE v_querytext;
 					END IF;
 				END IF;
+
+
 
 				-- reset mapzone geometry
 				IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' AND v_updatefeature AND v_updatemapzgeom > 0 THEN
@@ -621,10 +624,9 @@ BEGIN
 			
 				-- recalculate staticpressure (fid=147)
 				IF v_fid=146 THEN
-				
-					DELETE FROM audit_log_data WHERE fid=147 AND cur_user=current_user;
-			
-					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
+
+					DELETE FROM temp_data;
+					INSERT INTO temp_data (fid, feature_type, feature_id, log_message)
 					SELECT 147, 'node', n.node_id, 
 					concat('{"staticpressure":',case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
 					then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END,
@@ -636,7 +638,7 @@ BEGIN
 					WHERE fid=146 AND cur_user=current_user;
 
 					-- update on node table those elements connected on graf
-					UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
+					UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_data a WHERE a.feature_id=node_id 
 					AND fid=147 AND cur_user=current_user;
 					
 					-- update on node table those elements disconnected from graf
@@ -644,12 +646,11 @@ BEGIN
 									FROM v_edit_arc,node n
 									WHERE st_dwithin(v_edit_arc.the_geom, n.the_geom, 0.05::double precision) AND v_edit_arc.state = 1 AND n.state = 1
 									and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
-											
 					-- updat connec table
-					UPDATE v_edit_connec SET staticpressure =(a.head - a.elevation + (case when a.depth is null then 0 else a.depth end)::float) FROM 
-						(SELECT connec_id, head, elevation, depth FROM connec
+					UPDATE connec SET staticpressure =(a.head - a.elevation + (case when a.depth is null then 0 else a.depth end)::float) FROM 
+						(SELECT connec_id, head, elevation, depth FROM v_edit_connec
 						JOIN presszone USING (presszone_id)) a
-						WHERE v_edit_connec.connec_id=a.connec_id;
+						WHERE connec.connec_id=a.connec_id;
 				END IF;
 
 				-- disconnected arcs
@@ -673,23 +674,23 @@ BEGIN
 				END IF;
 
 				-- manage conflicts
-				FOR rec_conflict IN EXECUTE 'SELECT concat(m1,'','',m2) as mapzone, node_id FROM (select n.node_id, n.'||v_field||' as m1, a.'||v_field||' as m2 from v_edit_node n JOIN 
+				FOR rec_conflict IN EXECUTE 'SELECT concat(''''''m1'''''','','',''''''m2'''''') as mapzone, node_id FROM (select n.node_id, n.'||v_field||' as m1, a.'||v_field||' as m2 from v_edit_node n JOIN 
 				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz)a
 				USING (node_id))a
 				WHERE m1 != m2'
 				LOOP						
 					-- update & count features
 					--arc
-					EXECUTE 'UPDATE arc t SET '||v_field||'  = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
+					EXECUTE 'UPDATE arc t SET '||v_field||' = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' arc(s) affected.'));
 
 					-- node
-					EXECUTE 'UPDATE node t SET '||v_field||'  = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
+					EXECUTE 'UPDATE node t SET '||v_field||' = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
 
 					-- connec
-					EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::integer IN ('||rec_conflict.mapzone||')';
+					EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' connec(s) affected.'));
@@ -698,9 +699,10 @@ BEGIN
 					EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
 					
 					-- update mapzone geometry
-					EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::integer IN ('||rec_conflict.mapzone||')';
+					EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
 						
 				END LOOP;
+
 			ELSE
 				-- message
 				INSERT INTO audit_check_data (fid, criticity, error_message)
@@ -932,6 +934,8 @@ BEGIN
         
     END IF;
 
+	RAISE NOTICE 'FINISH MAPZONE';
+
     	-- restore state selector (if it's needed)
 	IF v_usepsector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
@@ -948,6 +952,8 @@ BEGIN
 	INSERT INTO selector_expl (expl_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=289 and cur_user=current_user
 	ON CONFLICT (expl_id, cur_user) DO NOTHING;
+
+	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

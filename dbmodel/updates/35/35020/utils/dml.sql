@@ -13,3 +13,11 @@ VALUES (430, 'Check matcat null for arcs','utils', null, null) ON CONFLICT (fid)
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (431, 'Check minimun length for arcs','ud', null, null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('temp_data', 'Table for additional, uneditable fields related to feature','role_om', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, vdefault, datatype, ismandatory)
+VALUES ('edit_typevalue_fk_disable', 'hidden', 'Used on code to disable fk in order to enhance performance for grafanalytics mapzones', 'role_basic', 'utils','FALSE','boolean',true) 
+ON CONFLICT (id) DO NOTHING;
