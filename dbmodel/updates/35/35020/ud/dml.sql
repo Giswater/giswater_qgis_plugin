@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud_deposona, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/30
 UPDATE sys_table SET id = 'inp_snowpack_value' WHERE id  ='inp_snowpack';
