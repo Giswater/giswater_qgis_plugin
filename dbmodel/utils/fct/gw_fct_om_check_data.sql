@@ -1137,10 +1137,12 @@ BEGIN
 		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-			VALUES (125, 2, '429', concat('WARNING-429: There is/are ',v_count,' exploitation(s) without geometry wich may create some gap on ext_raster view (DEM strategy is enabled).'),v_count);
+			SELECT 125, 2, '429', 
+			concat('WARNING-429: There is/are ',v_count,' exploitation(s) without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: ',string_agg(name,', ')),v_count 
+			FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
-			VALUES (125, 1, '429','INFO: All exploitations have geometry wich will no have problems with raster DEM enabled strategy.',v_count);
+			VALUES (125, 1, '429','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
 		END IF;
 	END IF;
 	
