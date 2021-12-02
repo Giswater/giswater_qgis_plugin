@@ -77,7 +77,7 @@ v_default boolean;
 v_defaultval text;
 v_dwfscenarioval text;
 v_exportmodeval text;
-v_networkmode text;
+v_networkmode integer;
 
 object_rec record;
 
@@ -100,7 +100,7 @@ BEGIN
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_networkmode = (SELECT (value::integer) FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user)::boolean;
+	v_networkmode = (SELECT (value) FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user)::integer;
 
 
 	-- manage no found results
