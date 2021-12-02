@@ -17,7 +17,7 @@ $BODY$
 
 	SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
 	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats"}}}$$)::text
+	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats","isAudit":false}}}$$)::text
 
 	--Project - audit_check_project - only errors
 	--User - errors and info
@@ -52,6 +52,7 @@ v_result_id text;
 v_result text;
 v_result_info json;
 v_error_context text;
+v_isaudit boolean;
 
 BEGIN
 
@@ -64,6 +65,7 @@ BEGIN
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	v_log_project = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'checkType')::text;
+	v_isaudit = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'isAudit')::boolean;
 	
 	IF v_log_project = 'Project' THEN
 		v_target= '''ERROR''';
@@ -178,9 +180,9 @@ BEGIN
 		EXECUTE 'INSERT INTO '||v_selector_name||'
 		SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''')';
 	END LOOP;
-	
+
 	--copy errors results from project check
-	IF v_log_project = 'Project' THEN
+	IF v_log_project = 'Project' AND v_isaudit IS TRUE THEN
 		INSERT INTO audit_fid_log (fid, fcount, criticity)
 		SELECT result_id::integer, fcount, criticity
 		FROM audit_check_data

@@ -16,7 +16,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":101}}$$);
 
- SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "logFolderVolume":"34MB", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
+ SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "isAudit":false,"addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "logFolderVolume":"34MB", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
 	om: 125
@@ -83,6 +83,7 @@ v_qgis_project_type text;
 v_logfoldervolume text;
 v_uservalues json;
 v_user_expl text;
+v_isaudit text;
 
 BEGIN 
 
@@ -105,6 +106,7 @@ BEGIN
 	v_insert_fields := (p_data ->> 'data')::json->> 'fields';
 	v_qgis_project_type := (p_data ->> 'data')::json->> 'projectType';
 	v_logfoldervolume := (p_data ->> 'data')::json->> 'logFolderVolume';
+	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
 
 
 	-- profilactic control of qgis variables
@@ -438,8 +440,8 @@ BEGIN
 
 		EXECUTE 'SELECT gw_fct_user_check_data($${"client":
 		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project"}}}$$)::text';
-		
+		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||'}}}$$)::text';
+			
 		-- insert results 
 		UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
 		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
