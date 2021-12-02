@@ -881,7 +881,8 @@ BEGIN
 
 	RAISE NOTICE '31 - Check operative arcs with wrong topology (372)';
 	
-	INSERT INTO temp_arc (arc_id, node_1, node_2, result_id, sector_id,state) SELECT arc_id, node_1, node_2, '372', sector_id,state FROM arc WHERE state = 1;
+	EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, result_id, sector_id,state) SELECT arc_id, node_1, node_2, ''372'', sector_id,state 
+			 FROM '||v_edit||'arc WHERE state = 1';
 	-- update node_1
 	UPDATE temp_arc t SET node_1 = node_id, state = 9 FROM (
 	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
