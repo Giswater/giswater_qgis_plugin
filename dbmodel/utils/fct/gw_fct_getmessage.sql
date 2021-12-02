@@ -65,7 +65,7 @@ BEGIN
 
 		-- log_level of type 'WARNING' (mostly applied to functions)
 		ELSIF rec_cat_error.log_level = 1 THEN
-			SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
+			SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,' ',v_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
 			FROM sys_function WHERE sys_function.id=v_function_id; 
 		
 			v_level = 1;

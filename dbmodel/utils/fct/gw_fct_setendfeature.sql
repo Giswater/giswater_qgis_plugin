@@ -89,7 +89,7 @@ BEGIN
 	
 		FOREACH rec_id IN ARRAY(v_id_list)
 		LOOP
-			--check if node is involved into psector
+			--check if node is involved into psector because of arc
 			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2;'
 			INTO v_num_feature;
 
@@ -107,6 +107,21 @@ BEGIN
 					"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
 				END IF;
 			END IF;
+
+			--check if unconnected node is involved into psector
+			EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
+			FROM plan_psector_x_node 
+			JOIN plan_psector USING (psector_id) 
+			where node_id = '||quote_literal(rec_id)||';'
+			INTO v_psector_list, v_psector_id;
+
+			IF v_psector_id IS NOT NULL THEN 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
+	
+				EXECUTE 'DELETE FROM plan_psector_x_node WHERE node_id = '||quote_literal(rec_id)||' AND psector_id IN ('||v_psector_id||');';			
+			END IF;
+
 
 			--check if node is related to on service arcs
 			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;'
