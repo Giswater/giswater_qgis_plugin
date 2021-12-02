@@ -48,6 +48,7 @@ v_connect_node text;
 v_element text;
 v_visit text;
 v_doc text;
+v_psector text;
 v_connect_arc text;
 v_version json;
 v_result_id text= 'feature relations';
@@ -181,13 +182,36 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Visits connected with the feature: ',v_visit ));
 	END IF;
 
-	--check visits related to feature
+	--check documents related to feature
 	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_doc;
 
 	IF v_doc IS NOT NULL THEN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Documents connected with the feature: ',v_doc ));
 	END IF;
+
+	--check psectors related to feature
+	IF v_feature_type='node' THEN
+		EXECUTE 'SELECT string_agg(distinct a.name, '', '') FROM (
+		SELECT name FROM plan_psector_x_node
+		JOIN plan_psector USING (psector_id) where node_id = '''||v_feature_id||'''::text 
+		UNION 
+		SELECT name FROM plan_psector_x_arc
+		JOIN plan_psector USING (psector_id) 
+		JOIN arc using (arc_id) 
+		where node_1 =  '''||v_feature_id||'''::text or node_2= '''||v_feature_id||'''::text  and arc.state=2)a'
+		INTO v_psector;
+	ELSE
+		
+		EXECUTE 'SELECT string_agg(name,'', '') FROM plan_psector_x_'||v_feature_type||' 
+		JOIN plan_psector USING (psector_id) where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+		INTO v_psector;
+	END IF;
+
+	IF v_psector IS NOT NULL THEN
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Psectors connected with the feature: ',v_psector ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('IMPORTANT: Activate psector before deleting features.' ));
+	END IF;	
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 151) row;
