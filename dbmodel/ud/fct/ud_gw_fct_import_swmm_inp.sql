@@ -71,8 +71,7 @@ v_status text = 'Accepted';
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-
-
+	
 	-- get project type and srid
 	SELECT project_type, epsg, giswater INTO v_projecttype, v_epsg, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -210,10 +209,12 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data from inp file to temp_csv table -> Done');
 
 			UPDATE temp_csv SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
-			csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
+			csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null 
+			WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
 
 			UPDATE temp_csv SET csv1=concat(csv1,' ',csv2),csv2=concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
-			csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND csv1!='TIMESERIES' AND csv1!='FILE' AND csv1!='SNOWMELT';
+			csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null 
+			WHERE source='[TEMPERATURE]' AND csv1!='TIMESERIES' AND csv1!='FILE' AND csv1!='SNOWMELT';
 			
 			UPDATE temp_csv SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 			csv2=null, csv3=null, csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[CONTROLS]';

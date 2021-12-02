@@ -77,10 +77,10 @@ BEGIN
 			VALUES (NEW.subc_id, NEW.aquif_id, NEW.node_id, NEW.surfel, NEW.a1, NEW.b1, NEW.a2, NEW.b2, NEW.a3, NEW.tw, NEW.h, 1);
 			
 		ELSIF v_view='vi_snowpacks' THEN
-			INSERT INTO inp_snowpack (snow_id, snow_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7)
+			INSERT INTO inp_snowpack_value (snow_id, snow_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7)
 			VALUES (NEW.snow_id,NEW.snow_type, NEW.value_1, NEW.value_2, NEW.value_3, NEW.value_4, NEW.value_5, NEW.value_6, NEW.value_7);
 			
-			INSERT INTO inp_snowpack_id (snow_id) 
+			INSERT INTO inp_snowpack (snow_id) 
 			SELECT NEW.snow_id FROM inp_snowpack WHERE NEW.snow_id not in (select snow_id FROM inp_snowpack_id);
 
 		ELSIF v_view='vi_gwf' THEN 
