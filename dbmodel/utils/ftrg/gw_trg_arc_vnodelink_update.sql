@@ -19,6 +19,7 @@ It works over v_edit_link, wich means that is mandatory to activate psectors in 
 DECLARE 
 v_link record;
 v_closest_point PUBLIC.geometry;
+v_debugmsg text;
 
 BEGIN 
 
@@ -30,8 +31,12 @@ BEGIN
 		-- check if there are not-selected psector affected
 		IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
 		WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+			
+			SELECT concat('Psector: ',string_agg(distinct name::text, ', ')) into v_debugmsg FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
+			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector);
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);';								
+			"data":{"message":"3180", "function":"2542","debug_msg":"'||v_debugmsg||'"}}$$);';								
 		END IF;
 		
 		-- Redraw link and vnode
@@ -52,8 +57,12 @@ BEGIN
 			-- check if there are not-selected psector affected
 			IF (SELECT count (*) FROM plan_psector_x_gully JOIN plan_psector USING (psector_id) 
 			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+
+				SELECT concat('Psector: ',string_agg(distinct name::text, ', ')) into v_debugmsg FROM plan_psector_x_gully JOIN plan_psector USING (psector_id) 
+				WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector);
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);';								
+				"data":{"message":"3180", "function":"2542","debug_msg":"'||v_debugmsg||'"}}$$);';								
 			END IF;
 
 			FOR v_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
