@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/30
-UPDATE sys_table SET id = 'inp_snowpack_value' WHERE id IN ('inp_snowpack', 'inp_snowpack_values';
-UPDATE sys_table SET id = 'inp_snowpack' WHERE id  ='inp_snowpack_id';
+UPDATE sys_table SET id = 'inp_snowpack_values' WHERE id ='inp_snowpack';
+UPDATE sys_table SET id = 'inp_snowpack' WHERE id ='inp_snowpack_id';
