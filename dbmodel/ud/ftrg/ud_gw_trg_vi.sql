@@ -234,8 +234,14 @@ BEGIN
 			INSERT INTO inp_treatment_node_x_pol (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
 			
 		ELSIF v_view='vi_dwf' THEN
-			INSERT INTO inp_dwf(node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
-			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4, 1);
+		
+			IF NEW.type_dwf ='FLOW' THEN
+				INSERT INTO inp_dwf(node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
+				VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4, 1);
+			ELSE 
+				INSERT INTO inp_dwf_pol_x_node (poll_id, node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
+				VALUES (NEW.type_dwf, NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4, 1);
+			END IF;
 			
 		ELSIF v_view='vi_patterns' THEN
 	
@@ -287,12 +293,17 @@ BEGIN
 				END IF;
 				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
-			ELSIF  NEW.other1 ilike '%:%'  THEN
+			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' THEN
+
+				IF NEW.other1 ~ '^\d+$' then
+					NEW.other1 = concat(NEW.other1,':00');
+				END IF;
+				
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'RELATIVE');
 				END IF;
 				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, '', NEW.other1, NEW.other2::numeric);				
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1::time, NEW.other2::numeric);				
 				ELSE
 					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
 				END IF;				
@@ -300,7 +311,10 @@ BEGIN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'ABSOLUTE');
 				END IF;
-				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1::date, NEW.other2, NEW.other3::numeric);
+				IF NEW.other2 ~ '^\d+$' then
+					NEW.other2 = concat(NEW.other2,':00');
+				END IF;
+				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
