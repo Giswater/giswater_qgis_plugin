@@ -89,11 +89,11 @@ class GwEpaFileManager(GwTask):
         super().finished(result)
 
         self.dlg_go2epa.btn_cancel.setEnabled(False)
-        if self.isCanceled():
-            return
+        self.dlg_go2epa.btn_accept.setEnabled(True)
 
         self._close_file()
-        self.dlg_go2epa.btn_accept.setEnabled(True)
+        if self.isCanceled():
+            return
 
         # If PostgreSQL function returned null
         if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
@@ -195,27 +195,41 @@ class GwEpaFileManager(GwTask):
         if steps == 3:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if self.isCanceled():
+                return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
                 json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+                if self.isCanceled():
+                    return False
                 if json_result is not None:
                     self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                     json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
                                                              is_thread=True)
+                    if self.isCanceled():
+                        return False
         elif steps == 2:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if self.isCanceled():
+                return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                 json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+                if self.isCanceled():
+                    return False
 
         elif steps == 1:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if self.isCanceled():
+                return False
         else:  # steps == 0
             extras += f', "step": 0'
             self.body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            if self.isCanceled():
+                return False
 
         # Manage json result
         self.json_result = json_result
@@ -228,6 +242,8 @@ class GwEpaFileManager(GwTask):
                 self.function_failed = True
             else:
                 status = True
+        if self.isCanceled():
+            return False
 
         return status
 
@@ -276,27 +292,32 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        # Replace extension .inp
-        aditional_path = folder_path.replace('.inp', f'.gul')
-        aditional_file = open(aditional_path, "w")
-        read = True
-        save_file = False
-        for row in all_rows:
-            # Use regexp to check which targets to read (only TITLE and aditional target)
-            if bool(re.match('\[(.*?)\]', row['text'])) and ('TITLE' in row['text'] or row['text'] in ['GULLY', 'LINK', 'GRATE', 'LXSECTIONS']):
-                read = True
-                if row['text'] in ['GULLY', 'LINK', 'GRATE', 'LXSECTIONS']:
-                    save_file = True
-            elif bool(re.match('\[(.*?)\]', row['text'])):
-                read = False
-            if 'text' in row and row['text'] is not None and read:
-                line = row['text'].rstrip() + "\n"
-                aditional_file.write(line)
+        if global_vars.project_type == 'ud' and f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
 
-        self._close_file(aditional_file)
+            # Replace extension .inp
+            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_file = open(aditional_path, "w")
+            read = True
+            save_file = False
+            for row in all_rows:
+                # Use regexp to check which targets to read (only TITLE and aditional target)
+                if bool(re.match('\[(.*?)\]', row['text'])) and \
+                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
+                         'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+                    read = True
+                    if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
+                       'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
+                        save_file = True
+                elif bool(re.match('\[(.*?)\]', row['text'])):
+                    read = False
+                if 'text' in row and row['text'] is not None and read:
+                    line = row['text'].rstrip() + "\n"
+                    aditional_file.write(line)
 
-        if save_file is False:
-            os.remove(aditional_path)
+            self._close_file(aditional_file)
+
+            if save_file is False:
+                os.remove(aditional_path)
 
 
     def _execute_epa(self):

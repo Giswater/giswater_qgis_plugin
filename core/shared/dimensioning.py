@@ -137,6 +137,8 @@ class GwDimensioning:
             else:
                 tools_gw.enable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
+        tools_qt.hide_void_groupbox(self.dlg_dim)
+
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False

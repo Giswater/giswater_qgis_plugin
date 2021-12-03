@@ -2004,38 +2004,55 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
 
 
 def get_project_type(schemaname=None):
-    """ Get project type from table 'version' """
+    """ Get project type from table 'sys_version' """
 
-    # init variables
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
     elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
-    # start process
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
-    if exists:
-        sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            project_type = row[0]
-    else:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = f"SELECT lower(wsoftware) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-            row = tools_db.get_row(sql)
-            if row:
-                project_type = row[0]
-        else:
-            tablename = "version_tm"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                project_type = "tm"
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_type = row[0]
 
     return project_type
+
+
+def get_project_info(schemaname=None):
+    """ Get project information from table 'sys_version' """
+
+    project_info_dict = None
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = (f"SELECT lower(project_type), epsg, giswater, language "
+           f"FROM {schemaname}.{tablename} "
+           f"ORDER BY id ASC LIMIT 1")
+    row = tools_db.get_row(sql)
+    if row:
+        project_info_dict = {'project_type': row[0],
+                             'project_epsg': row[1],
+                             'project_version': row[2],
+                             'project_language': row[3],
+                             }
+
+    return project_info_dict
 
 
 def get_layers_from_feature_type(feature_type):
@@ -3085,7 +3102,7 @@ def hide_widgets_form(dialog, dlg_name):
 
 
 def get_project_version(schemaname=None):
-    """ Get project version from table 'version' """
+    """ Get project version from table 'sys_version' """
 
     if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
@@ -3094,10 +3111,8 @@ def get_project_version(schemaname=None):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if not exists:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if not exists:
-            return None
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
 
     sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
     row = tools_db.get_row(sql)

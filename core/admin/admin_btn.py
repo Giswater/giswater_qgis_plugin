@@ -404,31 +404,6 @@ class GwAdminButton:
 
     # region private functions
 
-    def _get_project_epsg(self, schemaname=None):
-        """ Get project epsg from table 'version' """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        project_epsg = None
-        tablename = "sys_version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = tools_db.get_row(sql)
-            if row:
-                project_epsg = row[0]
-        else:
-            tablename = "version"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = tools_db.get_row(sql)
-                if row:
-                    project_epsg = row[0]
-
-        return project_epsg
-
 
     def _populate_combo_connections(self):
         """ Fill the combo with the connections that exist in QGis """
@@ -849,7 +824,7 @@ class GwAdminButton:
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
-        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
+        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject', title=f'Create GIS project ({schema_name})')
 
 
     def _btn_constrains_changed(self, button, call_function=False):
@@ -1997,18 +1972,6 @@ class GwAdminButton:
 
         result_list = []
         for row in rows:
-            # projects below 3.4
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT wsoftware FROM {row[0]}.version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
-                    elem = [row[0], row[0]]
-                    result_list.append(elem)
-            # projects upper 3.3
             sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
                    f"AND table_name = 'sys_version')")
@@ -2086,11 +2049,11 @@ class GwAdminButton:
             self.software_version_info.setText(msg)
 
         else:
-            # TODO: Make just one SQL query
-            self.project_type = tools_gw.get_project_type(schemaname=schema_name)
-            self.project_epsg = self._get_project_epsg(schemaname=schema_name)
-            self.project_version = tools_gw.get_project_version(schemaname=schema_name)
-            self.project_language = self._get_project_language(schemaname=schema_name)
+            dict_info = tools_gw.get_project_info(schema_name)
+            self.project_type = dict_info['project_type']
+            self.project_epsg = dict_info['project_epsg']
+            self.project_version = dict_info['project_version']
+            self.project_language = dict_info['project_language']
 
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
@@ -3283,40 +3246,6 @@ class GwAdminButton:
         tools_db.execute_sql(sql)
 
 
-    def _get_project_language(self, schemaname=None):
-        """ Get project langugage from table 'version' """
-
-        if schemaname in (None, 'null', ''):
-            schemaname = self.schema_name
-
-        project_language = None
-        tablename = "sys_version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = tools_db.get_row(sql)
-            if row:
-                project_language = row[0]
-        else:
-            tablename = "version"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = tools_db.get_row(sql)
-                if row:
-                    project_language = row[0]
-
-        # profilactic control in order to upgrade all versionS to 3.5 new strategy of locale
-        if project_language == 'EN':
-            project_language = 'en_US'
-        elif project_language == 'ES':
-            project_language = 'es_ES'
-        elif project_language == 'CA':
-            project_language = 'ca_ES'
-
-        return project_language
-
-
     def _select_active_locales(self, sqlite_cursor):
 
         sql = f"SELECT locale as id, name as idval FROM locales WHERE active = 1"
@@ -3411,7 +3340,8 @@ class GwAdminButton:
             self.ud_project_result = row
 
         if self.ws_project_result[0] != self.ud_project_result[0]:
-            msg = f"You need to select same version for ws and ud projects. Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}"
+            msg = (f"You need to select same version for ws and ud projects. "
+                   f"Versions: WS - {self.ws_project_result[0]} ; UD - {self.ud_project_result[0]}")
             tools_qgis.show_message(msg, 0)
             return
 
@@ -3419,7 +3349,6 @@ class GwAdminButton:
         sql = (f"SELECT schema_name FROM information_schema.schemata "
                f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
         row = tools_db.get_row(sql, commit=False)
-
         if row:
             msg = f"Schema Utils already exist."
             tools_qgis.show_message(msg, 0)

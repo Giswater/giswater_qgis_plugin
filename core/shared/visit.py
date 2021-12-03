@@ -152,6 +152,7 @@ class GwVisit(QObject):
         self.user_name = self.dlg_add_visit.findChild(QLineEdit, "user_name")
         self.ext_code = self.dlg_add_visit.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg_add_visit.findChild(QComboBox, "visitcat_id")
+        self.exploitation = self.dlg_add_visit.findChild(QComboBox, "expl_id")
 
         # tab 'Event'
         self.tbl_event = self.dlg_add_visit.findChild(QTableView, "tbl_event")
@@ -556,6 +557,9 @@ class GwVisit(QObject):
         if self.current_tab_index == self._tab_index('tab_visit'):
             self._manage_leave_visit_tab()
 
+        expl_value = tools_qt.get_combo_value(self.dlg_add_visit, self.exploitation)
+        if expl_value not in (None, 'None', ''):
+            tools_gw.set_config_parser('btn_add_visit', 'expl_id', expl_value)
         # Remove all previous selections
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.disconnect_signal('visit')
@@ -719,6 +723,8 @@ class GwVisit(QObject):
         self.current_visit.visitcat_id = tools_qt.get_combo_value(self.dlg_add_visit, 'visitcat_id', 0)
         self.current_visit.descript = tools_qt.get_text(self.dlg_add_visit, 'descript', False, False)
         self.current_visit.status = tools_qt.get_combo_value(self.dlg_add_visit, 'status', 0)
+        if self.expl_id is None:
+            self.expl_id = tools_qt.get_combo_value(self.dlg_add_visit, self.exploitation)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
 
@@ -1139,6 +1145,26 @@ class GwVisit(QObject):
                        f"WHERE id = '{visit_id}'")
                 status = tools_db.get_row(sql)
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
+
+        # Fill ComboBox exploitation
+        sql = "SELECT exploitation.expl_id, name FROM selector_expl JOIN exploitation USING (expl_id) " \
+              "WHERE cur_user=current_user"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.exploitation, rows, 1, sort_by=0)
+            if visit_id is None:
+                if self.expl_id is not None:
+                    tools_qt.set_combo_value(self.exploitation, self.expl_id, 0, add_new=False)
+                else:
+                    default_expl = tools_gw.get_config_parser('btn_add_visit', 'expl_id', "user", "session")
+                    if default_expl not in (None, 'None', ''):
+                        tools_qt.set_combo_value(self.exploitation, default_expl, 0, add_new=False)
+            else:
+                sql = (f"SELECT expl_id "
+                       f"FROM om_visit "
+                       f"WHERE id = '{visit_id}'")
+                row = tools_db.get_row(sql)
+                tools_qt.set_combo_value(self.exploitation, row[0], 0)
 
         # Relations tab
         # fill feature_type

@@ -114,7 +114,7 @@ class GwSelector:
             return False
 
         # Get styles
-        stylesheet = json_result['body']['form']['style']
+        stylesheet = json_result['body']['form']['style'] if 'style' in json_result['body']['form'] else None
         color_rows = False
         if stylesheet:
             # Color selectors zebra-styled
