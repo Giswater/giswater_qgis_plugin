@@ -123,12 +123,12 @@ BEGIN
 		WHEN rec_table.tablename = 'vi_coordinates' THEN
 			-- on the fly transformation of epsg
 			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_coordinates', 
-			node_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_coordinates;
+			node_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_coordinates;
 
 		WHEN rec_table.tablename = 'vi_vertices' THEN
 			-- on the fly transformation of epsg
 			INSERT INTO temp_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_vertices', 
-			arc_id, ST_x(ST_transform(the_geom, v_client_epsg)), ST_y(ST_transform(the_geom, v_client_epsg))  FROM vi_vertices;
+			arc_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_vertices;
 		ELSE
 			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||';';
