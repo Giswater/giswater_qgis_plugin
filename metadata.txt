@@ -9,6 +9,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.5.020
+    - Improve schema creation (more precise progress bar)
     - Improve management of signals
     - Minor enhancement and minor bug fix
 
