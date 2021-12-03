@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import QSettings
 
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
+from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis
 
 
@@ -53,7 +54,8 @@ class GwDimensioningButton(GwMaptool):
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool
-            self.layer.featureAdded.connect(self._open_new_dimensioning)
+            tools_gw.connect_signal(self.layer.featureAdded, self._open_new_dimensioning,
+                                    'dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
 
     # endregion
 
@@ -77,6 +79,7 @@ class GwDimensioningButton(GwMaptool):
         self.dimensioning = GwDimensioning()
         self.dimensioning.points = list_points
         self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
+        tools_gw.disconnect_signal('dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
         super().deactivate()
 
     # endregion

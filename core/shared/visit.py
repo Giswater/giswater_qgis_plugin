@@ -538,9 +538,13 @@ class GwVisit(QObject):
             widget_name = f'tbl_visit_x_{self.feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
+            tools_gw.disconnect_signal('visit')
+            tools_gw.connect_signal(global_vars.canvas.selectionChanged,
+                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                    'visit', 'set_locked_relation_canvas_selectionChanged')
             tools_qgis.select_features_by_ids(self.feature_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
+            tools_gw.disconnect_signal('visit')
 
 
     def _manage_accepted(self):
@@ -558,6 +562,7 @@ class GwVisit(QObject):
             tools_gw.set_config_parser('btn_add_visit', 'expl_id', expl_value)
         # Remove all previous selections
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('visit')
         self.layers = tools_gw.remove_selection(layers=self.layers)
 
         # Update geometry field (if user have selected a point)
@@ -614,6 +619,7 @@ class GwVisit(QObject):
 
             # Remove all previous selections
             tools_qgis.disconnect_signal_selection_changed()
+            tools_gw.disconnect_signal('visit')
             self.layers = tools_gw.remove_selection(layers=self.layers)
         except Exception as e:
             tools_log.log_info(f"manage_rejected: {e}")
@@ -1046,9 +1052,13 @@ class GwVisit(QObject):
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
+        tools_gw.disconnect_signal('visit')
+        tools_gw.connect_signal(global_vars.canvas.selectionChanged,
+                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                'visit', 'get_features_visit_feature_type_canvas_selectionChanged')
         tools_qgis.select_features_by_ids(feature_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('visit')
 
 
     def _filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):

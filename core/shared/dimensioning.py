@@ -78,10 +78,12 @@ class GwDimensioning:
         tools_gw.add_icon(action_orientation, "133")
 
         # LAYER SIGNALS
-        self.layer_dimensions.editingStarted.connect(
-            partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
-        self.layer_dimensions.editingStopped.connect(
-            partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
+        tools_gw.connect_signal(self.layer_dimensions.editingStarted,
+                                partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']),
+                                'dimensioning', 'open_dimensioning_form_layer_dimensions_editingStarted_enable_all')
+        tools_gw.connect_signal(self.layer_dimensions.editingStopped,
+                                partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False),
+                                'dimensioning', 'open_dimensioning_form_layer_dimensions_editingStopped_enable_widgets')
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(
@@ -153,6 +155,7 @@ class GwDimensioning:
         if action_orientation.isChecked():
             action_orientation.trigger()
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
+        tools_gw.disconnect_signal('dimensioning')
         tools_gw.close_dialog(self.dlg_dim)
 
 
@@ -225,6 +228,8 @@ class GwDimensioning:
     def _snapping(self, action):
 
         # Set active layer and set signals
+        tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+        tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         if self._deactivate_signals(action, emit_point):
@@ -242,8 +247,10 @@ class GwDimensioning:
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.xyCoordinates.connect(self._mouse_move)
-        emit_point.canvasClicked.connect(partial(self._click_button_snapping, action, emit_point))
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move,
+                                'dimensioning', 'snapping_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._click_button_snapping, action, emit_point),
+                                'dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
 
 
     def _mouse_move(self, point):
@@ -269,6 +276,8 @@ class GwDimensioning:
         if btn == Qt.RightButton:
             if btn == Qt.RightButton:
                 action.setChecked(False)
+                tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+                tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
                 self._deactivate_signals(action, emit_point)
                 return
 
@@ -321,12 +330,16 @@ class GwDimensioning:
             tools_qt.set_widget_text(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.restore_snap_options(self.previous_snapping)
+            tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
+            tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
             self._deactivate_signals(action, emit_point)
             action.setChecked(False)
 
 
     def _orientation(self, action):
 
+        tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+        tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         if self._deactivate_signals(action, emit_point):
@@ -343,8 +356,10 @@ class GwDimensioning:
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
-        self.canvas.xyCoordinates.connect(self._canvas_move_event)
-        emit_point.canvasClicked.connect(partial(self._click_button_orientation, action, emit_point))
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._canvas_move_event,
+                                'dimensioning', 'orientation_xyCoordinates_canvas_move_event')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._click_button_orientation, action, emit_point),
+                                'dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
 
 
     def _canvas_move_event(self, point):
@@ -364,6 +379,8 @@ class GwDimensioning:
 
         if btn == Qt.RightButton:
             action.setChecked(False)
+            tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+            tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
             self._deactivate_signals(action, emit_point)
             return
 
@@ -373,6 +390,8 @@ class GwDimensioning:
         self.y_symbol.setText(str(int(point.y())))
 
         self.snapper_manager.restore_snap_options(self.previous_snapping)
+        tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
+        tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
         self._deactivate_signals(action, emit_point)
         action.setChecked(False)
 
@@ -384,14 +403,20 @@ class GwDimensioning:
         if not row or row[0].lower() != 'true':
             return
 
+        tools_gw.disconnect_signal('dimensioning', 'create_map_tips_timer_map_tips_timeout_show_map_tip')
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()
         self.map_tip_connec = QgsMapTip()
 
-        self.canvas.xyCoordinates.connect(self._map_tip_changed)
-        self.timer_map_tips.timeout.connect(self._show_map_tip)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._map_tip_changed,
+                                'dimensioning', 'create_map_tips_xyCoordinates_map_tip_changed')
+        tools_gw.connect_signal(self.timer_map_tips.timeout, self._show_map_tip,
+                                'dimensioning', 'create_map_tips_timer_map_tips_timeout_show_map_tip')
+
+        tools_gw.disconnect_signal('dimensioning', 'create_map_tips_timer_map_tips_clear_timeout_clear_map_tip')
         self.timer_map_tips_clear = QTimer(self.canvas)
-        self.timer_map_tips_clear.timeout.connect(self._clear_map_tip)
+        tools_gw.connect_signal(self.timer_map_tips_clear.timeout, self._clear_map_tip,
+                                'dimensioning', 'create_map_tips_timer_map_tips_clear_timeout_clear_map_tip')
 
 
     def _map_tip_changed(self, point):

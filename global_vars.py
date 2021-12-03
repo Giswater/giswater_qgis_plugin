@@ -61,7 +61,8 @@ user_level = {                          # An instance used to know user level an
     'showquestion': None,               # Used for show help (default config show for level 1 and 2)
     'showsnapmessage': None,            # Used to indicate to the user that they can snapping
     'showselectmessage': None,          # Used to indicate to the user that they can select
-    'showadminadvanced': None}          # Manage advanced tab, fields manager tab and sample dev radio button from admin
+    'showadminadvanced': None,          # Manage advanced tab, fields manager tab and sample dev radio button from admin
+}
 date_format = None                      # Display format of the dates allowed in the forms: dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd
 feature_cat = None                      # Dictionary to keep every record of table 'cat_feature'. Stored here to avoid executing gw_fct_getcatfeaturevalues multiple times
 # endregion
@@ -80,6 +81,7 @@ session_vars['logged_status'] = None       # An instance of connection status. C
 session_vars['last_focus'] = None          # An instance of the last focused dialog's tag
 snappers = []                              # A list of all the snapper managers, used to disable them in 'Reset plugin' action
 active_rubberbands = []                    # A list of all active rubber bands, used to disable them in 'Reset plugin' action
+active_signals = {}                        # A dictionary containing all connected signals, first key is dlg_name/file_name, then there are all the signal names.
 # endregion
 
 
