@@ -194,40 +194,46 @@ class GwEpaFileManager(GwTask):
 
         if steps == 3:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                         aux_conn=self.aux_conn, is_thread=True)
                 if self.isCanceled():
                     return False
                 if json_result is not None:
                     self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                     json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
-                                                             is_thread=True)
+                                                             aux_conn=self.aux_conn, is_thread=True)
                     if self.isCanceled():
                         return False
         elif steps == 2:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                         aux_conn=self.aux_conn, is_thread=True)
                 if self.isCanceled():
                     return False
 
         elif steps == 1:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
         else:  # steps == 0
             extras += f', "step": 0'
             self.body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True, is_thread=True)
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
 
@@ -505,7 +511,8 @@ class GwEpaFileManager(GwTask):
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
         self.body = tools_gw.create_body(extras=extras)
-        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
+        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
+                                                      aux_conn=self.aux_conn, is_thread=True)
         self.rpt_result = self.json_result
         if self.json_result is None or not self.json_result:
             self.function_failed = True
