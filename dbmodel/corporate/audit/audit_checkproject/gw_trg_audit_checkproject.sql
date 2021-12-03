@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_audit() RETURNS TRIGGER AS $body$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_audit_checkproject() RETURNS TRIGGER AS $body$
 DECLARE
     v_old_data json;
     v_new_data json;
@@ -35,7 +35,7 @@ BEGIN
         elev1, elev2, losses, 'SCHEMA_NAME'
         FROM anl_arc WHERE fid=NEW.fid AND cur_user=current_user;
 
-        INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
+        INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
         state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
         descript, result_id, total_distance, sys_type, code, cat_geom1, 
         elevation, elev, depth, state_type, sector_id, losses, schema)
@@ -54,7 +54,7 @@ LANGUAGE plpgsql;
 
 
 
-CREATE TRIGGER gw_trg_audit
+CREATE TRIGGER gw_trg_audit_checkproject
   AFTER INSERT ON SCHEMA_NAME.audit_fid_log
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_audit();
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_audit_checkproject();
