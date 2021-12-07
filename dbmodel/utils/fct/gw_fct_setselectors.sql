@@ -59,6 +59,7 @@ v_sector integer;
 v_sectorfromexpl boolean;
 v_explfromsector boolean;
 v_sectorfrommacroexpl boolean;
+v_explmuni text;
 
 BEGIN
 
@@ -124,10 +125,16 @@ BEGIN
 		v_tablename = v_parameter_selector->>'selector';
 		v_columnname = v_parameter_selector->>'selector_id'; 
 
-		v_id = (SELECT expl_id FROM exploitation e, ext_municipality m 
+		v_explmuni = (SELECT expl_id FROM exploitation e, ext_municipality m 
 			WHERE e.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
+
+		IF v_explmuni IS NULL THEN 
+			v_explmuni = (SELECT expl_id FROM exploitation e, ext_municipality m 
+			WHERE e.active IS TRUE AND st_dwithin(ST_GeneratePoints(e.the_geom, 1), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
+		END IF;
+
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
-		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';	
+		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''')';	
 	END IF;
 
 /*
