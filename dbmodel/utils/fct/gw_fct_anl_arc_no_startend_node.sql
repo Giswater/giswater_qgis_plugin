@@ -46,7 +46,8 @@ v_partcount integer = 0;
 v_totcount integer = 0;
 v_version text;
 v_error_context text;
-v_count integer;
+v_count_state1 integer;
+v_count_state2 integer;
 
 BEGIN
 
@@ -84,21 +85,39 @@ BEGIN
 	LOOP 
 	
 		v_partcount = v_partcount +1;
-	
-		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
-		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
-		IF nodeRecord1 IS NULL 	THEN
-			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
-		END IF;
-	
-		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
-		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
-		IF nodeRecord2 IS NULL 	THEN
-			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
-		END IF;
+		IF arc_rec.state = 1 THEN
+			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
+			ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
+			IF nodeRecord1 IS NULL 	THEN
+				INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
+				SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			END IF;
 		
+			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
+			ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
+			IF nodeRecord2 IS NULL 	THEN
+				INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
+				SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			END IF;
+		ELSIF arc_rec.state = 2 THEN
+
+			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND 
+			(node.state=2 or node.state=1)
+			ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
+			IF nodeRecord1 IS NULL 	THEN
+				INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
+				SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			END IF;
+		
+			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND 
+			(node.state=2 or node.state=1)
+			ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
+			IF nodeRecord2 IS NULL 	THEN
+				INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
+				SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			END IF;
+		END IF;
+
 		RAISE NOTICE 'Progress %', (v_partcount::float*100/v_totcount::float)::numeric (5,2);
 		
 	END LOOP;
@@ -141,18 +160,30 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
-	SELECT count(*) INTO v_count FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103;
+	SELECT count(*) INTO v_count_state1 FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state = 1;
+	SELECT count(*) INTO v_count_state2 FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state = 2;
 
-	IF v_count = 0 THEN
+	IF v_count_state1 = 0 AND v_count_state2 = 0 THEN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (103,  'There are no arcs without final nodes.', v_count);
+		VALUES (103,  'There are no arcs without final nodes.', 0);
 	ELSE
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (103,  concat ('There are ',v_count,' arcs without final nodes.'), v_count);
+		IF v_count_state1 > 0 THEN
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			VALUES (103,  concat ('There are ',v_count_state1,' arcs with state 1 without final nodes.'), v_count_state1);
 
-		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
-		FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103;
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state1 
+			FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state=1;
+		END IF;
+
+		IF v_count_state2 > 0 THEN
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			VALUES (103,  concat ('There are ',v_count_state2,' arcs  with state 2 without final nodes.'), v_count_state2);
+
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count_state2 
+			FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103 AND state=2;
+		END IF;
 	END IF;
 	
 	-- info
