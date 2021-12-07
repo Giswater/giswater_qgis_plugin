@@ -195,7 +195,6 @@ BEGIN
 				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
 			END IF;
 		ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
-		raise notice '11';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3192", "function":"1344","debug_msg":""}}$$);';
 		ELSE
