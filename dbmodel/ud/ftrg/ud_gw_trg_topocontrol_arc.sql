@@ -99,6 +99,10 @@ BEGIN
 			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
+
+					-- looking for arc that are trying to connect with planified node
+						OR (NEW.state=1 AND node.state=2)
+
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
@@ -119,6 +123,9 @@ BEGIN
 			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
+
+					-- looking for arc that are trying to connect with planified node
+						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -143,6 +150,9 @@ BEGIN
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
+					-- looking for arc that are trying to connect with planified node
+						OR (NEW.state=1 AND node.state=2)
+
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
@@ -162,6 +172,9 @@ BEGIN
 			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
+
+					-- looking for arc that are trying to connect with planified node
+						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -192,6 +205,11 @@ BEGIN
 				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
 				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
 			END IF;
+
+		ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3192", "function":"1344","debug_msg":""}}$$);';
+			
 		ELSE
 
 			-- node_1

@@ -21,3 +21,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, vdefault, datatype, ismandatory)
 VALUES ('edit_typevalue_fk_disable', 'hidden', 'Used on code to disable fk in order to enhance performance for grafanalytics mapzones', 'role_basic', 'utils','FALSE','boolean',true) 
 ON CONFLICT (id) DO NOTHING;
+
+--2021/12/07
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES ('3192', 'It is not possible to connect on service arc with a planified node', 'Reconnect arc with node state 1', 2, TRUE, 'utils', NULL)
+ON CONFLICT (id) DO NOTHING;
