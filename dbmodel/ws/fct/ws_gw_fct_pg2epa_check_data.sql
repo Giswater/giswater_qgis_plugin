@@ -204,18 +204,18 @@ BEGIN
 	
 
 	RAISE NOTICE '8 - Node2arcs with more than two arcs (fid: 166)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-		SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
-		SELECT node_id, nodecat_id, node.the_geom FROM node
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+		SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs', expl_id FROM (
+		SELECT node_id, nodecat_id, node.the_geom, node.expl_id FROM node
 		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_1
 		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP')
 		UNION ALL
-		SELECT node_id, nodecat_id, node.the_geom FROM node
+		SELECT node_id, nodecat_id, node.the_geom, node.expl_id FROM node
 		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_2
 		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'))a
-	GROUP by node_id, nodecat_id, the_geom
+	GROUP by node_id, nodecat_id, the_geom, expl_id
 	HAVING count(*) > 2;
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 166 AND cur_user=current_user;
@@ -598,8 +598,8 @@ BEGIN
 
 
 	RAISE NOTICE '22 - valves with more than two arcs (293)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 293, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs'
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	select 293, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs', expl_id
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id 
