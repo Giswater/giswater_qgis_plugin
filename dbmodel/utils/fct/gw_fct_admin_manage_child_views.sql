@@ -21,15 +21,15 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 --only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from ONE UNIQUE parent
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"gully", "systemId":"CONDUIT"},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"connec_matcat_id" }}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"NODE"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 
 --only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from ONE UNIQUE MAN-TABLE
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"CONDUIT"},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"inlet_offset" }}$$);
 
 --only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"catFeature":"PIPE"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 
 --delete views & config_form_fields information
