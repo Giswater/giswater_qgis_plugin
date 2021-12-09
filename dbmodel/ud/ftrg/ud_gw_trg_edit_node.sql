@@ -77,9 +77,6 @@ BEGIN
 	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
-	EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-	FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
-	INTO v_doublegeometry, v_doublegeom_buffer;
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -95,6 +92,12 @@ BEGIN
 		IF (SELECT matcat_id FROM cat_node WHERE id = NEW.nodecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
+        
+        --check if feature is double geom	
+        EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+        FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
+        INTO v_doublegeometry, v_doublegeom_buffer;
+        
 	END IF;
 
 
