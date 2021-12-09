@@ -1139,6 +1139,9 @@ class GwAdminButton:
     def _check_project_name(self, project_name, project_descript):
         """ Check if @project_name and @project_descript are is valid """
 
+        sql = f"SELECT word FROM pg_get_keywords() ORDER BY 1;"
+        pg_keywords = tools_db.get_rows(sql, commit=False)
+
         # Check if project name is valid
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
@@ -1150,6 +1153,10 @@ class GwAdminButton:
             return False
         elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
             msg = "The 'Project_name' field have invalid character"
+            tools_qt.show_info_box(msg, "Info")
+            return False
+        elif [project_name] in pg_keywords:
+            msg = "The 'Project_name' field is a PostgreSQL reserved keyword"
             tools_qt.show_info_box(msg, "Info")
             return False
         if project_descript == 'null':
