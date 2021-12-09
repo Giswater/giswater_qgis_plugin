@@ -207,10 +207,12 @@ BEGIN
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 		SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
 		SELECT node_id, nodecat_id, node.the_geom FROM node
+		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_1
 		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP')
 		UNION ALL
 		SELECT node_id, nodecat_id, node.the_geom FROM node
+		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_2
 		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'))a
 	GROUP by node_id, nodecat_id, the_geom
