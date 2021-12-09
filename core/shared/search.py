@@ -48,9 +48,7 @@ class GwSearch:
 
     def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
 
-        # If docker search is already opened, don't let user open another one
-        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
-        if not load_project and docker_search and dlg_mincut is None:
+        if not load_project and dlg_mincut is None:
             return
 
         # If dlg_search is not None we are going to open search independently.
