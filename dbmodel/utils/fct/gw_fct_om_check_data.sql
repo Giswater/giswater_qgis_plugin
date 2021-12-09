@@ -24,7 +24,7 @@ SELECT gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424
+	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424
 
 */
 
@@ -78,7 +78,7 @@ BEGIN
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187,202);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202);
 	DELETE FROM temp_arc;
 
 	-- Starting process
@@ -1145,6 +1145,24 @@ BEGIN
 			VALUES (125, 1, '429','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
 		END IF;
 	END IF;
+
+	RAISE NOTICE '40 - Check nodes duplicated(106)';
+
+	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 106, t1.the_geom
+	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 106, node_1, nodecat_1, ''Duplicated nodes'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '106', concat('ERROR-106 (anl_node): There is/are ',v_count,' nodes duplicated.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '106','INFO: There are  no nodes duplicated',v_count);
+	END IF;
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
@@ -1171,7 +1189,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT node_id as id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"()
-	AND fid IN (177,187, 202)
+	AND fid IN (106,177,187,202)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291)) row) features;
