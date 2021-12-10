@@ -1834,20 +1834,20 @@ class GwAdminButton:
                 self.progress_value = int(self.progress_value * self.progress_ratio)
                 self.task_create_schema.set_progress(self.progress_value)
 
+            if self.task_create_schema.isCanceled():
+                return False
+
             filepath = os.path.join(filedir, file)
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
-                if self.dev_commit is True:
-                    status = tools_db.execute_sql(str(f_to_read), filepath=filepath)
-                else:
-                    status = tools_db.execute_sql(str(f_to_read), commit=False, filepath=filepath)
+                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit)
 
                 if status is False:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(f"_read_execute_file error {filepath}")
                     tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
-                    if self.dev_commit is True:
+                    if self.dev_commit is False:
                         global_vars.dao.rollback()
                     return False
 
@@ -1855,7 +1855,7 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
-            if self.dev_commit is True:
+            if self.dev_commit is False:
                 global_vars.dao.rollback()
             status = False
 

@@ -120,27 +120,27 @@ class GwCreateSchemaTask(GwTask):
         tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
 
         status = self.admin.load_base(self.dict_folders_process['load_base'])
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = self.admin.load_locale()
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = self.admin.update_30to31(True, project_type)
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = self.admin.load_views()
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = self.admin.load_trg()
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = self.admin.update_31to39(True, project_type)
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         status = True
@@ -149,7 +149,7 @@ class GwCreateSchemaTask(GwTask):
             status = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
 
-        if not status and self.admin.dev_commit is False:
+        if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
         return True
