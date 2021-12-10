@@ -2662,8 +2662,14 @@ class GwAdminButton:
     def _insert_inp_into_db(self, folder_path=None):
         """"""
 
-        _file = open(folder_path, "r+", encoding='utf8')
-        full_file = _file.readlines()
+        _file = None
+        try:
+            _file = open(folder_path, "r+", encoding='utf8')
+            full_file = _file.readlines()
+        except UnicodeDecodeError:
+            _file.close()
+            _file = open(folder_path, "r+", encoding='latin-1')
+            full_file = _file.readlines()
         sql = ""
         progress = 0
         target = ""
