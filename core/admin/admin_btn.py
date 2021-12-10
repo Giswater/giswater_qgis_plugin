@@ -452,7 +452,7 @@ class GwAdminButton:
         tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
         # Set shortcut keys
-        self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project))
+        self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project, False))
 
         # Get database connection name
         self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
@@ -1522,7 +1522,7 @@ class GwAdminButton:
 
     def _close_dialog_admin(self, dlg):
         """ Close dialog """
-        tools_gw.close_dialog(dlg)
+        tools_gw.close_dialog(dlg, delete_dlg=False)
         self.schema = None
 
 
