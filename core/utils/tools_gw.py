@@ -254,16 +254,17 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg):
+def close_dialog(dlg, delete_dlg=True):
     """ Close dialog """
 
     save_settings(dlg)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
-    try:
-        dlg.deleteLater()
-    except RuntimeError:
-        pass
+    if delete_dlg:
+        try:
+            dlg.deleteLater()
+        except RuntimeError:
+            pass
 
 
 def connect_signal(obj, pfunc, section, signal_name):
