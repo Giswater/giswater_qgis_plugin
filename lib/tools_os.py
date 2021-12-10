@@ -12,6 +12,7 @@ import sys
 import subprocess
 import urllib.parse as parse
 import webbrowser
+from chardet import detect
 
 from qgis.PyQt.QtWidgets import QFileDialog
 
@@ -65,6 +66,12 @@ def open_file(file_path):
         return True, None
     except Exception:
         return False, None
+
+
+def get_encoding_type(file_path):
+    with open(file_path, 'rb') as f:
+        rawdata = f.read()
+    return detect(rawdata)['encoding']
 
 
 def get_relative_path(filepath, levels=1):
