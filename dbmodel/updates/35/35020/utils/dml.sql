@@ -26,3 +26,11 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES ('3192', 'It is not possible to connect on service arc with a planified node', 'Reconnect arc with node state 1', 2, TRUE, 'utils', NULL)
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET inputparams='[{"widgetname":"selectionMode", "label":"Selection mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["userSelectors"],
+"comboNames":["Users selection (expl & state & psector)"], "selectedId":"userSelectors"}]' WHERE id=2670;
+
+UPDATE config_toolbox SET inputparams='[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
+"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"},
+{"widgetname":"selectionMode", "label":"Selection mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["userSelectors"],
+"comboNames":["Users selection (expl & state & psector)"], "selectedId":"userSelectors"}]' WHERE id=2790;

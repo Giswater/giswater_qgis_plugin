@@ -2,3 +2,6 @@
 *************
 - New check to control missed material for arcs
 - Minor adjustment of message on check-data-result
+- Only enable 'User Selectors' as execution mode on Check OM data and Check grafanalytics from toolbox
+- Add fid 106 (nodes duplicated) on Check OM data function
+- Enhance trg_edit_link to prevent error when one connect find itself as end point
