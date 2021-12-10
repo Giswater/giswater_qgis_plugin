@@ -65,7 +65,8 @@ class GwSnapManager(object):
         """ Store the project user snapping configuration """
 
         # Get an array containing the snapping options for all the layers
-        self.previous_snapping = self.get_snapping_options()
+        self.snapping_config = self.get_snapping_options()
+        self.previous_snapping = self.snapping_config
 
 
     def set_snapping_status(self, enable=False):
