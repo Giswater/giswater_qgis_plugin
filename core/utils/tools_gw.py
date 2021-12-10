@@ -260,7 +260,10 @@ def close_dialog(dlg):
     save_settings(dlg)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
-    dlg.deleteLater()
+    try:
+        dlg.deleteLater()
+    except RuntimeError:
+        pass
 
 
 def connect_signal(obj, pfunc, section, signal_name):
