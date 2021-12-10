@@ -2662,14 +2662,30 @@ class GwAdminButton:
     def _insert_inp_into_db(self, folder_path=None):
         """"""
 
-        _file = None
+        # Convert any file codec to utf-8
+        BLOCKSIZE = 1048576  # This is the number of bytes that will be read at a time (for handling big files)
+        srcfile = folder_path
+        trgfile = f"{folder_path}_utf8"
+        from_codec = tools_os.get_encoding_type(folder_path)  # Get file codec
+
         try:
-            _file = open(folder_path, "r+", encoding='utf8')
-            full_file = _file.readlines()
+            with open(srcfile, 'r', encoding=from_codec) as f, open(trgfile, 'w', encoding='utf-8') as e:
+                while True:
+                    text = f.read(BLOCKSIZE)
+                    if not text:
+                        break
+                    e.write(text)
+
+            os.remove(srcfile)  # remove old encoding file
+            os.rename(trgfile, srcfile)  # rename new encoding
         except UnicodeDecodeError:
-            _file.close()
-            _file = open(folder_path, "r+", encoding='latin-1')
-            full_file = _file.readlines()
+            tools_qgis.show_warning('Decode error reading inp file')
+        except UnicodeEncodeError:
+            tools_qgis.show_warning('Encode error reading inp file')
+
+        # Read the file
+        _file = open(folder_path, "r+", encoding='utf8')
+        full_file = _file.readlines()
         sql = ""
         progress = 0
         target = ""
