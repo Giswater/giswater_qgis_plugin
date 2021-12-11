@@ -176,7 +176,6 @@ BEGIN
 			IF NEW.shape='IRREGULAR' THEN
 				v_catalog = concat(NEW.shape::varchar(9),'-',NEW.other1::varchar(12));
 				UPDATE arc SET arccat_id=v_catalog WHERE arc_id=NEW.arc_id;
-				INSERT INTO inp_conduit (arc_id) VALUES (NEW.arc_id);
 				INSERT INTO cat_arc (id, shape, tsect_id) 
 				VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::varchar(16)) ON CONFLICT (id) DO nothing;
 								
