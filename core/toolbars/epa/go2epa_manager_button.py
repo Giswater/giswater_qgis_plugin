@@ -82,15 +82,15 @@ class GwGo2EpaManagerButton(GwAction):
 
         # Get column index for column export_options
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
-        export_options = json.loads(row[col_ind].data())
+        export_options = json.loads(f'{row[col_ind].data()}')
 
         # Get column index for column network_stats
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
-        network_stats = json.loads(row[col_ind].data())
+        network_stats = json.loads(f'{row[col_ind].data()}')
 
         # Get column index for column inp_options
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
-        inp_options = json.loads(row[col_ind].data())
+        inp_options = json.loads(f'{row[col_ind].data()}')
 
         # Construct message with all data rows
         msg += f"<b>Export Options: </b> <br>"
