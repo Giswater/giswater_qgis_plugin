@@ -236,6 +236,8 @@ class GwPrintButton(GwAction):
         composer_templates = []
         active_composers = tools_qgis.get_composers_list()
         for composer in active_composers:
+            if not isinstance(composer, QgsPrintLayout):
+                continue
             composer_map = []
             composer_template = {'ComposerTemplate': composer.name()}
             index = 0
