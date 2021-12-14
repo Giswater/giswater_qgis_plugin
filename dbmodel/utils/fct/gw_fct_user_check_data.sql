@@ -186,7 +186,8 @@ BEGIN
 		INSERT INTO audit_fid_log (fid, fcount, criticity)
 		SELECT result_id::integer, fcount, criticity
 		FROM audit_check_data
-		WHERE fid=101 AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') ;
+		WHERE fid=101 AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') 
+		AND result_id NOT IN ('349', '350', '351', '352', '353');
 	END IF;
 	-- get results
 	-- info
