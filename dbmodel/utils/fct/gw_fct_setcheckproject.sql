@@ -438,6 +438,8 @@ BEGIN
 			
 		END IF;
 
+		IF v_isaudit IS NULL THEN v_isaudit='false'; END IF;
+		
 		EXECUTE 'SELECT gw_fct_user_check_data($${"client":
 		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||'}}}$$)::text';
