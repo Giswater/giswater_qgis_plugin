@@ -9,3 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/30
 UPDATE sys_table SET id = 'inp_snowpack_value' WHERE id = 'inp_snowpack_values';
+
+UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, descript AS idval FROM cat_mat_arc WHERE id IS NOT NULL',
+iseditable=true, dv_isnullvalue=true
+WHERE formname='v_edit_connec' AND columnname='matcat_id';
