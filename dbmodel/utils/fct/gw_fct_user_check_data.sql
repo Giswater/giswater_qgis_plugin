@@ -17,11 +17,11 @@ $BODY$
 
 	SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
 	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats","isAudit":false}}}$$)::text
+	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":true, "selectionMode":"userSelectors"}}}$$)::text
 
 	--Project - audit_check_project - only errors
 	--User - errors and info
-	--Stats - errors and info for statistics (data copied to audit_fid_log)
+	--isAudit - errors and info for statistics (data copied to audit_fid_log)
 
 -- fid: 251
 
@@ -47,6 +47,8 @@ v_infotext text;
 rec_selector json;
 v_selector_value json;
 v_selector_name text;
+v_selection_mode text;
+v_cur_expl json;
 
 v_result_id text;
 v_result text;
@@ -64,9 +66,17 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
-	v_log_project = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'checkType')::text;
-	v_isaudit = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'isAudit')::boolean;
-	
+	v_log_project = json_extract_path_text(p_data,'data','parameters','checkType');
+	v_isaudit = json_extract_path_text(p_data,'data','parameters','isAudit')::boolean;
+	v_selection_mode = json_extract_path_text(p_data,'data','parameters','selectionMode')::text;
+
+	--if in schema audit doesnt exist or doesnt have table audit_fid_log - switch off audit option
+	IF v_isaudit IS TRUE and 
+	(SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'audit' AND table_name = 'audit_fid_log')) is false THEN
+		v_isaudit=FALSE;
+	END IF;
+
+	--if project check is executed look only for possible errors, if it's users check - look for info and errors
 	IF v_log_project = 'Project' THEN
 		v_target= '''ERROR''';
 	ELSE
@@ -92,19 +102,26 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
 	
-	-- save state & expl selector
-	DELETE FROM temp_table WHERE fid=251 AND cur_user=current_user;
-	INSERT INTO temp_table (fid, addparam)   
-	SELECT 251, json_agg(s.selector_conf)  FROM (
-	select jsonb_build_object('selector_expl', array_agg(expl_id))  as selector_conf
-	FROM selector_expl where cur_user=current_user 
-	UNION
-	select jsonb_build_object('selector_state', array_agg(state_id)) as selector_conf 
-	FROM selector_state where cur_user=current_user)s;
+		-- save state & expl selector
+	IF v_selection_mode !='userSelectors' THEN
+		DELETE FROM temp_table WHERE fid=251 AND cur_user=current_user;
+		INSERT INTO temp_table (fid, addparam)   
+		SELECT 251, json_agg(s.selector_conf)  FROM (
+		select jsonb_build_object('selector_expl', array_agg(expl_id))  as selector_conf
+		FROM selector_expl where cur_user=current_user 
+		UNION
+		select jsonb_build_object('selector_state', array_agg(state_id)) as selector_conf 
+		FROM selector_state where cur_user=current_user)s;
 
-	INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
-	INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
+		
+		INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
+		INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
+	END IF;
 
+	EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
+	FROM (SELECT expl_id FROM selector_expl) a'
+	INTO v_cur_expl;
+	
 	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
 		
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'warning' INTO v_warning_val;
@@ -122,7 +139,6 @@ BEGIN
 			''groupBy'', a.'||v_groupby||') AS feature
 			FROM ('||rec.querytext||')a) features;'
 			INTO json_result;
-					raise notice 'json_result,%',json_result;
 		END IF;
 
 		v_count = round(v_countquery::float);
@@ -144,9 +160,9 @@ BEGIN
 		END IF;
 		
 		IF v_groupby IS NULL THEN
-			IF v_log_project = 'Stats' THEN
-				INSERT INTO audit_fid_log (fid, fcount, criticity)
-				VALUES (rec.fid,  v_count::integer, v_criticity);
+			IF v_isaudit IS TRUE THEN
+				INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
+				VALUES (rec.fid,  v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
 			END IF;
 			INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  fcount)
 			SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name, ': ',v_count), v_count::integer
@@ -155,9 +171,9 @@ BEGIN
 		ELSIF json_result IS NOT NULL AND v_groupby IS NOT NULL THEN
 			FOREACH rec_result IN ARRAY(json_result) LOOP
 			
-				IF v_log_project = 'Stats'  THEN
-					INSERT INTO audit_fid_log (fid, fcount, criticity, groupby)
-					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'));
+				IF v_isaudit IS TRUE  THEN
+					INSERT INTO audit_fid_log (fid, fcount, criticity, groupby, source)
+					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
 				END IF;
 
 				INSERT INTO audit_check_data(fid, result_id, criticity, error_message, fcount)
@@ -168,27 +184,58 @@ BEGIN
 	END LOOP;
 	
 	--restore selectors
-	FOR rec_selector IN (select json_array_elements(addparam) from temp_table where fid=251) LOOP
-		raise notice 'rec_selector,%',rec_selector;
-		v_selector_name = json_object_keys(rec_selector);
+	IF v_selection_mode !='userSelectors' THEN
+		FOR rec_selector IN (select json_array_elements(addparam) from temp_table where fid=251) LOOP
 
-		--remove values for selector
-		EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
-		
-		v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
-	--insert previous values for selector
-		EXECUTE 'INSERT INTO '||v_selector_name||'
-		SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''')';
-	END LOOP;
+			v_selector_name = json_object_keys(rec_selector);
+
+			--remove values for selector
+			EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
+			
+			v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
+		--insert previous values for selector
+			EXECUTE 'INSERT INTO '||v_selector_name||'
+			SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''')';
+		END LOOP;
+	END IF;
 
 	--copy errors results from project check
 	IF v_log_project = 'Project' AND v_isaudit IS TRUE THEN
-		INSERT INTO audit_fid_log (fid, fcount, criticity)
-		SELECT result_id::integer, fcount, criticity
+		
+		EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
+		FROM (SELECT expl_id FROM selector_expl) a'
+		INTO v_cur_expl;
+		
+		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
+		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
 		FROM audit_check_data
-		WHERE fid=101 AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') 
+		WHERE fid=101 AND cur_user = current_user 
+		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') 
 		AND result_id NOT IN ('349', '350', '351', '352', '353');
+
+		INSERT INTO audit.anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
+    the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
+    code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, 
+    elev1, elev2, losses,source)
+    SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
+    the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
+    code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, 
+    elev1, elev2, losses, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+    FROM anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
+
+    INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
+    state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
+    descript, result_id, total_distance, sys_type, code, cat_geom1, 
+    elevation, elev, depth, state_type, sector_id, losses, source)
+    SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
+    state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
+    descript, result_id, total_distance, sys_type, code, cat_geom1, 
+    elevation, elev, depth, state_type, sector_id, losses, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+    FROM anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 	END IF;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -224,3 +271,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
