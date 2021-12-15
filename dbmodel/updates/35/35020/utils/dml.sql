@@ -34,3 +34,52 @@ UPDATE config_toolbox SET inputparams='[{"widgetname":"grafClass", "label":"Graf
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"},
 {"widgetname":"selectionMode", "label":"Selection mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["userSelectors"],
 "comboNames":["Users selection (expl & state & psector)"], "selectedId":"userSelectors"}]' WHERE id=2790;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('config_report', 'Configuration table used for raport tool.','role_edit', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('config_table', 'Config table used by plugin to aggrupate result layers','role_admin', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('crm_typevalue', 'Value domain of crm tables','role_admin', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_edit_inp_curve', 'View to edit curves, filteder by sector_id','role_epa', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_edit_inp_curve_value', 'View to edit curve values, filteder by sector_id','role_epa', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_edit_inp_controls', 'View to edit control values, filteder by sector_id','role_epa', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_om_visit', 'Shows all the executed visits."','role_basic', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_ui_doc_x_workcat', 'Shows documents related to workcats. User Interface view."','role_basic', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_ui_om_event', 'Shows all the executed events. User Interface view."','role_basic', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_ui_om_visit_x_doc', 'Shows documents related to visits. User Interface view."','role_basic', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_plan_psector_all', 'Unfiltered view that shows planified sectors','role_master', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+VALUES ('v_rtc_period_hydrometer', 'Shows the hydrometer periods.','role_basic', 0)
+ON CONFLICT (id) DO NOTHING;
+
