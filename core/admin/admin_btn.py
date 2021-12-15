@@ -19,7 +19,8 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget
+    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
+    QGridLayout
 from qgis.core import QgsProject, QgsTask, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
@@ -27,7 +28,8 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
+    GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi, \
+    GwReplaceInFileUi
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
@@ -2026,6 +2028,11 @@ class GwAdminButton:
                     msg = f'The importation process have been failed!<br>See Info log for more details.'
                     self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
+                    if 'replace' in complet_result['body']['data']:
+                        retry = self._build_replace_dlg(complet_result['body']['data']['replace'])
+                        if retry:
+                            return
+                        # return self._execute_import_inp(accepted, project_name, project_type)
                     global_vars.dao.rollback()
                     self.error_count = 0
 
@@ -2051,6 +2058,84 @@ class GwAdminButton:
 
         # Hide button execute
         self.dlg_import_inp.btn_run.setVisible(False)
+
+
+    def _build_replace_dlg(self, replace_json):
+
+        # Build the dialog
+        self.dlg_replace = GwReplaceInFileUi()
+        tools_gw.load_settings(self.dlg_replace)
+        self.dlg_replace.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        # Add a widget for each word to replace
+        self._add_replace_widgets(replace_json)
+
+        # Connect signals
+        self.dlg_replace.buttonBox.accepted.connect(partial(self._dlg_replace_accept))
+        self.dlg_replace.buttonBox.rejected.connect(partial(self.dlg_replace.reject))
+
+        resp = self.dlg_replace.exec_()  # We do exec_() because we want the execution to stop until the dlg is closed
+        print(f"{resp=}")
+        if resp == 0:
+            return False
+        return True
+
+
+    def _add_replace_widgets(self, replace_json):
+        idx = 0
+        for key in replace_json:
+            if replace_json[key]:
+                for i in replace_json[key]:
+                    lbl = QLabel()
+                    lbl.setText(f"{i['csv1']}")
+                    widget = QLineEdit()
+                    widget.setObjectName(f"{i['csv1']}")
+                    field = {"layoutname": 'lyt_replace', "layoutorder": idx}
+
+                    tools_gw.add_widget(self.dlg_replace, field, lbl, widget)
+                    idx += 1
+
+
+    def _dlg_replace_accept(self):
+
+        dict_to_replace = {}
+        for widget in self.dlg_replace.findChildren(QLineEdit):
+            dict_to_replace[f'{widget.objectName()}'] = f'{widget.text()}'
+
+        valid = True
+        for key in dict_to_replace:
+            old = key
+            new = dict_to_replace[key]
+
+            with open(self.file_inp, 'rb', 0) as file, \
+                    mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                if s.find(bytes(new, encoding='utf-8')) != -1:
+                    # if the new word is already on the file
+                    tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                    valid = False
+
+        # If none of the new words are in the file
+        if valid:
+            # Replace the words
+            contents = ""
+            try:
+                # Read the contents of the file
+                with open(self.file_inp, 'r', encoding='utf-8') as file:
+                    contents = file.read()
+                # Replace the words
+                for key in dict_to_replace:
+                    old = key
+                    new = dict_to_replace[key]
+                    contents.replace(old, new)
+                # Write the file with new contents
+                with open(self.file_inp, 'w', encoding='utf-8') as file:
+                    file.write(contents)
+            except Exception as e:
+                tools_log.log_error(f"Exception when replacing inp strings: {e}")
+            del contents
+
+            # Close the dlg
+            self.dlg_replace.accept()
 
 
     def _create_qgis_template(self):

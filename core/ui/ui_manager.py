@@ -417,4 +417,7 @@ FORM_CLASS = _get_ui_class('interpolate.ui')
 class GwInterpolate(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = _get_ui_class('replace_in_file.ui')
+class GwReplaceInFileUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
