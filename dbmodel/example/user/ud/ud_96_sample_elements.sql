@@ -22,6 +22,7 @@ ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk;
 ALTER TABLE node DISABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE gully DISABLE TRIGGER gw_trg_gully_proximity_insert;
+ALTER TABLE gully DISABLE TRIGGER gw_trg_typevalue_fk;
 ALTER TABLE gully DISABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE link DISABLE TRIGGER gw_trg_link_connecrotation_update;
@@ -10411,6 +10412,7 @@ ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk;
 ALTER TABLE node ENABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE gully ENABLE TRIGGER gw_trg_gully_proximity_insert;
+ALTER TABLE gully ENABLE TRIGGER gw_trg_typevalue_fk;
 ALTER TABLE gully ENABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE link ENABLE TRIGGER gw_trg_link_connecrotation_update;
