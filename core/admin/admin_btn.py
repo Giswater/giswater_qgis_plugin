@@ -1841,7 +1841,7 @@ class GwAdminButton:
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
-                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit)
+                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
 
                 if status is False:
                     self.error_count = self.error_count + 1
@@ -1849,6 +1849,9 @@ class GwAdminButton:
                     tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
+                    print("SQL error")
+                    self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
+                    self.task_create_schema.cancel()
                     return False
 
         except Exception as e:
@@ -1857,6 +1860,7 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             if self.dev_commit is False:
                 global_vars.dao.rollback()
+            self.task_create_schema.cancel()
             status = False
 
         finally:

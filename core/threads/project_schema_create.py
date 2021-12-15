@@ -25,6 +25,7 @@ class GwCreateSchemaTask(GwTask):
         self.admin = admin
         self.params = params
         self.dict_folders_process = {}
+        self.db_exception = (None, None, None)  # error, sql, filepath
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_create_project buttons
@@ -77,6 +78,10 @@ class GwCreateSchemaTask(GwTask):
 
         if self.isCanceled():
             self.setProgress(100)
+            # Handle db exception
+            if self.db_exception is not None:
+                error, sql, filepath = self.db_exception
+                tools_qt.manage_exception_db(error, sql, filepath=filepath)
             return
 
         # Handle exception
