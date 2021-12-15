@@ -75,7 +75,7 @@ BEGIN
 		FOR v_table IN SELECT * FROM sys_foreignkey WHERE active IS TRUE
 		LOOP
 			RAISE NOTICE ' v_table %', v_table;
-			IF (SELECT table_type FROM information_schema.tables WHERE  table_schema = 'ws_sample35' 
+			IF (SELECT table_type FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' 
 			AND table_name = v_table.target_table) ='BASE TABLE' THEN
 				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||v_table.target_table||';';
 				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||v_table.target_table||'
