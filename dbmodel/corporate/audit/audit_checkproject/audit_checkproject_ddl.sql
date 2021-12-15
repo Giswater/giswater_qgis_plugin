@@ -19,7 +19,7 @@ CREATE TABLE audit.audit_fid_log
   groupby text,
   criticity integer,
   tstamp timestamp without time zone DEFAULT now(),
-  schema text
+  source json
 );
 
 
@@ -53,7 +53,7 @@ CREATE TABLE audit.anl_arc
   elev2 double precision,
   losses numeric(12,4),
   tstamp timestamp DEFAULT now(),
-  schema text
+  source json
 );
 
 
@@ -87,7 +87,7 @@ CREATE TABLE audit.anl_node
   sector_id integer,
   losses numeric(12,4),
   tstamp timestamp DEFAULT now(),
-  schema text
+  source json
 );
 
 
