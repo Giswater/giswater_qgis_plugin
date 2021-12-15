@@ -2027,7 +2027,7 @@ class GwAdminButton:
 
                     # Close dialog
                     tools_gw.close_dialog(self.dlg_import_inp)
-                    tools_gw.close_dialog(self.dlg_readsql_create_project)
+                    tools_gw.close_dialog(self.dlg_readsql_create_project, False)
                     return
                 self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
             else:
