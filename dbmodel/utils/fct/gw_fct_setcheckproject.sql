@@ -84,6 +84,7 @@ v_logfoldervolume text;
 v_uservalues json;
 v_user_expl text;
 v_isaudit text;
+v_selection_mode text;
 
 BEGIN 
 
@@ -108,6 +109,12 @@ BEGIN
 	v_logfoldervolume := (p_data ->> 'data')::json->> 'logFolderVolume';
 	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
 
+
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+		v_selection_mode = 'userSelectors';
+	ELSE 
+		v_selection_mode = 'wholeSystem';
+	END IF;
 
 	-- profilactic control of qgis variables
 	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
@@ -232,7 +239,6 @@ BEGIN
 	--Reset the rest of sequences
 	FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
 	LOOP 
-		raise notice ' %', v_rectable;
 		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
 		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
@@ -344,13 +350,12 @@ BEGIN
 		END IF;
 	END IF;
 
-
-	-- Check which exploitations have been checked
-	SELECT string_agg(name, ' / ') INTO v_user_expl FROM exploitation JOIN selector_expl USING (expl_id) WHERE cur_user=current_user;
-	v_errortext=concat('Checked exploitation/s: ', v_user_expl);
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-
-
+	IF v_selection_mode = 'userSelectors' THEN
+		-- Check which exploitations have been checked
+		SELECT string_agg(name, ' / ') INTO v_user_expl FROM exploitation JOIN selector_expl USING (expl_id) WHERE cur_user=current_user;
+		v_errortext=concat('Checked exploitation/s: ', v_user_expl);
+		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	END IF;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
@@ -358,7 +363,7 @@ BEGIN
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)';
+			"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'"}}}$$)';
 			-- insert results 
 			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
@@ -371,7 +376,7 @@ BEGIN
 
 				EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":"ALL"}}}$$)';
+				"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "grafClass":"ALL"}}}$$)';
 				-- insert results 
 				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
@@ -442,7 +447,7 @@ BEGIN
 		
 		EXECUTE 'SELECT gw_fct_user_check_data($${"client":
 		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||'}}}$$)::text';
+		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||', "selectionMode":"'||v_selection_mode||'"}}}$$)::text';
 			
 		-- insert results 
 		UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
