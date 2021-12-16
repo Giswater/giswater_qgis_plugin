@@ -802,7 +802,7 @@ BEGIN
 	IF v_replace IS NOT NULL THEN
 		v_replace := '"replace":'||v_replace||',';
 	ELSE
-		v_replace := ''
+		v_replace := '';
 	END IF;
 
 	-- Return
