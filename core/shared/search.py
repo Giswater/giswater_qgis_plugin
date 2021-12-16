@@ -388,7 +388,7 @@ class GwSearch:
             if str(value) == '':
                 return
 
-            qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
+            qgis_project_add_schema = global_vars.project_vars['add_schema']
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
@@ -493,7 +493,7 @@ class GwSearch:
     def _open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
+        qgis_project_infotype = global_vars.project_vars['info_type']
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -644,7 +644,7 @@ class GwSearch:
     def _restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
 
-        qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
                 continue
