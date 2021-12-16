@@ -2031,7 +2031,9 @@ class GwAdminButton:
                     if 'replace' in complet_result['body']['data']:
                         retry = self._build_replace_dlg(complet_result['body']['data']['replace'])
                         if retry:
-                            return
+                            sql = "DELETE FROM temp_csv WHERE fid = 239;"
+                            tools_db.execute_sql(sql, commit=False)
+                            return self._execute_import_inp(accepted, project_name, project_type)
                         # return self._execute_import_inp(accepted, project_name, project_type)
                     global_vars.dao.rollback()
                     self.error_count = 0
@@ -2082,8 +2084,8 @@ class GwAdminButton:
 
 
     def _add_replace_widgets(self, replace_json):
+
         idx = 0
-        print(f"{replace_json=}")
         for item in replace_json:
             for key in item:
                 section = key
@@ -2112,28 +2114,46 @@ class GwAdminButton:
         for widget in self.dlg_replace.findChildren(QLineEdit):
             dict_to_replace[f'{widget.objectName()}'] = f'{widget.text()}'
 
-        valid = True
+        all_valid = True
         for key in dict_to_replace:
+            valid = True
             old = key
             new = dict_to_replace[key]
             if len(new) <= 0:
                 # if the string is empty
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Can\'t be empty')
-                valid = False
+                valid, all_valid = False, False
+            elif len(new) > 16:
+                # if the string is too long
+                tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Must have less than 16 characters')
+                valid, all_valid = False, False
             else:
-                with open(self.file_inp, 'rb', 0) as file, \
-                        mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
-                    if s.find(bytes(new, encoding='utf-8')) != -1:
-                        # if the new word is already on the file
-                        tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
-                        self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
-                        valid = False
+                # Search if the object already exists
+                sql = f"SELECT count(csv1) FROM temp_csv WHERE csv1 = '{new}'"
+                row = tools_db.get_row(sql, log_info=False, commit=False)
+                if row and row[0] is not None:
+                    try:
+                        matches = int(row[0])
+                        if matches > 0:
+                            tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                            self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
+                            valid, all_valid = False, False
+                    except Exception as e:
+                        print(f"{type(e).__name__}: {e}")
+                # with open(self.file_inp, 'rb', 0) as file, \
+                #         mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                #     if s.find(bytes(new, encoding='utf-8')) != -1:
+                #         # if the new word is already on the file
+                #         tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                #         self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
+                #         valid = False
             if valid:
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('')
         # If none of the new words are in the file
-        if valid:
+        if all_valid:
             # Replace the words
             contents = ""
             try:
@@ -2144,7 +2164,7 @@ class GwAdminButton:
                 for key in dict_to_replace:
                     old = key
                     new = dict_to_replace[key]
-                    contents.replace(old, new)
+                    contents = contents.replace(old, new)
                 # Write the file with new contents
                 with open(self.file_inp, 'w', encoding='utf-8') as file:
                     file.write(contents)
