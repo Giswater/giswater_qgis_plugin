@@ -47,8 +47,13 @@ BEGIN
         FOR rec_expl IN EXECUTE 'SELECT expl_id FROM '||v_schema||'.exploitation WHERE active IS TRUE AND expl_id > 0' LOOP
 
             EXECUTE 'DELETE FROM '||v_schema||'.selector_expl WHERE cur_user=current_user';
+            -- by the moment only useful when exploitations and sectors are exactly the same
+            EXECUTE 'DELETE FROM '||v_schema||'.selector_sector WHERE cur_user=current_user';
 
             EXECUTE 'INSERT INTO '||v_schema||'.selector_expl
+            VALUES ('||quote_literal(rec_expl)||', current_user)';
+            -- by the moment only useful when exploitations and sectors are exactly the same
+            EXECUTE 'INSERT INTO '||v_schema||'.selector_sector
             VALUES ('||quote_literal(rec_expl)||', current_user)';
 
             EXECUTE 'SELECT '||v_schema||'.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
@@ -83,9 +88,9 @@ BEGIN
 
 
         --  Exception handling
-    EXCEPTION WHEN OTHERS THEN
+    /*EXCEPTION WHEN OTHERS THEN
     GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-    RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;*/
       
 
 END;
