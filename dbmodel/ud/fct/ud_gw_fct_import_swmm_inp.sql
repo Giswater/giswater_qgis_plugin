@@ -67,6 +67,7 @@ v_error_context text;
 v_linkoffsets text;
 v_count_total integer;
 v_status text = 'Accepted';
+v_replace text = '';
 
 BEGIN
 	-- Search path
@@ -590,7 +591,16 @@ BEGIN
 	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
+	-- replace
+	SELECT json_agg(json_build_object(source,csv1)) INTO v_replace
+		FROM (
+		SELECT source, array_agg(distinct csv1) as csv1
+		FROM temp_csv
+		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
+			and source in ('[OUTFALLS]','[JUNCTIONS]','[STORAGES]','[DIVIDERS]','[CONDUITS]','[PUMPS]','[ORIFICES]','[WEIRS]','[OUTLETS]','[SUBCATCHMENTS]', '[AQUIFERS]', 
+							'[RAINGAGE]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
+		GROUP BY source ORDER BY 1) a;
 	
 	--Control nulls
 	v_version := COALESCE(v_version, '{}'); 
@@ -598,11 +608,17 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 	
+	IF v_replace IS NOT NULL THEN
+		v_replace := '"replace":'||v_replace||',';
+	ELSE
+		v_replace := ''
+	END IF;
 
 	-- 	Return
 	RETURN ('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
+			 	v_replace ||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 		       '}'||

@@ -65,6 +65,7 @@ v_status text = 'Accepted';
 v_pumptype text;
 v_newnode text;
 v_oldarc text;
+v_replace text='';
 
 BEGIN
 
@@ -783,16 +784,32 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
+	-- replace
+	SELECT json_agg(json_build_object(source,csv1)) INTO v_replace
+		FROM (
+		SELECT source, array_agg(distinct csv1) as csv1
+		FROM temp_csv
+		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
+			and source in ('[PIPES]','[JUNCTIONS]','[TANKS]','[RESERVOIRS]','[VALVES]','[PUMPS]','[CURVES]','[PATTERNS]') 
+		GROUP BY source ORDER BY 1) a;
+
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 	v_version := COALESCE(v_version, '{}'); 	
 
+	IF v_replace IS NOT NULL THEN
+		v_replace := '"replace":'||v_replace||',';
+	ELSE
+		v_replace := ''
+	END IF;
+
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'",  "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
+			 	v_replace||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 	    '}}')::json, 2522, null, null, null);
