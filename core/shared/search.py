@@ -46,10 +46,7 @@ class GwSearch:
         self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
-    def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
-
-        if not load_project and dlg_mincut is None:
-            return
+    def open_search(self, dlg_search, dlg_mincut=None):
 
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
