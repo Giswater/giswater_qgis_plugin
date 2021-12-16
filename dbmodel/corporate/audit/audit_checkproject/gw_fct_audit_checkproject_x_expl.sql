@@ -28,6 +28,7 @@ DECLARE
     v_result_info json;
     v_error_context text;
     v_version text;
+    v_expl_x_user boolean;
 BEGIN
 
 --  Set search path to local schema
@@ -37,19 +38,35 @@ BEGIN
 
     EXECUTE 'SELECT giswater FROM '||v_schema||'.sys_version order by id desc limit 1'
     INTO  v_version;
+    
+    EXECUTE 'SELECT value::boolean FROM '||v_schema||'.config_param_system WHERE parameter = ''admin_exploitation_x_user'''
+    INTO  v_expl_x_user;
+    
 
-    FOR rec_expl IN EXECUTE 'SELECT expl_id FROM '||v_schema||'.exploitation WHERE active IS TRUE AND expl_id > 0' LOOP
+    IF v_expl_x_user IS TRUE THEN
+        FOR rec_expl IN EXECUTE 'SELECT expl_id FROM '||v_schema||'.exploitation WHERE active IS TRUE AND expl_id > 0' LOOP
 
-        EXECUTE 'DELETE FROM '||v_schema||'.selector_expl WHERE cur_user=current_user';
+            EXECUTE 'DELETE FROM '||v_schema||'.selector_expl WHERE cur_user=current_user';
 
-        EXECUTE 'INSERT INTO '||v_schema||'.selector_expl
-        VALUES ('||quote_literal(rec_expl)||', current_user)';
+            EXECUTE 'INSERT INTO '||v_schema||'.selector_expl
+            VALUES ('||quote_literal(rec_expl)||', current_user)';
 
-        EXECUTE 'SELECT '||v_schema||'.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-        "feature":{}, "data":{"initProject":false, "isAudit":true, "selectionMode":"userSelectors"}}$$);';
+            EXECUTE 'SELECT '||v_schema||'.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+            "feature":{}, "data":{"initProject":false, "isAudit":true, "selectionMode":"userSelectors"}}$$);';
 
-        raise notice 'rec_expl,%',rec_expl;
-    END LOOP;
+        END LOOP;
+        
+        EXECUTE 'UPDATE audit.anl_node a SET expl_id = b.expl_id, 
+        source = jsonb_build_object(''schema'','||quote_literal(v_schema)||', ''expl_id'',b.expl_id) FROM '||v_schema||'.node b
+        WHERE a.node_id=b.node_id AND a.expl_id IS NULL;';
+
+        EXECUTE 'UPDATE audit.anl_arc a SET expl_id = b.expl_id, 
+        source = jsonb_build_object(''schema'','||quote_literal(v_schema)||', ''expl_id'',b.expl_id) FROM '||v_schema||'.arc b
+        WHERE a.arc_id=b.arc_id AND a.expl_id IS NULL;';
+
+    ELSE
+        RAISE EXCEPTION 'Executing project check by exploitation is only available in case of having activated the variable admin_exploitation_x_user from config_param_system';
+    END IF;
 
 -- Control nulls
     v_result_info := COALESCE(v_result_info, '{}'); 
