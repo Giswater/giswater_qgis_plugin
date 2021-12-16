@@ -216,25 +216,22 @@ BEGIN
 
 		INSERT INTO audit.anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
     the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
-    code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, 
-    elev1, elev2, losses,source)
+    code, source)
     SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
     the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
-    code, cat_geom1, length, slope, total_length, z1, z2, y1, y2, 
-    elev1, elev2, losses, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+    code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
     FROM anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 
     INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
     state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
-    descript, result_id, total_distance, sys_type, code, cat_geom1, 
-    elevation, elev, depth, state_type, sector_id, losses, source)
-    SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
-    state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
-    descript, result_id, total_distance, sys_type, code, cat_geom1, 
-    elevation, elev, depth, state_type, sector_id, losses, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
-    FROM anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		descript, result_id, sys_type, code, sector_id,  source)
+		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
+		state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
+		descript, result_id, sys_type, code,  sector_id, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+		FROM anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
+
 	END IF;
 
 	-- get results
