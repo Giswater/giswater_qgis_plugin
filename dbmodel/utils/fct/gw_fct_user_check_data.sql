@@ -123,7 +123,7 @@ BEGIN
 		
 	ELSE
 		EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
-		FROM (SELECT expl_id FROM selector_expl) a'
+		FROM (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) a'
 		INTO v_cur_expl;
 	END IF;
 
@@ -225,10 +225,10 @@ BEGIN
 
     INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
     state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
-		descript, result_id, sys_type, code, sector_id,  source)
+		descript, result_id, sys_type, code, source)
 		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
 		state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
-		descript, result_id, sys_type, code,  sector_id, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+		descript, result_id, sys_type, code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
 		FROM anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 
@@ -261,9 +261,9 @@ BEGIN
 
 
 		--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
+	/*EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;*/
 	  
 END;
 $BODY$
