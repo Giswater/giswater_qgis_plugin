@@ -110,8 +110,8 @@ BEGIN
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 187, node_id, nodecat_id, ''nodes
+		with state_type isoperative = false'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '187' ,concat('WARNING-187(anl_node): There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue.'),v_count);
 	ELSE
@@ -126,8 +126,8 @@ BEGIN
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom) SELECT 188, arc_id, arccat_id, ''arcs with state_type
-		isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id) SELECT 188, arc_id, arccat_id, ''arcs with state_type
+		isoperative = false'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '188', concat('WARNING-188 (anl_arc): There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),v_count);
 	ELSE
@@ -178,8 +178,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE elevation IS NULL AND cur_user = current_user;
 		
 	IF v_count > 0 THEN
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom)
-		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node WHERE elevation IS NULL;
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, expl_id)
+		SELECT 164, node_id, nodecat_id, the_geom, expl_id FROM v_edit_node WHERE elevation IS NULL;
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id,  error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '164',  concat('ERROR-164 (anl_node): There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'),v_count);
 	ELSE
@@ -229,8 +229,8 @@ BEGIN
 	
 
 	RAISE NOTICE '9 - Mandatory node2arcs with less than two arcs (fid: 167)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	SELECT 167, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	SELECT 167, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
@@ -256,8 +256,8 @@ BEGIN
 
 	
 	RAISE NOTICE '10 - Check sense of cv pipes only to warning to user about the sense of the geometry (169)';
-	INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom)
-	SELECT 169, arc_id, arccat_id, the_geom FROM v_edit_inp_pipe WHERE status='CV';
+	INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, expl_id)
+	SELECT 169, arc_id, arccat_id, the_geom, expl_id FROM v_edit_inp_pipe WHERE status='CV';
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE fid = 169 AND cur_user=current_user;
 	IF v_count > 0 THEN
@@ -291,15 +291,15 @@ BEGIN
 	
 	-- to_arc wrong values (170)
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve JOIN(
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', expl_id FROM v_edit_inp_valve JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1 where valv_type !='TCV'
 		union
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2 where valv_type !='TCV')a USING (node_id)
 		WHERE a.node_id IS NULL;			
 	ELSE 
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve JOIN(
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', expl_id FROM v_edit_inp_valve JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1
 		union
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2)a USING (node_id)
@@ -408,8 +408,8 @@ BEGIN
 	END IF;
 	
 	-- to_arc wrong values (171)
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump' FROM v_edit_inp_pump WHERE node_id NOT IN(
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', expl_id FROM v_edit_inp_pump WHERE node_id NOT IN(
 		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
 		union
 		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
@@ -468,8 +468,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_nodeproximity;
 
 	IF v_count > 0 THEN
-		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 229, arc_id, arccat_id , the_geom, concat('Length less than node proximity: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe 
+		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, expl_id)
+		SELECT 229, arc_id, arccat_id , the_geom, concat('Length less than node proximity: ', (st_length(the_geom))::numeric (12,3)), expl_id FROM v_edit_inp_pipe 
 		WHERE st_length(the_geom) < v_nodeproximity;
 		
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -485,8 +485,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_minlength;
 
 	IF v_count > 0 THEN
-		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
+		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, expl_id)
+		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)), expl_id FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '230',concat('ERROR-230 (anl_arc): There is/are ',v_count,' pipe(s) with length less than configured minimum length (',v_minlength,') which are not exported.'),v_count);
@@ -542,8 +542,8 @@ BEGIN
 	
 		
 	RAISE NOTICE '20 - tanks and inlets with null mandatory values(fid: 198)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values' FROM v_edit_inp_tank a
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values', expl_id FROM v_edit_inp_tank a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
@@ -557,8 +557,8 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '198','INFO: Tanks checked. No mandatory values missed.',v_count);
 	END IF;	
 
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	SELECT 198, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values' FROM v_edit_inp_inlet a
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	SELECT 198, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
@@ -573,8 +573,8 @@ BEGIN
 	END IF;		
 
 	RAISE NOTICE '21 - pumps with more than two arcs (292)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs'
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs', b.expl_id
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
@@ -623,18 +623,18 @@ BEGIN
 
 	
 	RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
-		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
+	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_tank table') AS epa_table, n.the_geom FROM v_edit_inp_tank JOIN node n USING (node_id) WHERE epa_type !='TANK'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_tank table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_tank JOIN node n USING (node_id) WHERE epa_type !='TANK'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_reservoir table') AS epa_table, n.the_geom FROM v_edit_inp_reservoir JOIN node n USING (node_id) WHERE epa_type !='RESERVOIR'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_reservoir table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_reservoir JOIN node n USING (node_id) WHERE epa_type !='RESERVOIR'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_valve table') AS epa_table, n.the_geom FROM v_edit_inp_valve JOIN node n USING (node_id) WHERE epa_type !='VALVE'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_valve table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_valve JOIN node n USING (node_id) WHERE epa_type !='VALVE'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_pump table') AS epa_table, n.the_geom FROM v_edit_inp_pump JOIN node n USING (node_id) WHERE epa_type !='PUMP'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_pump table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_pump JOIN node n USING (node_id) WHERE epa_type !='PUMP'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_shortpipe table') AS epa_table, n.the_geom FROM v_edit_inp_shortpipe JOIN node n USING (node_id) WHERE epa_type !='SHORTPIPE';
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_shortpipe table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_shortpipe JOIN node n USING (node_id) WHERE epa_type !='SHORTPIPE';
 
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=294 AND cur_user=current_user;
@@ -649,10 +649,10 @@ BEGIN
 	END IF;	
 
 	RAISE NOTICE '24 - Inconsistency on inp arc tables (295)';
-	INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
-		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
+	INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom, a.expl_id FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
 		UNION
-		SELECT 295, a.arc_id, a.arccat_id,  concat(epa_type, ' using inp_virtualvalve table') AS epa_table, a.the_geom FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !='PIPE';
+		SELECT 295, a.arc_id, a.arccat_id,  concat(epa_type, ' using inp_virtualvalve table') AS epa_table, a.the_geom, a.expl_id FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !='PIPE';
 
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=295 AND cur_user=current_user;
@@ -704,8 +704,8 @@ BEGIN
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 379, node_id, nodecat_id, ''nodes
+		with state_type isoperative = false'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
