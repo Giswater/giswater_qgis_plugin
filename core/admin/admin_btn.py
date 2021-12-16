@@ -2083,17 +2083,27 @@ class GwAdminButton:
 
     def _add_replace_widgets(self, replace_json):
         idx = 0
-        for key in replace_json:
-            if replace_json[key]:
-                for i in replace_json[key]:
+        print(f"{replace_json=}")
+        for item in replace_json:
+            for key in item:
+                section = key
+                section_lbl = QLabel()
+                section_lbl.setText(f"<b>{section}</b>")
+                field = {"layoutname": 'lyt_replace', "layoutorder": idx}
+                tools_gw.add_widget(self.dlg_replace, field, section_lbl, None)
+                idx += 1
+                for i in item[key]:
                     lbl = QLabel()
-                    lbl.setText(f"{i['csv1']}")
+                    lbl.setText(f"{i}")
                     widget = QLineEdit()
-                    widget.setObjectName(f"{i['csv1']}")
+                    widget.setObjectName(f"{i}")
                     field = {"layoutname": 'lyt_replace', "layoutorder": idx}
 
                     tools_gw.add_widget(self.dlg_replace, field, lbl, widget)
                     idx += 1
+        spacer = tools_qt.add_verticalspacer()
+        lyt_replace = self.dlg_replace.findChild(QGridLayout, 'lyt_replace')
+        lyt_replace.addItem(spacer)
 
 
     def _dlg_replace_accept(self):
@@ -2106,14 +2116,22 @@ class GwAdminButton:
         for key in dict_to_replace:
             old = key
             new = dict_to_replace[key]
-
-            with open(self.file_inp, 'rb', 0) as file, \
-                    mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
-                if s.find(bytes(new, encoding='utf-8')) != -1:
-                    # if the new word is already on the file
-                    tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
-                    valid = False
-
+            if len(new) <= 0:
+                # if the string is empty
+                tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Can\'t be empty')
+                valid = False
+            else:
+                with open(self.file_inp, 'rb', 0) as file, \
+                        mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                    if s.find(bytes(new, encoding='utf-8')) != -1:
+                        # if the new word is already on the file
+                        tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                        self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
+                        valid = False
+            if valid:
+                tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
+                self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('')
         # If none of the new words are in the file
         if valid:
             # Replace the words
