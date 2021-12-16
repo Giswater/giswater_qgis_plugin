@@ -101,7 +101,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
-	
+
 		-- save state & expl selector
 	IF v_selection_mode !='userSelectors' THEN
 		DELETE FROM temp_table WHERE fid=251 AND cur_user=current_user;
@@ -116,12 +116,17 @@ BEGIN
 		
 		INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
 		INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
+		
+		EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
+		FROM (SELECT expl_id FROM exploitation WHERE expl_id > 0) a'
+		INTO v_cur_expl;
+		
+	ELSE
+		EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
+		FROM (SELECT expl_id FROM selector_expl) a'
+		INTO v_cur_expl;
 	END IF;
 
-	EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
-	FROM (SELECT expl_id FROM selector_expl) a'
-	INTO v_cur_expl;
-	
 	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
 		
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'warning' INTO v_warning_val;
@@ -201,10 +206,6 @@ BEGIN
 
 	--copy errors results from project check
 	IF v_log_project = 'Project' AND v_isaudit IS TRUE THEN
-		
-		EXECUTE 'SELECT array_to_json(array_agg(a.expl_id::text))
-		FROM (SELECT expl_id FROM selector_expl) a'
-		INTO v_cur_expl;
 		
 		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
 		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)

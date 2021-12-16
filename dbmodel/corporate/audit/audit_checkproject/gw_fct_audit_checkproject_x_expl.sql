@@ -46,7 +46,7 @@ BEGIN
         VALUES ('||quote_literal(rec_expl)||', current_user)';
 
         EXECUTE 'SELECT '||v_schema||'.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-        "feature":{}, "data":{"initProject":false, "isAudit":true}}$$);';
+        "feature":{}, "data":{"initProject":false, "isAudit":true, "selectionMode":"userSelectors"}}$$);';
 
         raise notice 'rec_expl,%',rec_expl;
     END LOOP;
