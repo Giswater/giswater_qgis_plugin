@@ -789,16 +789,16 @@ BEGIN
 
     RAISE NOTICE '28 - Duplicated ID values between arc, node, connec, gully(266)';
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
-					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
-					UNION SELECT arc.arc_id FROM arc JOIN connec ON connec.connec_id=arc.arc_id';	
+		v_querytext = 'SELECT node_id AS feature_id FROM '||v_edit||'node n JOIN '||v_edit||'arc a ON a.arc_id=n.node_id
+					UNION SELECT node_id FROM '||v_edit||'node n JOIN '||v_edit||'connec c ON c.connec_id=n.node_id
+					UNION SELECT a.arc_id FROM '||v_edit||'arc a JOIN '||v_edit||'connec c ON c.connec_id=a.arc_id';	
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
-					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
-					UNION SELECT node_id FROM node JOIN gully ON gully.gully_id=node.node_id
-					UNION SELECT connec_id FROM connec JOIN gully ON gully.gully_id=connec.connec_id
-					UNION SELECT arc.arc_id FROM arc JOIN connec ON connec.connec_id=arc.arc_id	
-					UNION SELECT arc.arc_id FROM arc JOIN gully ON gully.gully_id=arc.arc_id';	
+		v_querytext = 'SELECT node_id AS feature_id FROM '||v_edit||'node n JOIN '||v_edit||'arc a ON a.arc_id=n.node_id
+					UNION SELECT node_id FROM '||v_edit||'node n JOIN '||v_edit||'connec c ON c.connec_id=n.node_id
+					UNION SELECT node_id FROM '||v_edit||'node n JOIN '||v_edit||'gully g ON g.gully_id=n.node_id
+					UNION SELECT connec_id FROM '||v_edit||'connec c JOIN '||v_edit||'gully g ON g.gully_id=c.connec_id
+					UNION SELECT a.arc_id FROM '||v_edit||'arc a JOIN '||v_edit||'connec c ON c.connec_id=a.arc_id	
+					UNION SELECT a.arc_id FROM '||v_edit||'arc a JOIN '||v_edit||'gully g ON g.gully_id=a.arc_id';	
 	END IF;
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;

@@ -100,23 +100,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'107', 'INFO: No node(s) orphan found.',v_count);
 	END IF;
-
-
-	RAISE NOTICE '2 - Check nodes with state_type isoperative = false (fid:  187)';
-	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
-	WHERE n.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
-	
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid, result_id,  criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '187', concat('WARNING-187 (anl_node): There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'),
-		v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '187', 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
-	END IF;
 	
 	
 	RAISE NOTICE '4 - Check state_type nulls (arc, node) (175)';

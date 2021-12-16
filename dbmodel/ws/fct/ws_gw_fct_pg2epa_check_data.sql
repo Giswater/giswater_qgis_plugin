@@ -103,21 +103,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id,  error_message, fcount)
 		VALUES (v_fid, 1, '107', 'INFO: No node(s) orphan found.',v_count);
 	END IF;
-	
-	RAISE NOTICE '2 - Check nodes with state_type isoperative = false (fid:  187)';
-	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
-			WHERE n.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
-	
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 187, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom, expl_id FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '187' ,concat('WARNING-187(anl_node): There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue.'),v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-	VALUES (v_fid, 1, '187','INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
-	END IF;
 		
 	
 	RAISE NOTICE '4 - Check state_type nulls (arc, node) (175)';
@@ -216,16 +201,16 @@ BEGIN
 	RAISE NOTICE '9 - Mandatory node2arcs with less than two arcs (fid: 167)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 	SELECT 167, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
-		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
+		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
-		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
+		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
-	GROUP by node_id, nodecat_id, the_geom
+	GROUP by node_id, nodecat_id, the_geom, expl_id
 	HAVING count(*) < 2;
 
 
@@ -516,13 +501,13 @@ BEGIN
 	(SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '283',concat(
-		'WARNING-283: There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 2, '284',concat(
+		'WARNING-284: There is/are ',v_count,
 		' register(s) on node''s catalog acting as [SHORTPIPE or VALVE or PUMP] with dint not defined.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
+		VALUES (v_fid, v_result_id, 1, '284', 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
 	END IF;
 	
 		
@@ -543,23 +528,23 @@ BEGIN
 	END IF;	
 
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	SELECT 198, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
+	SELECT 199, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
-	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=199 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '198',concat(
-		'ERROR-198 (anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
+		VALUES (v_fid, v_result_id, 3, '199',concat(
+		'ERROR-199 (anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '198','INFO: Inlets checked. No mandatory values missed.',v_count);
+		VALUES (v_fid, v_result_id , 1,  '199','INFO: Inlets checked. No mandatory values missed.',v_count);
 	END IF;		
 
 	RAISE NOTICE '21 - pumps with more than two arcs (292)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs', b.expl_id
+	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs', expl_id
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
@@ -689,8 +674,8 @@ BEGIN
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 379, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom, expl_id FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
+		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
