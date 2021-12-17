@@ -20,7 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
-    QGridLayout
+    QGridLayout, QTabWidget
 from qgis.core import QgsProject, QgsTask, QgsApplication, QgsMessageLog
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
@@ -2033,8 +2033,9 @@ class GwAdminButton:
                         if retry:
                             sql = "DELETE FROM temp_csv WHERE fid = 239;"
                             tools_db.execute_sql(sql, commit=False)
+                            self.dlg_import_inp.findChild(QTabWidget, 'mainTab').setTabEnabled(0, True)
+                            self.dlg_import_inp.findChild(QTabWidget, 'mainTab').setCurrentIndex(0)
                             return self._execute_import_inp(accepted, project_name, project_type)
-                        # return self._execute_import_inp(accepted, project_name, project_type)
                     global_vars.dao.rollback()
                     self.error_count = 0
 
@@ -2066,8 +2067,8 @@ class GwAdminButton:
 
         # Build the dialog
         self.dlg_replace = GwReplaceInFileUi()
-        tools_gw.load_settings(self.dlg_replace)
         self.dlg_replace.setWindowFlags(Qt.WindowStaysOnTopHint)
+        tools_gw.load_settings(self.dlg_replace)
 
         # Add a widget for each word to replace
         self._add_replace_widgets(replace_json)
@@ -2075,9 +2076,9 @@ class GwAdminButton:
         # Connect signals
         self.dlg_replace.buttonBox.accepted.connect(partial(self._dlg_replace_accept))
         self.dlg_replace.buttonBox.rejected.connect(partial(self.dlg_replace.reject))
+        self.dlg_replace.finished.connect(partial(tools_gw.save_settings, self.dlg_replace))
 
         resp = self.dlg_replace.exec_()  # We do exec_() because we want the execution to stop until the dlg is closed
-        print(f"{resp=}")
         if resp == 0:
             return False
         return True
@@ -2115,6 +2116,7 @@ class GwAdminButton:
             dict_to_replace[f'{widget.objectName()}'] = f'{widget.text()}'
 
         all_valid = True
+        news = []
         for key in dict_to_replace:
             valid = True
             old = key
@@ -2129,9 +2131,14 @@ class GwAdminButton:
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Must have less than 16 characters')
                 valid, all_valid = False, False
+            elif new in news:
+                # if the string is duplicated with other new strings
+                tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
+                self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('All new names should be unique')
+                valid, all_valid = False, False
             else:
                 # Search if the object already exists
-                sql = f"SELECT count(csv1) FROM temp_csv WHERE csv1 = '{new}'"
+                sql = f"SELECT count(csv1) FROM temp_csv WHERE csv1 ILIKE '{new}'"
                 row = tools_db.get_row(sql, log_info=False, commit=False)
                 if row and row[0] is not None:
                     try:
@@ -2142,31 +2149,32 @@ class GwAdminButton:
                             valid, all_valid = False, False
                     except Exception as e:
                         print(f"{type(e).__name__}: {e}")
-                # with open(self.file_inp, 'rb', 0) as file, \
-                #         mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
-                #     if s.find(bytes(new, encoding='utf-8')) != -1:
-                #         # if the new word is already on the file
-                #         tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
-                #         self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
-                #         valid = False
             if valid:
+                news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('')
         # If none of the new words are in the file
         if all_valid:
+            msg = "This will modify your inp file, so a backup will be created.\n" \
+                  "Do you want to proceed?"
+            if not tools_qt.show_question(msg):
+                return
             # Replace the words
             contents = ""
             try:
                 # Read the contents of the file
                 with open(self.file_inp, 'r', encoding='utf-8') as file:
                     contents = file.read()
+                # Save a backup of the file
+                with open(f"{self.file_inp}.old", 'w', encoding='utf-8') as file:
+                    file.write(contents)
                 # Replace the words
                 for key in dict_to_replace:
                     old = key
                     new = dict_to_replace[key]
-                    contents = contents.replace(old, new)
+                    contents = tools_os.ireplace(old, new, contents)
                 # Write the file with new contents
-                with open(self.file_inp, 'w', encoding='utf-8') as file:
+                with open(f"{self.file_inp}", 'w', encoding='utf-8') as file:
                     file.write(contents)
             except Exception as e:
                 tools_log.log_error(f"Exception when replacing inp strings: {e}")
