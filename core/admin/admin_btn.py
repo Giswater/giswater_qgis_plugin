@@ -1851,7 +1851,7 @@ class GwAdminButton:
                     tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
-                    print("SQL error")
+
                     self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
                     self.task_create_schema.cancel()
                     return False
@@ -2089,6 +2089,7 @@ class GwAdminButton:
         idx = 0
         for item in replace_json:
             for key in item:
+                # Add section label
                 section = key
                 section_lbl = QLabel()
                 section_lbl.setText(f"<b>{section}</b>")
@@ -2096,14 +2097,17 @@ class GwAdminButton:
                 tools_gw.add_widget(self.dlg_replace, field, section_lbl, None)
                 idx += 1
                 for i in item[key]:
+                    # Add widget label
                     lbl = QLabel()
                     lbl.setText(f"{i}")
+                    # Add widget Line Edit
                     widget = QLineEdit()
                     widget.setObjectName(f"{i}")
                     field = {"layoutname": 'lyt_replace', "layoutorder": idx}
 
                     tools_gw.add_widget(self.dlg_replace, field, lbl, widget)
                     idx += 1
+        # Add final vertical spacer
         spacer = tools_qt.add_verticalspacer()
         lyt_replace = self.dlg_replace.findChild(QGridLayout, 'lyt_replace')
         lyt_replace.addItem(spacer)
