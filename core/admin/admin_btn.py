@@ -1290,22 +1290,22 @@ class GwAdminButton:
     def _load_fct_ftrg(self):
         """"""
 
-        folder = self.folder_utils + self.file_pattern_fct
+        folder = self.folder_utils + os.sep + self.file_pattern_fct
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_utils + self.file_pattern_ftrg
+        folder = self.folder_utils + os.sep + self.file_pattern_ftrg
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + self.file_pattern_fct
+        folder = self.folder_software + os.sep + self.file_pattern_fct
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + self.file_pattern_ftrg
+        folder = self.folder_software + os.sep + self.file_pattern_ftrg
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
