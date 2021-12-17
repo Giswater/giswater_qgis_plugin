@@ -1020,7 +1020,7 @@ class GwAdminButton:
         roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
 
-        if export_passwd:
+        if export_passwd and not self.is_service:
             msg = "Credentials will be stored in GIS project file"
             tools_qt.show_info_box(msg, "Warning")
 
