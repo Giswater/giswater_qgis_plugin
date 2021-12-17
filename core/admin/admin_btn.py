@@ -1214,6 +1214,7 @@ class GwAdminButton:
             close_dlg_rename = False
             self.schema = str(create_project)
 
+        # Check if the new project name already exists
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = tools_db.get_rows(sql)
         for row in rows:
@@ -1227,14 +1228,18 @@ class GwAdminButton:
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
+        # Change schema name
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
         status = tools_db.execute_sql(sql, commit=False)
         if status:
+            # Reload fcts
             self._reload_fct_ftrg()
             self.task1.setProgress(40)
+            # Call fct gw_fct_admin_rename_fixviews
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)
+            # Execute last_process
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.task1.setProgress(100)
 
@@ -1243,6 +1248,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Rename project")
         if status:
             global_vars.dao.commit()
+            # Populate schema name combo and info panel
             self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             self._set_info_project()
