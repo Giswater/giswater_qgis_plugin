@@ -120,12 +120,12 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '5 - Check for missed features on inp tables (272)';
-	v_querytext = '(SELECT arc_id, ''arc'' FROM arc LEFT JOIN 
+	v_querytext = '(SELECT arc_id, ''arc'' FROM v_edit_arc LEFT JOIN 
 			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve UNION SELECT arc_id 
 			FROM inp_valve_importinp UNION SELECT arc_id FROM inp_pump_importinp) b using (arc_id)
 			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''UNDEFINED''
 			UNION 
-		SELECT node_id, ''node'' FROM node LEFT JOIN 
+		SELECT node_id, ''node'' FROM v_edit_node LEFT JOIN 
 			(select node_id from inp_shortpipe UNION select node_id from inp_valve 
 			UNION select node_id from inp_tank 
 			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump 
@@ -179,12 +179,12 @@ BEGIN
 		SELECT node_id, nodecat_id, node.the_geom, node.expl_id FROM node
 		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_1
-		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP')
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') WHERE current_user=cur_user
 		UNION ALL
 		SELECT node_id, nodecat_id, node.the_geom, node.expl_id FROM node
 		JOIN selector_sector USING (sector_id)
 		JOIN v_edit_arc a1 ON node_id=a1.node_2
-		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'))a
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') WHERE current_user=cur_user)a
 	GROUP by node_id, nodecat_id, the_geom, expl_id
 	HAVING count(*) > 2;
 	
@@ -496,22 +496,22 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for arc''s catalog checked. No values missed.',v_count);
 	END IF;
 
-
+	RAISE NOTICE '19.2 - Check dint value for cat_node acting as [SHORTPIPE or VALVE or PUMP] (142)';
 	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN 
 	(SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '284',concat(
-		'WARNING-284: There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 2, '142',concat(
+		'WARNING-142: There is/are ',v_count,
 		' register(s) on node''s catalog acting as [SHORTPIPE or VALVE or PUMP] with dint not defined.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '284', 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
+		VALUES (v_fid, v_result_id, 1, '142', 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
 	END IF;
 	
 		
-	RAISE NOTICE '20 - tanks and inlets with null mandatory values(fid: 198)';
+	RAISE NOTICE '20 - Tanks with null mandatory values(fid: 198)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values', expl_id FROM v_edit_inp_tank a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
@@ -527,19 +527,20 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '198','INFO: Tanks checked. No mandatory values missed.',v_count);
 	END IF;	
 
+	RAISE NOTICE '20.2 - Inlets with null mandatory values(fid: 153)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	SELECT 199, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
+	SELECT 153, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
-	SELECT count(*) FROM anl_node INTO v_count WHERE fid=199 AND cur_user=current_user;
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=153 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '199',concat(
-		'ERROR-199 (anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
+		VALUES (v_fid, v_result_id, 3, '153',concat(
+		'ERROR-153 (anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '199','INFO: Inlets checked. No mandatory values missed.',v_count);
+		VALUES (v_fid, v_result_id , 1,  '153','INFO: Inlets checked. No mandatory values missed.',v_count);
 	END IF;		
 
 	RAISE NOTICE '21 - pumps with more than two arcs (292)';
