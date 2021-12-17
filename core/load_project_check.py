@@ -76,11 +76,11 @@ class GwLoadProjectCheck:
         """ Execute function 'gw_fct_setcheckproject' """
 
         # Get project variables
-        add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
-        main_schema = tools_qgis.get_plugin_settings_value('gwMainSchema')
-        project_role = tools_qgis.get_plugin_settings_value('gwProjecRole')
-        info_type = tools_qgis.get_plugin_settings_value('gwInfoType')
-        project_type = tools_qgis.get_plugin_settings_value('gwProjectType')
+        add_schema = global_vars.project_vars['add_schema']
+        main_schema = global_vars.project_vars['main_schema']
+        project_role = global_vars.project_vars['project_role']
+        info_type = global_vars.project_vars['info_type']
+        project_type = global_vars.project_vars['project_type']
 
         plugin_version, message = tools_qgis.get_plugin_version()
         if plugin_version is None:

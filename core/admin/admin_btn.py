@@ -12,6 +12,7 @@ import re
 import sys
 import mmap
 from functools import partial
+from sip import isdeleted
 from time import sleep
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
@@ -310,7 +311,8 @@ class GwAdminButton:
 
 
     def cancel_task(self):
-        self.task_create_schema.cancel()
+        if not isdeleted(self.task_create_schema):
+            self.task_create_schema.cancel()
 
 
     # TODO: Rename this function => Update all versions from changelog file.
@@ -1216,6 +1218,7 @@ class GwAdminButton:
             close_dlg_rename = False
             self.schema = str(create_project)
 
+        # Check if the new project name already exists
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = tools_db.get_rows(sql)
         for row in rows:
@@ -1229,14 +1232,18 @@ class GwAdminButton:
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
+        # Change schema name
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
         status = tools_db.execute_sql(sql, commit=False)
         if status:
+            # Reload fcts
             self._reload_fct_ftrg()
             self.task1.setProgress(40)
+            # Call fct gw_fct_admin_rename_fixviews
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)
+            # Execute last_process
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.task1.setProgress(100)
 
@@ -1245,6 +1252,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Rename project")
         if status:
             global_vars.dao.commit()
+            # Populate schema name combo and info panel
             self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             self._set_info_project()
@@ -1292,22 +1300,22 @@ class GwAdminButton:
     def _load_fct_ftrg(self):
         """"""
 
-        folder = self.folder_utils + self.file_pattern_fct
+        folder = self.folder_utils + os.sep + self.file_pattern_fct
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_utils + self.file_pattern_ftrg
+        folder = self.folder_utils + os.sep + self.file_pattern_ftrg
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + self.file_pattern_fct
+        folder = self.folder_software + os.sep + self.file_pattern_fct
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + self.file_pattern_ftrg
+        folder = self.folder_software + os.sep + self.file_pattern_ftrg
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
@@ -1834,9 +1842,10 @@ class GwAdminButton:
             if set_progress_bar:
                 self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
                 self.progress_value = int(self.progress_value * self.progress_ratio)
-                self.task_create_schema.set_progress(self.progress_value)
+                if not isdeleted(self.task_create_schema):
+                    self.task_create_schema.set_progress(self.progress_value)
 
-            if self.task_create_schema.isCanceled():
+            if not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
                 return False
 
             filepath = os.path.join(filedir, file)
@@ -1852,8 +1861,10 @@ class GwAdminButton:
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
 
-                    self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
-                    self.task_create_schema.cancel()
+                    if not isdeleted(self.task_create_schema):
+                        self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        self.task_create_schema.cancel()
+
                     return False
 
         except Exception as e:
@@ -1862,7 +1873,8 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             if self.dev_commit is False:
                 global_vars.dao.rollback()
-            self.task_create_schema.cancel()
+            if not isdeleted(self.task_create_schema):
+                self.task_create_schema.cancel()
             status = False
 
         finally:
