@@ -12,6 +12,7 @@ import re
 import sys
 import mmap
 from functools import partial
+from sip import isdeleted
 from time import sleep
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
@@ -308,7 +309,8 @@ class GwAdminButton:
 
 
     def cancel_task(self):
-        self.task_create_schema.cancel()
+        if not isdeleted(self.task_create_schema):
+            self.task_create_schema.cancel()
 
 
     # TODO: Rename this function => Update all versions from changelog file.
@@ -1838,9 +1840,10 @@ class GwAdminButton:
             if set_progress_bar:
                 self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
                 self.progress_value = int(self.progress_value * self.progress_ratio)
-                self.task_create_schema.set_progress(self.progress_value)
+                if not isdeleted(self.task_create_schema):
+                    self.task_create_schema.set_progress(self.progress_value)
 
-            if self.task_create_schema.isCanceled():
+            if not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
                 return False
 
             filepath = os.path.join(filedir, file)
@@ -1855,9 +1858,9 @@ class GwAdminButton:
                     tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
-                    print("SQL error")
-                    self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
-                    self.task_create_schema.cancel()
+                    if not isdeleted(self.task_create_schema):
+                        self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        self.task_create_schema.cancel()
                     return False
 
         except Exception as e:
@@ -1866,7 +1869,8 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             if self.dev_commit is False:
                 global_vars.dao.rollback()
-            self.task_create_schema.cancel()
+            if not isdeleted(self.task_create_schema):
+                self.task_create_schema.cancel()
             status = False
 
         finally:
