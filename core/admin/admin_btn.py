@@ -2033,8 +2033,8 @@ class GwAdminButton:
                         if retry:
                             sql = "DELETE FROM temp_csv WHERE fid = 239;"
                             tools_db.execute_sql(sql, commit=False)
-                            self.dlg_import_inp.findChild(QTabWidget, 'mainTab').setTabEnabled(0, True)
-                            self.dlg_import_inp.findChild(QTabWidget, 'mainTab').setCurrentIndex(0)
+                            self.dlg_import_inp.mainTab.setTabEnabled(0, True)
+                            self.dlg_import_inp.mainTab.setCurrentIndex(0)  # TODO: this doesnt work for some reason...
                             return self._execute_import_inp(accepted, project_name, project_type)
                     global_vars.dao.rollback()
                     self.error_count = 0
@@ -2149,7 +2149,7 @@ class GwAdminButton:
                         matches = int(row[0])
                         if matches > 0:
                             tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'))
-                            self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Word already in the file')
+                            self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Another object has this name')
                             valid, all_valid = False, False
                     except Exception as e:
                         print(f"{type(e).__name__}: {e}")
