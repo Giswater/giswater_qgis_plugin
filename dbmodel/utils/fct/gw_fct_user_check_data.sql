@@ -212,7 +212,7 @@ BEGIN
 		FROM audit_check_data
 		WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') 
-		AND result_id NOT IN ('349', '350', '351', '352', '353', '302');
+		AND result_id NOT IN ('349', '350', '351', '352', '353', '302', '347');
 
 		INSERT INTO audit.anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
     the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
