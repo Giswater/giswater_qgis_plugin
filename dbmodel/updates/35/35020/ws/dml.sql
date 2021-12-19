@@ -60,3 +60,6 @@ DELETE from sys_table where id in ('value_priority','v_edit_man_wtp','v_edit_om_
 'v_rtc_hydrometer_period','v_rtc_dma_hydrometer_period','v_ui_scada_x_node','v_plan_aux_arc_connec','vi_parent_node','v_inp_vertice') AND
 id not in (SELECT table_name FROM information_schema.tables WHERE table_schema = 'SCHEMA_NAME' );
 
+--2021/12/19
+UPDATE rpt_cat_result SET status = 1 WHERE status IS NULL AND n_junction IS NULL;
+UPDATE rpt_cat_result SET status = 2 WHERE status IS NULL AND n_junction IS NOT NULL;

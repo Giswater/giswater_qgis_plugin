@@ -109,3 +109,7 @@ DELETE from sys_table where id in ('value_priority','v_edit_om_psector','v_edit_
 'v_inp_storage_fc','v_inp_storage_tb','v_inp_subcatch','v_inp_temp_sn','v_inp_temp_wf','v_inp_timser_abs','v_inp_timser_rel','v_inp_timser_fl',
 'v_inp_transects','v_inp_treatment','v_inp_washoff','v_inp_weir','v_inp_vertice','v_rpt_comp_arcpolload_sum','vi_lsections') AND
 id not in (SELECT table_name FROM information_schema.tables WHERE table_schema = 'SCHEMA_NAME');
+
+--2021/12/19
+UPDATE rpt_cat_result SET status = 1 WHERE status IS NULL AND flow_units IS NULL;
+UPDATE rpt_cat_result SET status = 2 WHERE status IS NULL AND flow_units IS NOT NULL;
