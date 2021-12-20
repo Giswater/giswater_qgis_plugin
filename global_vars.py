@@ -37,7 +37,6 @@ project_epsg = None                     # EPSG of QGIS project
 logger = None                           # Instance of class GwLogger. Found in "/lib/tools_log.py"
 signal_manager = None                   # Instance of class GwSignalManager. Found in "/core/utils/signal_manager.py"
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
-qgis_settings = None                    # Instance of class QSettings. General QGIS settings. !! DEPRECATED
 current_user = None                     # Current user connected with PostgreSql
 qgis_db_credentials = None              # Instance of class QSqlDatabase (QPSQL) used to manage QTableView widgets
 dao = None                              # Instance of class GwPgDao. Found in "/lib/tools_db.py"
@@ -109,9 +108,7 @@ def init_giswater_settings(setting_file):
 def init_qgis_settings(p_plugin_name):
     """ Function to set QGIS settings: stored in the registry (on Windows) or .ini file (on Unix) """
 
-    global plugin_name, qgis_settings
+    global plugin_name
     plugin_name = p_plugin_name
-    qgis_settings = QSettings()
-    qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
 # endregion

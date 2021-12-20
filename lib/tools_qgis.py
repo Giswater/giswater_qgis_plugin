@@ -746,18 +746,12 @@ def clean_layer_group_from_toc(group_name):
             root.removeChildNode(group)
 
 
-def get_plugin_settings_value(key, default_value=""):
+def get_plugin_settings_value(section, key, default_value=""):
     """ Get @value of QSettings located in @key """
 
-    key = global_vars.plugin_name + "/" + key
-    value = global_vars.qgis_settings.value(key, default_value)
+    key = section + "/" + key
+    value = QSettings().value(key, default_value)
     return value
-
-
-def set_plugin_settings_value(key, value):
-    """ Set @value to QSettings of selected @value located in @key """
-
-    global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
 
 
 def get_layer_by_layername(layername, log_info=False):
