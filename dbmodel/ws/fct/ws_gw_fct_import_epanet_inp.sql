@@ -425,12 +425,17 @@ BEGIN
 			INSERT INTO man_junction SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 			-- improve velocity for pipes using directy tables in spite of vi_pipes view
-			INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
-			SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2, 1 
+			INSERT INTO arc (arc_id, node_1, node_2, custom_length, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
+			SELECT csv1, csv2, csv3, csv4::numeric(12,3), concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2, 1 
 			FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
-			INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
-			INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+			INSERT INTO inp_pipe (arc_id, minorloss, status) 
+			SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+			-- delete those custom_length with same value of real_length
+			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
+			
+			INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+			
 			-- insert controls
 			INSERT INTO inp_controls (sector_id, text, active)
 			select 1, csv1, true FROM temp_csv where source='[CONTROLS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;

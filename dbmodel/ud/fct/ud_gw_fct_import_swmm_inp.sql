@@ -344,6 +344,9 @@ BEGIN
 			INSERT INTO inp_conduit (arc_id, q0, qmax) SELECT csv1, csv8::numeric(12,3), csv9::numeric(12,3)
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+			-- delete those custom_length with same value of real_length
+			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
+
 			-- insert other catalog tables
 			INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
