@@ -5,3 +5,5 @@
 - Only enable 'User Selectors' as execution mode on Check OM data and Check grafanalytics from toolbox
 - Add fid 106 (nodes duplicated) on Check OM data function
 - Enhance trg_edit_link to prevent error when one connect find itself as end point
+- General revision of Check Project. Harmonize Check OM and Check EPA functions and delete duplicated fid's
+- New function to check all the exploitations separately and save results into audit table
