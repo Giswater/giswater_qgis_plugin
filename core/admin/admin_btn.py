@@ -2037,7 +2037,10 @@ class GwAdminButton:
             if complet_result:
 
                 if complet_result['status'] == 'Failed':
-                    msg = f'The importation process have been failed!<br>See Info log for more details.'
+                    msg = f'The importation process has failed!'
+                    if 'replace' in complet_result['body']['data']:
+                        msg += f'<br>This can be fixed in the next dialog.'
+                    msg += f'<br>See Info log for more details.'
                     self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
                     if 'replace' in complet_result['body']['data']:
