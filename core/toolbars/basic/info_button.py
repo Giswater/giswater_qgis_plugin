@@ -109,7 +109,7 @@ class GwInfoButton(GwMaptool):
         """ Reactivate tool """
 
         self.block_signal = True
-        info_action = self.iface.mainWindow().findChild(QAction, self.action_name)
+        info_action = self.iface.mainWindow().findChildren(QAction, self.action_name)[-1]
         info_action.trigger()
 
 

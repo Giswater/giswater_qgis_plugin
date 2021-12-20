@@ -12,6 +12,7 @@ import operator
 import sys
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
@@ -38,6 +39,8 @@ class GwPsector:
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.emit_point = None
+        self.vertex_marker = None
 
 
     def get_psector(self, psector_id=None, is_api=False):
@@ -255,8 +258,6 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
             self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
-            if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
-                self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
@@ -351,6 +352,9 @@ class GwPsector:
             # Set check active True as default for new pesectors
             tools_qt.set_checked(self.dlg_plan_psector, "active", True)
 
+        if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
@@ -398,6 +402,8 @@ class GwPsector:
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._enable_arc_replace))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
@@ -949,6 +955,7 @@ class GwPsector:
         self.reset_model_psector("other")
         tools_gw.close_dialog(self.dlg_plan_psector)
         tools_qgis.disconnect_snapping()
+        tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -1265,6 +1272,10 @@ class GwPsector:
             1: OnRowChange
             2: OnManualSubmit
         """
+
+        # Manage exception if dialog is closed
+        if isdeleted(dialog):
+            return
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
@@ -1774,6 +1785,8 @@ class GwPsector:
 
     def _set_to_arc(self):
 
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
@@ -1787,8 +1800,10 @@ class GwPsector:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
-        self.emit_point.canvasClicked.connect(partial(self._set_arc_id))
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'set_to_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id),
+                                'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
 
 
     def _set_arc_id(self, point):
@@ -1865,6 +1880,8 @@ class GwPsector:
 
     def _replace_arc(self):
 
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
@@ -1878,8 +1895,10 @@ class GwPsector:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self._mouse_move_arc)
-        self.emit_point.canvasClicked.connect(self._open_arc_replace_form)
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'replace_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_replace_form, 'psector',
+                                'replace_arc_ep_canvasClicked_open_arc_replace_form')
 
 
     def _open_arc_replace_form(self, point):
@@ -1943,6 +1962,7 @@ class GwPsector:
         # Disconnect Snapping
         self.snapper_manager.recover_snapping_options()
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('psector')
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_replace_arc)
@@ -2002,6 +2022,8 @@ class GwPsector:
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
 
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        if self.qtbl_connec.selectionModel() is None:
+            return
         if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
             self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
         elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():

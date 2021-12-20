@@ -54,7 +54,8 @@ class GwConnectLink(GwTask):
             extras = f'"feature_type":"{feature_type.upper()}"'
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
-            self.json_result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body)
+            self.json_result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body,
+                                                          aux_conn=self.aux_conn, is_thread=True)
             return True
 
         return False

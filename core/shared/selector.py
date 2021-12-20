@@ -262,7 +262,7 @@ class GwSelector:
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         selector_type = dialog.main_tab.widget(index).property("selector_type")
-        qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):

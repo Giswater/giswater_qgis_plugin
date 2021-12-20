@@ -86,6 +86,17 @@ class Giswater(QObject):
             print(f"Exception in unload when self.iface.actionPan().trigger(): {e}")
 
         try:
+            # Disconnect QgsProject.instance().crsChanged signal
+            tools_gw.disconnect_signal('load_project', 'project_read_crsChanged_set_epsg')
+        except Exception as e:
+            print(f"Exception in unload when disconnecting QgsProject.instance().crsChanged signal: {e}")
+
+        try:
+            tools_gw.disconnect_signal('load_project', 'manage_attribute_table_focusChanged')
+        except Exception as e:
+            print(f"Exception in unload when disconnecting focusChanged signal: {e}")
+
+        try:
             # Remove 'Main Info button'
             self._unset_info_button()
         except Exception as e:
@@ -253,10 +264,32 @@ class Giswater(QObject):
         """ Define iface event signals on Project Read / New Project / Save Project """
 
         try:
-            self.iface.projectRead.connect(self._project_read)
-            self.iface.newProjectCreated.connect(self._project_new)
-            self.iface.actionSaveProject().triggered.connect(self._save_toolbars_position)
+            self._unset_signals()
+
+            tools_gw.connect_signal(self.iface.projectRead, self._project_read,
+                                    'main', 'projectRead')
+            tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
+                                    'main', 'newProjectCreated')
+            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
+                                    'main', 'actionSaveProject')
         except AttributeError:
+            pass
+
+
+    def _unset_signals(self):
+        """ Disconnect iface event signals on Project Read / New Project / Save Project """
+
+        try:
+            self.iface.projectRead.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.iface.newProjectCreated.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.iface.actionSaveProject().triggered.disconnect()
+        except TypeError:
             pass
 
 

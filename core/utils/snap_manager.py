@@ -65,7 +65,9 @@ class GwSnapManager(object):
         """ Store the project user snapping configuration """
 
         # Get an array containing the snapping options for all the layers
-        self.previous_snapping = self.get_snapping_options()
+        self.snapping_config = self.get_snapping_options()
+        self.snapping_config.setEnabled(True)
+        self.previous_snapping = self.snapping_config
 
 
     def set_snapping_status(self, enable=False):
@@ -344,14 +346,17 @@ class GwSnapManager(object):
 
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
-            active_layer = tools_qgis.get_layer_by_tablename('version')
+            active_layer = tools_qgis.get_layer_by_tablename('sys_version')
             global_vars.iface.setActiveLayer(active_layer)
 
         # Snapper
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(partial(self._get_mouse_move, vertex_marker))
-        emit_point.canvasClicked.connect(partial(self._get_xy, vertex_marker, emit_point))
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._get_mouse_move, vertex_marker),
+                                'snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_xy, vertex_marker, emit_point),
+                                'snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
 
 
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
@@ -393,8 +398,8 @@ class GwSnapManager(object):
 
         message = "Geometry has been added!"
         tools_qgis.show_info(message)
-        emit_point.canvasClicked.disconnect()
-        global_vars.canvas.xyCoordinates.disconnect()
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
 

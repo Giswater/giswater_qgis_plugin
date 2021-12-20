@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+from functools import partial
 
 from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.gui import QgsFieldExpressionWidget
 from qgis.PyQt.QtCore import QObject, Qt
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView, QDialog, QComboBox
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -118,6 +120,9 @@ class GwLoadProject(QObject):
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
 
+        # Manage "btn_updateall" from attribute table
+        self._manage_attribute_table()
+
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
 
@@ -136,8 +141,8 @@ class GwLoadProject(QObject):
 
         # Set global_vars.project_epsg
         global_vars.project_epsg = tools_qgis.get_epsg()
-        QgsProject.instance().crsChanged.connect(tools_gw.set_epsg)
-
+        tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
+                                'load_project', 'project_read_crsChanged_set_epsg')
         global_vars.project_loaded = True
 
         # Manage versions of Giswater and PostgreSQL
@@ -523,10 +528,10 @@ class GwLoadProject(QObject):
         self.iface.setActiveLayer(self.layer_muni)
         tools_qgis.set_layer_visible(self.layer_muni)
         self.layer_muni.selectAll()
-        self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
-        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
+        tools_gw.connect_signal(self.iface.mapCanvas().selectionChanged, self._selection_changed,
+                                'load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
         cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
@@ -542,7 +547,7 @@ class GwLoadProject(QObject):
             tools_log.log_info(f"Selected muni_id: {muni_id}")
             break
 
-        self.iface.mapCanvas().selectionChanged.disconnect()
+        tools_gw.disconnect_signal('load_project', 'manage_guided_map_mapCanvas_selectionChanged_selection_changed')
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
 
@@ -557,7 +562,16 @@ class GwLoadProject(QObject):
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
+            # Zoom to feature
+            try:
+                x1 = complet_result['body']['data']['geometry']['x1']
+                y1 = complet_result['body']['data']['geometry']['y1']
+                x2 = complet_result['body']['data']['geometry']['x2']
+                y2 = complet_result['body']['data']['geometry']['y2']
+                if x1 is not None:
+                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            except KeyError:
+                pass
             tools_gw.set_style_mapzones()
 
 
@@ -611,5 +625,46 @@ class GwLoadProject(QObject):
         """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
+
+
+    def _manage_attribute_table(self):
+        """ If configured, disable button "Update all" from attribute table """
+
+        disable = tools_gw.get_config_parser('system', 'disable_updateall_attributetable', "user", "init", prefix=False)
+        if tools_os.set_boolean(disable, False):
+            tools_gw.connect_signal(QApplication.instance().focusChanged, self._manage_focus_changed,
+                                    'load_project', 'manage_attribute_table_focusChanged')
+
+
+    def _manage_focus_changed(self, old, new):
+        """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """
+
+        if new is None:
+            return
+
+        table_dialog = new.window()
+        # Check if focused widget's window is a QgsAttributeTableDialog
+        if isinstance(table_dialog, QDialog) and table_dialog.objectName().startswith('QgsAttributeTableDialog'):
+            try:
+                # Look for the button "Update all"
+                for widget in table_dialog.children():
+                    if widget.objectName() == 'mUpdateExpressionBox':
+                        widget_btn_updateall = None
+                        for subwidget in widget.children():
+                            if subwidget.objectName() == 'mRunFieldCalc':  # This is for the button itself
+                                widget_btn_updateall = subwidget
+                                tools_qt.set_widget_enabled(None, widget_btn_updateall, False)
+                            if subwidget.objectName() == 'mUpdateExpressionText':  # This is the expression text field
+                                try:
+                                    subwidget.fieldChanged.disconnect()
+                                except:
+                                    pass
+                                # When you type something in the expression text field, the button "Update all" is
+                                # enabled. This will disable it again.
+                                subwidget.fieldChanged.connect(partial(
+                                    tools_qt.set_widget_enabled, None, widget_btn_updateall, False))
+                        break
+            except IndexError:
+                pass
 
     # endregion

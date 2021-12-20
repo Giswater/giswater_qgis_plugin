@@ -31,13 +31,12 @@ configs['dev'] = [None, None]           # Developer configuration file: dev.conf
 configs['giswater'] = [None, None]      # Plugin configuration file: giswater.config (located in plugin config folder)
 configs['user_params'] = [None, None]   # Settings configuration file: user_params.config (plugin config folder)
 schema_name = None                      # Schema name retrieved from QGIS project connection with PostgreSql
-project_type = None                     # Project type get from table "version"
+project_type = None                     # Project type get from table "sys_version"
 data_epsg = None                        # SRID retrieved from QGIS project layer "v_edit_node"
 project_epsg = None                     # EPSG of QGIS project
 logger = None                           # Instance of class GwLogger. Found in "/lib/tools_log.py"
 signal_manager = None                   # Instance of class GwSignalManager. Found in "/core/utils/signal_manager.py"
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
-qgis_settings = None                    # Instance of class QSettings. General QGIS settings
 current_user = None                     # Current user connected with PostgreSql
 qgis_db_credentials = None              # Instance of class QSqlDatabase (QPSQL) used to manage QTableView widgets
 dao = None                              # Instance of class GwPgDao. Found in "/lib/tools_db.py"
@@ -61,7 +60,8 @@ user_level = {                          # An instance used to know user level an
     'showquestion': None,               # Used for show help (default config show for level 1 and 2)
     'showsnapmessage': None,            # Used to indicate to the user that they can snapping
     'showselectmessage': None,          # Used to indicate to the user that they can select
-    'showadminadvanced': None}          # Manage advanced tab, fields manager tab and sample dev radio button from admin
+    'showadminadvanced': None,          # Manage advanced tab, fields manager tab and sample dev radio button from admin
+}
 date_format = None                      # Display format of the dates allowed in the forms: dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd
 feature_cat = None                      # Dictionary to keep every record of table 'cat_feature'. Stored here to avoid executing gw_fct_getcatfeaturevalues multiple times
 # endregion
@@ -80,6 +80,7 @@ session_vars['logged_status'] = None       # An instance of connection status. C
 session_vars['last_focus'] = None          # An instance of the last focused dialog's tag
 snappers = []                              # A list of all the snapper managers, used to disable them in 'Reset plugin' action
 active_rubberbands = []                    # A list of all active rubber bands, used to disable them in 'Reset plugin' action
+active_signals = {}                        # A dictionary containing all connected signals, first key is dlg_name/file_name, then there are all the signal names.
 # endregion
 
 
@@ -107,9 +108,7 @@ def init_giswater_settings(setting_file):
 def init_qgis_settings(p_plugin_name):
     """ Function to set QGIS settings: stored in the registry (on Windows) or .ini file (on Unix) """
 
-    global plugin_name, qgis_settings
+    global plugin_name
     plugin_name = p_plugin_name
-    qgis_settings = QSettings()
-    qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
 # endregion

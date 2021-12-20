@@ -254,12 +254,92 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg):
+def close_dialog(dlg, delete_dlg=True):
     """ Close dialog """
 
     save_settings(dlg)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
+    if delete_dlg:
+        try:
+            dlg.deleteLater()
+        except RuntimeError:
+            pass
+
+
+def connect_signal(obj, pfunc, section, signal_name):
+    """
+    Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
+    :param obj: the object to which the signal will be connected
+    :param pfunc: the partial object containing the function to connect and the arguments if needed
+    :param section: the name of the parent category
+    :param signal_name: the name of the signal. Should be {functionname}_{obj}_{pfunc} like -> {replace_arc}_{xyCoordinates}_{mouse_move_arc}
+    :return: the signal. If failed to connect it will return None
+    """
+
+    if section not in global_vars.active_signals:
+        global_vars.active_signals[section] = {}
+    # If the signal is already connected, don't reconnect it, just return it.
+    if signal_name in global_vars.active_signals[section]:
+        _, signal, _ = global_vars.active_signals[section][signal_name]
+        return signal
+    # Try to connect signal and save it in the dict
+    try:
+        signal = obj.connect(pfunc)
+        global_vars.active_signals[section][signal_name] = (obj, signal, pfunc)
+        return signal
+    except Exception as e:
+        pass
+    return None
+
+
+def disconnect_signal(section, signal_name=None, pop=True):
+    """
+    Disconnects a signal
+        :param section: the name of the parent category
+        :param signal_name: the name of the signal
+        :param pop: should always be True, if False it won't remove the signal from the dict.
+        :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
+                 (None, None) if it couldn't find the signal
+    """
+
+    if section not in global_vars.active_signals:
+        return None, None
+
+    if signal_name is None:
+        old_signals = []
+        for signal in global_vars.active_signals[section]:
+            old_signals.append(disconnect_signal(section, signal, False))
+        for signal in old_signals:
+            global_vars.active_signals[section].pop(signal, None)
+    if signal_name not in global_vars.active_signals[section]:
+        return None, None
+
+    obj, signal, pfunc = global_vars.active_signals[section][signal_name]
+    try:
+        obj.disconnect(signal)
+    except Exception as e:
+        pass
+    finally:
+        if pop:
+            global_vars.active_signals[section].pop(signal_name, None)
+            return obj, pfunc
+        return signal_name
+
+
+def reconnect_signal(section, signal_name):
+    """
+    Disconnects and reconnects a signal
+        :param section: the name of the parent category
+        :param signal_name: the name of the signal
+        :return: True if successfully reconnected, False otherwise (bool)
+    """
+
+    obj, pfunc = disconnect_signal(section, signal_name)  # Disconnect the signal
+    if obj is not None and pfunc is not None:
+        connect_signal(obj, pfunc, section, signal_name)  # Reconnect it
+        return True
+    return False
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
@@ -1928,38 +2008,55 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
 
 
 def get_project_type(schemaname=None):
-    """ Get project type from table 'version' """
+    """ Get project type from table 'sys_version' """
 
-    # init variables
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
     elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
-    # start process
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
-    if exists:
-        sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            project_type = row[0]
-    else:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = f"SELECT lower(wsoftware) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-            row = tools_db.get_row(sql)
-            if row:
-                project_type = row[0]
-        else:
-            tablename = "version_tm"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                project_type = "tm"
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_type = row[0]
 
     return project_type
+
+
+def get_project_info(schemaname=None):
+    """ Get project information from table 'sys_version' """
+
+    project_info_dict = None
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = (f"SELECT lower(project_type), epsg, giswater, language "
+           f"FROM {schemaname}.{tablename} "
+           f"ORDER BY id ASC LIMIT 1")
+    row = tools_db.get_row(sql)
+    if row:
+        project_info_dict = {'project_type': row[0],
+                             'project_epsg': row[1],
+                             'project_version': row[2],
+                             'project_language': row[3],
+                             }
+
+    return project_info_dict
 
 
 def get_layers_from_feature_type(feature_type):
@@ -3009,7 +3106,7 @@ def hide_widgets_form(dialog, dlg_name):
 
 
 def get_project_version(schemaname=None):
-    """ Get project version from table 'version' """
+    """ Get project version from table 'sys_version' """
 
     if schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
@@ -3018,10 +3115,8 @@ def get_project_version(schemaname=None):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if not exists:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if not exists:
-            return None
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
 
     sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
     row = tools_db.get_row(sql)

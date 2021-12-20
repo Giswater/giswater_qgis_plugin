@@ -275,21 +275,19 @@ class GwInfo(QObject):
         self.snapper_manager.config_snap_to_connec()
         self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
-        self.iface.actionAddFeature().toggled.connect(self._action_is_checked)
+        tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
+                                'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
         if self.info_layer:
-            try:
-                # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
-                # realizes that he has made a mistake and selects another feature, without this try two features would
-                # be inserted. This disconnect signal avoids it
-                self.info_layer.featureAdded.disconnect(self._open_new_feature)
-            except Exception:
-                # If self._open_new_feature is not connected, cause an exception
-                pass
+            # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
+            # realizes that he has made a mistake and selects another feature, without this two features would
+            # be inserted. This disconnect signal avoids it
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
@@ -299,7 +297,8 @@ class GwInfo(QObject):
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            self.info_layer.featureAdded.connect(self._open_new_feature)
+            tools_gw.connect_signal(self.info_layer.featureAdded, self._open_new_feature,
+                                    'info', 'add_feature_featureAdded_open_new_feature')
         else:
             message = "Layer not found"
             tools_qgis.show_warning(message, parameter=feature_cat.parent_layer)
@@ -337,10 +336,15 @@ class GwInfo(QObject):
         elif option == 'node':
             self.snapper_manager.config_snap_to_node()
         # Set signals
-        self.canvas.xyCoordinates.connect(partial(self._mouse_moved, layer))
+        tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
+                                'info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+
+        tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self._get_id, dialog, action, option, emit_point, child_type))
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type),
+                                'info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
 
 
     # region private functions
@@ -792,29 +796,30 @@ class GwInfo(QObject):
     def _connect_signals(self):
 
         if not self.connected:
-            self.layer.editingStarted.connect(self.fct_start_editing)
+            tools_gw.connect_signal(self.layer.editingStarted, self.fct_start_editing,
+                                    'info', 'connect_signals_layer_editingStarted_fct_start_editing')
             action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
             if action_toggle_editing:
-                action_toggle_editing.triggered.connect(self.fct_block_action_edit)
+                tools_gw.connect_signal(action_toggle_editing.triggered, self.fct_block_action_edit,
+                                        'info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
             self.connected = True
 
 
     def _disconnect_signals(self):
 
         try:
-            self.layer.editingStarted.disconnect(self.fct_start_editing)
+            tools_gw.disconnect_signal('info', 'connect_signals_layer_editingStarted_fct_start_editing')
         except Exception:
             pass
 
         try:
-            self.layer.editingStopped.disconnect(self.fct_stop_editing)
+            # This signal isn't connected atm, might need to change the name depending on where it's connected
+            tools_gw.disconnect_signal('info', 'connect_signals_layer_editingStopped_fct_stop_editing')
         except Exception:
             pass
 
         try:
-            action_toggle_editing = self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing')
-            if action_toggle_editing:
-                action_toggle_editing.triggered.disconnect(self.fct_block_action_edit)
+            tools_gw.disconnect_signal('info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
         except Exception:
             pass
 
@@ -852,6 +857,7 @@ class GwInfo(QObject):
         # Set circle vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
+        self.vertex_marker.show()
 
         self.node1 = None
         self.node2 = None
@@ -865,8 +871,10 @@ class GwInfo(QObject):
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
-        global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
-        ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate))
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._mouse_move),
+                                'info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(ep.canvasClicked, partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate),
+                                'info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
 
 
     def _snapping_node(self, ep, dlg_interpolate, rb_interpolate, point, button):
@@ -910,11 +918,11 @@ class GwInfo(QObject):
             chk_extrapolate = dlg_interpolate.findChild(QCheckBox, 'chk_extrapolate')
             action_dict = {True: 'EXTRAPOLATE', False: 'INTERPOLATE'}
 
-            global_vars.canvas.xyCoordinates.disconnect()
-            ep.canvasClicked.disconnect()
+            tools_gw.disconnect_signal('info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
+            tools_gw.disconnect_signal('info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
 
             global_vars.iface.setActiveLayer(self.layer)
-            global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+            self.vertex_marker.hide()
             extras = f'"parameters":{{'
             extras += f'"action":"{action_dict[chk_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
@@ -1001,10 +1009,12 @@ class GwInfo(QObject):
     def _change_hemisphere(self, dialog, action):
 
         # Set map tool emit point and signals
+        tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self._action_rotation_canvas_clicked, dialog, action, emit_point))
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._action_rotation_canvas_clicked, dialog, action, emit_point),
+                                'info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
 
     def _action_rotation_canvas_clicked(self, dialog, action, emit_point, point, btn):
@@ -1053,20 +1063,22 @@ class GwInfo(QObject):
         action_widget = dialog.findChild(QAction, "actionRotation")
         if action_widget:
             action_widget.setChecked(False)
-        try:
-            emit_point.canvasClicked.disconnect()
-        except Exception as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+        tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
 
     def _manage_action_copy_paste(self, dialog, feature_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
         # Set map tool emit point and signals
+        tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(self._manage_action_copy_paste_mouse_move)
-        emit_point.canvasClicked.connect(partial(self._manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
+        tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, self._manage_action_copy_paste_mouse_move,
+                                'info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point),
+                                'info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
+
         self.feature_type = feature_type
 
         # Store user snapping configuration
@@ -1201,8 +1213,8 @@ class GwInfo(QObject):
         try:
             self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.vertex_marker.hide()
-            global_vars.canvas.xyCoordinates.disconnect()
-            emit_point.canvasClicked.disconnect()
+            tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
+            tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         except Exception:
             pass
 
@@ -3671,7 +3683,6 @@ class GwInfo(QObject):
                    'set_to_arc': ['arc_id', '_set_to_arc']}
 
         if event == Qt.RightButton:
-            tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
             self._cancel_snapping_tool(dialog, action)
             return
 
@@ -3690,7 +3701,7 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dialog, widget, str(feat_id))
         elif option == 'set_to_arc':
             # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-            #       def set_to_arc(self, feat_id, child_type)
+            #       def _set_to_arc(self, feat_id, child_type)
             getattr(self, options[option][1])(feat_id, child_type)
         self.snapper_manager.recover_snapping_options()
         self._cancel_snapping_tool(dialog, action)
@@ -3705,7 +3716,7 @@ class GwInfo(QObject):
         """
 
         w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
-        if w_dma_id is QComboBox:
+        if isinstance(w_dma_id, QComboBox):
             dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         else:
             dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
@@ -3715,6 +3726,8 @@ class GwInfo(QObject):
         sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
         w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
         dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
+        if dqa_id == -1:
+            dqa_id = "null"
 
         feature = f'"featureType":"{child_type}", "id":"{self.feature_id}"'
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
@@ -3735,6 +3748,7 @@ class GwInfo(QObject):
     def _cancel_snapping_tool(self, dialog, action):
 
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('info_snapping')
         dialog.blockSignals(False)
         action.setChecked(False)
         self.signal_activate.emit()
@@ -3748,7 +3762,7 @@ class GwInfo(QObject):
 
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
-            self.iface.actionAddFeature().toggled.disconnect(self._action_is_checked)
+            tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
 
     def _open_new_feature(self, feature_id):

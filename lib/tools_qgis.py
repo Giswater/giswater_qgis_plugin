@@ -472,19 +472,19 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     try:
         global_vars.canvas.xyCoordinates.disconnect()
     except TypeError as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        print(f"{type(e).__name__} --> {e}")
 
     if emit_point is not None:
         try:
             emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+            print(f"{type(e).__name__} --> {e}")
 
     if vertex_marker is not None:
         try:
             vertex_marker.hide()
         except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+            print(f"{type(e).__name__} --> {e}")
 
     if action_pan:
         iface.actionPan().trigger()
@@ -746,18 +746,12 @@ def clean_layer_group_from_toc(group_name):
             root.removeChildNode(group)
 
 
-def get_plugin_settings_value(key, default_value=""):
+def get_plugin_settings_value(section, key, default_value=""):
     """ Get @value of QSettings located in @key """
 
-    key = global_vars.plugin_name + "/" + key
-    value = global_vars.qgis_settings.value(key, default_value)
+    key = section + "/" + key
+    value = QSettings().value(key, default_value)
     return value
-
-
-def set_plugin_settings_value(key, value):
-    """ Set @value to QSettings of selected @value located in @key """
-
-    global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
 
 
 def get_layer_by_layername(layername, log_info=False):
@@ -929,7 +923,7 @@ def get_geometry_from_json(feature):
         type_ = feature['geometry']['type']
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
-    except AttributeError as e:
+    except AttributeError or TypeError as e:
         tools_log.log_info(f"{type(e).__name__} --> {e}")
         return None
 
