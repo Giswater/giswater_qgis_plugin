@@ -283,6 +283,7 @@ class GwGo2EpaButton(GwAction):
 
         # Create the common signals
         go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
+        tools_gw.save_current_tab(dlg_selector, dlg_selector.main_tab, 'basic')
 
         # Open form
         if global_vars.session_vars['dialog_docker']:
