@@ -258,8 +258,6 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
             self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
-            if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
-                self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
@@ -353,6 +351,9 @@ class GwPsector:
 
             # Set check active True as default for new pesectors
             tools_qt.set_checked(self.dlg_plan_psector, "active", True)
+
+        if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
@@ -2021,6 +2022,8 @@ class GwPsector:
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
 
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        if self.qtbl_connec.selectionModel() is None:
+            return
         if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
             self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
         elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
