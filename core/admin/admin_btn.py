@@ -311,7 +311,7 @@ class GwAdminButton:
 
 
     def cancel_task(self):
-        if not isdeleted(self.task_create_schema):
+        if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
             self.task_create_schema.cancel()
 
 
@@ -1842,10 +1842,10 @@ class GwAdminButton:
             if set_progress_bar:
                 self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
                 self.progress_value = int(self.progress_value * self.progress_ratio)
-                if not isdeleted(self.task_create_schema):
+                if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                     self.task_create_schema.set_progress(self.progress_value)
 
-            if not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
+            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
                 return False
 
             filepath = os.path.join(filedir, file)
@@ -1861,7 +1861,7 @@ class GwAdminButton:
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
 
-                    if not isdeleted(self.task_create_schema):
+                    if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                         self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
                         self.task_create_schema.cancel()
 
@@ -1873,7 +1873,7 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             if self.dev_commit is False:
                 global_vars.dao.rollback()
-            if not isdeleted(self.task_create_schema):
+            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                 self.task_create_schema.cancel()
             status = False
 
