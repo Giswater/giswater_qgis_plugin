@@ -300,6 +300,7 @@ class GwEpaFileManager(GwTask):
 
         if global_vars.project_type == 'ud' and f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
 
+
             # Replace extension .inp
             aditional_path = folder_path.replace('.inp', f'.gul')
             aditional_file = open(aditional_path, "w")
