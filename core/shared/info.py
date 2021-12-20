@@ -857,6 +857,7 @@ class GwInfo(QObject):
         # Set circle vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
+        self.vertex_marker.show()
 
         self.node1 = None
         self.node2 = None
@@ -917,11 +918,11 @@ class GwInfo(QObject):
             chk_extrapolate = dlg_interpolate.findChild(QCheckBox, 'chk_extrapolate')
             action_dict = {True: 'EXTRAPOLATE', False: 'INTERPOLATE'}
 
-            global_vars.canvas.xyCoordinates.disconnect()
-            ep.canvasClicked.disconnect()
+            tools_gw.disconnect_signal('info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
+            tools_gw.disconnect_signal('info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
 
             global_vars.iface.setActiveLayer(self.layer)
-            global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+            self.vertex_marker.hide()
             extras = f'"parameters":{{'
             extras += f'"action":"{action_dict[chk_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
