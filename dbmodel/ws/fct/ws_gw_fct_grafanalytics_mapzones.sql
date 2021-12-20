@@ -377,8 +377,6 @@ BEGIN
 					END IF;
 				END IF;
 
-
-
 				-- reset mapzone geometry
 				IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' AND v_updatefeature AND v_updatemapzgeom > 0 THEN
 					v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
@@ -411,7 +409,7 @@ BEGIN
 					WHERE closed=TRUE
 					AND v.active IS TRUE)';
 			EXECUTE v_querytext;
-			
+
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
 					node_2::integer IN ('||v_text||' 
 					UNION
@@ -484,6 +482,12 @@ BEGIN
 			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 
+			-- close custom nodes acording config parameters
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+			
 			-- open custom nodes acording init parameters
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
