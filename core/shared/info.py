@@ -3716,7 +3716,7 @@ class GwInfo(QObject):
         """
 
         w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
-        if w_dma_id is QComboBox:
+        if isinstance(w_dma_id, QComboBox):
             dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         else:
             dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
@@ -3726,6 +3726,8 @@ class GwInfo(QObject):
         sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
         w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
         dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
+        if dqa_id == -1:
+            dqa_id = "null"
 
         feature = f'"featureType":"{child_type}", "id":"{self.feature_id}"'
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
