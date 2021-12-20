@@ -1152,15 +1152,15 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Info")
             return False
         elif any(c.isupper() for c in project_name) is True:
-            msg = "The 'Project_name' field require only lower caracters"
+            msg = "The project name can't have any upper-case characters"
             tools_qt.show_info_box(msg, "Info")
             return False
         elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
-            msg = "The 'Project_name' field have invalid character"
+            msg = "The project name has invalid character"
             tools_qt.show_info_box(msg, "Info")
             return False
         elif [project_name] in pg_keywords:
-            msg = "The 'Project_name' field is a PostgreSQL reserved keyword"
+            msg = "The project name can't be a PostgreSQL reserved keyword"
             tools_qt.show_info_box(msg, "Info")
             return False
         if project_descript == 'null':
