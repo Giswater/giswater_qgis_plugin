@@ -66,6 +66,7 @@ class GwSnapManager(object):
 
         # Get an array containing the snapping options for all the layers
         self.snapping_config = self.get_snapping_options()
+        self.snapping_config.setEnabled(True)
         self.previous_snapping = self.snapping_config
 
 
