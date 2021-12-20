@@ -2416,7 +2416,7 @@ class GwAdminButton:
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
-            partial(self._manage_accept, action, form_name_fields, self.model_update_table))
+            partial(self._manage_accept, action, form_name_fields))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_manage_fields))
         self.dlg_manage_fields.tbl_update.doubleClicked.connect(
             partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update))
@@ -2502,7 +2502,7 @@ class GwAdminButton:
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
-            partial(self._manage_accept, 'update', form_name_fields, self.model_update_table))
+            partial(self._manage_accept, 'update', form_name_fields))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self._manage_close_dlg, self.dlg_manage_fields))
 
         # Remove unused tabs
