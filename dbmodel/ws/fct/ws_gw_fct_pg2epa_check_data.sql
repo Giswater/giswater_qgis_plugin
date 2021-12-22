@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,380,411,412,430
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,380,411,412,430,432
 
 */
 
@@ -67,7 +67,7 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 225 AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (188, 169, 229, 230, 295) AND cur_user=current_user;
 	
 
@@ -776,6 +776,25 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All patterns checked have names without spaces.'),v_count);
 	END IF;
 	
+	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
+
+	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, v_edit_node n1
+		      JOIN (SELECT node_1 node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc) b USING (node_id)
+		      WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s WHERE s.sector_id = b.sector_id AND cur_user=current_user';
+
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+	INTO v_count;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-432 (anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
+
+		EXECUTE 'INSERT INTO anl_node (node_id, sector_id, fid, descript, nodecat_id, the_geom) '||v_querytext;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All Nodes T has right topology.'),v_count);
+	END IF;
+	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
@@ -820,7 +839,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379, 411, 412)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379, 411, 412, 432)) row) features;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 

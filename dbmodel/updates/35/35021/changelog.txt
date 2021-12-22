@@ -1,3 +1,5 @@
 3.5.021
 *************
 - Enhance usability of mapzones algorithm
+- Check node 'T candidate' with wrong topology
+- New column parent_id for sector

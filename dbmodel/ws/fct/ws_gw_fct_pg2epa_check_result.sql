@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
--- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415. Number 227 is passed by input parameters
+-- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
 
 */
 
@@ -725,7 +725,10 @@ BEGIN
 			UNION
 		      SELECT node_id, fid, 'ERROR-413: EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
 			UNION
-		      SELECT node_id, fid, 'ERROR-415: Connec AS JUNCTION without pjoint', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 415) row
+		      SELECT node_id, fid, 'ERROR-415: Connec AS JUNCTION without pjoint', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 415
+			UNION
+		      SELECT node_id, fid, 'ERROR-432: Node ''T candidate'' with wrong topology', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 432
+		      ) row
 		      ) features;
 
 		v_result := COALESCE(v_result, '[]'); 
