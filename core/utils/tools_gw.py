@@ -2022,7 +2022,7 @@ def get_project_type(schemaname=None):
         tools_qgis.show_warning(f"Table not found: '{tablename}'")
         return None
 
-    sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
+    sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
     row = tools_db.get_row(sql)
     if row:
         project_type = row[0]
@@ -2047,7 +2047,7 @@ def get_project_info(schemaname=None):
 
     sql = (f"SELECT lower(project_type), epsg, giswater, language "
            f"FROM {schemaname}.{tablename} "
-           f"ORDER BY id ASC LIMIT 1")
+           f"ORDER BY id DESC LIMIT 1")
     row = tools_db.get_row(sql)
     if row:
         project_info_dict = {'project_type': row[0],
