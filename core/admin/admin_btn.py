@@ -370,7 +370,7 @@ class GwAdminButton:
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
-        status = self._load_fct_ftrg(project_type)
+        status = self._load_fct_ftrg()
         self.task1.setProgress(20)
         self.task1.setProgress(40)
         if status:
@@ -1516,10 +1516,10 @@ class GwAdminButton:
 
         folders = sorted(os.listdir(self.folder_updates + ''))
         for folder in folders:
-            sub_folders = sorted(os.listdir(self.folder_updates + folder))
+            sub_folders = sorted(os.listdir(self.folder_updates + os.sep + folder))
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = self.folder_updates + folder + os.sep + sub_folder
+                    folder_aux = self.folder_updates + os.sep + folder + os.sep + sub_folder
                     if self._process_folder(folder_aux, ''):
                         status = self._read_files(sorted(os.listdir(folder_aux + '')), folder_aux + '')
                         if status is False:
@@ -1840,9 +1840,9 @@ class GwAdminButton:
 
             # Manage progress bar
             if set_progress_bar:
-                self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                self.progress_value = int(self.progress_value * self.progress_ratio)
                 if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
+                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
+                    self.progress_value = int(self.progress_value * self.progress_ratio)
                     self.task_create_schema.set_progress(self.progress_value)
 
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
