@@ -184,7 +184,7 @@ class GwAdminButton:
                     self.project_epsg = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
-                    self.folder_locale = f"{self.sql_dir}{os.sep}i18n{os.sep}{project_locale}{os.sep}"
+                    self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
@@ -480,9 +480,9 @@ class GwAdminButton:
 
     def load_locale(self):
 
-        if self._process_folder(self.folder_locale, '') is False:
+        if self._process_folder(self.folder_locale) is False:
             folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
-            if self._process_folder(folder_locale, '') is False:
+            if self._process_folder(folder_locale) is False:
                 return False
             else:
                 status = self._execute_files(folder_locale, True, set_progress_bar=True)
@@ -499,7 +499,7 @@ class GwAdminButton:
     def update_minor31to39(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
-        if self._process_folder(folder_utils, '') is True:
+        if self._process_folder(folder_utils) is True:
             status = self._load_sql(folder_utils, no_ct, set_progress_bar=True)
             if status is False:
                 return False
@@ -509,13 +509,13 @@ class GwAdminButton:
         else:
             folder_project = self.project_type_selected
         folder_project_type = os.path.join(folder_update, folder_project)
-        if self._process_folder(folder_project_type, ''):
+        if self._process_folder(folder_project_type):
             status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
             if status is False:
                 return False
 
         folder_locale = os.path.join(folder_update, 'i18n', self.locale)
-        if self._process_folder(folder_locale, '') is True:
+        if self._process_folder(folder_locale) is True:
             status = self._execute_files(folder_locale, True, set_progress_bar=True)
             if status is False:
                 return False
@@ -586,17 +586,17 @@ class GwAdminButton:
             if new_project:
                 if str(sub_folder) <= '31100':
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folderpath, '') is True:
+                    if self._process_folder(folderpath) is True:
                         status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, project_type)
-                    if self._process_folder(folderpath, '') is True:
+                    if self._process_folder(folderpath) is True:
                         status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath, '') is True:
+                    if self._process_folder(folderpath) is True:
                         status = self._execute_files(folderpath, True, set_progress_bar=set_progress_bar)
                         if status is False:
                             return False
@@ -609,12 +609,12 @@ class GwAdminButton:
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, self.project_type_selected)
-                    if self._process_folder(folderpath, '') is True:
+                    if self._process_folder(folderpath) is True:
                         status = self._load_sql(folderpath)
                         if status is False:
                             return False
                     folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath, '') is True:
+                    if self._process_folder(folderpath) is True:
                         status = self._execute_files(folderpath, True)
                         if status is False:
                             return False
@@ -1300,22 +1300,23 @@ class GwAdminButton:
     def _load_fct_ftrg(self):
         """"""
 
-        folder = self.folder_utils + os.sep + self.file_pattern_fct
+        folder = os.path.join(self.folder_utils, self.file_pattern_fct)
+
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_utils + os.sep + self.file_pattern_ftrg
+        folder = os.path.join(self.folder_utils, self.file_pattern_ftrg)
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + os.sep + self.file_pattern_fct
+        folder = os.path.join(self.folder_software, self.file_pattern_fct)
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
 
-        folder = self.folder_software + os.sep + self.file_pattern_ftrg
+        folder = os.path.join(self.folder_software, self.file_pattern_ftrg)
         status = self._execute_files(folder)
         if not status and self.dev_commit is False:
             return False
@@ -1516,11 +1517,11 @@ class GwAdminButton:
 
         folders = sorted(os.listdir(self.folder_updates + ''))
         for folder in folders:
-            sub_folders = sorted(os.listdir(self.folder_updates + os.sep + folder))
+            sub_folders = sorted(os.listdir(os.path.join(self.folder_software, self.file_pattern_ftrg)))
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = self.folder_updates + os.sep + folder + os.sep + sub_folder
-                    if self._process_folder(folder_aux, ''):
+                    folder_aux = os.path.join(self.folder_updates, folder,  sub_folder)
+                    if self._process_folder(folder_aux):
                         status = self._read_files(sorted(os.listdir(folder_aux + '')), folder_aux + '')
                         if status is False:
                             continue
@@ -1540,7 +1541,7 @@ class GwAdminButton:
         """"""
         # TODO: Check this!
         cmb_locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
-        self.folder_locale = self.sql_dir + os.sep + 'i18n' + os.sep + cmb_locale + os.sep
+        self.folder_locale = os.path.join(self.sql_dir, 'i18n', cmb_locale)
 
 
     def _enable_datafile(self):
@@ -1689,11 +1690,11 @@ class GwAdminButton:
             self.dlg_readsql.btn_info.setEnabled(False)
 
 
-    def _process_folder(self, folderpath, filepattern):
+    def _process_folder(self, folderpath, filepattern=''):
         """"""
 
         try:
-            os.listdir(folderpath + filepattern)
+            os.listdir(os.path.join(folderpath, filepattern))
             return True
         except Exception:
             return False
@@ -3180,32 +3181,31 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             return False
 
-        folders = sorted(os.listdir(folder_utils_updates + ''))
+        folders = sorted(os.listdir(folder_utils_updates))
         for folder in folders:
-            sub_folders = sorted(os.listdir(folder_utils_updates + folder))
+            sub_folders = sorted(os.listdir(os.path.join(folder_utils_updates, folder)))
+
             for sub_folder in sub_folders:
                 aux = str(self.ws_project_result[0]).replace('.', '')
                 if (schema_version is None and sub_folder < aux) \
                     or schema_version is not None and (schema_version < sub_folder < aux):
-
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
                     if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name='utils')
                         if status is False:
                             return False
-
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
-                    if self._process_folder(folder_update, ''):
+                    if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name=self.ws_project_name)
                         if status is False:
                             return False
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
-                    if self._process_folder(folder_update, ''):
+                    if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name=self.ud_project_name)
                         if status is False:
                             return False
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folder_update, '') is True:
+                    if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)
                         if status is False:
                             return False
