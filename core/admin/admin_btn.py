@@ -59,10 +59,10 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
-        self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                                       "giswater", False, force_reload=True))
-        self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                                       "giswater", False, force_reload=True))
+        self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
+                                            .replace('.', ''))
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir)
+                                            .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
