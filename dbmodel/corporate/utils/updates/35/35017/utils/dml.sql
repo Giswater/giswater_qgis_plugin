@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO utils.sys_table VALUES ('district', 'Districts on municipality', 'role_admin', 0);
+INSERT INTO sys_table VALUES ('district', 'Districts on municipality', 'role_admin', 0);
