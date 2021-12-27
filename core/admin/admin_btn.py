@@ -1515,14 +1515,14 @@ class GwAdminButton:
             tools_qgis.show_message("The update folder was not found in sql folder")
             return
 
-        folders = sorted(os.listdir(self.folder_updates + ''))
+        folders = sorted(os.listdir(self.folder_updates))
         for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_software, self.file_pattern_ftrg)))
+            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = os.path.join(self.folder_updates, folder,  sub_folder)
+                    folder_aux = os.path.join(self.folder_updates, folder, sub_folder)
                     if self._process_folder(folder_aux):
-                        status = self._read_files(sorted(os.listdir(folder_aux + '')), folder_aux + '')
+                        status = self._read_files(sorted(os.listdir(folder_aux)), folder_aux)
                         if status is False:
                             continue
                 else:
