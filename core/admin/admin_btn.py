@@ -1522,11 +1522,7 @@ class GwAdminButton:
                 if str(sub_folder) > str(self.project_version).replace('.', ''):
                     folder_aux = os.path.join(self.folder_updates, folder, sub_folder)
                     if self._process_folder(folder_aux):
-                        status = self._read_files(sorted(os.listdir(folder_aux)), folder_aux)
-                        if status is False:
-                            continue
-                else:
-                    continue
+                        self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
 
         return True
 
@@ -1884,24 +1880,29 @@ class GwAdminButton:
             return status
 
 
-    def _read_files(self, filelist, filedir):
-        """"""
+    def _read_changelog(self, filelist, filedir):
+        """ Read contents of file 'changelog.txt' """
 
         f = None
-        if "changelog.txt" in filelist:
-            try:
-                f = open(filedir + os.sep + 'changelog.txt', 'r')
-                if f:
-                    f_to_read = str(f.read()) + '\n'
-                    self.message_update = self.message_update + '\n' + str(f_to_read)
-                else:
-                    return False
-            except Exception as e:
-                tools_log.log_warning("Error _read_files: " + str(e))
+        if "changelog.txt" not in filelist:
+            tools_log.log_warning(f"File 'changelog.txt' not found in: {filedir}")
+            return True
+
+        try:
+            filepath = os.path.join(filedir, 'changelog.txt')
+            f = open(filepath, 'r')
+            if f:
+                f_to_read = str(f.read()) + '\n'
+                self.message_update = self.message_update + '\n' + str(f_to_read)
+            else:
                 return False
-            finally:
-                if f:
-                    f.close()
+        except Exception as e:
+            tools_log.log_warning(f"Error reading file 'changelog.txt': {e}")
+            return False
+        finally:
+            if f:
+                f.close()
+
         return True
 
 
