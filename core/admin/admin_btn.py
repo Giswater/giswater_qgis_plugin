@@ -338,7 +338,10 @@ class GwAdminButton:
             status = self.load_updates(project_type, update_changelog=True)
             if status:
                 self._set_info_project()
-                tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
+                if 'body' in status:
+                    tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
+                else:
+                    tools_log.log_warning(f"Key not found: 'body'")
 
             self.task1.setProgress(100)
         else:
@@ -2174,14 +2177,15 @@ class GwAdminButton:
                 news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('')
+
         # If none of the new words are in the file
         if all_valid:
             msg = "This will modify your inp file, so a backup will be created.\n" \
                   "Do you want to proceed?"
             if not tools_qt.show_question(msg):
                 return
+
             # Replace the words
-            contents = ""
             try:
                 # Read the contents of the file
                 with open(self.file_inp, 'r', encoding='utf-8') as file:
