@@ -59,10 +59,10 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
-        self.lower_postgresql_version = int(tools_gw.get_config_parser('system', 'lower_postgresql_version', "project",
-                                                                       "giswater", False, force_reload=True))
-        self.upper_postgresql_version = int(tools_gw.get_config_parser('system', 'upper_postgresql_version', "project",
-                                                                       "giswater", False, force_reload=True))
+        self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
+                                            .replace('.', ''))
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir)
+                                            .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
@@ -338,7 +338,10 @@ class GwAdminButton:
             status = self.load_updates(project_type, update_changelog=True)
             if status:
                 self._set_info_project()
-                tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
+                if 'body' in status:
+                    tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
+                else:
+                    tools_log.log_warning(f"Key not found: 'body'")
 
             self.task1.setProgress(100)
         else:
@@ -1515,18 +1518,14 @@ class GwAdminButton:
             tools_qgis.show_message("The update folder was not found in sql folder")
             return
 
-        folders = sorted(os.listdir(self.folder_updates + ''))
+        folders = sorted(os.listdir(self.folder_updates))
         for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_software, self.file_pattern_ftrg)))
+            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_version).replace('.', ''):
-                    folder_aux = os.path.join(self.folder_updates, folder,  sub_folder)
+                    folder_aux = os.path.join(self.folder_updates, folder, sub_folder)
                     if self._process_folder(folder_aux):
-                        status = self._read_files(sorted(os.listdir(folder_aux + '')), folder_aux + '')
-                        if status is False:
-                            continue
-                else:
-                    continue
+                        self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
 
         return True
 
@@ -1884,24 +1883,29 @@ class GwAdminButton:
             return status
 
 
-    def _read_files(self, filelist, filedir):
-        """"""
+    def _read_changelog(self, filelist, filedir):
+        """ Read contents of file 'changelog.txt' """
 
         f = None
-        if "changelog.txt" in filelist:
-            try:
-                f = open(filedir + os.sep + 'changelog.txt', 'r')
-                if f:
-                    f_to_read = str(f.read()) + '\n'
-                    self.message_update = self.message_update + '\n' + str(f_to_read)
-                else:
-                    return False
-            except Exception as e:
-                tools_log.log_warning("Error _read_files: " + str(e))
+        if "changelog.txt" not in filelist:
+            tools_log.log_warning(f"File 'changelog.txt' not found in: {filedir}")
+            return True
+
+        try:
+            filepath = os.path.join(filedir, 'changelog.txt')
+            f = open(filepath, 'r')
+            if f:
+                f_to_read = str(f.read()) + '\n'
+                self.message_update = self.message_update + '\n' + str(f_to_read)
+            else:
                 return False
-            finally:
-                if f:
-                    f.close()
+        except Exception as e:
+            tools_log.log_warning(f"Error reading file 'changelog.txt': {e}")
+            return False
+        finally:
+            if f:
+                f.close()
+
         return True
 
 
@@ -2173,14 +2177,15 @@ class GwAdminButton:
                 news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
                 self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('')
+
         # If none of the new words are in the file
         if all_valid:
             msg = "This will modify your inp file, so a backup will be created.\n" \
                   "Do you want to proceed?"
             if not tools_qt.show_question(msg):
                 return
+
             # Replace the words
-            contents = ""
             try:
                 # Read the contents of the file
                 with open(self.file_inp, 'r', encoding='utf-8') as file:
