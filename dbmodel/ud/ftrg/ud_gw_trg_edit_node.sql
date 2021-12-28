@@ -80,9 +80,16 @@ BEGIN
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		-- man2inp_values
-		v_man_view  = (SELECT child_layer FROM cat_feature WHERE id = NEW.node_type);
-		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
+		IF NEW.node_type IS NOT NULL THEN
+			-- man2inp_values
+			v_man_view  = (SELECT child_layer FROM cat_feature WHERE id = NEW.node_type);
+			v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
+
+			--check if feature is double geom	
+			EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+			FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
+			INTO v_doublegeometry, v_doublegeom_buffer;
+		END IF;
 		
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
@@ -92,12 +99,7 @@ BEGIN
 		IF (SELECT matcat_id FROM cat_node WHERE id = NEW.nodecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
-        
-        --check if feature is double geom	
-        EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
-        FROM cat_feature_node WHERE id='||quote_literal(NEW.node_type)||''
-        INTO v_doublegeometry, v_doublegeom_buffer;
-        
+               
 	END IF;
 
 
@@ -185,16 +187,26 @@ BEGIN
 				"data":{"message":"1004", "function":"1220","debug_msg":null}}$$);';
 			END IF;
             
- 			If v_customfeature IS NOT NULL THEN
+ 			IF v_customfeature IS NOT NULL THEN
  				NEW.node_type:=v_customfeature;
- 			ELSE
+ 			END IF;
+
+ 			-- get it from relation on cat_node
+ 			IF NEW.node_type IS NULL THEN
+				NEW.node_type:= (SELECT c.id FROM cat_feature_node c JOIN cat_node s ON c.id = s.node_type WHERE s.id=NEW.nodecat_id);
+			END IF;
+			
+			-- get it from vdefault
+			IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
 				NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-
-			IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
+			
+			-- get the first 1 from table
+			IF NEW.node_type IS NULL THEN
 				NEW.node_type:= (SELECT id FROM cat_feature_node LIMIT 1);
+			END IF;
 
-			ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
+			IF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
 				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
