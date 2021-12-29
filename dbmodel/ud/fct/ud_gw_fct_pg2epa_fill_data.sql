@@ -54,43 +54,42 @@ BEGIN
 
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
-	SELECT 
-	result_id_var,
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
+	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
 	FROM selector_sector, node  -- we need to use node to make more easy the relation sector against exploitation
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id
 	UNION
-	SELECT 
-	result_id_var,
+	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id
 	UNION
-	SELECT 
-	result_id_var,
+	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id
 	UNION
-	SELECT 
-	result_id_var,
+	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id;
-
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id';
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
 	PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
@@ -102,11 +101,10 @@ BEGIN
 	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider
 
 	-- Insert on arc rpt_inp table
-	INSERT INTO temp_arc 
+	EXECUTE 'INSERT INTO temp_arc 
 	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope,
 	culvert, kentry, kexit, kavg, flap, seepage)
-	SELECT
-	result_id_var,
+	SELECT '||quote_literal(result_id_var)||',
 	a.arc_id, node_1, node_2, a.sys_elev1, a.sys_elev2, a.arc_type, arccat_id, epa_type, a.sector_id, a.state, 
 	a.state_type, a.annotation, 
 	CASE
@@ -129,9 +127,9 @@ BEGIN
 		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE (is_operative IS TRUE)
-		AND epa_type !='UNDEFINED'
+		AND epa_type !=''UNDEFINED'' '||v_statetype||' 
 		AND a.sector_id > 0
-		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user;
+		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user';
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump
 
@@ -140,7 +138,7 @@ BEGIN
 	
 		INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
+		gully_id, g.gully_type, gratecat_id, g.sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
 		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
 		(case when pjoint_type = 'VNODE' THEN concat('VN',pjoint_id) ELSE pjoint_id end) as pjoint_id,
 		pjoint_type,
@@ -149,7 +147,7 @@ BEGIN
 		case when custom_n is not null then custom_n else n end, 
 		connec_y1, connec_y2, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
 		the_geom
-		FROM sector_selector, v_edit_inp_gully g 
+		FROM selector_sector, v_edit_inp_gully g 
 		JOIN cat_grate c ON id = gratecat_id 
 		left JOIN cat_connec a ON connec_arccat_id = a.id
 		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
