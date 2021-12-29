@@ -56,7 +56,8 @@ BEGIN
 	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
-		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text '
+		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
+		AND ve_arc.sector_id > 0 '
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id
@@ -72,6 +73,7 @@ BEGIN
 			FROM selector_sector, v_edit_inp_connec c
 			JOIN value_state_type ON id = state_type
 			WHERE c.sector_id = selector_sector.sector_id 
+			AND c.sector_id > 0
 			AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL
 			AND epa_type = ''JUNCTION''
 			AND selector_sector.cur_user = "current_user"()::text '
@@ -151,6 +153,7 @@ BEGIN
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''
+			AND v_arc.sector_id > 0
 			AND st_length(v_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode =  4 THEN
@@ -174,6 +177,7 @@ BEGIN
 				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
+				AND l.sector_id > 0
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
         

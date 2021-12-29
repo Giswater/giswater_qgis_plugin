@@ -62,7 +62,7 @@ BEGIN
 	FROM selector_sector, node  -- we need to use node to make more easy the relation sector against exploitation
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
@@ -71,7 +71,7 @@ BEGIN
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
@@ -80,7 +80,7 @@ BEGIN
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
@@ -89,7 +89,7 @@ BEGIN
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id;
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc WHERE sector_id > 0 UNION SELECT node_2 FROM vi_parent_arc WHERE sector_id > 0)a ON node.node_id=a.node_id;
 
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
@@ -130,6 +130,7 @@ BEGIN
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE (is_operative IS TRUE)
 		AND epa_type !='UNDEFINED'
+		AND a.sector_id > 0
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user;
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump
@@ -148,12 +149,15 @@ BEGIN
 		case when custom_n is not null then custom_n else n end, 
 		connec_y1, connec_y2, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
 		the_geom
-		FROM v_edit_inp_gully g 
+		FROM sector_selector, v_edit_inp_gully g 
 		JOIN cat_grate c ON id = gratecat_id 
 		left JOIN cat_connec a ON connec_arccat_id = a.id
 		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
 		left JOIN value_state_type s ON state_type = s.id
-		WHERE isepa IS TRUE AND is_operative IS TRUE; 
+		WHERE isepa IS TRUE AND is_operative IS TRUE
+		AND g.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+		AND g.sector_id > 0
+		AND is_operative IS TRUE; 
 	END IF;
 
 	-- fill rpt_inp_raingage
