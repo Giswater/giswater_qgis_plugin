@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()  RETURNS trigger AS
 $BODY$
 
 DECLARE 
-expl_id_int integer;
 v_newpattern json;
 v_status boolean;
 v_value text;
@@ -25,13 +24,23 @@ BEGIN
 		v_status = v_newpattern->>'status';
 		v_value = v_newpattern->>'value';
 		
-		--Exploitation ID
+		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;				
 		END IF;
 
-		expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-		
+		IF NEW.the_geom IS NOT NULL THEN
+			IF NEW.expl_id IS NULL THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			END IF;
+		END IF;
+
+		-- active
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
+
+		-- pattern_id
 		IF v_status THEN
 		
 			IF  v_value = 'dma_id' OR v_value IS NULL THEN
@@ -45,7 +54,7 @@ BEGIN
 		END IF;
 			
 		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, grafconfig, stylesheet, active)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, 
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, NEW.minc, 
 		NEW.maxc, NEW.effc, NEW.grafconfig::json, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;

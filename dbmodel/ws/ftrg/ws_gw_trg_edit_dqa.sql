@@ -10,35 +10,35 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dqa()  RETURNS trigger AS
 $BODY$
 
 DECLARE 
-	expl_id_int integer;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-    IF TG_OP = 'INSERT' THEN
+	IF TG_OP = 'INSERT' THEN
 		
-		--Exploitation ID
-        IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
-            -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        	 -- "data":{"message":"1012", "function":"1112","debug_msg":null, "variables":null}}$$); 
+		-- expl_id		
+		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                 -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        	 -- "data":{"message":"1014", "function":"1112","debug_msg":null, "variables":null}}$$); 
-				RETURN NULL; 
-            END IF;
+		END IF;
+		IF NEW.the_geom IS NOT NULL THEN
+			IF NEW.expl_id IS NULL THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			END IF;
+		END IF;
+
+		-- active
+		IF NEW.active IS NULL THEN
+			NEW.active = TRUE;
+		END IF;
 			
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig, 
-		stylesheet,active)
-		VALUES (NEW.dqa_id, NEW.name, expl_id_int, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type, 
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig, stylesheet,active)
+		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type,
 		NEW.link, NEW.grafconfig::json, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;
 		
-    ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE dqa 
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
@@ -48,13 +48,11 @@ BEGIN
 		
 		RETURN NEW;
 		
-    ELSIF TG_OP = 'DELETE' THEN  
+	ELSIF TG_OP = 'DELETE' THEN  
 	 
 		DELETE FROM dqa WHERE dqa_id = OLD.dqa_id;		
 		RETURN NULL;
-     
 	END IF;
-
 END;
 	
 $BODY$
