@@ -27,6 +27,7 @@ v_result_info json;
 v_project_type text;
 v_version text;
 v_fid integer = 385;
+v_timsertype text;
 
 BEGIN
 
@@ -49,7 +50,6 @@ BEGIN
   	-- starting process
  	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
-
 		IF rec_csv.csv1 IS NOT NULL THEN -- to control those null rows because user has a bad structured csv file (common last lines)
 			
 			IF rec_csv.csv1 NOT IN (SELECT id FROM inp_timeseries) THEN
@@ -59,31 +59,31 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Timeseries id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
 
 				-- insert inp_timeseries
-				INSERT INTO inp_timeseries VALUES (rec_csv.csv1, rec_csv.csv2,  rec_csv.csv3, rec_csv.csv1, concat('Imported by ',current_user,' on ', now()::date));
+				INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, sector_id) 
+				VALUES (rec_csv.csv1, rec_csv.csv5, rec_csv.csv6, rec_csv.csv1, rec_csv.csv7, rec_csv.csv8::integer);
 				
 				-- insert into inp_timeseries_value
-				IF rec_csv.csv3 = 'ABSOLUTE' THEN			
+				IF rec_csv.csv6 = 'ABSOLUTE' THEN			
 					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES
-					(rec_csv.csv1, rec_csv.csv4::date, rec_csv.csv5::time, rec_csv.csv6::float);
-				ELSIF rec_csv.csv3 = 'RELATIVE' THEN
+					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::float);
+				ELSIF rec_csv.csv6 = 'RELATIVE' THEN
 					INSERT INTO inp_timeseries_value (timser_id, "time", value) VALUES
-					(rec_csv.csv1, rec_csv.csv4::time, rec_csv.csv5::float);
+					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3::float);
 				END IF;
 
+				v_timsertype = rec_csv.csv6;
 
 			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_timeseries) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
 
 				-- insert into inp_timeseries_value
-				IF rec_csv.csv3 = 'ABSOLUTE' THEN			
+				IF v_timsertype = 'ABSOLUTE' THEN			
 					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES
-					(rec_csv.csv1, rec_csv.csv4::date, rec_csv.csv5::time, rec_csv.csv6::float);
-				ELSIF rec_csv.csv3 = 'RELATIVE' THEN
+					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::float);
+				ELSIF v_timsertype = 'RELATIVE' THEN
 					INSERT INTO inp_timeseries_value (timser_id, "time", value) VALUES
-					(rec_csv.csv1, rec_csv.csv4::time, rec_csv.csv5::float);
+					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3::float);
 				END IF;
-
 			ELSE 
-			
 				IF rec_csv.csv1 in (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
 				
 				ELSE 

@@ -61,7 +61,7 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Curve id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
 
 				-- insert inp_curve
-				INSERT INTO inp_curve VALUES (rec_csv.csv1, rec_csv.csv4, concat('Imported by ',current_user,' on ', now()::date), rec_csv.csv5::integer);
+				INSERT INTO inp_curve VALUES (rec_csv.csv1, rec_csv.csv4, rec_csv.csv6, rec_csv.csv5::integer);
 					
 				-- insert into inp_curve_value
 				INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES
@@ -88,8 +88,6 @@ BEGIN
 
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('Process finished'));
-
-	--DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

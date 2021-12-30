@@ -61,24 +61,25 @@ BEGIN
 				-- insert inp_patterN & inp_pattern_value	
 				IF v_project_type = 'UD' THEN
 
-					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date));
-				
+					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer);
+			
 					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, 
-									     factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) VALUES
-					(rec_csv.csv1, rec_csv.csv3::float, rec_csv.csv4::float, rec_csv.csv5::float, rec_csv.csv6::float, rec_csv.csv7::float, rec_csv.csv8::float, rec_csv.csv9::float
+					factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) VALUES
+					(rec_csv.csv1, rec_csv.csv5::float, rec_csv.csv6::float, rec_csv.csv7::float, rec_csv.csv8::float, rec_csv.csv9::float
 					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float 
 					, rec_csv.csv18::float, rec_csv.csv19::float, rec_csv.csv20::float, rec_csv.csv21::float, rec_csv.csv22::float, rec_csv.csv23::float, rec_csv.csv24::float, rec_csv.csv25::float
-					, rec_csv.csv26::float);
+					, rec_csv.csv26::float, rec_csv.csv27::float, rec_csv.csv28::float);
 				ELSE
-					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, concat('Imported by ',current_user,' on ', now()::date), null, rec_csv.csv3::integer);
+					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, null, null, rec_csv.csv3::integer);
 				END IF;
 
 			ELSIF rec_csv.csv1 IN (SELECT pattern_id FROM inp_pattern) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
 
 				-- insert inp_pattern_value				
 				IF v_project_type = 'WS' THEN
+				
 					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, 
-									     factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) VALUES
+					factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) VALUES
 					(rec_csv.csv1, rec_csv.csv2::float, rec_csv.csv3::float, rec_csv.csv4::float, rec_csv.csv5::float, rec_csv.csv6::float, rec_csv.csv7::float, rec_csv.csv8::float, rec_csv.csv9::float
 					, rec_csv.csv10::float, rec_csv.csv11::float, rec_csv.csv12::float, rec_csv.csv13::float, rec_csv.csv14::float, rec_csv.csv15::float, rec_csv.csv16::float, rec_csv.csv17::float 
 					, rec_csv.csv18::float, rec_csv.csv19::float);
