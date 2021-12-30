@@ -126,8 +126,7 @@ BEGIN
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
-		WHERE (is_operative IS TRUE)
-		AND epa_type !=''UNDEFINED'' '||v_statetype||' 
+		WHERE epa_type !=''UNDEFINED'' '||v_statetype||' 
 		AND a.sector_id > 0
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user';
 
@@ -136,7 +135,7 @@ BEGIN
 	-- fill temp_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
 	
-		INSERT INTO temp_gully 
+		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
 		gully_id, g.gully_type, gratecat_id, g.sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
 		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
@@ -152,10 +151,10 @@ BEGIN
 		left JOIN cat_connec a ON connec_arccat_id = a.id
 		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
 		left JOIN value_state_type s ON state_type = s.id
-		WHERE isepa IS TRUE AND is_operative IS TRUE
-		AND g.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-		AND g.sector_id > 0
-		AND is_operative IS TRUE; 
+		WHERE g.sector_id=selector_sector.sector_id 
+		AND selector_sector.cur_user=current_user
+		AND g.sector_id > 0 '||v_statetype||';';
+		
 	END IF;
 
 	-- fill rpt_inp_raingage
