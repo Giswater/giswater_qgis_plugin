@@ -170,8 +170,7 @@ BEGIN
 		v_count_2=0;
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '113', 
-		concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only nodes sink with outfallparam values can do it.'),v_count);
+		VALUES (v_fid, v_result_id, 1, '113', concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only nodes sink with outfallparam values can do it.'),v_count);
 	END IF;
 	
 	RAISE NOTICE '107- Node exit upper intro (111)';
@@ -313,11 +312,11 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
 	END IF;
 	
 
@@ -370,16 +369,11 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
-	END IF;
-
-	IF v_result_id IS NULL THEN
-		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
-		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
 	END IF;
 	
 	RAISE NOTICE '18 - Check EPA OBJECTS (curves, patterns, timeseries, lids, polluntats and snowpacks) have not spaces on names (fid: 429)';
@@ -388,7 +382,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' curve(s) has/have name with spaces. Please fix it!'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All curves checked have names without spaces.'),v_count);
 	END IF;
 
@@ -524,7 +518,11 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
 	END IF;	
 
-	
+	IF v_result_id IS NULL THEN
+		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
+		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
+	END IF;
+
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
