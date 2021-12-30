@@ -978,7 +978,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
 		SELECT 417, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with connec '',t.node_1), t.the_geom, a.expl_id 
 		FROM temp_arc t JOIN v_edit_connec a ON node_1 = connec_id WHERE t.state = 1';
-		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 3, '417', concat('ERROR-417 (anl_arc): There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
@@ -1159,18 +1159,17 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
 		SELECT 106, node_1, nodecat_1, ''Duplicated nodes'', the_geom, expl_id FROM (', v_querytext,')a');
 
-		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 3, '106', concat('ERROR-106 (anl_node): There is/are ',v_count,' nodes duplicated.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '106','INFO: There are  no nodes duplicated',v_count);
 	END IF;
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 1, '');
-
 	
 	-- get results
 	-- info
