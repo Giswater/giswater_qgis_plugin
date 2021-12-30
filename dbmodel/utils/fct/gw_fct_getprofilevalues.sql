@@ -126,6 +126,8 @@ v_nodevalid boolean;
 v_nodemessage text;
 v_querytext1 text;
 v_querytext2 text;
+v_count_int integer;
+object_rec record;
 
 BEGIN
 
@@ -190,6 +192,18 @@ BEGIN
 		v_message = v_nodemessage;
 	END IF;	
 
+	-- Check not integer id''s 
+	FOR object_rec IN SELECT json_array_elements_text('["arc", "node"]'::json) as idval
+	LOOP
+		EXECUTE 'SELECT count(*) FROM v_edit_'||object_rec.idval||' ' INTO v_count;
+		EXECUTE 'SELECT count(*) FROM v_edit_'||object_rec.idval||' WHERE '||object_rec.idval||'_id ~ ''^\d+$''' INTO v_count_int;
+		v_count = v_count - v_count_int;
+
+		IF v_count > 0 THEN
+			v_level = 2;
+			v_message = concat('There is/are ',v_count, ' ',object_rec.idval,'(s) with id''s not integer on the system. It is not possible to build the graf matrix to check shortestpath.');	
+		END IF;
+	END LOOP;
 
 	IF v_level = 3 THEN
 
