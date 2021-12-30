@@ -149,7 +149,7 @@ BEGIN
 		VALUES (211, 3, '176', concat('ERROR-176: There is/are ',v_count,' valve''s (state=1) with broken or closed with NULL values.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (211, 1, '176', 'INFO: No valves''s (state=1) with null values on closed and broken fields.',v_count);
+		VALUES (211, 1, '176', 'INFO: There are not operative valve(s) with null values on closed/broken fields.',v_count);
 	END IF;
 
 	-- inlet_x_exploitation (177)
