@@ -1,13 +1,13 @@
-curve_name;xval;yval;curve_type;exp_id(optative)
-example_pump_1;1.3;4.44;PUMP
-example_pump_1;10.2;3;PUMP
-example_pump_1;100.221;2;PUMP
-example_pump_1;1000.38;1.82;PUMP
-example_pump_2;1;4;PUMP
-example_pump_2;10;3;PUMP
-example_pump_2;100;2;PUMP
-example_pump_2;1000;1;PUMP
-example_pump_3;1;4;PUMP
-example_pump_3;10;3;PUMP
-example_pump_3;100;2;PUMP
-example_pump_3;1000;1;PUMP
+curve_name;xval;yval;curve_type;sector_id;descript
+example_pump_11;1.3;4.44;PUMP;1;Curve description for sector 1
+example_pump_11;10.2;3
+example_pump_11;100.221;2
+example_pump_11;1000.38;1.82
+example_pump_11;1;4
+example_pump_12;10;3;PUMP;1;Curve description for sector 1
+example_pump_12;100;2
+example_pump_12;1000;1
+example_pump_13;1;4;PUMP;;Curve description for all sectors (because sector_id is null)
+example_pump_13;10;3
+example_pump_13;100;2
+example_pump_13;1000;1

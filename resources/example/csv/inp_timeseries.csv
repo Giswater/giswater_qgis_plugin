@@ -1,12 +1,12 @@
-timser_id; timser_type, times_type; date(M/D/Y)-time; hour-value;value
-example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:00;1.15
-example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:10;1.25
-example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:20;1.35
-example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:30;2.45
-example_timser_1;Rainfall;ABSOLUTE;01/30/2017;00:40;2.55
-example_timser_2;Rainfall;RELATIVE;00:00;3.15
-example_timser_2;Rainfall;RELATIVE;00:10;3.25
-example_timser_2;Rainfall;RELATIVE;00:20;3.35
-example_timser_2;Rainfall;RELATIVE;00:30;3.45
-example_timser_2;Rainfall;RELATIVE;00:40;3.55
-example_timser_2;Rainfall;RELATIVE;00:50;3.65
+timser_id; date(M/D/Y)/time; hour/value; value; timser_type; times_type; description; sector_id (optional)
+example_timser_1;01/30/2017;00:00;1.15;Rainfall;ABSOLUTE;Timeseries for sector 1;1
+example_timser_1;01/30/2017;00:10;1.25
+example_timser_1;01/30/2017;00:20;1.35
+example_timser_1;01/30/2017;00:30;2.45
+example_timser_1;01/30/2017;00:40;2.55
+example_timser_2;00:00;3.15;;Rainfall;RELATIVE;"Description for all sector"
+example_timser_2;00:10;3.25
+example_timser_2;00:20;3.35
+example_timser_2;00:30;3.45
+example_timser_2;00:40;3.55
+example_timser_2;00:50;3.65
