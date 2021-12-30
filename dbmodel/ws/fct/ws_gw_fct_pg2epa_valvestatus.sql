@@ -72,26 +72,25 @@ BEGIN
 		IF v_valvemode = 3 THEN --mincut results
 			EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
 			EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
-		
+
+			-- set additional mincut closed valves
 			UPDATE temp_arc a SET status='CLOSED' 
 			FROM om_mincut_valve v
 			WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE);
 			
-			
 		ELSIF v_valvemode = 2 THEN -- inventory
 
-	
 			EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
 			EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
-
-			UPDATE temp_arc a SET status='OPEN'  -- open those valves wich are open on inventory but closed on epa tables
-				FROM  man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed=false AND a.status = 'CLOSED';
 
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc a SET status=p.status 
 			FROM inp_shortpipe p
 				WHERE a.arc_id=concat(p.node_id,'_n2a');
 		END IF;
+
+		-- Set CV valves 
+		UPDATE temp_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV';	
     END IF;
     
     -- all that not are closed are open
