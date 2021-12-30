@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/12/22
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (432, 'Check node ''T candidate'' with wrong topology','ws', null, null) ON CONFLICT (fid) DO NOTHING;
+
+--2021/12/30
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'checkData', 'NONE'::text) WHERE parameter = 'utils_grafanalytics_status';

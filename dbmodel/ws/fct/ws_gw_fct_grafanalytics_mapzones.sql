@@ -43,10 +43,10 @@ select * from exploitation
 
 ----------------
 -- QUERY SAMPLE
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], "checkData":false,
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "floodFromNode":"113766", "exploitation":[1], "macroExploitation":[1], 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "exploitation":[1], "checkData":false,
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "exploitation":[1], 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false}}}');
 
 
@@ -61,7 +61,7 @@ if updatefeature
 
 ---------------
 TEST EXAMPLE WITHOUT MODIFY SYSTEM VALUES
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "macroExploitation":[1], "checkData":false, "updateFeature":false, "updateMapZone":0, "geomParamUpdate":4}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "macroExploitation":[1], "updateFeature":false, "updateMapZone":0, "geomParamUpdate":4}}}');
 DELETE FROM anl_arc
 SELECT arc_id, descript, the_geom FROM anl_arc WHERE fid = 145
 ----------------
@@ -164,7 +164,7 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_checkdata boolean;
+v_checkdata text;  -- FULL / PARTIAL / NONE
 v_mapzonename text;
 v_parameters json;
 v_usepsector boolean;
@@ -196,28 +196,44 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
-	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
 	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
+	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+
 
 	-- data quality analysis
-	IF v_checkdata THEN
+	IF v_checkdata = 'FULL' THEN
+	
 		-- om data quality analysis
 		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count1 FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
+		SELECT count(*) INTO v_count1 FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3 AND result_id IS NOT NULL;
+
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND result_id IS NULL AND error_message ='' AND criticity=1;
 
 		-- graf quality analysis
 		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
 		PERFORM gw_fct_grafanalytics_check_data(v_input);
-		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3;
+		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3 AND result_id IS NOT NULL;
 
-		v_count = v_count1 + v_count2;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND result_id IS NULL;
+
+	ELSIF v_checkdata = 'PARTIAL' THEN
+
+		-- graf quality analysis
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
+		PERFORM gw_fct_grafanalytics_check_data(v_input);
+		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3 AND result_id IS NOT NULL;
+
+	ELSIF v_checkdata = 'NONE' THEN 
+	
 	END IF;
+
+	v_count = v_count1 + v_count2;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 0 THEN
@@ -332,6 +348,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatefeature::text)));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 		
 		IF v_floodfromnode IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood from mode is ENABLED. Graphic log (disconnected arcs & connecs) have been disabled. Used node:',v_floodfromnode,'.'));
@@ -859,7 +876,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
