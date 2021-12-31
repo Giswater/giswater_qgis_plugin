@@ -34,7 +34,7 @@ BEGIN
 
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
-				
+			
 		-- moving node demands to temp_demand
 		INSERT INTO temp_demand (feature_id, demand, pattern_id)
 		SELECT DISTINCT ON (feature_id) feature_id, d.demand, d.pattern_id 

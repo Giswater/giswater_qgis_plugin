@@ -758,7 +758,7 @@ BEGIN
 
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc arc 
 						where arc.state > 0 AND '||quote_ident(v_field)||' NOT IN (''0'', ''-1'') AND arc.'||quote_ident(v_field)||' IN
-						(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+						(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 						group by '||quote_ident(v_field)||')a 
 						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
@@ -779,13 +779,13 @@ BEGIN
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc
 							where arc.state > 0 AND  '||quote_ident(v_field)||' NOT IN (''0'', ''-1'') AND arc.'||quote_ident(v_field)||' IN
-							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+							(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||'
 							UNION
 							SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
 							WHERE v_edit_connec.state > 0 AND '||quote_ident(v_field)||' NOT IN (''0'', ''-1'')
 							AND v_edit_connec.'||quote_ident(v_field)||' IN
-							(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+							(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 							group by '||quote_ident(v_field)||'	
 							)a group by '||quote_ident(v_field)||')b 
@@ -819,7 +819,7 @@ BEGIN
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 						(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc 
 						where arc.state > 0 AND '||quote_ident(v_field)||' NOT IN (''0'', ''-1'') AND arc.'||quote_ident(v_field)||' IN
-						(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+						(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 						group by '||quote_ident(v_field)||'
 						UNION
 						SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
@@ -827,7 +827,7 @@ BEGIN
 						WHERE c.'||quote_ident(v_field)||' NOT IN (''0'', ''-1'') 
 						AND c.state > 0
 						AND c.'||quote_ident(v_field)||' IN
-						(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+						(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 						AND link.feature_id = connec_id and link.feature_type = ''CONNEC''
 						group by c.'||quote_ident(v_field)||'	
 						)a group by '||quote_ident(v_field)||')b 

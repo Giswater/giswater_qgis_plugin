@@ -79,6 +79,11 @@ BEGIN
 			record_new_arc.node_2 = arc_rec.node_2;
 			record_new_arc.epa_type = arc_rec.epa_type;
 			record_new_arc.sector_id = arc_rec.sector_id;
+			record_new_arc.sector_id = arc_rec.sector_id;
+			record_new_arc.dma_id = arc_rec.dma_id;
+			record_new_arc.presszone_id = arc_rec.presszone_id;
+			record_new_arc.dqa_id = arc_rec.dqa_id;
+			record_new_arc.minsector_id = arc_rec.minsector_id;
 			record_new_arc.state = arc_rec.state;
 			record_new_arc.arccat_id = arc_rec.arccat_id;
 			
@@ -101,10 +106,11 @@ BEGIN
 						 arc_rec.addparam::json->>'pump_type','"}');	
 
 			-- Inserting into temp_arc
-			INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
+			INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, 
+			length, diameter, roughness, dma_id, presszone_id, dqa_id, minsector_id) 
 			VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
-			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, arc_rec.length, arc_rec.diameter, arc_rec.roughness);			
-
+			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, 
+			arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);			
 		END LOOP;
 
     END LOOP;

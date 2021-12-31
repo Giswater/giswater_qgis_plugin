@@ -16,7 +16,7 @@ $BODY$
 delete from temp_anlgraf
 TO EXECUTE
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1]", "MaxMinsectors":500, "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "MaxMinsectors":0, "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
 
 select distinct(sector_id) from SCHEMA_NAME.arc where expl_id=1
 
@@ -202,7 +202,6 @@ BEGIN
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;	
 		END IF;
 
-
 		SELECT count(*)/2 INTO v_total FROM temp_anlgraf;
 		
 		-- set boundary conditions of graf table	
@@ -216,7 +215,10 @@ BEGIN
 			UPDATE temp_anlgraf SET water=0;
 			
 			v_cont2 = v_cont2 +1;
-			EXIT WHEN v_cont2 = v_maxmsector + 1;
+
+			IF v_maxmsector > 0 THEN
+				EXIT WHEN v_cont2 = v_maxmsector + 1;
+			END IF;
 
 			------------------
 			-- starting engine
@@ -254,42 +256,22 @@ BEGIN
 			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id;
 			GET DIAGNOSTICS v_affectedrow =row_count;
 
-			SELECT count(*) INTO v_row1 FROM anl_arc WHERE fid = 134 AND cur_user =current_user;
-
-			raise notice 'Expl: %, Minsector % - Arc % - ( % %%)', v_expl, v_cont2, v_arc, (100*v_row1/v_total)::numeric(12,2);	
-			
 		END LOOP;
 
-		-- insert node results into audit table
-		INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
-		SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, arc_id FROM (SELECT node_1 as node_id FROM
-		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
-		GROUP BY node_1, water HAVING water=1)b JOIN node c ON c.node_id=b.node_id;
-
-		-- insert node delimiters into audit table
-		INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
-		SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, 0 FROM
-		(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-		GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN node c ON c.node_id=b.node_id;
-		-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
-		
 		IF v_updatefeature THEN 
 		
 			-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
 			UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fid=134 AND a.arc_id=arc.arc_id AND cur_user=current_user;
-		
+
 			-- update graf nodes inside minsector
-			UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
-		
+			UPDATE node SET minsector_id = a.minsector_id FROM arc a WHERE node_id = node_1;
+			UPDATE node SET minsector_id = a.minsector_id FROM arc a WHERE node_id = node_2;
+	
 			-- update graf nodes on the border of minsectors
-			UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN cat_feature_node c ON c.id=node_type 
-			WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
-				
-			-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
-			UPDATE node SET minsector_id = a.minsector_id FROM v_edit_arc a WHERE a.arc_id=node.arc_id;
-		
+			UPDATE node SET minsector_id = 0 FROM v_edit_node n JOIN cat_feature_node c ON c.id=node_type WHERE graf_delimiter!='NONE' AND node.node_id = n.node_id;
+								
 			-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
-			UPDATE connec SET minsector_id = a.minsector_id FROM v_edit_arc a WHERE a.arc_id=connec.arc_id;
+			UPDATE v_edit_connec c SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=c.arc_id;
 
 			-- insert into minsector table
 			DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
@@ -313,7 +295,9 @@ BEGIN
 
 		-- update geometry of mapzones
 		IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
-			-- do nothing
+
+			UPDATE minsector m SET the_geom = null FROM v_edit_arc a WHERE a.minsector_id = m.minsector_id;
+						
 		ELSIF  v_updatemapzgeom = 1 THEN
 			
 			-- concave polygon

@@ -43,56 +43,14 @@ BEGIN
 	-- get user values
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
-
-	RAISE NOTICE 'v_networkmode % v_patternmethod %',v_networkmode , v_patternmethod ;
 			
 	-- check if pattern method is compatible
-	IF v_networkmode IN (1,2) THEN
-	
-		IF v_patternmethod IN (21,22,23,33,34,43,44,53,54) THEN 
+	IF v_networkmode = 3 AND v_patternmethod = 14 THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('ERROR-161: The pattern method is incompatible with the used export network mode'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
-			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
-		END IF;
-
-	ELSIF v_networkmode IN (3,4) THEN
-
-		IF v_patternmethod IN (11,12,13,31,32,41,42,51,52) THEN 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-161: The pattern method is incompatible with the used export network mode'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
-			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
-		END IF;
-		
-	END IF;
-
-	-- check demand scenario compatibility
-	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
-
-		IF v_patternmethod IN (21,22,23,24) THEN
-
-			-- info about how many pjoints has more than one connec
-			v_count = (SELECT count(*) FROM (SELECT pjoint_id, count(pattern_id) FROM inp_connec join connec USING (connec_id) group by pjoint_id having count(pattern_id) > 1 order by 1)a);
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: There are ',v_count,' vnodes with more than one connec'));
-
-			-- check inconsistency on inp_connec: More than one connec with same vnode and different pattern on inp_connec table
-			IF v_patternmethod = 23 AND v_networkmode = 3 THEN
-
-				v_count = (SELECT count(pjoint_id) FROM v_edit_inp_connec group by pjoint_id, pattern_id having count(pjoint_id) > 1 
-				AND count(pattern_id) < count(pjoint_id) order by 1 limit 1);
-
-				IF v_count > 0 THEN			
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-162: There are ',v_count,' connec with same vnode and different pattern. Use PJOINT&CONNEC exportmode to solve it.'));
-				END IF;
-			END IF;
-
-		END IF;
-
+			VALUES (v_fid, v_result_id, 3, 'Change the pattern method OR networkmode');
+			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';		
 	END IF;
 
 	--  Return

@@ -30,11 +30,9 @@ num_column text;
 v_result varchar;
 title_aux varchar;
 v_fid integer=141;
-v_demandtype integer;
 v_patternmethod	integer;
 v_networkmode integer;
 v_valvemode integer;
-v_demandtypeval text;
 v_patternmethodval text;
 v_valvemodeval text;
 v_networkmodeval text;
@@ -55,11 +53,9 @@ BEGIN
 
 	-- get parameters to put on header
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
-	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 	SELECT value INTO v_valvemode FROM config_param_user WHERE parameter = 'inp_options_valve_mode' AND cur_user=current_user;
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
-	SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
@@ -71,7 +67,6 @@ BEGIN
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',v_result,v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Export mode: ', v_networkmodeval, v_fid );
-	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Demand type: ', v_demandtypeval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Pattern method: ', v_patternmethodval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Valve mode: ', v_valvemodeval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',
@@ -144,12 +139,34 @@ BEGIN
 			rpad(csv8,20), ' ' , rpad(csv9,20), ' ', rpad(csv10,20), ' ', rpad(csv11,20), ' ', rpad(csv12,20)) 
 			as text from temp_csv where fid = 141 and cur_user = current_user and source is null
 		union
+			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_junctions')
+		union
+			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_reservoirs')
+		union
+			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
+			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_tanks')
+		union
+			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
+			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_pipes')
+		union
+			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
+			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_pumps')
+		union
+			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
+			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_valves')
+		union
 			select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('header')
 		union
 			select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop', 'vi_reactions')
 		union
 			-- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
-			select id, concat(rpad(csv1,19),' ',rpad(coalesce(csv2,''),19),' ', rpad(coalesce(csv3,''),19),' ',rpad(coalesce(csv4,''),19),' ',rpad(coalesce(csv5,''),19),
+			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),19),' ', rpad(coalesce(csv3,''),19),' ',rpad(coalesce(csv4,''),19),' ',rpad(coalesce(csv5,''),19),
 			' ',rpad(coalesce(csv6,''),19),	' ',rpad(coalesce(csv7,''),19),' ',rpad(coalesce(csv8,''),19),' ',rpad(coalesce(csv9,''),19),' ',rpad(coalesce(csv10,''),19),
 			' ',rpad(coalesce(csv11,''),19),' ',rpad(coalesce(csv12,''),19),' ',rpad(csv13,19),' ',rpad(csv14,19),' ',rpad(csv15,19),' ',rpad(csv16,19),' ',rpad(csv17,19)
 			,' ',rpad(csv18,19),' ',rpad(csv19,19),' ',rpad(csv20,19)) as text
@@ -159,7 +176,7 @@ BEGIN
 			' ',rpad(coalesce(csv6,''),20),	' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),
 			' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',
 			rpad(csv16,20),	' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-			from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop','vi_patterns', 'vi_reactions')
+			from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop','vi_patterns', 'vi_reactions','vi_junctions', 'vi_tanks', 'vi_valves','vi_reservoirs','vi_pipes','vi_pumps')
 		order by id)a )row;
 	
 	RETURN v_return;

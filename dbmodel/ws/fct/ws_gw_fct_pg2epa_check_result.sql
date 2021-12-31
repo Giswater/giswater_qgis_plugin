@@ -41,12 +41,10 @@ v_result_id text;
 v_min numeric (12,4);
 v_max numeric (12,4);
 v_headloss text;
-v_demandtype integer;
 v_patternmethod integer;
 v_period text;
 v_networkmode integer;
 v_valvemode integer;
-v_demandtypeval text;
 v_patternmethodval text;
 v_periodval text;
 v_valvemodeval text;
@@ -128,14 +126,12 @@ BEGIN
 			
 	SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';
 	
-	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 	SELECT value INTO v_valvemode FROM config_param_user WHERE parameter = 'inp_options_valve_mode' AND cur_user=current_user;
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
 	
-	SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
@@ -177,7 +173,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Demand type: ', v_demandtypeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Valve mode: ', v_valvemodeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
@@ -185,7 +180,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
 
 	UPDATE rpt_cat_result SET 
-	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Demand type": "', v_demandtypeval, '", "Pattern method": "', v_patternmethodval, '"}')::json
+	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Pattern method": "', v_patternmethodval, '"}')::json
 	WHERE result_id = v_result_id;
 
 	IF v_checkresult THEN
@@ -325,131 +320,9 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 				VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All registers on cat_connec table has dint values.'),v_count);
 			END IF;
-	
-			RAISE NOTICE '4.5 check demandtype only operative 2 (405)';
-			IF v_demandtype::text != '2' THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-405: There export method only is operative with demandtype = CONNEC ESTIMATED'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat(
-				'INFO: The network exportation mode (PJOINT & CONNEC WITH ALL NODARCS) is compatible with demand type choosed (CONNEC ESTIMATED)'));
-			END IF;
 		END IF;
 
-		RAISE NOTICE '5 - Check for demand type';	
-		IF v_demandtype IN (1,2) THEN
-
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Demand type estimated is used. No inconsistence have been analyzed.'));
-
-		ELSIF v_demandtype > 2 THEN
-
-			SELECT value INTO v_period FROM config_param_user WHERE parameter = 'inp_options_rtc_period_id' AND cur_user=current_user;
-			SELECT code INTO v_periodval FROM ext_cat_period WHERE id=v_period::text;
-			SELECT period_type INTO v_periodtype FROM ext_cat_period WHERE id=v_period::text;
-
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('CRM Period used: ', v_periodval));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('CRM Period type: ', v_periodtype));
-			
-			-- check hydrometers if exists
-			SELECT count(*) INTO v_count FROM vi_parent_hydrometer;
-						
-			-- check hydrometer-period table
-			SELECT count (*) INTO v_count_2 FROM ext_rtc_hydrometer_x_data JOIN vi_parent_hydrometer 
-			USING (hydrometer_id) WHERE ext_rtc_hydrometer_x_data.cat_period_id = v_period AND sum IS NOT NULL;				
-			
-			IF  v_count = 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-378: There is/are no hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
-				v_count=0;
-			ELSIF v_count_2 < v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-378: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
-				v_count_2,' hydrometer(s) with period values from that settings on the hydrometer-period table (ext_rtc_hydrometer_x_data).'));
-
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat(' SELECT hydrometer_id FROM vi_parent_hydrometer EXCEPT SELECT hydrometer_id FROM ext_rtc_hydrometer_x_data.'));
-				v_count=0;
-				
-			ELSIF v_count_2 = v_count  THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: There is/are ', v_count, ' hydrometer(s) on this exportation all of them with period flow values on the hydrometer-period table.'));
-				v_count=0;
-			END IF;
-
-			-- check connec - hydrometer relation
-			SELECT count(*) INTO v_count FROM v_edit_connec c JOIN vi_parent_arc USING (arc_id) LEFT JOIN v_rtc_hydrometer h USING (connec_id) WHERE h.connec_id is null;
-
-			IF v_count > 0 THEN
-
-				DELETE FROM anl_connec WHERE fid = 160 and cur_user=current_user;
-				INSERT INTO anl_connec (fid, connec_id, connecat_id, the_geom)
-				SELECT 160, connec_id, connecat_id, the_geom FROM v_edit_connec LEFT JOIN v_rtc_hydrometer h USING (connec_id) WHERE h.connec_id is null;
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-160: There is/are ',v_count,' connec(s) without hydrometers. It means that vnode is generated but pattern is null and demand is null for that vnode.'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_connec WHERE fid = 160 AND cur_user=current_user'));
-			END IF;
-
-		END IF;
-
-		RAISE NOTICE '6 - Check for dma-period values';
-		IF v_demandtype IN (1,2,3) THEN
-	
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No dma period values are need.'));
-
-		ELSIF v_demandtype IN (4,5) THEN -- dma needs rows on ext_rtc_dma_period
-
-			SELECT count(*) INTO v_count FROM vi_parent_dma JOIN v_rtc_period_dma USING (dma_id);
-			SELECT count(*) INTO v_count_2 FROM (SELECT dma_id, count(*) FROM vi_parent_connec WHERE dma_id >0 GROUP BY dma_id) a;
-
-			IF  v_count = 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: There aren''t dma''s defined on the dma-period table (ext_rtc_dma_period). Please check it before continue.'));
-			
-			ELSIF v_count_2 > v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: There is/are ', v_count_2,
-				' connec dma''s attribute on this exportation but there is/are only ',v_count,' dma''s defined on dma-period table (ext_rtc_dma_period). Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: There is/are ', v_count, ' dma''s on this exportation. The dma-period table (ext_rtc_dma_period) it''s filled.'));
-			END IF;
-		END IF;
-
-		RAISE NOTICE '7 - Check for losses strategy values';	
-		IF  v_demandtype = 4 THEN -- dma needs effc on ext_rtc_dma_period
-
-			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE effc IS NOT NULL;
-			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
-			
-			IF  v_count2 >  v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: Some mandatory values on ext_rtc_dma_period (eff) are missed. Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: All mandatory values on ext_rtc_dma_period (eff) are filled.'));
-			END IF;
-
-		ELSIF  v_demandtype = 5 THEN -- dma needs pattern_volume on ext_rtc_dma_period
-
-			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE pattern_volume IS NOT NULL;
-			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
-			
-			IF  v_count2 >  v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: Some values for pattern_volume on ext_rtc_dma_period are missed. Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: All pattern_volume values on ext_rtc_dma_period are filled.'));
-			END IF;
-		END IF;
-
-		RAISE NOTICE '8 - Check for UNDEFINED elements on temp table (297)';
+		RAISE NOTICE '5 - Check for UNDEFINED elements on temp table (297)';
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 		SELECT 297, node_id, nodecat_id, the_geom, 'Node with epa_type UNDEFINED' FROM temp_node WHERE  epa_type = 'UNDEFINED';
 		
@@ -473,78 +346,14 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs have epa_type defined.'));
 		END IF;
-
-
-		RAISE NOTICE '9 - Check for pattern method';
-		IF v_patternmethod IN (41,43,51,53) THEN -- dma needs pattern
-			
-			-- check mandatory values for ext_rtc_dma_period table
-			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE pattern_id IS NOT NULL;
-			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
-			
-			IF  v_count2 >  v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-374WA: Some values for pattern on ext_rtc_dma_period are missed. Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: All pattern values on ext_rtc_dma_period are filled.'));
-			END IF;
-
-		ELSIF v_patternmethod IN (42,44,52,54) THEN -- hydro needs patterns 
-
-			-- check ext_hydrometer_category_x_pattern
-			SELECT distinct(category_id) INTO v_count from ext_hydrometer_category_x_pattern WHERE period_type = v_periodtype;
-			SELECT distinct(category_id) INTO v_count2 from  v_rtc_hydrometer;
-			
-			IF v_count = 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-378: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
-			ELSIF v_count2 > v_count THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-378: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat(
-				'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data).'));			
-			END IF;
-			
-			-- check hydrometer
-			SELECT count (*) INTO v_count FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
-			WHERE a.cat_period_id = v_period AND sum IS NOT NULL; -- hydrometers with value	
-				
-			SELECT count (*) INTO v_count_2 FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
-			WHERE a.cat_period_id = v_period AND sum IS NOT NULL AND a.pattern_id IS not NULL; -- hydrometers with value and pattern	
-
-			IF  v_count_2 = 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-378: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat(
-				'HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
-			ELSIF v_count > v_count_2 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-378: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
-				' with defined pattern on on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat(
-				'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data).'));			
-				v_count=0;
-			END IF;
-		END IF;
 		
-		RAISE NOTICE '10 - Info about roughness and diameter for shortpipes';	
+		RAISE NOTICE '6 - Info about roughness and diameter for shortpipes';	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
 
 	END IF;
 	
-	RAISE NOTICE '11 - Check if there are features with sector_id = 0 (373)';
+	RAISE NOTICE '7 - Check if there are features with sector_id = 0 (373)';
 	v_querytext = 'SELECT 373, arc_id, ''Arc with sector_id = 0'', the_geom FROM v_edit_arc WHERE sector_id = 0';
 	
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'INTO v_count; 
@@ -563,7 +372,7 @@ BEGIN
 		END IF;
 
 
-	RAISE NOTICE '12 - Check if there are conflicts with dscenarios (396)';
+	RAISE NOTICE '8 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 	
 		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve"]'::json) as tabname, 
@@ -584,7 +393,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
 	END IF;
 
-	RAISE NOTICE '13 - Check if node_id and arc_id defined on CONTROLS and RULES exists (402)';
+	RAISE NOTICE '9 - Check if node_id and arc_id defined on CONTROLS and RULES exists (402)';
 
 	-- CONTROLS arcs
 	v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
@@ -672,7 +481,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '14 - EPA Outlayer values (407)';
+	RAISE NOTICE '10 - EPA Outlayer values (407)';
 
 	-- elevation
 	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_node) a 

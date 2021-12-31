@@ -78,7 +78,7 @@ BEGIN
 			AND temp_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_arc.state > 0
 		UNION 
 			-- connec over arc
-			SELECT distinct on (node_id) concat('VNC',node_id) as vnode_id, 
+			SELECT distinct on (node_id) concat('VC',node_id) as vnode_id, 
 			temp_arc.arc_id, 
 			case 	
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
@@ -101,7 +101,7 @@ BEGIN
 	DELETE FROM temp_node WHERE epa_type = 'TODELETE';
 
 	RAISE NOTICE '4 - new nodes on temp_node table ';
-	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
+	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam, dma_id, presszone_id, dqa_id, minsector_id)
 	SELECT 
 		vnode_id as node_id, 
 		t.elevation::numeric(12,3), -- elevation it's interpolated elevation against node1 and node2 of pipe
@@ -114,11 +114,30 @@ BEGIN
 		a.state_type,
 		null,
 		ST_LineInterpolatePoint (a.the_geom, locate::numeric(12,4)) as the_geom,
-		addparam
+		addparam, a.dma_id, a.presszone_id, a.dqa_id, a.minsector_id
 		FROM temp_go2epa t
 		JOIN temp_arc a USING (arc_id)
 		LEFT JOIN connec ON concat('VN',pjoint_id)=vnode_id
-		WHERE vnode_id ilike 'VN%' AND a.arc_type !='LINK';
+		WHERE vnode_id like 'VN%' AND a.arc_type !='LINK';
+
+	INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam, dma_id, presszone_id, dqa_id, minsector_id)
+	SELECT 
+		vnode_id as node_id, 
+		t.elevation::numeric(12,3), -- elevation it's interpolated elevation against node1 and node2 of pipe
+		t.elevation::numeric(12,3) - t.depth::numeric(12,3) as elev,  -- elev it's interpolated using elevation-depth against node1 and node2 of pipe 
+		'VCONNEC',
+		'VNODE',
+		'JUNCTION',
+		a.sector_id,
+		a.state,
+		a.state_type,
+		null,
+		ST_LineInterpolatePoint (a.the_geom, locate::numeric(12,4)) as the_geom,
+		addparam, a.dma_id, a.presszone_id, a.dqa_id, a.minsector_id
+		FROM temp_go2epa t
+		JOIN temp_arc a USING (arc_id)
+		LEFT JOIN connec ON concat('VC',pjoint_id)=vnode_id
+		WHERE vnode_id like 'VC%' AND a.arc_type !='LINK';
 
 
 	RAISE NOTICE '5 - update temp_table to work with next process';
@@ -135,7 +154,7 @@ BEGIN
 		
 	RAISE NOTICE '6 - new arcs on temp_arc table';
 	INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, 
-	the_geom, flw_code, minorloss, addparam, arcparent)
+	the_geom, flw_code, minorloss, addparam, arcparent, dma_id, presszone_id, dqa_id, minsector_id)
 
 	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
 			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
@@ -163,7 +182,7 @@ BEGIN
 		temp_arc.flw_code,
 		0,
 		temp_arc.addparam,
-		a.arc_id
+		a.arc_id, dma_id, presszone_id, dqa_id, minsector_id
 		FROM a
 		JOIN temp_arc USING (arc_id)
 		WHERE (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
