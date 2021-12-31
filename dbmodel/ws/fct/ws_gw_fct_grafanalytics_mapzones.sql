@@ -695,17 +695,16 @@ BEGIN
 				END IF;
 
 				-- manage conflicts
-				FOR rec_conflict IN EXECUTE 'SELECT concat(''''''m1'''''','','',''''''m2'''''') as mapzone, node_id FROM (select n.node_id, n.'||v_field||' as m1, a.'||v_field||' as m2 from v_edit_node n JOIN 
+				FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
 				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz)a
 				USING (node_id))a
-				WHERE m1 != m2'
+				WHERE m1::text != m2::text'
+				
 				LOOP						
 					-- update & count features
 					--arc
 					EXECUTE 'UPDATE arc t SET '||v_field||' = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
-					GET DIAGNOSTICS v_count = row_count;
-					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' arc(s) affected.'));
+					GET DIAGNOSTICS v_count1 = row_count;
 
 					-- node
 					EXECUTE 'UPDATE node t SET '||v_field||' = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
@@ -714,14 +713,13 @@ BEGIN
 					EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There are conflict against ',upper(v_table),'s (',rec_conflict.mapzone,') with ',v_count,' connec(s) affected.'));
+					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
 
 					-- log
 					EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
 					
 					-- update mapzone geometry
 					EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
-						
 				END LOOP;
 
 			ELSE
@@ -772,7 +770,6 @@ BEGIN
 							GROUP BY dma_id
 						)a WHERE a.dma_id=arc.dma_id;
 						*/
-
 				EXECUTE v_querytext;
 
 			ELSIF  v_updatemapzgeom = 3 THEN
@@ -900,7 +897,7 @@ BEGIN
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 			-- disconnected connecs
 			v_result = null;
@@ -918,7 +915,7 @@ BEGIN
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
-			v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "features":',v_result, '}'); 
+			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 		END IF;
 
 	ELSE -- all features in order to make a more complex log
