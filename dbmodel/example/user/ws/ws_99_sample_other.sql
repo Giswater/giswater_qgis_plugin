@@ -615,3 +615,44 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'e
 
 UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'autoRepair', 'true'::boolean) WHERE parameter = 'inp_options_debug';
 UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'autoRepair', 'true'::boolean) WHERE id = 'inp_options_debug';
+
+UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
+
+UPDATE inp_pattern SET pattern_id = 'sector_03' WHERE pattern_id = 'dma01_period05';
+UPDATE inp_pattern SET pattern_id = 'sector_05' WHERE pattern_id = 'dma01_period06';
+UPDATE inp_pattern SET pattern_id = 'dma_01' WHERE pattern_id = 'dma02_period07';
+UPDATE inp_pattern SET pattern_id = 'dma_02' WHERE pattern_id = 'dma02_period06';
+UPDATE inp_pattern SET pattern_id = 'dma_03' WHERE pattern_id = 'dma02_period05';
+UPDATE inp_pattern SET pattern_id = 'dma_04' WHERE pattern_id = 'dma03_period06';
+UPDATE inp_pattern SET pattern_id = 'dma_05' WHERE pattern_id = 'dma03_period07';
+
+UPDATE inp_pattern SET pattern_id = 'pattern_04' WHERE pattern_id = 'dma03_period05';
+UPDATE inp_pattern SET pattern_id = 'pattern_05' WHERE pattern_id = 'dma01_period07';
+
+UPDATE inp_pattern SET pattern_id = 'pattern_junction' WHERE pattern_id = 'pattern_01';
+UPDATE inp_pattern SET pattern_id = 'pattern_connec' WHERE pattern_id = 'pattern_02';
+
+UPDATE inp_pattern SET pattern_id = 'pattern_default' WHERE pattern_id = 'pattern_03';
+
+delete from inp_pattern where pattern_id = 'dma01_estimated';
+delete from inp_pattern where pattern_id = 'dma02_estimated';
+delete from inp_pattern where pattern_id = 'dma03_estimated';
+
+update inp_pattern SET observ = null
+
+UPDATE sector set pattern_id = null;
+UPDATE sector set pattern_id = 'sector_05' WHERE sector_id = 5;
+UPDATE sector set pattern_id = 'sector_03' WHERE sector_id = 3;
+
+UPDATE dma set pattern_id = null;
+UPDATE dma set pattern_id = 'dma_01' WHERE dma_id = 1;
+UPDATE dma set pattern_id = 'dma_03' WHERE dma_id = 3;
+UPDATE dma set pattern_id = 'dma_02' WHERE dma_id = 2;
+UPDATE dma set pattern_id = 'dma_04' WHERE dma_id = 4;
+UPDATE dma set pattern_id = 'dma_05' WHERE dma_id = 5;
+
+UPDATE inp_junction SET pattern_id = 'pattern_junction';
+UPDATE inp_connec SET pattern_id = 'pattern_connec';
+
+
+
