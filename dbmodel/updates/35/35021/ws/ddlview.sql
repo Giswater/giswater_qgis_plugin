@@ -53,7 +53,7 @@ CREATE OR REPLACE VIEW vi_reservoirs AS
  SELECT node_id,
     elevation AS head,
     pattern_id,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
    FROM temp_node
    WHERE epa_type = 'RESERVOIR'
    ORDER BY node_id;
@@ -67,7 +67,7 @@ CREATE OR REPLACE VIEW vi_tanks AS
     (addparam::json ->> 'diameter'::text)::numeric AS diameter,
     (addparam::json ->> 'minvol'::text)::numeric AS minvol,
     addparam::json ->> 'curve_id'::text AS curve_id,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
    FROM temp_node
    WHERE epa_type = 'TANK'
    ORDER BY node_id;
@@ -77,7 +77,7 @@ CREATE OR REPLACE VIEW vi_junctions AS
     elevation,
     demand,
     pattern_id,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
     FROM temp_node
     WHERE epa_type NOT IN ('RESERVOIR', 'TANK')
   ORDER BY node_id;
@@ -91,7 +91,7 @@ CREATE OR REPLACE VIEW vi_pipes AS
     roughness,
     minorloss,
     status::varchar(30),
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "other"
     FROM temp_arc
     WHERE epa_type IN ('PIPE', 'SHORTPIPE', 'NODE2NODE');
 
@@ -104,7 +104,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_valves AS
     a.valv_type,
     a.setting,
     a.minorloss,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "other"
    FROM ( SELECT arc_id::text AS arc_id,
             node_1,
             node_2,
@@ -175,7 +175,7 @@ CREATE OR REPLACE VIEW vi_pumps AS
             WHEN (addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (addparam::json ->> 'pattern'::text)
             ELSE NULL::text
         END AS pattern,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "giswater"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "other"
     FROM temp_arc
     WHERE epa_type IN ('PUMP') AND arc_id NOT IN (SELECT arc_id FROM vi_valves)
   ORDER BY arc_id;

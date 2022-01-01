@@ -46,6 +46,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 
 ALTER TABLE sector ADD CONSTRAINT sector_pattern_id_fkey FOREIGN KEY (pattern_id)
 REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-DROP FUNCTION IF EXISTS gw_fct_pg2epa_check_options(p_data json)
-

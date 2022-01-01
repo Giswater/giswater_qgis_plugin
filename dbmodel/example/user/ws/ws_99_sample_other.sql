@@ -5,7 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = 'SCHEMA_NAME', public, pg_catalog;
+
 
 UPDATE arc SET presszone_id = 0;
 
@@ -15,7 +16,6 @@ INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','
 INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
 UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2888;
 UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2918;
-
 
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
 
@@ -296,6 +296,7 @@ delete from link where link_id=211;
 INSERT INTO selector_sector (sector_id, cur_user)
 SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
 
 SELECT gw_fct_pg2epa_main($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -616,6 +617,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'e
 UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'autoRepair', 'true'::boolean) WHERE parameter = 'inp_options_debug';
 UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'autoRepair', 'true'::boolean) WHERE id = 'inp_options_debug';
 
+
 UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
 
 UPDATE inp_pattern SET pattern_id = 'sector_03' WHERE pattern_id = 'dma01_period05';
@@ -634,11 +636,7 @@ UPDATE inp_pattern SET pattern_id = 'pattern_connec' WHERE pattern_id = 'pattern
 
 UPDATE inp_pattern SET pattern_id = 'pattern_default' WHERE pattern_id = 'pattern_03';
 
-delete from inp_pattern where pattern_id = 'dma01_estimated';
-delete from inp_pattern where pattern_id = 'dma02_estimated';
-delete from inp_pattern where pattern_id = 'dma03_estimated';
-
-update inp_pattern SET observ = null
+UPDATE inp_pattern SET observ = null;
 
 UPDATE sector set pattern_id = null;
 UPDATE sector set pattern_id = 'sector_05' WHERE sector_id = 5;
@@ -651,8 +649,13 @@ UPDATE dma set pattern_id = 'dma_02' WHERE dma_id = 2;
 UPDATE dma set pattern_id = 'dma_04' WHERE dma_id = 4;
 UPDATE dma set pattern_id = 'dma_05' WHERE dma_id = 5;
 
+DELETE from inp_pattern where pattern_id = 'dma01_estimated';
+DELETE from inp_pattern where pattern_id = 'dma02_estimated';
+DELETE from inp_pattern where pattern_id = 'dma03_estimated';
+
 UPDATE inp_junction SET pattern_id = 'pattern_junction';
 UPDATE inp_connec SET pattern_id = 'pattern_connec';
 
-
-
+INSERT INTO connec VALUES ('114464','114464',45.7800,null,'PVC50-PN16-GRE',3,'114464',1,2,'2072',null,null,null,null,2,'3','soil1',null,null,'St. Fluid',null,'work1',null,null,'2021-12-31',null,'owner1',1,null,null,null,null,null,null,null,null,null,'VERIFIED',null,'0101000020E76400000B01F0AD8F931941257A500266755141',null,null,null,null,TRUE,TRUE,1,null,'CONNEC','2021-12-31 19:15:57.626916','CONNEC','114464','2021-12-31 20:53:41.174039','postgres','postgres',2047,null,null,1,null,null,null,null,null,'JUNCTION');
+INSERT INTO man_wjoin VALUES ('114464');
+INSERT INTO inp_connec VALUES ('114464');

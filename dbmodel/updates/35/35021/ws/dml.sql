@@ -24,11 +24,10 @@ WHERE id = 2710;
 UPDATE sys_param_user SET formname  ='hidden' WHERE id IN('inp_options_demandtype','inp_options_rtc_period_id');
 UPDATE sys_param_user SET dv_parent_id = null, dv_querytext_filterc = null WHERE id ='inp_options_patternmethod';
 
-UPDATE inp_typevalue SET addparam=null where typevalue = 'inp_value_patternmethod'
+UPDATE inp_typevalue SET addparam=null where typevalue = 'inp_value_patternmethod';
 
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM inp_typevalue where typevalue = 'inp_value_patternmethod' and id::integer > 20;
-
 UPDATE inp_typevalue SET id = '14' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET id = '13' WHERE id = '12' AND  typevalue = 'inp_value_patternmethod';
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN');
