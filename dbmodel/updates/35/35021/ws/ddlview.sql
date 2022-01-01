@@ -30,8 +30,7 @@ CREATE OR REPLACE VIEW v_edit_inp_pattern AS
     p.tscode,
     p.tsparameters::text AS tsparameters,
     p.sector_id,
-    p.insert_user,
-    p.insert_tstamp
+    p.log
    FROM selector_sector, inp_pattern p
   WHERE p.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text OR p.sector_id IS NULL
   ORDER BY p.pattern_id;
@@ -42,8 +41,7 @@ CREATE OR REPLACE VIEW v_edit_inp_curve AS
     c.curve_type,
     c.descript,
     c.sector_id,
-    c.insert_user,
-    c.insert_tstamp
+    c.log
    FROM selector_sector, inp_curve c
   WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text OR c.sector_id IS NULL
   ORDER BY c.id;
@@ -58,6 +56,7 @@ CREATE OR REPLACE VIEW vi_reservoirs AS
    WHERE epa_type = 'RESERVOIR'
    ORDER BY node_id;
 
+
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT node_id,
     elevation,
@@ -67,6 +66,7 @@ CREATE OR REPLACE VIEW vi_tanks AS
     (addparam::json ->> 'diameter'::text)::numeric AS diameter,
     (addparam::json ->> 'minvol'::text)::numeric AS minvol,
     addparam::json ->> 'curve_id'::text AS curve_id,
+    addparam::json ->> 'overflow'::text AS overflow,
     concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
    FROM temp_node
    WHERE epa_type = 'TANK'

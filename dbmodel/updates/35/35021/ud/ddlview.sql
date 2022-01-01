@@ -26,7 +26,8 @@ CREATE OR REPLACE VIEW v_edit_inp_curve AS
  SELECT DISTINCT c.id,
     c.curve_type,
     c.descript,
-    c.sector_id
+    c.sector_id,
+    c.log
    FROM selector_sector, inp_curve c
   WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text OR c.sector_id IS NULL
   ORDER BY c.id;
