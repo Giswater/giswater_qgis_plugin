@@ -56,12 +56,14 @@ BEGIN
 
 				-- insert log
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id, cur_user) 
-				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1, current_user);
+				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1, 
+				concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 
 				-- insert inp_patterN & inp_pattern_value	
 				IF v_project_type = 'UD' THEN
 
-					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer);
+					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer, 
+					concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 			
 					INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, 
 					factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) VALUES
@@ -70,7 +72,7 @@ BEGIN
 					, rec_csv.csv18::float, rec_csv.csv19::float, rec_csv.csv20::float, rec_csv.csv21::float, rec_csv.csv22::float, rec_csv.csv23::float, rec_csv.csv24::float, rec_csv.csv25::float
 					, rec_csv.csv26::float, rec_csv.csv27::float, rec_csv.csv28::float);
 				ELSE
-					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, null, null, rec_csv.csv3::integer);
+					INSERT INTO inp_pattern VALUES (rec_csv.csv1, rec_csv.csv2, null, null, rec_csv.csv3::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 				END IF;
 
 			ELSIF rec_csv.csv1 IN (SELECT pattern_id FROM inp_pattern) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
