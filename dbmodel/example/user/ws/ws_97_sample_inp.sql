@@ -55,12 +55,12 @@ INSERT INTO inp_pattern_value  VALUES (31, 'pattern_hydrant', 0.0000, 0.0000, 0.
 INSERT INTO inp_pattern_value  VALUES (32, 'pattern_hydrant', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
 
 
-INSERT INTO inp_dscenario_demand VALUES ('1009', 8.000000, 'pattern_hydrant', NULL, 1);
-INSERT INTO inp_dscenario_demand VALUES ('1012', 8.000000, 'pattern_03', NULL, 1);
-INSERT INTO inp_dscenario_demand VALUES ('1054', 8.000000, 'pattern_hydrant', NULL, 1);
-INSERT INTO inp_dscenario_demand VALUES ('113959', 8.000000, 'pattern_hydrant', NULL, 1);
-INSERT INTO inp_dscenario_demand VALUES ('113961', 8.000000, 'pattern_03', NULL, 1);
-INSERT INTO inp_dscenario_demand VALUES ('113960', 8.000000, 'pattern_hydrant', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('1009', 8.000000, 'pattern_hydrant', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('1012', 8.000000, 'pattern_03', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('1054', 8.000000, 'pattern_hydrant', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('113959', 8.000000, 'pattern_hydrant', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('113961', 8.000000, 'pattern_03', NULL, 1);
+INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id) VALUES ('113960', 8.000000, 'pattern_hydrant', NULL, 1);
 
 INSERT INTO inp_junction VALUES ('10761', 0.068855, 'pattern_02');
 INSERT INTO inp_junction VALUES ('1068', 0.047200, 'pattern_02');

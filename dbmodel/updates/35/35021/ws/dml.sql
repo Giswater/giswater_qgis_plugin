@@ -140,5 +140,3 @@ VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec
   ]'
 , NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
-
-DELETE FROM sys_function WHERE id = ;
