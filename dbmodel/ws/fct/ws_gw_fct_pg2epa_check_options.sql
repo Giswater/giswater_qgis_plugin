@@ -40,19 +40,6 @@ BEGIN
 	-- select system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
-	-- get user values
-	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
-	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
-			
-	-- check if pattern method is compatible
-	IF v_networkmode = 3 AND v_patternmethod = 14 THEN 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-161: The pattern method is incompatible with the used export network mode'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, 'Change the pattern method OR networkmode');
-			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';		
-	END IF;
-
 	--  Return
 	RETURN gw_fct_json_create_return(v_return, 2850, null, null, null);
 
