@@ -74,8 +74,9 @@ BEGIN
 	-- create log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
+
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
@@ -92,46 +93,54 @@ BEGIN
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('INFO: Process done successfully.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
 
 		-- getting columns
 		IF v_table  = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||'node_id, demand, pattern_id';
+			v_columns = v_scenarioid||', node_id, demand, pattern_id';
+		ELSIF v_table  = 'inp_dscenario_connec' THEN
+			v_columns = v_scenarioid||', connec_id, demand, pattern_id';
 		ELSIF v_table  = 'inp_dscenario_valve' THEN
 			v_columns = v_scenarioid||', node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings';
 		ELSIF v_table  = 'inp_dscenario_tank' THEN
 			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow';
 		ELSIF v_table  = 'inp_dscenario_reservoir' THEN
 			v_columns = v_scenarioid||', node_id, pattern_id, head';
+		ELSIF v_table  = 'inp_dscenario_inlet' THEN
+			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head';
 		ELSIF v_table  = 'inp_dscenario_pump' THEN
 			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern, status';
 		ELSIF v_table  = 'inp_dscenario_pipe' THEN
 			v_columns = v_scenarioid||', arc_id, minorloss, status, custom_roughness, custom_dint';
 		ELSIF v_table  = 'inp_dscenario_shortpipe' THEN
-			v_columns = v_scenarioid||', node_id, minorloss, status';				
+			v_columns = v_scenarioid||', node_id, minorloss, status';
+		ELSE 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+			VALUES (v_fid, null, 3, concat('ERROR: The table choosed does not fit with any epa dscenario. Please try another one.'));
 		END IF;
 
 		-- inserting values on tables
 		IF v_selectionmode = 'wholeSelection' THEN
 			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
-			EXECUTE v_querytext;	
-		ELSE
+		ELSIF  v_selectionmode = 'previousSelection' THEN
 			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
-			EXECUTE v_querytext;	
 		END IF;
 
+		EXECUTE v_querytext;	
 		GET DIAGNOSTICS v_count = row_count;
 		
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with features have been inserted on table ', v_table,'.'));
+		VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' features have been inserted on table ', v_table,'.'));
 		
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
-
 	END IF;
+
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
 
 	-- get results
 	-- info

@@ -232,3 +232,14 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS
           WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.value
            FROM SCHEMA_NAME.config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
+
+CREATE OR REPLACE VIEW vi_demands AS 
+SELECT temp_demand.feature_id,
+    temp_demand.demand,
+    temp_demand.pattern_id,
+    temp_demand.demand_type,
+    other
+   FROM temp_demand
+   JOIN temp_node ON temp_demand.feature_id::text = temp_node.node_id::text
+   ORDER BY temp_demand.feature_id;
+

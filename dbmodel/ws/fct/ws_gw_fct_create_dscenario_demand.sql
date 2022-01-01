@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3104
+--FUNCTION CODE: 3112
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_demand(p_data json) 
 RETURNS json AS 
@@ -13,9 +13,8 @@ $BODY$
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"NODE", "id":[]}, 
-"data":{"selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "type":"DEMAND"}}}$$);
-
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"1test", "descript":""}}}$$);
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_demand($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_inp_connec", "featureType":"CONNEC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"name":"uuuu", "descript":""}}}$$);
 */
 
 
@@ -37,7 +36,6 @@ v_action text;
 v_querytext text;
 v_result_id text = null;
 v_name text;
-v_type text;
 v_descript text;
 v_id text;
 v_selectionmode text;
@@ -46,7 +44,7 @@ v_tablename text;
 v_featuretype text;
 v_table text;
 v_columns text;
-v_querypartial text;
+v_queryfilter text;
 
 BEGIN
 
@@ -59,23 +57,24 @@ BEGIN
 	-- parameters of action CREATE
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
-	v_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
 	v_id :=  ((p_data ->>'feature')::json->>'id');
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_tablename :=  ((p_data ->>'feature')::json->>'tableName')::text;
-	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
-	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
-	
+	v_featuretype := ((p_data ->>'feature')::json->>'featureType')::text;
+
 	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
-	
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	-- create log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO DEMAND'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario type "DEMAND" with name ''',v_name, ''' have been created.'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Feature type: ',v_featuretype));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selection mode: ',v_selectionmode));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
@@ -88,36 +87,38 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	INSERT INTO cat_dscenario (name, descript, dscenario_type, log) VALUES (v_name, v_descript, v_type, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
+	INSERT INTO cat_dscenario (name, descript,  log) VALUES (v_name, v_descript,  concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid ;
+
+	RAISE NOTICE 'v_scenarioid %', v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('INFO: Process done successfully.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
 
-		-- built a query text
-		IF v_tablename = 'v_edit_inp_junction' THEN
-			v_querypartial = 'SELECT ''NODE'', node_id, demand, pattern_id FROM v_edit_inp_junction';
-
-		ELSIF  v_tablename = 'v_edit_inp_connec' THEN
-			v_querypartial = 'SELECT ''CONNEC'', connec_id, demand, pattern_id FROM v_edit_inp_connec';
-
-		END IF;
-
-		-- inserting values on tables
-		IF v_selectionmode = 'wholeSelection' THEN
-			v_querytext = 'INSERT INTO inp_dscenario_demand SELECT * FROM '||v_querypartial;
-			EXECUTE v_querytext;	
+		-- queryfilter
+		IF v_selectionmode = 'previousSelection' THEN
+			v_queryfilter = ' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id||' AND demand is not null';
 		ELSE
-			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT * FROM '||v_querypartial||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
-			EXECUTE v_querytext;	
-		END IF;
+			v_queryfilter = ' WHERE demand is not null';
+		END IF;	
 
+		-- insert process
+		IF v_tablename = 'v_edit_inp_junction' THEN
+			v_querytext =  'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id) 
+					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id FROM v_edit_inp_junction '||v_queryfilter||;
+
+		ELSIF v_tablename = 'v_edit_inp_connec' THEN		
+			v_querytext = 'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id) 
+					SELECT '|| v_scenarioid||', connec_id, ''CONNEC'', demand, pattern_id FROM v_edit_inp_connec '||v_queryfilter;
+		END IF;	
+
+		EXECUTE v_querytext;	
+
+		-- log
 		GET DIAGNOSTICS v_count = row_count;
-		
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with features have been inserted on table ', v_table,'.'));
 		
@@ -126,6 +127,10 @@ BEGIN
 
 	END IF;
 
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
