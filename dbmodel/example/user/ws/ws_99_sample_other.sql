@@ -620,21 +620,26 @@ UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 
 
 UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
 
-UPDATE inp_pattern SET pattern_id = 'sector_03' WHERE pattern_id = 'dma01_period05';
-UPDATE inp_pattern SET pattern_id = 'sector_05' WHERE pattern_id = 'dma01_period06';
+
+INSERT INTO inp_pattern VALUES ('sector_03');
+INSERT INTO inp_pattern VALUES ('sector_05');
+INSERT INTO inp_pattern VALUES ('dma_05_period');
+
+UPDATE inp_pattern SET pattern_id = 'dma_01_period' WHERE pattern_id = 'dma01_period05';
+UPDATE inp_pattern SET pattern_id = 'dma_02_period' WHERE pattern_id = 'dma01_period06';
+UPDATE inp_pattern SET pattern_id = 'dma_03_period' WHERE pattern_id = 'dma03_period05';
+UPDATE inp_pattern SET pattern_id = 'dma_04_period' WHERE pattern_id = 'dma01_period07';
+
 UPDATE inp_pattern SET pattern_id = 'dma_01' WHERE pattern_id = 'dma02_period07';
 UPDATE inp_pattern SET pattern_id = 'dma_02' WHERE pattern_id = 'dma02_period06';
 UPDATE inp_pattern SET pattern_id = 'dma_03' WHERE pattern_id = 'dma02_period05';
 UPDATE inp_pattern SET pattern_id = 'dma_04' WHERE pattern_id = 'dma03_period06';
 UPDATE inp_pattern SET pattern_id = 'dma_05' WHERE pattern_id = 'dma03_period07';
 
-UPDATE inp_pattern SET pattern_id = 'pattern_04' WHERE pattern_id = 'dma03_period05';
-UPDATE inp_pattern SET pattern_id = 'pattern_05' WHERE pattern_id = 'dma01_period07';
-
-UPDATE inp_pattern SET pattern_id = 'pattern_junction' WHERE pattern_id = 'pattern_01';
-UPDATE inp_pattern SET pattern_id = 'pattern_connec' WHERE pattern_id = 'pattern_02';
-
-UPDATE inp_pattern SET pattern_id = 'pattern_default' WHERE pattern_id = 'pattern_03';
+UPDATE inp_pattern SET pattern_id = 'junction' WHERE pattern_id = 'pattern_01';
+UPDATE inp_pattern SET pattern_id = 'connec' WHERE pattern_id = 'pattern_02';
+UPDATE inp_pattern SET pattern_id = 'default' WHERE pattern_id = 'pattern_03';
+UPDATE inp_pattern SET pattern_id = 'hydrant' WHERE pattern_id = 'pattern_hydrant';
 
 UPDATE inp_pattern SET observ = null;
 
@@ -653,8 +658,8 @@ DELETE from inp_pattern where pattern_id = 'dma01_estimated';
 DELETE from inp_pattern where pattern_id = 'dma02_estimated';
 DELETE from inp_pattern where pattern_id = 'dma03_estimated';
 
-UPDATE inp_junction SET pattern_id = 'pattern_junction';
-UPDATE inp_connec SET pattern_id = 'pattern_connec';
+UPDATE inp_junction SET pattern_id = 'junction';
+UPDATE inp_connec SET pattern_id = 'connec';
 
 INSERT INTO connec VALUES ('114464','114464',45.7800,null,'PVC50-PN16-GRE',3,'114464',1,2,'2072',null,null,null,null,2,'3','soil1',null,null,'St. Fluid',null,'work1',null,null,'2021-12-31',null,'owner1',1,null,null,null,null,null,null,null,null,null,'VERIFIED',null,'0101000020E76400000B01F0AD8F931941257A500266755141',null,null,null,null,TRUE,TRUE,1,null,'CONNEC','2021-12-31 19:15:57.626916','CONNEC','114464','2021-12-31 20:53:41.174039','postgres','postgres',2047,null,null,1,null,null,null,null,null,'JUNCTION');
 INSERT INTO man_wjoin VALUES ('114464');

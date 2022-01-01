@@ -10421,26 +10421,27 @@ update ext_rtc_hydrometer SET  priority_id=a.priority_id, category_id=a.category
 		
 INSERT INTO ext_cat_period_type VALUES (1, 'spring', NULL);
 INSERT INTO ext_cat_period_type VALUES (2, 'summer', NULL);
-INSERT INTO ext_cat_period_type VALUES (3, 'fall', NULL);
+INSERT INTO ext_cat_period_type VALUES (3, 'falls', NULL);
 INSERT INTO ext_cat_period_type VALUES (4, 'winter', NULL);
 
 UPDATE ext_cat_period SET period_type=2;
 
+INSERT INTO inp_pattern VALUES ('hydro_domestic');
+INSERT INTO inp_pattern VALUES ('hydro_industry');
+INSERT INTO inp_pattern VALUES ('hydro_other');
+INSERT INTO inp_pattern VALUES ('hydro_shops');
+INSERT INTO inp_pattern VALUES ('hydro_business');
 
-INSERT INTO ext_hydrometer_category_x_pattern VALUES ('1', 2, 'pattern_01', NULL);
-INSERT INTO ext_hydrometer_category_x_pattern VALUES ('4', 2, 'pattern_01', NULL);
-INSERT INTO ext_hydrometer_category_x_pattern VALUES ('2', 2, 'pattern_02', NULL);
-INSERT INTO ext_hydrometer_category_x_pattern VALUES ('3', 2, 'pattern_03', NULL);
-INSERT INTO ext_hydrometer_category_x_pattern VALUES ('5', 2, 'pattern_02', NULL);
-
+UPDATE ext_hydrometer_category SET pattern_id = 'hydro_domestic' WHERE id = '1';
+UPDATE ext_hydrometer_category SET pattern_id = 'hydro_industry' WHERE id = '2';
+UPDATE ext_hydrometer_category SET pattern_id = 'hydro_other' WHERE id = '3';
+UPDATE ext_hydrometer_category SET pattern_id = 'hydro_shops' WHERE id = '4';
+UPDATE ext_hydrometer_category SET pattern_id = 'hydro_business' WHERE id = '5';
 
 update ext_rtc_hydrometer_x_data SET pattern_id=e.pattern_id FROM (
-					--set search_path='SCHEMA_NAME';
-						select b.id, e.pattern_id FROM ext_rtc_hydrometer a JOIN ext_rtc_hydrometer_x_data b ON a.id=b.hydrometer_id
+						select b.id, d.pattern_id FROM ext_rtc_hydrometer a JOIN ext_rtc_hydrometer_x_data b ON a.id=b.hydrometer_id
 							JOIN ext_cat_period c ON b.cat_period_id=c.id
 							JOIN ext_hydrometer_category d ON d.id=a.category_id::text
-							JOIN ext_hydrometer_category_x_pattern e ON e.category_id=a.category_id::text AND e.period_type=c.period_type
 							)e WHERE e.id::int8=ext_rtc_hydrometer_x_data.id;
-
 
 update ext_rtc_hydrometer_x_data SET pattern_id='pattern_02' where pattern_id is null;
