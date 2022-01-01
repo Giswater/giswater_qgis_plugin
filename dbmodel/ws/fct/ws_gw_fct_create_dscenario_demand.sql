@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3104
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_demand(p_data json) 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"NODE", "id":[]}, 
 "data":{"selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "type":"DEMAND"}}}$$);
 
 */
@@ -46,6 +46,7 @@ v_tablename text;
 v_featuretype text;
 v_table text;
 v_columns text;
+v_querypartial text;
 
 BEGIN
 
@@ -72,7 +73,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	-- create log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO DEMAND'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
@@ -97,29 +98,21 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('INFO: Process done successfully.'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
 
-		-- getting columns
-		IF v_table  = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||'node_id, demand, pattern_id';
-		ELSIF v_table  = 'inp_dscenario_valve' THEN
-			v_columns = v_scenarioid||', node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings';
-		ELSIF v_table  = 'inp_dscenario_tank' THEN
-			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow';
-		ELSIF v_table  = 'inp_dscenario_reservoir' THEN
-			v_columns = v_scenarioid||', node_id, pattern_id, head';
-		ELSIF v_table  = 'inp_dscenario_pump' THEN
-			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern, status';
-		ELSIF v_table  = 'inp_dscenario_pipe' THEN
-			v_columns = v_scenarioid||', arc_id, minorloss, status, custom_roughness, custom_dint';
-		ELSIF v_table  = 'inp_dscenario_shortpipe' THEN
-			v_columns = v_scenarioid||', node_id, minorloss, status';				
+		-- built a query text
+		IF v_tablename = 'v_edit_inp_junction' THEN
+			v_querypartial = 'SELECT ''NODE'', node_id, demand, pattern_id FROM v_edit_inp_junction';
+
+		ELSIF  v_tablename = 'v_edit_inp_connec' THEN
+			v_querypartial = 'SELECT ''CONNEC'', connec_id, demand, pattern_id FROM v_edit_inp_connec';
+
 		END IF;
 
 		-- inserting values on tables
 		IF v_selectionmode = 'wholeSelection' THEN
-			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
+			v_querytext = 'INSERT INTO inp_dscenario_demand SELECT * FROM '||v_querypartial;
 			EXECUTE v_querytext;	
 		ELSE
-			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
+			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT * FROM '||v_querypartial||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
 			EXECUTE v_querytext;	
 		END IF;
 

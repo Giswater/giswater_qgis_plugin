@@ -4,17 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3104
+--FUNCTION CODE: 3042
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_crm(p_data json) 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{}, "data":{"parameters":{"name":"test", "descript":null, "type":"DEMAND", "targetFeature": "NODE", "period":5, "pattern":1, "units":"M3H"}}}$$);
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
-"data":{"selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "type":"DEMAND"}}}$$);
 
 */
 
@@ -26,26 +24,27 @@ object_rec record;
 v_version text;
 v_result json;
 v_result_info json;
-v_copyfrom integer;
-v_target integer;
+v_name text;
+v_type text;
+v_descript text;
+v_period integer;
+v_crm_name text;
 v_error_context text;
 v_count integer;
 v_count2 integer;
 v_projecttype text;
 v_fid integer = 403;
+v_source_name text;
+v_target_name text;
 v_action text;
 v_querytext text;
 v_result_id text = null;
-v_name text;
-v_type text;
-v_descript text;
-v_id text;
-v_selectionmode text;
 v_scenarioid integer;
-v_tablename text;
-v_featuretype text;
-v_table text;
-v_columns text;
+v_targetfeature text;
+v_pattern integer;
+v_periodunits text;
+v_flowunits text;
+v_periodseconds integer;
 
 BEGIN
 
@@ -54,27 +53,33 @@ BEGIN
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	
-	-- getting input data
-	-- parameters of action CREATE
+	-- getting input data 	
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
 	v_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
-	v_id :=  ((p_data ->>'feature')::json->>'id');
-	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_tablename :=  ((p_data ->>'feature')::json->>'tableName')::text;
-	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
-	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
+	v_targetfeature :=  ((p_data ->>'data')::json->>'parameters')::json->>'targetFeature';
+	v_period :=  ((p_data ->>'data')::json->>'parameters')::json->>'period';
+	v_pattern :=  ((p_data ->>'data')::json->>'parameters')::json->>'pattern';
+	v_periodunits :=  ((p_data ->>'data')::json->>'parameters')::json->>'periodUnits';
+	v_flowunits :=  ((p_data ->>'data')::json->>'parameters')::json->>'flowUnits';
 	
-	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
+	-- getting system values
+	v_crm_name := (SELECT code FROM ext_cat_period WHERE id  = v_period);
+	v_periodseconds := (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period);
+
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 
 	-- create log
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO FROM CRM'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from CRM: ',v_crm_name));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Period units: ',v_flowunits));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Flow units: ',v_flowunits));
+	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
@@ -87,51 +92,47 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	INSERT INTO cat_dscenario (name, descript, dscenario_type, log) VALUES (v_name, v_descript, v_type, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
+	INSERT INTO cat_dscenario (name, descript, dscenario_type, log) VALUES (v_name, v_descript, v_type, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),
+	'. Input params:{·Target feature":"", "Source CRM Period":"", "Source Pattern":"", "Flow Units":"", "Period Units":""}')) ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid ;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		
+	ELSIF v_periodseconds IS NULL THEN
+		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+	
 	ELSE 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 4, concat('INFO: Process done successfully.'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
 
-		-- getting columns
-		IF v_table  = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||'node_id, demand, pattern_id';
-		ELSIF v_table  = 'inp_dscenario_valve' THEN
-			v_columns = v_scenarioid||', node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings';
-		ELSIF v_table  = 'inp_dscenario_tank' THEN
-			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow';
-		ELSIF v_table  = 'inp_dscenario_reservoir' THEN
-			v_columns = v_scenarioid||', node_id, pattern_id, head';
-		ELSIF v_table  = 'inp_dscenario_pump' THEN
-			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern, status';
-		ELSIF v_table  = 'inp_dscenario_pipe' THEN
-			v_columns = v_scenarioid||', arc_id, minorloss, status, custom_roughness, custom_dint';
-		ELSIF v_table  = 'inp_dscenario_shortpipe' THEN
-			v_columns = v_scenarioid||', node_id, minorloss, status';				
-		END IF;
-
-		-- inserting values on tables
-		IF v_selectionmode = 'wholeSelection' THEN
-			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
-			EXECUTE v_querytext;	
-		ELSE
-			v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
-			EXECUTE v_querytext;	
-		END IF;
+/*		IF v_targetfeature = 'NODE' THEN
+		
+			--INSERT INTO inp_dscenario_demand (feature_type, feature_id, demand, pattern_id)
+			SELECT 'NODE', node_id, (case when custom_sum is null then sum else custom_sum end) as volume, pattern_id
+			FROM ext_rtc_hydrometer_x_data 
+			JOIN ext_rtc_hydrometer ON id = hydrometer_id
+			JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USIGN (connec_id) 
+			JOIN arc USING (arc_id)
+			
+			WHERE cat_period_id  = 5
+	
+			select * from ext_rtc_hydrometer
 
 		GET DIAGNOSTICS v_count = row_count;
-		
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with features have been inserted on table ', v_table,'.'));
 		
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
+*/
 
 	END IF;
+
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
 
 	-- get results
 	-- info

@@ -46,3 +46,46 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 
 ALTER TABLE sector ADD CONSTRAINT sector_pattern_id_fkey FOREIGN KEY (pattern_id)
 REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"overflow", "dataType":"varchar(3)", "isUtils":"False"}}$$);
+
+
+-- 2022/01/01
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_hydrometer_category", "column":"pattern_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+
+ALTER TABLE ext_hydrometer_category_x_pattern RENAME TO _ext_hydrometer_category_x_pattern_ ;
+DELETE FROM sys_table WHERE id = 'ext_hydrometer_category_x_pattern';
+
+
+CREATE TABLE inp_dscenario_junction(
+  dscenario_id integer NOT NULL,
+  node_id character varying(16) NOT NULL,
+  demand numeric(12,6),
+  pattern_id character varying(16),
+  demand_type character varying(18),
+  CONSTRAINT inp_dscenario_junction_pkey PRIMARY KEY (dscenario_id, node_id),
+  CONSTRAINT inp_dscenario_junction_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+      REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+ CONSTRAINT inp_dscenario_junction_node_id_fkey FOREIGN KEY (node_id)
+      REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_demand_pattern_id_fkey FOREIGN KEY (pattern_id)
+      REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE inp_dscenario_connec(
+  dscenario_id integer NOT NULL,
+  connec_id character varying(16) NOT NULL,
+  demand numeric(12,6),
+  pattern_id character varying(16),
+  demand_type character varying(18),
+  CONSTRAINT inp_dscenario_connec_pkey PRIMARY KEY (dscenario_id, connec_id),
+  CONSTRAINT inp_dscenario_connec_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+      REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+ CONSTRAINT inp_dscenario_connec_connec_id_fkey FOREIGN KEY (connec_id)
+      REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_demand_pattern_id_fkey FOREIGN KEY (pattern_id)
+      REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"overflow", "dataType":"float", "isUtils":"False"}}$$);

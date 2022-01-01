@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/22
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
@@ -65,8 +65,7 @@ VALUES (3110,'Create Dscenario from CRM', '{"featureType":[]}',
   {"widgetname":"targetFeature", "label":"Target feature:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4,"comboIds":["NODE","CONNEC"], "comboNames":["NODE","CONNEC"], "selectedId":""},
    {"widgetname":"period", "label":"Source CRM period:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":5, "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "selectedId":""},
      {"widgetname":"pattern", "label":"Source pattern:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":6,"comboIds":[1,2,3], "comboNames":["DMA-PERIOD","HYDROMETER-CATEGORY", "HYDROMETER-DATA"], "selectedId":""},
-     {"widgetname":"demandUnits", "label":"Demand units:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":["LTS/PERIOD", "M3/PERIOD"], "comboNames":["LTS/PERIOD", "M3/PERIOD"], "selectedId":"M3/PERIOD"},
-{"widgetname":"flowUnits", "label":"Flow units:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}
+{"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}
   ]'
 , NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
@@ -122,8 +121,30 @@ VALUES ('inp_options_max_flowchange', 'epaoptions', 'Max flow change', 'role_epa
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-
 INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA');
 INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA');
 
 UPDATE sys_param_user SET layoutorder = 12 WHERE id IN ('inp_options_quality_mode','inp_options_node_id');
+
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage scenario for junctions', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage scenario for connecs', 'role_epa', 'core');
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3112, 'gw_fct_create_dscenario_demand', 'ws', 'function', 'json', 
+'json', 'Function to create demand dscenarios from [CONNEC, JUNCTION].
+It moves demand & pattern data from junctions/connecs to inp_dscenario_demand.', 'role_epa', null, null) 
+ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM config_toolbox WHERE id = 3112;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec"]}',
+'[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+ {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
+ {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""}
+  ]'
+, NULL, TRUE) 
+ON CONFLICT (id) DO NOTHING;
