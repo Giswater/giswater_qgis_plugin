@@ -55,35 +55,35 @@ DELETE FROM sys_param_user WHERE id = 'inp_options_demand_model';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, dv_querytext, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
 VALUES ('inp_options_demand_model', 'DEMAND MODEL', 'epaoptions', 'Demand model:', 'role_epa', 'Demand model' , 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_demand_model''',true, 'lyt_general_1',10,
-'ws', FALSE, FALSE, 'text', 'combo', true, 'PDA', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'combo', true, 'PDA', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_minimum_pressure';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label,  isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_minimum_pressure', 'MINIMUM PRESSURE', 'epaoptions', 'Mininum pressure:', 'role_epa', 'Mininum pressure' , true, 'lyt_general_2',10,
-'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_required_pressure';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_required_pressure', 'REQUIRED PRESSURE', 'epaoptions', 'Required pressure:', 'role_epa', 'Required pressure' , true, 'lyt_general_1',11,
-'ws', FALSE, FALSE, 'text', 'linetext', true, '10', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'linetext', true, '10', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_pressure_exponent';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_pressure_exponent', 'PRESSURE EXPONENT', 'epaoptions', 'Presure exponent:', 'role_epa', 'Presure exponent' , true, 'lyt_general_2',11,
-'ws', FALSE, FALSE, 'text', 'linetext', true, '0.5', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'linetext', true, '0.5', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_max_headerror';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable
 VALUES ('inp_options_max_headerror', 'HEADERROR', 'epaoptions', 'Max. head error:', 'role_epa', 'Max head error' , true, 'lyt_hydraulics_1',11,
-'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_max_flowchange';
@@ -134,7 +134,7 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 return_type, descript, sys_role, sample_query, source)
 VALUES (3112, 'gw_fct_create_dscenario_demand', 'ws', 'function', 'json', 
 'json', 'Function to create demand dscenarios from [CONNEC, JUNCTION].
-It moves demand & pattern data from source to inp_dscenario_demand.', 'role_epa', null, null) 
+It moves demand & pattern data from source to inp_dscenario_demand. Works with epa layers (connec or junction) which means need to be loaded.', 'role_epa', null, null) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id = 3112;

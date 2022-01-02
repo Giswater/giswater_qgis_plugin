@@ -47,7 +47,6 @@ v_device integer;
 v_formname text;
 v_tabadmin json;
 v_querytext json;
-v_epaversion text;
 v_orderby text;
 v_editability text;
 v_image json;
@@ -71,40 +70,33 @@ v_msgerr json;
 BEGIN
 
 	-- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version	
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
 	-- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
         
 	--  Get project type
-    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-
-	--  Set epaversion
-    IF v_project_type='WS' then
-	v_epaversion='2.0.12';
-    ELSE
-	v_epaversion='5.0.022';
-    END IF;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
     
 	-- Get layers and table names
-    v_layers_name = ((p_data ->> 'data')::json->> 'list_layers_name')::text;
-    v_layers_table = ((p_data ->> 'data')::json->> 'list_tables_name')::text;
+	v_layers_name = ((p_data ->> 'data')::json->> 'list_layers_name')::text;
+	v_layers_table = ((p_data ->> 'data')::json->> 'list_tables_name')::text;
 
 	-- Delete and insert layers and table names into temp_table
-    DELETE FROM temp_table where fid=163 and cur_user=current_user;
-    INSERT INTO temp_table(fid, text_column, cur_user) VALUES (163, '{"list_layers_name":"'||v_layers_name||'", "list_tables_name":"'||v_layers_table||'"}', current_user);
+	DELETE FROM temp_table where fid=163 and cur_user=current_user;
+	INSERT INTO temp_table(fid, text_column, cur_user) VALUES (163, '{"list_layers_name":"'||v_layers_name||'", "list_tables_name":"'||v_layers_table||'"}', current_user);
     
 	-- Create tabs array
-    v_formtabs := '[';
+	v_formtabs := '[';
 
 	-- basic_tab
 	-------------------------
-    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tab_user';
-    IF rec_tab.tabname IS NOT NULL THEN
+	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tab_user';
+	IF rec_tab.tabname IS NOT NULL THEN
 
 		-- Get all parameters from audit_cat param_user
 		v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (
@@ -121,7 +113,6 @@ BEGIN
 					LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
 					WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 					AND formname =',quote_literal(lower(v_formname)),'
-					AND (epaversion::json->>''from''= ',quote_literal(v_epaversion),' or formname !=''epaoptions'')
 					AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),')
 					AND isenabled IS TRUE
 					AND sys_param_user.id NOT LIKE ''feat_%''
@@ -142,7 +133,7 @@ BEGIN
 					AND sys_param_user.id LIKE ''feat_%'')b			
 					ORDER by orderby) a');
 					
-		v_debug_vars := json_build_object('v_formname', v_formname, 'v_epaversion', v_epaversion, 'v_project_type', v_project_type);
+		v_debug_vars := json_build_object('v_formname', v_formname, 'v_project_type', v_project_type);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO fields_array;
