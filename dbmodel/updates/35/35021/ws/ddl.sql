@@ -134,6 +134,12 @@ CREATE TABLE ext_rtc_sector_period(
 
 CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_source USING btree (other);
 
+ALTER TABLE ext_rtc_sector_period ADD CONSTRAINT ext_rtc_sector_period_pattern_id_fkey FOREIGN KEY (pattern_id)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ext_hydrometer_category ADD CONSTRAINT ext_hydrometer_category_pattern_id_fkey FOREIGN KEY (pattern_id)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 CREATE TABLE inp_dscenario_inlet(
   dscenario_id integer NOT NULL,
   node_id character varying(16) NOT NULL,

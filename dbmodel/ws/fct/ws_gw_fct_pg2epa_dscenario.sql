@@ -35,23 +35,18 @@ BEGIN
 
 		v_networkmode = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
+		v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
-			
-		--- moving node or connec demands to temp_demand
-		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
-		SELECT DISTINCT dscenario_id, feature_id, d.demand, d.pattern_id,  demand_type, source
-		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
-		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		-- moving connec demands to linked object which is exported	
 		IF v_networkmode IN(1,2) THEN
 
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
-			SELECT node_1 AS node_id, connec_id, demand/2 as demand, pattern_id, demand_type, source FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
-			JOIN inp_dscenario_demand ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+			SELECT dscenario_id, node_1 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
+			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
 			UNION ALL
-			SELECT node_2 AS node_id, connec_id, demand/2, pattern_id, demand_type, source  FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
-			JOIN inp_dscenario_demand ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
+			SELECT dscenario_id, node_2 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source  FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
+			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
 			
 		ELSIF v_networkmode = 3 THEN
 		
@@ -90,7 +85,25 @@ BEGIN
 			JOIN temp_demand ON node_id = feature_id
 			WHERE n.demand IS NOT NULL AND n.demand <> 0;
 		END IF;
+	
+		-- update patterns in function of pattern method choosed
+		IF v_patternmethod = 11 THEN
+			UPDATE temp_demand SET pattern_id = null;
+
+		ELSIF v_patternmethod = 12 THEN
+			UPDATE temp_demand d SET pattern_id = s.pattern_id
+			FROM sector s JOIN temp_node n USING (sector_id)
+			WHERE d.feature_id = n.node_id;
 		
+		ELSIF v_patternmethod = 13 THEN
+			UPDATE temp_demand d SET pattern_id = s.pattern_id
+			FROM dma s JOIN temp_node n USING (dma_id)
+			WHERE d.feature_id = n.node_id;
+
+		ELSIF v_patternmethod = 14 THEN
+			--do nothing
+		END IF;
+				
 		-- move patterns used demands scenario table
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)

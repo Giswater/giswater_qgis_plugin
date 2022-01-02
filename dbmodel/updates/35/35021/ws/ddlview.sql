@@ -241,7 +241,7 @@ SELECT temp_demand.feature_id,
     concat(';',dscenario_id,' ',source,' ', demand_type) as other
    FROM temp_demand
    JOIN temp_node ON temp_demand.feature_id::text = temp_node.node_id::text
-   ORDER BY temp_demand.feature_id;
+   ORDER BY 1,4;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_demand AS 
