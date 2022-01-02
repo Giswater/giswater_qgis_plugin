@@ -64,6 +64,8 @@ BEGIN
 
 	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
 
+	IF v_id IS NULL THEN v_id = '()';END IF;
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
@@ -107,12 +109,14 @@ BEGIN
 
 		-- insert process
 		IF v_tablename = 'v_edit_inp_junction' THEN
-			v_querytext =  'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id) 
-					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id FROM v_edit_inp_junction '||v_queryfilter||;
+			v_querytext =  'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
+					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id, concat(''NODE '',node_id) FROM v_edit_inp_junction '||v_queryfilter||;
 
 		ELSIF v_tablename = 'v_edit_inp_connec' THEN		
-			v_querytext = 'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id) 
-					SELECT '|| v_scenarioid||', connec_id, ''CONNEC'', demand, pattern_id FROM v_edit_inp_connec '||v_queryfilter;
+			v_querytext = 'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
+					SELECT '|| v_scenarioid||', connec_id, ''CONNEC'', demand, pattern_id, concat(''CONNEC '',connec_id) FROM v_edit_inp_connec '||v_queryfilter;
+		ELSE 
+			v_querytext ='';
 		END IF;	
 
 		EXECUTE v_querytext;	

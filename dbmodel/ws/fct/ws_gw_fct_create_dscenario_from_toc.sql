@@ -66,6 +66,8 @@ BEGIN
 	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
 	
 	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
+
+	IF v_id IS NULL THEN v_id = '()';END IF;
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
