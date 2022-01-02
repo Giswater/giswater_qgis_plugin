@@ -49,17 +49,16 @@ BEGIN
   	-- starting process
  	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
-
 		IF rec_csv.csv1 IS NOT NULL THEN -- to control those null rows because user has a bad structured csv file (common last lines)
+
 
 			IF rec_csv.csv1 NOT IN (SELECT pattern_id FROM inp_pattern) THEN
 
-				-- insert log
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id, cur_user) 
-				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1, 
-				concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
-
-				-- insert inp_patterN & inp_pattern_value	
+				-- insert log				
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
+				VALUES (v_fid, v_result_id, 1, concat('INFO: Pattern id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
+				
+				-- insert inp_pattern & inp_pattern_value	
 				IF v_project_type = 'UD' THEN
 
 					INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log) VALUES (rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::integer, 
