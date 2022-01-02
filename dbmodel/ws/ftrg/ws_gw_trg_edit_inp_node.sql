@@ -91,7 +91,9 @@ BEGIN
 		END IF;
 
         IF v_node_table = 'inp_junction' THEN
-            UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor WHERE node_id=OLD.node_id;
+            UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, emitter_coef= NEW.emitter_coef,
+            initial_quality = NEW.initial_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern = NEW.source_pattern
+            WHERE node_id=OLD.node_id;
 			
         ELSIF v_node_table = 'inp_reservoir' THEN
             UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;  
@@ -115,8 +117,7 @@ BEGIN
 			
         END IF;
 
-        UPDATE node 
-        SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
+        UPDATE node SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
         WHERE node_id=OLD.node_id;
 
 		RETURN NEW;
