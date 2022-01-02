@@ -120,12 +120,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 				
-		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, other)
+		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
 		SELECT 'CONNEC' as feature_type, v_scenarioid, c.connec_id as node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, hc.hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
-		JOIN connec c ON c.connec_id = hc.connec_id
+		JOIN v_edit_connec c ON c.connec_id = hc.connec_id
 		WHERE cat_period_id  = v_period
 		order by 2;
 
@@ -149,7 +149,7 @@ BEGIN
 			FROM ext_rtc_sector_period s 
 			JOIN connec USING (sector_id) 
 			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.other = h.hydrometer_id AND cat_period_id = v_period 
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
 		ELSIF v_pattern = 3 THEN -- dma period
@@ -158,14 +158,14 @@ BEGIN
 			FROM ext_rtc_dma_period s 
 			JOIN connec c ON c.dma_id = s.dma_id::integer  
 			JOIN rtc_hydrometer_x_connec h USING (connec_id) 
-			WHERE d.other = h.hydrometer_id AND cat_period_id = v_period
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
 		ELSIF v_pattern = 4 THEN -- hydrometer period
 
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM ext_rtc_hydrometer_x_data s
-			WHERE d.other = s.hydrometer_id AND cat_period_id = v_period
+			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id 
+			FROM ext_rtc_hydrometer_x_data h
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
 		ELSIF v_pattern = 5 THEN -- hydrometer category
@@ -174,7 +174,8 @@ BEGIN
 			FROM ext_rtc_hydrometer h
 			JOIN ext_rtc_hydrometer_x_data e ON h.id = e.hydrometer_id
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.other = h.id AND cat_period_id = v_period AND dscenario_id = v_scenarioid;
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
+			AND dscenario_id = v_scenarioid;
 		END IF;
 
 		IF v_pattern > 1 THEN
@@ -199,13 +200,12 @@ BEGIN
 		END IF;
 				
 		-- set selector
-		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
+		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING;
+
+		UPDATE inp_dscenario_demand SET source = concat('HYD', source) WHERE dscenario_id = v_scenarioid;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(''));
-
-		UPDATE inp_dscenario_demand SET other = concat(';',other) WHERE dscenario_id = v_scenarioid;
-		
 	END IF;
 		
 	-- insert spacers

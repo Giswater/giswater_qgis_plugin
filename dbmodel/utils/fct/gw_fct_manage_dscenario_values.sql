@@ -122,10 +122,12 @@ BEGIN
 					EXECUTE 'SELECT count(*) FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target INTO v_count;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-						VALUES (v_fid, v_result_id, 1, concat('INFO: There was/were ',v_count,' row(s) related to this dscenario which has/have been keep on table inp_dscenario_',object_rec.table,'.'));
+						VALUES (v_fid, v_result_id, 1, concat('INFO: There was/were ',v_count,
+						' row(s) related to this dscenario which has/have been keep on table inp_dscenario_',object_rec.table,'.'));
 					END IF;		
 
-					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+					FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 					' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 					RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext;
@@ -142,7 +144,7 @@ BEGIN
 						
 				ELSIF v_action = 'DELETE-ONLY' THEN
 
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
+					EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -184,7 +186,8 @@ BEGIN
 						INSERT INTO inp_dscenario_demand SELECT feature_id, demand, pattern_id, demand_type, v_target, feature_type 
 						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom ON CONFLICT (dscenario_id, feature_id) DO NOTHING;
 					ELSE
-						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
 						'ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 						RAISE NOTICE 'v_querytext %', v_querytext;
 						EXECUTE v_querytext;	
@@ -202,7 +205,8 @@ BEGIN
 
 				ELSIF v_action = 'DELETE-ONLY' THEN
 
-					EXECUTE 'DELETE FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_target;
+					-- delete scenario
+					EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -216,8 +220,9 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: Process done successfully.'));
 	
 		-- set selector
-		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_target, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
-
+		IF v_action != 'DELETE-ONLY' THEN
+			INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_target, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
+		END IF;
 	END IF;
 
 	-- insert spacers
