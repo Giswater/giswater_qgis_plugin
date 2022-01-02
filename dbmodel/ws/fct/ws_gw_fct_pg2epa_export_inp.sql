@@ -143,6 +143,9 @@ BEGIN
 			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_junctions')
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),500))
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_demands')
+		union
+			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),500))
 			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_reservoirs')
 		union
 			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
@@ -176,7 +179,8 @@ BEGIN
 			' ',rpad(coalesce(csv6,''),20),	' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),
 			' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',
 			rpad(csv16,20),	' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-			from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop','vi_patterns', 'vi_reactions','vi_junctions', 'vi_tanks', 'vi_valves','vi_reservoirs','vi_pipes','vi_pumps')
+			from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop','vi_patterns', 'vi_reactions','vi_junctions', 'vi_tanks', 
+			'vi_valves','vi_reservoirs','vi_pipes','vi_pumps', 'vi_demands')
 		order by id)a )row;
 	
 	RETURN v_return;
