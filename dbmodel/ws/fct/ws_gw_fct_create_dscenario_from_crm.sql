@@ -111,12 +111,12 @@ BEGIN
 		v_factor = 1000*(SELECT value::json->>v_demandunits FROM config_param_system WHERE parameter = 'epa_units_factor')::float/v_periodseconds::float;		
 
 		-- total number of hydrometers
-		SELECT count(*) INTO v_total_hydro FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period;
+		SELECT count(*) INTO v_total_hydro FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('There are ', v_total_hydro, ' hydrometers with data for this period and this exploitation.'));
 
 		-- total volume of hydrometers
-		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period;
+		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 				
@@ -126,7 +126,7 @@ BEGIN
 		JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
 		JOIN v_edit_connec c ON c.connec_id = hc.connec_id
-		WHERE cat_period_id  = v_period
+		WHERE cat_period_id  = v_period AND c.expl_id = v_expl
 		order by 2;
 
 		-- real number of hydrometers
@@ -143,7 +143,16 @@ BEGIN
 		(100-100*v_count2::float/v_total_vol::float)::numeric(12,2),' %.'));
 		
 		-- update patterns  (1 -> none)
-		IF v_pattern = 2 THEN -- sector period
+		IF v_pattern = 2 THEN -- sector default
+
+			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
+			FROM sector s 
+			JOIN connec USING (sector_id) 
+			JOIN rtc_hydrometer_x_connec h USING (connec_id)
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
+			AND dscenario_id = v_scenarioid;
+		
+		ELSIF v_pattern = 3 THEN -- sector period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM ext_rtc_sector_period s 
@@ -152,7 +161,16 @@ BEGIN
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 3 THEN -- dma period
+		ELSIF v_pattern = 4 THEN -- dma default
+
+			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
+			FROM dma s 
+			JOIN connec c ON c.dma_id = s.dma_id::integer  
+			JOIN rtc_hydrometer_x_connec h USING (connec_id) 
+			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
+			AND dscenario_id = v_scenarioid;
+
+		ELSIF v_pattern = 5 THEN -- dma period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM ext_rtc_dma_period s 
@@ -161,20 +179,20 @@ BEGIN
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 4 THEN -- hydrometer period
+		ELSIF v_pattern = 6 THEN -- hydrometer period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id 
 			FROM ext_rtc_hydrometer_x_data h
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 5 THEN -- hydrometer category
+		ELSIF v_pattern = 7 THEN -- hydrometer category
 
 			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 			FROM ext_rtc_hydrometer h
 			JOIN ext_rtc_hydrometer_x_data e ON h.id = e.hydrometer_id
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
+			WHERE d.source = e.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 		END IF;
 
@@ -202,7 +220,7 @@ BEGIN
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING;
 
-		UPDATE inp_dscenario_demand SET source = concat('HYD', source) WHERE dscenario_id = v_scenarioid;
+		UPDATE inp_dscenario_demand SET source = concat('HYD ', source) WHERE dscenario_id = v_scenarioid;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(''));

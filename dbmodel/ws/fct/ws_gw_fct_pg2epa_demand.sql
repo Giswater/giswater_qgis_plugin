@@ -97,7 +97,15 @@ BEGIN
 
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (PJOINT)
 
-			-- this method is no enabled due the possible inconsistency may exists
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type)
+			SELECT 0, node_id, n.demand, c.pattern_id, 'BASE DEMAND' FROM temp_node n JOIN v_edit_inp_connec c ON concat('VN', pjoint_id) = node_id;
+
+			UPDATE temp_node SET demand = 0;
+
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message)
+			VALUES (227, 2, '272', concat('WARNING-227: Network export mode and Pattern method used forces to propagate values from [JUNCTION] to [DEMANDS] sections.'));
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message)
+			VALUES (227, 2, '272', concat('HINT: See EPANET file for more details.'));
 		END IF;	
 		
 	ELSIF v_networkmode = 4 THEN 

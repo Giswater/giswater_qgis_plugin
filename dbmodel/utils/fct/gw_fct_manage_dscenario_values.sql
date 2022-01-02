@@ -140,17 +140,8 @@ BEGIN
 					ELSIF v_count2 > 0 THEN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) has/have been inserted on inp_dscenario_',object_rec.table,' table.'));
-					END IF;
-						
-				ELSIF v_action = 'DELETE-ONLY' THEN
-
-					EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
-
-					-- get message
-					GET DIAGNOSTICS v_count = row_count;
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) has/have been removed from inp_',object_rec.table,' table.'));
-				END IF;				
+					END IF;	
+				END IF;		
 			END LOOP;		
 				
 		ELSIF v_projecttype = 'WS' THEN
@@ -202,19 +193,18 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_dscenario_',object_rec.table,' table.'));
 					END IF;	
-
-				ELSIF v_action = 'DELETE-ONLY' THEN
-
-					-- delete scenario
-					EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
-
-					-- get message
-					GET DIAGNOSTICS v_count = row_count;
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
-				END IF;	
+				END IF;
 			END LOOP;		
 		END IF;
+		
+		IF v_action = 'DELETE-ONLY' THEN
+
+			EXECUTE 'DELETE FROM cat_dscenario WHERE dscenario_id = '||v_target;
+
+			-- get message
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: 1 row(s) has/have been removed from cat_dscenario table.'));
+		END IF;	
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: Process done successfully.'));

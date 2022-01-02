@@ -51,39 +51,45 @@ UPDATE config_toolbox SET id = 3108 WHERE id = 3104;
 
 UPDATE config_toolbox SET alias = 'Create Dscenario from ToC' WHERE id = 3108;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, dv_querytext, isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_demand_model';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, dv_querytext, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_demand_model', 'epaoptions', 'Demand model', 'role_epa', 'Demand model' , 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_demand_model''',true, 'lyt_general_1',10,
+VALUES ('inp_options_demand_model', 'DEMAND MODEL', 'epaoptions', 'Demand model:', 'role_epa', 'Demand model' , 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_demand_model''',true, 'lyt_general_1',10,
 'ws', FALSE, FALSE, 'text', 'combo', true, 'PDA', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label,  isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_minimum_pressure';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label,  isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_minimum_pressure', 'epaoptions', 'Mininum pressure', 'role_epa', 'Mininum pressure' , true, 'lyt_general_2',10,
+VALUES ('inp_options_minimum_pressure', 'MINIMUM PRESSURE', 'epaoptions', 'Mininum pressure:', 'role_epa', 'Mininum pressure' , true, 'lyt_general_2',10,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_required_pressure';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_required_pressure', 'epaoptions', 'Required pressure', 'role_epa', 'Required pressure' , true, 'lyt_general_1',11,
+VALUES ('inp_options_required_pressure', 'REQUIRED PRESSURE', 'epaoptions', 'Required pressure:', 'role_epa', 'Required pressure' , true, 'lyt_general_1',11,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '10', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_pressure_exponent';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_pressure_exponent', 'epaoptions', 'Presure exponent', 'role_epa', 'Presure exponent' , true, 'lyt_general_2',11,
+VALUES ('inp_options_pressure_exponent', 'PRESSURE EXPONENT', 'epaoptions', 'Presure exponent:', 'role_epa', 'Presure exponent' , true, 'lyt_general_2',11,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0.5', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_max_headerror';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_max_headerror', 'epaoptions', 'Max head error', 'role_epa', 'Max head error' , true, 'lyt_hydraulics_1',11,
+VALUES ('inp_options_max_headerror', 'HEADERROR', 'epaoptions', 'Max. head error:', 'role_epa', 'Max head error' , true, 'lyt_hydraulics_1',11,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+DELETE FROM sys_param_user WHERE id = 'inp_options_max_flowchange';
+INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
-VALUES ('inp_options_max_flowchange', 'epaoptions', 'Max flow change', 'role_epa', 'Max flow change' , true, 'lyt_hydraulics_2',11,
+VALUES ('inp_options_max_flowchange', 'FLOWCHANGE', 'epaoptions', 'Max. flow change:', 'role_epa', 'Max flow change' , true, 'lyt_hydraulics_2',11,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
 ON CONFLICT (id) DO NOTHING;
 
@@ -104,14 +110,14 @@ return_type, descript, sys_role, sample_query, source)
 VALUES (3110, 'gw_fct_create_dscenario_from_crm', 'ws', 'function', 'json', 
 'json', 'Function to create dscenarios from CRM. <br>This function store values on CONNEC features.<br>When the network geometry generator works with [NODE] demands are moved 50% to node_1 and node_2.', 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
-
-INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+DELETE FROM ws_sample.config_toolbox WHERE id = 3110;
+INSERT INTO ws_sample.config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3110,'Create Demand Dscenario from CRM', '{"featureType":[]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}, 
 {"widgetname":"period", "label":"Source CRM period:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":6, "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "selectedId":""},
-{"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4], "comboNames":["NONE", "SECTOR-PERIOD", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY"], "selectedId":""}, 
+{"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4,5,6,7], "comboNames":["NONE", "SECTOR-DEFAULT", "SECTOR-PERIOD", "DMA-DEFAULT", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY"], "selectedId":""}, 
 {"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. <br> This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}]'
 , NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;

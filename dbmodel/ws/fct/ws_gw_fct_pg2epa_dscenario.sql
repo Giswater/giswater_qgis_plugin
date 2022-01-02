@@ -38,6 +38,12 @@ BEGIN
 		v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 
+		-- moving node demands to temp_demand
+		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
+		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
+		AND dscenario_id IN (SELECT unnest(v_userscenario));
+
 		-- moving connec demands to linked object which is exported	
 		IF v_networkmode IN(1,2) THEN
 
@@ -84,24 +90,6 @@ BEGIN
 			FROM temp_node n
 			JOIN temp_demand ON node_id = feature_id
 			WHERE n.demand IS NOT NULL AND n.demand <> 0;
-		END IF;
-	
-		-- update patterns in function of pattern method choosed
-		IF v_patternmethod = 11 THEN
-			UPDATE temp_demand SET pattern_id = null;
-
-		ELSIF v_patternmethod = 12 THEN
-			UPDATE temp_demand d SET pattern_id = s.pattern_id
-			FROM sector s JOIN temp_node n USING (sector_id)
-			WHERE d.feature_id = n.node_id;
-		
-		ELSIF v_patternmethod = 13 THEN
-			UPDATE temp_demand d SET pattern_id = s.pattern_id
-			FROM dma s JOIN temp_node n USING (dma_id)
-			WHERE d.feature_id = n.node_id;
-
-		ELSIF v_patternmethod = 14 THEN
-			--do nothing
 		END IF;
 				
 		-- move patterns used demands scenario table
