@@ -234,6 +234,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS
           WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
 
+drop view vi_demands;
 CREATE OR REPLACE VIEW vi_demands AS 
 SELECT temp_demand.feature_id,
     temp_demand.demand,
@@ -242,8 +243,7 @@ SELECT temp_demand.feature_id,
    FROM temp_demand
    JOIN temp_node ON temp_demand.feature_id::text = temp_node.node_id::text
    ORDER BY 1,4;
-
-
+     
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_demand AS 
  SELECT inp_dscenario_demand.dscenario_id,
     inp_dscenario_demand.feature_id,

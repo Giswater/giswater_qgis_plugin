@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/02
-ALTER TABLE config_user_x_sector DROP CO7NSTRAINT config_user_x_sector_sector_id_fkey;
+ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
 ALTER TABLE config_user_x_sector ADD CONSTRAINT config_user_x_sector_sector_id_fkey FOREIGN KEY (sector_id)
 REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -90,9 +90,6 @@ CREATE TABLE inp_dscenario_connec(
 );
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"overflow", "dataType":"float", "isUtils":"False"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_demand", "column":"source", "dataType":"text", "isUtils":"False"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_demand", "column":"dscenario_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_demand", "column":"source", "dataType":"text", "isUtils":"False"}}$$);
 
@@ -109,7 +106,7 @@ CREATE TABLE inp_dscenario_demand(
   demand numeric(12,6),
   pattern_id character varying(16),
   demand_type character varying(18),
-  other text,
+  source text,
   CONSTRAINT inp_dscenario_demand_pkey PRIMARY KEY (id),
   CONSTRAINT inp_demand_dscenario_id_fkey FOREIGN KEY (dscenario_id)
       REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
@@ -132,7 +129,7 @@ CREATE TABLE ext_rtc_sector_period(
   CONSTRAINT ext_rtc_period_sector_id_cat_period_id_pkey PRIMARY KEY (sector_id, cat_period_id)
 );
 
-CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_source USING btree (other);
+CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_demand USING btree (source);
 
 ALTER TABLE ext_rtc_sector_period ADD CONSTRAINT ext_rtc_sector_period_pattern_id_fkey FOREIGN KEY (pattern_id)
 REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

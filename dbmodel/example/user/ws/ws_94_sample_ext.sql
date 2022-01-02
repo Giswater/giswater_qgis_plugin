@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
 INSERT INTO ext_municipality (muni_id, name, observ, the_geom, active) VALUES (1, 'Sant Boi del Llobregat', NULL, '0106000020E764000001000000010300000001000000310000004344FB8D57901941579E3EEE847551414952F8205C901941B8E002D4967551412BEA86DD5E901941F1B6390E9D7551413CD9D0716790194146526D5EA2755141C252A53388901941664752E5A675514191608F1EC4901941107C78DAAA755141CD78F02601911941C9594B57AD7551414B4A73286091194199E45D54AF75514196093983DB9119419860ED49B175514149511D00F9911941A04440BDAF755141B5BE46E8AD921941115C602EA47551413252FCBE16941941AC9DABDF94755141C78F577EA29419415AE606D58E755141FCEF873869951941DBF98480867551414E302882CF95194168805EE581755141F6C32938F4961941D22EAC8E75755141BEF2646F3C9719414D0EBC8972755141B8A7F68B9A971941C8CDBE026E755141B22277D1FD97194193B3528968755141A8344C506D981941BC3C94776275514160A9766BB2981941E2E516F45E755141CA43B6C34F991941615273F3557551410137653BB1991941816A8CAD50755141B0C634E3339A1941036077F54A755141BE58D480839A1941224D3F97477551410BFAD15B709B1941806778B53D755141C2A48EBD199C19410F36E0BE367551419E9C3986F39B19416CBC9C1C33755141EAE67282AE9B1941FBE7A8EA3575514124193708FA9A1941AC2FF50B2C75514107D9C6CECB9A194101574A97297551414723F9E6179A19412C13ABA61F755141CAB0FBC0ED991941446A39E61C755141309C88F89098194121ABAC8A087551411D554E735E98194151FB59B705755141962F594D3D9819415F273EE5037551410EC2A5985A971941C7A4626AF77451416E6AC5DC6F961941F6EF74CCEA745141D6D7D6B2959519417289B548EF745141BEEC10BC4995194190769F9CF07451415C5A0852729419413182684F02755141DCE1D4EF6B94194131C106B705755141F1E448C7A1931941A4154AA615755141D1BA81A24E9319415BFD9E7E1975514154BF5362D4911941BB61D7152975514169EECA68629019410ED2733838755141CEE8BC0E43901941490775783A755141253AB8DB34901941CEE66D84407551414344FB8D57901941579E3EEE84755141', true);
 INSERT INTO ext_municipality (muni_id, name, observ, the_geom, active) VALUES (2, 'Sant Esteve de les Roures', NULL, '0106000020E76400000100000001030000000100000020000000BBD70605668A1941BEB94A87BF765141584CD18B848919412D294EC3B57651411A1991F0AE881941D9ED61A0AB76514113D980EEA3871941BAB108279E7651418474A44FDB871941D13E8274997651410A7D84E9FE8719412ECCCADE957651417CD969941C881941B20229FB8B765141736CAD5B3088194158565FEF84765141E5C892064E88194185AA331D80765141380CC18979881941F15318EC7A7651416C3638E5B28819416C19991F74765141EDD15B46EA8819416A34F9106E76514186197A96278919413FC1A341687651410548E1BE72891941F8DB3416617651411213A8BBF98919415DF5BA5A5476514133A1A8E86F8A194150BA9D544B765141CC0E4EC7D48A1941CA7F1E8844765141F5F18F78498B1941BA7EE2144076514121AF4A9B968B1941E3F137E445765141CB473921268D1941F5F273574A765141A02F5445258E1941692CB7B04C765141DAFDCE9BB98E1941849ED00C4E76514132DC37DAA38E19418C2E2F9755765141DF980957788E194172C036EB64765141061F7DB7568E1941788A760871765141828359561F8E1941C339255184765141A5374B39D08D194174EB1A9DA1765141115DE9217F8D1941ECF2BEC3C076514134E35C825D8D19414276DAABCE76514132074079A28B1941F4821D4EC87651412191BA001A8B1941531066B8C4765141BBD70605668A1941BEB94A87BF765141', true);
 
@@ -788,9 +789,12 @@ INSERT INTO ext_cat_period VALUES ('5', '2015-05-01 00:00:00', '2015-05-31 00:00
 INSERT INTO ext_cat_period VALUES ('6', '2015-06-01 00:00:00', '2015-06-30 00:00:00', 2592000, NULL, 'June');
 INSERT INTO ext_cat_period VALUES ('7', '2015-07-01 00:00:00', '2015-07-31 00:00:00', 2678400, NULL, 'July');
 
-INSERT INTO ext_hydrometer_category VALUES ('1', 'Domestic');
-INSERT INTO ext_hydrometer_category VALUES ('2', 'Industry');
-INSERT INTO ext_hydrometer_category VALUES ('3', 'Other');
+INSERT INTO ext_hydrometer_category (id, observ, code, pattern_id) VALUES ('5', 'business', NULL, 'PTN-HYD-BUSINESS');
+INSERT INTO ext_hydrometer_category (id, observ, code, pattern_id) VALUES ('3', 'Other', NULL, 'PTN-HYD-OTHER');
+INSERT INTO ext_hydrometer_category (id, observ, code, pattern_id) VALUES ('2', 'Industry', NULL, 'PTN-HYD-INDUSTRY');
+INSERT INTO ext_hydrometer_category (id, observ, code, pattern_id) VALUES ('1', 'Domestic', NULL, 'PTN-HYD-DOMESTIC');
+INSERT INTO ext_hydrometer_category (id, observ, code, pattern_id) VALUES ('4', 'Shops', NULL, 'PTN-HYD-SHOPS');
+
 
 INSERT INTO ext_rtc_hydrometer VALUES ('3', '10002', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'cc3169', NULL, NULL, 1, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO ext_rtc_hydrometer VALUES ('60', '10059', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'cc3274', NULL, NULL, 2, 3, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -10393,37 +10397,37 @@ INSERT INTO ext_rtc_hydrometer_x_data VALUES (3599, '1202', 0, 0.007965576463560
 INSERT INTO ext_rtc_hydrometer_x_data VALUES (3600, '1203', 0, 0.012836021505376299, 0.0025672043010752702, 6.8760000000000003, NULL, '7');
 
 
-INSERT INTO ext_rtc_dma_period VALUES (1, '2', '5', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'dma02_period05');
-INSERT INTO ext_rtc_dma_period VALUES (2, '2', '6', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'dma02_period06');
-INSERT INTO ext_rtc_dma_period VALUES (3, '2', '7', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'dma02_period07');
-INSERT INTO ext_rtc_dma_period VALUES (4, '3', '5', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'dma03_period05');
-INSERT INTO ext_rtc_dma_period VALUES (5, '3', '6', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'dma03_period06');
-INSERT INTO ext_rtc_dma_period VALUES (6, '3', '7', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'dma03_period07');
-INSERT INTO ext_rtc_dma_period VALUES (7, '1', '5', 0.79999999999999998, 0.49999999999999999, 5.2000000000000002, 'dma01_period05');
-INSERT INTO ext_rtc_dma_period VALUES (8, '1', '6', 0.79999999999999998, 0.49999999999999999, 5.2000000000000002, 'dma01_period06');
-INSERT INTO ext_rtc_dma_period VALUES (9, '1', '7', 0.79999999999999998, 0.49999999999999999, 5.2000000000000002, 'dma01_period07');
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (1, '2', '5', 0.819999999999999951, NULL, NULL, 'PTN-DMA-02-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (2, '2', '6', 0.819999999999999951, NULL, NULL, 'PTN-DMA-02-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (3, '2', '7', 0.819999999999999951, NULL, NULL, 'PTN-DMA-02-P7', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (4, '3', '5', 0.729999999999999982, NULL, NULL, 'PTN-DMA-03-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (5, '3', '6', 0.729999999999999982, NULL, NULL, 'PTN-DMA-03-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (6, '3', '7', 0.729999999999999982, NULL, NULL, 'PTN-DMA-03-P7', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (7, '1', '5', 0.799999999999999933, NULL, NULL, 'PTN-DMA-01-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (8, '1', '6', 0.799999999999999933, NULL, NULL, 'PTN-DMA-01-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (9, '1', '7', 0.799999999999999933, NULL, NULL, 'PTN-DMA-01-P7', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (10, '4', '5', 0.800000000000000044, NULL, NULL, 'PTN-DMA-04-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (11, '4', '6', 0.800000000000000044, NULL, NULL, 'PTN-DMA-04-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (12, '4', '7', 0.800000000000000044, NULL, NULL, 'PTN-DMA-04-P7', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (13, '5', '5', 0.800000000000000044, NULL, NULL, 'PTN-DMA-05-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (14, '5', '6', 0.800000000000000044, NULL, NULL, 'PTN-DMA-05-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (15, '5', '7', 0.800000000000000044, NULL, NULL, 'PTN-DMA-05-P7', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (16, '6', '5', 0.800000000000000044, NULL, NULL, 'PTN-DMA-06-P5', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (17, '6', '6', 0.800000000000000044, NULL, NULL, 'PTN-DMA-06-P6', NULL);
+INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (18, '6', '7', 0.800000000000000044, NULL, NULL, 'PTN-DMA-06-P7', NULL);
 
-INSERT INTO inp_pattern VALUES ('sector_02_p5');
-INSERT INTO inp_pattern VALUES ('sector_02_p6');
-INSERT INTO inp_pattern VALUES ('sector_02_p7');
-INSERT INTO inp_pattern VALUES ('sector_03_p5');
-INSERT INTO inp_pattern VALUES ('sector_03_p6');
-INSERT INTO inp_pattern VALUES ('sector_03_p7');
 
-INSERT INTO ext_rtc_sector_period VALUES (2, '5', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'sector_02_p5');
-INSERT INTO ext_rtc_sector_period VALUES (2, '6', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'sector_02_p6');
-INSERT INTO ext_rtc_sector_period VALUES (2, '7', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'sector_02_p7');
-INSERT INTO ext_rtc_sector_period VALUES (3, '5', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'sector_03_p5');
-INSERT INTO ext_rtc_sector_period VALUES (3, '6', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'sector_03_p6');
-INSERT INTO ext_rtc_sector_period VALUES (3, '7', 0.72999999999999998, 0.29999999999999999, 3.2000000000000002, 'sector_03_p7');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '5', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P5');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '6', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P6');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '7', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P7');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '6', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P6');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '7', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P7');
+INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '5', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P5');
 
 
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (1, 'low', NULL);
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (2, 'medium', NULL);
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (3, 'high', NULL);
-
-INSERT INTO ext_hydrometer_category VALUES (4, 'Shops', NULL);
-INSERT INTO ext_hydrometer_category VALUES (5, 'business', NULL);
 
 
 update ext_rtc_hydrometer SET  priority_id=a.priority_id, category_id=a.category_id
@@ -10440,22 +10444,10 @@ INSERT INTO ext_cat_period_type VALUES (4, 'winter', NULL);
 
 UPDATE ext_cat_period SET period_type=2;
 
-INSERT INTO inp_pattern VALUES ('hydro_domestic');
-INSERT INTO inp_pattern VALUES ('hydro_industry');
-INSERT INTO inp_pattern VALUES ('hydro_other');
-INSERT INTO inp_pattern VALUES ('hydro_shops');
-INSERT INTO inp_pattern VALUES ('hydro_business');
-
-UPDATE ext_hydrometer_category SET pattern_id = 'hydro_domestic' WHERE id = '1';
-UPDATE ext_hydrometer_category SET pattern_id = 'hydro_industry' WHERE id = '2';
-UPDATE ext_hydrometer_category SET pattern_id = 'hydro_other' WHERE id = '3';
-UPDATE ext_hydrometer_category SET pattern_id = 'hydro_shops' WHERE id = '4';
-UPDATE ext_hydrometer_category SET pattern_id = 'hydro_business' WHERE id = '5';
-
 update ext_rtc_hydrometer_x_data SET pattern_id=e.pattern_id FROM (
 						select b.id, d.pattern_id FROM ext_rtc_hydrometer a JOIN ext_rtc_hydrometer_x_data b ON a.id=b.hydrometer_id
 							JOIN ext_cat_period c ON b.cat_period_id=c.id
 							JOIN ext_hydrometer_category d ON d.id=a.category_id::text
 							)e WHERE e.id::int8=ext_rtc_hydrometer_x_data.id;
 
-update ext_rtc_hydrometer_x_data SET pattern_id='pattern_02' where pattern_id is null;
+update ext_rtc_hydrometer_x_data SET pattern_id='pattern_02' where pattern_id is null

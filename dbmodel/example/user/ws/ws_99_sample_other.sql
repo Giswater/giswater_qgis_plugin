@@ -437,10 +437,10 @@ SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES
 
 
 -- update demands and patterns for connec
-UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 100 OFFSET 0) a WHERE a.connec_id = inp_connec.connec_id;
-UPDATE inp_connec SET pattern_id = 'pattern_02', demand = demand*0.3 FROM (SELECT * FROM connec LIMIT 100 OFFSET 100) a WHERE a.connec_id = inp_connec.connec_id;
-UPDATE inp_connec SET pattern_id = 'pattern_03', demand = demand*0.25 FROM (SELECT * FROM connec LIMIT 100 OFFSET 200) a WHERE a.connec_id = inp_connec.connec_id;
-UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 300 OFFSET 300) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'PTN-CONNEC', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 100 OFFSET 0) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'PTN-CONNEC', demand = demand*0.3 FROM (SELECT * FROM connec LIMIT 100 OFFSET 100) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'PTN-CONNEC', demand = demand*0.25 FROM (SELECT * FROM connec LIMIT 100 OFFSET 200) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'PTN-CONNEC', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 300 OFFSET 300) a WHERE a.connec_id = inp_connec.connec_id;
 
 
 UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
@@ -453,7 +453,7 @@ UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id '
 WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id';
 
 UPDATE inp_junction SET demand = 0 WHERE demand = 16.000000;
-UPDATE inp_junction SET demand = 0 , pattern_id  = 'pattern_02' WHERE pattern_id = 'pattern_hydrant';
+UPDATE inp_junction SET demand = 0 WHERE pattern_id = 'PTN-HYDRANT';
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
 
@@ -608,7 +608,7 @@ UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
 UPDATE inp_pump SET pump_type = 'PRESSPUMP' WHERE node_id = '113951';
 UPDATE inp_pump SET pump_type = 'FLOWPUMP' WHERE node_id = '1105';
 
-SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
+SELECT setval('ws_sample.urn_id_seq', gw_fct_setvalurn(),true);
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl', false) WHERE parameter = 'basic_selector_tab_exploitation';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector', false) WHERE parameter = 'basic_selector_tab_sector';
@@ -620,49 +620,10 @@ UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 
 
 UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
 
-
-INSERT INTO inp_pattern VALUES ('sector_03');
-INSERT INTO inp_pattern VALUES ('sector_05');
-INSERT INTO inp_pattern VALUES ('dma_05_period');
-
-UPDATE inp_pattern SET pattern_id = 'dma_01_period' WHERE pattern_id = 'dma01_period05';
-UPDATE inp_pattern SET pattern_id = 'dma_02_period' WHERE pattern_id = 'dma01_period06';
-UPDATE inp_pattern SET pattern_id = 'dma_03_period' WHERE pattern_id = 'dma03_period05';
-UPDATE inp_pattern SET pattern_id = 'dma_04_period' WHERE pattern_id = 'dma01_period07';
-
-UPDATE inp_pattern SET pattern_id = 'dma_01' WHERE pattern_id = 'dma02_period07';
-UPDATE inp_pattern SET pattern_id = 'dma_02' WHERE pattern_id = 'dma02_period06';
-UPDATE inp_pattern SET pattern_id = 'dma_03' WHERE pattern_id = 'dma02_period05';
-UPDATE inp_pattern SET pattern_id = 'dma_04' WHERE pattern_id = 'dma03_period06';
-UPDATE inp_pattern SET pattern_id = 'dma_05' WHERE pattern_id = 'dma03_period07';
-
-UPDATE inp_pattern SET pattern_id = 'junction' WHERE pattern_id = 'pattern_01';
-UPDATE inp_pattern SET pattern_id = 'connec' WHERE pattern_id = 'pattern_02';
-UPDATE inp_pattern SET pattern_id = 'default' WHERE pattern_id = 'pattern_03';
-UPDATE inp_pattern SET pattern_id = 'hydrant' WHERE pattern_id = 'pattern_hydrant';
-
-UPDATE inp_pattern SET observ = null;
-
-UPDATE sector set pattern_id = null;
-UPDATE sector set pattern_id = 'sector_05' WHERE sector_id = 5;
-UPDATE sector set pattern_id = 'sector_03' WHERE sector_id = 3;
-
-UPDATE dma set pattern_id = null;
-UPDATE dma set pattern_id = 'dma_01' WHERE dma_id = 1;
-UPDATE dma set pattern_id = 'dma_03' WHERE dma_id = 3;
-UPDATE dma set pattern_id = 'dma_02' WHERE dma_id = 2;
-UPDATE dma set pattern_id = 'dma_04' WHERE dma_id = 4;
-UPDATE dma set pattern_id = 'dma_05' WHERE dma_id = 5;
-
-DELETE from inp_pattern where pattern_id = 'dma01_estimated';
-DELETE from inp_pattern where pattern_id = 'dma02_estimated';
-DELETE from inp_pattern where pattern_id = 'dma03_estimated';
-
-UPDATE inp_junction SET pattern_id = 'junction';
-UPDATE inp_connec SET pattern_id = 'connec';
+UPDATE inp_junction SET pattern_id = 'PTN-JUNCTION';
 
 INSERT INTO connec VALUES ('114464','114464',45.7800,null,'PVC50-PN16-GRE',3,'114464',1,2,'2072',null,null,null,null,2,'3','soil1',null,null,'St. Fluid',null,'work1',null,null,'2021-12-31',null,'owner1',1,null,null,null,null,null,null,null,null,null,'VERIFIED',null,'0101000020E76400000B01F0AD8F931941257A500266755141',null,null,null,null,TRUE,TRUE,1,null,'CONNEC','2021-12-31 19:15:57.626916','CONNEC','114464','2021-12-31 20:53:41.174039','postgres','postgres',2047,null,null,1,null,null,null,null,null,'JUNCTION');
 INSERT INTO man_wjoin VALUES ('114464');
-INSERT INTO inp_connec VALUES ('114464');
+INSERT INTO inp_connec VALUES ('114464',0.5,'PTN-CONNEC');
 
-UPDATE inp_dscenario_demand SET feature_type  ='NODE', pattern_id = 'hydrant', demand_type = 'HYDRANT' , source = concat('NODE ', feature_id);
+UPDATE inp_dscenario_demand SET feature_type  ='NODE', pattern_id = 'PTN-HYDRANT', demand_type = 'HYDRANT' , source = concat('NODE ', feature_id);
