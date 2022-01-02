@@ -31,3 +31,39 @@ CREATE OR REPLACE VIEW v_edit_inp_curve AS
    FROM selector_sector, inp_curve c
   WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text OR c.sector_id IS NULL
   ORDER BY c.id;
+
+
+CREATE OR REPLACE VIEW vi_options AS 
+SELECT a.parameter,
+a.value
+   FROM ( SELECT a_1.idval AS parameter,
+            b.value,
+                CASE
+                    WHEN a_1.layoutname ~~ '%general_1%'::text THEN '1'::text
+                    WHEN a_1.layoutname ~~ '%hydraulics_1%'::text THEN '2'::text
+                    WHEN a_1.layoutname ~~ '%hydraulics_2%'::text THEN '3'::text
+                    WHEN a_1.layoutname ~~ '%date_1%'::text THEN '3'::text
+                    WHEN a_1.layoutname ~~ '%date_2%'::text THEN '4'::text
+                    WHEN a_1.layoutname ~~ '%general_2%'::text THEN '5'::text
+                    ELSE NULL::text
+                END AS layoutname,
+            a_1.layoutorder
+           FROM sys_param_user a_1
+             JOIN config_param_user b ON a_1.id = b.parameter::text
+          WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text, 'lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND a_1.idval IS NOT NULL
+        UNION
+         SELECT 'INFILTRATION'::text AS parameter,
+            cat_hydrology.infiltration AS value,
+            '1'::text AS text,
+            2
+           FROM config_param_user,
+            cat_hydrology
+          WHERE config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text AND config_param_user.cur_user::text = "current_user"()::text) a
+  ORDER BY a.layoutname, a.layoutorder;
+
+
+CREATE TRIGGER gw_trg_vi_xsections
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_options
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_options');
