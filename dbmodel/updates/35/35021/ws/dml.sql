@@ -43,8 +43,7 @@ UPDATE sys_param_user SET label= 'Default pattern:' WHERE id = 'inp_options_patt
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3108, 'gw_fct_create_dscenario_from_toc', 'ws', 'function', 'json', 
-'json', 'Function to create dscenarios from ToC. 
-To work with CRM system need to be connected and at least tables ext_cat_period and ext_rtc_hydrometer_x_data need to be operative',
+'json', 'Function to create network dscenarios from ToC.',
 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET id = 3108 WHERE id = 3104;
@@ -102,7 +101,7 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3110, 'gw_fct_create_dscenario_from_crm', 'ws', 'function', 'json', 
-'json', 'Function to create dscenarios from CRM. This function only works with CONNEC features. Is mandatory to use this method only if your network geometry generator [PJOINT or CONNEC] are enabled.', 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+'json', 'Function to create dscenarios from CRM. This function store values on CONNEC features. When the network geometry generator works with [NODE] demands al moved 50% to node_1 and node_2.', 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id = 3110;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
@@ -110,7 +109,7 @@ VALUES (3110,'Create Demand Dscenario from CRM', '{"featureType":[]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}, 
-{"widgetname":"targetFeature", "label":"Target feature:","tooltip":"Only CONNEC are supported by this function. <br> As result, to operate with this scenario you should work with PJOINT or CONNEC network geometry generator.", "widgettype":"combo","datatype":"text", "layoutname":"grl_option_parameters", "layoutorder":5, "comboIds":["CONNEC"], "comboNames":["CONNEC"], "selectedId":""},
+{"widgetname":"targetFeature", "label":"Target feature:","tooltip":"", "widgettype":"combo","datatype":"text", "layoutname":"grl_option_parameters", "layoutorder":5, "comboIds":["CONNEC"], "comboNames":["CONNEC"], "selectedId":""},
 {"widgetname":"period", "label":"Source CRM period:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":6, "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "selectedId":""},
 {"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4,5], "comboNames":["NONE", "SECTOR-PERIOD", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY"], "selectedId":""}, 
 {"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. <br> This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}]'
@@ -140,3 +139,6 @@ VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec
   ]'
 , NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET alias = 'Create Network Dscenario from ToC'
+WHERE id = 3108

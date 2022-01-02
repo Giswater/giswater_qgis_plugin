@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/02
-ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
+ALTER TABLE config_user_x_sector DROP CO7NSTRAINT config_user_x_sector_sector_id_fkey;
 ALTER TABLE config_user_x_sector ADD CONSTRAINT config_user_x_sector_sector_id_fkey FOREIGN KEY (sector_id)
 REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -91,8 +91,10 @@ CREATE TABLE inp_dscenario_connec(
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"overflow", "dataType":"float", "isUtils":"False"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_demand", "column":"other", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_demand", "column":"other", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_demand", "column":"source", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_demand", "column":"dscenario_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_demand", "column":"source", "dataType":"text", "isUtils":"False"}}$$);
 
 ALTER TABLE inp_dscenario_demand RENAME TO _inp_dscenario_demand_ ;
 ALTER TABLE _inp_dscenario_demand_ DROP CONSTRAINT inp_dscenario_demand_pkey;
@@ -130,7 +132,7 @@ CREATE TABLE ext_rtc_sector_period(
   CONSTRAINT ext_rtc_period_sector_id_cat_period_id_pkey PRIMARY KEY (sector_id, cat_period_id)
 );
 
-CREATE INDEX inp_dscenario_demand_other ON inp_dscenario_demand USING btree (other);
+CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_source USING btree (other);
 
 CREATE TABLE inp_dscenario_inlet(
   dscenario_id integer NOT NULL,

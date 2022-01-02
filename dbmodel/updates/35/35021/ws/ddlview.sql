@@ -233,13 +233,43 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS
            FROM SCHEMA_NAME.config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
+
 CREATE OR REPLACE VIEW vi_demands AS 
 SELECT temp_demand.feature_id,
     temp_demand.demand,
     temp_demand.pattern_id,
-    temp_demand.demand_type,
-    other
+    concat(';',dscenario_id,' ',source,' ', demand_type) as other
    FROM temp_demand
    JOIN temp_node ON temp_demand.feature_id::text = temp_node.node_id::text
    ORDER BY temp_demand.feature_id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_demand AS 
+ SELECT inp_dscenario_demand.dscenario_id,
+    inp_dscenario_demand.feature_id,
+    inp_dscenario_demand.feature_type,
+    inp_dscenario_demand.demand,
+    inp_dscenario_demand.pattern_id,
+    inp_dscenario_demand.demand_type,
+    inp_dscenario_demand.source
+   FROM selector_sector,
+    selector_inp_dscenario,
+    inp_dscenario_demand
+     JOIN v_node ON v_node.node_id::text = inp_dscenario_demand.feature_id::text
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+  AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
+UNION
+ SELECT inp_dscenario_demand.dscenario_id,
+    inp_dscenario_demand.feature_id,
+    inp_dscenario_demand.feature_type,
+    inp_dscenario_demand.demand,
+    inp_dscenario_demand.pattern_id,
+    inp_dscenario_demand.demand_type,
+    inp_dscenario_demand.source
+   FROM selector_sector,
+    selector_inp_dscenario,
+    inp_dscenario_demand
+     JOIN v_connec ON v_connec.connec_id::text = inp_dscenario_demand.feature_id::text
+  WHERE v_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+  AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
