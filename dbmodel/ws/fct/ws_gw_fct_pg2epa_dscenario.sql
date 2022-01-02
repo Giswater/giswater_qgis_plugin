@@ -22,6 +22,7 @@ v_demandpriority integer;
 v_querytext text;
 v_patternmethod integer;
 v_userscenario integer[];
+v_networkmode integer;
 
 BEGIN
 
@@ -32,20 +33,47 @@ BEGIN
 
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
+		v_networkmode = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 			
-		-- moving node demands to temp_demand
-		INSERT INTO temp_demand (feature_id, demand, pattern_id)
-		SELECT DISTINCT ON (feature_id) feature_id, d.demand, d.pattern_id 
+		--- moving node or connec demands to temp_demand
+		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+		SELECT DISTINCT dscenario_id, feature_id, d.demand, d.pattern_id,  demand_type, source
 		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
-		-- moving connec demands to temp_demand
-		INSERT INTO temp_demand (feature_id, demand, pattern_id)
-		SELECT n.node_id, (d.demand), d.pattern_id 
+		-- moving connec demands to linked object which is exported	
+		IF v_networkmode IN(1,2) THEN
+
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+			SELECT node_1 AS node_id, connec_id, demand/2 as demand, pattern_id, demand_type, source FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
+			JOIN inp_dscenario_demand ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+			UNION ALL
+			SELECT node_2 AS node_id, connec_id, demand/2, pattern_id, demand_type, source  FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
+			JOIN inp_dscenario_demand ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
+			
+		ELSIF v_networkmode = 3 THEN
+		
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
+			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
+			FROM  inp_dscenario_demand d ,temp_node n
+			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
+			WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+
+		ELSIF v_networkmode = 4 THEN
+			-- nothing to do because it is automatic. Connec exists as feature exported
+		END IF;
+
+		-- remove those demands which for some reason linked node is not exported
+		DELETE FROM temp_demand WHERE feature_id IN (SELECT feature_id FROM temp_demand EXCEPT select node_id FROM temp_node);
+
+		-- demands for virtual connec (3 , 4 only)
+		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
+		SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
 		FROM  inp_dscenario_demand d ,temp_node n
-		JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
+		JOIN connec c ON concat('VC',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
@@ -56,10 +84,11 @@ BEGIN
 		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined,  moving to temp_demand in order to do not lose base demand (because EPANET does)
 
 			-- moving node demands to temp_demand
-			INSERT INTO temp_demand (feature_id, demand, pattern_id)
-			SELECT node_id, demand, pattern_id 
-			FROM temp_node WHERE demand IS NOT NULL AND demand <> 0 ;
-
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id)
+			SELECT DISTINCT ON (node_id) 0, node_id, n.demand, n.pattern_id 
+			FROM temp_node n
+			JOIN temp_demand ON node_id = feature_id
+			WHERE n.demand IS NOT NULL AND n.demand <> 0;
 		END IF;
 		
 		-- move patterns used demands scenario table
