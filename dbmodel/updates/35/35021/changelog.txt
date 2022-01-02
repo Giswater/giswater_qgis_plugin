@@ -4,3 +4,7 @@
 - Check node 'T candidate' with wrong topology
 - New column parent_id for sector
 - Enhance the way of getting node_type when is NULL (UD)
+- Upgrade to EPANET 2.2
+- Refactor how demands are used for EPANET
+- Refactor how CRM is used on EPANET
+- Improve the write inp file creating ';xxxx' valous additional info to trace and debug
