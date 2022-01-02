@@ -53,7 +53,7 @@ UPDATE config_toolbox SET alias = 'Create Dscenario from ToC' WHERE id = 3108;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_demand_model';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, dv_querytext, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_demand_model', 'DEMAND MODEL', 'epaoptions', 'Demand model:', 'role_epa', 'Demand model' , 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_demand_model''',true, 'lyt_general_1',10,
 'ws', FALSE, FALSE, 'text', 'combo', true, 'PDA', TRUE) 
 ON CONFLICT (id) DO NOTHING;
@@ -81,16 +81,16 @@ ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_max_headerror';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_max_headerror', 'HEADERROR', 'epaoptions', 'Max. head error:', 'role_epa', 'Max head error' , true, 'lyt_hydraulics_1',11,
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_max_flowchange';
 INSERT INTO sys_param_user(id, idval, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable, epaversion)
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, iseditable)
 VALUES ('inp_options_max_flowchange', 'FLOWCHANGE', 'epaoptions', 'Max. flow change:', 'role_epa', 'Max flow change' , true, 'lyt_hydraulics_2',11,
-'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE, '{"from":"2.0.12", "to":null, "language":"english"}') 
+'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA');

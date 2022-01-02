@@ -45,8 +45,8 @@ BEGIN
 	  ELSIF v_view='vi_tanks' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.node_id, NEW.elevation,'TANK','TANK',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
-	    INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id) 
-	    VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id);
+	    INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow) 
+	    VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow);
 	    INSERT INTO man_tank (node_id) VALUES (NEW.node_id); 
 
 	  ELSIF v_view='vi_pumps' THEN 
