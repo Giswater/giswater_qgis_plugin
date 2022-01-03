@@ -629,3 +629,5 @@ INSERT INTO inp_connec VALUES ('114464',0.5,'PTN-CONNEC');
 UPDATE inp_dscenario_demand SET feature_type  ='NODE', pattern_id = 'PTN-HYDRANT', demand_type = 'HYDRANT' , source = concat('NODE ', feature_id);
 
 UPDATE inp_junction SET demand = 0.01 ;
+
+INSERT INTO config_param_user VALUES ('edit_pavement_vdefault','Asphalt',current_user);
