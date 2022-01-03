@@ -608,7 +608,7 @@ UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
 UPDATE inp_pump SET pump_type = 'PRESSPUMP' WHERE node_id = '113951';
 UPDATE inp_pump SET pump_type = 'FLOWPUMP' WHERE node_id = '1105';
 
-SELECT setval('ws_sample.urn_id_seq', gw_fct_setvalurn(),true);
+SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl', false) WHERE parameter = 'basic_selector_tab_exploitation';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector', false) WHERE parameter = 'basic_selector_tab_sector';

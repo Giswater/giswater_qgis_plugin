@@ -110,8 +110,8 @@ return_type, descript, sys_role, sample_query, source)
 VALUES (3110, 'gw_fct_create_dscenario_from_crm', 'ws', 'function', 'json', 
 'json', 'Function to create dscenarios from CRM. <br>This function store values on CONNEC features.<br>When the network geometry generator works with [NODE] demands are moved 50% to node_1 and node_2.', 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM ws_sample.config_toolbox WHERE id = 3110;
-INSERT INTO ws_sample.config_toolbox(id, alias, functionparams, inputparams, observ, active)
+DELETE FROM config_toolbox WHERE id = 3110;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3110,'Create Demand Dscenario from CRM', '{"featureType":[]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
