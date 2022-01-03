@@ -96,7 +96,7 @@ CREATE OR REPLACE VIEW vi_pipes AS
     WHERE epa_type IN ('PIPE', 'SHORTPIPE', 'NODE2NODE');
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_valves AS 
+CREATE OR REPLACE VIEW vi_valves AS 
  SELECT DISTINCT ON (a.arc_id) a.arc_id,
     a.node_1,
     a.node_2,
@@ -293,9 +293,35 @@ AS SELECT n.node_id,
     inp_tank.diameter,
     inp_tank.minvol,
     inp_tank.curve_id,
-    inp_tank.overflow,
     n.the_geom
    FROM selector_sector,
     v_node n
      JOIN inp_tank USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+    inp_inlet.pattern_id,
+    n.the_geom,
+	inp_inlet.overflow
+   FROM selector_sector, v_node n
+     JOIN inp_inlet USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
