@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget, QCheckBox
 from qgis.core import QgsPointXY, QgsGeometry
 
 from .document import GwDocument
@@ -95,6 +95,12 @@ class GwSearch:
                     label = QLabel()
                     label.setObjectName('lbl_' + field['label'])
                     label.setText(field['label'].capitalize())
+
+                    if 'tooltip' in field:
+                        label.setToolTip(field['tooltip'])
+                    else:
+                        label.setToolTip(field['label'].capitalize())
+
                     widget = None
                     if field['widgettype'] == 'typeahead':
                         completer = QCompleter()
@@ -103,6 +109,8 @@ class GwSearch:
                         self.lineedit_list.append(widget)
                     elif field['widgettype'] == 'combo':
                         widget = self._add_combobox(field)
+                    elif field['widgettype'] == 'check':
+                        widget = tools_gw.add_checkbox(field)
                     gridlayout.addWidget(label, x, 0)
                     gridlayout.addWidget(widget, x, 1)
                     x += 1
@@ -183,6 +191,7 @@ class GwSearch:
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
 
 
     def _reset_rubber_band(self):
@@ -363,6 +372,7 @@ class GwSearch:
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
+        chk_list = self.dlg_search.main_tab.widget(index).findChildren(QCheckBox)
         form_search += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
         form_search_add += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
 
@@ -391,6 +401,9 @@ class GwSearch:
             qgis_project_add_schema = global_vars.project_vars['add_schema']
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
+            if chk_list:
+                chk_list = chk_list[0]
+                extras_search += f', "{chk_list.property("columnname")}":"{chk_list.isChecked()}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search, extras=extras_search)
             result = tools_gw.execute_procedure('gw_fct_setsearch', body, rubber_band=self.rubber_band)
