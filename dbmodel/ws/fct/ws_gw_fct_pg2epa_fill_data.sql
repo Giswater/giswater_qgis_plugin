@@ -91,12 +91,12 @@ BEGIN
 
 	-- update child param for inp_tank
 	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
-	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
 	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
 	
 	-- update child param for inp_inlet
 	UPDATE temp_node SET addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
-	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
 	FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id;
 	
 	-- update child param for inp_valve

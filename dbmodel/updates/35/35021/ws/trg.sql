@@ -13,3 +13,11 @@ CREATE TRIGGER gw_trg_vi_demands
   ON vi_demands
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_demands');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_tank ON v_edit_inp_tank;
+
+CREATE TRIGGER gw_trg_edit_inp_node_tank
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_tank
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank');
