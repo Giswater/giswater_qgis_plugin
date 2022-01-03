@@ -549,7 +549,7 @@ BEGIN
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
 		-- start process
-		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role IN 
+		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_toc IN 
 		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
 		LOOP
 		
