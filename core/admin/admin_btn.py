@@ -920,7 +920,7 @@ class GwAdminButton:
 
         elif self.form_enabled:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-            if any(x in global_vars.dao_db_credentials['db'] for x in ('.', ',')):
+            if any(x in str(global_vars.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
                 self.form_enabled = False
             if schema_name == 'null':
@@ -1377,7 +1377,7 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
-            if any(x in credentials['db'] for x in ('.', ',')):
+            if any(x in str(credentials['db']) for x in ('.', ',')):
                 message = 'Database name contains special characters that are not supported'
                 self.form_enabled = False
             elif str(self.plugin_version) > str(self.project_version):
