@@ -150,6 +150,39 @@ BEGIN
 	
 	END IF;
 
+	--check if exists schem utils and recreate permissions
+  EXECUTE 'SELECT EXISTS (select * from pg_catalog.pg_namespace where nspname = ''utils'');'
+  INTO v_query_text;
+
+  IF v_query_text = 't' or v_query_text = 'true' THEN
+   	EXECUTE 'SELECT value::boolean FROM config_param_system WHERE parameter=''admin_utils_schema'';'
+    INTO v_query_text;
+  END IF;
+
+  IF v_query_text = 't' or v_query_text = 'true'  THEN
+  	--Grant to role_basic
+ 		v_query_text:= 'GRANT ALL ON SCHEMA utils TO "role_basic";';
+		EXECUTE v_query_text;
+
+		v_query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA utils TO "role_basic";';
+		EXECUTE v_query_text;
+
+		v_query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  utils TO "role_basic";'; 
+		EXECUTE v_query_text;
+
+		v_query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA utils TO role_basic'; 
+		EXECUTE v_query_text;
+
+		-- Grant specificic permissions for tables
+		FOR v_tablerecord IN SELECT * FROM utils.sys_table WHERE sys_role IS NOT NULL AND id IN 
+		(SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname = 'utils' 
+		UNION
+		SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'utils') LOOP
+			v_query_text:= 'GRANT ALL ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
+			EXECUTE v_query_text;
+		END LOOP;
+
+  END IF;
 	RETURN ;
 
 END;
