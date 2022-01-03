@@ -196,6 +196,7 @@ class GwAdminButton:
             sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
             tools_db.execute_sql(sql)
 
+        self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
         self.schema = project_name_schema
@@ -3134,6 +3135,7 @@ class GwAdminButton:
             tools_qgis.show_message(msg, 0)
             return
 
+        self.error_count = 0
         # Set background task 'GwCreateSchemaTask'
         description = f"Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
