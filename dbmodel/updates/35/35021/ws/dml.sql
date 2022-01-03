@@ -156,3 +156,23 @@ FALSE, TRUE, FALSE,FALSE,'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS id
 '{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}', 
 NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, vdefault)
+VALUES ('edit_node_interpolate', 'hidden', 'Values to use with tool node interpolate',
+'role_edit', 'Values to manage node interpolate tool', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', true, NULL, NULL,
+'{"elevation":{"status":false, "column":"custom_top_elev"},  "depth":{"status":true, "column":"custom_elev"}}') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled":false},
+{"actionName":"actionZoom",  "disabled":false},
+{"actionName":"actionCentered",  "disabled":false},
+{"actionName":"actionZoomOut" , "disabled":false},
+{"actionName":"actionCatalog",  "disabled":false},
+{"actionName":"actionWorkcat",  "disabled":false},
+{"actionName":"actionCopyPaste",  "disabled":false},
+{"actionName":"actionLink",  "disabled":false},
+{"actionName":"actionMapZone",  "disabled":false},
+{"actionName":"actionSetToArc",  "disabled":false},
+{"actionName":"actionGetParentId",  "disabled":false},
+{"actionName":"actionGetArcId", "disabled":false},
+{"actionName": "actionRotation","disabled": false},
+{"actionName":"actionInterpolate", "disabled":false}]' WHERE formname='v_edit_node';
