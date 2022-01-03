@@ -39,3 +39,5 @@ UPDATE sys_table SET qgis_toc = 'Node'FROM cat_feature  WHERE sys_table.id = cat
 UPDATE sys_table SET qgis_toc = 'Connec' FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'CONNEC';
 UPDATE sys_table SET qgis_toc = 'Gully' FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'GULLY';
 UPDATE sys_table SET qgis_toc = 'EPA Catalog' WHERE id like 'cat_%' AND sys_role = 'role_epa';
+
+INSERT INTO config_form_fields VALUES ('search', 'form_feature', 'main', 'hydro_contains', 'lyt_data_1', NULL, 'string', 'nowidget', 'Use contains', 'Check: allow to search using any of the characters. Unchecked: the search engine only will return results when matching the first characters (useful for short numbers)', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}',NULL,NULL, FALSE);

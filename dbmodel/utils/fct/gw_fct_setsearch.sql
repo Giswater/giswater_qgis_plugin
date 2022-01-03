@@ -121,6 +121,8 @@ v_exploitation_geom_field varchar;
 v_schemaname text;
 v_addschema text;
 
+v_hydro_contains text;
+
 v_srid integer;
 v_return json;
 v_flag boolean = false;
@@ -144,6 +146,7 @@ BEGIN
 	v_tab := ((p_data->>'form')::json)->>'tabName';
 	v_searchtype := (p_data->>'data')::json->>'searchType';
 	v_addschema := (p_data->>'data')::json->>'addSchema';
+	v_hydro_contains := (p_data->>'data')::json->>'hydro_contains';
 	
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -291,7 +294,12 @@ BEGIN
 		v_idarg := v_combo->>'id';
 		v_name := v_combo->>'name';
 		v_edittext := ((p_data->>'data')::json)->>'hydro_search';
-		v_textarg := concat(v_edittext->>'text' ,'%');
+		IF v_hydro_contains = 'True' THEN
+			v_textarg := concat('%', v_edittext->>'text' ,'%');
+		ELSE
+			v_textarg := concat(v_edittext->>'text' ,'%');
+		END IF;
+		
 
 		-- Fix exploitation vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;

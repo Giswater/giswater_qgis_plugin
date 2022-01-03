@@ -35,6 +35,7 @@ formWorkcat json;
 editCode json;
 editCode1 json;
 editCode2 json;
+chkContains json;
 comboType json;
 comboType1 json;
 comboType2 json;
@@ -377,14 +378,17 @@ BEGIN
 			-- Add to json
 			comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 		
-		
 			-- Add edit box to introduce search text
 			SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_search';
 			editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('hydro_',rec_fields.columnname),
 			'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+
+			SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_contains';
+			chkContains := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('hydro_',rec_fields.columnname),
+			'widgettype','check','datatype','boolean','placeholder','','disabled',false,'noresultsMsg','','loadingMsg','', 'tooltip',rec_fields.tooltip);
 		
 			-- Create array with hydro fields
-			fieldsJson := '[' || comboType || ',' || editCode || ']';
+			fieldsJson := '[' || chkContains || ',' || comboType || ',' || editCode || ']';
 			fieldsJson := COALESCE(fieldsJson, '[]');
 
 			-- Create tabs array
