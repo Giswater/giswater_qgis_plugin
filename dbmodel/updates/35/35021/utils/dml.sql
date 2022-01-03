@@ -28,4 +28,14 @@ UPDATE config_toolbox SET inputparams =
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE VALUES & COPY FROM", "KEEP VALUES & COPY FROM", "DELETE SCENARIO"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"$userDscenario"}
   ]'
-WHERE id = 3042
+WHERE id = 3042;
+
+
+--2022/01/03
+UPDATE sys_table SET qgis_toc = 'Catalog' WHERE id like 'cat_%' AND sys_role !=  'role_epa';
+UPDATE sys_table SET qgis_toc = 'Mapzone' WHERE id in ('v_edit_exploitation', 'v_edit_sector', 'v_edit_dma', 'v_edit_dqa', 'v_edit_presszone');
+UPDATE sys_table SET qgis_toc = 'Arc' FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'ARC';
+UPDATE sys_table SET qgis_toc = 'Node'FROM cat_feature  WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'NODE';
+UPDATE sys_table SET qgis_toc = 'Connec' FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'CONNEC';
+UPDATE sys_table SET qgis_toc = 'Gully' FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'GULLY';
+UPDATE sys_table SET qgis_toc = 'EPA Catalog' WHERE id like 'cat_%' AND sys_role = 'role_epa';
