@@ -53,12 +53,12 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 0
         self.admin.current_sql_file = 0
         self.admin.progress_value = 0
-
+        tools_log.log_info(f"Task 'Create schema' execute function 'def main_execution'")
         status = self.main_execution()
         if not status:
             tools_log.log_info("Function main_execution returned False")
             return False
-
+        tools_log.log_info(f"Task 'Create schema' execute function 'def custom_execution'")
         self.custom_execution()
         return True
 
@@ -121,6 +121,7 @@ class GwCreateSchemaTask(GwTask):
         project_srid = self.params['project_srid']
 
         self.admin.progress_ratio = 0.8
+        tools_log.log_info(f"Task 'Create schema' execute function 'def calculate_number_of_files'")
         self.admin.total_sql_files = self.calculate_number_of_files()
         tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
 
@@ -192,6 +193,7 @@ class GwCreateSchemaTask(GwTask):
         list_process = ['load_base', 'load_locale', 'update_30to31', 'load_views', 'load_trg']
 
         for process_name in list_process:
+            tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
             tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
@@ -200,6 +202,7 @@ class GwCreateSchemaTask(GwTask):
 
         # Manage process 'update_31to39'
         process_name = 'update_31to39'
+        tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
         dict_folders = self.get_folders_process(process_name)
         self.dict_folders_process[process_name] = dict_folders
 
@@ -209,6 +212,7 @@ class GwCreateSchemaTask(GwTask):
             total_folder_update_major = 0
             list_folder_update_minor = sorted(glob.glob(f"{folder_update_major}/*/"))
             for folder_update_minor in list_folder_update_minor:
+                tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_folder_update_minor' with parameters: '{folder_update_minor}'")
                 total_files_minor = self.get_number_of_files_folder_update_minor(folder_update_minor)
                 total_folder_update_major += total_files_minor
             tools_log.log_info(f"Folder {folder_update_major}: {total_folder_update_major}")
@@ -236,6 +240,7 @@ class GwCreateSchemaTask(GwTask):
     def get_number_of_files_process(self, process_name: str):
         """ Calculate number of files of all folders of selected @process_name """
 
+        tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
         dict_folders = self.get_folders_process(process_name)
         if dict_folders is None:
             return dict_folders, 0

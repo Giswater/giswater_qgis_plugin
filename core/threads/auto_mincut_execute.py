@@ -50,6 +50,7 @@ class GwAutoMincutTask(GwTask):
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
             self.body = tools_gw.create_body(extras=extras)
+            tools_log.log_info(f"Task 'Mincut execute' execute procedure 'gw_fct_setmincut' with parameters: '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
             self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', self.body, aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
@@ -71,6 +72,7 @@ class GwAutoMincutTask(GwTask):
         if self.body:
             sql += f"{self.body}"
         sql += f");"
+        tools_log.log_info(f"Task 'Mincut execute' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.complet_result, sql, None)
 
         # If user cancel task

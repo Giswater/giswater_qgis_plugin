@@ -41,6 +41,7 @@ class GwProjectLayersConfig(GwTask):
         self.vr_errors = set()
         self.vr_missing = set()
         self._get_layers_to_config()
+        tools_log.log_info(f"Task 'ConfigLayerFields' execute function 'def _set_layer_config' with parameters: '{self.available_layers}'")
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
 
@@ -55,6 +56,7 @@ class GwProjectLayersConfig(GwTask):
         if self.body:
             sql += f"{self.body}"
         sql += f");"
+        tools_log.log_info(f"Task 'ConfigLayerFields' manage json response with parameters: '{self.json_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.json_result, sql, None)
 
         # If user cancel task
@@ -140,6 +142,8 @@ class GwProjectLayersConfig(GwTask):
 
             feature = f'"tableName":"{layer_name}", "isLayer":true'
             self.body = tools_gw.create_body(feature=feature)
+            tools_log.log_info(f"Task 'ConfigLayerFields' execute procedure 'gw_fct_getinfofromid' with parameters: "
+                               f"'gw_fct_getinfofromid', '{self.body}', 'aux_conn=self.aux_conn', 'is_thread=True', 'check_function=False'")
             self.json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', self.body, aux_conn=self.aux_conn,
                                                           is_thread=True, check_function=False)
             if not self.json_result:
@@ -163,6 +167,8 @@ class GwProjectLayersConfig(GwTask):
 
                 # Hide selected fields according table config_form_fields.hidden
                 if 'hidden' in field:
+                    tools_log.log_info(f"Task 'ConfigLayerFields' execute function 'def _set_column_visibility' with parameters: "
+                        f"'{layer}', '{field['columnname']}', '{field['hidden']}'")
                     self._set_column_visibility(layer, field['columnname'], field['hidden'])
 
                 # Set alias column
@@ -185,6 +191,8 @@ class GwProjectLayersConfig(GwTask):
                                              QgsFieldConstraints.ConstraintStrengthSoft)
 
                 # Manage editability
+                tools_log.log_info(f"Task 'ConfigLayerFields' execute function 'def _set_read_only' with parameters: "
+                                   f"'{self.layer}', '{field}', '{field_index}'")
                 self._set_read_only(layer, field, field_index)
 
                 # delete old values on ValueMap
@@ -255,6 +263,8 @@ class GwProjectLayersConfig(GwTask):
 
                 # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
                 if field['widgettype'] == 'text':
+                    tools_log.log_info(f"Task 'ConfigLayerFields' execute function 'def _set_column_multiline' with parameters: "
+                        f"'{layer}', '{field}', '{field_index}'")
                     self._set_column_multiline(layer, field, field_index)
 
         if msg_failed != "":
