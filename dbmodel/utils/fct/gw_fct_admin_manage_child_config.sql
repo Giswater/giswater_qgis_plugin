@@ -58,8 +58,8 @@ BEGIN
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-		INSERT INTO sys_table(id, descript, sys_role, sys_criticity, orderby)
-	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, 0)
+		INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
+	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0)
 	  ON CONFLICT (id) DO NOTHING;
 	  IF (SELECT giswater from sys_version) >'3.5.021' THEN
 	  	UPDATE sys_table st SET qgis_toc = initcat(system_id) FROM cat_feature cf WHERE cf.id = v_view_name AND cf.id=st.id;
