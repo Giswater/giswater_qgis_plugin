@@ -172,6 +172,16 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
+
+				-- hydrometer control
+				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id = customer_code WHERE c.connec_id = '3001' AND state IN
+				(SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+				
+				IF v_num_feature > 0 THEN 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3194", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+				END IF;
+					
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
 			
@@ -183,7 +193,18 @@ BEGIN
 						USING feature_id_aux;						
 					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
-			END IF;	
+
+				-- hydrometer control
+				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id = customer_code WHERE c.connec_id = '3001' AND state IN
+				(SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+				
+				IF v_num_feature > 0 THEN 
+					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
+						INTO v_state_type
+						USING feature_id_aux;						
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
+				END IF;
+			END IF;			
 
 		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM gully WHERE gully_id=feature_id_aux;
