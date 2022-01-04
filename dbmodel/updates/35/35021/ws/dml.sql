@@ -160,7 +160,7 @@ INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, l
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, vdefault)
 VALUES ('edit_node_interpolate', 'hidden', 'Values to use with tool node interpolate',
 'role_edit', 'Values to manage node interpolate tool', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', true, NULL, NULL,
-'{"elevation":{"status":false, "column":"custom_top_elev"},  "depth":{"status":true, "column":"custom_elev"}}') ON CONFLICT (id) DO NOTHING;
+'{"elevation":{"status":true, "column":"elevation"}, "depth":{"status":true, "column":"depth"}}') ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled":false},
 {"actionName":"actionZoom",  "disabled":false},
