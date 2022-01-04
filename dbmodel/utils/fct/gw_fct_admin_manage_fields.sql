@@ -90,8 +90,6 @@ BEGIN
 		v_querytext = 'Process not executed. Table has already been modified.';
 	END IF;
 
-	RAISE NOTICE 'query text %',v_querytext;
-
 	-- recover search_path in case utils = true in order to reset value fixed before
 	SET search_path = "SCHEMA_NAME", public;
 

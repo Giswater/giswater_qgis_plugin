@@ -91,3 +91,6 @@ VALUES ('v_edit_sector','form_feature', 'main', 'parent_id', null, null, 'string
 FALSE, TRUE, FALSE,FALSE,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ', TRUE, TRUE, NULL, NULL,NULL,
 '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', 
 NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE sys_fprocess set project_type='utils' where fid=213;
+UPDATE sys_function set project_type='utils' where id=2720;
