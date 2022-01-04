@@ -1243,7 +1243,7 @@ class GwPsector:
         if query == 'null':
             query = ""
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
-               f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {tableright}"
+               f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {schema_name}.{tableright}"
                f" WHERE psector_id = '{psector_id}')")
         self.fill_table_by_query(qtable, sql)
 
