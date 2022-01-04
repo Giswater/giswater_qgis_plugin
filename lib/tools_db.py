@@ -339,6 +339,9 @@ def get_postgis_version():
 def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None, is_admin=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
+    if global_vars.dao is None:
+        tools_log.log_warning("The connection to the database is broken.", parameter=sql)
+        return None
     sql = _get_sql(sql, log_sql, params)
     row = global_vars.dao.get_row(sql, commit, aux_conn=aux_conn)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
@@ -356,6 +359,9 @@ def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_con
 def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
+    if global_vars.dao is None:
+        tools_log.log_warning("The connection to the database is broken.", parameter=sql)
+        return None
     sql = _get_sql(sql, log_sql, params)
     rows = None
     rows2 = global_vars.dao.get_rows(sql, commit)
