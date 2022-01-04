@@ -61,7 +61,7 @@ BEGIN
 		INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
 	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0)
 	  ON CONFLICT (id) DO NOTHING;
-	  IF (SELECT giswater from sys_version) >'3.5.021' THEN
+	  IF (SELECT giswater from sys_version) >'3.5.020' THEN
 	  	UPDATE sys_table st SET qgis_toc = initcat(system_id) FROM cat_feature cf WHERE cf.id = v_view_name AND cf.id=st.id;
 	  END IF;
 
