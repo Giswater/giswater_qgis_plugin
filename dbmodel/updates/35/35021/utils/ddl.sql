@@ -17,3 +17,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenar
 
 ALTER TABLE sys_table RENAME COLUMN qgis_role TO qgis_toc;
 ALTER TABLE sys_table DROP CONSTRAINT sys_table_qgis_role_fkey;
+
+ALTER TABLE sector DROP CONSTRAINT IF EXISTS sector_parent_id_fkey;
+ALTER TABLE sector ADD CONSTRAINT sector_parent_id_fkey 
+FOREIGN KEY (parent_id) REFERENCES sector (sector_id) MATCH SIMPLE
+ON UPDATE CASCADE ON DELETE RESTRICT;

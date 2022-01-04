@@ -146,7 +146,7 @@ VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET alias = 'Create Network Dscenario from ToC'
-WHERE id = 3108
+WHERE id = 3108;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
@@ -160,7 +160,7 @@ INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, l
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, vdefault)
 VALUES ('edit_node_interpolate', 'hidden', 'Values to use with tool node interpolate',
 'role_edit', 'Values to manage node interpolate tool', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', true, NULL, NULL,
-'{"elevation":{"status":false, "column":"custom_top_elev"},  "depth":{"status":true, "column":"custom_elev"}}') ON CONFLICT (id) DO NOTHING;
+'{"elevation":{"status":true, "column":"elevation"}, "depth":{"status":true, "column":"depth"}}') ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled":false},
 {"actionName":"actionZoom",  "disabled":false},
@@ -177,6 +177,11 @@ UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled
 {"actionName": "actionRotation","disabled": false},
 {"actionName":"actionInterpolate", "disabled":false}]' WHERE formname='v_edit_node';
 
-INSERT INTO config_form_fields
-      (formname,          formtype,       tabname, columnname, layoutname,   layoutorder, "datatype", widgettype, "label",    tooltip, placeholder,         ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,           widgetfunction, linkedobject, hidden)
-VALUES('v_edit_inp_tank', 'form_feature', 'main',  'overflow', 'lyt_data_1', 71,          'string',   'text',     'overflow', null,    '''Yes'' or ''No''', false,       false,    true,       false,        false,    null,         false,         false,          null,         null,                 null,       '{"setMultiline":false}', null,           null,         false);
+INSERT INTO config_form_fields (formname, formtype,tabname, columnname, layoutname,layoutorder,datatype, 
+widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
+widgetfunction, linkedobject, hidden)
+VALUES('v_edit_inp_tank', 'form_feature', 'main','overflow','lyt_data_1', 71, 'string',
+'text','overflow', null,  'Yes or No', false,false, true,false, false, 
+null,  false,  false,  null,null, null,'{"setMultiline":false}', 
+null,null,false);

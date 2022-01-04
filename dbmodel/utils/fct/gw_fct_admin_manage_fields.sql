@@ -81,12 +81,13 @@ BEGIN
 		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' DROP COLUMN '||quote_ident(v_column);
 		EXECUTE v_querytext;
 
-	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL THEN
+	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns 
+		WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column AND data_type!=v_datatype) IS NOT NULL THEN
 
 		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
 		EXECUTE v_querytext;
 	ELSE 
-		RAISE NOTICE 'Process not executed. Check data';
+		v_querytext = 'Process not executed. Table has already been modified.';
 	END IF;
 
 	RAISE NOTICE 'query text %',v_querytext;
