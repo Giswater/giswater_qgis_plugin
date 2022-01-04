@@ -46,8 +46,13 @@ class GwCreateSchemaUtilsTask(GwTask):
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
             tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
             tools_db.execute_sql(sql)
-            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
             sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
+            tools_db.execute_sql(sql)
+
+            # execute gw_fct_admin_role_permissions
+            sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_role_permissions();"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
             tools_db.execute_sql(sql)
 
             # Insert into config_param_system utils schema version

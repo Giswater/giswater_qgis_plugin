@@ -3194,8 +3194,7 @@ class GwAdminButton:
 
             for sub_folder in sub_folders:
                 aux = str(self.ws_project_result[0]).replace('.', '')
-                if (schema_version is None and sub_folder < aux) \
-                    or schema_version is not None and (schema_version < sub_folder < aux):
+                if (schema_version is None and sub_folder <= aux) or schema_version is not None and (schema_version < sub_folder < aux):
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
                     if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name='utils')
