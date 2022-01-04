@@ -185,3 +185,10 @@ VALUES('v_edit_inp_tank', 'form_feature', 'main','overflow','lyt_data_1', 71, 's
 'text','overflow', null,  'Yes or No', false,false, true,false, false, 
 null,  false,  false,  null,null, null,'{"setMultiline":false}', 
 null,null,false);
+
+INSERT INTO config_param_system VALUES ('admin_hydrometer_state', '{"0":[0], "1":[1,2,3,4]}', 
+'Variable to map state values from crm to giswater state values in order to identify what state are deprecated to check on function state_control for connecs');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES ('3194', 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, TRUE, 'utils', NULL)
+ON CONFLICT (id) DO NOTHING;
