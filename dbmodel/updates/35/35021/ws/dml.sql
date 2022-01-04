@@ -177,6 +177,11 @@ UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled
 {"actionName": "actionRotation","disabled": false},
 {"actionName":"actionInterpolate", "disabled":false}]' WHERE formname='v_edit_node';
 
-INSERT INTO config_form_fields
-      (formname,          formtype,       tabname, columnname, layoutname,   layoutorder, "datatype", widgettype, "label",    tooltip, placeholder,         ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,           widgetfunction, linkedobject, hidden)
-VALUES('v_edit_inp_tank', 'form_feature', 'main',  'overflow', 'lyt_data_1', 71,          'string',   'text',     'overflow', null,    '''Yes'' or ''No''', false,       false,    true,       false,        false,    null,         false,         false,          null,         null,                 null,       '{"setMultiline":false}', null,           null,         false);
+INSERT INTO config_form_fields (formname, geomformtype,tabname, columnname, layoutname,layoutorder,datatype, 
+widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
+widgetfunction, linkedobject, hidden)
+VALUES('v_edit_inp_tank', 'form_feature', 'main','overflow','lyt_data_1', 71, 'string',
+'text','overflow', null,  'Yes or No', false,false, true,false, false, 
+null,  false,  false,  null,null, null,'{"setMultiline":false}', 
+null,null,false);
