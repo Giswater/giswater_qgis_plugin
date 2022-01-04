@@ -15,7 +15,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"log", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"log", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE sys_table RENAME COLUMN qgis_role TO qgis_toc;
 ALTER TABLE sys_table DROP CONSTRAINT sys_table_qgis_role_fkey;
 
 ALTER TABLE sector DROP CONSTRAINT IF EXISTS sector_parent_id_fkey;
@@ -23,7 +22,7 @@ ALTER TABLE sector ADD CONSTRAINT sector_parent_id_fkey
 FOREIGN KEY (parent_id) REFERENCES sector (sector_id) MATCH SIMPLE
 ON UPDATE CASCADE ON DELETE RESTRICT;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_role", "newName":""}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_role", "newName":"context"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_message", "newName":"alias"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_criticity", "newName":"orderby"}}$$);
 ALTER TABLE sys_table ALTER COLUMN context TYPE character varying(500);
