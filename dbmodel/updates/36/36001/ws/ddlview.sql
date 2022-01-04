@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/01/03
 DROP VIEW v_edit_inp_junction;
-CREATE OR REPLACE VIEW ve_inp_junction AS 
+CREATE OR REPLACE VIEW v_edit_inp_junction AS 
  SELECT n.node_id,
     n.elevation,
     n.depth,
@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW ve_inp_junction AS
 /*
 
 DROP VIEW v_edit_inp_pipe;
-CREATE OR REPLACE VIEW ve_inp_pipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
  SELECT arc.arc_id,
     arc.node_1,
     arc.node_2,
@@ -55,7 +55,8 @@ CREATE OR REPLACE VIEW ve_inp_pipe AS
     status,
     custom_roughness,
     custom_dint,
-	
+
+
     arc.the_geom
    FROM selector_sector,v_arc arc
    JOIN inp_pipe USING (arc_id)
@@ -64,7 +65,7 @@ CREATE OR REPLACE VIEW ve_inp_pipe AS
 
 
 DROP VIEW v_edit_inp_pump;
-CREATE OR REPLACE VIEW ve_inp_pump AS 
+CREATE OR REPLACE VIEW v_edit_inp_pump AS 
  SELECT n.node_id,
     n.elevation,
     n.depth,
@@ -84,6 +85,7 @@ CREATE OR REPLACE VIEW ve_inp_pump AS
     to_arc,
     status,
     pump_type,
+	
 	
     n.the_geom
    FROM selector_sector, v_node n
@@ -143,7 +145,7 @@ CREATE OR REPLACE VIEW ve_inp_shortpipe AS
   
   
 DROP VIEW v_edit_inp_tank;
-CREATE OR REPLACE VIEW ve_inp_tank AS 
+CREATE OR REPLACE VIEW v_edit_inp_tank AS 
  SELECT n.node_id,
     n.elevation,
     n.depth,
@@ -171,7 +173,7 @@ CREATE OR REPLACE VIEW ve_inp_tank AS
   
   
 DROP VIEW v_edit_inp_valve;
-CREATE OR REPLACE VIEW ve_inp_valve AS 
+CREATE OR REPLACE VIEW v_edit_inp_valve AS 
  SELECT v_node.node_id,
     v_node.elevation,
     v_node.depth,
@@ -202,7 +204,7 @@ CREATE OR REPLACE VIEW ve_inp_valve AS
   
   
 DROP VIEW v_edit_inp_virtualvalve;
-CREATE OR REPLACE VIEW ve_inp_virtualvalve AS 
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
     v_arc.node_2,
@@ -232,7 +234,7 @@ CREATE OR REPLACE VIEW ve_inp_virtualvalve AS
   
   
 DROP VIEW v_edit_inp_inlet;
-CREATE OR REPLACE VIEW ve_inp_inlet AS 
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
  SELECT n.node_id,
     n.elevation,
     n.depth,
@@ -260,7 +262,7 @@ CREATE OR REPLACE VIEW ve_inp_inlet AS
  
  
 DROP VIEW v_edit_inp_connec;
-CREATE OR REPLACE VIEW ve_inp_connec AS 
+CREATE OR REPLACE VIEW v_edit_inp_connec AS 
  SELECT connec.connec_id,
     connec.elevation,
     connec.depth,
