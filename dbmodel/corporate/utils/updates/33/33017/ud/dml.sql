@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity, qgis_criticity)
 VALUES ('ext_district', 'Catalog of districts', 'role_edit', 0, 0) ON CONFLICT (id) DO NOTHING;
