@@ -146,7 +146,7 @@ VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET alias = 'Create Network Dscenario from ToC'
-WHERE id = 3108
+WHERE id = 3108;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
@@ -177,7 +177,7 @@ UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled
 {"actionName": "actionRotation","disabled": false},
 {"actionName":"actionInterpolate", "disabled":false}]' WHERE formname='v_edit_node';
 
-INSERT INTO config_form_fields (formname, geomformtype,tabname, columnname, layoutname,layoutorder,datatype, 
+INSERT INTO config_form_fields (formname, formtype,tabname, columnname, layoutname,layoutorder,datatype, 
 widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
 widgetfunction, linkedobject, hidden)
