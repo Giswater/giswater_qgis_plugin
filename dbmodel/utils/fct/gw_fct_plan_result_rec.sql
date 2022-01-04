@@ -184,7 +184,9 @@ BEGIN
 		INSERT INTO selector_plan_result (cur_user, result_id) VALUES (current_user, v_result_id) ON CONFLICT (cur_user, result_id) DO NOTHING;
 
 		-- inserting log
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Process -> Done');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '1ST. STEP executed');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Snapshot of values form v_plan_arc and v_plan_node have been inserted on plan_result_arc and plan_result_node tables');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'This proces enables to execute STEP 2 in order to calculate amortized values using age,cost and acoeff (amortized rate per year)');
 	
 	ELSIF v_step = 2 THEN
 		
@@ -207,13 +209,16 @@ BEGIN
 			pending = CASE WHEN (age * builtcost * acoeff)< builtcost THEN (builtcost - age * builtcost * acoeff)::numeric(12,2) 
 						ELSE 0::numeric(12,2) END
 		WHERE result_id = v_result_id;
+
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '2ND STEP executed');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Amortized values using age,cost and acoeff have been calculated');
 	
 	END IF;
 	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
