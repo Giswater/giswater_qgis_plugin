@@ -105,6 +105,8 @@ INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inl
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');
 
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED');
+
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3110, 'gw_fct_create_dscenario_from_crm', 'ws', 'function', 'json', 
@@ -125,7 +127,8 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE config_toolbox SET inputparams =
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
-{"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""}
+{"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
+{"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
 ]', functionparams = '{"featureType":["node", "arc", "connec"]}'
 WHERE id = 3108;
 
@@ -139,9 +142,10 @@ ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id = 3112;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec"]}',
+VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node":{"v_edit_inp_junction"},"connec":{"v_edit_inp_connec"}]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
- {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}
+ {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""},
+ {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
   ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
