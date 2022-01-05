@@ -52,7 +52,14 @@ UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"NODE"}', alias 
 UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"CONNEC"}', alias = initcap(cat_feature.id) FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'CONNEC';
 UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"GULLY"}', alias = initcap(cat_feature.id)  FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'GULLY';
 
-UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om';
+UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"ARC"}' WHERE id='v_edit_arc';
+UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"NODE"}' WHERE id='v_edit_node';
+UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"CONNEC"}' WHERE id='v_edit_connec';
+UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"GULLY"}' WHERE id='v_edit_gully';
+
+UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'anl%';
+UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'v_om_mincut%';
+UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and (id IN ('v_edit_om_visit') OR id ilike 've_visit%';
 
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Hydrology catalog' , orderby=1 WHERE id ='v_edit_inp_hydrology';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'DWF catalog' , orderby=2 WHERE id ='v_edit_inp_dwf';
