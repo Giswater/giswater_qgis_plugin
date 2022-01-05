@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
-from ...ui.ui_manager import GwDscenarioManagerUi
+from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
@@ -75,18 +75,54 @@ class GwDscenarioManagerButton(GwAction):
 
     def _manage_active_functions(self):
 
-        values = [[3108, "Create from ToC"]]
+        values = []
         if global_vars.project_type == 'ws':
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
-
+            values.append([3108, "Create from ToC"])
+        if global_vars.project_type == 'ud':
+            values.append([3118, "Create from ToC"])
         tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_function, values, index_to_show=1)
 
 
-    def _open_dscenario(self):
+    def _open_dscenario(self, index):
 
-        # Build dialog with tabs
-        return
+        # Get selected dscenario_id
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+        dscenario_id = index.sibling(row, column_index).data()
+
+        # Create dialog
+        self.dlg_dscenario = GwDscenarioUi()
+        tools_gw.load_settings(self.dlg_dscenario)
+
+        # Select all dscenario views
+        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
+              f"AND table_name LIKE 'v_edit_inp_dscenario%'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            views = [x[0] for x in rows]
+            for view in views:
+                qtableview = QTableView()
+                complet_list = self._get_list(view, filter_id=f"{dscenario_id}")
+                if complet_list is False:
+                    continue
+                for field in complet_list['body']['data']['fields']:
+                    if 'hidden' in field and field['hidden']: continue
+                    model = qtableview.model()
+                    if model is None:
+                        model = QStandardItemModel()
+                        qtableview.setModel(model)
+                    model.removeRows(0, model.rowCount())
+
+                    if field['value']:
+                        qtableview = tools_gw.add_tableview_header(qtableview, field)
+                        qtableview = tools_gw.fill_tableview_rows(qtableview, field)
+                    tools_qt.set_tableview_config(qtableview)
+                self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
+
+        tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
+
 
     def _open_create_workspace_dlg(self):
 
@@ -104,11 +140,13 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
 
 
-    def _get_list(self, table_name='cat_dscenario', filter_name=""):
+    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+        if filter_id is not None:
+            filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -123,7 +161,7 @@ class GwDscenarioManagerButton(GwAction):
     def _fill_tbl(self, filter_name=""):
         """ Fill table with initial data into QTableView """
 
-        complet_list = self._get_list("cat_dscenario", filter_name)
+        complet_list = self._get_list("v_edit_cat_dscenario", filter_name)
 
         if complet_list is False:
             return False, False

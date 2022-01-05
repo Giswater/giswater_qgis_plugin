@@ -185,6 +185,10 @@ class GwHydrologySelectorUi(GwDialog, FORM_CLASS):
 FROM_CLASS = _get_ui_class('dscenario_manager.ui', 'epa')
 class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
     pass
+
+FROM_CLASS = _get_ui_class('dscenario.ui')
+class GwDscenarioUi(GwDialog, FROM_CLASS):
+    pass
 # endregion
 
 
