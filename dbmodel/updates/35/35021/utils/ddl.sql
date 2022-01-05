@@ -38,3 +38,7 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTR
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"expl_id", "dataType":"integer", "isUtils":"False"}}$$);
 
+ALTER TABLE rpt_cat_result DROP CONSTRAINT IF EXISTS rpt_cat_result_expl_id_fkey;
+ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_expl_id_fkey FOREIGN KEY (expl_id) 
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
