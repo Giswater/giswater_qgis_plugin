@@ -58,11 +58,11 @@ BEGIN
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-		INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
-	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0)
+		INSERT INTO sys_table(id, descript, sys_role)
+	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit')
 	  ON CONFLICT (id) DO NOTHING;
 	  IF (SELECT giswater from sys_version) >'3.5.020' THEN
-			UPDATE sys_table st SET context = concat('{"level_1":"NETWORK", "level_2":"',feature_type,'"}') 
+			UPDATE sys_table st SET context = concat('{"level_1":"NETWORK", "level_2":"',feature_type,'"}'), criticity=0
 	  	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
 	  END IF;
 

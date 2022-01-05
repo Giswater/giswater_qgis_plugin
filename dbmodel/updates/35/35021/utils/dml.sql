@@ -59,7 +59,7 @@ UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"GULLY"}' WHERE 
 
 UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'anl%';
 UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'v_om_mincut%';
-UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and (id IN ('v_edit_om_visit') OR id ilike 've_visit%';
+UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and (id IN ('v_edit_om_visit') OR id ilike 've_visit%');
 
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Hydrology catalog' , orderby=1 WHERE id ='v_edit_inp_hydrology';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'DWF catalog' , orderby=2 WHERE id ='v_edit_inp_dwf';
