@@ -142,7 +142,7 @@ ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id = 3112;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node":["v_edit_inp_junction"],"connec":["v_edit_inp_connec"]]}',
+VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType": {"node":["v_edit_inp_junction"],"connec":["v_edit_inp_connec"]}}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
  {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""},
  {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
