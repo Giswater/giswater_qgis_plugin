@@ -325,3 +325,17 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
      JOIN inp_inlet USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
+
+
+CREATE OR REPLACE VIEW ws_sample.v_ui_rpt_cat_result AS 
+ SELECT rpt_cat_result.result_id,
+    rpt_cat_result.cur_user,
+    rpt_cat_result.exec_date,
+    inp_typevalue.idval AS status,
+    rpt_cat_result.export_options,
+    rpt_cat_result.network_stats,
+    rpt_cat_result.inp_options,
+    rpt_cat_result.rpt_stats
+   FROM ws_sample.rpt_cat_result
+     JOIN ws_sample.inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
+  WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text;

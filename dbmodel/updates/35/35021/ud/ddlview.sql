@@ -62,8 +62,34 @@ a.value
   ORDER BY a.layoutname, a.layoutorder;
 
 
-CREATE TRIGGER gw_trg_vi_xsections
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON vi_options
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_vi('vi_options');
+--2022/01/05
+ CREATE VIEW v_edit_cat_dwf_dscenario AS
+ SELECT DISTINCT ON (c.id)
+ id,
+ idval,
+ startdate,
+ enddate,
+ observ,
+ c.expl_id,
+ c.active,
+ log
+ FROM cat_dwf_scenario c, selector_expl s
+ WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
+ OR c.expl_id is null;
+
+
+CREATE VIEW v_edit_cat_hydrology AS
+SELECT DISTINCT ON (hydrology_id)
+hydrology_id,
+name,
+infiltration,
+text,
+c.expl_id,
+c.active,
+log
+FROM cat_hydrology c, selector_expl s
+WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
+OR c.expl_id is null;
+
+
+
