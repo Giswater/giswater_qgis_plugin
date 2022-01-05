@@ -10,6 +10,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 Changelog=Version 3.5.021
     - Update version of EPANET 
+    - Update QGIS templates: change dscenario keys, delete EPA Compare Result group and add missing composer for UD
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
