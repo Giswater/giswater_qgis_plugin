@@ -45,7 +45,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_dscenario_manager)
 
         # Manage active buttons depending on project type
-        self._manage_active_buttons()
+        self._manage_active_functions()
 
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
@@ -58,10 +58,9 @@ class GwDscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
+        self.dlg_dscenario_manager.btn_create.clicked.connect(partial(self._open_toolbox_function, None))
         self.dlg_dscenario_manager.btn_manage_values.clicked.connect(partial(self._open_toolbox_function, "3042"))
-        self.dlg_dscenario_manager.btn_create_crm.clicked.connect(partial(self._open_toolbox_function, "3110"))
-        self.dlg_dscenario_manager.btn_create_d_toc.clicked.connect(partial(self._open_toolbox_function, "3112"))
-        self.dlg_dscenario_manager.btn_create_toc.clicked.connect(partial(self._open_toolbox_function, "3108"))
+        self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
         # selection_model = self.dlg_dscenario_manager.tbl_dscenario.selectionModel()
         # selection_model.selectionChanged.connect(partial(self._fill_info))
@@ -74,11 +73,14 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
 
-    def _manage_active_buttons(self):
+    def _manage_active_functions(self):
 
-        if global_vars.project_type == 'ud':
-            self.dlg_dscenario_manager.btn_create_crm.setVisible(False)
-            self.dlg_dscenario_manager.btn_create_d_toc.setVisible(False)
+        values = [[3108, "Create from ToC"]]
+        if global_vars.project_type == 'ws':
+            values.append([3110, "Create from CRM"])
+            values.append([3112, "Create demand from ToC"])
+
+        tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_function, values, index_to_show=1)
 
 
     def _open_dscenario(self):
@@ -143,7 +145,10 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
 
-    def _open_toolbox_function(self, function):
+    def _open_toolbox_function(self, function=None):
+
+        if function is None:
+            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_function')
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         toolbox_btn.open_function_by_id(function)
