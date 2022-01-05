@@ -5,6 +5,9 @@
 - New column parent_id for sector
 - Enhance the way of getting node_type when is NULL (UD)
 - Upgrade to EPANET 2.2
+- Upgrade to SWMM 5.1015
 - Refactor how demands are used for EPANET
 - Refactor how CRM is used on EPANET
 - Improve the write inp file creating ';xxxx' valous additional info to trace and debug
+- New column expl_id for catalogs of hydrololgy, dwf_scenario, dscenario
+- New edit filtered views for catalogs of hydrololgy, dwf_scenario, dscenario
