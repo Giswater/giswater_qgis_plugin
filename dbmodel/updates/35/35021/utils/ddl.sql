@@ -36,6 +36,10 @@ ALTER TABLE cat_dscenario DROP CONSTRAINT IF EXISTS cat_dscenario_expl_id_fkey;
 ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_expl_id_fkey FOREIGN KEY (expl_id) 
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE cat_dscenario DROP CONSTRAINT IF EXISTS cat_dscenario_parent_id_fkey;
+ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_parent_id_fkey FOREIGN KEY (parent_id) 
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"expl_id", "dataType":"integer", "isUtils":"False"}}$$);
 
 ALTER TABLE rpt_cat_result DROP CONSTRAINT IF EXISTS rpt_cat_result_expl_id_fkey;

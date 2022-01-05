@@ -111,3 +111,39 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 return_type, descript, sys_role, sample_query, source)
 VALUES (3116, 'gw_trg_edit_cat_dscenario', 'utils', 'trigger function', null,null, 'Trigger function for cat dscenario', 'role_epa', null, null) 
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'parent_id', null, null, 'string', 'combo', 'parent_id', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,'SELECT dscenario_id as id,name as idval FROM cat_dscenario WHERE dscenario_id IS NOT NULL AND active IS TRUE ', TRUE, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false}', 
+NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'active', null, null, 'boolean', 'check', 'active', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false}', NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'expl_id', null, null, 'string', 'combo', 'exploitation', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ', TRUE, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}', 
+NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('cat_dscenario','form_feature', 'main', 'log', null, null, 'string', 'text', 'log', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,NULL, NULL, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false}', NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields
+SELECT 'v_edit_cat_dscenario', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields where formname='cat_dscenario' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
