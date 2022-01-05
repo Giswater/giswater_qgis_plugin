@@ -19,7 +19,7 @@ from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardIt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
@@ -828,41 +828,54 @@ class GwInfo(QObject):
         is_inserting = False
 
 
-    def _activate_snapping(self, complet_result, ep):
+    def _activate_snapping(self, complet_result, ep, refresh_dialog=False):
 
-        rb_interpolate = []
+        self.rb_interpolate = []
         self.interpolate_result = None
+        self.last_rb = None
         tools_gw.reset_rubberband(self.rubber_band)
-        dlg_interpolate = GwInterpolate()
-        tools_gw.load_settings(dlg_interpolate)
 
-        msg = ('Interpolate tool.\n'
+        if refresh_dialog is False:
+            dlg_interpolate = GwInterpolate()
+            tools_gw.load_settings(dlg_interpolate)
+        else:
+            dlg_interpolate = refresh_dialog
+        
+        self.ep = ep
+
+        # Manage QRadioButton interpolate/extrapolate
+        rb_name = tools_gw.get_config_parser("btn_info", "rb_action_interpolate", "user", "session")
+        self.last_rb = rb_name
+        rb_widget = dlg_interpolate.findChild(QRadioButton, rb_name)
+        rb_widget.setChecked(True)
+
+        self.msg_infolog = ('Interpolate tool.\n'
                'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
                'edit_node_interpolate on table config_param_user')
-        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, msg)
+        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, self.msg_infolog)
 
-        msg = "Please, use the cursor to select two nodes to proceed with the interpolation\nNode1: \nNode2:"
-        dlg_interpolate.lbl_text.setText(msg)
+        self.msg_text = "Please, use the cursor to select two nodes to proceed with the interpolation\nNode1: \nNode2:"
+        dlg_interpolate.lbl_text.setText(self.msg_text)
 
-        dlg_interpolate.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_interpolate))
-        dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
-        dlg_interpolate.rejected.connect(partial(tools_gw.save_settings, dlg_interpolate))
-        dlg_interpolate.rejected.connect(partial(self._remove_interpolate_rb, rb_interpolate))
+        if refresh_dialog is False:
+            # Disable tab log
+            tools_gw.disable_tab_log(dlg_interpolate)
 
-        # Disable tab log
-        tools_gw.disable_tab_log(dlg_interpolate)
+            dlg_interpolate.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_interpolate))
+            dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
+            dlg_interpolate.rejected.connect(partial(tools_gw.save_settings, dlg_interpolate))
+            dlg_interpolate.rejected.connect(partial(self._manage_interpolate_rejected))
+            dlg_interpolate.rb_interpolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_interpolate, complet_result, ep))
+            dlg_interpolate.rb_extrapolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_extrapolate, complet_result, ep))
 
-        tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
+            tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
         # Set circle vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
         self.vertex_marker.show()
 
-        self.node1 = None
-        self.node2 = None
-
-        global_vars.canvas.setMapTool(ep)
+        global_vars.canvas.setMapTool(self.ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
         tools_gw.draw_by_json(complet_result, self.rubber_band, None, False)
 
@@ -871,13 +884,35 @@ class GwInfo(QObject):
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
+
+        self.node1 = None
+        self.node2 = None
+
         tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._mouse_move),
                                 'info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
-        tools_gw.connect_signal(ep.canvasClicked, partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate),
+        tools_gw.connect_signal(ep.canvasClicked, partial(self._snapping_node, dlg_interpolate),
                                 'info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
 
+    def _manage_interpolate_rejected(self):
 
-    def _snapping_node(self, ep, dlg_interpolate, rb_interpolate, point, button):
+        tools_gw.disconnect_signal('info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
+        tools_gw.disconnect_signal('info_snapping', 'activate_snapping_ep_canvasClicked_snapping_node')
+        self._remove_interpolate_rb()
+        self.vertex_marker.hide()
+        self.iface.actionPan().trigger()
+
+
+    def _change_rb_type(self, dialog, widget, complet_result, ep):
+        """ Function to manage radioButton interpolate/extrapolate"""
+
+        if widget.objectName() != self.last_rb:
+            self.last_rb = widget.objectName()
+            tools_gw.set_config_parser("btn_info", "rb_action_interpolate", f"{widget.objectName()}")
+            self._manage_interpolate_rejected()
+            self._activate_snapping(complet_result, ep, refresh_dialog=dialog)
+
+
+    def _snapping_node(self, dlg_interpolate, point, button):
         """ Get id of selected nodes (node1 and node2) """
 
         if button == 2:
@@ -902,20 +937,21 @@ class GwInfo(QObject):
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
-                    rb_interpolate.append(rb)
+                    self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
-                    rb_interpolate.append(rb)
+                    self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
 
             # Get checkbox extrapolate value from dialog
-            chk_extrapolate = dlg_interpolate.findChild(QCheckBox, 'chk_extrapolate')
+            rb_extrapolate = dlg_interpolate.findChild(QRadioButton, 'rb_extrapolate')
+
             action_dict = {True: 'EXTRAPOLATE', False: 'INTERPOLATE'}
 
             tools_gw.disconnect_signal('info_snapping', 'activate_snapping_xyCoordinates_mouse_move')
@@ -924,7 +960,7 @@ class GwInfo(QObject):
             global_vars.iface.setActiveLayer(self.layer)
             self.vertex_marker.hide()
             extras = f'"parameters":{{'
-            extras += f'"action":"{action_dict[chk_extrapolate.isChecked()]}", '
+            extras += f'"action":"{action_dict[rb_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
             extras += f'"node1":"{self.node1}", '
@@ -984,10 +1020,10 @@ class GwInfo(QObject):
             pass
 
 
-    def _remove_interpolate_rb(self, rb_interpolate):
+    def _remove_interpolate_rb(self):
 
         # Remove the circumferences made by the interpolate
-        for rb in rb_interpolate:
+        for rb in self.rb_interpolate:
             global_vars.iface.mapCanvas().scene().removeItem(rb)
 
 
