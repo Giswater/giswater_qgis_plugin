@@ -33,8 +33,8 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
     rpt_cat_result.network_stats,
     rpt_cat_result.inp_options,
     rpt_cat_result.rpt_stats
-   FROM selector_expl s, ws_sample.rpt_cat_result
-     JOIN ws_sample.inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
+   FROM selector_expl s, rpt_cat_result
+     JOIN inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
   WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text
   AND ((s.expl_id = rpt_cat_result.expl_id AND s.cur_user = current_user)
   OR rpt_cat_result.expl_id is null);
