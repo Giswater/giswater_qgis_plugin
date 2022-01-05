@@ -30,7 +30,8 @@ class GwToolBoxButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        if icon_path is not None:
+            super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
@@ -41,6 +42,51 @@ class GwToolBoxButton(GwAction):
 
         self._open_toolbox()
 
+
+    def open_function_by_id(self, func_id):
+
+        self.dlg_functions = GwToolboxManagerUi()
+        tools_gw.load_settings(self.dlg_functions)
+        self.dlg_functions.progressBar.setVisible(False)
+        self.dlg_functions.btn_cancel.hide()
+        self.dlg_functions.btn_close.show()
+
+        self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
+        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
+                                                                          self.dlg_functions.cmb_layers))
+        self.dlg_functions.rbt_previous.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_previous))
+        self.dlg_functions.rbt_layer.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_layer))
+        self.dlg_functions.rbt_layer.setChecked(True)
+
+        extras = f'"function":{func_id}'
+        extras += ', "isToolbox":false'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+        sql = f"SELECT alias FROM config_toolbox WHERE id = {func_id}"
+        self.function_selected = f"{tools_db.get_row(sql)[0]}"
+        status = self._populate_functions_dlg(self.dlg_functions, json_result['body']['data']['processes'])
+        if not status:
+            message = "Function not found"
+            tools_qgis.show_message(message, parameter=self.function_selected)
+            return
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_functions)
+
+        # Connect signals
+        self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
+        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
+                                                           self.dlg_functions, self.dlg_functions.cmb_layers,
+                                                           json_result['body']['data']['processes']))
+        self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+
+        # Open form and set title
+        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
+        tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
     def remove_layers(self):
 
