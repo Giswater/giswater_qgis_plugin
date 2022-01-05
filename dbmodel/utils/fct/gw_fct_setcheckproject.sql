@@ -549,13 +549,13 @@ BEGIN
         INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
 		-- start process
-		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_toc IN 
+		FOR v_rectable IN SELECT * FROM sys_table WHERE sys_role IN 
 		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
 		LOOP
 		
 			--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
 			IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE cur_user=current_user AND fid=v_fid) THEN
-				INSERT INTO audit_check_project (table_id, fid, criticity, enabled, message) VALUES (v_rectable.id, 101, v_rectable.qgis_criticity, FALSE, v_rectable.qgis_message);
+				INSERT INTO audit_check_project (table_id, fid, criticity, enabled, message) VALUES (v_rectable.id, 101, v_rectable.criticity, FALSE, v_rectable.descript);
 			--ELSE 
 			--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
 			END IF;	
@@ -568,7 +568,7 @@ BEGIN
 		--list missing layers with criticity 3 and 2
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as pkey_field,
-		'''||v_epsg||''' as srid,b.column_name as geom_field,''3'' as criticity, qgis_message, style as style_id, group_layer
+		'''||v_epsg||''' as srid,b.column_name as geom_field,''3'' as criticity, descript, style as style_id, group_layer
 		FROM '||v_schemaname||'.audit_check_project 
 		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
@@ -576,12 +576,12 @@ BEGIN
 		LEFT JOIN config_table ON sys_table.id = config_table.id
 		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
 		WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
-		WHERE criticity=3 and enabled IS NOT TRUE) a'
+		WHERE audit_check_project.criticity=3 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity3;
 
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as pkey_field,
-		'''||v_epsg||''' as srid,b.column_name as geom_field,''2'' as criticity, qgis_message, style as style_id, group_layer
+		'''||v_epsg||''' as srid,b.column_name as geom_field,''2'' as criticity, descript, style as style_id, group_layer
 		FROM '||v_schemaname||'.audit_check_project 
 		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
@@ -589,7 +589,7 @@ BEGIN
 		LEFT JOIN config_table ON sys_table.id = config_table.id
 		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
 		WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
-		WHERE criticity=2 and enabled IS NOT TRUE) a'
+		WHERE audit_check_project.criticity=2 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity2;
 
 		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
