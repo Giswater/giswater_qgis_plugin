@@ -196,7 +196,8 @@ class GwDscenarioManagerButton(GwAction):
             function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_actions')
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
-        toolbox_btn.open_function_by_id(function)
+        connect = partial(self._fill_tbl, self.filter_name.text())
+        toolbox_btn.open_function_by_id(function, connect_signal=connect)
         return
 
     # endregion

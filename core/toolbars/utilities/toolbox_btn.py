@@ -43,7 +43,7 @@ class GwToolBoxButton(GwAction):
         self._open_toolbox()
 
 
-    def open_function_by_id(self, func_id):
+    def open_function_by_id(self, func_id, connect_signal=None):
 
         self.dlg_functions = GwToolboxManagerUi()
         tools_gw.load_settings(self.dlg_functions)
@@ -83,6 +83,8 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        if connect_signal is not None:
+            self.dlg_functions.rejected.connect(connect_signal)
 
         # Open form and set title
         self.dlg_functions.setWindowTitle(f"{self.function_selected}")
