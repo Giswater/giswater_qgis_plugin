@@ -147,3 +147,5 @@ SELECT 'v_edit_cat_dscenario', formtype, tabname, columnname, layoutname, layout
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields where formname='cat_dscenario' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET widgettype='typeahead' WHERE dv_querytext LIKE '%plan_price WHERE%';
