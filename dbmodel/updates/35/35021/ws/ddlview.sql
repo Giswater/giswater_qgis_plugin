@@ -181,23 +181,23 @@ CREATE OR REPLACE VIEW vi_pumps AS
   ORDER BY arc_id;
 
 
-DROP VIEW SCHEMA_NAME.vi_tags;
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_tags AS 
+DROP VIEW vi_tags;
+CREATE OR REPLACE VIEW vi_tags AS 
  SELECT inp_tags.feature_type,
     inp_tags.feature_id,
     inp_tags.tag
-   FROM SCHEMA_NAME.inp_tags
+   FROM inp_tags
   ORDER BY inp_tags.feature_type;
 
 CREATE TRIGGER gw_trg_vi_tags
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.vi_tags
+  ON vi_tags
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_tags');
+  EXECUTE PROCEDURE gw_trg_vi('vi_tags');
 
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS 
+CREATE OR REPLACE VIEW vi_curves AS 
  SELECT
         CASE
             WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
@@ -207,30 +207,30 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS
     a.y_value::numeric(12,4) AS y_value,
     NULL::text AS other
    FROM ( SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
-                   FROM SCHEMA_NAME.inp_curve_value sub
+                   FROM inp_curve_value sub
                   WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
             inp_curve_value.curve_id,
             concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
             NULL::numeric AS x_value,
             NULL::numeric AS y_value
-           FROM SCHEMA_NAME.inp_curve
-             JOIN SCHEMA_NAME.inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
+           FROM inp_curve
+             JOIN inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
         UNION
          SELECT inp_curve_value.id,
             inp_curve_value.curve_id,
             inp_curve.curve_type,
             inp_curve_value.x_value,
             inp_curve_value.y_value
-           FROM SCHEMA_NAME.inp_curve_value
-             JOIN SCHEMA_NAME.inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
+           FROM inp_curve_value
+             JOIN inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
   ORDER BY 1, 4 DESC) a
   WHERE (a.curve_id::text IN ( SELECT vi_tanks.curve_id
-           FROM SCHEMA_NAME.vi_tanks)) OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head
-           FROM SCHEMA_NAME.vi_pumps)) OR (a.curve_id::text IN ( SELECT vi_valves.setting
-           FROM SCHEMA_NAME.vi_valves)) OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue
-           FROM SCHEMA_NAME.vi_energy
+           FROM vi_tanks)) OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head
+           FROM vi_pumps)) OR (a.curve_id::text IN ( SELECT vi_valves.setting
+           FROM vi_valves)) OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue
+           FROM vi_energy
           WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.value
-           FROM SCHEMA_NAME.config_param_user
+           FROM config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
 
@@ -326,9 +326,9 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
-
-CREATE OR REPLACE VIEW ws_sample.v_ui_rpt_cat_result AS 
- SELECT rpt_cat_result.result_id,
+CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS 
+ SELECT DISTINCT ON (result_id) 
+    rpt_cat_result.result_id,
     rpt_cat_result.cur_user,
     rpt_cat_result.exec_date,
     inp_typevalue.idval AS status,
@@ -336,6 +336,8 @@ CREATE OR REPLACE VIEW ws_sample.v_ui_rpt_cat_result AS
     rpt_cat_result.network_stats,
     rpt_cat_result.inp_options,
     rpt_cat_result.rpt_stats
-   FROM ws_sample.rpt_cat_result
-     JOIN ws_sample.inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
-  WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text;
+   FROM selector_expl s, rpt_cat_result
+     JOIN inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
+  WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text
+  AND ((s.expl_id = rpt_cat_result.expl_id AND s.cur_user = current_user)
+  OR rpt_cat_result.expl_id is null);

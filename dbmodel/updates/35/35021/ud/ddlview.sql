@@ -77,7 +77,6 @@ a.value
  WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
  OR c.expl_id is null;
 
-
 CREATE VIEW v_edit_cat_hydrology AS
 SELECT DISTINCT ON (hydrology_id)
 hydrology_id,
@@ -90,6 +89,3 @@ log
 FROM cat_hydrology c, selector_expl s
 WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
 OR c.expl_id is null;
-
-
-
