@@ -58,8 +58,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
-        self.dlg_dscenario_manager.btn_create.clicked.connect(partial(self._open_toolbox_function, None))
-        self.dlg_dscenario_manager.btn_manage_values.clicked.connect(partial(self._open_toolbox_function, "3042"))
+        self.dlg_dscenario_manager.btn_execute.clicked.connect(partial(self._open_toolbox_function, None))
+        self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
         # selection_model = self.dlg_dscenario_manager.tbl_dscenario.selectionModel()
@@ -75,14 +75,14 @@ class GwDscenarioManagerButton(GwAction):
 
     def _manage_active_functions(self):
 
-        values = []
+        values = [[3042, "Manage values"]]
         if global_vars.project_type == 'ws':
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
             values.append([3108, "Create from ToC"])
         if global_vars.project_type == 'ud':
             values.append([3118, "Create from ToC"])
-        tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_function, values, index_to_show=1)
+        tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_actions, values, index_to_show=1)
 
 
     def _open_dscenario(self, index):
@@ -124,20 +124,27 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
 
 
-    def _open_create_workspace_dlg(self):
+    def _delete_selected_dscenario(self):
 
-        # Create workspace dialog
-        self.dlg_create_workspace = GwCreateWorkspaceUi()
-        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
-        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
+        # Get selected row
+        selected_list = self.tbl_dscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
 
-        # Connect create workspace dialog signals
-        self.new_workspace_name.textChanged.connect(partial(self._check_exists))
-        self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
-        self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
+        # Get selected dscenario id
+        index = self.tbl_dscenario.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
 
-        # Open the dialog
-        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
+        message = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
+        if answer:
+            sql = f"DELETE FROM v_edit_cat_dscenario WHERE dscenario_id = {value}"
+            tools_db.execute_sql(sql)
+
+            self._fill_tbl(self.filter_name.text())
+        pass
 
 
     def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
@@ -186,39 +193,10 @@ class GwDscenarioManagerButton(GwAction):
     def _open_toolbox_function(self, function=None):
 
         if function is None:
-            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_function')
+            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_actions')
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         toolbox_btn.open_function_by_id(function)
         return
-
-
-    def _check_exists(self, name=""):
-        sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"
-        row = tools_db.get_row(sql, log_info=False)
-        if row:
-            self.dlg_create_workspace.btn_accept.setEnabled(False)
-            tools_qt.set_stylesheet(self.new_workspace_name)
-            self.new_workspace_name.setToolTip("Workspace already exists")
-            return
-        self.dlg_create_workspace.btn_accept.setEnabled(True)
-        tools_qt.set_stylesheet(self.new_workspace_name, style="")
-        self.new_workspace_name.setToolTip("")
-
-
-    def _set_labels_current_workspace(self, value="", name=None, result=None):
-        """ Set the current workspace label with @value """
-
-        if name is None:
-            sql = (f"SELECT name FROM cat_workspace "
-                   f" WHERE id='{value}'")
-            row = tools_db.get_row(sql)
-            if not row:
-                return
-            name = row[0]
-        text = f"{name}"
-        tools_qt.set_widget_text(self.dlg_workspace_manager, 'lbl_vdefault_workspace', text)
-        if result:
-            tools_gw.manage_current_selections_docker(result)
 
     # endregion

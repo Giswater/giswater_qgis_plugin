@@ -108,7 +108,7 @@ class GwToolBoxButton(GwAction):
             if len(parent_group.findLayers()) == 0:
                 root.removeChildNode(parent_group)
 
-        self.iface.mapCanvas().refresh()
+        global_vars.iface.mapCanvas().refresh()
 
 
     def set_selected_layer(self, dialog, combo):
@@ -118,7 +118,7 @@ class GwToolBoxButton(GwAction):
         if layer is None:
             tools_qgis.show_warning("Layer not found", parameter=layer_name)
             return None
-        self.iface.setActiveLayer(layer)
+        global_vars.iface.setActiveLayer(layer)
         return layer
 
 

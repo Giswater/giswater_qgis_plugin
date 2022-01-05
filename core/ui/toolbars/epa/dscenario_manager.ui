@@ -20,10 +20,29 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="5" column="4">
-       <widget class="QPushButton" name="btn_manage_values">
+      <item row="5" column="2" colspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5000</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QLineEdit" name="txt_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Manage Values</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -67,34 +86,8 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QLineEdit" name="txt_name">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>5000</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="5" column="6">
-       <widget class="QPushButton" name="btn_create">
+       <widget class="QPushButton" name="btn_execute">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -102,9 +95,12 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Create</string>
+         <string>Execute</string>
         </property>
        </widget>
+      </item>
+      <item row="5" column="5">
+       <widget class="QComboBox" name="cmb_actions"/>
       </item>
       <item row="7" column="7">
        <widget class="QPushButton" name="btn_cancel">
@@ -113,8 +109,12 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QComboBox" name="cmb_function"/>
+      <item row="5" column="4">
+       <widget class="QLabel" name="lbl_actions">
+        <property name="text">
+         <string>Actions:</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
