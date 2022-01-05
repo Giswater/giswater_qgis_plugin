@@ -26,3 +26,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_tabl
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_message", "newName":"alias"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_criticity", "newName":"orderby"}}$$);
 ALTER TABLE sys_table ALTER COLUMN context TYPE character varying(500);
+
+ALTER TABLE config_typevalue ALTER COLUMN id TYPE character varying(50);

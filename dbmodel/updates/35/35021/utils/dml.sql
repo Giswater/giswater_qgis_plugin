@@ -73,13 +73,18 @@ UPDATE sys_table SET context = '{"level_1":"PLAN"}' , alias = 'Plan current psec
 UPDATE sys_table SET context = '{"level_1":"PLAN"}' , alias = 'Arc pavement', orderby = 3 WHERE id = 'plan_arc_x_pavement';
 
 
-INSERT INTO config_typevalue VALUES ('sys_table_context','CATALOG', null, '{"orderBy":1}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','MAPZONE', null, '{"orderBy":2}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','NETWORK', null, '{"orderBy":3}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','O&M', null, '{"orderBy":4}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','EPA', null, '{"orderBy":5}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','PLAN', null, '{"orderBy":6}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','ADMIN', null, '{"orderBy":7}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"CATALOG"}', null, '{"orderBy":1}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"MAPZONE"}', null, '{"orderBy":2}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"ARC"}', null, '{"orderBy":3}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"NODE"}', null, '{"orderBy":4}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"CONNEC"}', null, '{"orderBy":5}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"GULLY"}', null, '{"orderBy":6}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"O&M"}', null, '{"orderBy":7}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"CATALOG"}', null, '{"orderBy":8}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"INPUT"}', null, '{"orderBy":9}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"RESULT"}', null, '{"orderBy":10}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN"}', null, '{"orderBy":11}');
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN"}', null, '{"orderBy":12}');
 
 
 INSERT INTO config_form_fields VALUES ('search', 'form_feature', 'main', 'hydro_contains', 'lyt_data_1', NULL, 'string', 'nowidget', 'Use contains', 'Check: allow to search using any of the characters. Unchecked: the search engine only will return results when matching the first characters (useful for short numbers)', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}',NULL,NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -94,3 +99,6 @@ NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTH
 
 UPDATE sys_fprocess set project_type='utils' where fid=213;
 UPDATE sys_function set project_type='utils' where id=2720;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('config_typevalue','sys_table_context','sys_table','context', true);
