@@ -209,22 +209,23 @@ BEGIN
 		
 		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
 		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
-		FROM audit_check_data
-		WHERE fid=101 AND cur_user = current_user 
-		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%') 
-		AND result_id NOT IN ('349', '350', '351', '352', '353', '302', '347');
+		FROM audit_check_data a
+		JOIN sys_fprocess f ON f.fid=result_id::integer 
+		WHERE a.fid=101 AND cur_user = current_user 
+		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')
+		AND f.isaudit IS TRUE;
 
 		INSERT INTO audit.anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
-    the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
-    code, source)
-    SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
-    the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
-    code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
-    FROM anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
+		code, source)
+		SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
+		the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
+		code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
+		FROM anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 
-    INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
-    state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
+		INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
+		state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
 		descript, result_id, sys_type, code, source)
 		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
 		state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 

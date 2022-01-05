@@ -156,3 +156,6 @@ widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields where formname='cat_dscenario' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET widgettype='typeahead' WHERE dv_querytext LIKE '%plan_price WHERE%';
+
+UPDATE sys_fprocess SET isaudit=TRUE WHERE isaudit IS NULL;
+UPDATE sys_fprocess SET isaudit = FALSE WHERE fid IN ('349', '350', '351', '352', '353', '302', '347');

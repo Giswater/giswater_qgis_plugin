@@ -58,3 +58,4 @@ ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_result_id_
 ALTER TABLE selector_plan_result ADD CONSTRAINT plan_result_selector_result_id_fk FOREIGN KEY (result_id) 
 REFERENCES plan_result_cat (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"isaudit", "dataType":"boolean", "isUtils":"False"}}$$);
