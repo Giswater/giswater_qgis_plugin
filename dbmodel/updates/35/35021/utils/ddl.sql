@@ -46,3 +46,11 @@ ALTER TABLE rpt_cat_result DROP CONSTRAINT IF EXISTS rpt_cat_result_expl_id_fkey
 ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_expl_id_fkey FOREIGN KEY (expl_id) 
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE selector_inp_dscenario DROP CONSTRAINT inp_selector_dscenario_dscenario_id_fkey;
+ALTER TABLE selector_inp_dscenario ADD CONSTRAINT inp_selector_dscenario_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_result_id_fk;
+ALTER TABLE selector_plan_result ADD CONSTRAINT plan_result_selector_result_id_fk FOREIGN KEY (result_id) 
+REFERENCES plan_result_cat (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+

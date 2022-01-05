@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3108
+--FUNCTION CODE: 3118
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json) 
 RETURNS json AS 
@@ -13,8 +13,9 @@ $BODY$
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
-"data":{"selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "type":"DEMAND"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, 
+"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"name":"test", "type":"CONDUIT"}}}$$);
 
 */
 
@@ -87,9 +88,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
-
 	-- inserting on catalog table
-	PERFORM setval('ud_sample.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
+	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
 	INSERT INTO cat_dscenario ( name, descript, dscenario_type, log) 
 	VALUES ( v_name, v_descript, v_type, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING;
@@ -99,44 +99,27 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
-	
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
-
 		-- getting columns
 		IF v_table  = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||', node_id, demand, pattern_id';
-		ELSIF v_table  = 'inp_dscenario_connec' THEN
-			v_columns = v_scenarioid||', connec_id, demand, pattern_id';
-		ELSIF v_table  = 'inp_dscenario_valve' THEN
-			v_columns = v_scenarioid||', node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings';
-		ELSIF v_table  = 'inp_dscenario_tank' THEN
-			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow';
-		ELSIF v_table  = 'inp_dscenario_reservoir' THEN
-			v_columns = v_scenarioid||', node_id, pattern_id, head';
-		ELSIF v_table  = 'inp_dscenario_inlet' THEN
-			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head';
-		ELSIF v_table  = 'inp_dscenario_pump' THEN
-			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern, status';
-		ELSIF v_table  = 'inp_dscenario_pipe' THEN
-			v_columns = v_scenarioid||', arc_id, minorloss, status, custom_roughness, custom_dint';
-		ELSIF v_table  = 'inp_dscenario_shortpipe' THEN
-			v_columns = v_scenarioid||', node_id, minorloss, status';
+			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam json';
+		ELSIF v_table  = 'inp_dscenario_conduit' THEN
+			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage';
+		ELSIF v_table  = 'inp_dscenario_raingage' THEN
+			v_columns = v_scenarioid||', rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units';
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 			VALUES (v_fid, null, 3, concat('ERROR: The table choosed does not fit with any epa dscenario. Please try another one.'));
 			v_finish = true;
-			
 		END IF;
-
-
+		
 		IF v_finish IS NOT TRUE THEN
 
 			-- log
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
 			VALUES (v_fid, null, 4, concat('New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
-			
+		
 			-- inserting values on tables
 			IF v_selectionmode = 'wholeSelection' THEN
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
@@ -149,10 +132,13 @@ BEGIN
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 			VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' features have been inserted on table ', v_table,'.'));
-			
+
 			-- set selector
-			INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
-			
+			--INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
+--select * from selector_inp_dscenario
+
+--select * from cat_dscenario
+		
 		END IF;
 	END IF;
 
@@ -178,9 +164,9 @@ BEGIN
 	    '}')::json, 3042, null, null, null); 
 
 	-- manage exceptions
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
