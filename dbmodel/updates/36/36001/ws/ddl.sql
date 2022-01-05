@@ -12,26 +12,25 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- JUNCTION REFACTOR
---coef 1 o 2 f? emitter_coef - buk_coeff
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"emitter_coef", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"emitter_coef", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
-UPDATE inp_junction j SET emitter_coef = coef FROM inp_emitter s WHERE s.node_id = j.node_id;
+UPDATE inp_junction j SET emitter_coeff = coef FROM inp_emitter s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET source_type = sourc_type FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET source_pattern_id = s.pattern_id FROM inp_source s WHERE s.node_id = j.node_id;
 
-UPDATE config_form_fields SET columnname = 'emitter_coef' WHERE columnname='coef' and formname = 'inp_emitter';
+UPDATE config_form_fields SET columnname = 'emitter_coeff' WHERE columnname='coef' and formname = 'inp_emitter';
 UPDATE config_form_fields SET columnname = 'init_quality' WHERE columnname='initqual' and formname = 'inp_quality';
 UPDATE config_form_fields SET columnname = 'source_type' WHERE columnname='sourc_type' and formname = 'inp_source';
 UPDATE config_form_fields SET columnname = 'source_quality' WHERE columnname='quality' and formname = 'inp_source';
@@ -46,25 +45,30 @@ INSERT INTO config_form_fields
 SELECT 'v_edit_inp_dscenario_junction', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('node_id','demand','pattern_id','demand_type', 'emitter_coef',
+FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('node_id','demand','pattern_id','demand_type', 'emitter_coeff',
 'init_quality', 'source_type', 'source_quality', 'source_pattern_id') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 --PUMP REFACTOR
---nodarc_id es una concatenacion dentro de la vista o un campo mas? Salen ambos campos - node_id y nodearc_id?
+--nodarc_id es una concatenacion dentro de la vista o un campo mas? Salen ambos campos - node_id y nodearc_id? ambos campos
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"price_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"price_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
---how to update those fields???
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
+--how to update those fields??? - XAVI
+--Energy - epanet - section C
+--2puntos con pump
 --UPDATE inp_pump j SET energy_price = sourc_type FROM inp_energy s WHERE s.node_id = j.node_id;
 
 --PIPE REFACTOR
---pipe has fields reactionparam character varying(30),reactionvalue character varying(30), already its the same thing?
+--pipe has fields reactionparam character varying(30),reactionvalue character varying(30), already its the same thing? - XAVI
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pipe", "column":"bulk_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pipe", "column":"wall_coeff", "dataType":"float", "isUtils":"False"}}$$);
 
 --SHORTPIPE REFACTOR
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pipe", "column":"reactionparam", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pipe", "column":"reactionvalue", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_shortpipe", "column":"bulk_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_shortpipe", "column":"wall_coeff", "dataType":"float", "isUtils":"False"}}$$);
 
@@ -181,7 +185,7 @@ FROM config_form_fields WHERE formname ='inp_virtualvalve' AND columnname in ('i
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 --INLET REFACTOR
---head - where is it from? what data type? there is head in dscenario, not in inp_inlet
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"head", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"mixing_model", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"bulk_coeff", "dataType":"float", "isUtils":"False"}}$$);
