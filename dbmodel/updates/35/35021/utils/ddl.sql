@@ -10,6 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/12/22
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dscenario", "column":"expl_id", "dataType":"integer", "isUtils":"False"}}$$);
+
 --2021/12/30
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"log", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"log", "dataType":"text", "isUtils":"False"}}$$);
@@ -27,4 +29,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_tabl
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_criticity", "newName":"orderby"}}$$);
 ALTER TABLE sys_table ALTER COLUMN context TYPE character varying(500);
 
+-- 2022/01/05
 ALTER TABLE config_typevalue ALTER COLUMN id TYPE character varying(50);
+
+ALTER TABLE cat_dscenario DROP CONSTRAINT IF EXISTS cat_dscenario_expl_id_fkey;
+ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_expl_id_fkey FOREIGN KEY (expl_id) 
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

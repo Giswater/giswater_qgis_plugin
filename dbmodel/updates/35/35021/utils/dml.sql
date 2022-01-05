@@ -30,8 +30,6 @@ UPDATE config_toolbox SET inputparams =
   ]'
 WHERE id = 3042;
 
-
-
 --2022/01/03
 UPDATE sys_table SET context = NULL, alias = NULL, orderby = null;
 UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Feature catalog' , orderby=1 WHERE id ='cat_feature';
@@ -100,5 +98,16 @@ NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTH
 UPDATE sys_fprocess set project_type='utils' where fid=213;
 UPDATE sys_function set project_type='utils' where id=2720;
 
+-- 2022/01/05
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES ('config_typevalue','sys_table_context','sys_table','context', true);
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3114, 'gw_fct_getaddlayervalues', 'utils', 'function', 'json', 'json', 'Function to manage toc values', 'role_basic', null, null) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3116, 'gw_trg_edit_cat_dscenario', 'utils', 'trigger function', null,null, 'Trigger function for cat dscenario', 'role_epa', null, null) 
+ON CONFLICT (id) DO NOTHING;

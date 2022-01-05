@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
+--FUNCTION CODE:3114
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getaddlayervalues(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getaddlayervalues(p_data json)
