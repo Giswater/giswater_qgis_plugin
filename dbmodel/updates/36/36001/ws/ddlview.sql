@@ -6,7 +6,34 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+/*
+drop view if exists ws_sample35.vi_reactions;
+CREATE OR REPLACE VIEW ws_sample35.vi_reactions AS 
+ SELECT 'BULK' as param,
+inp_pipe.arc_id,
+inp_pipe.bulk_coeff as coeff
+FROM ws_sample35.selector_inp_result,
+ws_sample35.inp_pipe
+ JOIN ws_sample35.rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
+  WHERE bulk_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNIO
+N  SELECT 'WALL' as param,
+inp_pipe.arc_id,
+inp_pipe.wall_coeff as coeff
+FROM ws_sample35.selector_inp_result,
+ws_sample35.inp_pipe
+JOIN ws_sample35.rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
+ WHERE wall_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+  SELECT a.key AS param,
+NULL::character varying AS arc_id,
+a.value::float AS coeff
+  FROM  ws_sample35.config_param_user , 
+  json_each_text(ws_sample35.config_param_user.value::json) AS a
+  WHERE parameter='inp_global_reactions' and cur_user=current_user
+  ORDER BY 1;
 
+*/
 
 --2022/01/03
 DROP VIEW IF EXISTS v_edit_inp_junction;
@@ -24,7 +51,7 @@ n.annotation,
 demand,
 pattern_id,
 peak_factor,
-emitter_coef,
+emitter_coeff,
 init_quality,
 source_type,
 source_quality,
@@ -41,7 +68,7 @@ p.node_id,
 p.demand_type,
 p.demand,
 p.pattern_id,
-emitter_coef,
+emitter_coeff,
 init_quality,
 source_type,
 source_quality,
@@ -51,8 +78,6 @@ JOIN inp_dscenario_junction p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
-
-/*
 
 
 DROP VIEW IF EXISTS v_edit_inp_pump;
@@ -76,14 +101,76 @@ pattern,
 to_arc,
 status,
 pump_type,
-
-
+effic_curve_id,
+energy_price,
+energy_pattern_id,
 n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_pump USING (node_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
+DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS 
+SELECT d.dscenario_id,
+p.node_id,
+p.power,
+p.curve_id,
+p.speed,
+p.pattern,
+p.status,
+effic_curve_id,
+energy_price,
+energy_pattern_id
+FROM selector_sector,
+selector_inp_dscenario,v_node
+JOIN inp_dscenario_pump p USING (node_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_pump_additional;
+CREATE OR REPLACE VIEW v_edit_inp_pump_additional AS 
+SELECT n.node_id,
+n.elevation,
+n.depth,
+n.nodecat_id,
+n.sector_id,
+n.state,
+n.state_type,
+n.annotation,
+n.dma_id,
+inp_pump_additional.power,
+inp_pump_additional.curve_id,
+inp_pump_additional.speed,
+inp_pump_additional.pattern,
+inp_pump_additional.status,
+effic_curve_id,
+energy_price,
+energy_pattern_id,
+n.the_geom
+FROM selector_sector,v_node n
+JOIN inp_pump_additional USING (node_id)
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_pump_additional;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS 
+SELECT d.dscenario_id,
+p.node_id,
+p.power,
+p.curve_id,
+p.speed,
+p.pattern,
+p.status,
+effic_curve_id,
+energy_price,
+energy_pattern_id
+FROM selector_sector,
+selector_inp_dscenario,v_node
+JOIN inp_dscenario_pump_additional p USING (node_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_pipe;
@@ -104,13 +191,125 @@ minorloss,
 status,
 custom_roughness,
 custom_dint,
-
-
+bulk_coeff,
+wall_coeff,
 arc.the_geom
 FROM selector_sector,v_arc arc
 JOIN inp_pipe USING (arc_id)
 WHERE arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-*/
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_dscenario_pipe AS 
+ SELECT d.dscenario_id,
+p.arc_id,
+p.minorloss,
+p.status,
+p.roughness,
+p.dint,
+bulk_coeff,
+wall_coeff
+FROM SCHEMA_NAME.selector_sector,
+SCHEMA_NAME.selector_inp_dscenario,
+SCHEMA_NAME.v_arc
+ JOIN SCHEMA_NAME.inp_dscenario_pipe p USING (arc_id)
+ JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+
+DROP VIEW IF EXISTS v_edit_inp_shortpipe;
+CREATE OR REPLACE VIEW ve_inp_shortpipe AS 
+ SELECT n.node_id,
+n.elevation,
+n.depth,
+n.nodecat_id,
+n.sector_id,
+--n.macrosector_id,
+n.dma_id,
+n.state,
+n.state_type,
+n.annotation,
+--n.expl_id,
+concat(n.node_id,'_n2a') AS nodarc_id,
+minorloss,
+to_arc,
+status,
+bulk_coeff,
+wall_coeff,
+n.the_geom
+FROM selector_sector, v_node n
+JOIN inp_shortpipe USING (node_id)
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+  
+  
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_dscenario_shortpipe AS 
+SELECT d.dscenario_id,
+p.node_id,
+p.minorloss,
+p.status,
+bulk_coeff,
+wall_coeff
+FROM SCHEMA_NAME.selector_sector,
+SCHEMA_NAME.selector_inp_dscenario,
+SCHEMA_NAME.v_node
+JOIN SCHEMA_NAME.inp_dscenario_shortpipe p USING (node_id)
+JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
+WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+  
+DROP VIEW IF EXISTS v_edit_inp_tank;
+CREATE OR REPLACE VIEW v_edit_inp_tank AS 
+ SELECT n.node_id,
+n.elevation,
+n.depth,
+n.nodecat_id,
+n.sector_id,
+--n.macrosector_id,
+n.dma_id,
+n.state,
+n.state_type,
+n.annotation,
+--n.expl_id,
+initlevel,
+minlevel,
+maxlevel,
+diameter,
+minvol,
+curve_id,
+mixing_model,
+mixing_fraction,
+reaction_coeff,
+init_quality,
+source_type,
+source_quality,
+source_pattern_id,
+n.the_geom
+FROM selector_sector, v_node n
+JOIN inp_tank USING (node_id)
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_dscenario_tank AS 
+SELECT d.dscenario_id,
+p.node_id,
+p.initlevel,
+p.minlevel,
+p.maxlevel,
+p.diameter,
+p.minvol,
+p.curve_id,
+mixing_model,
+mixing_fraction,
+reaction_coeff,
+init_quality,
+source_type,
+source_quality,
+source_pattern_id
+FROM SCHEMA_NAME.selector_sector,
+SCHEMA_NAME.selector_inp_dscenario,
+SCHEMA_NAME.v_node
+JOIN SCHEMA_NAME.inp_dscenario_tank p USING (node_id)
+JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
+WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_reservoir;
@@ -154,7 +353,6 @@ JOIN cat_dscenario d USING (dscenario_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
-
   
 DROP VIEW IF EXISTS v_edit_inp_valve;
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
@@ -169,7 +367,7 @@ n.state,
 n.state_type,
 n.annotation,
 --v_node.expl_id,
-concat(v_node.node_id,'_n2a') AS nodarc_id,
+concat(n.node_id,'_n2a') AS nodarc_id,
 valv_type,
 pressure,
 flow,
@@ -180,11 +378,11 @@ to_arc,
 status,
 custom_dint,
 add_settings,
-init_quality
-v_node.the_geom,
+init_quality,
+n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_valve USING (node_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
@@ -229,7 +427,7 @@ curve_id,
 minorloss,
 to_arc,
 status,
-init_quality
+init_quality,
 v_arc.the_geom
 FROM selector_sector,v_arc
 JOIN inp_virtualvalve USING (arc_id)
@@ -249,70 +447,11 @@ p.status,
 p.add_settings,
 init_quality
 FROM selector_sector, selector_inp_dscenario, v_arc
-JOIN inp_dscenario_virtualvalve p USING (node_id)
+JOIN inp_dscenario_virtualvalve p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
-
-/*
+WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
-
-
-
-DROP VIEW IF EXISTS v_edit_inp_shortpipe;
-CREATE OR REPLACE VIEW ve_inp_shortpipe AS 
- SELECT n.node_id,
-n.elevation,
-n.depth,
-n.nodecat_id,
-n.sector_id,
---n.macrosector_id,
-n.dma_id,
-n.state,
-n.state_type,
-n.annotation,
---n.expl_id,
-concat(n.node_id,'_n2a') AS nodarc_id,
-minorloss,
-to_arc,
-status,
-
-
-n.the_geom
-FROM selector_sector, v_node n
-JOIN inp_shortpipe USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-  
-  
-  
-DROP VIEW IF EXISTS v_edit_inp_tank;
-CREATE OR REPLACE VIEW v_edit_inp_tank AS 
- SELECT n.node_id,
-n.elevation,
-n.depth,
-n.nodecat_id,
-n.sector_id,
---n.macrosector_id,
-n.dma_id,
-n.state,
-n.state_type,
-n.annotation,
---n.expl_id,
-initlevel,
-minlevel,
-maxlevel,
-diameter,
-minvol,
-curve_id,
-
-
-n.the_geom
-FROM selector_sector, v_node n
-JOIN inp_tank USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-  
-  
 DROP VIEW IF EXISTS v_edit_inp_inlet;
 CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
  SELECT n.node_id,
@@ -333,14 +472,44 @@ diameter,
 minvol,
 curve_id,
 pattern_id,
-
-
+mixing_model,
+mixing_fraction,
+reaction_coeff,
+init_quality,
+source_type,
+source_quality,
+source_pattern_id,
 n.the_geom
 FROM selector_sector,v_node n
 JOIN inp_inlet USING (node_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
- 
- 
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_inlet;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
+SELECT p.dscenario_id, 
+node_id, 
+initlevel, 
+minlevel, 
+maxlevel,
+diameter, 
+minvol, 
+curve_id, 
+overflow, 
+head, 
+pattern_id,
+mixing_model,
+mixing_fraction,
+reaction_coeff,
+init_quality,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_sector, selector_inp_dscenario, v_node
+JOIN inp_dscenario_inlet p USING (node_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+/*
 DROP VIEW IF EXISTS v_edit_inp_connec;
 CREATE OR REPLACE VIEW v_edit_inp_connec AS 
  SELECT connec.connec_id,
@@ -368,6 +537,5 @@ inp_connec.custom_dint,
 connec.the_geom
 FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
-WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;*/
   
-*/
