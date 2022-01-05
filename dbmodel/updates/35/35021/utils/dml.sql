@@ -61,8 +61,6 @@ UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' an
 UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'v_om_mincut%';
 UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and (id IN ('v_edit_om_visit') OR id ilike 've_visit%');
 
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Hydrology catalog' , orderby=1 WHERE id ='v_edit_inp_hydrology';
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'DWF catalog' , orderby=2 WHERE id ='v_edit_inp_dwf';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Dscenario catalog' , orderby=3 WHERE id ='v_edit_cat_dscenario';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Roughness catalog' , orderby=4 WHERE id ='cat_mat_roughness';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Curve catalog' , orderby=5 WHERE id ='v_edit_inp_curve';
@@ -159,3 +157,5 @@ UPDATE config_form_fields SET widgettype='typeahead' WHERE dv_querytext LIKE '%p
 
 UPDATE sys_fprocess SET isaudit=TRUE WHERE isaudit IS NULL;
 UPDATE sys_fprocess SET isaudit = FALSE WHERE fid IN ('349', '350', '351', '352', '353', '302', '347');
+
+INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) VALUES('v_edit_cat_dscenario', 'Table to manage dynamic scenarios', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Dscenario catalog', 2, 'core');

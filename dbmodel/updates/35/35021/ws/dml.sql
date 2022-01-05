@@ -98,9 +98,17 @@ INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA');
 
 UPDATE sys_param_user SET layoutorder = 12 WHERE id IN ('inp_options_quality_mode','inp_options_node_id');
 
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage scenario for junctions', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage scenario for connecs', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage scenario for inlets', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage dscenario for junctions', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage dscenario for connecs', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage dscenario for inlets', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_virtualvalve', 'Table to manage dscenario for virtualvalves', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_pump_additional', 'Table to manage dscenario for additional pumps', 'role_epa', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_junction', 'View to manage dscenario for junctions', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_connec', 'View to manage dscenario for connecs', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_inlet', 'View to manage dscenario for inlets', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_virtualvalve', 'View to manage dscenario for virtualvalves', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_pump_additional', 'View to manage dscenario for additional pumps', 'role_epa', 'core');
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');

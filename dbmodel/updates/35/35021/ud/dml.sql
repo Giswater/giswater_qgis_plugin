@@ -19,6 +19,7 @@ INSERT INTO config_toolbox VALUES (3118, 'Create Dscenario with values from ToC'
   {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}]' ,
   NULL,TRUE)  ON CONFLICT (id) DO NOTHING;
-  
 
 
+INSERT INTO ws_sample.sys_table (id, descript, sys_role, context, alias, orderby, source) VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Hydrology catalog',1,'core');
+INSERT INTO ws_sample.sys_table (id, descript, sys_role, context, alias, orderby, source) VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','DWF catalog', 2 ,'core');

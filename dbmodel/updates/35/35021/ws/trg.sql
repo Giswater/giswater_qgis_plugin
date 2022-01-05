@@ -14,10 +14,72 @@ CREATE TRIGGER gw_trg_vi_demands
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_demands');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_tank ON v_edit_inp_tank;
 
 CREATE TRIGGER gw_trg_edit_inp_node_tank
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_tank
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_node_pump
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_pump
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump');
+  
+    
+CREATE TRIGGER gw_trg_edit_inp_node_valve
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_valve
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_shortpipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe');
+
+    
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_pump
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_shortpipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('SHORTPIPE');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_junction
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('JUNCTION');
+  
+    
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_connec
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONNEC');
+  
+  
+  CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_inlet
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INLET');
+  
+    
+  CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_virtualvalve
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VIRTUALVALVE');

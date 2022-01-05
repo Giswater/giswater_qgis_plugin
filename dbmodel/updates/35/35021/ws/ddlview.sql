@@ -293,7 +293,8 @@ AS SELECT n.node_id,
     inp_tank.diameter,
     inp_tank.minvol,
     inp_tank.curve_id,
-    n.the_geom
+    n.the_geom,
+    overflow
    FROM selector_sector,
     v_node n
      JOIN inp_tank USING (node_id)
@@ -320,7 +321,7 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
     inp_inlet.curve_id,
     inp_inlet.pattern_id,
     n.the_geom,
-	inp_inlet.overflow
+    inp_inlet.overflow
    FROM selector_sector, v_node n
      JOIN inp_inlet USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
@@ -341,3 +342,263 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
   WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text
   AND ((s.expl_id = rpt_cat_result.expl_id AND s.cur_user = current_user)
   OR rpt_cat_result.expl_id is null);
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS 
+ SELECT connec.connec_id,
+    connec.pjoint_type,
+    connec.pjoint_id,
+    c.demand,
+    c.pattern_id,
+    c.peak_factor,
+    c.custom_roughness,
+    c.custom_length,
+    c.custom_dint,
+    connec.the_geom
+   FROM selector_sector,selector_inp_dscenario,
+    v_connec connec
+     JOIN inp_dscenario_connec c USING (connec_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  AND c.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
+ SELECT n.node_id,
+    j.demand,
+    j.pattern_id,
+    j.peak_factor,
+    n.the_geom
+   FROM selector_sector,selector_inp_dscenario,
+    v_edit_node n
+     JOIN inp_dscenario_junction j USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  AND j.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
+ SELECT n.node_id,
+    i.initlevel,
+    i.minlevel,
+    i.maxlevel,
+    i.diameter,
+    i.minvol,
+    i.curve_id,
+    i.pattern_id,
+    i.overflow,
+    i.head,
+    n.the_geom
+   FROM selector_sector, selector_inp_dscenario, v_node n
+     JOIN inp_dscenario_inlet i USING (node_id)
+      JOIN cat_dscenario d USING (dscenario_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  AND i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS 
+ SELECT d.dscenario_id,
+    p.arc_id,
+    p.minorloss,
+    p.status,
+    p.roughness,
+    p.dint,
+    the_geom
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_arc
+     JOIN inp_dscenario_pipe p USING (arc_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS 
+ SELECT d.dscenario_id,
+    concat(p.node_id, '_n2a') as nodarc_id,
+    p.node_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern,
+    p.status,
+    the_geom
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_node
+     JOIN inp_dscenario_pump p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    p.pattern_id,
+    p.head,
+    the_geom
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_node
+     JOIN inp_dscenario_reservoir p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    concat(p.node_id, '_n2a') as nodarc_id,
+    p.minorloss,
+    p.status
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_node
+     JOIN inp_dscenario_shortpipe p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    p.initlevel,
+    p.minlevel,
+    p.maxlevel,
+    p.diameter,
+    p.minvol,
+    p.curve_id,
+    overflow,
+    the_geom
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_node
+     JOIN inp_dscenario_tank p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    concat(p.node_id, '_n2a') as nodarc_id,
+    p.valv_type,
+    p.pressure,
+    p.flow,
+    p.coef_loss,
+    p.curve_id,
+    p.minorloss,
+    p.status,
+    p.add_settings,
+    the_geom
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_node
+     JOIN inp_dscenario_valve p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+ 
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS 
+ SELECT d.dscenario_id,
+	arc_id,
+	valv_type,
+	pressure,
+	diameter,
+	flow,
+	coef_loss,
+	curve_id,
+	minorloss, 
+	status,
+	the_geom 
+   FROM selector_sector,
+    selector_inp_dscenario,
+    v_arc
+     JOIN inp_dscenario_virtualvalve v USING (arc_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_pump;
+CREATE OR REPLACE VIEW v_edit_inp_pump AS 
+ SELECT n.node_id,
+    concat(n.node_id, '_n2a') as nodarc_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    n.dma_id,
+    inp_pump.power,
+    inp_pump.curve_id,
+    inp_pump.speed,
+    inp_pump.pattern,
+    inp_pump.to_arc,
+    inp_pump.status,
+    inp_pump.pump_type,
+    n.the_geom
+   FROM selector_sector,
+    v_node n
+     JOIN inp_pump USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+DROP VIEW v_edit_inp_valve;
+CREATE OR REPLACE VIEW v_edit_inp_valve AS 
+ SELECT v_node.node_id,
+    concat(v_node.node_id, '_n2a') as nodarc_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_valve.valv_type,
+    inp_valve.pressure,
+    inp_valve.flow,
+    inp_valve.coef_loss,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    inp_valve.to_arc,
+    inp_valve.status,
+    v_node.the_geom,
+    inp_valve.custom_dint,
+    inp_valve.add_settings
+   FROM selector_sector,
+    v_node
+     JOIN inp_valve USING (node_id)
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+DROP VIEW v_edit_inp_shortpipe;
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+ SELECT n.node_id,
+    concat(n.node_id, '_n2a') as nodarc_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_shortpipe.minorloss,
+    inp_shortpipe.to_arc,
+    inp_shortpipe.status,
+    n.the_geom
+   FROM selector_sector,
+    v_node n
+     JOIN inp_shortpipe USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

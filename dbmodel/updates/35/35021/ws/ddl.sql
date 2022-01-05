@@ -58,12 +58,60 @@ ALTER TABLE ext_hydrometer_category_x_pattern RENAME TO _ext_hydrometer_category
 DELETE FROM sys_table WHERE id = 'ext_hydrometer_category_x_pattern';
 
 
+CREATE TABLE inp_dscenario_virtualvalve(
+  dscenario_id integer NOT NULL,
+  arc_id character varying(16) NOT NULL,
+  valv_type character varying(18),
+  pressure numeric(12,4),
+  diameter numeric(12,4),
+  flow numeric(12,4),
+  coef_loss numeric(12,4),
+  curve_id character varying(16),
+  minorloss numeric(12,4),
+  status character varying(12),
+  CONSTRAINT inp_dscenario_virtualvalve_pkey PRIMARY KEY (dscenario_id, arc_id),
+  CONSTRAINT inp_dscenario_virtualvalve_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+      REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+ CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id)
+      REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_dscenario_virtualvalve_curve_id_fkey FOREIGN KEY (curve_id)
+      REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE inp_dscenario_pump_additional (
+  id serial NOT NULL,
+  dscenario_id integer NOT NULL,
+  node_id character varying(16) NOT NULL,
+  order_id smallint,
+  power character varying,
+  curve_id character varying,
+  speed numeric(12,6),
+  pattern character varying,
+  status character varying(12),
+  energyparam character varying(30),
+  energyvalue character varying(30),
+  CONSTRAINT inp_dscenario_pump_additional_pkey PRIMARY KEY (id),
+  CONSTRAINT inp_dscenario_pump_additional_curve_id_fkey FOREIGN KEY (curve_id)
+      REFERENCES inp_curve (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_dscenario_pump_additional_node_id_fkey FOREIGN KEY (node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_dscenario_pump_additional_pattern_id_fkey FOREIGN KEY (pattern)
+      REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT inp_dscenario_pump_additional_unique UNIQUE (node_id, order_id),
+  CONSTRAINT inp_dscenario_pump_additional_pattern_check CHECK (status::text = ANY (ARRAY['CLOSED'::character varying, 'OPEN'::character varying]::text[]))
+  );
+
+  
 CREATE TABLE inp_dscenario_junction(
   dscenario_id integer NOT NULL,
   node_id character varying(16) NOT NULL,
   demand numeric(12,6),
   pattern_id character varying(16),
   demand_type character varying(18),
+  peak_factor numeric(12,4),
   CONSTRAINT inp_dscenario_junction_pkey PRIMARY KEY (dscenario_id, node_id),
   CONSTRAINT inp_dscenario_junction_dscenario_id_fkey FOREIGN KEY (dscenario_id)
       REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
@@ -80,6 +128,10 @@ CREATE TABLE inp_dscenario_connec(
   demand numeric(12,6),
   pattern_id character varying(16),
   demand_type character varying(18),
+  peak_factor numeric(12,4),
+  custom_roughness float,
+  custom_length float,
+  custom_dint float,
   CONSTRAINT inp_dscenario_connec_pkey PRIMARY KEY (dscenario_id, connec_id),
   CONSTRAINT inp_dscenario_connec_dscenario_id_fkey FOREIGN KEY (dscenario_id)
       REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
