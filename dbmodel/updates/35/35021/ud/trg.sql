@@ -13,3 +13,73 @@ CREATE TRIGGER gw_trg_vi_xsections
   ON vi_options
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_options');
+ 
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_outfall
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('OUTFALL');
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_storage
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('STORAGE');
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_divider
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('DIVIDER');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_weir
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('WEIR');
+ 
+ 
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_pump
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
+  
+ 
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_orifice
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('ORIFICE');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_outlet
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('OUTLET');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_inflows
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS');
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_inflows_pol_x_node
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS_POL_X_NODE');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_treatment
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TREATMENT');
