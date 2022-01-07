@@ -129,6 +129,8 @@ CREATE TABLE inp_dscenario_connec(
   pattern_id character varying(16),
   demand_type character varying(18),
   peak_factor numeric(12,4),
+  status varchar(16),
+  minorloss float,
   custom_roughness float,
   custom_length float,
   custom_dint float,
@@ -212,3 +214,7 @@ ALTER TABLE ext_rtc_dma_period ADD CONSTRAINT ext_rtc_dma_period_pattern_id_fkey
 REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_param_user", "column":"epaversion", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"status", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"minorloss", "dataType":"float", "isUtils":"False"}}$$);
+

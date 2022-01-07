@@ -24,10 +24,10 @@ BEGIN
 		-- update expl_id
 		IF NEW.expl_id != OLD.expl_id AND NEW.expl_id IS NOT NULL THEN
 			IF admin_exploitation_x_user IS FALSE THEN
-				UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW result_id;
+				UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW.result_id;
 			ELSIF admin_exploitation_x_user IS TRUE THEN
 				IF NEW.cur_user = current_user THEN
-					UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW result_id;
+					UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW.result_id;
 				END IF;
 			END IF;
 		END IF;
@@ -35,7 +35,14 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM rpt_cat_result WHERE id = '||quote_literal(OLD.id)||';';
+        v_sql:= 'DELETE FROM rpt_cat_result WHERE result_id = '||quote_literal(OLD.result_id)||';';
+		IF admin_exploitation_x_user IS FALSE THEN
+	        EXECUTE v_sql;
+			ELSIF admin_exploitation_x_user IS TRUE THEN
+				IF NEW.cur_user = current_user THEN
+					EXECUTE v_sql;
+				END IF;
+			END IF;
         EXECUTE v_sql;
         RETURN NULL;
     

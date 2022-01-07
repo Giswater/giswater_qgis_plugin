@@ -269,6 +269,35 @@ UNION
   AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
+CREATE OR REPLACE VIEW v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+    connec.elevation,
+    connec.depth,
+    connec.connecat_id,
+    connec.arc_id,
+    connec.sector_id,
+    connec.dma_id,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.expl_id,
+    connec.pjoint_type,
+    connec.pjoint_id,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    connec.the_geom,
+    inp_connec.peak_factor,
+    inp_connec.custom_roughness,
+    inp_connec.custom_length,
+    inp_connec.custom_dint,
+    connec.epa_type,
+	inp_connec.status,
+	inp_connec.minorloss
+   FROM selector_sector, v_connec connec
+     JOIN inp_connec USING (connec_id)
+  WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
 DROP VIEW IF EXISTS v_edit_inp_tank;
 CREATE OR REPLACE VIEW v_edit_inp_tank
 AS SELECT n.node_id,
@@ -329,6 +358,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS
     c.demand,
     c.pattern_id,
     c.peak_factor,
+	c.status,
+	c.minorloss,
     c.custom_roughness,
     c.custom_length,
     c.custom_dint,
