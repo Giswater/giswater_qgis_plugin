@@ -145,8 +145,7 @@ CONSTRAINT iinp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
 
 CREATE TABLE inp_dscenario_flwreg_weir(
 dscenario_id integer,
-node_id character varying(16) NOT NULL,
-order_id integer,
+nodarc_id character varying(16) NOT NULL,
 weir_type character varying(18) NOT NULL,
 offsetval numeric(12,4),
 cd numeric(12,4),
@@ -161,43 +160,33 @@ surcharge character varying(3),
 road_width float,
 road_surf character varying(16),
 coef_curve float,
-CONSTRAINT inp_dscenario_flwreg_weir_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
-CONSTRAINT inp_dscenario_flwreg_weir_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
+CONSTRAINT inp_dscenario_flwreg_weir_pkey PRIMARY KEY (dscenario_id, nodarc_id),
 CONSTRAINT inp_dscenario_flwreg_weir_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_weir_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])));
 
 
 CREATE TABLE inp_dscenario_flwreg_pump(
 dscenario_id integer,
-node_id character varying(16) NOT NULL,
-order_id integer,
+nodarc_id character varying(16) NOT NULL,
 curve_id character varying(16) NOT NULL,
 status character varying(3),
 startup numeric(12,4),
 shutoff numeric(12,4),
-CONSTRAINT inp_dscenario_flwreg_pump_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
+CONSTRAINT inp_dscenario_flwreg_pump_pkey PRIMARY KEY (dscenario_id, nodarc_id),
 CONSTRAINT inp_dscenario_flwreg_pump_curve_id_fkey FOREIGN KEY (curve_id)
   REFERENCES inp_curve (id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_pump_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_pump_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_pump_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::character varying, 'OFF'::character varying]::text[])));
 
 
 CREATE TABLE inp_dscenario_flwreg_orifice( 
 dscenario_id integer,
-node_id character varying(16) NOT NULL,
-order_id integer,
+nodarc_id character varying(16) NOT NULL,
 ori_type character varying(18) NOT NULL,
 offsetval numeric(12,4),
 cd numeric(12,4) NOT NULL,
@@ -209,39 +198,30 @@ geom2 numeric(12,4) NOT NULL DEFAULT 0.00,
 geom3 numeric(12,4) DEFAULT 0.00,
 geom4 numeric(12,4) DEFAULT 0.00,
 close_time integer DEFAULT 0,
-CONSTRAINT inp_dscenario_flwreg_orifice_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
-CONSTRAINT inp_dscenario_flwreg_orifice_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
+CONSTRAINT inp_dscenario_flwreg_orifice_pkey PRIMARY KEY (dscenario_id, nodarc_id),
 CONSTRAINT inp_dscenario_flwreg_orifice_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_orifice_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_orifice_check_ory_type CHECK (ori_type::text = ANY (ARRAY['SIDE'::character varying, 'BOTTOM'::character varying]::text[])),
 CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying, 'RECT-CLOSED'::character varying]::text[])));
 
 
 CREATE TABLE inp_dscenario_flwreg_outlet(
 dscenario_id integer, 
-node_id character varying(16) NOT NULL,
-order_id integer,
+nodarc_id character varying(16) NOT NULL,
 outlet_type character varying(16) NOT NULL,
 offsetval numeric(12,4),
 curve_id character varying(16),
 cd1 numeric(12,4),
 cd2 numeric(12,4),
 flap character varying(3),
-CONSTRAINT inp_dscenario_flwreg_outlet_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
+CONSTRAINT inp_dscenario_flwreg_outlet_pkey PRIMARY KEY (dscenario_id, nodarc_id),
 CONSTRAINT inp_dscenario_flwreg_outlet_curve_id_fkey FOREIGN KEY (curve_id)
   REFERENCES inp_curve (id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_outlet_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_outlet_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_outlet_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_outlet_check_type CHECK (outlet_type::text = ANY (ARRAY['FUNCTIONAL/DEPTH'::character varying, 
 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying]::text[])));
 

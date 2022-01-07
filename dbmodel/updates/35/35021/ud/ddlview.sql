@@ -63,7 +63,7 @@ a.value
 
 
 --2022/01/05
- CREATE VIEW v_edit_cat_dwf_dscenario AS
+ CREATE OR REPLACE VIEW v_edit_cat_dwf_dscenario AS
  SELECT DISTINCT ON (c.id)
  id,
  idval,
@@ -78,7 +78,7 @@ a.value
  OR c.expl_id is null;
 
 
-CREATE VIEW v_edit_cat_hydrology AS
+CREATE OR REPLACE VIEW v_edit_cat_hydrology AS
 SELECT DISTINCT ON (hydrology_id)
 hydrology_id,
 name,
@@ -180,11 +180,11 @@ CREATE OR REPLACE VIEW v_edit_inp_orifice AS
 
 
 
-CREATE VIEW v_edit_inp_flwreg_weir AS
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir AS
 SELECT
-concat(node_id,'_wei',order_id) as nodarc_id,
 node_id,
 order_id,
+concat(node_id,'_wei_',order_id) as nodarc_id,
 to_arc,
 flwreg_length,
 weir_type,
@@ -203,14 +203,14 @@ road_surf,
 coef_curve,
 the_geom
 FROM inp_flwreg_weir f
-JOIN node USING (node_id);
+JOIN v_edit_node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_flwreg_pump AS
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump AS
 SELECT
-concat(node_id,'_pum',order_id) as nodarc_id,
 node_id,
 order_id,
+concat(node_id,'_pum_',order_id) as nodarc_id,
 to_arc,
 flwreg_length,
 curve_id,
@@ -219,15 +219,15 @@ startup,
 shutoff,
 the_geom
 FROM inp_flwreg_pump f
-JOIN node USING (node_id);
+JOIN v_edit_node USING (node_id);
 
   
 
-CREATE VIEW v_edit_inp_flwreg_orifice AS
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice AS
 SELECT
-concat(node_id,'_ori',order_id) as nodarc_id,
 node_id,
 order_id,
+concat(node_id,'_ori_',order_id) as nodarc_id,
 to_arc,
 flwreg_length,
 ori_type, 
@@ -243,14 +243,14 @@ geom4,
 close_time,
 the_geom
 FROM inp_flwreg_orifice f
-JOIN node USING (node_id);
+JOIN v_edit_node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_flwreg_outlet AS
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet AS
 SELECT
-concat(node_id,'_out',order_id) as nodarc_id,
 node_id,
 order_id,
+concat(node_id,'_out_',order_id) as nodarc_id,
 to_arc, 
 flwreg_length,
 outlet_type, 
@@ -261,7 +261,7 @@ cd2,
 flap,
 the_geom
 FROM inp_flwreg_outlet f
-JOIN node USING (node_id);
+JOIN v_edit_node USING (node_id);
 
 
 DROP VIEW IF EXISTS v_edit_inp_outlet;
@@ -358,13 +358,10 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_dscenario_flwreg_weir AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir AS
 SELECT
 s.dscenario_id,
-concat(f.node_id,'_wei',f.order_id) as nodarc_id,
-f.node_id,
-f.order_id,
-to_arc,
+f.nodarc_id,
 f.weir_type,
 f.offsetval,
 f.cd,
@@ -378,41 +375,27 @@ f.geom4,
 f.surcharge,
 f.road_width, 
 f.road_surf,
-f.coef_curve,
-the_geom
+f.coef_curve
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
-JOIN node USING (node_id)
-JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-
-CREATE VIEW v_edit_inp_dscenario_flwreg_pump AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump AS
 SELECT
 s.dscenario_id,
-concat(f.node_id,'_pum',f.order_id) as nodarc_id,
-f.node_id,
-f.order_id,
-to_arc,
+f.nodarc_id,
 f.curve_id,
 f.status,
 f.startup,
-f.shutoff,
-the_geom
+f.shutoff
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
-JOIN node USING (node_id)
-JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-
-CREATE VIEW v_edit_inp_dscenario_flwreg_orifice AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice AS
 SELECT
 s.dscenario_id,
-concat(f.node_id,'_ori',f.order_id) as nodarc_id,
-f.node_id,
-f.order_id,
-to_arc,
+f.nodarc_id,
 f.ori_type,
 f.offsetval,
 f.cd,
@@ -423,37 +406,27 @@ f.geom1,
 f.geom2,
 f.geom3,
 f.geom4, 
-f.close_time,
-the_geom
+f.close_time
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
-JOIN node USING (node_id)
-JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-
-CREATE VIEW v_edit_inp_dscenario_flwreg_outlet AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet AS
 SELECT
 s.dscenario_id,
-concat(f.node_id,'_out',f.order_id) as nodarc_id,
-f.node_id,
-f.order_id,
-to_arc,
+f.nodarc_id,
 f.outlet_type,
 f.offsetval,
 f.curve_id,
 f.cd1,
 f.cd2,
-f.flap,
-the_geom
+f.flap
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
-JOIN node USING (node_id)
-JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_conduit;
-CREATE VIEW v_edit_inp_dscenario_conduit AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_conduit AS
 SELECT
 f.dscenario_id,
 arc_id,
@@ -477,7 +450,7 @@ WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;
-CREATE VIEW v_edit_inp_dscenario_junction AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS
 SELECT
 f.dscenario_id,
 node_id,
@@ -492,7 +465,7 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_inflows AS
+CREATE OR REPLACE VIEW v_edit_inp_inflows AS
 SELECT
 node_id,
 order_id,
@@ -505,7 +478,7 @@ FROM inp_inflows
 JOIN node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_dscenario_inflows AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inflows AS
 SELECT
 s.dscenario_id,
 node_id,
@@ -520,7 +493,7 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_inflows_poll AS
+CREATE OR REPLACE VIEW v_edit_inp_inflows_poll AS
 SELECT
 node_id,
 poll_id,
@@ -535,7 +508,7 @@ FROM inp_inflows_poll
 JOIN node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_dscenario_inflows_poll AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inflows_poll AS
 SELECT
 s.dscenario_id,
 node_id,
@@ -552,7 +525,7 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_treatment AS
+CREATE OR REPLACE VIEW v_edit_inp_treatment AS
 SELECT
 node_id,
 poll_id,
@@ -562,7 +535,7 @@ FROM inp_treatment
 JOIN node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_dscenario_treatment AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_treatment AS
 SELECT
 s.dscenario_id,
 node_id, 
@@ -762,7 +735,7 @@ CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS
 
 
 DROP VIEW IF EXISTS vi_inflows;
-CREATE VIEW vi_inflows AS
+CREATE OR REPLACE VIEW vi_inflows AS
 SELECT
 node_id,
 type,
