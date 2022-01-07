@@ -54,10 +54,10 @@ BEGIN
 
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom, addparam)
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
-	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, outfallparam
 	FROM selector_sector, node  -- we need to use node to make more easy the relation sector against exploitation
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
@@ -66,7 +66,8 @@ BEGIN
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
-	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom,
+	'{"divider_type":"||divider_type||","arc_id":"||arc_id||","curve_id":"||curve_id||","qmin":"||qmin||","ht":"||ht||","cd":"||cd||","y0":"||y0||","ysur":"||ysur||","apond":"||apond||"}'
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
@@ -76,6 +77,8 @@ BEGIN
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	'{"storage_type":"||storage_type||","curve_id":"||curve_id||","a1":"||a1||","a2":"||a2||","a0":"||a0||","fevap":"||fevap||","sh":"||sh||","hc":"||hc||","imd":"||imd||
+	,"y0":"||y0||","ysur":"||ysur||","apond":"||apond||"}'
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
@@ -85,6 +88,7 @@ BEGIN
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom
+	'{"outfall_type":"||outfall_type||","stage":"||stage||","curve_id":"||curve_id||","timser_id":"||timser_id||","gate":"||gate||"}'
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
@@ -97,8 +101,6 @@ BEGIN
 	UPDATE temp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_node.node_id=a.node_id;
-
-	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider
 
 	INSERT INTO temp_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
 	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM v_edit_inp_inflows;
@@ -167,25 +169,25 @@ BEGIN
 	END IF;
 
 	-- orifice
-	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
-	SELECT arc_id, 'ORIFICE', ori_type, "offset", cd, orate, flat, inp_typevalue.descript, geom1, geom2, geom3, geom4, close_time
+	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
+	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flat, inp_typevalue.descript, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_orifice
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ori_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_orifice';
 	
-	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
-	SELECT nodarc_id, 'ORIFICE', ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time
+	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
+	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_flowreg_orifice
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ori_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_orifice';
 
 	-- outlet
-	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, "offset", curve_id, cd1, cd2, flap)
-	SELECT arc_id, 'OUTLET', "offset", outlet_type, curve_id, cd1, cd2, flap
+	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+	SELECT arc_id, 'OUTLET', offsetval, outlet_type, curve_id, cd1, cd2, flap
 	FROM v_edit_inp_outlet;
 
-	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, "offset", curve_id, cd1, cd2, flap)
-	SELECT nodarc_id, 'OUTLET', outlet_type, "offset",, curve_id, cd1, cd2, flap
+	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+	SELECT nodarc_id, 'OUTLET', outlet_type, offsetval,, curve_id, cd1, cd2, flap
 	FROM v_edit_inp_flowreg_outlet;
 
 	-- pump
@@ -198,14 +200,14 @@ BEGIN
 	FROM v_edit_inp_flowreg_pump;
 
 	-- weir
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, "offset", cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
-	SELECT arc_id, 'WEIR', weir_type, "offset", cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
+	SELECT arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
 	FROM v_edit_inp_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 	
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, "offset", cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
-	SELECT nodarc_id, 'WEIR', weir_type, "offset", cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
+	SELECT nodarc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
 	FROM v_edit_inp_flowreg_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';

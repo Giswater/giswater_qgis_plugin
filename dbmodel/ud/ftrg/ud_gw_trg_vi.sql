@@ -149,13 +149,16 @@ BEGIN
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'ORIFICE','ORIFICE','ORIFICE', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
-			INSERT INTO inp_orifice (arc_id, ori_type, "offset", cd, flap, orate) VALUES (NEW.arc_id, NEW.ori_type, NEW."offset", NEW.cd, NEW.flap, NEW.orate);
+			INSERT INTO inp_orifice (arc_id, ori_type, offsetval, cd, flap, orate, close_time) 
+			VALUES (NEW.arc_id, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.flap, NEW.orate, NEW.close_time);
 			
 		ELSIF v_view='vi_weirs' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'WEIR','WEIR','WEIR', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
-			INSERT INTO inp_weir (arc_id, weir_type, "offset", cd, flap, ec, cd2, surcharge) VALUES (NEW.arc_id, NEW.weir_type, NEW."offset", NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge);
+			INSERT INTO inp_weir (arc_id, weir_type, offsetval, cd, flap, ec, cd2, surcharge, road_width, road_surf, coef_curve) 
+			VALUES (NEW.arc_id, NEW.weir_type, NEW.offsetval, NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge
+			NEW.road_width, NEW.road_surf, NEW.coef_curve);
 			
 		ELSIF v_view='vi_outlets' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
@@ -163,12 +166,12 @@ BEGIN
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			
 			IF NEW.outlet_type LIKE 'FUNCTIONAL%' THEN
-				INSERT INTO inp_outlet (arc_id, "offset", outlet_type, cd1, cd2,flap) 
-				VALUES (NEW.arc_id, NEW."offset", NEW.outlet_type, NEW.other1::numeric, NEW.other2::numeric, NEW.other3);
+				INSERT INTO inp_outlet (arc_id, offsetval, outlet_type, cd1, cd2,flap) 
+				VALUES (NEW.arc_id, NEW.offsetval, NEW.outlet_type, NEW.other1::numeric, NEW.other2::numeric, NEW.other3);
 				
 			ELSIF NEW.outlet_type LIKE 'TABULAR%' THEN
-				INSERT INTO inp_outlet (arc_id, "offset", outlet_type, curve_id,flap) 
-				VALUES (NEW.arc_id, NEW."offset", NEW.outlet_type, NEW.other1, NEW.other2);
+				INSERT INTO inp_outlet (arc_id, offsetval, outlet_type, curve_id,flap) 
+				VALUES (NEW.arc_id, NEW.offsetval, NEW.outlet_type, NEW.other1, NEW.other2);
 			END IF;
 			
 		ELSIF v_view='vi_xsections' THEN 

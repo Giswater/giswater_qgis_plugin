@@ -125,3 +125,24 @@ CREATE TRIGGER gw_trg_vi_pumps
   ON ud_sample.vi_pumps
   FOR EACH ROW
   EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_pumps');
+  
+    
+CREATE TRIGGER gw_trg_edit_inp_inflows
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_inflows
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_inflows('INFLOWS');
+
+
+CREATE TRIGGER gw_trg_edit_inp_inflows
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_inflows_poll
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_inflows('INFLOWS-POLL');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_treatment
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_treatment
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_treatment();

@@ -146,11 +146,9 @@ CONSTRAINT iinp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
 CREATE TABLE inp_dscenario_flwreg_weir(
 dscenario_id integer,
 node_id character varying(16) NOT NULL,
-order_id smallint NOT NULL,
-to_arc character varying(16) NOT NULL,
-flwreg_length double precision NOT NULL,
+order_id integer,
 weir_type character varying(18) NOT NULL,
-"offset" numeric(12,4),
+offsetval numeric(12,4),
 cd numeric(12,4),
 ec numeric(12,4),
 cd2 numeric(12,4),
@@ -181,9 +179,7 @@ CONSTRAINT inp_dscenario_flwreg_weir_check_type CHECK (weir_type::text = ANY (AR
 CREATE TABLE inp_dscenario_flwreg_pump(
 dscenario_id integer,
 node_id character varying(16) NOT NULL,
-order_id smallint NOT NULL,
-to_arc character varying(16) NOT NULL,
-flwreg_length double precision NOT NULL,
+order_id integer,
 curve_id character varying(16) NOT NULL,
 status character varying(3),
 startup numeric(12,4),
@@ -209,11 +205,9 @@ CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARR
 CREATE TABLE inp_dscenario_flwreg_orifice( 
 dscenario_id integer,
 node_id character varying(16) NOT NULL,
-order_id smallint NOT NULL,
-to_arc character varying(16) NOT NULL,
-flwreg_length double precision NOT NULL,
+order_id integer,
 ori_type character varying(18) NOT NULL,
-"offset" numeric(12,4),
+offsetval numeric(12,4),
 cd numeric(12,4) NOT NULL,
 orate numeric(12,4),
 flap character varying(3) NOT NULL,
@@ -242,11 +236,9 @@ CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY (AR
 CREATE TABLE inp_dscenario_flwreg_outlet(
 dscenario_id integer, 
 node_id character varying(16) NOT NULL,
-order_id smallint NOT NULL,
-to_arc character varying(16) NOT NULL,
-flwreg_length double precision NOT NULL,
+order_id integer,
 outlet_type character varying(16) NOT NULL,
-"offset" numeric(12,4),
+offsetval numeric(12,4),
 curve_id character varying(16),
 cd1 numeric(12,4),
 cd2 numeric(12,4),
@@ -362,7 +354,7 @@ CREATE TABLE temp_arc_flowregulator(
 arc_id character varying(18) PRIMARY KEY,
 type character varying(18),
 weir_type character varying(18),
-"offset" numeric(12,4),
+offsetval numeric(12,4),
 cd numeric(12,4),
 ec numeric(12,4),
 cd2 numeric(12,4),
@@ -408,7 +400,7 @@ result_id varchar(16),
 arc_id character varying(18) NOT NULL,
 type character varying(18) NOT NULL, -- ORIFICE, OUTLET, WEIR, PUMP
 weir_type character varying(18) NOT NULL,
-"offset" numeric(12,4),
+offsetval numeric(12,4),
 cd numeric(12,4),
 ec numeric(12,4),
 cd2 numeric(12,4),
@@ -456,3 +448,10 @@ CONSTRAINT rpt_inp_node_other_result_id_fkey FOREIGN KEY (result_id)
       REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_orifice", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_weir", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_outlet", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_orifice", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_weir", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_outlet", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);

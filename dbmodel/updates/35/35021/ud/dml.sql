@@ -131,3 +131,16 @@ VALUES('temp_flowregulator', 'Table to use on pg2epa export for flowregulators (
 
 INSERT INTO sys_table (id, descript, sys_role) 
 VALUES('temp_node1n', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa');
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3120, 'gw_trg_edit_inp_flwreg', 'UD', 'function trigger', null, null, null, 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3122, 'gw_trg_edit_inp_inflows', 'UD', 'function trigger', null, null, null, 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3124, 'gw_trg_edit_inp_treatment', 'UD', 'function trigger', null, null, null, 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+

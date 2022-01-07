@@ -118,7 +118,7 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
     v_arc.custom_length,
     v_arc.expl_id,
     inp_weir.weir_type,
-    inp_weir."offset",
+    inp_weir.offsetval,
     inp_weir.cd,
     inp_weir.ec,
     inp_weir.cd2,
@@ -162,7 +162,7 @@ CREATE OR REPLACE VIEW v_edit_inp_orifice AS
     v_arc.custom_length,
     v_arc.expl_id,
     inp_orifice.ori_type,
-    inp_orifice."offset",
+    inp_orifice.offsetval,
     inp_orifice.cd,
     inp_orifice.orate,
     inp_orifice.flap,
@@ -187,7 +187,7 @@ order_id,
 to_arc,
 flwreg_length,
 weir_type,
-"offset",
+offsetval,
 cd,
 ec,
 cd2, 
@@ -230,7 +230,7 @@ order_id,
 to_arc,
 flwreg_length,
 ori_type, 
-"offset", 
+offsetval, 
 cd, 
 orate,
 flap, 
@@ -253,7 +253,7 @@ order_id,
 to_arc, 
 flwreg_length,
 outlet_type, 
-"offset", 
+offsetval, 
 curve_id, 
 cd1, 
 cd2, 
@@ -261,6 +261,44 @@ flap,
 the_geom
 FROM inp_flwreg_outlet f
 JOIN node USING (node_id);
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_outlet AS 
+ SELECT v_arc.arc_id,
+    v_arc.node_1,
+    v_arc.node_2,
+    v_arc.y1,
+    v_arc.custom_y1,
+    v_arc.elev1,
+    v_arc.custom_elev1,
+    v_arc.sys_elev1,
+    v_arc.y2,
+    v_arc.custom_y2,
+    v_arc.elev2,
+    v_arc.custom_elev2,
+    v_arc.sys_elev2,
+    v_arc.arccat_id,
+    v_arc.gis_length,
+    v_arc.sector_id,
+    v_arc.macrosector_id,
+    v_arc.state,
+    v_arc.state_type,
+    v_arc.annotation,
+    v_arc.inverted_slope,
+    v_arc.custom_length,
+    v_arc.expl_id,
+    inp_outlet.outlet_type,
+    inp_outlet.offsetval,
+    inp_outlet.curve_id,
+    inp_outlet.cd1,
+    inp_outlet.cd2,
+    inp_outlet.flap,
+    v_arc.the_geom
+   FROM selector_sector, v_arc
+     JOIN inp_outlet USING (arc_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
 
 
 CREATE VIEW v_edit_inp_dscenario_outfall AS
@@ -327,9 +365,8 @@ concat(node_id,'_wei',order_id) as nodarc_id,
 node_id,
 order_id,
 to_arc,
-flwreg_length,
 weir_type,
-"offset",
+offsetval,
 cd,
 ec,
 cd2, 
@@ -345,6 +382,7 @@ coef_curve,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
 JOIN node USING (node_id)
+JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -356,7 +394,6 @@ concat(node_id,'_pum',order_id) as nodarc_id,
 node_id,
 order_id,
 to_arc,
-flwreg_length,
 curve_id,
 status,
 startup,
@@ -364,6 +401,7 @@ shutoff,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
 JOIN node USING (node_id)
+JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -375,9 +413,8 @@ concat(node_id,'_ori',order_id) as nodarc_id,
 node_id,
 order_id,
 to_arc,
-flwreg_length,
 ori_type,
-"offset",
+offsetval,
 cd,
 orate,
 flap,
@@ -390,6 +427,7 @@ close_time,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
 JOIN node USING (node_id)
+JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -401,9 +439,8 @@ concat(node_id,'_out',order_id) as nodarc_id,
 node_id,
 order_id,
 to_arc,
-flwreg_length,
 outlet_type,
-"offset",
+offsetval,
 curve_id,
 cd1,
 cd2,
@@ -411,6 +448,7 @@ flap,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
 JOIN node USING (node_id)
+JOIN inp_flwreg_orifice o ON o.node_id = f.node_id
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -500,8 +538,8 @@ JOIN node USING (node_id);
 CREATE VIEW v_edit_inp_dscenario_inflows_poll AS
 SELECT
 s.dscenario_id,
-poll_id,
 node_id,
+poll_id,
 timser_id,
 form_type,
 mfactor,
@@ -765,7 +803,7 @@ CREATE OR REPLACE VIEW vi_outlets AS
 SELECT arc_id,
 node_1,
 node_2,
-"offset",
+offsetval as "Offset",
 outlet_type,
 case when curve_id is null then cd1::text else curve_id end as other1,
 cd2::text AS other2,
@@ -781,7 +819,7 @@ SELECT arc_id,
 node_1,
 node_2,
 ori_type,
-"offset",
+offsetval as "Offset",
 cd,
 f.flap,
 orate,
@@ -797,7 +835,7 @@ SELECT arc_id,
 node_1,
 node_2,
 weir_type,
-"offset",
+offsetval as "Offset",
 cd,
 f.flap,
 ec,
@@ -883,5 +921,28 @@ CREATE TRIGGER gw_trg_vi_xsections
   ON vi_xsections
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

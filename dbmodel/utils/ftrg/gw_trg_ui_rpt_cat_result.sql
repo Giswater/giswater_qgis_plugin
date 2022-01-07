@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- FUNCTION CODE: 3120
+-- FUNCTION CODE: 2932
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_rpt_cat_result() RETURNS trigger AS $BODY$
 DECLARE 
