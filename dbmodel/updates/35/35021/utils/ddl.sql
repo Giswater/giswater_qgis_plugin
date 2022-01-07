@@ -59,3 +59,9 @@ ALTER TABLE selector_plan_result ADD CONSTRAINT plan_result_selector_result_id_f
 REFERENCES plan_result_cat (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"isaudit", "dataType":"boolean", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"pavcat_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+
+UPDATE arc a SET pavcat_id = p.pavcat_id FROM plan_arc_x_pavement p WHERE percent = 1 AND p.arc_id = a.arc_id;
+
+ALTER TABLE plan_arc_x_pavement RENAME to _plan_arc_x_pavement_;

@@ -134,7 +134,7 @@ BEGIN
 			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc);
 			
 			-- updating flw_code
-			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type,',rec_flowreg.order_id);
+			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type, rec_flowreg.order_id);
 
 			-- udpating the feature
 			UPDATE temp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
