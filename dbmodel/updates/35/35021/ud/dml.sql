@@ -42,8 +42,7 @@ INSERT INTO inp_typevalue VALUES ('inp_value_surface','GRAVEL','GRAVEL');
 
 INSERT INTO inp_typevalue VALUES ('inp_value_weirs','ROADWAY','ROADWAY');
 
-
-UPDATE sys_foreignkey SET active=false WHERE typevalue_name ='sys_table_context' 
+UPDATE sys_foreignkey SET active=false WHERE typevalue_name ='sys_table_context';
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
 VALUES('v_edit_inp_dscenario_outfall', 'Editable view to manage scenario for outfall','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario outfall', 2 ,'core')
