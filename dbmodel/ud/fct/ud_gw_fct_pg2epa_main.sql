@@ -42,6 +42,7 @@ v_response text;
 v_message text;
 v_step integer=0;
 v_autorepair boolean;
+v_expl integer = null;
 
 
 BEGIN
@@ -62,7 +63,10 @@ BEGIN
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-
+	IF (SELECT count(expl_id) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
+		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+	END IF;
+	
 	IF v_step=3 THEN
 
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
@@ -109,7 +113,7 @@ BEGIN
 
 	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
 	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id, inp_options, status) VALUES (v_result, v_inpoptions, 1);
+	INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
