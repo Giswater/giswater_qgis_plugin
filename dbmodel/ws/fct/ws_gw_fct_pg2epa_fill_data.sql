@@ -159,14 +159,15 @@ BEGIN
 	IF v_networkmode =  4 THEN
 
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
-		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id)
+		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
+			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss)
 			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
 			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 			l.the_geom,
-			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id
+			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss
 			FROM selector_sector, v_edit_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type

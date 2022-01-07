@@ -172,6 +172,60 @@ BEGIN
 		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'overflow',d.overflow) FROM v_edit_inp_dscenario_tank d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.overflow IS NOT NULL;
 
+		-- updating values for inlet
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'initlevel',d.initlevel) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.initlevel IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minlevel',d.minlevel) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minlevel IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'maxlevel',d.maxlevel) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.maxlevel IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'diameter',d.diameter) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.diameter IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minvol',d.minvol) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minvol IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
+		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'overflow',d.overflow) FROM v_edit_inp_dscenario_inlet d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.overflow IS NOT NULL;
+
+		-- updating values for junction
+		UPDATE temp_node t SET demand = d.demand FROM v_edit_inp_dscenario_junction d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.demand IS NOT NULL;
+		UPDATE temp_node t SET pattern_id = d.pattern_id FROM v_edit_inp_dscenario_junction d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;
+		
+		
+		-- updating values for connec
+		UPDATE temp_node t SET demand = d.demand FROM v_edit_inp_dscenario_connec d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.demand IS NOT NULL;
+		UPDATE temp_node t SET pattern_id = d.pattern_id FROM v_edit_inp_dscenario_connec d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;
+		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_connec d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		UPDATE temp_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_connec d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+		UPDATE temp_arc t SET diameter = d.custom_dint FROM v_edit_inp_dscenario_connec d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_dint IS NOT NULL;
+		UPDATE temp_arc t SET length = d.custom_length FROM v_edit_inp_dscenario_connec d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_length IS NOT NULL;
+		UPDATE temp_arc t SET roughness = d.custom_roughness FROM v_edit_inp_dscenario_connec d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_roughness IS NOT NULL;
+		
+		-- updating values for virtualvalve
+		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valv_type',d.valv_type) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valv_type IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pressure',d.pressure) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pressure IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'flow',d.flow) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flow IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'coef_loss',d.coef_loss) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.coef_loss IS NOT NULL;		
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minorloss',d.minorloss) FROM v_edit_inp_dscenario_virtualvalve d 
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;				
 	END IF;
 
 	RETURN 1;
