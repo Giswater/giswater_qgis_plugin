@@ -359,10 +359,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"ymax", "dataType":"float", "isUtils":"False"}}$$);
 
 CREATE TABLE temp_arc_flowregulator(
-id serial PRIMARY KEY,
-arc_id character varying(18) NOT NULL,
-order_id smallint NOT NULL,
-flwreg_length double precision NOT NULL,
+arc_id character varying(18) PRIMARY KEY,
 weir_type character varying(18) NOT NULL,
 "offset" numeric(12,4),
 cd numeric(12,4),
@@ -403,3 +400,58 @@ mfactor numeric(12,4), -- 1 for flow or mfactor for polluntants
 sfactor numeric(12,4),
 base numeric(12,4),
 pattern_id character varying(16));
+
+
+CREATE TABLE rpt_inp_arc_flowregulator(
+result_id varchar(16),
+arc_id character varying(18) NOT NULL,
+type character varying(18) NOT NULL, -- ORIFICE, OUTLET, WEIR, PUMP
+weir_type character varying(18) NOT NULL,
+"offset" numeric(12,4),
+cd numeric(12,4),
+ec numeric(12,4),
+cd2 numeric(12,4),
+flap character varying(3),
+geom1 numeric(12,4),
+geom2 numeric(12,4) DEFAULT 0.00,
+geom3 numeric(12,4) DEFAULT 0.00,
+geom4 numeric(12,4) DEFAULT 0.00,
+surcharge character varying(3),
+road_width float,
+road_surf character varying(16),
+coef_curve float,
+---
+curve_id character varying(16),
+status character varying(3),
+startup numeric(12,4),
+shutoff numeric(12,4),
+---
+ori_type character varying(18) NOT NULL,
+orate numeric(12,4),
+shape character varying(18) NOT NULL,
+close_time integer DEFAULT 0,
+----
+outlet_type character varying(16) NOT NULL,
+cd1 numeric(12,4),
+CONSTRAINT rpt_inp_arc_flowregulator_pkey PRIMARY KEY (result_id, arc_id),
+CONSTRAINT rpt_inp_arc_flowregulator_result_id_fkey FOREIGN KEY (result_id)
+      REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE);
+
+
+CREATE TABLE rpt_inp_node_other (
+id serial PRIMARY KEY,
+result_id character varying(16),
+node_id character varying(16),
+type character varying(16), -- 'POLLUTANT' or 'FLOW' or 'TREATMENT'
+poll_id character varying(16),
+timser_id character varying(16),
+other varchar(30), -- concen/mas for polluntants or 'FLOW' for flow or function for treatment
+mfactor numeric(12,4), -- 1 for flow or mfactor for polluntants
+sfactor numeric(12,4),
+base numeric(12,4),
+pattern_id character varying(16),
+CONSTRAINT rpt_inp_node_other_result_id_fkey FOREIGN KEY (result_id)
+      REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE);
+

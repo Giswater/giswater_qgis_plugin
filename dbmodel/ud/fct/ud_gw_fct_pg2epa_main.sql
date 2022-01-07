@@ -179,11 +179,20 @@ BEGIN
 	result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
 	FROM temp_arc;
+	
 	INSERT INTO rpt_inp_node (result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id,
 	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
 	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
+
+	INSERT INTO rpt_inp_node_other (result_id, node_id, type, poll_id, timser_id, other, mfactor, sfactor, base, pattern_id)
+	SELECT v_result, node_id, type, poll_id, timser_id, other, mfactor, sfactor, base, pattern_id
+	FROM temp_node_other;
+	
+	INSERT INTO rpt_inp_arc_flowregulator
+	SELECT v_result, * FROM rpt_inp_arc_flowregulator;
+	
 	
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN

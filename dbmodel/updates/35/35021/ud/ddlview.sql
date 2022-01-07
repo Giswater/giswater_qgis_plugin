@@ -487,7 +487,7 @@ SELECT
 node_id,
 poll_id,
 timser_id,
-form_type,
+format_type,
 mfactor,
 sfactor,
 base,
@@ -767,22 +767,11 @@ CREATE OR REPLACE VIEW vi_outlets AS
     node_2,
     "offset",
     outlet_type,
-    cd1::text AS other1,
+	case curve_id is null then cd1 else curve_id end as other1,
     cd2::text AS other2,
     i.flap::varchar AS other3
    FROM temp_arc
-   JOIN inp_outlet i USING (arc_id)
-UNION
- SELECT temp_arc.arc_id,
-    node_1,
-    node_2,
-    "offset",
-    outlet_type,
-    cd1::text AS other1,
-    cd2::text AS other2,
-    i.flap::varchar AS other3
-   FROM temp_arc
-   JOIN temp_arc_flowregulator i USING (arc_id);
+   WHERE type='OUTLET';
 
 
 DROP VIEW IF EXISTS vi_orifices;
@@ -797,19 +786,7 @@ CREATE OR REPLACE VIEW vi_orifices AS
     orate,
     close_time
    FROM temp_arc
-   JOIN inp_orifice i USING (arc_id)
-UNION
- SELECT arc_id,
-    node_1,
-    node_2,
-    ori_type,
-    "offset",
-    cd,
-    i.flap,
-    orate,
-    close_time
-   FROM temp_arc
-   JOIN temp_arc_flowregulator i USING (arc_id);
+   WHERE type='ORIFICE';
 
 
 DROP VIEW IF EXISTS vi_weirs;
@@ -827,28 +804,8 @@ CREATE OR REPLACE VIEW vi_weirs AS
     road_width,
     road_surf,
     coef_curve
- FROM temp_arc
-   JOIN inp_weir i USING (arc_id)
-   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = i.weir_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_weirs'::text 
-   UNION
- SELECT arc_id,
-    node_1,
-    node_2,
-    inp_typevalue.idval AS weir_type,
-    "offset",
-    cd,
-    i.flap,
-    ec,
-    cd2,
-    surcharge,
-    road_width,
-    road_surf,
-    coef_curve
- FROM temp_arc
-   JOIN temp_arc_flowregulator i USING (arc_id)
-   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = i.weir_type::text
-   WHERE inp_typevalue.typevalue::text = 'inp_value_weirs'::text;
+  FROM temp_arc
+  WHERE type='WEIR';
 
 
 DROP VIEW IF EXISTS vi_pumps;
@@ -860,16 +817,67 @@ CREATE OR REPLACE VIEW vi_pumps AS
     status,
     startup,
     shutoff
-FROM temp_arc
-   JOIN inp_pump i USING (arc_id)
-   UNION
-   SELECT arc_id,
-    node_1,
-    node_2,
-    curve_id,
-    status,
-    startup,
-    shutoff
-FROM temp_arc
-   JOIN temp_arc_flowregulator i USING (arc_id);
+	FROM temp_arc
+	WHERE type='PUMP';
+  
+
+DROP VIEW IF EXISTS vi_xsections;
+CREATE OR REPLACE VIEW vi_xsections AS 
+ SELECT arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.geom1::text AS other1,
+    cat_arc.curve_id AS other2,
+    0::text AS other3,
+    0::text AS other4,
+    barrels AS other5,
+    NULL::text AS other6
+   FROM temp_arc
+   JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+   JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   WHERE cat_arc_shape.epa::text = 'CUSTOM'::text
+UNION
+ SELECT arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.geom1::text AS other1,
+    cat_arc.geom2::text AS other2,
+    cat_arc.geom3::text AS other3,
+    cat_arc.geom4::text AS other4,
+    barrels AS other5,
+    culvert::text AS other6
+    FROM temp_arc
+    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+    JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+    WHERE cat_arc_shape.epa::text NOT IN ('CUSTOM','IRREGULAR')
+UNION
+ SELECT arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.tsect_id AS other1,
+    0::character varying AS other2,
+    0::text AS other3,
+    0::text AS other4,
+    barrels AS other5,
+    NULL::text AS other6
+    FROM temp_arc
+    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+    JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+    WHERE cat_arc_shape.epa::text = 'IRREGULAR'
+UNION
+ SELECT arc_id,
+    shape,
+    geom1::text AS other1,
+    geom2::text AS other2,
+    geom3::text AS other3,
+    geom4::text AS other4,
+    NULL::integer AS other5,
+    NULL::text AS other6
+    FROM temp_arc_flowregulator
+    WHERE type IN ('ORIFICE', 'WEIR');
+
+
+CREATE TRIGGER gw_trg_vi_xsections
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_xsections
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
+
 

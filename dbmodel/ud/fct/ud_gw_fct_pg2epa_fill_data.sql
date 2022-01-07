@@ -100,6 +100,15 @@ BEGIN
 
 	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider
 
+	INSERT INTO temp_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
+	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM v_edit_inp_inflows;
+
+	INSERT INTO temp_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id)
+	SELECT node_id, 'POLLUTANT', timser_id, poll_id, format_type, mfactor, sfactor, base, pattern_id SELECT * FROM v_edit_inp_inflows_poll;
+	
+	INSERT INTO temp_node_other (node_id, type, poll_id, other)
+	SELECT node_id, 'TREATMENT', poll_id, function FROM v_edit_inp_treatment;
+
 	-- Insert on arc rpt_inp table
 	EXECUTE 'INSERT INTO temp_arc 
 	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope,
@@ -157,7 +166,52 @@ BEGIN
 		
 	END IF;
 
-	-- fill rpt_inp_raingage
+	-- orifice
+	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
+	SELECT arc_id, 'ORIFICE', ori_type, "offset", cd, orate, flat, inp_typevalue.descript, geom1, geom2, geom3, geom4, close_time
+	FROM v_edit_inp_orifice
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ori_type::text
+	WHERE inp_typevalue.typevalue::text = 'inp_value_orifice';
+	
+	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time)
+	SELECT nodarc_id, 'ORIFICE', ori_type, "offset", cd, orate, flat, shape, geom1, geom2, geom3, geom4, close_time
+	FROM v_edit_inp_flowreg_orifice
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = ori_type::text
+	WHERE inp_typevalue.typevalue::text = 'inp_value_orifice';
+
+	-- outlet
+	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, "offset", curve_id, cd1, cd2, flap)
+	SELECT arc_id, 'OUTLET', "offset", outlet_type, curve_id, cd1, cd2, flap
+	FROM v_edit_inp_outlet;
+
+	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, "offset", curve_id, cd1, cd2, flap)
+	SELECT nodarc_id, 'OUTLET', outlet_type, "offset",, curve_id, cd1, cd2, flap
+	FROM v_edit_inp_flowreg_outlet;
+
+	-- pump
+	INSERT INTO temp_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
+	SELECT arc_id, 'PUMP', curve_id, status, startup, shutoff
+	FROM v_edit_inp_pump;
+	
+	INSERT INTO temp_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
+	SELECT nodarc_id, 'PUMP', curve_id, status, startup, shutoff
+	FROM v_edit_inp_flowreg_pump;
+
+	-- weir
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, "offset", cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
+	SELECT arc_id, 'WEIR', weir_type, "offset", cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	FROM v_edit_inp_weir
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_weir.weir_type::text
+	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
+	
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, "offset", cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
+	SELECT nodarc_id, 'WEIR', weir_type, "offset", cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	FROM v_edit_inp_flowreg_weir
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_weir.weir_type::text
+	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
+
+
+	-- rpt_inp_raingage
 	INSERT INTO rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
 	
