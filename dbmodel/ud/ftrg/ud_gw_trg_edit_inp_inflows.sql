@@ -39,7 +39,7 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		SIF v_table = 'INFLOWS' THEN
+		IF v_table = 'INFLOWS' THEN
 			UPDATE inp_inflows SET dscenario_id=NEW.node_id=NEW.node_id, order_id=NEW.order_id, timser_id=NEW.timser_id, 
 			format_type=NEW.format_type, mfactor=NEW.mfactor, sfactor=NEW.sfactor, base=NEW.base, pattern_id=NEW.pattern_id		
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND order_id = OLD.order_id;

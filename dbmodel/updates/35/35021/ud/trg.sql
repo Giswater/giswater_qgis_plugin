@@ -115,16 +115,16 @@ CREATE TRIGGER gw_trg_vi_orifices
 
 CREATE TRIGGER gw_trg_vi_weirs
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ud_sample.vi_weirs
+  ON vi_weirs
   FOR EACH ROW
-  EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_weirs');
+  EXECUTE PROCEDURE gw_trg_vi('vi_weirs');
 
 
 CREATE TRIGGER gw_trg_vi_pumps
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ud_sample.vi_pumps
+  ON vi_pumps
   FOR EACH ROW
-  EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_pumps');
+  EXECUTE PROCEDURE gw_trg_vi('vi_pumps');
   
     
 CREATE TRIGGER gw_trg_edit_inp_inflows
@@ -146,3 +146,24 @@ CREATE TRIGGER gw_trg_edit_inp_treatment
   ON v_edit_inp_treatment
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_treatment();
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_arc_outlet
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_outlet
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_outlet');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_arc_orifice
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_orifice
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_orifice');
+  
+  
+  CREATE TRIGGER gw_trg_edit_inp_arc_weir
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_weir
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_weir');

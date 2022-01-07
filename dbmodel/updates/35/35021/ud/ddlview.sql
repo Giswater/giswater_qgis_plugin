@@ -92,7 +92,7 @@ WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
 OR c.expl_id is null;
 
 
-
+DROP VIEW IF EXISTS v_edit_inp_weir;
 CREATE OR REPLACE VIEW v_edit_inp_weir AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
@@ -137,6 +137,7 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
    WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
+DROP VIEW IF EXISTS v_edit_inp_orifice;
 CREATE OR REPLACE VIEW v_edit_inp_orifice AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
@@ -263,7 +264,7 @@ FROM inp_flwreg_outlet f
 JOIN node USING (node_id);
 
 
-
+DROP VIEW IF EXISTS v_edit_inp_outlet;
 CREATE OR REPLACE VIEW v_edit_inp_outlet AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
@@ -300,8 +301,7 @@ CREATE OR REPLACE VIEW v_edit_inp_outlet AS
   WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
-
-CREATE VIEW v_edit_inp_dscenario_outfall AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_outfall AS
 SELECT
 s.dscenario_id,
 node_id, 
@@ -316,7 +316,7 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_dscenario_storage AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_storage AS
 SELECT
 s.dscenario_id,
 node_id, 
@@ -338,7 +338,7 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_dscenario_divider AS
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_divider AS
 SELECT
 s.dscenario_id,
 node_id, 
@@ -361,24 +361,24 @@ WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 CREATE VIEW v_edit_inp_dscenario_flwreg_weir AS
 SELECT
 s.dscenario_id,
-concat(node_id,'_wei',order_id) as nodarc_id,
-node_id,
-order_id,
+concat(f.node_id,'_wei',f.order_id) as nodarc_id,
+f.node_id,
+f.order_id,
 to_arc,
-weir_type,
-offsetval,
-cd,
-ec,
-cd2, 
-flap, 
-geom1, 
-geom2,
-geom3,
-geom4,
-surcharge,
-road_width, 
-road_surf,
-coef_curve,
+f.weir_type,
+f.offsetval,
+f.cd,
+f.ec,
+f.cd2, 
+f.flap, 
+f.geom1, 
+f.geom2,
+f.geom3,
+f.geom4,
+f.surcharge,
+f.road_width, 
+f.road_surf,
+f.coef_curve,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
 JOIN node USING (node_id)
@@ -390,14 +390,14 @@ WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 CREATE VIEW v_edit_inp_dscenario_flwreg_pump AS
 SELECT
 s.dscenario_id,
-concat(node_id,'_pum',order_id) as nodarc_id,
-node_id,
-order_id,
+concat(f.node_id,'_pum',f.order_id) as nodarc_id,
+f.node_id,
+f.order_id,
 to_arc,
-curve_id,
-status,
-startup,
-shutoff,
+f.curve_id,
+f.status,
+f.startup,
+f.shutoff,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
 JOIN node USING (node_id)
@@ -409,21 +409,21 @@ WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 CREATE VIEW v_edit_inp_dscenario_flwreg_orifice AS
 SELECT
 s.dscenario_id,
-concat(node_id,'_ori',order_id) as nodarc_id,
-node_id,
-order_id,
+concat(f.node_id,'_ori',f.order_id) as nodarc_id,
+f.node_id,
+f.order_id,
 to_arc,
-ori_type,
-offsetval,
-cd,
-orate,
-flap,
-shape, 
-geom1, 
-geom2,
-geom3,
-geom4, 
-close_time,
+f.ori_type,
+f.offsetval,
+f.cd,
+f.orate,
+f.flap,
+f.shape, 
+f.geom1, 
+f.geom2,
+f.geom3,
+f.geom4, 
+f.close_time,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
 JOIN node USING (node_id)
@@ -435,16 +435,16 @@ WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 CREATE VIEW v_edit_inp_dscenario_flwreg_outlet AS
 SELECT
 s.dscenario_id,
-concat(node_id,'_out',order_id) as nodarc_id,
-node_id,
-order_id,
+concat(f.node_id,'_out',f.order_id) as nodarc_id,
+f.node_id,
+f.order_id,
 to_arc,
-outlet_type,
-offsetval,
-curve_id,
-cd1,
-cd2,
-flap,
+f.outlet_type,
+f.offsetval,
+f.curve_id,
+f.cd1,
+f.cd2,
+f.flap,
 the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
 JOIN node USING (node_id)
@@ -914,35 +914,3 @@ UNION
     NULL::text AS other6
     FROM temp_arc_flowregulator
     WHERE type IN ('ORIFICE', 'WEIR');
-
-
-CREATE TRIGGER gw_trg_vi_xsections
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON vi_xsections
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

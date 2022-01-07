@@ -165,13 +165,9 @@ CONSTRAINT inp_dscenario_flwreg_weir_pkey PRIMARY KEY (dscenario_id, node_id, or
 CONSTRAINT inp_dscenario_flwreg_weir_node_id_fkey FOREIGN KEY (node_id)
   REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_weir_to_arc_fkey FOREIGN KEY (to_arc)
-  REFERENCES arc (arc_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_weir_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_weir_unique UNIQUE (node_id, to_arc, order_id),
 CONSTRAINT inp_dscenario_flwreg_weir_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])));
 
@@ -191,13 +187,9 @@ CONSTRAINT inp_dscenario_flwreg_pump_curve_id_fkey FOREIGN KEY (curve_id)
 CONSTRAINT inp_dscenario_flwreg_pump_node_id_fkey FOREIGN KEY (node_id)
   REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_pump_to_arc_fkey FOREIGN KEY (to_arc)
-  REFERENCES arc (arc_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_pump_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_pump_unique UNIQUE (node_id, to_arc, order_id),
 CONSTRAINT inp_dscenario_flwreg_pump_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::character varying, 'OFF'::character varying]::text[])));
 
@@ -221,13 +213,9 @@ CONSTRAINT inp_dscenario_flwreg_orifice_pkey PRIMARY KEY (dscenario_id, node_id,
 CONSTRAINT inp_dscenario_flwreg_orifice_node_id_fkey FOREIGN KEY (node_id)
   REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_orifice_to_arc_fkey FOREIGN KEY (to_arc)
-  REFERENCES arc (arc_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_orifice_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_orifice_unique UNIQUE (node_id, to_arc, order_id),
 CONSTRAINT inp_dscenario_flwreg_orifice_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_orifice_check_ory_type CHECK (ori_type::text = ANY (ARRAY['SIDE'::character varying, 'BOTTOM'::character varying]::text[])),
 CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying, 'RECT-CLOSED'::character varying]::text[])));
@@ -250,13 +238,9 @@ CONSTRAINT inp_dscenario_flwreg_outlet_curve_id_fkey FOREIGN KEY (curve_id)
 CONSTRAINT inp_dscenario_flwreg_outlet_node_id_fkey FOREIGN KEY (node_id)
   REFERENCES node (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_outlet_to_arc_fkey FOREIGN KEY (to_arc)
-  REFERENCES arc (arc_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_flwreg_outlet_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_flwreg_outlet_unique UNIQUE (node_id, to_arc, order_id),
 CONSTRAINT inp_dscenario_flwreg_outlet_check CHECK (order_id = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9])),
 CONSTRAINT inp_dscenario_flwreg_outlet_check_type CHECK (outlet_type::text = ANY (ARRAY['FUNCTIONAL/DEPTH'::character varying, 
 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying]::text[])));
@@ -455,3 +439,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwr
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_orifice", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_weir", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_outlet", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
+
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT IF EXISTS inp_flwreg_orifice_unique;
+ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT IF EXISTS inp_flwreg_outlet_unique;
+ALTER TABLE inp_flwreg_weir DROP CONSTRAINT IF EXISTS inp_flwreg_weir_unique;
+ALTER TABLE inp_flwreg_pump DROP CONSTRAINT IF EXISTS inp_flwreg_pump_unique;
