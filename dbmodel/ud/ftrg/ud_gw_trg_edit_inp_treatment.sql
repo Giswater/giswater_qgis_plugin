@@ -12,8 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_treatment()
 $BODY$
 DECLARE 
 
-v_dscenario text;
-
 BEGIN
 
 	--Get schema name
