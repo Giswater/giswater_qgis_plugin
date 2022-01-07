@@ -360,7 +360,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 
 CREATE TABLE temp_arc_flowregulator(
 arc_id character varying(18) PRIMARY KEY,
-weir_type character varying(18) NOT NULL,
+type character varying(18),
+weir_type character varying(18),
 "offset" numeric(12,4),
 cd numeric(12,4),
 ec numeric(12,4),

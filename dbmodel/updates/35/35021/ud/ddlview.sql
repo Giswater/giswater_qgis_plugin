@@ -487,7 +487,7 @@ SELECT
 node_id,
 poll_id,
 timser_id,
-format_type,
+form_type,
 mfactor,
 sfactor,
 base,
@@ -762,63 +762,67 @@ WHERE type = 'TREATMENT';
 
 DROP VIEW IF EXISTS vi_outlets;
 CREATE OR REPLACE VIEW vi_outlets AS 
- SELECT arc_id,
-    node_1,
-    node_2,
-    "offset",
-    outlet_type,
-	case curve_id is null then cd1 else curve_id end as other1,
-    cd2::text AS other2,
-    i.flap::varchar AS other3
-   FROM temp_arc
-   WHERE type='OUTLET';
+SELECT arc_id,
+node_1,
+node_2,
+"offset",
+outlet_type,
+case when curve_id is null then cd1::text else curve_id end as other1,
+cd2::text AS other2,
+f.flap::varchar AS other3
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='OUTLET';
 
 
 DROP VIEW IF EXISTS vi_orifices;
 CREATE OR REPLACE VIEW vi_orifices AS 
- SELECT arc_id,
-    node_1,
-    node_2,
-    ori_type,
-    "offset",
-    cd,
-    i.flap,
-    orate,
-    close_time
-   FROM temp_arc
-   WHERE type='ORIFICE';
+SELECT arc_id,
+node_1,
+node_2,
+ori_type,
+"offset",
+cd,
+f.flap,
+orate,
+close_time
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='ORIFICE';
 
 
 DROP VIEW IF EXISTS vi_weirs;
 CREATE OR REPLACE VIEW vi_weirs AS 
- SELECT arc_id,
-    node_1,
-    node_2,
-    inp_typevalue.idval AS weir_type,
-    "offset",
-    cd,
-    i.flap,
-    ec,
-    cd2,
-    surcharge,
-    road_width,
-    road_surf,
-    coef_curve
-  FROM temp_arc
-  WHERE type='WEIR';
+SELECT arc_id,
+node_1,
+node_2,
+weir_type,
+"offset",
+cd,
+f.flap,
+ec,
+cd2,
+surcharge,
+road_width,
+road_surf,
+coef_curve
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='WEIR';
 
 
 DROP VIEW IF EXISTS vi_pumps;
 CREATE OR REPLACE VIEW vi_pumps AS 
- SELECT arc_id,
-    node_1,
-    node_2,
-    curve_id,
-    status,
-    startup,
-    shutoff
-	FROM temp_arc
-	WHERE type='PUMP';
+SELECT arc_id,
+node_1,
+node_2,
+curve_id,
+status,
+startup,
+shutoff
+FROM temp_arc_flowregulator
+JOIN temp_arc USING (arc_id)
+WHERE type='PUMP';
   
 
 DROP VIEW IF EXISTS vi_xsections;
