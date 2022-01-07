@@ -160,6 +160,3 @@ UPDATE sys_fprocess SET isaudit = FALSE WHERE fid IN ('349', '350', '351', '352'
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
 VALUES('v_edit_cat_dscenario', 'Table to manage dynamic scenarios', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Dscenario catalog', 2, 'core');
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3120, 'gw_trg_ui_rpt_cat_result', 'utils', 'function trigger', null, null, 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;

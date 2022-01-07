@@ -27,7 +27,7 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
-UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
+UPDATE arc SET pavcat_id = 'Asphalt';
 	
 TRUNCATE plan_psector_x_arc;
 INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);

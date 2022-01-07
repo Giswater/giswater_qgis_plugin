@@ -51,7 +51,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_weir", "column":"road_surf", "dataType":"varchar(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_weir", "column":"coef_curve", "dataType":"float", "isUtils":"False"}}$$);
 
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_subcatchment", "column":"nperv_pattern_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_subcatchment", "column":"dstore_pattern_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_subcatchment", "column":"infil_pattern_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
@@ -348,3 +347,5 @@ ALTER TABLE inp_coverage_land_x_subc RENAME TO inp_coverage;
 ALTER TABLE inp_loadings_pol_x_subc RENAME TO inp_loadings;
 
 ALTER TABLE inp_inflows_pol_x_node RENAME TO inp_inflows_pol;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_conduit", "column":"inlet_offset", "dataType":"float", "isUtils":"False"}}$$);

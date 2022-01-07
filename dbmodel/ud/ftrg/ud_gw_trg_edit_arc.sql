@@ -378,7 +378,7 @@ BEGIN
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id);
+			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id);
 		ELSE
 			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
@@ -391,7 +391,7 @@ BEGIN
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.lastupdate, NEW.lastupdate_user, 
-			NEW.asset_id);		
+			NEW.asset_id, NEW.pavcat_id);		
 		END IF;
 		
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
@@ -406,7 +406,7 @@ BEGIN
 			
 		IF v_man_table='man_conduit' THEN
 			
-			INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
+			INSERT INTO man_conduit VALUES (NEW.arc_id, NEW.inlet_offset);
 		
 		ELSIF v_man_table='man_siphon' THEN
 							
@@ -603,7 +603,7 @@ BEGIN
 			verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id
+			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id
 			WHERE arc_id=OLD.arc_id;	
 		ELSE
 			UPDATE arc
@@ -615,14 +615,14 @@ BEGIN
 			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user, matcat_id=NEW.matcat_id,
-			asset_id=NEW.asset_id
+			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id
 			WHERE arc_id=OLD.arc_id;	
 		END IF;
 
 		-- child tables fields
 		IF v_man_table='man_conduit' THEN
 
-			UPDATE man_conduit SET arc_id=NEW.arc_id WHERE arc_id=OLD.arc_id;
+			UPDATE man_conduit SET arc_id=NEW.arc_id, inlet_offset = NEW.inlet_offset WHERE arc_id=OLD.arc_id;
 			
 		ELSIF v_man_table='man_siphon' THEN			
 

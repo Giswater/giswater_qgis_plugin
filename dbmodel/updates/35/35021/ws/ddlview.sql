@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 --2021/12/22
 CREATE OR REPLACE VIEW v_edit_sector AS 
  SELECT sector.sector_id,
@@ -189,13 +190,6 @@ CREATE OR REPLACE VIEW vi_tags AS
    FROM inp_tags
   ORDER BY inp_tags.feature_type;
 
-CREATE TRIGGER gw_trg_vi_tags
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON vi_tags
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_vi('vi_tags');
-
-
 
 CREATE OR REPLACE VIEW vi_curves AS 
  SELECT
@@ -243,6 +237,7 @@ SELECT temp_demand.feature_id,
    FROM temp_demand
    JOIN temp_node ON temp_demand.feature_id::text = temp_node.node_id::text
    ORDER BY 1,4;
+
      
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_demand AS 
  SELECT inp_dscenario_demand.dscenario_id,
@@ -325,23 +320,6 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
    FROM selector_sector, v_node n
      JOIN inp_inlet USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS 
- SELECT DISTINCT ON (result_id) 
-    rpt_cat_result.result_id,
-    rpt_cat_result.cur_user,
-    rpt_cat_result.exec_date,
-    inp_typevalue.idval AS status,
-    rpt_cat_result.export_options,
-    rpt_cat_result.network_stats,
-    rpt_cat_result.inp_options,
-    rpt_cat_result.rpt_stats
-   FROM selector_expl s, rpt_cat_result
-     JOIN inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
-  WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text
-  AND ((s.expl_id = rpt_cat_result.expl_id AND s.cur_user = current_user)
-  OR rpt_cat_result.expl_id is null);
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS 
@@ -605,3 +583,140 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
     v_node n
      JOIN inp_shortpipe USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vu_arc AS 
+ WITH query_node AS (
+         SELECT node.node_id,
+            node.elevation,
+            node.depth,
+            cat_node.nodetype_id,
+            node.staticpressure
+           FROM node
+             JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+        )
+ SELECT arc.arc_id,
+    arc.code,
+    arc.node_1,
+    arc.node_2,
+    a.elevation AS elevation1,
+    a.depth AS depth1,
+    b.elevation AS elevation2,
+    b.depth AS depth2,
+    arc.arccat_id,
+    cat_arc.arctype_id AS arc_type,
+    cat_feature.system_id AS sys_type,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.pnom AS cat_pnom,
+    cat_arc.dnom AS cat_dnom,
+    arc.epa_type,
+    arc.expl_id,
+    exploitation.macroexpl_id,
+    arc.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    arc.state,
+    arc.state_type,
+    arc.annotation,
+    arc.observ,
+    arc.comment,
+    st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+    arc.custom_length,
+    arc.minsector_id,
+    arc.dma_id,
+    dma.name AS dma_name,
+    dma.macrodma_id,
+    arc.presszone_id,
+    presszone.name AS presszone_name,
+    arc.dqa_id,
+    dqa.name AS dqa_name,
+    dqa.macrodqa_id,
+    arc.soilcat_id,
+    arc.function_type,
+    arc.category_type,
+    arc.fluid_type,
+    arc.location_type,
+    arc.workcat_id,
+    arc.workcat_id_end,
+    arc.buildercat_id,
+    arc.builtdate,
+    arc.enddate,
+    arc.ownercat_id,
+    arc.muni_id,
+    arc.postcode,
+    arc.district_id,
+    c.descript::character varying(100) AS streetname,
+    arc.postnumber,
+    arc.postcomplement,
+    d.descript::character varying(100) AS streetname2,
+    arc.postnumber2,
+    arc.postcomplement2,
+    arc.descript,
+    concat(cat_feature.link_path, arc.link) AS link,
+    arc.verified,
+    arc.undelete,
+    cat_arc.label,
+    arc.label_x,
+    arc.label_y,
+    arc.label_rotation,
+    arc.publish,
+    arc.inventory,
+    arc.num_value,
+    cat_arc.arctype_id AS cat_arctype_id,
+    a.nodetype_id AS nodetype_1,
+    a.staticpressure AS staticpress1,
+    b.nodetype_id AS nodetype_2,
+    b.staticpressure AS staticpress2,
+    date_trunc('second'::text, arc.tstamp) AS tstamp,
+    arc.insert_user,
+    date_trunc('second'::text, arc.lastupdate) AS lastupdate,
+    arc.lastupdate_user,
+    arc.the_geom,
+    arc.depth,
+    arc.adate,
+    arc.adescript,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    arc.workcat_id_plan,
+    arc.asset_id,
+	arc.pavcat_id
+   FROM arc
+     LEFT JOIN sector ON arc.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
+     LEFT JOIN dma ON arc.dma_id = dma.dma_id
+     LEFT JOIN query_node a ON a.node_id::text = arc.node_1::text
+     LEFT JOIN query_node b ON b.node_id::text = arc.node_2::text
+     LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text;
+
+
+CREATE OR REPLACE VIEW v_arc AS 
+SELECT * FROM vu_arc
+JOIN v_state_arc USING (arc_id);
+
+CREATE OR REPLACE VIEW v_edit_arc AS 
+SELECT * FROM v_arc;
+
+CREATE OR REPLACE VIEW ve_arc AS 
+SELECT * FROM v_arc;
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"ARC"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"pavcat_id" }}$$);
+
+
+CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
+ SELECT a.arc_id,
+        CASE 
+            WHEN v_price_x_catpavement.thickness IS NULL THEN 0::numeric(12,2)
+            ELSE v_price_x_catpavement.thickness::numeric(12,2)
+        END AS thickness,
+        CASE
+            WHEN v_price_x_catpavement.m2pav_cost IS NULL THEN 0::numeric
+            ELSE v_price_x_catpavement.m2pav_cost::numeric
+        END AS m2pav_cost
+   FROM v_edit_arc a
+     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text;

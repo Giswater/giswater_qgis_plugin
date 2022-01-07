@@ -40,18 +40,3 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
   WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text
   AND ((s.expl_id = rpt_cat_result.expl_id AND s.cur_user = current_user)
   OR rpt_cat_result.expl_id is null);
-  
-  
-CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
- SELECT plan_arc_x_pavement.arc_id,
-        CASE 
-            WHEN v_price_x_catpavement.thickness IS NULL THEN 0::numeric(12,2)
-            ELSE v_price_x_catpavement.thickness::numeric(12,2)
-        END AS thickness,
-        CASE
-            WHEN v_price_x_catpavement.m2pav_cost IS NULL THEN 0::numeric(12,2)
-            ELSE v_price_x_catpavement.m2pav_cost::numeric(12,2)
-        END AS m2pav_cost
-   FROM v_edit_arc a
-     LEFT JOIN plan_arc_x_pavement USING (arc_id)
-     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text;

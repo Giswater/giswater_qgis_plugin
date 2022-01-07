@@ -31,7 +31,7 @@ INSERT INTO config_graf_inlet VALUES (113766, 1);
 INSERT INTO config_graf_inlet VALUES (113952, 2);
 
 
-UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
+UPDATE arc SET pavcat_id = 'Asphalt';
 
 UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
 

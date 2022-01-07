@@ -9,6 +9,7 @@
 - Refactor how demands are used for EPANET
 - Refactor how CRM is used on EPANET
 - Improve the write inp file creating ';xxxx' valous additional info to trace and debug
-- New column expl_id for catalogs of hydrololgy, dwf_scenario, dscenario
+- New column expl_id for catalogs of hydrololgy, dwf_scenario, dscenario and rpt_cat_result
 - New edit filtered views for catalogs of hydrololgy, dwf_scenario, dscenario
 - New column isaudit on sys_fprocess to config which fid's are auditable or not
+- Refactor of pavcat_id strategy. From independent table to arc (and related views)

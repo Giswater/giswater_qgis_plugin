@@ -8,6 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/01/02
+CREATE TRIGGER gw_trg_vi_tags
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_tags
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_tags');
+
+
 CREATE TRIGGER gw_trg_vi_demands
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON vi_demands

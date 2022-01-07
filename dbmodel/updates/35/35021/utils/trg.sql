@@ -15,8 +15,8 @@ CREATE TRIGGER gw_trg_edit_cat_dscenario
   EXECUTE PROCEDURE gw_trg_edit_cat_dscenario();
   
    
-CREATE TRIGGER gw_trg_ui_rpt_cat_result;
+CREATE TRIGGER gw_trg_ui_rpt_cat_result
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ud_sample.v_ui_plan_psector
+  ON v_ui_rpt_cat_result
   FOR EACH ROW
-  EXECUTE PROCEDURE ud_sample.gw_trg_ui_plan_psector();
+  EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();
