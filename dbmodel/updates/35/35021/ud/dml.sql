@@ -20,7 +20,6 @@ INSERT INTO config_toolbox VALUES (3118, 'Create Dscenario with values from ToC'
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}]' ,
   NULL,TRUE)  ON CONFLICT (id) DO NOTHING;
 
-
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
 VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Hydrology catalog',1,'core');
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
@@ -38,7 +37,6 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','TREATMENT','TREATME
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OTHER','OTHER');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JOINED','JOINED');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED');
-
 
 INSERT INTO inp_typevalue VALUES ('inp_value_surface','PAVED','PAVED');
 INSERT INTO inp_typevalue VALUES ('inp_value_surface','GRAVEL','GRAVEL');
@@ -71,10 +69,10 @@ INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source)
 VALUES('v_edit_inp_dscenario_inflows', 'Editable view to manage scenario for inflows','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario inflows', 10 ,'core');
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_inflows_pol_x_node', 'Editable view to manage scenario for inflows','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario inflows', 10 ,'core');
+VALUES('v_edit_inp_dscenario_inflows_pol', 'Editable view to manage scenario for inflows','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario inflows', 10 ,'core');
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_treatment_node_x_pol', 'Editable view to manage scenario for treatment','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario treatment', 11 ,'core');
+VALUES('v_edit_inp_dscenario_treatment_pol', 'Editable view to manage scenario for treatment','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario treatment', 11 ,'core');
 
 UPDATE sys_table SET id = 'inp_hydrograph_value' WHERE id = 'inp_hydrograph';
 UPDATE sys_table SET id = 'inp_hydrograph' WHERE id = 'inp_hydrograph_id';
@@ -84,6 +82,7 @@ UPDATE sys_table SET id = 'inp_coverage' WHERE id = 'inp_coverage_land_x_subc';
 UPDATE sys_table SET id = 'inp_loadings' WHERE id = 'inp_loadings_pol_x_subc';
 UPDATE sys_table SET id = 'inp_washoff' WHERE id = 'inp_washoff_land_x_pol';
 UPDATE sys_table SET id = 'inp_buildup' WHERE id = 'inp_buildup_land_x_pol';
+UPDATE sys_table SET id = 'inp_inflows_pol' WHERE id = 'inp_inflows_pol_x_node';
 
 
 INSERT INTO sys_table (id, descript, sys_role) 
@@ -111,7 +110,7 @@ INSERT INTO sys_table (id, descript, sys_role)
 VALUES('inp_dscenario_inflows', 'Table to manage scenario for inflows','role_epa');
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_inflows_pol_x_node', 'Table to manage scenario for inflows','role_epa');
+VALUES('inp_dscenario_inflows_pol', 'Table to manage scenario for inflows','role_epa');
 
 INSERT INTO sys_table (id, descript, sys_role) 
 VALUES('inp_dscenario_treatment', 'Table to manage scenario for treatment','role_epa';

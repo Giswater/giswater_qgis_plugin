@@ -77,6 +77,7 @@ a.value
  WHERE (s.expl_id = c.expl_id AND cur_user = current_user)
  OR c.expl_id is null;
 
+
 CREATE VIEW v_edit_cat_hydrology AS
 SELECT DISTINCT ON (hydrology_id)
 hydrology_id,
@@ -92,328 +93,406 @@ OR c.expl_id is null;
 
 
 
+CREATE OR REPLACE VIEW v_edit_inp_weir AS 
+ SELECT v_arc.arc_id,
+    v_arc.node_1,
+    v_arc.node_2,
+    v_arc.y1,
+    v_arc.custom_y1,
+    v_arc.elev1,
+    v_arc.custom_elev1,
+    v_arc.sys_elev1,
+    v_arc.y2,
+    v_arc.custom_y2,
+    v_arc.elev2,
+    v_arc.custom_elev2,
+    v_arc.sys_elev2,
+    v_arc.arccat_id,
+    v_arc.gis_length,
+    v_arc.sector_id,
+    v_arc.macrosector_id,
+    v_arc.state,
+    v_arc.state_type,
+    v_arc.annotation,
+    v_arc.inverted_slope,
+    v_arc.custom_length,
+    v_arc.expl_id,
+    inp_weir.weir_type,
+    inp_weir."offset",
+    inp_weir.cd,
+    inp_weir.ec,
+    inp_weir.cd2,
+    inp_weir.flap,
+    inp_weir.geom1,
+    inp_weir.geom2,
+    inp_weir.geom3,
+    inp_weir.geom4,
+    inp_weir.surcharge,
+    v_arc.the_geom,
+    road_width,  
+    road_surf,
+    coef_curve
+   FROM selector_sector, v_arc
+   JOIN inp_weir USING (arc_id)
+   WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_orifice AS 
+ SELECT v_arc.arc_id,
+    v_arc.node_1,
+    v_arc.node_2,
+    v_arc.y1,
+    v_arc.custom_y1,
+    v_arc.elev1,
+    v_arc.custom_elev1,
+    v_arc.sys_elev1,
+    v_arc.y2,
+    v_arc.custom_y2,
+    v_arc.elev2,
+    v_arc.custom_elev2,
+    v_arc.sys_elev2,
+    v_arc.arccat_id,
+    v_arc.gis_length,
+    v_arc.sector_id,
+    v_arc.macrosector_id,
+    v_arc.state,
+    v_arc.state_type,
+    v_arc.annotation,
+    v_arc.inverted_slope,
+    v_arc.custom_length,
+    v_arc.expl_id,
+    inp_orifice.ori_type,
+    inp_orifice."offset",
+    inp_orifice.cd,
+    inp_orifice.orate,
+    inp_orifice.flap,
+    inp_orifice.shape,
+    inp_orifice.geom1,
+    inp_orifice.geom2,
+    inp_orifice.geom3,
+    inp_orifice.geom4,
+    v_arc.the_geom,
+    close_time
+   FROM selector_sector, v_arc
+     JOIN inp_orifice USING (arc_id)
+  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
 
 CREATE VIEW v_edit_inp_flwreg_weir AS
-id,
-  node_id,
-  concat(node_id, to_arc, flwreg_id)
-  to_arc,
-  flwreg_id,
-  flwreg_length,
-  weir_type,
-  "offset",
-  cd,
-  ec,
-  cd2, 
-  flap, 
-  geom1, 
-  geom2,
-  geom3,
-  geom4,
-  surcharge,
-  road_width, 
-  road_surf,
-  coef_curve,
-  the_geom,
+SELECT
+concat(node_id,'_wei',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+weir_type,
+"offset",
+cd,
+ec,
+cd2, 
+flap, 
+geom1, 
+geom2,
+geom3,
+geom4,
+surcharge,
+road_width, 
+road_surf,
+coef_curve,
+the_geom
 FROM inp_flwreg_weir f
-  JOIN node USING (node_id);
-
+JOIN node USING (node_id);
 
 
 CREATE VIEW v_edit_inp_flwreg_pump AS
-id 
-  node_id 
-  concat(node_id, to_arc, flwreg_id)
-  to_arc 
-  flwreg_id 
-  flwreg_length
-  curve_id
-  status
-  startup
-  shutoff
-  the_geom
-  FROM inp_flwreg_pump f
-  JOIN node USING (node_id);
+SELECT
+concat(node_id,'_pum',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+curve_id,
+status,
+startup,
+shutoff,
+the_geom
+FROM inp_flwreg_pump f
+JOIN node USING (node_id);
 
   
 
 CREATE VIEW v_edit_inp_flwreg_orifice AS
-  id,
-  node_id ,
-  concat(node_id, to_arc, flwreg_id)
-  to_arc
-  flwreg_id 
-  flwreg_length 
-  ori_type 
-  "offset" 
-  cd 
-  orate 
-  flap 
-  shape 
-  geom1 
-  geom2
-  geom3 
-  geom4 
-  close_time,
-  the_geom
-  FROM inp_flwreg_orifice f
-  JOIN node USING (node_id);
+SELECT
+concat(node_id,'_ori',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+ori_type, 
+"offset", 
+cd, 
+orate,
+flap, 
+shape, 
+geom1, 
+geom2,
+geom3, 
+geom4, 
+close_time,
+the_geom
+FROM inp_flwreg_orifice f
+JOIN node USING (node_id);
 
 
-
-
-CREATE VIEW v_edit_inp_flwreg_outlet AS;
-id 
-  node_id
-  concat(node_id, to_arc, flwreg_id)
-  to_arc 
-  flwreg_id
-  flwreg_length 
-  outlet_type 
-  "offset" 
-  curve_id 
-  cd1 
-  cd2 
-  flap
-  the_geom
+CREATE VIEW v_edit_inp_flwreg_outlet AS
+SELECT
+concat(node_id,'_out',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc, 
+flwreg_length,
+outlet_type, 
+"offset", 
+curve_id, 
+cd1, 
+cd2, 
+flap,
+the_geom
 FROM inp_flwreg_outlet f
-  JOIN node USING (node_id);
+JOIN node USING (node_id);
+
+
+CREATE VIEW v_edit_inp_dscenario_outfall AS
+SELECT
+s.dscenario_id,
+node_id, 
+outfall_type,
+stage, 
+curve_id,
+timser_id, 
+gate, 
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_outfall f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
+CREATE VIEW v_edit_inp_dscenario_storage AS
+SELECT
+s.dscenario_id,
+node_id, 
+storage_type,
+curve_id, 
+a1, 
+a2, 
+a0, 
+fevap, 
+sh, 
+hc, 
+imd, 
+y0,
+ysur,
+apond,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_storage f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
+CREATE VIEW v_edit_inp_dscenario_divider AS
+SELECT
+s.dscenario_id,
+node_id, 
+divider_type,
+f.arc_id, 
+curve_id,
+qmin, 
+ht, 
+cd, 
+y0, 
+ysur,
+apond 
+FROM selector_inp_dscenario s, inp_dscenario_divider f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
+CREATE VIEW v_edit_inp_dscenario_flwreg_weir AS
+SELECT
+s.dscenario_id,
+concat(node_id,'_wei',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+weir_type,
+"offset",
+cd,
+ec,
+cd2, 
+flap, 
+geom1, 
+geom2,
+geom3,
+geom4,
+surcharge,
+road_width, 
+road_surf,
+coef_curve,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 
-
-CREATE VIEW v_edit_inp_dscenario_outfall AS;
-dscenario_id 
- node_id 
-  outfall_type
-  stage 
-  curve_id 
-  timser_id 
-  gate 
-  the_geom
-  FROM selector_dscenario s, inp_dscenario_outfall f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
-
-CREATE VIEW v_edit_inp_dscenario_storage AS;
-dscenario_id
-node_id 
-  storage_type 
-  curve_id 
-  a1 
-  a2 
-  a0 
-  fevap 
-  sh 
-  hc 
-  imd 
-  y0
-  ysur 
-  apond 
- FROM selector_dscenario s, inp_dscenario_storage f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+CREATE VIEW v_edit_inp_dscenario_flwreg_pump AS
+SELECT
+s.dscenario_id,
+concat(node_id,'_pum',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+curve_id,
+status,
+startup,
+shutoff,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_dscenario_divider AS;
-dscenario_id 
-node_id 
-  divider_type
-  arc_id 
-  curve_id
-  qmin 
-  ht 
-  cd 
-  y0 
-  ysur
-  apond 
-FROM selector_dscenario s, inp_dscenario_divider f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
-
-CREATE VIEW v_edit_inp_dscenario_flwreg_weir AS;
-id,
- dscenario_id,
-  node_id,
-  concat(node_id, to_arc, flwreg_id)
-  to_arc,
-  flwreg_id,
-  flwreg_length,
-  weir_type,
-  "offset",
-  cd,
-  ec,
-  cd2, 
-  flap, 
-  geom1, 
-  geom2,
-  geom3,
-  geom4,
-  surcharge,
-  road_width, 
-  road_surf,
-  coef_curve,
-  the_geom
-  FROM selector_dscenario s, inp_dscenario_flwreg_orifice f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
-
-
-CREATE VIEW v_edit_inp_dscenario_flwreg_pump AS;
-id 
-  dscenario_id
-  node_id 
-  concat(node_id, to_arc, flwreg_id)
-  to_arc 
-  flwreg_id 
-  flwreg_length
-  curve_id
-  status
-  startup
-  shutoff
-  the_geom
-  FROM selector_dscenario s, inp_flwreg_pump f
-  JOIN node USING (node_id)
-   WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
-  
-  
 
 CREATE VIEW v_edit_inp_dscenario_flwreg_orifice AS
 SELECT
-  id,
-  dscenario_id,
-  node_id ,
-  concat(node_id, to_arc, flwreg_id)
-  to_arc
-  flwreg_id 
-  flwreg_length 
-  ori_type 
-  "offset" 
-  cd 
-  orate 
-  flap 
-  shape 
-  geom1 
-  geom2
-  geom3 
-  geom4 
-  close_time,
-  the_geom
-  FROM selector_dscenario s, inp_dscenario_flwreg_orifice f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-    
-  
+s.dscenario_id,
+concat(node_id,'_ori',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+ori_type,
+"offset",
+cd,
+orate,
+flap,
+shape, 
+geom1, 
+geom2,
+geom3,
+geom4, 
+close_time,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
-CREATE VIEW v_edit_inp_dscenario_flwreg_outlet
-id 
-  dscenario_id,
-  node_id
-  concat(node_id, to_arc, flwreg_id)
-  to_arc 
-  flwreg_id
-  flwreg_length 
-  outlet_type 
-  "offset" 
-  curve_id 
-  cd1 
-  cd2 
-  flap
-  the_geom
- FROM selector_dscenario s, inp_dscenario_flwreg_outlet f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-  
+
+
+CREATE VIEW v_edit_inp_dscenario_flwreg_outlet AS
+SELECT
+s.dscenario_id,
+concat(node_id,'_out',order_id) as nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+outlet_type,
+"offset",
+curve_id,
+cd1,
+cd2,
+flap,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 CREATE VIEW v_edit_inp_inflows AS
-id
-  node_id 
-  timser_id
-  format_type
-  mfactor 
-  sfactor 
-  base 
-  pattern_id 
-  the_geom
+SELECT
+node_id,
+order_id,
+timser_id,
+format_type,
+mfactor,
+sfactor,
+base,
+pattern_id,
+the_geom
 FROM inp_inflows
-  JOIN node USING (node_id)
+JOIN node USING (node_id);
 
 
 CREATE VIEW v_edit_inp_dscenario_inflows AS
-id
-dscenario_id
-  node_id 
-  timser_id
-  format_type
-  mfactor 
-  sfactor 
-  base 
-  pattern_id 
-  the_geom
- FROM selector_dscenario s, inp_dscenario_inflows f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+SELECT
+s.dscenario_id,
+node_id,
+order_id,
+timser_id,
+format_type,
+mfactor,
+sfactor,
+base,
+pattern_id,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_inflows f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-
-CREATE VIEW v_edit_inp_inflows_node_x_pol AS
- poll_id 
-  node_id
-  timser_id
-  form_type
-  mfactor 
-  sfactor 
-  base 
-  pattern_id
-  the_geom
-FROM inp_inflows_node_x_pol
-  JOIN node USING (node_id)
-
-
-
-CREATE VIEW v_edit_inp_dscenario_inflows_node_x_pol AS
-dscenario_id
- poll_id 
-  node_id
-  timser_id
-  form_type
-  mfactor 
-  sfactor 
-  base 
-  pattern_id
-  the_geom
- FROM selector_dscenario s, inp_inflows_node_x_pol f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+CREATE VIEW v_edit_inp_inflows_pol AS
+SELECT
+poll_id,
+node_id,
+timser_id,
+form_type,
+mfactor,
+sfactor,
+base,
+pattern_id,
+the_geom
+FROM inp_inflows_pol
+JOIN node USING (node_id);
 
 
-  
+CREATE VIEW v_edit_inp_dscenario_inflows_pol AS
+SELECT
+s.dscenario_id,
+poll_id,
+node_id,
+timser_id,
+form_type,
+mfactor,
+sfactor,
+base,
+pattern_id,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_inflows_pol f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
 CREATE VIEW v_edit_inp_treatment AS
-  node_id 
-  poll_id 
-  function
-  the_geom
+SELECT
+node_id,
+poll_id,
+function,
+the_geom
 FROM inp_treatment
-  JOIN node USING (node_id);
-  
+JOIN node USING (node_id);
+
 
 CREATE VIEW v_edit_inp_dscenario_treatment AS
-  dscenario_id
-  node_id 
-  poll_id 
-  function
-  the_geom
- FROM selector_dscenario s, inp_dscenario_treatment f
-  JOIN node USING (node_id)
-  WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
-  
-  
-  
-    
- 
+SELECT
+s.dscenario_id,
+node_id, 
+poll_id, 
+function,
+the_geom
+FROM selector_inp_dscenario s, inp_dscenario_treatment f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;

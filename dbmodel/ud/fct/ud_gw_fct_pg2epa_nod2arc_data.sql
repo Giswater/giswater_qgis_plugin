@@ -55,25 +55,25 @@ BEGIN
 	SELECT * INTO record_new_arc FROM temp_arc LIMIT 1;
     
     FOR rec_flowreg IN
-	SELECT temp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id  
+	SELECT temp_node.node_id, order_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id  
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
+	SELECT temp_node.node_id, order_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
+	SELECT temp_node.node_id, order_id,  to_arc, flwreg_length, 'pum'::text as flw_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, flwreg_id, to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
+	SELECT temp_node.node_id, order_id, to_arc, flwreg_length, 'wei'::text as flw_type FROM inp_flwreg_weir 
 	JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
-	ORDER BY node_id, to_arc DESC, flwreg_id ASC
+	ORDER BY node_id, to_arc DESC, order_id ASC
 
 	LOOP
 
 		IF rec_flowreg.flw_type='ori' THEN epa_type_aux='ORIFICE';
-		ELSIF rec_flowreg.flw_type='pump' THEN epa_type_aux='PUMP';
+		ELSIF rec_flowreg.flw_type='pum' THEN epa_type_aux='PUMP';
 		ELSIF rec_flowreg.flw_type='out' THEN epa_type_aux='OUTLET';
-		ELSIF rec_flowreg.flw_type='weir' THEN epa_type_aux='WEIR';
+		ELSIF rec_flowreg.flw_type='wei' THEN epa_type_aux='WEIR';
 		END IF;
 
 		IF old_node_id= rec_flowreg.node_id AND old_to_arc =rec_flowreg.to_arc THEN
@@ -91,7 +91,7 @@ BEGIN
 			
 			-- Id creation from pattern arc 
 			record_new_arc.arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc,counter);
-			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
+			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type,rec_flowreg.order_id);
 
 			-- Copiyng values from patter arc
 			record_new_arc.node_1 = nodarc_rec.node_1;
@@ -134,7 +134,7 @@ BEGIN
 			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc);
 			
 			-- updating flw_code
-			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
+			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type,',rec_flowreg.order_id);
 
 			-- udpating the feature
 			UPDATE temp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
@@ -145,7 +145,7 @@ BEGIN
 		old_to_arc= rec_flowreg.to_arc;
 
 		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
-		IF rec_flowreg.flw_type='pump' THEN
+		IF rec_flowreg.flw_type='pum' THEN
 			UPDATE temp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
 		

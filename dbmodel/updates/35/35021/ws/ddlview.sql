@@ -448,8 +448,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS
 DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS 
  SELECT d.dscenario_id,
-    p.node_id,
     concat(p.node_id, '_n2a') as nodarc_id,
+    p.node_id,
     p.minorloss,
     p.status
    FROM selector_sector,
@@ -482,8 +482,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
  SELECT d.dscenario_id,
+     concat(p.node_id, '_n2a') as nodarc_id,
     p.node_id,
-    concat(p.node_id, '_n2a') as nodarc_id,
     p.valv_type,
     p.pressure,
     p.flow,
@@ -524,8 +524,9 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS
 
 DROP VIEW IF EXISTS v_edit_inp_pump;
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
- SELECT n.node_id,
+ SELECT
     concat(n.node_id, '_n2a') as nodarc_id,
+	n.node_id,
     n.elevation,
     n.depth,
     n.nodecat_id,
@@ -552,8 +553,9 @@ CREATE OR REPLACE VIEW v_edit_inp_pump AS
 
 DROP VIEW v_edit_inp_valve;
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
- SELECT v_node.node_id,
+ SELECT 
     concat(v_node.node_id, '_n2a') as nodarc_id,
+    v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
@@ -582,8 +584,9 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
 
 DROP VIEW v_edit_inp_shortpipe;
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
- SELECT n.node_id,
+ SELECT 
     concat(n.node_id, '_n2a') as nodarc_id,
+    n.node_id,
     n.elevation,
     n.depth,
     n.nodecat_id,
