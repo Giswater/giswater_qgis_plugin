@@ -4,9 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
 
 INSERT INTO inp_gully (gully_id, isepa, efficiency)
 SELECT gully_id, true, 1 FROM gully where state > 0;
@@ -27,8 +25,6 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
-UPDATE arc SET pavcat_id = 'Asphalt';
-	
 TRUNCATE plan_psector_x_arc;
 INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL);
@@ -198,6 +194,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"weir_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Weir param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
+
 
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo1','combo1');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo2','combo2');
