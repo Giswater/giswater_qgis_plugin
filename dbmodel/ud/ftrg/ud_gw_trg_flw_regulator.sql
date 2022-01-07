@@ -38,9 +38,9 @@ BEGIN
 	END IF;
 	
 	-- flowreg_id
-	IF NEW.flwreg_id IS NULL THEN
-		EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc='||quote_literal(NEW.to_arc)||' AND node_id='||quote_literal(NEW.node_id) INTO  NEW.flwreg_id;
-		NEW.flwreg_id=NEW.flwreg_id+1;
+	IF NEW.order_id IS NULL THEN
+		EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc='||quote_literal(NEW.to_arc)||' AND node_id='||quote_literal(NEW.node_id) INTO  NEW.order_id;
+		NEW.order_id=NEW.order_id+1;
 	END IF;
 
 	-- specific flow regulators
