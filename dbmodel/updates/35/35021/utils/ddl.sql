@@ -64,8 +64,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 
 UPDATE arc a SET pavcat_id = p.pavcat_id FROM plan_arc_x_pavement p WHERE percent = 1 AND p.arc_id = a.arc_id;
 
-ALTER TABLE plan_arc_x_pavement RENAME to _plan_arc_x_pavement_;
-
 DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
 
 ALTER TABLE arc ADD CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id) 

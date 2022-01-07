@@ -93,7 +93,7 @@ UPDATE sys_table SET id = 'inp_coverage' WHERE id = 'inp_coverage_land_x_subc';
 UPDATE sys_table SET id = 'inp_loadings' WHERE id = 'inp_loadings_pol_x_subc';
 UPDATE sys_table SET id = 'inp_washoff' WHERE id = 'inp_washoff_land_x_pol';
 UPDATE sys_table SET id = 'inp_buildup' WHERE id = 'inp_buildup_land_x_pol';
-UPDATE sys_table SET id = 'inp_inflows_pol' WHERE id = 'inp_inflows_pol_x_node';
+UPDATE sys_table SET id = 'inp_inflows_poll' WHERE id = 'inp_inflows_pol_x_node';
 
 
 INSERT INTO sys_table (id, descript, sys_role) 
@@ -125,3 +125,9 @@ VALUES('inp_dscenario_inflows_pol', 'Table to manage scenario for inflows','role
 
 INSERT INTO sys_table (id, descript, sys_role) 
 VALUES('inp_dscenario_treatment', 'Table to manage scenario for treatment','role_epa');
+
+INSERT INTO sys_table (id, descript, sys_role) 
+VALUES('temp_flowregulator', 'Table to use on pg2epa export for flowregulators (outlet, orifice, weir, pump','role_epa');
+
+INSERT INTO sys_table (id, descript, sys_role) 
+VALUES('temp_node1n', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa');

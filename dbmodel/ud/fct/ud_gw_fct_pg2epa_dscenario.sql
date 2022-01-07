@@ -71,7 +71,11 @@ BEGIN
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.qmax IS NOT NULL;
 		UPDATE temp_arc t SET seepage = d.seepage FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.seepage IS NOT NULL;
-
+		UPDATE temp_arc t SET y1 = d.y1 FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y1 IS NOT NULL;
+		UPDATE temp_arc t SET y2 = d.y2 FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y2 IS NOT NULL;
+		
 		-- arccat
 		UPDATE temp_arc t SET arccat_id = d.arccat_id FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arccat_id IS NOT NULL;
@@ -91,8 +95,11 @@ BEGIN
 		UPDATE temp_arc t SET n = d.custom_n FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_n IS NOT NULL;
 
-
 		-- update junctions
+		UPDATE temp_node t SET elev = d.elev FROM v_edit_inp_dscenario_junction d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.elev IS NOT NULL;		
+		UPDATE temp_node t SET ymax = d.ymax FROM v_edit_inp_dscenario_junction d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ymax IS NOT NULL;		
 		UPDATE temp_node t SET y0 = d.y0 FROM v_edit_inp_dscenario_junction d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;		
 		UPDATE temp_node t SET ysur = d.ysur FROM v_edit_inp_dscenario_junction d 
@@ -101,6 +108,27 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;	
 
 		-- TODO: update outfallparam
+
+		-- update dividers
+
+		-- update outfalls
+
+		-- update storage
+
+		-- update flwreg orifice
+
+		-- update flwreg outlet
+		
+		-- update flwreg pump
+
+		-- update flwreg weir
+
+		-- update inflows
+
+		-- update inflows poll
+
+		-- update treatment
+		
 			
 	END IF;
 

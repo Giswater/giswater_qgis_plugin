@@ -104,12 +104,49 @@ BEGIN
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
 		-- getting columns
-		IF v_table  = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam json';
-		ELSIF v_table  = 'inp_dscenario_conduit' THEN
-			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage';
-		ELSIF v_table  = 'inp_dscenario_raingage' THEN
+		
+		
+		IF v_table = 'inp_dscenario_conduit' THEN
+			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, y1, y2, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage';
+			
+		ELSIF v_table = 'inp_dscenario_divider' THEN
+			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
+
+		ELSIF v_table = 'inp_dscenario_flwreg_orifice' THEN
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length,  ori_type, "offset", cd, orate, flap, shape,
+			geom1, geom2, geom3, geom4, close_time';
+			
+	 	ELSIF v_table = 'inp_dscenario_flwreg_outlet' THEN
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, outlet_type, "offset", curve_id, cd1, cd2';
+
+	 	ELSIF v_table = 'inp_dscenario_flwreg_pump' THEN
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, curve_id, status, startup, shutoff';
+
+	 	ELSIF v_table = 'inp_dscenario_flwreg_weir' THEN
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, weir_type, "offset", cd, ec, 
+			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve';
+			
+		ELSIF v_table = 'inp_dscenario_inflows' THEN
+			v_columns = v_scenarioid||', node_id, order_id, timser_id, format_type, mfactor, sfactor, base, pattern_id';
+			
+	 	ELSIF v_table = 'inp_dscenario_inflows_poll' THEN
+			v_columns = v_scenarioid||', poll_id,  node_id, timser_id, form_type, mfactor, factor, base, pattern_id';
+						
+	 	ELSIF v_table = 'inp_dscenario_junction' THEN
+			v_columns = v_scenarioid||', node_id, elev, ymax, y0, ysur, apond, outfallparam';
+
+ 		ELSIF v_table = 'inp_dscenario_outfall' THEN
+			v_columns = v_scenarioid||', node_id, outfall_type, stage, curve_id, timser_id, gate';
+			
+		ELSIF v_table = 'inp_dscenario_raingage' THEN
 			v_columns = v_scenarioid||', rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units';
+	 		
+		ELSIF v_table = 'inp_dscenario_storage' THEN
+			v_columns = v_scenarioid||', node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond';
+
+	 	ELSIF v_table = 'inp_dscenario_treatment' THEN
+			v_columns = v_scenarioid||', node_id, poll_id, function';
+			
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
@@ -129,7 +166,8 @@ BEGIN
 			IF v_selectionmode = 'wholeSelection' THEN
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
 			ELSIF  v_selectionmode = 'previousSelection' THEN
-				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
+				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||
+				' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
 			END IF;
 
 			EXECUTE v_querytext;	

@@ -304,6 +304,8 @@ CREATE VIEW v_edit_inp_dscenario_divider AS
 SELECT
 s.dscenario_id,
 node_id, 
+f.elev,
+f.ymax,
 divider_type,
 f.arc_id, 
 curve_id,
@@ -412,13 +414,51 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
+DROP VIEW IF EXISTS v_edit_inp_dscenario_conduit;
+CREATE VIEW v_edit_inp_dscenario_conduit AS
+SELECT
+f.dscenario_id,
+arc_id,
+f.arccat_id,
+f.matcat_id,
+f.y1,
+f.y2,
+custom_n,
+barrels,
+culvert,
+kentry,
+kexit,
+kavg,
+flap,
+q0,
+qmax,
+seepage
+FROM selector_inp_dscenario s, inp_dscenario_conduit f
+JOIN arc USING (arc_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
+DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;
+CREATE VIEW v_edit_inp_dscenario_junction AS
+SELECT
+f.dscenario_id,
+node_id,
+f.elev,
+f.ymax,
+y0,
+ysur,
+apond,
+outfallparam
+FROM selector_inp_dscenario s, inp_dscenario_junction f
+JOIN node USING (node_id)
+WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
+
+
 CREATE VIEW v_edit_inp_inflows AS
 SELECT
 node_id,
 order_id,
 timser_id,
-format_type,
-mfactor,
 sfactor,
 base,
 pattern_id,
@@ -433,8 +473,6 @@ s.dscenario_id,
 node_id,
 order_id,
 timser_id,
-format_type,
-mfactor,
 sfactor,
 base,
 pattern_id,
@@ -444,10 +482,10 @@ JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE VIEW v_edit_inp_inflows_pol AS
+CREATE VIEW v_edit_inp_inflows_poll AS
 SELECT
-poll_id,
 node_id,
+poll_id,
 timser_id,
 form_type,
 mfactor,
@@ -455,11 +493,11 @@ sfactor,
 base,
 pattern_id,
 the_geom
-FROM inp_inflows_pol
+FROM inp_inflows_poll
 JOIN node USING (node_id);
 
 
-CREATE VIEW v_edit_inp_dscenario_inflows_pol AS
+CREATE VIEW v_edit_inp_dscenario_inflows_poll AS
 SELECT
 s.dscenario_id,
 poll_id,
@@ -471,7 +509,7 @@ sfactor,
 base,
 pattern_id,
 the_geom
-FROM selector_inp_dscenario s, inp_dscenario_inflows_pol f
+FROM selector_inp_dscenario s, inp_dscenario_inflows_poll f
 JOIN node USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
@@ -668,7 +706,7 @@ SELECT * FROM v_arc;
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"ARC"},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"pavcat_id" }}$$);
  
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"CONDUIT"},
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"CONDUIT"},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"inlet_offset" }}$$);
 
 CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
@@ -683,3 +721,155 @@ CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS
         END AS m2pav_cost
    FROM v_edit_arc a
      LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text;
+
+
+DROP VIEW IF EXISTS vi_inflows;
+CREATE VIEW vi_inflows AS
+SELECT
+node_id,
+type,
+timser_id,
+'FLOW'::text as format,
+1::numeric(12,4) as mfactor,
+sfactor,
+base,
+pattern_id
+FROM temp_node_other
+WHERE type = 'FLOW'
+UNION
+SELECT
+node_id,
+poll_id,
+timser_id,
+other as format,
+mfactor,
+sfactor,
+base,
+pattern_id
+FROM temp_node_other
+WHERE type ='POLLUTANT';
+
+
+DROP VIEW IF EXISTS vi_treatment;
+CREATE OR REPLACE VIEW vi_treatment AS 
+ SELECT 
+node_id,
+poll_id,
+other as function
+FROM temp_node_other
+WHERE type = 'TREATMENT';
+
+
+DROP VIEW IF EXISTS vi_outlets;
+CREATE OR REPLACE VIEW vi_outlets AS 
+ SELECT arc_id,
+    node_1,
+    node_2,
+    "offset",
+    outlet_type,
+    cd1::text AS other1,
+    cd2::text AS other2,
+    i.flap::varchar AS other3
+   FROM temp_arc
+   JOIN inp_outlet i USING (arc_id)
+UNION
+ SELECT temp_arc.arc_id,
+    node_1,
+    node_2,
+    "offset",
+    outlet_type,
+    cd1::text AS other1,
+    cd2::text AS other2,
+    i.flap::varchar AS other3
+   FROM temp_arc
+   JOIN temp_arc_flowregulator i USING (arc_id);
+
+
+DROP VIEW IF EXISTS vi_orifices;
+CREATE OR REPLACE VIEW vi_orifices AS 
+ SELECT arc_id,
+    node_1,
+    node_2,
+    ori_type,
+    "offset",
+    cd,
+    i.flap,
+    orate,
+    close_time
+   FROM temp_arc
+   JOIN inp_orifice i USING (arc_id)
+UNION
+ SELECT arc_id,
+    node_1,
+    node_2,
+    ori_type,
+    "offset",
+    cd,
+    i.flap,
+    orate,
+    close_time
+   FROM temp_arc
+   JOIN temp_arc_flowregulator i USING (arc_id);
+
+
+DROP VIEW IF EXISTS vi_weirs;
+CREATE OR REPLACE VIEW vi_weirs AS 
+ SELECT arc_id,
+    node_1,
+    node_2,
+    inp_typevalue.idval AS weir_type,
+    "offset",
+    cd,
+    i.flap,
+    ec,
+    cd2,
+    surcharge,
+    road_width,
+    road_surf,
+    coef_curve
+ FROM temp_arc
+   JOIN inp_weir i USING (arc_id)
+   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = i.weir_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_weirs'::text 
+   UNION
+ SELECT arc_id,
+    node_1,
+    node_2,
+    inp_typevalue.idval AS weir_type,
+    "offset",
+    cd,
+    i.flap,
+    ec,
+    cd2,
+    surcharge,
+    road_width,
+    road_surf,
+    coef_curve
+ FROM temp_arc
+   JOIN temp_arc_flowregulator i USING (arc_id)
+   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = i.weir_type::text
+   WHERE inp_typevalue.typevalue::text = 'inp_value_weirs'::text;
+
+
+DROP VIEW IF EXISTS vi_pumps;
+CREATE OR REPLACE VIEW vi_pumps AS 
+ SELECT arc_id,
+    node_1,
+    node_2,
+    curve_id,
+    status,
+    startup,
+    shutoff
+FROM temp_arc
+   JOIN inp_pump i USING (arc_id)
+   UNION
+   SELECT arc_id,
+    node_1,
+    node_2,
+    curve_id,
+    status,
+    startup,
+    shutoff
+FROM temp_arc
+   JOIN temp_arc_flowregulator i USING (arc_id);
+

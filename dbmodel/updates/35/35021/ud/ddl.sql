@@ -117,6 +117,8 @@ CONSTRAINT inp_dscenario_storage_node_id_fkey FOREIGN KEY (node_id)
 CREATE TABLE inp_dscenario_divider(
 dscenario_id integer,
 node_id character varying(50) NOT NULL,
+elev numeric(12,3),
+ymax numeric(12,3),
 divider_type character varying(18),
 arc_id character varying(50),
 curve_id character varying(16),
@@ -290,7 +292,7 @@ CONSTRAINT inp_dscenario_inflows_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 
-CREATE TABLE inp_dscenario_inflows_pol(
+CREATE TABLE inp_dscenario_inflows_poll(
 dscenario_id integer,
 node_id character varying(50) NOT NULL,
 poll_id character varying(16) NOT NULL,
@@ -346,6 +348,58 @@ ALTER TABLE inp_buildup_land_x_pol RENAME TO inp_buildup;
 ALTER TABLE inp_coverage_land_x_subc RENAME TO inp_coverage;
 ALTER TABLE inp_loadings_pol_x_subc RENAME TO inp_loadings;
 
-ALTER TABLE inp_inflows_pol_x_node RENAME TO inp_inflows_pol;
+ALTER TABLE inp_inflows_pol_x_node RENAME TO inp_inflows_poll;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_conduit", "column":"inlet_offset", "dataType":"float", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"y1", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"y2", "dataType":"float", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"elev", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"ymax", "dataType":"float", "isUtils":"False"}}$$);
+
+CREATE TABLE temp_arc_flowregulator(
+id serial PRIMARY KEY,
+arc_id character varying(18) NOT NULL,
+order_id smallint NOT NULL,
+flwreg_length double precision NOT NULL,
+weir_type character varying(18) NOT NULL,
+"offset" numeric(12,4),
+cd numeric(12,4),
+ec numeric(12,4),
+cd2 numeric(12,4),
+flap character varying(3),
+geom1 numeric(12,4),
+geom2 numeric(12,4) DEFAULT 0.00,
+geom3 numeric(12,4) DEFAULT 0.00,
+geom4 numeric(12,4) DEFAULT 0.00,
+surcharge character varying(3),
+road_width float,
+road_surf character varying(16),
+coef_curve float,
+---
+curve_id character varying(16),
+status character varying(3),
+startup numeric(12,4),
+shutoff numeric(12,4),
+---
+ori_type character varying(18) NOT NULL,
+orate numeric(12,4),
+shape character varying(18) NOT NULL,
+close_time integer DEFAULT 0,
+----
+outlet_type character varying(16) NOT NULL,
+cd1 numeric(12,4));
+
+
+CREATE TABLE temp_node_other (
+id serial PRIMARY KEY,
+node_id character varying(16),
+type character varying(16), -- 'POLLUTANT' or 'FLOW' or 'TREATMENT'
+poll_id character varying(16),
+timser_id character varying(16),
+other varchar(30), -- concen/mas for polluntants or 'FLOW' for flow or function for treatment
+mfactor numeric(12,4), -- 1 for flow or mfactor for polluntants
+sfactor numeric(12,4),
+base numeric(12,4),
+pattern_id character varying(16));

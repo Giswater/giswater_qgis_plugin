@@ -40,28 +40,28 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_flwreg_weir
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('WEIR');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-WEIR');
  
  
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_flwreg_pump
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-PUMP');
   
  
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_flwreg_orifice
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('ORIFICE');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-ORIFICE');
   
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_flwreg_outlet
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('OUTLET');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-OUTLET');
   
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
@@ -73,9 +73,9 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_inflows_pol
+  ON v_edit_inp_dscenario_inflows_poll
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS_POL');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS-POLL');
   
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
@@ -83,4 +83,45 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   ON v_edit_inp_dscenario_treatment
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TREATMENT');
+
  
+CREATE TRIGGER gw_trg_vi_inflows
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_inflows
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_inflows');
+
+ 
+CREATE TRIGGER gw_trg_vi_treatment
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_treatment
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_treatment');
+
+
+CREATE TRIGGER gw_trg_vi_outlets
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_outlets
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_outlets');
+
+
+CREATE TRIGGER gw_trg_vi_orifices
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_orifices
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_orifices');
+
+
+CREATE TRIGGER gw_trg_vi_weirs
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON ud_sample.vi_weirs
+  FOR EACH ROW
+  EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_weirs');
+
+
+CREATE TRIGGER gw_trg_vi_pumps
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON ud_sample.vi_pumps
+  FOR EACH ROW
+  EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_pumps');
