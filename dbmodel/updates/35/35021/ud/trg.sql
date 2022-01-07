@@ -38,28 +38,28 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_weir
+  ON v_edit_inp_dscenario_flwreg_weir
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('WEIR');
  
  
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_pump
+  ON v_edit_inp_dscenario_flwreg_pump
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
   
  
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_orifice
+  ON v_edit_inp_dscenario_flwreg_orifice
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('ORIFICE');
   
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_outlet
+  ON v_edit_inp_dscenario_flwreg_outlet
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('OUTLET');
   
@@ -73,9 +73,9 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_inflows_pol_x_node
+  ON v_edit_inp_dscenario_inflows_pol
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS_POL_X_NODE');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INFLOWS_POL');
   
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
@@ -83,3 +83,4 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   ON v_edit_inp_dscenario_treatment
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TREATMENT');
+ 
