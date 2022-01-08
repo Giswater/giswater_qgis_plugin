@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3124
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_treatment()
+CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_inp_treatment()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -20,21 +20,21 @@ BEGIN
 	
 	IF TG_OP = 'INSERT' THEN
 				
-		INSERT INTO inp_dscenario_treatment (dscenario_id, node_id, poll_id, function)
-		VALUES (NEW.dscenario_id, NEW.node_id, NEW.poll_id, NEW.function);
+		INSERT INTO inp_treatment (node_id, poll_id, function)
+		VALUES (NEW.node_id, NEW.poll_id, NEW.function);
 		
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		UPDATE inp_dscenario_treatment SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, poll_id=NEW.poll_id, function=NEW.function 
+		UPDATE inp_treatment SET node_id=NEW.node_id, poll_id=NEW.poll_id, function=NEW.function 
 		WHERE node_id=OLD.node_id AND poll_id = OLD.poll_id;
 		
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
 
-		DELETE FROM inp_dscenario_treatment WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND poll_id = OLD.poll_id;
+		DELETE FROM inp_treatment WHERE node_id=OLD.node_id AND poll_id = OLD.poll_id;
 
 		RETURN OLD;
   END IF;

@@ -66,6 +66,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_outlet", "column":"nodarc_id", "dataType":"varchar(20)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_pump", "column":"nodarc_id", "dataType":"varchar(20)", "isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"format_type", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"mfactor","isUtils":"False"}}$$);
+
 ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT "inp_flwreg_orifice_nodarc_id_unique" UNIQUE(nodarc_id);
 ALTER TABLE inp_flwreg_weir ADD CONSTRAINT "inp_flwreg_weir_nodarc_id_unique" UNIQUE(nodarc_id);
 ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT "inp_flwreg_outlet_nodarc_id_unique" UNIQUE(nodarc_id);
@@ -90,7 +93,7 @@ CONSTRAINT inp_dscenario_outfall_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_outfall_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES v_edit_inp_outfall (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_outfall_timser_id_fkey FOREIGN KEY (timser_id)
   REFERENCES inp_timeseries (id) MATCH SIMPLE
@@ -120,7 +123,7 @@ CONSTRAINT inp_dscenario_storage_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_storage_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES v_edit_inp_storage (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 
@@ -149,7 +152,7 @@ CONSTRAINT inp_dscenario_divider_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT iinp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES v_edit_inp_divider (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 
@@ -260,7 +263,7 @@ base numeric(12,4),
 pattern_id character varying(16),
 CONSTRAINT inp_dscenario_inflows_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
 CONSTRAINT inp_dscenario_inflows_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES inp_inflows (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE RESTRICT,
 CONSTRAINT inp_dscenario_inflows_pattern_id_fkey FOREIGN KEY (pattern_id)
   REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
@@ -282,7 +285,7 @@ base numeric(12,4),
 pattern_id character varying(16),
 CONSTRAINT inp_dscenario_inflows_pol_pkey PRIMARY KEY (dscenario_id, node_id, poll_id),
 CONSTRAINT inp_dscenario_inflows_pol_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES inp_inflows_poll (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_inflows_pol_pattern_id_fkey FOREIGN KEY (pattern_id)
   REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
@@ -305,7 +308,7 @@ poll_id character varying(16),
 function character varying(100),
 CONSTRAINT inp_treatment_pkey PRIMARY KEY (dscenario_id, node_id, poll_id),
 CONSTRAINT inp_treatment_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES node (node_id) MATCH SIMPLE
+  REFERENCES inp_treatment (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_treatment_poll_id_fkey FOREIGN KEY (poll_id)
   REFERENCES inp_pollutant (poll_id) MATCH SIMPLE

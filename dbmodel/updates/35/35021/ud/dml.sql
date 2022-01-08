@@ -147,3 +147,8 @@ VALUES (3124, 'gw_trg_edit_inp_treatment', 'UD', 'function trigger', null, null,
 UPDATE config_param_system SET value = '{"table":"v_edit_cat_dscenario", "selector":"selector_inp_dscenario", "table_id":"dscenario_id",  "selector_id":"dscenario_id",  "label":"dscenario_id, '' - '', name, '' ('', dscenario_type,'')''", "orderBy":"dscenario_id", "selectionMode":"removePrevious", 
 "manageAll":false, "query_filter":" AND dscenario_id > 0 AND active is true", "typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))"}'
 WHERE parameter = 'basic_selector_tab_dscenario';
+
+UPDATE inp_flwreg_orifice SET nodarc_id = concat(node_id,'OR',order_id);
+UPDATE inp_flwreg_weir SET nodarc_id = concat(node_id,'WE',order_id);
+UPDATE inp_flwreg_outlet SET nodarc_id = concat(node_id,'OT',order_id);
+UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);

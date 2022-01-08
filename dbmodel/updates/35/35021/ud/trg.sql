@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ud_sample, public, pg_catalog;
 
 --2022/01/05
 CREATE TRIGGER gw_trg_vi_xsections
@@ -112,8 +112,23 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TREATMENT');
 
- 
-CREATE TRIGGER gw_trg_vi_inflows
+  
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_conduit
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONDUIT');
+
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_dscenario ON v_edit_inp_dscenario_junction
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_junction
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('JUNCTION');
+
+
+ CREATE TRIGGER gw_trg_vi_inflows
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON vi_inflows
   FOR EACH ROW

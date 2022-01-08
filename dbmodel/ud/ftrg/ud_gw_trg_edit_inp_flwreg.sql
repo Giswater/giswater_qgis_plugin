@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3120
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_flwreg()
+CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_inp_flwreg()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -43,7 +43,7 @@ BEGIN
 			IF NEW.outlet_type IS NULL THEN NEW.outlet_type = 'FUNCTIONAL/DEPTH'; END IF;
 			
 			INSERT INTO inp_flwreg_outlet (nodarc_id, node_id, order_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2)
-			VALUES (concat(NEW.node_id,'OU',NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, NEW.outlet_type, NEW.offsetval, NEW.curve_id, NEW.cd1, NEW.cd2);
+			VALUES (concat(NEW.node_id,'OT',NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, NEW.outlet_type, NEW.offsetval, NEW.curve_id, NEW.cd1, NEW.cd2);
 
 	 	ELSIF v_table = 'FLWREG-PUMP' THEN
 	 	
@@ -75,7 +75,7 @@ BEGIN
 			
 	 	ELSIF v_table = 'FLWREG-OUTLET' THEN
 	 	
-			UPDATE inp_flwreg_outlet SET nodarc_id=concat(NEW.node_id,'OU',NEW.order_id), node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, 
+			UPDATE inp_flwreg_outlet SET nodarc_id=concat(NEW.node_id,'OT',NEW.order_id), node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, 
 			flwreg_length= NEW.flwreg_length, outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1, cd2=NEW.cd2
 			WHERE nodarc_id=OLD.nodarc_id;
 
