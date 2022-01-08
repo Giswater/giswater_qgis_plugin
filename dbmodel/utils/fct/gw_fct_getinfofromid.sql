@@ -640,10 +640,19 @@ BEGIN
 			v_formtype := 'default';
 		END IF;
 
-		raise notice ' v_editable %', v_editable;
-	
 		-- call fields function
-		IF v_editable THEN
+		IF v_islayer then
+		
+			-- call info form function
+			v_querystring = concat('SELECT gw_fct_getfeatureinfo(',quote_nullable(v_tablename),', ',quote_nullable(v_id),', ',quote_nullable(v_device),', ',quote_nullable(v_infotype),', ',quote_nullable(v_configtabledefined),
+						', ',quote_nullable(v_idname),', ',quote_nullable(column_type),', ',quote_nullable(v_tg_op),');');
+			v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_device', v_device, 'v_infotype', v_infotype,
+							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type, 'v_tg_op', v_tg_op);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 350);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_fields;
+
+		ELSIF v_editable THEN
 
 			-- getting id from URN
 			IF v_id IS NULL AND v_islayer is not true THEN
@@ -667,7 +676,7 @@ BEGIN
 			RAISE NOTICE 'v_fields %', v_fields;
 
 						
-		ELSIF v_editable = FALSE OR v_islayer THEN 
+		ELSIF v_editable = FALSE THEN 
 			
 			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
 			-- call info form function
