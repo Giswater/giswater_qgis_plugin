@@ -80,6 +80,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_infl
 CREATE TABLE inp_dscenario_outfall(
 dscenario_id integer,
 node_id character varying(16) NOT NULL,
+elev numeric(12,3),
+ymax numeric(12,3),
 outfall_type character varying(16),
 stage numeric(12,4),
 curve_id character varying(16),
@@ -93,7 +95,7 @@ CONSTRAINT inp_dscenario_outfall_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_outfall_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES v_edit_inp_outfall (node_id) MATCH SIMPLE
+  REFERENCES inp_outfall (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_outfall_timser_id_fkey FOREIGN KEY (timser_id)
   REFERENCES inp_timeseries (id) MATCH SIMPLE
@@ -103,6 +105,8 @@ CONSTRAINT inp_dscenario_outfall_timser_id_fkey FOREIGN KEY (timser_id)
 CREATE TABLE inp_dscenario_storage(
 dscenario_id integer,
 node_id character varying(50) NOT NULL,
+elev numeric(12,3),
+ymax numeric(12,3),
 storage_type character varying(18),
 curve_id character varying(16),
 a1 numeric(12,4),
@@ -123,7 +127,7 @@ CONSTRAINT inp_dscenario_storage_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_storage_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES v_edit_inp_storage (node_id) MATCH SIMPLE
+  REFERENCES inp_storage (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 
@@ -152,7 +156,7 @@ CONSTRAINT inp_dscenario_divider_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT iinp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES v_edit_inp_divider (node_id) MATCH SIMPLE
+  REFERENCES inp_divider (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 

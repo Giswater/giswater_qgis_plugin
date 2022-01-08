@@ -311,6 +311,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_outfall AS
 SELECT
 s.dscenario_id,
 f.node_id, 
+f.elev,
+f.ymax,
 f.outfall_type,
 f.stage, 
 f.curve_id,
@@ -325,6 +327,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_storage AS
 SELECT
 s.dscenario_id,
 f.node_id, 
+f.elev,
+f.ymax,
 f.storage_type,
 f.curve_id, 
 f.a1, 

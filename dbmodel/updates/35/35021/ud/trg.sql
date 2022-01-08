@@ -120,7 +120,8 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONDUIT');
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_inp_dscenario ON v_edit_inp_dscenario_junction
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_dscenario 
+ON v_edit_inp_dscenario_junction;
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_junction

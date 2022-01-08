@@ -151,7 +151,6 @@ BEGIN
 			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.outfallparam IS NULL OR NEW.outfallparam='' THEN NEW.outfallparam = (SELECT outfallparam FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 	 	
 			INSERT INTO inp_dscenario_junction (dscenario_id, node_id, elev, ymax, y0, ysur, apond, outfallparam)
 	 		VALUES (NEW.dscenario_id, NEW.node_id, NEW.elev, NEW.ymax, NEW.y0, NEW.ysur, NEW.apond, NEW.outfallparam);
@@ -225,8 +224,8 @@ BEGIN
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 		ELSIF v_dscenario_type = 'DIVIDER' THEN
-			UPDATE inp_dscenario_raingage SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=NEW.ymax, divider_type=NEW.divider_type, 
-			arc_id=NEW.arc_id, curve_id=NEW.curve_id, qmin=NEW.qmin, qmin=NEW.ht, qmin=NEW.cd, qmin=NEW.y0, qmin=NEW.ysur, qmin=NEW.apond
+			UPDATE inp_dscenario_divider SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=NEW.ymax, divider_type=NEW.divider_type, 
+			arc_id=NEW.arc_id, curve_id=NEW.curve_id, qmin=NEW.qmin, ht=NEW.ht, cd=NEW.cd, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
