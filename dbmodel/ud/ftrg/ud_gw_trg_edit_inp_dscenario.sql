@@ -25,6 +25,14 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		 		
 	 	IF v_dscenario = 'CONDUIT' THEN
+
+			-- default values
+			IF NEW.arccat_id IS NULL THEN NEW.arccat_id = (SELECT arccat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.matcat_id IS NULL THEN NEW.matcat_id = (SELECT matcat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.y1 IS NULL THEN NEW.y1 = (SELECT y1 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.y2 IS NULL THEN NEW.y2 = (SELECT y2 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.barrels IS NULL THEN NEW.barrels = (SELECT barrels FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+	 	
 			INSERT INTO inp_dscenario_conduit (dscenario_id, arc_id, arccat_id, matcat_id, y1, y2, custom_n, barrels, culvert, kentry, kexit,
 			kavg, flap, q0, qmax, seepage)
 	 		VALUES (NEW.dscenario_id, NEW.arc_id, NEW.arccat_id, NEW.matcat_id, NEW.y1, NEW.y2, NEW.custom_n, NEW.barrels, NEW.culvert, NEW.kentry, NEW.kexit,
@@ -35,20 +43,61 @@ BEGIN
 	 		VALUES (NEW.dscenario_id, NEW.node_id, NEW.divider_type, NEW.arc_id, NEW.curve_id, NEW.qmin, NEW.ht, NEW.cd, NEW.y0, NEW.ysur, NEW.apond );
 
 		ELSIF v_dscenario = 'FLWREG-ORIFICE' THEN
-			INSERT INTO inp_dscenario_flwreg_orifice (dscenario_id, nodarc_id, ori_type, offsetval, cd, orate,
-			flap, shape, geom1, geom2, geom3, geom4, close_time)
-			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.orate, 
-			NEW.flap, NEW.shape, NEW.geom1, NEW.geom2, NEW.geom3, NEW.geom4, NEW.close_time);
+
+			-- default values
+			IF NEW.ori_type IS NULL THEN NEW.ori_type = (SELECT ori_type FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.flap IS NULL THEN NEW.flap = (SELECT flap FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.shape IS NULL THEN NEW.shape = (SELECT shape FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);	END IF;		
+			IF NEW.close_time IS NULL THEN NEW.close_time = (SELECT close_time FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+		
+			INSERT INTO inp_dscenario_flwreg_orifice (dscenario_id, nodarc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
+			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.orate, NEW.flap, NEW.shape, NEW.geom1, NEW.geom2, NEW.geom3, NEW.geom4, NEW.close_time);
 			
 	 	ELSIF v_dscenario = 'FLWREG-OUTLET' THEN
+
+			-- default values
+			IF NEW.outlet_type IS NULL THEN NEW.outlet_type = (SELECT outlet_type FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.curve_id IS NULL THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd1 IS NULL THEN NEW.cd1 = (SELECT cd1 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+	 	
 			INSERT INTO inp_dscenario_flwreg_outlet (dscenario_id, nodarc_id, outlet_type, offsetval, curve_id, cd1, cd2)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.outlet_type, NEW.offsetval, NEW.curve_id, NEW.cd1, NEW.cd2);
 
 	 	ELSIF v_dscenario = 'FLWREG-PUMP' THEN
+
+			-- default values
+			IF NEW.curve_id IS NULL THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.status IS NULL THEN NEW.status = (SELECT status FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.startup IS NULL THEN NEW.startup = (SELECT startup FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.shutoff IS NULL THEN NEW.shutoff = (SELECT shutoff FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+				 	
 			INSERT INTO inp_dscenario_flwreg_pump (dscenario_id, nodarc_id, curve_id, status, startup, shutoff)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.curve_id, NEW.status, NEW.startup, NEW.shutoff);	
 
 	 	ELSIF v_dscenario = 'FLWREG-WEIR' THEN
+
+			-- default values
+			IF NEW.weir_type IS NULL THEN NEW.weir_type = (SELECT weir_type FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.offsetval IS NULL THEN NEW.offsetval = (SELECT offsetval FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd IS NULL THEN NEW.cd = (SELECT cd FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.ec IS NULL THEN NEW.ec = (SELECT ec FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.cd2 IS NULL THEN NEW.cd2 = (SELECT cd2 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.flap IS NULL THEN NEW.flap = (SELECT flap FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom1 IS NULL THEN NEW.geom1 = (SELECT geom1 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom2 IS NULL THEN NEW.geom2 = (SELECT geom2 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom3 IS NULL THEN NEW.geom3 = (SELECT geom3 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.geom4 IS NULL THEN NEW.geom4 = (SELECT geom4 FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;				
+			IF NEW.surcharge IS NULL THEN NEW.surcharge = (SELECT surcharge FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.road_width IS NULL THEN NEW.road_width = (SELECT road_width FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.road_surf IS NULL THEN NEW.road_surf = (SELECT road_surf FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+			IF NEW.coef_curve IS NULL THEN NEW.coef_curve = (SELECT coef_curve FROM v_edit_inp_flwreg_orifice WHERE nodarc_id = NEW.nodarc_id);END IF;
+	 	
 			INSERT INTO inp_dscenario_flwreg_weir (dscenario_id, nodarc_id, weir_type, offsetval, cd, ec, 
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve)
 			VALUES (NEW.dscenario_id, NEW.nodarc_id, NEW.weir_type, NEW.offsetval, NEW.cd, NEW.ec, 
@@ -89,8 +138,8 @@ BEGIN
 
 		IF v_dscenario = 'CONDUIT' THEN
 			UPDATE inp_dscenario_conduit SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, 
-			matcat_id=NEW.matcat_id, y1=NEW.y1, y2=NEW.y2, custom_n=NEW.custom_n, barrels=NEW.barrels, culvert=NEW.culvert, kentry=NEW.kentry, kexit=NEW.kexit,
-			kavg=NEW.kavg, flap=NEW.flap, q0=NEW.q0, qmax=NEW.qmax, seepage=NEW.seepage 
+			matcat_id=NEW.matcat_id, y1=NEW.y1, y2=NEW.y2, custom_n=NEW.custom_n, barrels=NEW.barrels, culvert=NEW.culvert, 
+			kentry=NEW.kentry, kexit=NEW.kexit, kavg=NEW.kavg, flap=NEW.flap, q0=NEW.q0, qmax=NEW.qmax, seepage=NEW.seepage 
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 		ELSIF v_dscenario = 'DIVIDER' THEN
@@ -99,24 +148,24 @@ BEGIN
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario = 'FLWREG-ORIFICE' THEN
-			UPDATE inp_dscenario_flwreg_orifice SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc, 
+			UPDATE inp_dscenario_flwreg_orifice SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id,
 			ori_type=NEW.ori_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape, 
 			geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4, close_time=NEW.close_time
 			WHERE dscenario_id=OLD.dscenario_id AND nodarc_id=OLD.nodarc_id;
 			
 	 	ELSIF v_dscenario = 'FLWREG-OUTLET' THEN
-			UPDATE inp_dscenario_flwreg_outlet SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc, 
+			UPDATE inp_dscenario_flwreg_outlet SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id,
 			outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1, cd2=NEW.cd2
 			WHERE dscenario_id=OLD.dscenario_id AND nodarc_id=OLD.nodarc_id;
 
 	 	ELSIF v_dscenario = 'FLWREG-PUMP' THEN
-			UPDATE inp_dscenario_flwreg_pump SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc, 
+			UPDATE inp_dscenario_flwreg_pump SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id,
 			curve_id=NEW.curve_id, status=NEW.status, startup=NEW.startup, shutoff=NEW.shutoff
 			WHERE dscenario_id=OLD.dscenario_id AND nodarc_id=OLD.nodarc_id;
 
 	 	ELSIF v_dscenario = 'FLWREG-WEIR' THEN
-			UPDATE inp_dscenario_inflows SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc,
-			weir_type=NEW.weir_type, offsetval=NEW.offsetval, cd=NEW.cd, ec=NEW.ec, cd2=NEW.cd2, flap=NEW.flap, geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, 
+			UPDATE inp_dscenario_inflows SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id, weir_type=NEW.weir_type, 
+			offsetval=NEW.offsetval, cd=NEW.cd, ec=NEW.ec, cd2=NEW.cd2, flap=NEW.flap, geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3, 
 			geom4=NEW.geom4, surcharge=NEW.surcharge, road_width=NEW.road_width, road_surf=NEW.road_surf, coef_curve=NEW.coef_curve
 			WHERE dscenario_id=OLD.dscenario_id AND nodarc_id=OLD.nodarc_id;
 

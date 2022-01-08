@@ -179,12 +179,55 @@ CREATE OR REPLACE VIEW v_edit_inp_orifice AS
   WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice AS
+SELECT
+nodarc_id,
+node_id,
+order_id,
+to_arc,
+flwreg_length,
+ori_type, 
+offsetval, 
+cd, 
+orate,
+flap, 
+shape, 
+geom1, 
+geom2,
+geom3, 
+geom4, 
+close_time,
+ST_setsrid(ST_makeline(n.the_geom, ST_lineinterpolatepoint(a.the_geom, flwreg_length/st_length(a.the_geom))),SRID_VALUE)::geometry(LINESTRING,SRID_VALUE) as the_geom
+FROM selector_sector s, inp_flwreg_orifice f
+JOIN v_edit_node n USING (node_id)
+LEFT JOIN arc a ON arc_id = to_arc
+WHERE s.sector_id = n.sector_id AND cur_user = current_user;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet AS
+SELECT
+nodarc_id,
+node_id,
+order_id,
+to_arc, 
+flwreg_length,
+outlet_type, 
+offsetval, 
+curve_id, 
+cd1, 
+cd2, 
+flap,
+ST_setsrid(ST_makeline(n.the_geom, ST_lineinterpolatepoint(a.the_geom, flwreg_length/st_length(a.the_geom))),SRID_VALUE)::geometry(LINESTRING,SRID_VALUE) as the_geom
+FROM selector_sector s, inp_flwreg_outlet f
+JOIN v_edit_node n USING (node_id)
+LEFT JOIN arc a ON arc_id = to_arc
+WHERE s.sector_id = n.sector_id AND cur_user = current_user;
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir AS
 SELECT
+nodarc_id,
 node_id,
 order_id,
-concat(node_id,'_wei_',order_id) as nodarc_id,
 to_arc,
 flwreg_length,
 weir_type,
@@ -201,67 +244,30 @@ surcharge,
 road_width, 
 road_surf,
 coef_curve,
-the_geom
-FROM inp_flwreg_weir f
-JOIN v_edit_node USING (node_id);
+ST_setsrid(ST_makeline(n.the_geom, ST_lineinterpolatepoint(a.the_geom, flwreg_length/st_length(a.the_geom))),SRID_VALUE)::geometry(LINESTRING,SRID_VALUE) as the_geom
+FROM selector_sector s, inp_flwreg_weir f
+JOIN v_edit_node n USING (node_id)
+LEFT JOIN arc a ON arc_id = to_arc
+WHERE s.sector_id = n.sector_id AND cur_user = current_user;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump AS
 SELECT
+nodarc_id,
 node_id,
 order_id,
-concat(node_id,'_pum_',order_id) as nodarc_id,
 to_arc,
 flwreg_length,
 curve_id,
 status,
 startup,
 shutoff,
-the_geom
-FROM inp_flwreg_pump f
-JOIN v_edit_node USING (node_id);
+ST_setsrid(ST_makeline(n.the_geom, ST_lineinterpolatepoint(a.the_geom, flwreg_length/st_length(a.the_geom))),SRID_VALUE)::geometry(LINESTRING,SRID_VALUE) as the_geom
+FROM selector_sector s, inp_flwreg_pump f
+JOIN v_edit_node n USING (node_id)
+LEFT JOIN arc a ON arc_id = to_arc
+WHERE s.sector_id = n.sector_id AND cur_user = current_user;
 
-  
-
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice AS
-SELECT
-node_id,
-order_id,
-concat(node_id,'_ori_',order_id) as nodarc_id,
-to_arc,
-flwreg_length,
-ori_type, 
-offsetval, 
-cd, 
-orate,
-flap, 
-shape, 
-geom1, 
-geom2,
-geom3, 
-geom4, 
-close_time,
-the_geom
-FROM inp_flwreg_orifice f
-JOIN v_edit_node USING (node_id);
-
-
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet AS
-SELECT
-node_id,
-order_id,
-concat(node_id,'_out_',order_id) as nodarc_id,
-to_arc, 
-flwreg_length,
-outlet_type, 
-offsetval, 
-curve_id, 
-cd1, 
-cd2, 
-flap,
-the_geom
-FROM inp_flwreg_outlet f
-JOIN v_edit_node USING (node_id);
 
 
 DROP VIEW IF EXISTS v_edit_inp_outlet;
@@ -304,57 +310,55 @@ CREATE OR REPLACE VIEW v_edit_inp_outlet AS
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_outfall AS
 SELECT
 s.dscenario_id,
-node_id, 
-outfall_type,
-stage, 
-curve_id,
-timser_id, 
-gate, 
-the_geom
+f.node_id, 
+f.outfall_type,
+f.stage, 
+f.curve_id,
+f.timser_id, 
+f.gate
 FROM selector_inp_dscenario s, inp_dscenario_outfall f
-JOIN node USING (node_id)
+JOIN v_edit_inp_outfall USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_storage AS
 SELECT
 s.dscenario_id,
-node_id, 
-storage_type,
-curve_id, 
-a1, 
-a2, 
-a0, 
-fevap, 
-sh, 
-hc, 
-imd, 
-y0,
-ysur,
-apond,
-the_geom
+f.node_id, 
+f.storage_type,
+f.curve_id, 
+f.a1, 
+f.a2, 
+f.a0, 
+f.fevap, 
+f.sh, 
+f.hc, 
+f.imd, 
+f.y0,
+f.ysur,
+f.apond
 FROM selector_inp_dscenario s, inp_dscenario_storage f
-JOIN node USING (node_id)
+JOIN v_edit_inp_storage USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_divider AS
 SELECT
 s.dscenario_id,
-node_id, 
+f.node_id, 
 f.elev,
 f.ymax,
-divider_type,
+f.divider_type,
 f.arc_id, 
-curve_id,
-qmin, 
-ht, 
-cd, 
-y0, 
-ysur,
-apond 
+f.curve_id,
+f.qmin, 
+f.ht, 
+f.cd, 
+f.y0, 
+f.ysur,
+f.apond 
 FROM selector_inp_dscenario s, inp_dscenario_divider f
-JOIN node USING (node_id)
+JOIN v_edit_inp_divider USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -434,18 +438,18 @@ f.arccat_id,
 f.matcat_id,
 f.y1,
 f.y2,
-custom_n,
-barrels,
-culvert,
-kentry,
-kexit,
-kavg,
-flap,
-q0,
-qmax,
-seepage
+f.custom_n,
+f.barrels,
+f.culvert,
+f.kentry,
+f.kexit,
+f.kavg,
+f.flap,
+f.q0,
+f.qmax,
+f.seepage
 FROM selector_inp_dscenario s, inp_dscenario_conduit f
-JOIN arc USING (arc_id)
+JOIN v_edit_inp_conduit USING (arc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -456,12 +460,12 @@ f.dscenario_id,
 node_id,
 f.elev,
 f.ymax,
-y0,
-ysur,
-apond,
-outfallparam
+f.y0,
+f.ysur,
+f.apond,
+f.outfallparam
 FROM selector_inp_dscenario s, inp_dscenario_junction f
-JOIN node USING (node_id)
+JOIN v_edit_inp_junction USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -472,10 +476,9 @@ order_id,
 timser_id,
 sfactor,
 base,
-pattern_id,
-the_geom
+pattern_id
 FROM inp_inflows
-JOIN node USING (node_id);
+JOIN v_edit_inp_junction USING (node_id);
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_inflows AS
@@ -486,10 +489,9 @@ order_id,
 timser_id,
 sfactor,
 base,
-pattern_id,
-the_geom
+pattern_id
 FROM selector_inp_dscenario s, inp_dscenario_inflows f
-JOIN node USING (node_id)
+JOIN v_edit_inp_junction USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -502,10 +504,9 @@ form_type,
 mfactor,
 sfactor,
 base,
-pattern_id,
-the_geom
+pattern_id
 FROM inp_inflows_poll
-JOIN node USING (node_id);
+JOIN v_edit_inp_junction USING (node_id);
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_inflows_poll AS
@@ -518,10 +519,9 @@ form_type,
 mfactor,
 sfactor,
 base,
-pattern_id,
-the_geom
+pattern_id
 FROM selector_inp_dscenario s, inp_dscenario_inflows_poll f
-JOIN node USING (node_id)
+JOIN v_edit_inp_junction USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -529,10 +529,9 @@ CREATE OR REPLACE VIEW v_edit_inp_treatment AS
 SELECT
 node_id,
 poll_id,
-function,
-the_geom
+function
 FROM inp_treatment
-JOIN node USING (node_id);
+JOIN v_edit_inp_junction USING (node_id);
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_treatment AS
@@ -540,10 +539,9 @@ SELECT
 s.dscenario_id,
 node_id, 
 poll_id, 
-function,
-the_geom
+function
 FROM selector_inp_dscenario s, inp_dscenario_treatment f
-JOIN node USING (node_id)
+JOIN v_edit_inp_junction USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 

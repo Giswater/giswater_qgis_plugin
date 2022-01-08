@@ -63,6 +63,34 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-OUTLET');
   
+
+CREATE TRIGGER gw_trg_edit_inp_flwreg
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_flwreg_weir
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_flwreg('FLWREG-WEIR');
+ 
+ 
+CREATE TRIGGER gw_trg_edit_inp_flwreg
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_flwreg_pump
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_flwreg('FLWREG-PUMP');
+  
+ 
+CREATE TRIGGER gw_trg_edit_inp_flwreg
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_flwreg_orifice
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_flwreg('FLWREG-ORIFICE');
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_flwreg
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_flwreg_outlet
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_flwreg('FLWREG-OUTLET');
+
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
@@ -167,3 +195,5 @@ CREATE TRIGGER gw_trg_edit_inp_arc_orifice
   ON v_edit_inp_weir
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_weir');
+
+
