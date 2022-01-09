@@ -317,7 +317,8 @@ f.outfall_type,
 f.stage, 
 f.curve_id,
 f.timser_id, 
-f.gate
+f.gate,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_outfall f
 JOIN v_edit_inp_outfall USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
@@ -340,7 +341,8 @@ f.hc,
 f.imd, 
 f.y0,
 f.ysur,
-f.apond
+f.apond,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_storage f
 JOIN v_edit_inp_storage USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
@@ -364,8 +366,10 @@ f.geom4,
 f.surcharge,
 f.road_width, 
 f.road_surf,
-f.coef_curve
+f.coef_curve,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
+JOIN v_edit_inp_flwreg_weir n USING (nodarc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -376,8 +380,10 @@ f.nodarc_id,
 f.curve_id,
 f.status,
 f.startup,
-f.shutoff
+f.shutoff,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
+JOIN v_edit_inp_flwreg_pump n USING (nodarc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -395,8 +401,10 @@ f.geom1,
 f.geom2,
 f.geom3,
 f.geom4, 
-f.close_time
+f.close_time,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
+JOIN v_edit_inp_flwreg_orifice n USING (nodarc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -409,8 +417,10 @@ f.offsetval,
 f.curve_id,
 f.cd1,
 f.cd2,
-f.flap
+f.flap,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
+JOIN v_edit_inp_flwreg_outlet n USING (nodarc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
@@ -432,7 +442,8 @@ f.kavg,
 f.flap,
 f.q0,
 f.qmax,
-f.seepage
+f.seepage,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_conduit f
 JOIN v_edit_inp_conduit USING (arc_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
@@ -448,7 +459,8 @@ f.ymax,
 f.y0,
 f.ysur,
 f.apond,
-f.outfallparam
+f.outfallparam,
+the_geom
 FROM selector_inp_dscenario s, inp_dscenario_junction f
 JOIN v_edit_inp_junction USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
