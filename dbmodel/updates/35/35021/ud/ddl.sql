@@ -69,6 +69,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"format_type", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"mfactor","isUtils":"False"}}$$);
 
+DROP VIEW IF EXISTS vi_orifices;
+DROP VIEW IF EXISTS vi_weirs;
+DROP VIEW IF EXISTS vi_pumps;
+DROP VIEW IF EXISTS vi_outlets;
+DROP VIEW IF EXISTS vi_xsections;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_arc", "column":"flw_code","isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_inp_arc", "column":"flw_code","isUtils":"False"}}$$);
 
@@ -244,7 +250,7 @@ base numeric(12,4),
 pattern_id character varying(16),
 CONSTRAINT inp_dscenario_inflows_pkey PRIMARY KEY (dscenario_id, node_id, order_id),
 CONSTRAINT inp_dscenario_inflows_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES inp_inflows (node_id) MATCH SIMPLE
+  REFERENCES inp_junction (node_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE RESTRICT,
 CONSTRAINT inp_dscenario_inflows_pattern_id_fkey FOREIGN KEY (pattern_id)
   REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
@@ -253,6 +259,7 @@ CONSTRAINT inp_dscenario_inflows_dscenario_id_fkey FOREIGN KEY (dscenario_id)
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
+ALTER TABLE inp_inflows_pol_x_node RENAME TO inp_inflows_poll;
 
 CREATE TABLE inp_dscenario_inflows_poll(
 dscenario_id integer,
@@ -265,8 +272,8 @@ sfactor numeric(12,4),
 base numeric(12,4),
 pattern_id character varying(16),
 CONSTRAINT inp_dscenario_inflows_pol_pkey PRIMARY KEY (dscenario_id, node_id, poll_id),
-CONSTRAINT inp_dscenario_inflows_pol_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES inp_inflows_poll (node_id) MATCH SIMPLE
+CONSTRAINT inp_dscenario_inflows_pol_node_id_fkey FOREIGN KEY (node_id, poll_id)
+  REFERENCES inp_inflows_poll (node_id, poll_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT inp_dscenario_inflows_pol_pattern_id_fkey FOREIGN KEY (pattern_id)
   REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
@@ -281,6 +288,7 @@ CONSTRAINT inp_dscenario_inflows_pol_dscenario_id_fkey FOREIGN KEY (dscenario_id
   REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE);
 
+ALTER TABLE inp_treatment_node_x_pol RENAME TO inp_treatment;
 
 CREATE TABLE inp_dscenario_treatment(
 dscenario_id integer,
@@ -302,23 +310,20 @@ CONSTRAINT inp_dscenario_treatment_dscenario_id_fkey FOREIGN KEY (dscenario_id)
 ALTER TABLE inp_hydrograph RENAME TO inp_hydrograph_value;
 ALTER TABLE inp_hydrograph_id RENAME TO inp_hydrograph;
 
-ALTER TABLE inp_treatment_node_x_pol RENAME TO inp_treatment;
-
 ALTER TABLE inp_washoff_land_x_pol RENAME TO inp_washoff;
 ALTER TABLE inp_buildup_land_x_pol RENAME TO inp_buildup;
 
 ALTER TABLE inp_coverage_land_x_subc RENAME TO inp_coverage;
 ALTER TABLE inp_loadings_pol_x_subc RENAME TO inp_loadings;
 
-ALTER TABLE inp_inflows_pol_x_node RENAME TO inp_inflows_poll;
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_conduit", "column":"inlet_offset", "dataType":"float", "isUtils":"False"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"y1", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"y2", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_conduit", "column":"y1", "newName":"elev1", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_conduit", "column":"y2", "newName":"elev2", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"elev", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"ymax", "dataType":"float", "isUtils":"False"}}$$);
+
 
 CREATE TABLE temp_arc_flowregulator(
 arc_id character varying(18) PRIMARY KEY,

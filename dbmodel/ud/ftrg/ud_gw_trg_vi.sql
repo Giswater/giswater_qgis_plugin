@@ -157,7 +157,7 @@ BEGIN
 			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'WEIR','WEIR','WEIR', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_weir (arc_id, weir_type, offsetval, cd, flap, ec, cd2, surcharge, road_width, road_surf, coef_curve) 
-			VALUES (NEW.arc_id, NEW.weir_type, NEW.offsetval, NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge
+			VALUES (NEW.arc_id, NEW.weir_type, NEW.offsetval, NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge,
 			NEW.road_width, NEW.road_surf, NEW.coef_curve);
 			
 		ELSIF v_view='vi_outlets' THEN 

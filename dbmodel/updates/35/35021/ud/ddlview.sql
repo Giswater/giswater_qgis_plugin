@@ -763,7 +763,7 @@ offsetval as "Offset",
 outlet_type,
 case when curve_id is null then cd1::text else curve_id end as other1,
 cd2::text AS other2,
-f.flap::varchar AS other3,
+f.flap::varchar AS other3
 FROM temp_arc_flowregulator f
 JOIN temp_arc USING (arc_id)
 WHERE type='OUTLET';
