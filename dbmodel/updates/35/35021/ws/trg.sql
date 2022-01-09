@@ -20,35 +20,7 @@ CREATE TRIGGER gw_trg_vi_demands
   ON vi_demands
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_demands');
-
-
-CREATE TRIGGER gw_trg_edit_inp_node_tank
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_tank
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank');
   
-  
-CREATE TRIGGER gw_trg_edit_inp_node_pump
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_pump
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump');
-  
-    
-CREATE TRIGGER gw_trg_edit_inp_node_valve
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_valve
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve');
-  
-  
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_shortpipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe');
-
     
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
