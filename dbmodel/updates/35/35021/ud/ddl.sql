@@ -69,6 +69,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_flwreg_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"format_type", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_inflows", "column":"mfactor","isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_arc", "column":"flw_code","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_inp_arc", "column":"flw_code","isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_node", "column":"flw_code","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_inp_node", "column":"flw_code","isUtils":"False"}}$$);
+
 ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT "inp_flwreg_orifice_nodarc_id_unique" UNIQUE(nodarc_id);
 ALTER TABLE inp_flwreg_weir ADD CONSTRAINT "inp_flwreg_weir_nodarc_id_unique" UNIQUE(nodarc_id);
 ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT "inp_flwreg_outlet_nodarc_id_unique" UNIQUE(nodarc_id);
@@ -366,12 +372,12 @@ status character varying(3),
 startup numeric(12,4),
 shutoff numeric(12,4),
 ---
-ori_type character varying(18) NOT NULL,
+ori_type character varying(18),
 orate numeric(12,4),
-shape character varying(18) NOT NULL,
+shape character varying(18),
 close_time integer DEFAULT 0,
 ----
-outlet_type character varying(16) NOT NULL,
+outlet_type character varying(16),
 cd1 numeric(12,4));
 
 
@@ -388,59 +394,6 @@ base numeric(12,4),
 pattern_id character varying(16));
 
 
-CREATE TABLE rpt_inp_arc_flowregulator(
-result_id varchar(16),
-arc_id character varying(18) NOT NULL,
-type character varying(18) NOT NULL, -- ORIFICE, OUTLET, WEIR, PUMP
-weir_type character varying(18) NOT NULL,
-offsetval numeric(12,4),
-cd numeric(12,4),
-ec numeric(12,4),
-cd2 numeric(12,4),
-flap character varying(3),
-geom1 numeric(12,4),
-geom2 numeric(12,4) DEFAULT 0.00,
-geom3 numeric(12,4) DEFAULT 0.00,
-geom4 numeric(12,4) DEFAULT 0.00,
-surcharge character varying(3),
-road_width float,
-road_surf character varying(16),
-coef_curve float,
----
-curve_id character varying(16),
-status character varying(3),
-startup numeric(12,4),
-shutoff numeric(12,4),
----
-ori_type character varying(18) NOT NULL,
-orate numeric(12,4),
-shape character varying(18) NOT NULL,
-close_time integer DEFAULT 0,
-----
-outlet_type character varying(16) NOT NULL,
-cd1 numeric(12,4),
-CONSTRAINT rpt_inp_arc_flowregulator_pkey PRIMARY KEY (result_id, arc_id),
-CONSTRAINT rpt_inp_arc_flowregulator_result_id_fkey FOREIGN KEY (result_id)
-      REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-CREATE TABLE rpt_inp_node_other (
-id serial PRIMARY KEY,
-result_id character varying(16),
-node_id character varying(16),
-type character varying(16), -- 'POLLUTANT' or 'FLOW' or 'TREATMENT'
-poll_id character varying(16),
-timser_id character varying(16),
-other varchar(30), -- concen/mas for polluntants or 'FLOW' for flow or function for treatment
-mfactor numeric(12,4), -- 1 for flow or mfactor for polluntants
-sfactor numeric(12,4),
-base numeric(12,4),
-pattern_id character varying(16),
-CONSTRAINT rpt_inp_node_other_result_id_fkey FOREIGN KEY (result_id)
-      REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_orifice", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_weir", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_flwreg_outlet", "column":"offset", "newName":"offsetval", "isUtils":"False"}}$$);
@@ -453,3 +406,10 @@ ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT IF EXISTS inp_flwreg_orifice_uniq
 ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT IF EXISTS inp_flwreg_outlet_unique;
 ALTER TABLE inp_flwreg_weir DROP CONSTRAINT IF EXISTS inp_flwreg_weir_unique;
 ALTER TABLE inp_flwreg_pump DROP CONSTRAINT IF EXISTS inp_flwreg_pump_unique;
+
+ALTER TABLE temp_node ADD CONSTRAINT temp_node_node_id_unique UNIQUE (node_id);
+
+ALTER TABLE inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_check_type;
+
+ALTER TABLE inp_flwreg_weir
+  ADD CONSTRAINT inp_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL'::text]));

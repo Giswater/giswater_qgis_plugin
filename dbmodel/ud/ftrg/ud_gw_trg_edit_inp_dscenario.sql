@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3074
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_inp_dscenario()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_dscenario()
   RETURNS trigger AS
 $BODY$
 DECLARE 

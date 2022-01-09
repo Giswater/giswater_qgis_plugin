@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3120
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_inp_flwreg()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_flwreg()
   RETURNS trigger AS
 $BODY$
 DECLARE 

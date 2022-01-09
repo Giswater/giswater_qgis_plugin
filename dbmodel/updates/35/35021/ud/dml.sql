@@ -130,7 +130,7 @@ INSERT INTO sys_table (id, descript, sys_role)
 VALUES('temp_flowregulator', 'Table to use on pg2epa export for flowregulators (outlet, orifice, weir, pump','role_epa');
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('temp_node1n', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa');
+VALUES('temp_node_other', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa');
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
@@ -152,3 +152,20 @@ UPDATE inp_flwreg_orifice SET nodarc_id = concat(node_id,'OR',order_id);
 UPDATE inp_flwreg_weir SET nodarc_id = concat(node_id,'WE',order_id);
 UPDATE inp_flwreg_outlet SET nodarc_id = concat(node_id,'OT',order_id);
 UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);
+
+ALTER TABLE inp_dscenario_flwreg_orifice DROP CONSTRAINT inp_dscenario_flwreg_orifice_check_shape;
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT inp_flwreg_orifice_check_shape;
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+UPDATE inp_typevalue SET id = 'RECT_CLOSED' WHERE id = 'RECT-CLOSED';
+UPDATE inp_typevalue SET id = 'ADC PERVIOUS' WHERE id = 'ADC PERVIUOS';
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE inp_flwreg_orifice SET shape = 'RECT_CLOSED' WHERE shape  ='RECT-CLOSED';
+UPDATE inp_dscenario_flwreg_orifice SET shape = 'RECT_CLOSED' WHERE shape  ='RECT-CLOSED';
+
+ALTER TABLE inp_dscenario_flwreg_orifice
+ADD CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying::text, 'RECT_CLOSED'::character varying::text]));
+
+ALTER TABLE inp_flwreg_orifice
+ADD CONSTRAINT inp_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying::text, 'RECT_CLOSED'::character varying::text]));

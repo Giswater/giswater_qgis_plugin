@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/01/05
 CREATE TRIGGER gw_trg_vi_xsections
@@ -213,3 +213,22 @@ CREATE TRIGGER gw_trg_edit_inp_arc_orifice
   EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_weir');
 
 
+CREATE TRIGGER gw_trg_vi_outfalls
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_outfalls
+  FOR EACH ROW
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_outfalls');
+
+
+CREATE TRIGGER gw_trg_vi_storage
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_storage
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_storage');
+
+
+CREATE TRIGGER gw_trg_vi_dividers
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_dividers
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_dividers');

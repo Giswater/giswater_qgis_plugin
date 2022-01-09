@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3124
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_inp_treatment()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_treatment()
   RETURNS trigger AS
 $BODY$
 DECLARE 

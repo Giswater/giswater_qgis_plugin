@@ -20,6 +20,9 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$) -- ANALYZE GRAF
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$) -- CREATE JSON
 
+SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
+
+
 -- fid: 227
 
 */
@@ -135,7 +138,7 @@ BEGIN
 	PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
 	
 	RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
-	PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
+	--PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
 
 	RAISE NOTICE '8 - Trim arcs';
 	IF v_networkmode = 2 THEN
@@ -185,14 +188,6 @@ BEGIN
 	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
-
-	INSERT INTO rpt_inp_node_other (result_id, node_id, type, poll_id, timser_id, other, mfactor, sfactor, base, pattern_id)
-	SELECT v_result, node_id, type, poll_id, timser_id, other, mfactor, sfactor, base, pattern_id
-	FROM temp_node_other;
-	
-	INSERT INTO rpt_inp_arc_flowregulator
-	SELECT v_result, * FROM rpt_inp_arc_flowregulator;
-	
 	
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN
@@ -211,10 +206,10 @@ BEGIN
 	END IF;
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
-	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+	--to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 	
 END;

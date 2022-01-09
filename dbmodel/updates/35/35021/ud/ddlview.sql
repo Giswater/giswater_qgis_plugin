@@ -889,3 +889,148 @@ UNION
     NULL::text AS other6
     FROM temp_arc_flowregulator
     WHERE type IN ('ORIFICE', 'WEIR');
+
+DROP VIEW vi_outfalls;
+CREATE OR REPLACE VIEW vi_outfalls AS 
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as "Outfall type",
+addparam::json->>'gate' as "Other 1",
+null::text as "Other 2"
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' IN ('FREE','NORMAL')
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as "outfall_type",
+addparam::json->>'state' as "other1",
+addparam::json->>'gate' as "other2"
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'FIXED'
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as "Outfall type",
+addparam::json->>'curve_id' as "Other 1",
+addparam::json->>'gate' as "Other 2"
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'TIDAL'
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as "Outfall type",
+addparam::json->>'timser_id' as "Other 1",
+addparam::json->>'gate' as "Other 2"
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'TIMESERIES';
+
+
+DROP VIEW vi_storage;
+CREATE OR REPLACE VIEW vi_storage AS
+SELECT
+node_id,
+elev,
+ymax,
+y0,
+addparam::json->>'storage_type' as "storage_type",
+addparam::json->>'a1' AS "other1",
+addparam::json->>'a2' AS "other2",
+addparam::json->>'a0' AS "other3",
+apond::text AS "other4",
+addparam::json->>'fevap' AS "other5",
+addparam::json->>'sh' AS "other6",
+addparam::json->>'hc' AS "other7",
+addparam::json->>'imd' AS "other8"
+FROM temp_node WHERE epa_type  ='STORAGE' 
+AND addparam::json->>'storage_type' = 'FUNCTIONAL'
+UNION
+SELECT
+node_id,
+elev,
+ymax,
+y0,
+addparam::json->>'storage_type' as "Storage type",
+addparam::json->>'curve_id' AS other1,
+apond::text AS other2,
+addparam::json->>'fevap' AS other3,
+addparam::json->>'sh' AS other4,
+addparam::json->>'hc' AS other5,
+addparam::json->>'imd' AS other6,
+NULL AS other7,
+NULL AS other8
+FROM temp_node WHERE epa_type  ='STORAGE' 
+AND addparam::json->>'storage_type' = 'TABULAR';
+
+
+DROP VIEW vi_dividers;
+CREATE VIEW vi_dividers AS 
+SELECT
+node_id,
+elev,
+addparam::json->>'arc_id' as "arc_id",
+addparam::json->>'divider_type' AS divider_type,
+addparam::json->>'qmin' AS other1,
+y0 AS other2,
+ysur AS other3,
+apond AS other4,
+NULL::double precision AS other5,
+NULL::double precision AS other6
+FROM temp_node WHERE epa_type  ='DIVIDER' 
+AND addparam::json->>'divider_type' = 'CUTOFF'
+UNION
+SELECT
+node_id,
+elev,
+addparam::json->>'arc_id' as "arc_id",
+addparam::json->>'divider_type' AS divider_type,
+y0::text AS other1,
+ysur AS other2,
+apond AS other3,
+NULL::numeric AS other4,
+NULL::double precision AS other5,
+NULL::double precision AS other6
+FROM temp_node WHERE epa_type  ='DIVIDER' 
+AND addparam::json->>'divider_type' = 'OVERFLOW'
+UNION
+SELECT
+node_id,
+elev,
+addparam::json->>'arc_id' as "arc_id",
+addparam::json->>'divider_type' AS divider_type,
+addparam::json->>'curve_id' AS other1,
+y0 AS other2,
+ysur AS other3,
+apond AS other4,
+NULL::double precision AS other5,
+NULL::double precision AS other6
+FROM temp_node WHERE epa_type  ='DIVIDER' 
+AND addparam::json->>'divider_type' = 'TABULAR'
+UNION
+SELECT
+node_id,
+elev,
+addparam::json->>'arc_id' as "arc_id",
+addparam::json->>'divider_type' AS divider_type,
+addparam::json->>'qmin' AS other1,
+(addparam::json->>'ht')::numeric AS other2,
+(addparam::json->>'cd')::numeric AS other3,
+y0 AS other4,
+ysur AS other5,
+apond AS other6
+FROM temp_node WHERE epa_type  ='DIVIDER' 
+AND addparam::json->>'divider_type' = 'WEIR';
+
+
+CREATE OR REPLACE VIEW vi_junctions AS
+SELECT 
+node_id,
+elev,
+ymax,
+y0,
+ysur,
+apond
+FROM temp_node WHERE epa_type  ='JUNCTION'; 

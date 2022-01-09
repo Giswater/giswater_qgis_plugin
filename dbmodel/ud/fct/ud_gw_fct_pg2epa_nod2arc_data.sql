@@ -44,36 +44,37 @@ epa_type_aux text;
 BEGIN
 
 	--  Search path
-    SET search_path = "SCHEMA_NAME", public; 
+	SET search_path = "SCHEMA_NAME", public; 
  
 	--  Start process	
-    RAISE NOTICE 'Starting flowregulators process.';
+	RAISE NOTICE 'Starting flowregulators process.';
 
-    SELECT * INTO rec FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT * INTO rec FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	-- setting record_new_arc
 	SELECT * INTO record_new_arc FROM temp_arc LIMIT 1;
     
-    FOR rec_flowreg IN
-	SELECT temp_node.node_id, order_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id  
+	FOR rec_flowreg IN
+	SELECT node_id,  to_arc, flwreg_length, flw_type, order_id FROM 
+	(SELECT temp_node.node_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id 
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, order_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
+	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'OT'::text as flw_type, order_id FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, order_id,  to_arc, flwreg_length, 'pum'::text as flw_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
+	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'PU'::text as flw_type, order_id FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, order_id, to_arc, flwreg_length, 'wei'::text as flw_type FROM inp_flwreg_weir 
-	JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
-	ORDER BY node_id, to_arc DESC, order_id ASC
+	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'WE'::text as flw_type, order_id FROM inp_flwreg_weir JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id)a
 
 	LOOP
+		RAISE NOTICE ' rec_flowreg -----------------------> %', rec_flowreg;
 
-		IF rec_flowreg.flw_type='ori' THEN epa_type_aux='ORIFICE';
-		ELSIF rec_flowreg.flw_type='pum' THEN epa_type_aux='PUMP';
-		ELSIF rec_flowreg.flw_type='out' THEN epa_type_aux='OUTLET';
-		ELSIF rec_flowreg.flw_type='wei' THEN epa_type_aux='WEIR';
+		IF rec_flowreg.flw_type='OR' THEN epa_type_aux='ORIFICE';
+		ELSIF rec_flowreg.flw_type='PU' THEN epa_type_aux='PUMP';
+		ELSIF rec_flowreg.flw_type='OT' THEN epa_type_aux='OUTLET';
+		ELSIF rec_flowreg.flw_type='WE' THEN epa_type_aux='WEIR';
 		END IF;
 
 		IF old_node_id= rec_flowreg.node_id AND old_to_arc =rec_flowreg.to_arc THEN
@@ -125,19 +126,15 @@ BEGIN
 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
 	
 			-- Inserting into inp_rpt_arc
-			INSERT INTO temp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
-			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.flw_code,record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
+			INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
+			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
 			record_new_arc.sector_id, record_new_arc.arc_type, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.the_geom);
 
 		ELSE
-
-			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc);
+			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type, rec_flowreg.order_id);
 			
-			-- updating flw_code
-			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type, rec_flowreg.order_id);
-
 			-- udpating the feature
-			UPDATE temp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
+			UPDATE temp_arc SET epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
 			counter :=1;
 	
 		END IF;
@@ -145,7 +142,7 @@ BEGIN
 		old_to_arc= rec_flowreg.to_arc;
 
 		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
-		IF rec_flowreg.flw_type='pum' THEN
+		IF rec_flowreg.flw_type='PU' THEN
 			UPDATE temp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
 		
