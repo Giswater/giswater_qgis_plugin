@@ -1034,3 +1034,22 @@ y0,
 ysur,
 apond
 FROM temp_node WHERE epa_type  ='JUNCTION'; 
+
+
+DROP VIEW vi_adjustments;
+CREATE OR REPLACE VIEW vi_adjustments AS 
+SELECT adj_type as parameter, subc_id, monthly_adj FROM (
+SELECT 1 as order, inp_adjustments.adj_type, null as subc_id,
+concat(inp_adjustments.value_1, ' ', inp_adjustments.value_2, ' ', inp_adjustments.value_3, ' ', inp_adjustments.value_4, ' ', 
+inp_adjustments.value_5, ' ', inp_adjustments.value_6, ' ', inp_adjustments.value_7, ' ', inp_adjustments.value_8, ' ', 
+inp_adjustments.value_9, ' ', inp_adjustments.value_10, ' ', inp_adjustments.value_11, ' ', inp_adjustments.value_12) AS monthly_adj
+FROM inp_adjustments
+UNION
+SELECT 2, 'N-PERV' as parameter, subc_id, nperv_pattern_id as montly_adjunstment FROM inp_subcatchment WHERE nperv_pattern_id IS NOT NULL
+UNION
+SELECT 2, 'DSTORE' , subc_id, dstore_pattern_id as montly_adjunstment FROM inp_subcatchment WHERE dstore_pattern_id IS NOT NULL
+UNION
+SELECT 2, 'INFIL', subc_id, infil_pattern_id as montly_adjunstment FROM inp_subcatchment WHERE infil_pattern_id IS NOT NULL
+)a;
+
+

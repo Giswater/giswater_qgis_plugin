@@ -169,3 +169,6 @@ ADD CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY
 
 ALTER TABLE inp_flwreg_orifice
 ADD CONSTRAINT inp_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying::text, 'RECT_CLOSED'::character varying::text]));
+
+INSERT INTO config_fprocess VALUES (141, 'vi_adjustments', '[ADJUSTMENTS]', null, 44);
+INSERT INTO config_fprocess VALUES (239, 'vi_adjustments', '[ADJUSTMENTS]', null, 30);

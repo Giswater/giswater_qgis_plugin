@@ -252,3 +252,7 @@ UPDATE inp_divider SET y0=random(), ysur=random(), apond= random()*100 ;
 UPDATE inp_conduit SET kentry=random()*0.3, kexit=random()*0.3, kavg=random()*0.3 , q0=random()*01, qmax=random(), custom_n=0.011 ;
 
 UPDATE inp_dwf SET pat1='pattern_01', pat2='pattern_02', pat3='pattern_03', pat4='pattern_04';
+
+update inp_subcatchment SET dstore_pattern_id = 'pattern_01';
+update inp_subcatchment SET infil_pattern_id = 'pattern_02';
+update inp_subcatchment SET nperv_pattern_id = 'pattern_03';
