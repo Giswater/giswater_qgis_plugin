@@ -395,3 +395,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"age", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"age", "dataType":"integer", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"elev1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"elev2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
