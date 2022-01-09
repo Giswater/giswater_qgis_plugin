@@ -173,16 +173,16 @@ BEGIN
 	RAISE NOTICE '13 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
-	INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
 	SELECT
-	result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+	result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
 	FROM temp_arc;
 	
-	INSERT INTO rpt_inp_node (result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id,
+	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
 	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
-	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
+	SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
 	
@@ -203,10 +203,10 @@ BEGIN
 	END IF;
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
-	--to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 	
 END;

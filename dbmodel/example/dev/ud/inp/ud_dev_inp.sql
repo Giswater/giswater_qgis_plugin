@@ -116,8 +116,6 @@ INSERT INTO inp_flwreg_weir VALUES (11, '40', '163', 1, 2, 'V-NOTCH', 35.1020, 1
 
 UPDATE inp_flwreg_weir SET nodarc_id = concat(node_id, 'WE',order_id);
 
-INSERT INTO inp_aquifer VALUES ('aquifer01');
-
 INSERT INTO inp_groundwater VALUES ('S101', 'aquifer01', '101', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, '0', '0', 1);
 INSERT INTO inp_groundwater VALUES ('S102', 'aquifer01', '102', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, '0', '0', 1);
 
@@ -185,7 +183,6 @@ INSERT INTO inp_pollutant VALUES ('SS', 'MG/L', 10.0000, 5.0000, 0.0000, 5.0000,
 INSERT INTO inp_rdii VALUES ('101', 'UH1', 0.251000);
 INSERT INTO inp_rdii VALUES ('102', 'UH1', 0.325100);
 
-INSERT INTO inp_snowpack VALUES ('Spack_01', 'Demo');
 INSERT INTO inp_snowpack_value VALUES (1, 'Spack_01', 'PLOWABLE', 0.001, 0.001, 32.000, 0.001, 0.000, 0.000, 0.000);
 INSERT INTO inp_snowpack_value VALUES (2, 'Spack_01', 'IMPERVIOUS', 0.001, 0.001, 32.000, 0.001, 0.000, 0.000, 0.000);
 INSERT INTO inp_snowpack_value VALUES (3, 'Spack_01', 'PERVIOUS', 0.001, 0.001, 0.000, 0.001, 0.000, 0.000, 0.000);
@@ -256,3 +253,5 @@ UPDATE inp_dwf SET pat1='pattern_01', pat2='pattern_02', pat3='pattern_03', pat4
 update inp_subcatchment SET dstore_pattern_id = 'pattern_01';
 update inp_subcatchment SET infil_pattern_id = 'pattern_02';
 update inp_subcatchment SET nperv_pattern_id = 'pattern_03';
+
+UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);

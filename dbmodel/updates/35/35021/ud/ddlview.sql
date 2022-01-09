@@ -1014,7 +1014,7 @@ ymax,
 y0,
 ysur,
 apond,
-concat(';',sector_id,' ',node_type,' ',age)::text as other
+concat(';',sector_id,' ',node_type)::text as other
 FROM temp_node WHERE epa_type  ='JUNCTION'; 
 
 
@@ -1059,7 +1059,7 @@ UNION
     elevmax2 AS z2,
     t.q0::numeric(12,4) AS q0,
     t.qmax::numeric(12,4) AS qmax,
-    concat(';',sector_id,' ',arccat_id,' ',age)::text as other
+    concat(';',sector_id,' ',arccat_id)::text as other
    FROM temp_arc t
      JOIN inp_conduit ON arcparent::text = inp_conduit.arc_id::text;
   

@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(result_id_var tex
 $BODY$
 
 /*
-SELECT  "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data('r1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "resultId":"test_bgeo", "dumpSubcatch":"True", "step": 0}}$$);
+SELECT  "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data('test_bgeo')
 */
 
 DECLARE
@@ -90,7 +91,6 @@ BEGIN
 			
 			-- Id creation from pattern arc 
 			record_new_arc.arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc,counter);
-			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.flw_type,rec_flowreg.order_id);
 
 			-- Copiyng values from patter arc
 			record_new_arc.node_1 = nodarc_rec.node_1;
