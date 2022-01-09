@@ -418,18 +418,31 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All features have sector_id different than 0.'));			
 			v_count=0;
 		END IF;
-
+		
 	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
-		FOR object_rec IN SELECT json_array_elements_text('["junction","conduit", "raingage"]'::json) as tabname, 
-					 json_array_elements_text('["node"    ,"arc"    , "rg"]'::json) as colname
+		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall" ]'::json) as tabname, 
+					 json_array_elements_text('["node" ,"arc", "rg", "nodarc", "nodarc", "nodarc", "nodarc", "node", "node"]'::json) as colname
 		LOOP
 
 			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
+				
+				IF object_rec.colname IN ('arc', 'node') THEN
+				
+					EXECUTE 'INSERT INTO anl_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
+					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||' JOIN '||
+					object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP BY '||object_rec.colname||'_id, the_geom  having count(arc_id) > 1';
+
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+				ELSE
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+				END IF;
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
@@ -541,8 +554,11 @@ BEGIN
 		 'type',       'Feature',
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM (SELECT node_id as id, 228 as fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (228,107)) row) features;
+		) AS feature FROM
+		(SELECT node_id as id, 228 as fid, 'ERROR-228: Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (228,107)
+		  UNION
+		SELECT node_id as id, 396 as fid, 'ERROR-396: Node used on more than one scenario' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 396)
+		 row) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -556,9 +572,11 @@ BEGIN
 		   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		   'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM  (SELECT arc_id as id, fid, 'Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139
+		FROM  (SELECT arc_id as id, fid, 'ERROR: Disconnected arc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 139
 				UNION
-			   SELECT arc_id as id, fid, 'Flow regulator length do not fits with target arc', the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 427
+			   SELECT arc_id as id, fid, 'ERROR-427: Flow regulator length do not fits with target arc', the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 427
+				UNION
+			   SELECT arc_id as id, fid, 'ERROR-396: Arc used on more than one scenario', the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid = 396
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
