@@ -135,12 +135,9 @@ BEGIN
 	PERFORM gw_fct_pg2epa_manage_varc(v_result);
 	
 	RAISE NOTICE '5 - Call nod2arc function';
-	PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
+	PERFORM gw_fct_pg2epa_nod2arc(v_result);
 	
-	RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
-	--PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
-
-	RAISE NOTICE '8 - Trim arcs';
+	RAISE NOTICE '6 - Trim arcs';
 	IF v_networkmode = 2 THEN
 		SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
 	END IF;

@@ -163,3 +163,7 @@ ADD CONSTRAINT inp_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['C
 
 INSERT INTO config_fprocess VALUES (141, 'vi_adjustments', '[ADJUSTMENTS]', null, 44);
 INSERT INTO config_fprocess VALUES (239, 'vi_adjustments', '[ADJUSTMENTS]', null, 30);
+
+DELETE FROM sys_table WHERE id = 2240;
+DROP FUNCTION IF EXISTS gw_fct_pg2epa_nod2arc_geom (character varying);
+UPDATE sys_table SET function_name = 'gw_fct_pg2epa_nod2arc' WHERE id = 2238;
