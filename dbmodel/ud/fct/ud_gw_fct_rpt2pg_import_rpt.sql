@@ -127,8 +127,8 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
 
 	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Loading';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Flow' and csv2='Avg.';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Freq.' and csv2='Flow';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Flow%' and csv2 like 'Avg%';
+	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Freq%' and csv2 like 'Flow%';
 	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Node';
 	
 	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
