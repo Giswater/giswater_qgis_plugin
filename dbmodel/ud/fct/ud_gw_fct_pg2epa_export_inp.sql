@@ -161,7 +161,8 @@ BEGIN
 			' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv16,20),' ',rpad(csv17,20),' ',rpad(csv18,20),' ', rpad(csv19,20), ' ', rpad(csv20,20),' ',rpad(csv21,20),
 			' ',rpad(csv22,20),' ',rpad(csv23,20),' ',rpad(csv24,20),' ', rpad(csv25,20),' ',rpad(csv26,20),' ',rpad(csv27,20),' ', rpad(csv28,20), ' ', rpad(csv29,20),' ',rpad(csv30,20)) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source not in
-			('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects','vi_raingages','vi_timeseries','vi_transects', 'vi_report', 'vi_map')
+			('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects',
+			'vi_raingages','vi_timeseries','vi_transects', 'vi_report', 'vi_map', 'vi_junctions', 'vi_conduits')
 		order by id
 		)a )row;
 	
