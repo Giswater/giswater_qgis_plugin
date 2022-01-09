@@ -421,8 +421,8 @@ f.dscenario_id,
 arc_id,
 f.arccat_id,
 f.matcat_id,
-f.y1,
-f.y2,
+f.elev1,
+f.elev2,
 f.custom_n,
 f.barrels,
 f.culvert,
@@ -1034,3 +1034,29 @@ SELECT 2, 'INFIL', subc_id, infil_pattern_id as montly_adjunstment FROM inp_subc
 )a;
 
 
+DROP VIEW vi_conduits;
+CREATE OR REPLACE VIEW vi_conduits AS 
+ SELECT arc_id,
+    node_1,
+    node_2,
+    length,
+    n,
+    elevmax1 AS z1,
+    elevmax2 AS z2,
+    t.q0::numeric(12,4) AS q0,
+    t.qmax::numeric(12,4) AS qmax
+   FROM temp_arc t
+     JOIN inp_conduit USING (arc_id)
+UNION
+ SELECT t.arc_id,
+    node_1,
+    node_2,
+    length,
+    n,
+    elevmax1 AS z1,
+    elevmax2 AS z2,
+    t.q0::numeric(12,4) AS q0,
+    t.qmax::numeric(12,4) AS qmax
+   FROM temp_arc t
+     JOIN inp_conduit ON arcparent::text = inp_conduit.arc_id::text;
+  

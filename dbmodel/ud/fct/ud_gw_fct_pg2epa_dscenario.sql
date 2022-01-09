@@ -69,10 +69,10 @@ BEGIN
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.qmax IS NOT NULL;
 		UPDATE temp_arc t SET seepage = d.seepage FROM v_edit_inp_dscenario_conduit d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.seepage IS NOT NULL;
-		UPDATE temp_arc t SET y1 = d.y1 FROM v_edit_inp_dscenario_conduit d 
-		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y1 IS NOT NULL;
-		UPDATE temp_arc t SET y2 = d.y2 FROM v_edit_inp_dscenario_conduit d 
-		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y2 IS NOT NULL;
+		UPDATE temp_arc t SET elevmax1 = d.elev1 FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.elev1 IS NOT NULL;
+		UPDATE temp_arc t SET elevmax2 = d.elev2 FROM v_edit_inp_dscenario_conduit d 
+		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.elev2 IS NOT NULL;
 
 		-- arccat
 		UPDATE temp_arc t SET arccat_id = d.arccat_id FROM v_edit_inp_dscenario_conduit d 
@@ -154,7 +154,7 @@ BEGIN
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd IS NOT NULL;
 		UPDATE temp_arc_flowregulator t SET orate = d.orate FROM v_edit_inp_dscenario_flwreg_orifice d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.orate IS NOT NULL;
-		UPDATE temp_arc_flowregulator t SET cd2 = d.cd2 FROM v_edit_inp_dscenario_flwreg_orifice d 
+		UPDATE temp_arc_flowregulator t SET flap = d.flap FROM v_edit_inp_dscenario_flwreg_orifice d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flap IS NOT NULL;
 		UPDATE temp_arc_flowregulator t SET shape = d.shape FROM v_edit_inp_dscenario_flwreg_orifice d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.shape IS NOT NULL;
@@ -169,6 +169,7 @@ BEGIN
 		UPDATE temp_arc_flowregulator t SET close_time = d.close_time FROM v_edit_inp_dscenario_flwreg_orifice d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.close_time IS NOT NULL;
 
+		
 		-- update flwreg outlet
 		UPDATE temp_arc_flowregulator t SET outlet_type = d.outlet_type FROM v_edit_inp_dscenario_flwreg_outlet d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.outlet_type IS NOT NULL;
@@ -178,7 +179,7 @@ BEGIN
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
 		UPDATE temp_arc_flowregulator t SET cd1 = d.cd1 FROM v_edit_inp_dscenario_flwreg_outlet d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd1 IS NOT NULL;
-		UPDATE temp_arc_flowregulator t SET ec = d.ec FROM v_edit_inp_dscenario_flwreg_outlet d 
+		UPDATE temp_arc_flowregulator t SET cd2 = d.cd2 FROM v_edit_inp_dscenario_flwreg_outlet d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd2 IS NOT NULL;
 		UPDATE temp_arc_flowregulator t SET flap = d.flap FROM v_edit_inp_dscenario_flwreg_outlet d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flap IS NOT NULL;
@@ -224,8 +225,6 @@ BEGIN
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.coef_curve IS NOT NULL;
 		
 		-- update inflows
-		UPDATE temp_node_other t SET order_id = d.order_id FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.order_id IS NOT NULL;
 		UPDATE temp_node_other t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_inflows d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
 		UPDATE temp_node_other t SET sfactor = d.sfactor FROM v_edit_inp_dscenario_inflows d 
@@ -240,7 +239,7 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.poll_id IS NOT NULL;
 		UPDATE temp_node_other t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_inflows_poll d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
-		UPDATE temp_node_other t SET form_type = d.form_type FROM v_edit_inp_dscenario_inflows_poll d 
+		UPDATE temp_node_other t SET other = d.form_type FROM v_edit_inp_dscenario_inflows_poll d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.form_type IS NOT NULL;
 		UPDATE temp_node_other t SET mfactor = d.mfactor FROM v_edit_inp_dscenario_inflows_poll d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.mfactor IS NOT NULL;
@@ -254,9 +253,8 @@ BEGIN
 		-- update treatment
 		UPDATE temp_node_other t SET poll_id = d.poll_id FROM v_edit_inp_dscenario_treatment d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.poll_id IS NOT NULL;
-		UPDATE temp_node_other t SET function = d.function FROM v_edit_inp_dscenario_treatment d 
+		UPDATE temp_node_other t SET other = d.function FROM v_edit_inp_dscenario_treatment d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.function IS NOT NULL;	
-					
 	END IF;
 
 	RETURN 1;

@@ -33,13 +33,13 @@ BEGIN
 			-- default values
 			IF NEW.arccat_id IS NULL OR NEW.arccat_id='' THEN NEW.arccat_id = (SELECT arccat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.matcat_id IS NULL OR NEW.matcat_id='' THEN NEW.matcat_id = (SELECT matcat_id FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.y1 IS NULL THEN NEW.y1 = (SELECT y1 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.y2 IS NULL THEN NEW.y2 = (SELECT y2 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.elev1 IS NULL THEN NEW.elev1 = (SELECT sys_elev1 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.elev2 IS NULL THEN NEW.elev2 = (SELECT sys_elev2 FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.barrels IS NULL THEN NEW.barrels = (SELECT barrels FROM v_edit_inp_conduit WHERE arc_id = NEW.arc_id);END IF;			
 	 	
-			INSERT INTO inp_dscenario_conduit (dscenario_id, arc_id, arccat_id, matcat_id, y1, y2, custom_n, barrels, culvert, kentry, kexit,
+			INSERT INTO inp_dscenario_conduit (dscenario_id, arc_id, arccat_id, matcat_id, elev1, elev2, custom_n, barrels, culvert, kentry, kexit,
 			kavg, flap, q0, qmax, seepage)
-	 		VALUES (NEW.dscenario_id, NEW.arc_id, NEW.arccat_id, NEW.matcat_id, NEW.y1, NEW.y2, NEW.custom_n, NEW.barrels, NEW.culvert, NEW.kentry, NEW.kexit,
+	 		VALUES (NEW.dscenario_id, NEW.arc_id, NEW.arccat_id, NEW.matcat_id, NEW.elev1, NEW.elev2, NEW.custom_n, NEW.barrels, NEW.culvert, NEW.kentry, NEW.kexit,
 	 		NEW.kavg, NEW.flap, NEW.q0, NEW.qmax, NEW.seepage);
 
 
@@ -203,14 +203,9 @@ BEGIN
 
 		IF v_dscenario_type = 'CONDUIT' THEN
 			UPDATE inp_dscenario_conduit SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, 
-			matcat_id=NEW.matcat_id, y1=NEW.y1, y2=NEW.y2, custom_n=NEW.custom_n, barrels=NEW.barrels, culvert=NEW.culvert, 
+			matcat_id=NEW.matcat_id, elev1=NEW.elev1, elev2=NEW.elev2, custom_n=NEW.custom_n, barrels=NEW.barrels, culvert=NEW.culvert, 
 			kentry=NEW.kentry, kexit=NEW.kexit, kavg=NEW.kavg, flap=NEW.flap, q0=NEW.q0, qmax=NEW.qmax, seepage=NEW.seepage 
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
-
-		ELSIF v_dscenario_type = 'DIVIDER' THEN
-			UPDATE inp_dscenario_divider SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=NEW.ymax, divider_type=NEW.divider_type, 
-			arc_id=NEW.arc_id, curve_id=NEW.curve_id, qmin=NEW.qmin, ht=NEW.ht, cd=NEW.cd, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
-			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 			UPDATE inp_dscenario_flwreg_orifice SET dscenario_id=NEW.dscenario_id, nodarc_id=NEW.nodarc_id,
@@ -276,9 +271,6 @@ BEGIN
 		IF v_dscenario_type = 'CONDUIT' THEN
 			DELETE FROM inp_dscenario_conduit WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 	
-		ELSIF v_dscenario_type = 'DIVIDER' THEN
-			DELETE FROM inp_dscenario_divider WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
-
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 			DELETE FROM inp_dscenario_flwreg_orifice WHERE dscenario_id=OLD.dscenario_id AND nodarc_id=OLD.nodarc_id ;
 			

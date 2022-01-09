@@ -67,10 +67,10 @@ BEGIN
 
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom, age)
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
-	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
@@ -79,7 +79,7 @@ BEGIN
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
-	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
@@ -88,7 +88,7 @@ BEGIN
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
-	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
@@ -97,7 +97,7 @@ BEGIN
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
-	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom
+	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
@@ -137,7 +137,7 @@ BEGIN
 	-- Insert on arc rpt_inp table
 	EXECUTE 'INSERT INTO temp_arc 
 	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope,
-	culvert, kentry, kexit, kavg, flap, seepage)
+	culvert, kentry, kexit, kavg, flap, seepage, age)
 	SELECT '||quote_literal(result_id_var)||',
 	a.arc_id, node_1, node_2, a.sys_elev1, a.sys_elev2, a.arc_type, arccat_id, epa_type, a.sector_id, a.state, 
 	a.state_type, a.annotation, 
@@ -155,7 +155,7 @@ BEGIN
 	qmax,
 	barrels,
 	slope,
-	culvert, kentry, kexit, kavg, flap, seepage
+	culvert, kentry, kexit, kavg, flap, seepage, (now()::date-a.builtdate)/30
 	FROM selector_sector, v_arc a
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id

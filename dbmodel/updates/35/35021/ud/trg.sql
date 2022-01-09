@@ -226,3 +226,10 @@ CREATE TRIGGER gw_trg_vi_dividers
   ON vi_dividers
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_dividers');
+
+  
+CREATE TRIGGER gw_trg_vi_conduits
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON SCHEMA_NAME.vi_conduits
+  FOR EACH ROW
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_conduits');

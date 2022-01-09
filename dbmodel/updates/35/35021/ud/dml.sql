@@ -27,14 +27,12 @@ VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_ep
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTFALL','OUTFALL');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','STORAGE','STORAGE');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','DIVIDER','DIVIDER');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','WEIR','WEIR');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','PUMP','PUMP');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','ORIFICE','ORIFICE');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTLET','OUTLET');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','INFLOWS','INFLOWS');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','TREATMENT','TREATMENT');
-
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED');
 
 INSERT INTO inp_typevalue VALUES ('inp_value_surface','PAVED','PAVED');
