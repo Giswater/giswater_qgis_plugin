@@ -1005,7 +1005,7 @@ apond AS other6
 FROM temp_node WHERE epa_type  ='DIVIDER' 
 AND addparam::json->>'divider_type' = 'WEIR';
 
-
+DROP VIEW IF EXISTS vi_junction;
 CREATE OR REPLACE VIEW vi_junctions AS
 SELECT 
 node_id,
