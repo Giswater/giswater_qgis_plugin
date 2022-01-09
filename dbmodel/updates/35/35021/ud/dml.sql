@@ -170,3 +170,8 @@ DROP FUNCTION IF EXISTS gw_fct_pg2epa_nod2arc_geom (character varying);
 
 UPDATE config_fprocess SET tablename ='vi_junctions' WHERE tablename ='vi_junction';
 UPDATE sys_table SET id ='vi_junctions' WHERE id ='vi_junction';
+
+UPDATE config_param_user SET value = '5.1' WHERE  parameter = 'inp_options_epaversion';
+UPDATE sys_param_user SET vdefault = '5.1' WHERE  id = 'inp_options_epaversion';
+
+UPDATE ud_sample.config_function SET style = '{"style":{"point":{"style":"qml", "id":"111"}, "line":{"style":"qml", "id":"110"}}}' WHERE function_name = 'gw_fct_pg2epa_check_result';
