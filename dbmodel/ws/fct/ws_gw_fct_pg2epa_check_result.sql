@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2848
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_check_result(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
-SELECT ws_sample.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
 -- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
 

@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/02
+--2021/12/02
 ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
 ALTER TABLE config_user_x_sector ADD CONSTRAINT config_user_x_sector_sector_id_fkey FOREIGN KEY (sector_id)
 REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
@@ -110,7 +111,6 @@ CREATE TABLE inp_dscenario_junction(
   node_id character varying(16) NOT NULL,
   demand numeric(12,6),
   pattern_id character varying(16),
-  demand_type character varying(18),
   peak_factor numeric(12,4),
   CONSTRAINT inp_dscenario_junction_pkey PRIMARY KEY (dscenario_id, node_id),
   CONSTRAINT inp_dscenario_junction_dscenario_id_fkey FOREIGN KEY (dscenario_id)
@@ -127,7 +127,6 @@ CREATE TABLE inp_dscenario_connec(
   connec_id character varying(16) NOT NULL,
   demand numeric(12,6),
   pattern_id character varying(16),
-  demand_type character varying(18),
   peak_factor numeric(12,4),
   status varchar(16),
   minorloss float,

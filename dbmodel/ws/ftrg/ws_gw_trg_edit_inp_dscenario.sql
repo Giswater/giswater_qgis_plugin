@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION NUMBER : 3074
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_trg_edit_inp_dscenario()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_dscenario()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -101,23 +101,21 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.demand_type IS NULL OR NEW.demand_type='' THEN NEW.demand_type = (SELECT demand_type FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 	
-			INSERT INTO inp_dscenario_junction(dscenario_id, node_id, demand, pattern_id, demand_type)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
+			INSERT INTO inp_dscenario_junction(dscenario_id, node_id, demand, pattern_id)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.demand, NEW.pattern_id);
 			
 		ELSIF v_dscenario_type = 'CONNEC' THEN
 
 			-- default values
 			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
-			IF NEW.demand_type IS NULL OR NEW.demand_type='' THEN NEW.demand_type = (SELECT demand_type FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 			IF NEW.custom_roughness IS NULL THEN NEW.custom_roughness = (SELECT custom_roughness FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 			IF NEW.custom_length IS NULL THEN NEW.custom_length = (SELECT custom_length FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 			IF NEW.custom_dint IS NULL THEN NEW.custom_dint = (SELECT custom_dint FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 				
-			INSERT INTO inp_dscenario_connec(dscenario_id, connec_id, demand, pattern_id, demand_type, custom_roughness, custom_length, custom_dint)
-			VALUES (NEW.dscenario_id, NEW.connec_id, NEW.demand, NEW.pattern_id, NEW.demand_type, NEW.custom_roughness, NEW.custom_length, NEW.custom_dint);
+			INSERT INTO inp_dscenario_connec(dscenario_id, connec_id, demand, pattern_id, custom_roughness, custom_length, custom_dint)
+			VALUES (NEW.dscenario_id, NEW.connec_id, NEW.demand, NEW.pattern_id, NEW.custom_roughness, NEW.custom_length, NEW.custom_dint);
 			
 		ELSIF v_dscenario_type = 'INLET' THEN
 

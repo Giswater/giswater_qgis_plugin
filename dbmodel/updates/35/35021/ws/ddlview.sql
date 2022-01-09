@@ -352,11 +352,14 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS 
- SELECT connec.connec_id,
+ SELECT 
+    d.dscenario_id,
+    connec.connec_id,
     connec.pjoint_type,
     connec.pjoint_id,
     c.demand,
     c.pattern_id,
+    c.demand_type,
     c.peak_factor,
 	c.status,
 	c.minorloss,
@@ -373,9 +376,12 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
- SELECT n.node_id,
+ SELECT 
+    d.dscenario_id,
+    n.node_id,
     j.demand,
     j.pattern_id,
+    j.demand_type,
     j.peak_factor,
     n.the_geom
    FROM selector_sector,selector_inp_dscenario,
@@ -387,7 +393,9 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
- SELECT n.node_id,
+ SELECT
+    d.dscenario_id,
+    n.node_id,
     i.initlevel,
     i.minlevel,
     i.maxlevel,
@@ -424,7 +432,6 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS 
  SELECT d.dscenario_id,
-    concat(p.node_id, '_n2a') as nodarc_id,
     p.node_id,
     p.power,
     p.curve_id,
@@ -441,7 +448,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS 
- SELECT d.dscenario_id,
+ SELECT 
+    d.dscenario_id,
     p.node_id,
     p.pattern_id,
     p.head,
@@ -456,8 +464,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS 
- SELECT d.dscenario_id,
-    concat(p.node_id, '_n2a') as nodarc_id,
+ SELECT 
+    d.dscenario_id,
     p.node_id,
     p.minorloss,
     p.status
@@ -470,7 +478,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS 
- SELECT d.dscenario_id,
+ SELECT 
+    d.dscenario_id,
     p.node_id,
     p.initlevel,
     p.minlevel,
@@ -490,8 +499,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
- SELECT d.dscenario_id,
-     concat(p.node_id, '_n2a') as nodarc_id,
+ SELECT 
+    d.dscenario_id,
     p.node_id,
     p.valv_type,
     p.pressure,
@@ -512,7 +521,8 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS
  
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS 
- SELECT d.dscenario_id,
+ SELECT 
+	d.dscenario_id,
 	arc_id,
 	valv_type,
 	pressure,
@@ -534,8 +544,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS
 DROP VIEW IF EXISTS v_edit_inp_pump;
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
  SELECT
-    concat(n.node_id, '_n2a') as nodarc_id,
-	n.node_id,
+    n.node_id,
     n.elevation,
     n.depth,
     n.nodecat_id,
@@ -563,7 +572,6 @@ CREATE OR REPLACE VIEW v_edit_inp_pump AS
 DROP VIEW v_edit_inp_valve;
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
  SELECT 
-    concat(v_node.node_id, '_n2a') as nodarc_id,
     v_node.node_id,
     v_node.elevation,
     v_node.depth,
@@ -594,7 +602,6 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
 DROP VIEW v_edit_inp_shortpipe;
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
  SELECT 
-    concat(n.node_id, '_n2a') as nodarc_id,
     n.node_id,
     n.elevation,
     n.depth,

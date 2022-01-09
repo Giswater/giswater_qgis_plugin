@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2224
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_fct_pg2epa_nod2arc(result_id_var character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var character varying)
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
@@ -14,9 +14,9 @@ CREATE OR REPLACE FUNCTION ud_sample.gw_fct_pg2epa_nod2arc(result_id_var charact
 AS $BODY$
 
 /*
-SELECT ud_sample.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
-SELECT * FROM ud_sample.temp_arc
+SELECT * FROM SCHEMA_NAME.temp_arc
 
 */
 
@@ -66,7 +66,7 @@ old_node_2 varchar;
 BEGIN
 
 	--  Search path
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
