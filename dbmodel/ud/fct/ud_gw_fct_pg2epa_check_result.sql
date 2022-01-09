@@ -542,7 +542,7 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT node_id as id, fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228) row) features;
+		FROM (SELECT node_id as id, 228 as fid, 'Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (228,107)) row) features;
 
 		v_result := COALESCE(v_result, '[]'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
