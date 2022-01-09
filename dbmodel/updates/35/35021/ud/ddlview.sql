@@ -675,7 +675,7 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.the_geom,
     arc.workcat_id_plan,
     arc.asset_id,
-	arc.pavcat_id
+    arc.pavcat_id
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
@@ -763,7 +763,7 @@ offsetval as "Offset",
 outlet_type,
 case when curve_id is null then cd1::text else curve_id end as other1,
 cd2::text AS other2,
-f.flap::varchar AS other3
+f.flap::varchar AS other3,
 FROM temp_arc_flowregulator f
 JOIN temp_arc USING (arc_id)
 WHERE type='OUTLET';
@@ -1013,7 +1013,8 @@ elev,
 ymax,
 y0,
 ysur,
-apond
+apond,
+concat(';',sector_id,' ',node_type,' ',age)::text as other
 FROM temp_node WHERE epa_type  ='JUNCTION'; 
 
 
@@ -1044,7 +1045,8 @@ CREATE OR REPLACE VIEW vi_conduits AS
     elevmax1 AS z1,
     elevmax2 AS z2,
     t.q0::numeric(12,4) AS q0,
-    t.qmax::numeric(12,4) AS qmax
+    t.qmax::numeric(12,4) AS qmax,
+    concat(';',sector_id,' ',arccat_id,' ',age)::text as other
    FROM temp_arc t
      JOIN inp_conduit USING (arc_id)
 UNION
@@ -1056,7 +1058,8 @@ UNION
     elevmax1 AS z1,
     elevmax2 AS z2,
     t.q0::numeric(12,4) AS q0,
-    t.qmax::numeric(12,4) AS qmax
+    t.qmax::numeric(12,4) AS qmax,
+    concat(';',sector_id,' ',arccat_id,' ',age)::text as other
    FROM temp_arc t
      JOIN inp_conduit ON arcparent::text = inp_conduit.arc_id::text;
   

@@ -69,8 +69,6 @@ BEGIN
 	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id)a
 
 	LOOP
-		RAISE NOTICE ' rec_flowreg -----------------------> %', rec_flowreg;
-
 		IF rec_flowreg.flw_type='OR' THEN epa_type_aux='ORIFICE';
 		ELSIF rec_flowreg.flw_type='PU' THEN epa_type_aux='PUMP';
 		ELSIF rec_flowreg.flw_type='OT' THEN epa_type_aux='OUTLET';
@@ -102,8 +100,7 @@ BEGIN
 			record_new_arc.state = nodarc_rec.state;
 			record_new_arc.state_type = nodarc_rec.state_type;
 			record_new_arc.epa_type = epa_type_aux;
-			record_new_arc.arccat_id = 'SECONDARY';
-
+			record_new_arc.arccat_id = 'SECONDARY'; 
 
 			-- Geometry construction from pattern arc
 			-- intermediate variables
@@ -121,14 +118,13 @@ BEGIN
 			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.1*(counter)::float;
 			p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
 
-
-			--create arc
+			--create geometry
 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
 	
 			-- Inserting into inp_rpt_arc
-			INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
+			INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom, age)
 			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
-			record_new_arc.sector_id, record_new_arc.arc_type, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.the_geom);
+			record_new_arc.sector_id, record_new_arc.arc_type, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.the_geom, record_new_arc.age);
 
 		ELSE
 			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type, rec_flowreg.order_id);
@@ -136,7 +132,6 @@ BEGIN
 			-- udpating the feature
 			UPDATE temp_arc SET epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
 			counter :=1;
-	
 		END IF;
 		old_node_id= rec_flowreg.node_id;
 		old_to_arc= rec_flowreg.to_arc;
@@ -145,11 +140,10 @@ BEGIN
 		IF rec_flowreg.flw_type='PU' THEN
 			UPDATE temp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
-		
     END LOOP;
      	
     RETURN 1;
-		
+    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

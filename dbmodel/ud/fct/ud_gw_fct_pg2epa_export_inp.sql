@@ -134,6 +134,12 @@ BEGIN
 		union
 			select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_transects','vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons') 
 		union
+			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', csv7) as text
+			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_junctions') 
+		union
+			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20),' ', rpad(csv7,20) , ' ', rpad(csv8,20), ' ', rpad(csv8,20), ' ',
+			csv10) as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_conduits') 
+		union
 			select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('header', 'vi_evaporation','vi_temperature', 'vi_report', 'vi_map')
 		union
 			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files', 'vi_adjustments')

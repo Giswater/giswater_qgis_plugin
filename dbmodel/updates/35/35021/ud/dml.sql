@@ -167,3 +167,6 @@ INSERT INTO config_fprocess VALUES (239, 'vi_adjustments', '[ADJUSTMENTS]', null
 DELETE FROM sys_table WHERE id = 2240;
 DROP FUNCTION IF EXISTS gw_fct_pg2epa_nod2arc_geom (character varying);
 UPDATE sys_table SET function_name = 'gw_fct_pg2epa_nod2arc' WHERE id = 2238;
+
+UPDATE sys_fprocess SET tablename ='vi_junctions' WHERE tablename ='vi_junction';
+UPDATE sys_table SET id ='vi_junctions' WHERE id ='vi_junction';
