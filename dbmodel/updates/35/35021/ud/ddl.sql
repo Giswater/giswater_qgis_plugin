@@ -137,35 +137,6 @@ CONSTRAINT inp_dscenario_storage_node_id_fkey FOREIGN KEY (node_id)
   ON UPDATE CASCADE ON DELETE CASCADE);
 
 
-CREATE TABLE inp_dscenario_divider(
-dscenario_id integer,
-node_id character varying(50) NOT NULL,
-elev numeric(12,3),
-ymax numeric(12,3),
-divider_type character varying(18),
-arc_id character varying(50),
-curve_id character varying(16),
-qmin numeric(16,6),
-ht numeric(12,4),
-cd numeric(12,4),
-y0 numeric(12,4),
-ysur numeric(12,4),
-apond numeric(12,4),
-CONSTRAINT inp_dscenario_divider_pkey PRIMARY KEY (dscenario_id, node_id),
-CONSTRAINT inp_dscenario_divider_arc_id_fkey FOREIGN KEY (arc_id)
-  REFERENCES arc (arc_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT iinp_dscenario_divider_curve_id_fkey FOREIGN KEY (curve_id)
-  REFERENCES inp_curve (id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT inp_dscenario_divider_dscenario_id_fkey FOREIGN KEY (dscenario_id)
-  REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE,
-CONSTRAINT iinp_dscenario_divider_node_id_fkey FOREIGN KEY (node_id)
-  REFERENCES inp_divider (node_id) MATCH SIMPLE
-  ON UPDATE CASCADE ON DELETE CASCADE);
-
-
 CREATE TABLE inp_dscenario_flwreg_weir(
 dscenario_id integer,
 nodarc_id character varying(20) NOT NULL,

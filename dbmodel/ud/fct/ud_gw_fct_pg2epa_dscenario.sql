@@ -107,26 +107,6 @@ BEGIN
 
 		-- TODO: update outfallparam
 
-		-- update dividers
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'divider_type', d.divider_type) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.divider_type IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'arc_id', d.arc_id) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arc_id IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', d.curve_id) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'qmin', d.qmin) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.qmin IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'ht', d.ht) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ht IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'cd', d.cd) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'y0', d.y0) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'ysur', d.ysur) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;		
-		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'apond', d.apond) FROM v_edit_inp_dscenario_divider d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;		
-
 		-- update outfalls
 		UPDATE temp_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'outfall_type', d.outfall_type) FROM v_edit_inp_dscenario_outfall d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.outfall_type IS NOT NULL;		
@@ -248,8 +228,6 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.order_id IS NOT NULL;
 		UPDATE temp_node_other t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_inflows d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
-		UPDATE temp_node_other t SET form_type = d.form_type FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.form_type IS NOT NULL;
 		UPDATE temp_node_other t SET sfactor = d.sfactor FROM v_edit_inp_dscenario_inflows d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.sfactor IS NOT NULL;
 		UPDATE temp_node_other t SET base = d.base FROM v_edit_inp_dscenario_inflows d 

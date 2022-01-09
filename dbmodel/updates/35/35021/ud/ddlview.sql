@@ -346,25 +346,6 @@ JOIN v_edit_inp_storage USING (node_id)
 WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
 
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_divider AS
-SELECT
-s.dscenario_id,
-f.node_id, 
-f.elev,
-f.ymax,
-f.divider_type,
-f.arc_id, 
-f.curve_id,
-f.qmin, 
-f.ht, 
-f.cd, 
-f.y0, 
-f.ysur,
-f.apond 
-FROM selector_inp_dscenario s, inp_dscenario_divider f
-JOIN v_edit_inp_divider USING (node_id)
-WHERE s.dscenario_id = f.dscenario_id AND cur_user = current_user;
-
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir AS
 SELECT

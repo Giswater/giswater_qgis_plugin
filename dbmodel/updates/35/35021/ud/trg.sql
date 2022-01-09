@@ -28,13 +28,7 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('STORAGE');
 
-
-CREATE TRIGGER gw_trg_edit_inp_dscenario
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_dscenario_divider
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('DIVIDER');
-  
+ 
   
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE

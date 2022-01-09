@@ -53,10 +53,6 @@ VALUES('v_edit_inp_dscenario_storage', 'Editable view to manage scenario for sto
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_divider', 'Editable view to manage scenario for divider','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario divider', 4 ,'core')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
 VALUES('v_edit_inp_dscenario_weir', 'Editable view to manage scenario for weir','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario weir', 6 ,'core')
 ON CONFLICT (id) DO NOTHING;
 
@@ -101,9 +97,6 @@ VALUES('inp_dscenario_outfall', 'Table to manage scenario for outfall','role_epa
 
 INSERT INTO sys_table (id, descript, sys_role) 
 VALUES('inp_dscenario_storage', 'Table to manage scenario for storage','role_epa');
-
-INSERT INTO sys_table (id, descript, sys_role)
-VALUES('inp_dscenario_divider', 'Table to manage scenario for divider','role_epa');
 
 INSERT INTO sys_table (id, descript, sys_role) 
 VALUES('inp_dscenario_weir', 'Table to manage scenario for weir','role_epa');

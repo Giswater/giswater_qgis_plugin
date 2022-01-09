@@ -42,22 +42,6 @@ BEGIN
 	 		VALUES (NEW.dscenario_id, NEW.arc_id, NEW.arccat_id, NEW.matcat_id, NEW.y1, NEW.y2, NEW.custom_n, NEW.barrels, NEW.culvert, NEW.kentry, NEW.kexit,
 	 		NEW.kavg, NEW.flap, NEW.q0, NEW.qmax, NEW.seepage);
 
-		ELSIF v_dscenario_type = 'DIVIDER' THEN
-
-			-- default values
-			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.divider_type IS NULL OR NEW.divider_type='' THEN NEW.divider_type = (SELECT divider_type FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;		
-			IF NEW.arc_id IS NULL OR NEW.arc_id='' THEN NEW.arc_id = (SELECT arc_id FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.qmin IS NULL THEN NEW.qmin = (SELECT qmin FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ht IS NULL THEN NEW.ht = (SELECT ht FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_divider WHERE node_id = NEW.node_id);END IF;
-	
-			INSERT INTO inp_dscenario_divider (dscenario_id, node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, y0, ysur, apond)
-	 		VALUES (NEW.dscenario_id, NEW.node_id, NEW.elev, NEW.ymax, NEW.divider_type, NEW.arc_id, NEW.curve_id, NEW.qmin, NEW.ht, NEW.y0, NEW.ysur, NEW.apond);
 
 		ELSIF v_dscenario_type = 'FLWREG-ORIFICE' THEN
 
