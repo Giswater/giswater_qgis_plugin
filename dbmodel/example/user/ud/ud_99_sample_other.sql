@@ -483,3 +483,5 @@ UPDATE inp_flwreg_orifice SET nodarc_id = concat(node_id,'OR',order_id);
 UPDATE inp_flwreg_weir SET nodarc_id = concat(node_id,'WE',order_id);
 UPDATE inp_flwreg_outlet SET nodarc_id = concat(node_id,'OT',order_id);
 UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);
+
+UPDATE inp_flwreg_pump SET to_arc = '18966' WHERE node_id = '18828';
