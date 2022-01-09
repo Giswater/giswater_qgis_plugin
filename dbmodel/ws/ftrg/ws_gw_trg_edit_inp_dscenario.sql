@@ -150,13 +150,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
 
 			-- default values
-			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.order_id IS NULL THEN NEW.order_id = (SELECT order_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pattern IS NULL OR NEW.pattern='' THEN NEW.pattern = (SELECT pattern FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-		
-			INSERT INTO inp_dscenario_pump_additional(dscenario_id, node_id, power, order_id, curve_id, speed, pattern, status)
+			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern IS NULL OR NEW.pattern='' THEN NEW.pattern = (SELECT pattern FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			
+			INSERT INTO inp_dscenario_pump_additional(dscenario_id, node_id, order_id, power, curve_id, speed, pattern, status)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 		END IF;
 		
@@ -197,9 +196,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 		ELSIF v_dscenario_type = 'CONNEC' THEN
 			UPDATE inp_dscenario_connec SET dscenario_id=NEW.dscenario_id, connec_id=NEW.connec_id, 
-			connec_id=NEW.connec_id, demand=NEW.demand, pattern_id=NEW.pattern_id, demand_type=NEW.demand_type, peak_factor=NEW.peak_factor, 
+			demand=NEW.demand, pattern_id=NEW.pattern_id, demand_type=NEW.demand_type, peak_factor=NEW.peak_factor, 
 			custom_roughness=NEW.custom_roughness, custom_length=NEW.custom_length, custom_dint=NEW.custom_dint
-			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
+			WHERE dscenario_id=OLD.dscenario_id AND connec_id=OLD.connec_id;
 
 		ELSIF v_dscenario_type = 'INLET' THEN
 			UPDATE inp_dscenario_inlet SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel,
@@ -242,7 +241,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			DELETE FROM inp_dscenario_junction WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
 		ELSIF v_dscenario_type = 'CONNEC' THEN
-			DELETE FROM inp_dscenario_connec WHERE dscenario_id=OLD.dscenario_id AND connec=OLD.connec;
+			DELETE FROM inp_dscenario_connec WHERE dscenario_id=OLD.dscenario_id AND connec_id=OLD.connec_id;
 			
 		ELSIF v_dscenario_type = 'INLET' THEN
 			DELETE FROM inp_dscenario_inlet WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;

@@ -59,6 +59,13 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_pump_additional
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP_ADDITIONAL');
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_dscenario_shortpipe
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('SHORTPIPE');

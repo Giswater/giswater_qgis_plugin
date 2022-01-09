@@ -222,3 +222,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"age", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"age", "dataType":"integer", "isUtils":"False"}}$$);
+
+ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT IF EXISTS inp_pump_additional_unique;
+ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_unique UNIQUE(dscenario_id, node_id, order_id);

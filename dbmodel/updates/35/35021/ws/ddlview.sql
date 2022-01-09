@@ -367,12 +367,11 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS
     c.custom_length,
     c.custom_dint,
     connec.the_geom
-   FROM selector_sector,selector_inp_dscenario,
-    v_connec connec
+   FROM selector_inp_dscenario,
+    v_edit_inp_connec connec
      JOIN inp_dscenario_connec c USING (connec_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
-  AND c.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE c.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
@@ -384,12 +383,11 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS
     j.demand_type,
     j.peak_factor,
     n.the_geom
-   FROM selector_sector,selector_inp_dscenario,
-    v_edit_node n
+   FROM selector_inp_dscenario,
+    v_edit_inp_junction n
      JOIN inp_dscenario_junction j USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
-  AND j.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE j.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
@@ -406,11 +404,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS
     i.overflow,
     i.head,
     n.the_geom
-   FROM selector_sector, selector_inp_dscenario, v_node n
+   FROM  selector_inp_dscenario, v_edit_inp_inlet n
      JOIN inp_dscenario_inlet i USING (node_id)
       JOIN cat_dscenario d USING (dscenario_id)
-  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
-  AND i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS 
@@ -421,12 +418,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS
     p.roughness,
     p.dint,
     the_geom
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_arc
+   FROM  selector_inp_dscenario, v_edit_inp_pipe
      JOIN inp_dscenario_pipe p USING (arc_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
@@ -439,12 +434,25 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS
     p.pattern,
     p.status,
     the_geom
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_node
+   FROM selector_inp_dscenario, v_edit_inp_pump
      JOIN inp_dscenario_pump p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    p.order_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern,
+    p.status
+   FROM selector_inp_dscenario, v_edit_inp_pump
+     JOIN inp_dscenario_pump_additional p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS 
@@ -454,12 +462,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS
     p.pattern_id,
     p.head,
     the_geom
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_node
+   FROM  selector_inp_dscenario,  v_edit_inp_reservoir
      JOIN inp_dscenario_reservoir p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
@@ -469,12 +475,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS
     p.node_id,
     p.minorloss,
     p.status
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_node
+   FROM selector_inp_dscenario, v_edit_inp_shortpipe v
      JOIN inp_dscenario_shortpipe p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS 
@@ -487,14 +491,12 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS
     p.diameter,
     p.minvol,
     p.curve_id,
-    overflow,
+    p.overflow,
     the_geom
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_node
+   FROM  selector_inp_dscenario, v_edit_inp_tank v
      JOIN inp_dscenario_tank p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
@@ -511,12 +513,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS
     p.status,
     p.add_settings,
     the_geom
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_node
+   FROM selector_inp_dscenario, v_edit_inp_valve v
      JOIN inp_dscenario_valve p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
  
 
@@ -524,103 +524,19 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS
  SELECT 
 	d.dscenario_id,
 	arc_id,
-	valv_type,
-	pressure,
-	diameter,
-	flow,
-	coef_loss,
-	curve_id,
-	minorloss, 
-	status,
+	v.valv_type,
+	v.pressure,
+	v.diameter,
+	v.flow,
+	v.coef_loss,
+	v.curve_id,
+	v.minorloss, 
+	v.status,
 	the_geom 
-   FROM selector_sector,
-    selector_inp_dscenario,
-    v_arc
+   FROM selector_inp_dscenario, v_edit_inp_virtualvalve
      JOIN inp_dscenario_virtualvalve v USING (arc_id)
      JOIN cat_dscenario d USING (dscenario_id)
-  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
-
-
-DROP VIEW IF EXISTS v_edit_inp_pump;
-CREATE OR REPLACE VIEW v_edit_inp_pump AS 
- SELECT
-    n.node_id,
-    n.elevation,
-    n.depth,
-    n.nodecat_id,
-    n.sector_id,
-    n.macrosector_id,
-    n.state,
-    n.state_type,
-    n.annotation,
-    n.expl_id,
-    n.dma_id,
-    inp_pump.power,
-    inp_pump.curve_id,
-    inp_pump.speed,
-    inp_pump.pattern,
-    inp_pump.to_arc,
-    inp_pump.status,
-    inp_pump.pump_type,
-    n.the_geom
-   FROM selector_sector,
-    v_node n
-     JOIN inp_pump USING (node_id)
-  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-DROP VIEW v_edit_inp_valve;
-CREATE OR REPLACE VIEW v_edit_inp_valve AS 
- SELECT 
-    v_node.node_id,
-    v_node.elevation,
-    v_node.depth,
-    v_node.nodecat_id,
-    v_node.sector_id,
-    v_node.macrosector_id,
-    v_node.state,
-    v_node.state_type,
-    v_node.annotation,
-    v_node.expl_id,
-    inp_valve.valv_type,
-    inp_valve.pressure,
-    inp_valve.flow,
-    inp_valve.coef_loss,
-    inp_valve.curve_id,
-    inp_valve.minorloss,
-    inp_valve.to_arc,
-    inp_valve.status,
-    v_node.the_geom,
-    inp_valve.custom_dint,
-    inp_valve.add_settings
-   FROM selector_sector,
-    v_node
-     JOIN inp_valve USING (node_id)
-  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-DROP VIEW v_edit_inp_shortpipe;
-CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
- SELECT 
-    n.node_id,
-    n.elevation,
-    n.depth,
-    n.nodecat_id,
-    n.sector_id,
-    n.macrosector_id,
-    n.dma_id,
-    n.state,
-    n.state_type,
-    n.annotation,
-    n.expl_id,
-    inp_shortpipe.minorloss,
-    inp_shortpipe.to_arc,
-    inp_shortpipe.status,
-    n.the_geom
-   FROM selector_sector,
-    v_node n
-     JOIN inp_shortpipe USING (node_id)
-  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+  WHERE v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW vu_arc AS 
