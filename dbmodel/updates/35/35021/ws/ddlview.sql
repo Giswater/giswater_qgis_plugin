@@ -78,7 +78,7 @@ CREATE OR REPLACE VIEW vi_junctions AS
     elevation,
     demand,
     pattern_id,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type,' ', age) as "other"
     FROM temp_node
     WHERE epa_type NOT IN ('RESERVOIR', 'TANK')
   ORDER BY node_id;
@@ -92,7 +92,7 @@ CREATE OR REPLACE VIEW vi_pipes AS
     roughness,
     minorloss,
     status::varchar(30),
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id) as "other"
+    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', arccat_id,' ', age) as "other"
     FROM temp_arc
     WHERE epa_type IN ('PIPE', 'SHORTPIPE', 'NODE2NODE');
 
@@ -298,7 +298,6 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
   WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
-DROP VIEW IF EXISTS v_edit_inp_tank;
 CREATE OR REPLACE VIEW v_edit_inp_tank
 AS SELECT n.node_id,
     n.elevation,

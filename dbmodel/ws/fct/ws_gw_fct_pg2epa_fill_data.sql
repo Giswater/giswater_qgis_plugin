@@ -53,23 +53,25 @@ BEGIN
 	raise notice 'Inserting nodes on temp_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id)
+	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
 		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
 		AND ve_arc.sector_id > 0 '
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
-		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id
+		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
 
 	IF v_networkmode = 4 THEN
 	
-		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id)
+		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
-			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id
+			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
+			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_connec c
 			JOIN value_state_type ON id = state_type
 			WHERE c.sector_id = selector_sector.sector_id 
@@ -132,14 +134,15 @@ BEGIN
 	raise notice 'inserting arcs on temp_arc table';
 	
 	EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
-		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id)
+		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT
 		v_arc.arc_id, node_1, node_2, v_arc.cat_arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
 		(CASE WHEN v_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 		v_arc.the_geom,
-		v_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id
+		v_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		(case when v_arc.builtdate is not null then (now()::date-v_arc.builtdate)/30 else 0 end)
 		FROM selector_sector, v_arc
 			LEFT JOIN value_state_type ON id=state_type
 			LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
@@ -160,14 +163,15 @@ BEGIN
 
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
-			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss)
+			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
 			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
 			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 			l.the_geom,
-			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss
+			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
+			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type
