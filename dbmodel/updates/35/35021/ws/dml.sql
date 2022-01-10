@@ -200,7 +200,7 @@ null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHIN
 
 INSERT INTO config_param_system VALUES ('admin_hydrometer_state', '{"0":[0], "1":[1,2,3,4]}', 
 'Variable to map state values from crm to giswater state values in order to identify what state are deprecated to check on function state_control for connecs')
- ON CONFLICT (id) DO NOTHING;
+ ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES ('3194', 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, TRUE, 'utils', NULL)
