@@ -373,3 +373,6 @@ FROM config_form_fields WHERE formname='v_edit_inp_virtualvalve' AND columnname 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET dv_isnullvalue= true WHERE widgettype='combo' AND formname ILIKE 'v_edit_inp_dscenario_inp%';
+
+UPDATE sys_param_user SET datatype='integer', vdefault = '40' where id IN ('inp_options_trials', 'inp_options_unbalanced_n');
+UPDATE config_param_user SET value = cast(value::numeric as integer) where parameter IN ('inp_options_trials', 'inp_options_unbalanced_n');
