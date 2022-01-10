@@ -21,24 +21,27 @@ INSERT INTO config_toolbox VALUES (3118, 'Create Dscenario with values from ToC'
   NULL,TRUE)  ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Hydrology catalog',1,'core');
+VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Hydrology catalog',1,'core')
+ ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','DWF catalog', 2 ,'core');
+VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','DWF catalog', 2 ,'core')
+ ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTFALL','OUTFALL');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','STORAGE','STORAGE');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','WEIR','WEIR');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','PUMP','PUMP');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','ORIFICE','ORIFICE');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTLET','OUTLET');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','INFLOWS','INFLOWS');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','TREATMENT','TREATMENT');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTFALL','OUTFALL') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','STORAGE','STORAGE') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','WEIR','WEIR') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','PUMP','PUMP') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','ORIFICE','ORIFICE') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTLET','OUTLET') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','INFLOWS','INFLOWS') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','TREATMENT','TREATMENT') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED') ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_value_surface','PAVED','PAVED');
-INSERT INTO inp_typevalue VALUES ('inp_value_surface','GRAVEL','GRAVEL');
+INSERT INTO inp_typevalue VALUES ('inp_value_surface','PAVED','PAVED') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_value_surface','GRAVEL','GRAVEL') ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_value_weirs','ROADWAY','ROADWAY');
+INSERT INTO inp_typevalue VALUES ('inp_value_weirs','ROADWAY','ROADWAY') ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE sys_foreignkey SET active=false WHERE typevalue_name ='sys_table_context';
 
@@ -91,37 +94,38 @@ UPDATE sys_table SET id = 'inp_inflows_poll' WHERE id = 'inp_inflows_pol_x_node'
 
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_outfall', 'Table to manage scenario for outfall','role_epa');
+VALUES('inp_dscenario_outfall', 'Table to manage scenario for outfall','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_storage', 'Table to manage scenario for storage','role_epa');
+VALUES('inp_dscenario_storage', 'Table to manage scenario for storage','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_weir', 'Table to manage scenario for weir','role_epa');
+VALUES('inp_dscenario_weir', 'Table to manage scenario for weir','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_pump', 'Table to manage scenario for pump','role_epa');
+VALUES('inp_dscenario_pump', 'Table to manage scenario for pump','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_orifice', 'Table to manage scenario for orifice','role_epa');
+VALUES('inp_dscenario_orifice', 'Table to manage scenario for orifice','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_outlet', 'Table to manage scenario for outlet','role_epa');
+VALUES('inp_dscenario_outlet', 'Table to manage scenario for outlet','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_inflows', 'Table to manage scenario for inflows','role_epa');
+VALUES('inp_dscenario_inflows', 'Table to manage scenario for inflows','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_inflows_pol', 'Table to manage scenario for inflows','role_epa');
+VALUES('inp_dscenario_inflows_pol', 'Table to manage scenario for inflows','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('inp_dscenario_treatment', 'Table to manage scenario for treatment','role_epa');
+VALUES('inp_dscenario_treatment', 'Table to manage scenario for treatment','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('temp_flowregulator', 'Table to use on pg2epa export for flowregulators (outlet, orifice, weir, pump','role_epa');
+VALUES('temp_flowregulator', 'Table to use on pg2epa export for flowregulators (outlet, orifice, weir, pump','role_epa') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) 
-VALUES('temp_node_other', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa');
+VALUES('temp_node_other', 'Table to use on pg2epa export for those processes that uses a relation of cardinility on nodes 1:m (inflows, treatment','role_epa')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
@@ -161,8 +165,8 @@ ADD CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (shape::text = ANY
 ALTER TABLE inp_flwreg_orifice
 ADD CONSTRAINT inp_flwreg_orifice_check_shape CHECK (shape::text = ANY (ARRAY['CIRCULAR'::character varying::text, 'RECT_CLOSED'::character varying::text]));
 
-INSERT INTO config_fprocess VALUES (141, 'vi_adjustments', '[ADJUSTMENTS]', null, 44);
-INSERT INTO config_fprocess VALUES (239, 'vi_adjustments', '[ADJUSTMENTS]', null, 30);
+INSERT INTO config_fprocess VALUES (141, 'vi_adjustments', '[ADJUSTMENTS]', null, 44) ON CONFLICT (fid) DO NOTHING;
+INSERT INTO config_fprocess VALUES (239, 'vi_adjustments', '[ADJUSTMENTS]', null, 30) ON CONFLICT (fid) DO NOTHING;
 
 DELETE FROM sys_function WHERE id = 2240;
 DELETE FROM sys_function WHERE id = 2238;
@@ -175,3 +179,51 @@ UPDATE config_param_user SET value = '5.1' WHERE  parameter = 'inp_options_epave
 UPDATE sys_param_user SET vdefault = '5.1' WHERE  id = 'inp_options_epaversion';
 
 UPDATE config_function SET style = '{"style":{"point":{"style":"qml", "id":"111"}, "line":{"style":"qml", "id":"110"}}}' WHERE function_name = 'gw_fct_pg2epa_check_result';
+
+--2022/01/10
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_conduit', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_dscenario_conduit', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_dscenario_flwreg_orifice', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_orifice', 'inp_dscenario_flwreg_orifice', 'ori_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_orifice', 'inp_dscenario_flwreg_orifice', 'shape', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_outlet', 'inp_dscenario_flwreg_outlet', 'outlet_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_dscenario_flwreg_outlet', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_flwreg_outlet', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_outlet', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status', 'inp_dscenario_flwreg_pump', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_dscenario_flwreg_weir', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_weirs', 'inp_dscenario_flwreg_weir', 'weir_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_inflows', 'inp_dscenario_inflows_poll', 'form_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_outfall', 'inp_dscenario_outfall', 'outfall_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+UPDATE sys_foreignkey SET typevalue_name='inp_value_raingage' WHERE target_table='inp_dscenario_raingage' AND target_field='form_type';
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_storage', 'inp_dscenario_storage', 'storage_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;

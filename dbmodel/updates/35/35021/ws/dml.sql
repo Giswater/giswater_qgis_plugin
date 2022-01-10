@@ -98,22 +98,22 @@ INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA') ON CON
 
 UPDATE sys_param_user SET layoutorder = 12 WHERE id IN ('inp_options_quality_mode','inp_options_node_id');
 
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage dscenario for junctions', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage dscenario for connecs', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage dscenario for inlets', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_virtualvalve', 'Table to manage dscenario for virtualvalves', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_pump_additional', 'Table to manage dscenario for additional pumps', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage dscenario for junctions', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage dscenario for connecs', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage dscenario for inlets', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_virtualvalve', 'Table to manage dscenario for virtualvalves', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_pump_additional', 'Table to manage dscenario for additional pumps', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_junction', 'View to manage dscenario for junctions', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_connec', 'View to manage dscenario for connecs', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_inlet', 'View to manage dscenario for inlets', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_virtualvalve', 'View to manage dscenario for virtualvalves', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_pump_additional', 'View to manage dscenario for additional pumps', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_junction', 'View to manage dscenario for junctions', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_connec', 'View to manage dscenario for connecs', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_inlet', 'View to manage dscenario for inlets', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_virtualvalve', 'View to manage dscenario for virtualvalves', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_pump_additional', 'View to manage dscenario for additional pumps', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC') ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED') ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
@@ -196,10 +196,11 @@ widgetfunction, linkedobject, hidden)
 VALUES('v_edit_inp_tank', 'form_feature', 'main','overflow','lyt_data_1', 71, 'string',
 'text','overflow', null,  'Yes or No', false,false, true,false, false, 
 null,  false,  false,  null,null, null,'{"setMultiline":false}', 
-null,null,false);
+null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_param_system VALUES ('admin_hydrometer_state', '{"0":[0], "1":[1,2,3,4]}', 
-'Variable to map state values from crm to giswater state values in order to identify what state are deprecated to check on function state_control for connecs');
+'Variable to map state values from crm to giswater state values in order to identify what state are deprecated to check on function state_control for connecs')
+ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES ('3194', 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, TRUE, 'utils', NULL)
@@ -249,7 +250,7 @@ VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_dscenario_virtualvalve',
 
 ALTER TABLE inp_dscenario_demand DROP CONSTRAINT IF EXISTS inp_dscenario_demand_feature_type_fkey;
 ALTER TABLE inp_dscenario_demand ADD CONSTRAINT inp_dscenario_demand_feature_type_fkey FOREIGN KEY (feature_type)
-REFERENCES cat_feature (feature_type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 UPDATE sys_foreignkey SET target_field='demand_type' WHERE target_field='deman_type' AND target_table='inp_dscenario_demand';
 
