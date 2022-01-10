@@ -263,6 +263,15 @@ BEGIN
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
+	
+	UPDATE temp_node SET dqa_id = 0 WHERE dqa_id IS NULL;
+	UPDATE temp_arc SET dqa_id = 0 WHERE dqa_id IS NULL;
+	
+	UPDATE temp_node SET dma_id = 0 WHERE dma_id IS NULL;
+	UPDATE temp_arc SET dma_id = 0 WHERE dma_id IS NULL;
+	
+	UPDATE temp_node SET presszone_id = 0 WHERE presszone_id IS NULL;
+	UPDATE temp_arc SET presszone_id = 0 WHERE presszone_id IS NULL;
 
 	-- remove pattern when breakPipes is enabled	
 	IF v_breakpipes THEN

@@ -21,6 +21,13 @@ CREATE TRIGGER gw_trg_vi_demands
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_demands');
   
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_dscenario_valve
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
+
     
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
