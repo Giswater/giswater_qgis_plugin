@@ -30,7 +30,7 @@ ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM inp_typevalue where typevalue = 'inp_value_patternmethod' and id::integer > 20;
 UPDATE inp_typevalue SET id = '14' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET id = '13' WHERE id = '12' AND  typevalue = 'inp_value_patternmethod';
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN') ON CONFLICT (typevalue, id) DO NOTHING;
 UPDATE inp_typevalue SET idval = 'DEFAULT PATTERN' WHERE id = '11' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'FEATURE PATTERN' WHERE id = '14' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'DMA PATTERN' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
@@ -93,8 +93,8 @@ VALUES ('inp_options_max_flowchange', 'FLOWCHANGE', 'epaoptions', 'Max. flow cha
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA');
-INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA');
+INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA') ON CONFLICT (typevalue, id) DO NOTHING;;
 
 UPDATE sys_param_user SET layoutorder = 12 WHERE id IN ('inp_options_quality_mode','inp_options_node_id');
 
@@ -204,3 +204,58 @@ INSERT INTO config_param_system VALUES ('admin_hydrometer_state', '{"0":[0], "1"
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES ('3194', 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, TRUE, 'utils', NULL)
 ON CONFLICT (id) DO NOTHING;
+
+--2022/01/10
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pump', 'inp_dscenario_pump', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pump', 'inp_dscenario_pump_additional', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_param_energy', 'inp_dscenario_pump_additional', 'energyparam', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+ALTER TABLE inp_dscenario_pump DROP CONSTRAINT IF EXISTS inp_dscenario_pump_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump ADD CONSTRAINT inp_dscenario_pump_pattern_id_fkey FOREIGN KEY (pattern)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+ALTER TABLE inp_dscenario_tank DROP CONSTRAINT IF EXISTS inp_dscenario_tank_curve_id_fkey;
+ALTER TABLE inp_dscenario_tank ADD CONSTRAINT inp_dscenario_tank_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_tank DROP CONSTRAINT IF EXISTS inp_tank_curve_id_fkey;
+ALTER TABLE inp_tank ADD CONSTRAINT inp_tank_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_inlet DROP CONSTRAINT IF EXISTS inp_dscenario_inlet_curve_id_fkey;
+ALTER TABLE inp_dscenario_inlet ADD CONSTRAINT inp_dscenario_inlet_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_valve', 'inp_virtualvalve', 'valv_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_virtualvalve', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_valve', 'inp_dscenario_virtualvalve', 'valv_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_dscenario_virtualvalve', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+
+ALTER TABLE inp_dscenario_demand DROP CONSTRAINT IF EXISTS inp_dscenario_demand_feature_type_fkey;
+ALTER TABLE inp_dscenario_demand ADD CONSTRAINT inp_dscenario_demand_feature_type_fkey FOREIGN KEY (feature_type)
+REFERENCES cat_feature (feature_type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+UPDATE sys_foreignkey SET target_field='demand_type' WHERE target_field='deman_type' AND target_table='inp_dscenario_demand';
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_connec', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_connec', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
