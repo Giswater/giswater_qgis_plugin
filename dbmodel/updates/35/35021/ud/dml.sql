@@ -405,14 +405,6 @@ dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
 FROM config_form_fields WHERE formname='inp_inflows' AND columnname IN ('node_id','order_id','timser_id','sfactor','base', 'pattern_id')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
-datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
-dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT 'v_edit_inp_dscenario_inflows_poll', formtype, tabname, columnname, layoutname, layoutorder, 
-datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
-dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_inp_dscenario_conduit' AND columnname IN ('dscenario_id')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET formname='v_edit_inp_inflows_poll' WHERE formname='inp_inflows_pol_x_node';
 
@@ -489,3 +481,4 @@ dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
 FROM config_form_fields WHERE formname='inp_treatment_node_x_pol'
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+UPDATE config_form_fields SET dv_isnullvalue= true WHERE widgettype='combo' AND formname ILIKE 'v_edit_inp_dscenario_inp%';
