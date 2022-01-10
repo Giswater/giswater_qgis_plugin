@@ -660,19 +660,37 @@ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "l
 
 
 CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
- SELECT a.arc_id,
-        CASE 
+SELECT arc_id,
+case when plan_arc.m2pav_cost is not null then plan_arc.thickness else arc.thickness end as thickness,
+case when plan_arc.m2pav_cost is not null then plan_arc.m2pav_cost else arc.m2pav_cost end as m2pav_cost
+ FROM
+ (SELECT a.arc_id,
+        CASE
             WHEN v_price_x_catpavement.thickness IS NULL THEN 0::numeric(12,2)
-            ELSE v_price_x_catpavement.thickness::numeric(12,2)
+            ELSE v_price_x_catpavement.thickness
         END AS thickness,
         CASE
             WHEN v_price_x_catpavement.m2pav_cost IS NULL THEN 0::numeric
-            ELSE v_price_x_catpavement.m2pav_cost::numeric
+            ELSE v_price_x_catpavement.m2pav_cost
         END AS m2pav_cost
    FROM v_edit_arc a
-     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text;
-
+     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text) arc
+left join 
+ (SELECT plan_arc_x_pavement.arc_id,
+        CASE
+            WHEN sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2)
+            ELSE sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2)
+        END AS thickness,
+        CASE
+            WHEN sum(v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2)
+            ELSE sum(v_price_x_catpavement.m2pav_cost::numeric(12,2) * plan_arc_x_pavement.percent)
+        END AS m2pav_cost
+   FROM plan_arc_x_pavement
+     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text
+  GROUP BY plan_arc_x_pavement.arc_id) plan_arc
+USING (arc_id);
    
+  
 CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
  SELECT n.node_id,
     n.elevation,
