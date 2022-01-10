@@ -34,7 +34,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_tabl
 ALTER TABLE sys_table ALTER COLUMN context TYPE character varying(500);
 
 -- 2022/01/05
-ALTER TABLE config_typevalue ALTER COLUMN id TYPE character varying(50);
+ALTER TABLE config_typevalue ALTER COLUMN id TYPE character varying(100);
 
 ALTER TABLE cat_dscenario DROP CONSTRAINT IF EXISTS cat_dscenario_expl_id_fkey;
 ALTER TABLE cat_dscenario ADD CONSTRAINT cat_dscenario_expl_id_fkey FOREIGN KEY (expl_id) 
