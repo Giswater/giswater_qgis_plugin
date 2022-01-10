@@ -713,7 +713,7 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
     n.the_geom,
     inp_inlet.overflow,
     inp_inlet.head
-   FROM ws_sample.selector_sector,
-    ws_sample.v_node n
-     JOIN ws_sample.inp_inlet USING (node_id)
+   FROM selector_sector,
+    v_node n
+     JOIN inp_inlet USING (node_id)
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
