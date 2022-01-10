@@ -30,14 +30,14 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		IF v_dscenario_type = 'VALVE' THEN
 
 			-- default values
-			IF NEW.valv_type IS NULL OR NEW.valv_type='' THEN NEW.valv_type = (SELECT valv_type FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.pressure IS NULL THEN NEW.pressure = (SELECT pressure FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.flow IS NULL THEN NEW.flow = (SELECT flow FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.coef_loss IS NULL THEN NEW.coef_loss = (SELECT coef_loss FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.add_settings IS NULL OR NEW.add_settings='' THEN NEW.add_settings = (SELECT add_settings FROM v_edit_inp_valve WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.valv_type IS NULL OR NEW.valv_type='' THEN NEW.valv_type = (SELECT valv_type FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pressure IS NULL THEN NEW.pressure = (SELECT pressure FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.flow IS NULL THEN NEW.flow = (SELECT flow FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.coef_loss IS NULL THEN NEW.coef_loss = (SELECT coef_loss FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.add_settings IS NULL THEN NEW.add_settings = (SELECT add_settings FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 		
 			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings);
@@ -90,8 +90,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.roughness IS NULL THEN NEW.roughness = (SELECT roughness FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.dint IS NULL THEN NEW.dint = (SELECT dint FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.roughness IS NULL THEN NEW.roughness = (SELECT roughness FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.dint IS NULL THEN NEW.dint = (SELECT diameter FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
 		
 			INSERT INTO inp_dscenario_pipe(dscenario_id, arc_id, minorloss, status, roughness, dint)
 			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.minorloss, NEW.status, NEW.roughness, NEW.dint);
@@ -130,7 +130,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head)
+			INSERT INTO inp_dscenario_inlet (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow, NEW.pattern_id, NEW.head);
 			
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN

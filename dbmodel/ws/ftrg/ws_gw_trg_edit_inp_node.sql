@@ -111,7 +111,7 @@ BEGIN
 			
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,
-            pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
+            pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;
 			
         END IF;
 

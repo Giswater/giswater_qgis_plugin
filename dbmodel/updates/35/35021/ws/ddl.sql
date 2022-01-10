@@ -225,3 +225,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_nod
 
 ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT IF EXISTS inp_dscenario_pump_additional_unique;
 ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_unique UNIQUE(dscenario_id, node_id, order_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"head", "dataType":"double precision", "isUtils":"False"}}$$);

@@ -671,3 +671,31 @@ CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS
         END AS m2pav_cost
    FROM v_edit_arc a
      LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text;
+
+   
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+    inp_inlet.pattern_id,
+    n.the_geom,
+    inp_inlet.overflow,
+    inp_inlet.head
+   FROM ws_sample.selector_sector,
+    ws_sample.v_node n
+     JOIN ws_sample.inp_inlet USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
