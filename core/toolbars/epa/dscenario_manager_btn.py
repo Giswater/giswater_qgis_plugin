@@ -8,8 +8,10 @@ or (at your option) any later version.
 import json
 import re
 from functools import partial
+from sip import isdeleted
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QTableView
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
@@ -54,6 +56,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
+        # self.fill_table(self.dlg_dscenario_manager, self.tbl_dscenario, 'v_edit_cat_dscenario')
         self._fill_tbl()
 
         # Connect main dialog signals
@@ -96,6 +99,11 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario = GwDscenarioUi()
         tools_gw.load_settings(self.dlg_dscenario)
 
+        # Add icons
+        tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_dscenario.btn_select, "137")
+
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
               f"AND table_name LIKE 'v_edit_inp_dscenario%'"
@@ -109,19 +117,90 @@ class GwDscenarioManagerButton(GwAction):
                     continue
                 for field in complet_list['body']['data']['fields']:
                     if 'hidden' in field and field['hidden']: continue
-                    model = qtableview.model()
-                    if model is None:
-                        model = QStandardItemModel()
-                        qtableview.setModel(model)
-                    model.removeRows(0, model.rowCount())
+                    self.fill_table(self.dlg_dscenario, qtableview, view)
+                    # model = qtableview.model()
+                    # if model is None:
+                    #     model = QStandardItemModel()
+                    #     qtableview.setModel(model)
+                    # model.removeRows(0, model.rowCount())
+                    #
+                    # if field['value']:
+                    #     qtableview = tools_gw.add_tableview_header(qtableview, field)
+                    #     qtableview = tools_gw.fill_tableview_rows(qtableview, field)
+                    # tools_qt.set_tableview_config(qtableview)
+                tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
+                self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
 
-                    if field['value']:
-                        qtableview = tools_gw.add_tableview_header(qtableview, field)
-                        qtableview = tools_gw.fill_tableview_rows(qtableview, field)
-                    tools_qt.set_tableview_config(qtableview)
-                self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
+        # Connect signals
+        self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
+        self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
 
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
+
+
+    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+        """ Set a model with selected filter.
+            Attach that model to selected table
+            @setEditStrategy:
+            0: OnFieldChange
+            1: OnRowChange
+            2: OnManualSubmit
+        """
+
+        # Manage exception if dialog is closed
+        if isdeleted(dialog):
+            return
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
+
+        # When change some field we need to refresh Qtableview and filter by psector_id
+        # model.beforeUpdate.connect(partial(self.manage_update_state, model))
+        # model.dataChanged.connect(partial(self._fill_tbl, self.filter_name.text()))
+        # model.dataChanged.connect(partial(self.update_total, dialog, widget))
+        widget.setEditTriggers(set_edit_triggers)
+
+        # Check for errors
+        if model.lastError().isValid():
+            tools_qgis.show_warning(model.lastError().text())
+        # Attach model to table view
+        if expr:
+            widget.setModel(model)
+            widget.model().setFilter(expr)
+        else:
+            widget.setModel(model)
+
+        # if hidde:
+        #     self.refresh_table(dialog, widget)
+
+
+    def _manage_insert(self):
+
+        self.dlg_dscenario.main_tab.currentIndex()
+        current_tab = self.dlg_dscenario.main_tab.currentWidget()
+        view = current_tab.objectName()
+        # get current tab objectName
+
+        sql = f"INSERT INTO {view}"
+        print(f"{sql}")
+
+
+    def _manage_delete(self):
+
+        self.dlg_dscenario.main_tab.currentIndex()
+        current_tab = self.dlg_dscenario.main_tab.currentWidget()
+        view = current_tab.objectName()
+        # get current tab objectName
+
+        sql = f"DELETE FROM {view} WHERE "  # dscenario_id = {dscenario_id} AND (feature/arc/node)_id = {feature_id}"
+        print(f"{sql}")
 
 
     def _delete_selected_dscenario(self):
