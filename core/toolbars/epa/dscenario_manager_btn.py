@@ -112,22 +112,24 @@ class GwDscenarioManagerButton(GwAction):
             views = [x[0] for x in rows]
             for view in views:
                 qtableview = QTableView()
-                complet_list = self._get_list(view, filter_id=f"{dscenario_id}")
-                if complet_list is False:
-                    continue
-                for field in complet_list['body']['data']['fields']:
-                    if 'hidden' in field and field['hidden']: continue
-                    self.fill_table(self.dlg_dscenario, qtableview, view)
-                    # model = qtableview.model()
-                    # if model is None:
-                    #     model = QStandardItemModel()
-                    #     qtableview.setModel(model)
-                    # model.removeRows(0, model.rowCount())
-                    #
-                    # if field['value']:
-                    #     qtableview = tools_gw.add_tableview_header(qtableview, field)
-                    #     qtableview = tools_gw.fill_tableview_rows(qtableview, field)
-                    # tools_qt.set_tableview_config(qtableview)
+                qtableview.setObjectName(f"tbl_{view}")
+                # complet_list = self._get_list(view, filter_id=f"{dscenario_id}")
+                # if complet_list is False:
+                #     continue
+                # self.fill_table(self.dlg_dscenario, qtableview, view)
+                # for field in complet_list['body']['data']['fields']:
+                #     if 'hidden' in field and field['hidden']:
+                #         continue
+                #     model = qtableview.model()
+                #     if model is None:
+                #         model = QStandardItemModel()
+                #         qtableview.setModel(model)
+                #     model.removeRows(0, model.rowCount())
+                #
+                #     if field['value']:
+                #         qtableview = tools_gw.add_tableview_header(qtableview, field)
+                #         qtableview = tools_gw.fill_tableview_rows(qtableview, field)
+                #     tools_qt.set_tableview_config(qtableview)
                 tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
 
@@ -135,10 +137,14 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
 
+        self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._fill_table))
+
+        self._fill_table()
+
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
 
 
-    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_table(self, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Set a model with selected filter.
             Attach that model to selected table
             @setEditStrategy:
@@ -148,8 +154,11 @@ class GwDscenarioManagerButton(GwAction):
         """
 
         # Manage exception if dialog is closed
-        if isdeleted(dialog):
+        if isdeleted(self.dlg_dscenario):
             return
+
+        table_name = f"{self.dlg_dscenario.main_tab.currentWidget().objectName()}"
+        widget = self.dlg_dscenario.main_tab.currentWidget()
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
