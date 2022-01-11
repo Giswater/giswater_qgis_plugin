@@ -42,25 +42,36 @@ BEGIN
 		DELETE FROM sector WHERE sector_id = OLD.sector_id;
 
 	END IF;
-
+	
 	-- manage admin_exploitation_x_user
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') THEN
 
 		IF TG_OP = 'INSERT' THEN
-		
-			v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.parent_id||')';
-			FOR v_row IN EXECUTE v_querytext
-			LOOP
-				v_sector_id = array_append (v_row.sector_id, NEW.sector_id);
-				UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
-			END LOOP;	
+
+			IF NEW.parent_id IS NULL THEN
+			
+				IF (SELECT count(*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
+					NEW.parent_id = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user LIMIT 1) ;
+				END IF;
+			END IF;
+
+			IF  NEW.parent_id IS NOT NULL THEN
+
+				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.parent_id||')';
+				FOR v_row IN EXECUTE v_querytext
+				LOOP
+					v_sector_id = array_append (v_row.sector_id, NEW.sector_id);
+					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
+				END LOOP;	
+			END IF;
+			
 			INSERT INTO selector_sector VALUES (NEW.sector_id, current_user);
 			
 			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
 
-			IF (NEW.parent_id <> OLD.parent_id) OR (NEW.parent_id IS NULL AND OLD.parent_id IS NOT NULL) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL) THEN
+			IF (NEW.parent_id <> OLD.parent_id) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL) THEN
 
 				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||OLD.sector_id||')';
 				FOR v_row IN EXECUTE v_querytext
@@ -69,12 +80,13 @@ BEGIN
 					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
 				END LOOP;
 			
-				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.parent_id||')';
+				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.sector_id||')';
 				FOR v_row IN EXECUTE v_querytext
 				LOOP
 					v_sector_id = array_append (v_row.sector_id, NEW.sector_id);
 					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
-				END LOOP;	
+				END LOOP;
+				
 			END IF;
 			
 			RETURN NEW;
@@ -101,4 +113,4 @@ BEGIN
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100;  
