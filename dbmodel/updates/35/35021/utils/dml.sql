@@ -160,3 +160,6 @@ UPDATE sys_fprocess SET isaudit = FALSE WHERE fid IN ('349', '350', '351', '352'
 
 INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
 VALUES('v_edit_cat_dscenario', 'Table to manage dynamic scenarios', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Dscenario catalog', 2, 'core');
+
+--2022/01/11
+UPDATE sys_table SET sys_role='role_basic' WHERE id='selector_sector';
