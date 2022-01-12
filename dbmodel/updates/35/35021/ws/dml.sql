@@ -39,8 +39,8 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 UPDATE sys_param_user SET label  = 'Shutoff valve status:',
 descript = 'Defines the status of valves (OPEN, CLOSED) in function of [INVENTORY][MINCUT RESULT]. Inventory is the status of shutoff valve defined on inventory. 
-Mincut Result is the posibility to use a defined status of valves as a result on a mincut scenario. It only applies for shut-off valves'.
- WHERE id = 'inp_options_valve_mode'
+Mincut Result is the posibility to use a defined status of valves as a result on a mincut scenario. It only applies for shut-off valves.'
+ WHERE id = 'inp_options_valve_mode';
 
 UPDATE inp_typevalue SET idval = 'CONNEC (ALL NODARCS)' WHERE typevalue = 'inp_options_networkmode' AND id  ='4';
 UPDATE inp_typevalue SET idval = 'NODE (BASIC NODARCS)' WHERE typevalue = 'inp_options_networkmode' AND id  ='1';
@@ -53,8 +53,7 @@ VALUES (3108, 'gw_fct_create_dscenario_from_toc', 'ws', 'function', 'json',
 'json', 'Function to create network dscenarios from ToC.',
 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
-UPDATE config_toolbox SET id = 3108 WHERE id = 3104
-ON CONFLICT (id) DO NOTHING;
+UPDATE config_toolbox SET id = 3108 WHERE id = 3104;
 
 UPDATE config_toolbox SET alias = 'Create Dscenario from ToC' WHERE id = 3108;
 
@@ -145,8 +144,7 @@ UPDATE config_toolbox SET inputparams =
 {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
 ]', functionparams = '{"featureType":["node", "arc", "connec"]}'
-WHERE id = 3108 ON CONFLICT (id) DO NOTHING;
-;
+WHERE id = 3108;
 
 DELETE FROM sys_function WHERE id = 3112;
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
