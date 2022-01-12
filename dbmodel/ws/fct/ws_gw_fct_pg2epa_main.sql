@@ -192,11 +192,11 @@ BEGIN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;
 
-	RAISE NOTICE '14 - Setting dscenarios';
-	PERFORM gw_fct_pg2epa_dscenario(v_result);
-	
-	RAISE NOTICE '15 - Setting valve status';
+	RAISE NOTICE '14 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
+
+	RAISE NOTICE '15 - Setting dscenarios';
+	PERFORM gw_fct_pg2epa_dscenario(v_result);
 		
 	RAISE NOTICE '16 - Advanced settings';
 	IF v_advancedsettings THEN
@@ -262,6 +262,8 @@ BEGIN
 
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
+
+	-- for those elements like filter o flowmeter which they do not have the attribute on the inventory table
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
 	
 	UPDATE temp_node SET dqa_id = 0 WHERE dqa_id IS NULL;
