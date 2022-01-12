@@ -272,4 +272,12 @@ UPDATE sys_table SET sys_role='role_basic' WHERE id='selector_sector';
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit)
 VALUES (433, 'Arc materials not defined in cat_mat_roughness table', 'ws', null, 'core', TRUE) ON CONFLICT (fid) DO NOTHING;
 
-UPDATE sys_fprocess SET fprocess_name='Check if defined nodes and arcs exist in a database ' WHERE fid=367;
+UPDATE sys_fprocess SET fprocess_name='Check if defined nodes and arcs exist in a database' WHERE fid=367;
+UPDATE sys_fprocess SET fprocess_name='Mincut conflict scenario result' WHERE fid=131;
+UPDATE sys_fprocess SET fprocess_name='Grafanalytics check data' WHERE fid=211;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit)
+VALUES (434, 'Backup and restore tables', 'utils', null, 'core', TRUE) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit)
+VALUES (435, 'Store hydrometer user selector values', 'utils', null,'core', true) ON CONFLICT (fid) DO NOTHING;

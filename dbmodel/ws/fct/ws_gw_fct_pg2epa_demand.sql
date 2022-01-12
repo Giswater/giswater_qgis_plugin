@@ -45,9 +45,9 @@ BEGIN
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
 
 	-- save previous values to set hydrometer selector
-	DELETE FROM temp_table WHERE fid=357 AND cur_user=current_user;
+	DELETE FROM temp_table WHERE fid=435 AND cur_user=current_user;
 	INSERT INTO temp_table (fid, text_column)
-	SELECT 357, (array_agg(state_id)) FROM selector_hydrometer WHERE cur_user=current_user;
+	SELECT 435, (array_agg(state_id)) FROM selector_hydrometer WHERE cur_user=current_user;
 
 	-- reset selector
 	INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
@@ -160,7 +160,7 @@ BEGIN
 	-- restore hydrometer selector
 	DELETE FROM selector_hydrometer WHERE cur_user = current_user;
 	INSERT INTO selector_hydrometer (state_id, cur_user)
-	select unnest(text_column::integer[]), current_user from temp_table where fid=357 and cur_user=current_user
+	select unnest(text_column::integer[]), current_user from temp_table where fid=435 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 	
 	UPDATE temp_node SET demand = 0 WHERE demand is null;
