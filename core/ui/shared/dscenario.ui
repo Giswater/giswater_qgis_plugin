@@ -34,7 +34,7 @@
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="txt_feature_id"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">

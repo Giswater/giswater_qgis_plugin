@@ -13,7 +13,7 @@ from sip import isdeleted
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import QRegExp
-from qgis.PyQt.QtWidgets import QTableView
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
 
 from ..dialog import GwAction
@@ -30,6 +30,7 @@ class GwDscenarioManagerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
     def clicked_event(self):
@@ -93,7 +94,7 @@ class GwDscenarioManagerButton(GwAction):
         # Get selected dscenario_id
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
-        dscenario_id = index.sibling(row, column_index).data()
+        self.selected_dscenario_id = index.sibling(row, column_index).data()
 
         # Create dialog
         self.dlg_dscenario = GwDscenarioUi()
@@ -104,6 +105,27 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_dscenario.btn_select, "137")
 
+        # Get layers of every feature_type
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['gully'] = []
+        self.layers['element'] = []
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        if self.project_type.upper() == 'UD':
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
               f"AND table_name LIKE 'v_edit_inp_dscenario%'"
@@ -113,38 +135,23 @@ class GwDscenarioManagerButton(GwAction):
             for view in views:
                 qtableview = QTableView()
                 qtableview.setObjectName(f"tbl_{view}")
-                # complet_list = self._get_list(view, filter_id=f"{dscenario_id}")
-                # if complet_list is False:
-                #     continue
-                # self.fill_table(self.dlg_dscenario, qtableview, view)
-                # for field in complet_list['body']['data']['fields']:
-                #     if 'hidden' in field and field['hidden']:
-                #         continue
-                #     model = qtableview.model()
-                #     if model is None:
-                #         model = QStandardItemModel()
-                #         qtableview.setModel(model)
-                #     model.removeRows(0, model.rowCount())
-                #
-                #     if field['value']:
-                #         qtableview = tools_gw.add_tableview_header(qtableview, field)
-                #         qtableview = tools_gw.fill_tableview_rows(qtableview, field)
-                #     tools_qt.set_tableview_config(qtableview)
+                qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
                 tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
 
         # Connect signals
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
+        self.dlg_dscenario.btn_select.clicked.connect(partial(self._manage_select))
 
-        self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._fill_table))
+        self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
 
         self._fill_table()
 
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
 
 
-    def _fill_table(self, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _fill_table(self, hidde=False, set_edit_triggers=QTableView.DoubleClicked, expr=None):
         """ Set a model with selected filter.
             Attach that model to selected table
             @setEditStrategy:
@@ -166,11 +173,13 @@ class GwDscenarioManagerButton(GwAction):
         # Set model
         model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
+        model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         # model.beforeUpdate.connect(partial(self.manage_update_state, model))
         # model.dataChanged.connect(partial(self._fill_tbl, self.filter_name.text()))
         # model.dataChanged.connect(partial(self.update_total, dialog, widget))
@@ -186,30 +195,101 @@ class GwDscenarioManagerButton(GwAction):
         else:
             widget.setModel(model)
 
+        geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
+        if geom_col_idx is not False:
+            widget.setColumnHidden(geom_col_idx, True)
+
         # if hidde:
         #     self.refresh_table(dialog, widget)
+
+
+    def _manage_current_changed(self):
+
+        # Fill current table
+        self._fill_table()
+
+        # Manage insert typeahead
+
+
+    def _manage_highlight(self, qtableview, view, index):
+
+        table = view.replace("_dscenario", "")
+        feature_type = 'feature_id'
+
+        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
+        for x in feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
+            if col_idx is not False:
+                feature_type = x
+                break
+        if feature_type != 'feature_type':
+            table = f"v_edit_{feature_type.split('_')[0]}"
+        tools_qgis.hilight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
     def _manage_insert(self):
 
         self.dlg_dscenario.main_tab.currentIndex()
-        current_tab = self.dlg_dscenario.main_tab.currentWidget()
-        view = current_tab.objectName()
-        # get current tab objectName
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        view = tableview.objectName()
 
-        sql = f"INSERT INTO {view}"
-        print(f"{sql}")
+        sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        self._fill_table()
 
 
     def _manage_delete(self):
 
-        self.dlg_dscenario.main_tab.currentIndex()
-        current_tab = self.dlg_dscenario.main_tab.currentWidget()
-        view = current_tab.objectName()
-        # get current tab objectName
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        # Get selected row
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
 
-        sql = f"DELETE FROM {view} WHERE "  # dscenario_id = {dscenario_id} AND (feature/arc/node)_id = {feature_id}"
-        print(f"{sql}")
+        # Get selected feature_id
+        view = tableview.objectName()
+        col_idx = -1
+        feature_type = 'feature_id'
+
+        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
+        for x in feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
+            if col_idx is not False:
+                feature_type = x
+                break
+        index = tableview.selectionModel().currentIndex()
+        value = index.sibling(index.row(), col_idx).data()
+
+        message = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), col_idx).data())
+        if answer:
+            sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
+            tools_db.execute_sql(sql)
+
+            # Refresh tableview
+            self._fill_table()
+
+
+    def _manage_select(self):
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        self.feature_type = 'all'
+        feature_type = 'feature_id'
+
+        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
+        for x in feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
+            if col_idx is not False:
+                feature_type = x
+                break
+
+        if feature_type != 'feature_id':
+            self.feature_type = feature_type.split('_')[0]
+
+        tools_gw.selection_init(self, self.dlg_dscenario, tableview)
 
 
     def _delete_selected_dscenario(self):
@@ -231,8 +311,8 @@ class GwDscenarioManagerButton(GwAction):
             sql = f"DELETE FROM v_edit_cat_dscenario WHERE dscenario_id = {value}"
             tools_db.execute_sql(sql)
 
+            # Refresh tableview
             self._fill_tbl(self.filter_name.text())
-        pass
 
 
     def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
