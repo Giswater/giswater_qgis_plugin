@@ -31,64 +31,169 @@ UPDATE config_toolbox SET inputparams =
 WHERE id = 3042;
 
 --2022/01/03
+
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"CATALOG"}', null, '{"orderBy":1}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"MAPZONE"}', null, '{"orderBy":2}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"ARC"}', null, '{"orderBy":3}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}', null, '{"orderBy":4}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}', null, '{"orderBy":5}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', null, '{"orderBy":6}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', null, '{"orderBy":7}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"AUXILIAR"}', null, '{"orderBy":8}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"MINCUT"}', null, '{"orderBy":9}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"PROFILE"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"VISIT"}', null, '{"orderBy":11}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"CATALOG"}', null, '{"orderBy":12}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"INPUT"}', null, '{"orderBy":13}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"DSCENARIO"}', null, '{"orderBy":14}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"RESULT"}', null, '{"orderBy":15}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"COMPARE"}', null, '{"orderBy":16}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"CATALOG"}', null, '{"orderBy":17}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PSECTOR"}', null, '{"orderBy":18}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PRICES"}', null, '{"orderBy":19}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"MAPZONES"}', null, '{"orderBy":20}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"CATALOGS"}', null, '{"orderBy":21}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"ADDRESS"}', null, '{"orderBy":22}') ON CONFLICT (typevalue, id) DO NOTHING;
+
+
 UPDATE sys_table SET context = NULL, alias = NULL, orderby = null;
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Feature catalog' , orderby=1 WHERE id ='cat_feature';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Node feature catalog' , orderby=2 WHERE id ='cat_feature_node';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Node material catalog' , orderby=3 WHERE id ='cat_mat_node';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Node catalog' , orderby=4 WHERE id ='cat_node';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Arc material catalog' , orderby=5 WHERE id ='cat_mat_arc';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Arc catalog' , orderby=6 WHERE id ='cat_arc';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Connec catalog' , orderby=7 WHERE id ='cat_connec';
-UPDATE sys_table SET context = '{"level_1":"CATALOG"}', alias = 'Grate catalog' , orderby=8 WHERE id ='cat_grate';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Feature catalog' , orderby=1 WHERE id ='cat_feature';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Node feature catalog' , orderby=2 WHERE id ='cat_feature_node';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Node material catalog' , orderby=3 WHERE id ='cat_mat_node';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Node catalog' , orderby=4 WHERE id ='cat_node';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Arc material catalog' , orderby=5 WHERE id ='cat_mat_arc';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Arc catalog' , orderby=6 WHERE id ='cat_arc';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Connec catalog' , orderby=7 WHERE id ='cat_connec';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOG"}', alias = 'Grate catalog' , orderby=8 WHERE id ='cat_grate';
 
-UPDATE sys_table SET context = '{"level_1":"MAPZONE"}', alias = 'Exploitation', orderby=1 WHERE id= 'v_edit_exploitation';
-UPDATE sys_table SET context = '{"level_1":"MAPZONE"}', alias = 'Sector', orderby=2 WHERE id= 'v_edit_sector';
-UPDATE sys_table SET context = '{"level_1":"MAPZONE"}', alias = 'DMA' , orderby=3 WHERE id= 'v_edit_dma';
-UPDATE sys_table SET context = '{"level_1":"MAPZONE"}', alias = 'Presszone', orderby=4 WHERE id= 'v_edit_presszone';
-UPDATE sys_table SET context = '{"level_1":"MAPZONE"}', alias = 'DQA' , orderby=5 WHERE id= 'v_edit_dqa';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"MAPZONE"}', alias = 'Exploitation', orderby=1 WHERE id= 'v_edit_exploitation';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"MAPZONE"}', alias = 'Sector', orderby=2 WHERE id= 'v_edit_sector';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"MAPZONE"}', alias = 'DMA' , orderby=3 WHERE id= 'v_edit_dma';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"MAPZONE"}', alias = 'Presszone', orderby=4 WHERE id= 'v_edit_presszone';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"MAPZONE"}', alias = 'DQA' , orderby=5 WHERE id= 'v_edit_dqa';
 
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"ARC"}', alias = initcap(cat_feature.id) FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'ARC';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"NODE"}', alias = initcap(cat_feature.id) FROM cat_feature  WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'NODE';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"CONNEC"}', alias = initcap(cat_feature.id) FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'CONNEC';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"GULLY"}', alias = initcap(cat_feature.id)  FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'GULLY';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"ARC"}', alias = initcap(cat_feature.id) FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'ARC';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}', alias = initcap(cat_feature.id) FROM cat_feature  WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'NODE';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}', alias = initcap(cat_feature.id) FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'CONNEC';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', alias = initcap(cat_feature.id)  FROM cat_feature WHERE sys_table.id = cat_feature.child_layer AND feature_type = 'GULLY';
 
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"ARC"}' WHERE id='v_edit_arc';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"NODE"}' WHERE id='v_edit_node';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"CONNEC"}' WHERE id='v_edit_connec';
-UPDATE sys_table SET context = '{"level_1":"NETWORK", "level_2":"GULLY"}' WHERE id='v_edit_gully';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"ARC"}', alias = 'Arc', orderby=1 WHERE id='v_edit_arc';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}', alias = 'Node', orderby=1  WHERE id='v_edit_node';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}',alias = 'Connec', orderby=1  WHERE id='v_edit_connec';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', alias = 'Gully', orderby=1  WHERE id='v_edit_gully';
 
-UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'anl%';
-UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and id ILIKE 'v_om_mincut%';
-UPDATE sys_table SET context = '{"level_1":"O&M"}' WHERE sys_role = 'role_om' and (id IN ('v_edit_om_visit') OR id ilike 've_visit%');
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}', alias = 'Node polygon'  WHERE id='ve_pol_node';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}', alias = 'Connec polygon'  WHERE id='ve_pol_connec';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', alias = 'Gully polygon'  WHERE id='ve_pol_gully';
 
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Dscenario catalog' , orderby=3 WHERE id ='v_edit_cat_dscenario';
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Roughness catalog' , orderby=4 WHERE id ='cat_mat_roughness';
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Curve catalog' , orderby=5 WHERE id ='v_edit_inp_curve';
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Pattern catalog' , orderby=6 WHERE id ='v_edit_inp_pattern';
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by id)  as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"ARC"}' and orderby IS NULL ) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by id) as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}' and orderby IS NULL) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by id)  as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}' and orderby IS NULL ) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by id)  as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}'  and orderby IS NULL) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', alias = 'Dimensioning' , orderby=1  WHERE id='v_edit_dimensions';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', alias = 'Element' , orderby=2  WHERE id='v_edit_element';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', alias = 'Samplepoint' , orderby=3  WHERE id='v_edit_samplepoint';
+
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Point' , orderby=1 WHERE id ='v_edit_cad_auxpoint';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Line' , orderby=2 WHERE id ='v_edit_cad_auxline';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Cirle' , orderby=3 WHERE id ='v_edit_cad_auxcircle';
+
+
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"MINCUT"}', alias = 'Mincut init point' , orderby=1 WHERE id ='v_om_mincut';
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"MINCUT"}', alias = 'Mincut result valve' , orderby=2 WHERE id ='v_om_mincut_valve';
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"MINCUT"}', alias = 'Mincut result node' , orderby=3 WHERE id ='v_om_mincut_node';
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"MINCUT"}', alias = 'Mincut result connec' , orderby=4 WHERE id ='v_om_mincut_connec';
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"MINCUT"}', alias = 'Mincut result arc' , orderby=5 WHERE id ='v_om_mincut_arc';
+
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"PROFILE"}', alias = id WHERE sys_role = 'role_om' and id ILIKE 'profile%';
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"VISIT"}', alias = 'Visit', orderby=1 WHERE id ='v_edit_om_visit';
+
+UPDATE sys_table SET context = '{"level_1":"OM","level_2":"VISIT"}', alias = idval FROM config_visit_class 
+WHERE sys_table.sys_role = 'role_om' and sys_table.id=tablename and sys_table.id!='om_visit';
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by id) +1 as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"OM","level_2":"VISIT"}' ) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Dscenario catalog' , orderby=1 WHERE id ='v_edit_cat_dscenario';
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Roughness catalog' , orderby=2 WHERE id ='cat_mat_roughness';
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Curve catalog' , orderby=3 WHERE id ='v_edit_inp_curve';
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Curve' , orderby=4 WHERE id ='v_edit_inp_curve_value';
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Pattern catalog' , orderby=5 WHERE id ='v_edit_inp_pattern';
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Pattern' , orderby=6 WHERE id ='v_edit_inp_pattern_value';
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"CATALOG"}' , alias = 'Timeseries catalog' , orderby=7 WHERE id ='v_edit_inp_timeseries';
 
 UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"INPUT"}' , alias = initcap(s.id) FROM sys_feature_epa_type s WHERE sys_table.id = concat('v_edit_',epa_table);
-UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"RESULT"}', alias = initcap(replace(id,'v_rpt_','')) WHERE id like 'v_rpt%' and id not in (SELECT id FROM sys_table WHERE id like 'v_rpt_comp%');
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"DSCENARIO"}', alias = replace(replace(id,'v_edit_inp_d','D'),'_',' ') WHERE sys_table.id ilike 'v_edit_inp_dscenario%';
 
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"EPA", "level_2":"INPUT"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
 
-UPDATE sys_table SET context = '{"level_1":"PLAN"}' , alias = 'Plan psector', orderby = 1 WHERE id = 'v_edit_plan_psector';
-UPDATE sys_table SET context = '{"level_1":"PLAN"}' , alias = 'Plan current psector', orderby = 2 WHERE id = 'v_plan_current_psector';
-UPDATE sys_table SET context = '{"level_1":"PLAN"}' , alias = 'Arc pavement', orderby = 3 WHERE id = 'plan_arc_x_pavement';
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"EPA", "level_2":"DSCENARIO"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
 
+UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"RESULT"}', alias = replace(initcap(replace(id,'v_rpt_','')),'_',' ') WHERE id like 'v_rpt%' and id not in (SELECT id FROM sys_table WHERE id like 'v_rpt_comp%');
+--UPDATE sys_table SET context = '{"level_1":"EPA", "level_2":"COMPARE"}', alias = initcap(replace(id,'v_rpt_','')) WHERE id like 'v_rpt%' and id not in (SELECT id FROM sys_table WHERE id like 'v_rpt_comp%');
 
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"CATALOG"}', null, '{"orderBy":1}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"MAPZONE"}', null, '{"orderBy":2}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"ARC"}', null, '{"orderBy":3}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"NODE"}', null, '{"orderBy":4}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"CONNEC"}', null, '{"orderBy":5}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"NETWORK", "level_2":"GULLY"}', null, '{"orderBy":6}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"O&M"}', null, '{"orderBy":7}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"CATALOG"}', null, '{"orderBy":8}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"INPUT"}', null, '{"orderBy":9}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"RESULT"}', null, '{"orderBy":10}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN"}', null, '{"orderBy":11}');
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN"}', null, '{"orderBy":12}');
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"EPA", "level_2":"RESULT"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
 
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PSECTOR"}' , alias = 'Plan psector', orderby = 1 WHERE id = 'v_edit_plan_psector';
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PSECTOR"}' , alias = 'Plan current psector', orderby = 2 WHERE id = 'v_plan_current_psector';
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PSECTOR"}' , alias = replace(replace(id,'v_p','P'),'_',' ')
+WHERE id IN ('v_plan_psector_arc', 'v_plan_psector_node', 'v_plan_psector_link', 'v_plan_psector_connec','v_plan_psector_gully');
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) +2 as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"PLAN","level_2":"PSECTOR"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"CATALOG"}' , alias = 'Arc pavement', orderby = 1 WHERE id = 'plan_arc_x_pavement';
+
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PRICES"}', alias = 'Prices', orderby=1 WHERE id ='plan_price';
+UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PRICES"}', alias = 'Compost prices', orderby=2 WHERE id ='plan_price_compost';
+
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(replace(id,'v_edit_macro',''))  WHERE id ilike 'v_edit_macro%';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(id)  WHERE id ilike 'macroexploitation';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(replace(id,'v_',''))  WHERE id ilike 'v_minsector';
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"ADMIN","level_2":"MAPZONES"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
+
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Element material catalog', orderby=1 WHERE id ='cat_mat_element';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Element catalog', orderby=2 WHERE id ='cat_element';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Owner catalog', orderby=3 WHERE id ='cat_owner';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Soil catalog', orderby=4 WHERE id ='cat_soil';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Pavement catalog', orderby=5 WHERE id ='cat_pavement';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Work catalog', orderby=6 WHERE id ='cat_work';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Builder catalog', orderby=7 WHERE id ='cat_builder';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Brand model catalog', orderby=8 WHERE id ='cat_brand_model';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Brand catalog', orderby=9 WHERE id ='cat_brand';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Users catalog', orderby=10 WHERE id ='cat_users';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Period catalog', orderby=11 WHERE id ='ext_cat_period';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"CATALOG"}', alias = 'Hydrometer catalog', orderby=12 WHERE id ='ext_cat_hydrometer';
+
+UPDATE sys_table SET context = '{"level_1":"BASEMAP","level_2":"ADDRESS"}'::json , alias = initcap(replace(id,'ext_','')), orderby=1 WHERE id ilike 'ext_municipality';
+UPDATE sys_table SET context = '{"level_1":"BASEMAP","level_2":"ADDRESS"}'::json , alias = initcap(replace(id,'v_ext_',''))  WHERE id ilike 'v_ext_%';
+
+UPDATE sys_table c SET orderby = c2.seqnum FROM (SELECT c2.id, c2.alias, row_number() over (order by alias) +1 as seqnum
+FROM sys_table c2 WHERE context ='{"level_1":"BASEMAP","level_2":"ADDRESS"}' AND orderby IS NULL ) c2
+WHERE c2.id = c.id;
 
 INSERT INTO config_form_fields VALUES ('search', 'form_feature', 'main', 'hydro_contains', 'lyt_data_1', NULL, 'string', 'nowidget', 'Use contains', 'Check: allow to search using any of the characters. Unchecked: the search engine only will return results when matching the first characters (useful for short numbers)', NULL, FALSE, FALSE, FALSE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}',NULL,NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
