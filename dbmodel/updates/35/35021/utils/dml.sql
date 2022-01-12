@@ -163,3 +163,8 @@ VALUES('v_edit_cat_dscenario', 'Table to manage dynamic scenarios', 'role_epa', 
 
 --2022/01/11
 UPDATE sys_table SET sys_role='role_basic' WHERE id='selector_sector';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit)
+VALUES (433, 'Arc materials not defined in cat_mat_roughness table', 'ws', null, 'core', TRUE) ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_fprocess SET fprocess_name='Check if defined nodes and arcs exist in a database ' WHERE fid=367;

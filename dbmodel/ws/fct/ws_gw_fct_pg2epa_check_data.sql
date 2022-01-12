@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,380,411,412,430,432
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,433,411,412,430,432
 
 */
 
@@ -686,17 +686,17 @@ BEGIN
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
 	END IF;
 
-	RAISE NOTICE '27 - Arc materials not defined in cat_mat_roughness table (380)';
+	RAISE NOTICE '27 - Arc materials not defined in cat_mat_roughness table (433)';
 	v_querytext = 'SELECT id FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_mat_roughness)';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '380' ,concat('ERROR-380: There is/are ',v_count,' arc materials that are not defined in cat_mat_rougnhess table. Please, check your data before continue.'),v_count);
+		VALUES (v_fid, 3, '433' ,concat('ERROR-433: There is/are ',v_count,' arc materials that are not defined in cat_mat_rougnhess table. Please, check your data before continue.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-	VALUES (v_fid, 1, '380','INFO: All arc materials are defined on cat_mat_rougnhess table.',v_count);
+	VALUES (v_fid, 1, '433','INFO: All arc materials are defined on cat_mat_rougnhess table.',v_count);
 	END IF;
 
 	RAISE NOTICE '28- Mandatory nodarc over epa node (411)';
