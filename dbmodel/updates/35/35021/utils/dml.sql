@@ -52,7 +52,7 @@ INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","lev
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PSECTOR"}', null, '{"orderBy":18}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PRICES"}', null, '{"orderBy":19}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"MAPZONES"}', null, '{"orderBy":20}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"CATALOGS"}', null, '{"orderBy":21}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"CATALOG"}', null, '{"orderBy":21}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"ADDRESS"}', null, '{"orderBy":22}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":22}') ON CONFLICT (typevalue, id) DO NOTHING;
 
