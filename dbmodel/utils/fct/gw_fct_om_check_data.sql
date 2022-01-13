@@ -1134,17 +1134,17 @@ BEGIN
 		VALUES (125, 1, '424','INFO: All features has location_type informed on man_type_location table',v_count);
 	END IF;
 
-	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (429)';
+	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (428)';
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter ='admin_raster_dem') IS true THEN
 		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-			SELECT 125, 2, '429', 
-			concat('WARNING-429: There is/are ',v_count,' exploitation(s) without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: ',string_agg(name,', ')),v_count 
+			SELECT 125, 2, '428', 
+			concat('WARNING-428: There is/are ',v_count,' exploitation(s) without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: ',string_agg(name,', ')),v_count 
 			FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
-			VALUES (125, 1, '429','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
+			VALUES (125, 1, '428','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
 		END IF;
 	END IF;
 
