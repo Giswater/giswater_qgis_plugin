@@ -168,7 +168,7 @@ UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"CATALOG"}' , alias 
 UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PRICES"}', alias = 'Prices', orderby=1 WHERE id ='plan_price';
 UPDATE sys_table SET context = '{"level_1":"PLAN","level_2":"PRICES"}', alias = 'Compost prices', orderby=2 WHERE id ='plan_price_compost';
 
-UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(replace(id,'v_edit_macro',''))  WHERE id ilike 'v_edit_macro%';
+UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(replace(id,'v_edit_',''))  WHERE id ilike 'v_edit_macro%';
 UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(id)  WHERE id ilike 'macroexploitation';
 UPDATE sys_table SET context = '{"level_1":"ADMIN","level_2":"MAPZONES"}'::json , alias = initcap(replace(id,'v_',''))  WHERE id ilike 'v_minsector';
 
