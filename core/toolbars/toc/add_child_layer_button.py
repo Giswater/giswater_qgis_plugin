@@ -5,8 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+
 from functools import partial
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.PyQt.QtGui import QCursor
@@ -39,61 +42,55 @@ class GwAddChildLayerButton(GwAction):
         x = cursor.pos().x()
         y = cursor.pos().y()
         click_point = QPoint(x + 5, y + 5)
-        schema_name = self.schema_name.replace('"', '')
-        # Get parent layers
-        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
-               "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
-               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature "
-               "ORDER BY parent_layer")
-        parent_layers = tools_db.get_rows(sql)
 
-        for parent_layer in parent_layers:
+        # Get load layers
+        layer_list = []
 
-            # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), cat_feature.id as alias, style as style_id, "
-                   f" group_layer "
-                   f" FROM cat_feature "
-                   f" LEFT JOIN config_table ON config_table.id = child_layer "
-                   f"WHERE parent_layer = '{parent_layer[1]}' "
-                   f"AND child_layer IN ("
-                   f"   SELECT table_name FROM information_schema.tables"
-                   f"   WHERE table_schema = '{schema_name}')"
-                   f" ORDER BY child_layer")
+        for layer in QgsProject.instance().mapLayers().values():
+            layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
-            child_layers = tools_db.get_rows(sql)
-            if not child_layers:
-                continue
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
 
-            # Create sub menu
-            sub_menu = main_menu.addMenu(str(parent_layer[0]))
-            child_layers.insert(0, ['Load all', 'Load all', 'Load all', 'Load all', 'Load all'])
-            for child_layer in child_layers:
-                # Create actions
-                action = QAction(str(child_layer[2]), sub_menu, checkable=True)
+        dict_menu = {}
 
-                # Get load layers and create child layers menu (actions)
-                layers_list = []
-                layers = self.iface.mapCanvas().layers()
-                for layer in layers:
-                    layers_list.append(str(layer.name()))
-                if str(child_layer[0]) in layers_list:
+        for field in json_result['body']['data']['fields']:
+            if field['context'] is not None:
+                context = json.loads(field['context'])
+                if 'level_1' in context and context['level_1'] not in dict_menu:
+                    menu_level_1 = main_menu.addMenu(f"{context['level_1']}")
+                    dict_menu[context['level_1']] = menu_level_1
+                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
+                    menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
+                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
+                    menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(f"{context['level_3']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+                if 'level_3' in context:
+                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
+                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
+                else:
+                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
+                    dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
+
+                if f"{field['tableName']}" in layer_list:
                     action.setChecked(True)
 
-                sub_menu.addAction(action)
-                if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self._check_action_ischecked, None, "the_geom", "id", child_layers,
-                                                     "GW Layers", "-1"))
+                layer_name = field['tableName']
+                if field['geomField'] == "None":
+                    the_geom = None
                 else:
-                    layer_name = child_layer[0]
-                    the_geom = "the_geom"
-                    geom_field = child_layer[1] + "_id"
-                    style_id = child_layer[3]
-                    group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                     None, group, style_id))
+                    the_geom = field['geomField']
+                geom_field = field['tableId']
+                style_id = None
+                group = 'GW Layers'
+
+                action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
+                                                 None, group, style_id))
 
         main_menu.exec_(click_point)
-
 
     def _check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, style_id, is_checked):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
