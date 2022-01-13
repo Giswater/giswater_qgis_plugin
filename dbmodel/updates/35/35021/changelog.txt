@@ -12,4 +12,5 @@
 - New column expl_id for catalogs of hydrololgy, dwf_scenario, dscenario and rpt_cat_result
 - New edit filtered views for catalogs of hydrololgy, dwf_scenario, dscenario
 - New column isaudit on sys_fprocess to config which fid's are auditable or not
+- New column fprocess_type on sys_fprocess to categorize processes
 - Refactor of pavcat_id strategy. From independent table to arc (and related views)

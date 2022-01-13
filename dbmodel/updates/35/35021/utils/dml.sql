@@ -281,3 +281,50 @@ VALUES (434, 'Backup and restore tables', 'utils', null, 'core', TRUE) ON CONFLI
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit)
 VALUES (435, 'Store hydrometer user selector values', 'utils', null,'core', true) ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_fprocess SET fprocess_type='Check admin' WHERE fid IN (303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322);
+
+UPDATE sys_fprocess SET fprocess_type='Check om-data' WHERE fid IN 
+( 175,177,187,188,201,202,205,210,252,253,254,256,257,260,261,262,263,264,266,291,302,356,372,406,418,419,421,422,423,424,428);
+
+UPDATE sys_fprocess SET fprocess_type='Check om-topology' WHERE fid IN 
+(103,106,196,197,204,223,251,255,259,265,391,417);
+
+UPDATE sys_fprocess SET fprocess_type='Check plan-config' WHERE fid IN 
+(252,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,354,355);
+
+UPDATE sys_fprocess SET fprocess_type='Check plan-data' WHERE fid IN (354,355);
+
+UPDATE sys_fprocess SET fprocess_type='Check epa-data' WHERE fid IN 
+(153,164,165,169,170,171,175,198,272,273,274,275,276,277,278,279,280,281,284,285,286,287,294,295,368,381,382,395,427);
+
+UPDATE sys_fprocess SET fprocess_type='Check epa-topology' WHERE fid IN 
+(106,107,111,113,166,167,229,230,292,293,379,411,412,425);
+
+UPDATE sys_fprocess SET fprocess_type='Check epa-config' WHERE fid IN 
+( 142,282,283,371,383,429,430,433);
+
+UPDATE sys_fprocess SET fprocess_type='Check epa-result' WHERE fid IN 
+(114,159,172,227,232,290,297,296,373,375,377,396,397,400,402,405,407,413,414,415,416,432);
+
+UPDATE sys_fprocess SET fprocess_type='Check epa-network' WHERE fid IN 
+( 227,231,233,228,404,431);
+
+UPDATE sys_fprocess SET fprocess_type='Check graf-data' WHERE fid IN 
+(176,177,181,182,208,209,367);
+
+UPDATE sys_fprocess SET fprocess_type='Check graf-config' WHERE fid IN 
+(179,180,183,184,185,186,192,268,269,270,271);
+ 
+UPDATE sys_fprocess SET fprocess_type='Check project' WHERE fid IN (349,350,351,352,353); 
+
+UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fid IN 
+( 101,104,105,108,109,110,111,112,113,115,116,117,118,124,125,127,128,129,130,131,132,133,134,135,136,137,138,140,141,143,144,145,146,147,149,150,151,152,155,
+156,157,158,163,168,193,194,195,199,203,207,211,212,213,214,215,216,217,218,219,220,221,222,225,248,249,250,288,289,298,299,300,301,357,358,359,360,361,362,376,
+380,387,394,397,398,399,434,435,403);
+
+UPDATE sys_fprocess SET fprocess_type=NULL WHERE fid IN 
+(102,119,120,121,122,123,126,139,148,159,160,161,162,173,174,178,183,184,185,186,190,191,200,224,226,258,267,348,363,364,365,366,369,
+370,374,378,389,390,393,401,410,420,426);
+
+UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fprocess_name ilike 'Import%' OR fprocess_name ilike 'Export%' and fprocess_type IS NULL;

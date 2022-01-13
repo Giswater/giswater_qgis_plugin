@@ -68,3 +68,5 @@ DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
 
 ALTER TABLE arc ADD CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id) 
 REFERENCES cat_pavement (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"fprocess_type", "dataType":"text", "isUtils":"False"}}$$);
