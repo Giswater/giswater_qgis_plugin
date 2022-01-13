@@ -8,9 +8,6 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var character varying)
     RETURNS integer
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 
 /*
@@ -215,4 +212,6 @@ BEGIN
 	END LOOP;
 	RETURN 1;		
 END;
-$BODY$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
