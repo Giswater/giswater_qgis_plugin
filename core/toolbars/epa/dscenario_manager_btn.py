@@ -30,6 +30,8 @@ class GwDscenarioManagerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.feature_type = 'node'
+        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id']
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
@@ -103,7 +105,7 @@ class GwDscenarioManagerButton(GwAction):
         # Add icons
         tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
-        tools_gw.add_icon(self.dlg_dscenario.btn_select, "137")
+        tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
 
         # Get layers of every feature_type
 
@@ -142,9 +144,9 @@ class GwDscenarioManagerButton(GwAction):
         # Connect signals
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
-        self.dlg_dscenario.btn_select.clicked.connect(partial(self._manage_select))
-
+        self.dlg_dscenario.btn_snapping.clicked.connect(partial(self._manage_select))
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
+        self.dlg_dscenario.rejected.connect(self._selection_end)
 
         self._fill_table()
 
@@ -209,15 +211,33 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_table()
 
         # Manage insert typeahead
+        viewname = "v_edit_" + self.feature_type
+        tools_gw.set_completer_widget(viewname, self.dlg_dscenario.txt_feature_id, str(self.feature_type) + "_id")
 
+        # Deactivate btn_snapping functionality
+        self._selection_end()
+
+
+    def _manage_feature_type(self):
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        self.feature_type = 'node'
+        feature_type = 'feature_id'
+
+        for x in self.feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
+            if col_idx is not False:
+                feature_type = x
+                break
+
+        if feature_type != 'feature_id':
+            self.feature_type = feature_type.split('_')[0]
 
     def _manage_highlight(self, qtableview, view, index):
 
         table = view.replace("_dscenario", "")
         feature_type = 'feature_id'
 
-        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
-        for x in feature_types:
+        for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
             if col_idx is not False:
                 feature_type = x
@@ -229,7 +249,6 @@ class GwDscenarioManagerButton(GwAction):
 
     def _manage_insert(self):
 
-        self.dlg_dscenario.main_tab.currentIndex()
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
@@ -255,41 +274,98 @@ class GwDscenarioManagerButton(GwAction):
         col_idx = -1
         feature_type = 'feature_id'
 
-        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
-        for x in feature_types:
+        for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
             if col_idx is not False:
                 feature_type = x
                 break
-        index = tableview.selectionModel().currentIndex()
-        value = index.sibling(index.row(), col_idx).data()
+
+        values = []
+        for index in selected_list:
+            values.append(index.sibling(index.row(), col_idx).data())
 
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), col_idx).data())
+        answer = tools_qt.show_question(message, "Delete records", values)
         if answer:
-            sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
-            tools_db.execute_sql(sql)
+            for value in values:
+                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
+                tools_db.execute_sql(sql)
 
             # Refresh tableview
             self._fill_table()
 
 
     def _manage_select(self):
-        tableview = self.dlg_dscenario.main_tab.currentWidget()
-        self.feature_type = 'all'
-        feature_type = 'feature_id'
 
-        feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id']
-        for x in feature_types:
-            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
-                feature_type = x
-                break
+        self._manage_feature_type()
 
-        if feature_type != 'feature_id':
-            self.feature_type = feature_type.split('_')[0]
+        # Get current layer and remove selection
+        current_layer = self.iface.activeLayer()
+        current_layer.removeSelection()
 
-        tools_gw.selection_init(self, self.dlg_dscenario, tableview)
+        # Set active layer
+        view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
+        layer_name = view_name.replace("dscenario_", "")
+        print(f"{layer_name=}")
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if layer is None:
+            layer_name = 'v_edit_' + self.feature_type
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+        self.iface.setActiveLayer(layer)
+        tools_qgis.set_layer_visible(layer)
+
+        # Clear feature id field
+        #
+
+        self._selection_init()
+        # tools_gw.selection_init(self, self.dlg_dscenario, tableview)
+
+
+    def _selection_init(self):
+        """ Set canvas map tool to an instance of class 'GwSelectManager' """
+
+        tools_gw.disconnect_signal('dscenario_snapping')
+        self.iface.actionSelect().trigger()
+        self.connect_signal_selection_changed()
+
+
+    def connect_signal_selection_changed(self):
+        """ Connect signal selectionChanged """
+
+        tools_gw.connect_signal(global_vars.canvas.selectionChanged, partial(self._manage_selection),
+                                'dscenario_snapping', 'connect_signal_selection_changed_selectionChanged_manage_selection')
+
+    def _manage_selection(self):
+        """ Slot function for signal 'canvas.selectionChanged' """
+
+        # Get feature_type and feature_id
+        layer = self.iface.activeLayer()
+        field_id = self.feature_type + "_id"
+
+        # Iterate over layer
+        if layer.selectedFeatureCount() > 0:
+            selected_ids = []
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_ids.append(feature.attribute(field_id))
+
+            if selected_ids:
+                self.list_ids = selected_ids
+                print(f"{self.list_ids}")
+                tableview = self.dlg_dscenario.main_tab.currentWidget()
+                view = tableview.objectName()
+                for f in selected_ids:
+                    sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{f}');"
+                    tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
+                self._fill_table()
+
+
+    def _selection_end(self):
+        tools_gw.disconnect_signal('dscenario_snapping')
+        tools_gw.remove_selection()
+        self.iface.actionPan().trigger()
 
 
     def _delete_selected_dscenario(self):
