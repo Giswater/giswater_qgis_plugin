@@ -51,6 +51,7 @@ v_count integer;
 v_step integer=0;
 v_autorepair boolean;
 v_expl integer = null;
+v_sector_0 boolean = false;
 	
 BEGIN
 
@@ -110,7 +111,13 @@ BEGIN
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	
+
+	-- force only sector =0 disabled
+	IF (SELECT count(*) FROM selector_sector WHERE sector_id = 0 and cur_user = current_user ) = 1 THEN
+		v_sector_0 = true;
+	END IF;
+	DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
+		
 	-- setting variables
 	IF v_networkmode = 1 THEN 
 		v_onlymandatory_nodarc = TRUE;
@@ -295,6 +302,11 @@ BEGIN
 	status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 	FROM temp_arc;
 
+	-- recover sector 0 (if exists previously)
+	IF v_sector_0 = true THEN
+		INSERT INTO selector_sector VALUES (0,current_user);
+	END IF;
+	
 	RAISE NOTICE '22 - Manage return';
 	IF v_step=1 THEN
 	

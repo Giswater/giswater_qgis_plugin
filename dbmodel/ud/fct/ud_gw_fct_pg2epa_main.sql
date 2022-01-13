@@ -46,6 +46,8 @@ v_message text;
 v_step integer=0;
 v_autorepair boolean;
 v_expl integer = null;
+v_sector_0 boolean = false;
+
 
 
 BEGIN
@@ -102,6 +104,12 @@ BEGIN
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+	
+	-- force only sector =0 disabled
+	IF (SELECT count(*) FROM selector_sector WHERE sector_id = 0 and cur_user = current_user ) = 1 THEN
+		v_sector_0 = true;
+	END IF;
+	DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
 
 	-- setting variables
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
@@ -185,6 +193,11 @@ BEGIN
 	SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
+	
+	-- recover sector 0 (if exists previously)
+	IF v_sector_0 = true THEN
+		INSERT INTO selector_sector VALUES (0,current_user);
+	END IF;
 	
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN

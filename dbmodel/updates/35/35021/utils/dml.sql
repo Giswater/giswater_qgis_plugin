@@ -330,3 +330,7 @@ UPDATE sys_fprocess SET fprocess_type=NULL WHERE fid IN
 370,374,378,389,390,393,401,410,420,426);
 
 UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fprocess_name ilike 'Import%' OR fprocess_name ilike 'Export%' and fprocess_type IS NULL;
+
+UPDATE config_param_system SET 
+value='{"table":"sector","selector":"selector_sector","table_id":"sector_id","selector_id":"sector_id","label":"sector_id, '' - '', name","orderBy":"sector_id","manageAll":true,"query_filter":" AND sector_id >=0","typeaheadForced":true,"explFromSector":false}'
+WHERE parameter = 'basic_selector_tab_sector';
