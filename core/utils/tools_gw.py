@@ -505,7 +505,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", sub_group=None, style_id="-1"):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -543,7 +543,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
     else:
         uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
         vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(vlayer, group)
+        tools_qt.add_layer_to_toc(vlayer, group, sub_group)
         # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
         # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
         # therefore, we define it with "-1"

@@ -85,14 +85,18 @@ class GwAddChildLayerButton(GwAction):
                     the_geom = field['geomField']
                 geom_field = field['tableId']
                 style_id = None
-                group = 'GW Layers'
+                # group = 'GW Layers'
+                # sub_group = 'GW Layers'
+
+                group = context['level_1']
+                sub_group = context['level_2']
 
                 action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                 None, group, style_id))
+                                                 None, group, sub_group, style_id))
 
         main_menu.exec_(click_point)
 
-    def _check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, style_id, is_checked):
+    def _check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, sub_group, style_id, is_checked):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -102,14 +106,13 @@ class GwAddChildLayerButton(GwAction):
         :param style_id: Id of the style we want to load (integer or String)
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
-
         if is_checked:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom, field_id, child_layers, group, style_id)
+                tools_gw.add_layer_database(tablename, the_geom, field_id, child_layers, group, sub_group, style_id)
         else:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
-                tools_qgis.remove_layer_from_toc(tablename, group)
+                tools_qgis.remove_layer_from_toc(tablename, group, sub_group)
 
     # endregion

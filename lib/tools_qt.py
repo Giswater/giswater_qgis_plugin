@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
     QDateEdit, QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
     QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox, \
     QToolButton
-from qgis.core import QgsExpression, QgsProject
+from qgis.core import QgsExpression, QgsProject, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
 
 from . import tools_log, tools_os, tools_qgis
@@ -630,7 +630,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     qtable.setModel(model)
 
 
-def add_layer_to_toc(layer, group=None):
+def add_layer_to_toc(layer, group=None, sub_group=None):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
     :param group: Name of the group that will be created in the toc (string)
@@ -641,11 +641,14 @@ def add_layer_to_toc(layer, group=None):
     else:
         QgsProject.instance().addMapLayer(layer, False)
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup(group)
-        if my_group is None:
-            my_group = root.insertGroup(0, group)
-        my_group.insertLayer(0, layer)
-
+        first_group = root.findGroup(group)
+        if sub_group:
+            for child in first_group.children():
+                second_group = first_group.findGroup(child.name())
+                if sub_group.lower() == child.name().lower():
+                    second_group.insertLayer(0, layer)
+        else:
+            first_group.insertLayer(0, layer)
 
 def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     """Apply the init function related to the model. It's necessary
