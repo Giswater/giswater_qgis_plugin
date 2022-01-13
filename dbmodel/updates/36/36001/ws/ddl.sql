@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2022/01/03
-CREATE TABLE inp_dscenario_virtualvalve
+CREATE TABLE IF NOT EXISTS inp_dscenario_virtualvalve
 (
   dscenario_id integer NOT NULL,
   arc_id character varying(16) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE inp_dscenario_virtualvalve
   CONSTRAINT inp_dscenario_virtualvalve_valv_type_check CHECK (valv_type::text = ANY (ARRAY['FCV'::character varying::text, 'GPV'::character varying::text, 'PBV'::character varying::text, 'PRV'::character varying::text, 'PSV'::character varying::text, 'TCV'::character varying::text]))
 );
 
-CREATE TABLE inp_dscenario_pump_additional
+CREATE TABLE IF NOT EXISTS inp_dscenario_pump_additional
 (
   dscenario_id integer NOT NULL,
   node_id character varying(16) NOT NULL,
@@ -70,23 +70,6 @@ UPDATE inp_junction j SET source_type = sourc_type FROM inp_source s WHERE s.nod
 UPDATE inp_junction j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET source_pattern_id = s.pattern_id FROM inp_source s WHERE s.node_id = j.node_id;
 
-UPDATE config_form_fields SET columnname = 'emitter_coeff' WHERE columnname='coef' and formname = 'inp_emitter';
-UPDATE config_form_fields SET columnname = 'init_quality' WHERE columnname='initqual' and formname = 'inp_quality';
-UPDATE config_form_fields SET columnname = 'source_type' WHERE columnname='sourc_type' and formname = 'inp_source';
-UPDATE config_form_fields SET columnname = 'source_quality' WHERE columnname='quality' and formname = 'inp_source';
-UPDATE config_form_fields SET columnname = 'source_pattern_id_id'WHERE columnname='pattern_id' and formname = 'inp_source';
-
-UPDATE config_form_fields SET formname = 'v_edit_inp_junction' 
-WHERE formname IN ('inp_quality','inp_source','inp_emitter') AND columnname!='node_id';
-
-DELETE FROM config_form_fields WHERE formname in ('inp_quality', 'inp_source','inp_emitter');
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_junction', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('node_id','demand','pattern_id','demand_type', 'emitter_coeff',
-'init_quality', 'source_type', 'source_quality', 'source_pattern_id') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 --PUMP REFACTOR 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"effic_curve_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
@@ -97,14 +80,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
-ALTER TABLE inp_pump DROP CONSTRAINT IF EXISTS inp_valve_effic_curve_id_fkey;
-ALTER TABLE inp_pump ADD CONSTRAINT inp_valve_effic_curve_id_fkey FOREIGN KEY (effic_curve_id)
-REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE inp_dscenario_pump DROP CONSTRAINT IF EXISTS inp_valve_effic_curve_id_fkey;
-ALTER TABLE inp_dscenario_pump ADD CONSTRAINT inp_valve_effic_curve_id_fkey FOREIGN KEY (effic_curve_id)
-REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
 UPDATE inp_pump SET effic_curve_id=energyvalue 
 WHERE energyparam ilike '%EFFIC%' AND energyvalue in (select id from inp_curve);
 
@@ -113,9 +88,6 @@ WHERE energyparam ilike '%PRICE%' and energyvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[
 
 UPDATE inp_pump SET energy_pattern_id=energyvalue 
 WHERE energyparam ilike '%PATTERN%' AND energyvalue in (select pattern_id from inp_pattern);
---PRIMERO HAY QUE REHACER LA VISTA VI_ENERGY
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pump", "column":"energyparam"}}$$);
---SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pump", "column":"energyvalue"}}$$);
 
 --PUMP_ADDITIONAL REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_additional", "column":"effic_curve_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
@@ -127,13 +99,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump_additional", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump_additional", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
-ALTER TABLE inp_pump_additional DROP CONSTRAINT IF EXISTS inp_valve_effic_curve_id_fkey;
-ALTER TABLE inp_pump_additional ADD CONSTRAINT inp_valve_effic_curve_id_fkey FOREIGN KEY (effic_curve_id)
-REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT IF EXISTS inp_valve_effic_curve_id_fkey;
-ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_valve_effic_curve_id_fkey FOREIGN KEY (effic_curve_id)
-REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 UPDATE inp_pump_additional SET effic_curve_id=energyvalue 
 WHERE energyparam ilike '%EFFIC%' AND energyvalue in (select id from inp_curve);
@@ -143,9 +108,6 @@ WHERE energyparam ilike '%PRICE%' and energyvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[
 
 UPDATE inp_pump_additional SET energy_pattern_id=energyvalue 
 WHERE energyparam ilike '%PATTERN%' AND energyvalue in (select pattern_id from inp_pattern);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pump_additional", "column":"energyparam"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pump_additional", "column":"energyvalue"}}$$);
 
 --PIPE REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pipe", "column":"bulk_coeff", "dataType":"float", "isUtils":"False"}}$$);
@@ -160,9 +122,6 @@ WHERE reactionparam ilike '%bulk%' and reactionvalue ~ '^ *[-+]?[0-9]*([.][0-9]+
 
 UPDATE inp_pipe SET bulk_coeff=reactionvalue::float 
 WHERE reactionparam ilike '%wall%' and reactionvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[0-9]*(([eE][-+]?)[0-9]+)? *$' is true;
---PRIMERO HAY QUE REHACER LA VISTA VI_REACTIONS
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pipe", "column":"reactionparam"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pipe", "column":"reactionvalue"}}$$);
 
 --SHORTPIPE REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_shortpipe", "column":"bulk_coeff", "dataType":"float", "isUtils":"False"}}$$);
@@ -194,22 +153,6 @@ UPDATE inp_tank j SET source_type = sourc_type FROM inp_source s WHERE s.node_id
 UPDATE inp_tank j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_tank j SET source_pattern_id = s.pattern_id FROM inp_source s WHERE s.node_id = j.node_id;
 
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND 
-columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
-AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
 -- RESERVOIR REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
@@ -226,22 +169,6 @@ UPDATE inp_reservoir j SET source_type = sourc_type FROM inp_source s WHERE s.no
 UPDATE inp_reservoir j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_reservoir j SET source_pattern_id = s.pattern_id FROM inp_source s WHERE s.node_id = j.node_id;
 
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_reservoir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND 
-columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_reservoir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_reservoir' 
-AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
 
 --VALVE REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_valve", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
@@ -249,42 +176,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 
 UPDATE inp_valve j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.node_id;
 
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_reservoir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('init_quality') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_reservoir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_reservoir' AND columnname in ('init_quality')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
 --VIRTUALVALVE REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_virtualvalve", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_virtualvalve", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 
 UPDATE inp_virtualvalve j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.arc_id;
 
-INSERT INTO config_form_fields 
-SELECT 'inp_virtualvalve', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('init_quality') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'inp_dscenario_virtualvalve', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='inp_virtualvalve' AND columnname in ('init_quality')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
 --INLET REFACTOR
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"head", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"mixing_model", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"mixing_fraction", "dataType":"float", "isUtils":"False"}}$$);

@@ -10,6 +10,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_node() 
 RETURNS trigger AS 
 $BODY$
+
 DECLARE 
 v_node_table varchar;
 v_man_table varchar;
@@ -114,17 +115,17 @@ BEGIN
         ELSIF v_node_table = 'inp_valve' THEN     
             UPDATE inp_valve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status, custom_dint=NEW.custom_dint, add_settings = NEW.add_settings,
-            init_quality=NEW.init_quality WHERE node_id=replace(OLD.node_id,'_n2a','');;
+            init_quality=NEW.init_quality WHERE node_id=replace(OLD.node_id,'_n2a','');
 			
         ELSIF v_node_table = 'inp_shortpipe' THEN     
             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status,bulk_coeff=NEW.bulk_coeff, 
-            wall_coeff=NEW.wall_coeff WHERE node_id=replace(OLD.node_id,'_n2a','');;  
+            wall_coeff=NEW.wall_coeff WHERE node_id=replace(OLD.node_id,'_n2a','');  
 			
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, 
             curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, mixing_model=NEW.mixing_model, bulk_coeff=NEW.bulk_coeff,
             wall_coeff=NEW.wall_coeff, init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, 
-            source_pattern = NEW.source_patternWHERE node_id=OLD.node_id;
+            source_pattern = NEW.source_pattern WHERE node_id=OLD.node_id;
 			
         END IF;
 
