@@ -205,7 +205,7 @@ widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_sector','form_feature', 'main', 'parent_id', null, null, 'string', 'combo', 'parent_id', NULL, NULL,  FALSE,
 FALSE, TRUE, FALSE,FALSE,'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id > -1 AND active IS TRUE ', TRUE, TRUE, NULL, NULL,NULL,
 '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", 
-"filterExpression": sector_id > -1 AND active IS TRUE"}}', 
+"filterExpression": "sector_id > -1 AND active IS TRUE"}}', 
 NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE sys_fprocess set project_type='utils' where fid=213;

@@ -485,3 +485,5 @@ UPDATE inp_flwreg_outlet SET nodarc_id = concat(node_id,'OT',order_id);
 UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);
 
 UPDATE inp_flwreg_pump SET to_arc = '18966' WHERE node_id = '18828';
+
+UPDATE arc SET pavcat_id = 'Asphalt';
