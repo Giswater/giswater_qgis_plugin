@@ -34,12 +34,11 @@ INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN
 UPDATE inp_typevalue SET idval = 'DEFAULT PATTERN' WHERE id = '11' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'FEATURE PATTERN' WHERE id = '14' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'DMA PATTERN' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
-DELETE FROM inp_typevalue WHERE typevalue = 'inp_value_opti_valvemode' AND idval = 'EPA TABLES';
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
-UPDATE sys_param_user SET label  = 'Shutoff valve status:',
-descript = 'Defines the status of valves (OPEN, CLOSED) in function of [INVENTORY][MINCUT RESULT]. Inventory is the status of shutoff valve defined on inventory. 
-Mincut Result is the posibility to use a defined status of valves as a result on a mincut scenario. It only applies for shut-off valves.'
+UPDATE sys_param_user SET label  = 'Valve status:',
+descript = 'Defines the status of valves (OPEN, CLOSED) in function of [EPA-TABLES][INVENTORY][MINCUT RESULT]. Inventory is the status of shutoff valve defined on inventory. 
+Mincut Result is the posibility to use a defined status of valves as a result on a mincut scenario.'
  WHERE id = 'inp_options_valve_mode';
 
 UPDATE inp_typevalue SET idval = 'CONNEC (ALL NODARCS)' WHERE typevalue = 'inp_options_networkmode' AND id  ='4';
