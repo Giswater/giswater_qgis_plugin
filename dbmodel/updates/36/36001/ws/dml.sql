@@ -148,7 +148,7 @@ AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_patt
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields 
-SELECT 'v_edit_inp__inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+SELECT 'v_edit_inp_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
@@ -209,7 +209,8 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields 
 SELECT 'v_edit_inp_pump', formtype, tabname, 'effic_curve_id', layoutname, layoutorder, datatype, widgettype, 'effic_curve_id', tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
+'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}',
+ widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname ='v_edit_inp_pump' AND 
 columnname in ('curve_id') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -217,7 +218,8 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields 
 SELECT 'v_edit_inp_dscenario_pump', formtype, tabname, 'effic_curve_id', layoutname, layoutorder, datatype, widgettype, 'effic_curve_id', tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
+'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}',
+widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname ='v_edit_inp_pump' AND 
 columnname in ('curve_id') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

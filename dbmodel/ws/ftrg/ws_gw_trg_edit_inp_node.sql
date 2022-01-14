@@ -103,14 +103,15 @@ BEGIN
 			
         ELSIF v_node_table = 'inp_tank' THEN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, 
-            minvol=NEW.minvol, curve_id=NEW.curve_id, mixing_model=NEW.mixing_model, bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff,
+            minvol=NEW.minvol, curve_id=NEW.curve_id, mixing_model=NEW.mixing_model, reaction_coeff=NEW.reaction_coeff,
             init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id 
             WHERE node_id=OLD.node_id;
 			
         ELSIF v_node_table = 'inp_pump' THEN          
             UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, 
-            status=NEW.status , pump_type=NEW.pump_type, energy_price=NEW.energy_price, price_pattern_id=NEW.price_pattern_id 
-            WHERE node_id=replace(OLD.node_id,'_n2a','');
+            status=NEW.status , pump_type=NEW.pump_type, energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id,
+            effic_curve_id=NEW.effic_curve_id
+            WHERE node_id=OLD.node_id;
 			
         ELSIF v_node_table = 'inp_valve' THEN     
             UPDATE inp_valve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
@@ -119,12 +120,12 @@ BEGIN
 			
         ELSIF v_node_table = 'inp_shortpipe' THEN     
             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status,bulk_coeff=NEW.bulk_coeff, 
-            wall_coeff=NEW.wall_coeff WHERE node_id=replace(OLD.node_id,'_n2a','');  
+            wall_coeff=NEW.wall_coeff WHERE node_id=OLD.node_id;  
 			
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, 
-            curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, mixing_model=NEW.mixing_model, bulk_coeff=NEW.bulk_coeff,
-            wall_coeff=NEW.wall_coeff, init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, 
+            curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, mixing_model=NEW.mixing_model, reaction_coeff=NEW.reaction_coeff,
+            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, 
             source_pattern_id = NEW.source_pattern_id WHERE node_id=OLD.node_id;
 			
         END IF;
