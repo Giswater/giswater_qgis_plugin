@@ -88,6 +88,10 @@ v_mapzone_new text;
 v_fid integer = 143;
 v_gully_proximity_value text;
 v_gully_proximity_active text;
+v_category text;
+v_function text;
+v_fluid text;
+v_location text;
 
 BEGIN
 
@@ -194,6 +198,22 @@ BEGIN
 	INTO v_verified_id;
 	EXECUTE 'SELECT inventory FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
 	INTO v_inventory;
+	EXECUTE 'SELECT n.category_type FROM '||v_feature_layer||' n JOIN man_type_category m ON n.category_type=m.category_type
+	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	INTO v_category;
+	EXECUTE 'SELECT n.function_type FROM '||v_feature_layer||' n JOIN man_type_function m ON n.function_type=m.function_type
+	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	INTO v_function;
+	EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
+	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	INTO v_fluid;
+	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
+	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	INTO v_location;
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
@@ -221,13 +241,15 @@ BEGIN
 		-- inserting new feature on parent tables
 		IF v_feature_type='node' THEN
 			IF v_project_type='WS' then
-				INSERT INTO node (node_id, code, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
+				INSERT INTO node (node_id, code, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom,
+				category_type, function_type, fluid_type, location_type) 
 				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id,  
-				0, v_state_type, v_workcat_id_end, v_the_geom);
+				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location);
 			ELSE 
-				INSERT INTO node (node_id, code, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom) 
+				INSERT INTO node (node_id, code, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, 
+				the_geom, category_type, function_type, fluid_type, location_type) 
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 
-				0, v_state_type, v_workcat_id_end, v_the_geom);
+				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -235,11 +257,15 @@ BEGIN
 
 		ELSIF v_feature_type='arc' THEN
 			IF v_project_type='WS' then
-				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
-				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
+				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, 
+				verified, category_type, function_type, fluid_type, location_type) 
+				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, 
+				v_verified_id, v_category, v_function, v_fluid, v_location);
 			ELSE 
-				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, verified) 
-				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, v_verified_id);
+				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, 
+				verified, category_type, function_type, fluid_type, location_type) 
+				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, 
+				v_the_geom, v_verified_id, v_category, v_function, v_fluid, v_location);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -248,19 +274,25 @@ BEGIN
 		ELSIF v_feature_type ='connec' THEN
 		
 			IF v_project_type='WS' then
-				INSERT INTO connec (connec_id, code, connecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, verified, inventory) 
-				VALUES (v_id, v_code, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, v_inventory);
+				INSERT INTO connec (connec_id, code, connecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, verified, 
+				inventory, category_type, function_type, fluid_type, location_type) 
+				VALUES (v_id, v_code, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, 
+				v_inventory, v_category, v_function, v_fluid, v_location);
 			ELSE 
-				INSERT INTO connec (connec_id, code, connec_type, connecat_id,  sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, verified, inventory) 
-				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id, v_expl_id,0, v_state_type, v_the_geom,v_workcat_id_end, v_verified_id, v_inventory);
+				INSERT INTO connec (connec_id, code, connec_type, connecat_id,  sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, 
+				verified, inventory, category_type, function_type, fluid_type, location_type) 
+				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id, v_expl_id,0, v_state_type, v_the_geom,v_workcat_id_end, 
+				v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location);
 			END IF;	
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into connec table.'));
 
 		ELSIF v_feature_type = 'gully' THEN
-			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, inventory) 
-			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, v_inventory);
+			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, 
+			inventory, category_type, function_type, fluid_type, location_type) 
+			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, 
+			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location);
 			
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));
@@ -294,7 +326,8 @@ BEGIN
 							where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 							table_name='''||v_feature_type||''') and column_name!='''||v_id_column||''' and column_name!=''the_geom'' and column_name!=''state''
 							and column_name!=''code'' and column_name!=''epa_type'' and column_name!=''state_type'' and column_name!='''||v_cat_column||'''
-							and column_name!=''sector_id'' and column_name!=''dma_id'' and column_name!=''expl_id'';';
+							and column_name!=''sector_id'' and column_name!=''dma_id'' and column_name!=''expl_id'' and column_name!=''category_type'' 
+							and column_name!=''function_type'' and column_name!=''fluid_type'' and column_name!=''location_type'';';
 
 		FOR v_column IN EXECUTE v_sql
 		LOOP
