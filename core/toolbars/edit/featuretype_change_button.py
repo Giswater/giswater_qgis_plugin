@@ -183,20 +183,22 @@ class GwFeatureTypeChangeButton(GwMaptool):
             if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
                     project_type == 'ud'):
 
-                fieldname = f"{self.feature_type}cat_id"
-                if self.feature_type == "connec":
-                    fieldname = f"connecat_id"
-                elif self.feature_type == "gully":
-                    fieldname = f"gratecat_id"
-                sql = (f"UPDATE {self.tablename} "
-                       f"SET {fieldname} = '{featurecat_id}' "
-                       f"WHERE {self.feature_type}_id = '{self.feature_id}'")
-                tools_db.execute_sql(sql)
-                if project_type == 'ud':
-                    sql = (f"UPDATE {self.tablename} "
-                           f"SET {self.feature_type}_type = '{feature_type_new}' "
-                           f"WHERE {self.feature_type}_id = '{self.feature_id}'")
-                    tools_db.execute_sql(sql)
+                # Get function input parameters
+                feature = f'"type":"{self.feature_type}"'
+                extras = f'"feature_id":"{self.feature_id}"'
+                extras += f', "feature_type_new":"{feature_type_new}"'
+                extras += f', "featurecat_id":"{featurecat_id}"'
+                body = tools_gw.create_body(feature=feature, extras=extras)
+
+                # Execute SQL function and show result to the user
+                complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body, log_sql=True)
+                if not complet_result:
+                    message = "Error replacing feature"
+                    tools_qgis.show_warning(message)
+                    # Check in init config file if user wants to keep map tool active or not
+                    self.manage_active_maptool()
+                    tools_gw.close_dialog(self.dlg_change)
+                    return
 
                 tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
                 tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
