@@ -15,3 +15,4 @@
 - New column fprocess_type on sys_fprocess to categorize processes
 - Refactor of pavcat_id strategy. From independent table to arc (and related views)
 - Improve the management of undefined (0) sector. Enable on filter selector, force disable on go2epa
+- Force selector for whole user on same cat_manager when new sector is created
