@@ -334,3 +334,12 @@ UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fprocess_name ili
 UPDATE config_param_system SET 
 value='{"table":"sector","selector":"selector_sector","table_id":"sector_id","selector_id":"sector_id","label":"sector_id, '' - '', name","orderBy":"sector_id","manageAll":true,"query_filter":" AND sector_id >=0","typeaheadForced":true,"explFromSector":false}'
 WHERE parameter = 'basic_selector_tab_sector';
+
+--2022/01/14
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3117,'gw_fct_setchangefeaturetype', 'utils', 'function', 'json', 'json', 'Change type and catalog of a node, arc, connec or gully', 
+'role_edit', NULL, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
+VALUES (436, 'Change node type', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
+
