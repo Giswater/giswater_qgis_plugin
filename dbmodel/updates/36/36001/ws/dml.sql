@@ -138,6 +138,24 @@ FROM config_form_fields WHERE formname ='v_edit_inp_tank'
 AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+--inlet
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp_dscenario_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
+AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp__inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
+AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
 --reservoir
 INSERT INTO config_form_fields 
 SELECT 'v_edit_inp_reservoir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
@@ -219,3 +237,11 @@ widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND 
 columnname in ('pattern_id') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields set dv_isnullvalue=TRUE WHERE columnname='source_pattern_id' or columnname='source_type';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}' 
+WHERE columnname='source_pattern_id';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}' 
+WHERE columnname='pattern_id';

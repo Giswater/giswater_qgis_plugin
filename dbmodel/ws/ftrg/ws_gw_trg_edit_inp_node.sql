@@ -93,18 +93,18 @@ BEGIN
 
         IF v_node_table = 'inp_junction' THEN
             UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, emitter_coeff= NEW.emitter_coeff,
-            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern = NEW.source_pattern
+            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id
             WHERE node_id=OLD.node_id;
 			
         ELSIF v_node_table = 'inp_reservoir' THEN
             UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, head = NEW.head,
-            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern = NEW.source_pattern
+            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id
             WHERE node_id=OLD.node_id;  
 			
         ELSIF v_node_table = 'inp_tank' THEN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, 
             minvol=NEW.minvol, curve_id=NEW.curve_id, mixing_model=NEW.mixing_model, bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff,
-            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern = NEW.source_pattern 
+            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id 
             WHERE node_id=OLD.node_id;
 			
         ELSIF v_node_table = 'inp_pump' THEN          
@@ -125,7 +125,7 @@ BEGIN
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, 
             curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, mixing_model=NEW.mixing_model, bulk_coeff=NEW.bulk_coeff,
             wall_coeff=NEW.wall_coeff, init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, 
-            source_pattern = NEW.source_pattern WHERE node_id=OLD.node_id;
+            source_pattern_id = NEW.source_pattern_id WHERE node_id=OLD.node_id;
 			
         END IF;
 

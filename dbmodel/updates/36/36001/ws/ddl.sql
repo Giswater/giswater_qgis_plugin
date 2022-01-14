@@ -56,7 +56,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junctio
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_junction", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
@@ -137,7 +137,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"mixing_model", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"mixing_fraction", "dataType":"float", "isUtils":"False"}}$$);
@@ -145,7 +145,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 UPDATE inp_tank j SET mixing_model = mix_type,mixing_fraction=value FROM inp_mixing s WHERE s.node_id = j.node_id;
 UPDATE inp_tank j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.node_id;
@@ -190,7 +190,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"mixing_model", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"mixing_fraction", "dataType":"float", "isUtils":"False"}}$$);
@@ -198,7 +198,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"source_pattern_id", "dataType":"character varying(1)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 UPDATE inp_inlet j SET mixing_model = mix_type,mixing_fraction=value FROM inp_mixing s WHERE s.node_id = j.node_id;
 UPDATE inp_inlet j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.node_id;
