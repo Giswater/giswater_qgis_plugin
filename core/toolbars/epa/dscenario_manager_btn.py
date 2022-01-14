@@ -150,7 +150,11 @@ class GwDscenarioManagerButton(GwAction):
 
         self._fill_table()
 
-        tools_gw.open_dialog(self.dlg_dscenario, 'dscenario')
+        sql = f"SELECT name FROM v_edit_cat_dscenario WHERE dscenario_id = {self.selected_dscenario_id}"
+        row = tools_db.get_row(sql)
+        dscenario_name = row[0]
+        title = f"Dscenario {self.selected_dscenario_id} - {dscenario_name}"
+        tools_gw.open_dialog(self.dlg_dscenario, 'dscenario', title=f"{title}")
 
 
     def _fill_table(self, hidde=False, set_edit_triggers=QTableView.DoubleClicked, expr=None):
@@ -305,12 +309,10 @@ class GwDscenarioManagerButton(GwAction):
 
         # Set active layer
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
-        layer_name = view_name.replace("dscenario_", "")
-        print(f"{layer_name=}")
+        layer_name = 'v_edit_' + self.feature_type
+        if self.feature_type == 'nodarc':
+            layer_name = view_name.replace("dscenario_", "")
         layer = tools_qgis.get_layer_by_tablename(layer_name)
-        if layer is None:
-            layer_name = 'v_edit_' + self.feature_type
-            layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
 
@@ -352,14 +354,20 @@ class GwDscenarioManagerButton(GwAction):
                 selected_ids.append(feature.attribute(field_id))
 
             if selected_ids:
+                inserted = {f'{self.feature_type}': []}
                 self.list_ids = selected_ids
                 print(f"{self.list_ids}")
                 tableview = self.dlg_dscenario.main_tab.currentWidget()
                 view = tableview.objectName()
                 for f in selected_ids:
                     sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{f}');"
-                    tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
+                    result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
+                    if result:
+                        inserted[f'{self.feature_type}'].append(f)
                 self._fill_table()
+
+                # Just select the inserted features
+                tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
 
 
     def _selection_end(self):
