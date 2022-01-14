@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION CODE: 1124
 
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_sector();
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_sector()
   RETURNS trigger AS
 $BODY$
@@ -15,6 +13,8 @@ DECLARE
 v_querytext text;
 v_row record;
 v_sector_id integer[];
+v_user text;
+
 
 BEGIN
 
@@ -57,16 +57,23 @@ BEGIN
 
 			IF  NEW.parent_id IS NOT NULL THEN
 
-				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.parent_id||')';
+				-- manage cat_manager
+				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a 
+				WHERE sector_id = '||NEW.parent_id||')';
 				FOR v_row IN EXECUTE v_querytext
 				LOOP
+					-- update array of sectors for specific row
 					v_sector_id = array_append (v_row.sector_id, NEW.sector_id);
 					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
-				END LOOP;	
+					
+					-- insert new sector on selector for all those user allowed on specific row
+					FOR v_user IN SELECT unnest(username) FROM cat_manager WHERE id = v_row.id
+					LOOP
+						INSERT INTO selector_sector VALUES (NEW.sector_id, v_user);		
+					END LOOP;
+				END LOOP;		
 			END IF;
-			
-			INSERT INTO selector_sector VALUES (NEW.sector_id, current_user);
-			
+						
 			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
@@ -114,3 +121,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;  
+
+ GRANT ALL ON ALL FUNCTIONS IN SCHEMA ws to role_basic
