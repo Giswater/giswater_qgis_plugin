@@ -203,8 +203,9 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES ('v_edit_sector','form_feature', 'main', 'parent_id', null, null, 'string', 'combo', 'parent_id', NULL, NULL,  FALSE,
-FALSE, TRUE, FALSE,FALSE,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ', TRUE, TRUE, NULL, NULL,NULL,
-'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', 
+FALSE, TRUE, FALSE,FALSE,'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id > -1 AND active IS TRUE ', TRUE, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", 
+"filterExpression": sector_id > -1 AND active IS TRUE"}}', 
 NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE sys_fprocess set project_type='utils' where fid=213;
@@ -343,3 +344,4 @@ VALUES (3126,'gw_fct_setchangefeaturetype', 'utils', 'function', 'json', 'json',
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
 VALUES (436, 'Change node type', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
 
+UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id >= 0 AND active IS TRUE' WHERE columnname = 'sector_id'
