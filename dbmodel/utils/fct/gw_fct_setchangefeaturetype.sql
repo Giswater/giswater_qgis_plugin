@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: 3117
+--FUNCTION CODE: 3126
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setchangefeaturetype(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setchangefeaturetype (p_data json)
 RETURNS json AS
