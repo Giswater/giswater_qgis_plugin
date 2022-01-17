@@ -17,7 +17,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_bulk_order', 'epaoptions', 'Power to which concentration is raised when computing a bulk flow reaction rate','role_epa',
 'ORDER BULK', 'Bulk Reaction Order', null, null, true, 1, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'integer',
-'linetext', FALSE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'linetext', TRUE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -26,7 +26,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_wall_order', 'epaoptions', 'Power to which concentration is raised when computing a bulk flow reaction rate','role_epa',
 'ORDER WALL', 'Wall Reaction Order', null, null, true, 2, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'integer',
-'linetext', FALSE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'linetext', TRUE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -35,7 +35,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_global_bulk', 'epaoptions', 'Default bulk reaction rate coefficient (Kb) assigned to all pipes.','role_epa',
 'GLOBAL BULK', 'Global Bulk Coefficient', null, null, true, 3, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'double',
-'spinbox', FALSE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'spinbox', TRUE, NULL, NULL, 'lyt_reactions_1', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -44,7 +44,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_global_wall', 'epaoptions', 'Wall reaction rate coefficient (Kw) assigned to all pipes.','role_epa',
 'GLOBAL WALL', 'Global Wall Coefficient', null, null, true, 1, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'double',
-'spinbox', FALSE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'spinbox', TRUE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -53,7 +53,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_limit_concentration', 'epaoptions', 'Maximum concentration that a substance can grow to or minimum value it can decay to.','role_epa',
 'LIMITING POTENTIAL', 'Limiting Concentration', null, null, true, 2, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'double',
-'spinbox', FALSE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'spinbox', TRUE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -62,7 +62,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_reactions_wall_coeff_correlation', 'epaoptions', 'Factor correlating wall reaction coefficient to pipe roughness.','role_epa',
 'ROUGHNESS CORRELATION', 'Wall Coefficient Correlation', null, null, true, 3, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'double',
-'spinbox', FALSE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'spinbox', TRUE, NULL, NULL, 'lyt_reactions_2', TRUE, NULL, TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 --energy
 
@@ -73,7 +73,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_energy_pump_effic', 'epaoptions', 'Default pump efficiency','role_epa',
 'GLOBAL EFFIC', 'Pump Efficiency', 'SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL', null, true, 1, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'string',
-'combo', FALSE, NULL, NULL, 'lyt_energy_1', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'combo', TRUE, NULL, NULL, 'lyt_energy_1', TRUE, NULL, TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -82,7 +82,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_energy_price', 'epaoptions', 'Price of energy per kilowatt-hour','role_epa',
 'GLOBAL PRICE', 'Energy Price per Kwh', null, null, true, 2, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'text',
-'linetext', FALSE, NULL, NULL, 'lyt_energy_1', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'linetext', TRUE, NULL, NULL, 'lyt_energy_1', TRUE, NULL, TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -91,7 +91,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_energy_price_pattern', 'epaoptions', 'ID label of a time pattern used to represent variations in energy price with time.','role_epa',
 'GLOBAL PATTERN', 'Price Pattern', 'SELECT pattern_id AS id, pattern_id AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL', null, true, 1, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'string',
-'combo', FALSE, NULL, NULL, 'lyt_energy_2', TRUE, NULL,TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'combo', TRUE, NULL, NULL, 'lyt_energy_2', TRUE, NULL, TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, 
 idval, label, dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, 
@@ -100,7 +100,7 @@ widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_or
 VALUES ('inp_energy_demand_charge', 'epaoptions', 'Additional energy charge per maximum kilowatt usage.','role_epa',
 'DEMAND CHARGE', 'Demand Charge', null, null, true, 2, 'ws',FALSE,
 FALSE,FALSE,FALSE,FALSE,'text',
-'linetext', FALSE, NULL, NULL, 'lyt_energy_2', TRUE, NULL,NULL, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
+'linetext', TRUE, NULL, NULL, 'lyt_energy_2', TRUE, NULL, TRUE, NULL, NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 --junction
 UPDATE config_form_fields SET columnname = 'emitter_coeff', label ='emitter_coeff' WHERE columnname='coef' and formname = 'inp_emitter';

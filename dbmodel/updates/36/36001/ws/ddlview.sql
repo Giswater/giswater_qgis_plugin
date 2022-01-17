@@ -6,32 +6,92 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-/*
+drop view if exists vi_reactions;
+drop view if exists vi_curves;
+drop view if exists vi_energy;
+
 drop view if exists ws_sample35.vi_reactions;
 CREATE OR REPLACE VIEW ws_sample35.vi_reactions AS 
- SELECT 'BULK' as param,
+SELECT 'BULK' as param,
 inp_pipe.arc_id,
-inp_pipe.bulk_coeff as coeff
-FROM ws_sample35.selector_inp_result,
-ws_sample35.inp_pipe
- JOIN ws_sample35.rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
-  WHERE bulk_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
-UNIO
-N  SELECT 'WALL' as param,
-inp_pipe.arc_id,
-inp_pipe.wall_coeff as coeff
-FROM ws_sample35.selector_inp_result,
-ws_sample35.inp_pipe
-JOIN ws_sample35.rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
- WHERE wall_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+inp_pipe.bulk_coeff::text as coeff
+FROM selector_inp_result, inp_pipe
+LEFT JOIN rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
+WHERE bulk_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
 UNION
-  SELECT a.key AS param,
-NULL::character varying AS arc_id,
-a.value::float AS coeff
-  FROM  ws_sample35.config_param_user , 
-  json_each_text(ws_sample35.config_param_user.value::json) AS a
-  WHERE parameter='inp_global_reactions' and cur_user=current_user
-  ORDER BY 1;
+SELECT 'WALL' as param,
+inp_pipe.arc_id,
+inp_pipe.wall_coeff::text as coeff
+FROM selector_inp_result, inp_pipe
+JOIN rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
+WHERE wall_coeff is not null AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT idval as  param,
+NULL AS arc_id,
+value::character varying AS coeff
+FROM config_param_user
+JOIN sys_param_user ON id=parameter
+WHERE (parameter='inp_reactions_bulk_order' OR parameter = 'inp_reactions_wall_order' OR parameter = 'inp_reactions_global_bulk' OR 
+parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_concentration' OR parameter ='inp_reactions_wall_coeff_correlation')
+AND cur_user=current_user order by 1;
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_energy AS 
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'EFFIC' as idval,
+    effic_curve_id AS energyvalue
+   FROM selector_inp_result, inp_pump
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump.effic_curve_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'PRICE' as idval,
+    energy_price::TEXT AS energyvalue
+   FROM selector_inp_result,  inp_pump
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump.energy_price IS NOT NULL
+UNION
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'PATTERN' as idval,
+    energy_pattern_id AS energyvalue
+   FROM selector_inp_result,   inp_pump
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump.energy_pattern_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'EFFIC' as idval,
+    effic_curve_id AS energyvalue
+   FROM selector_inp_result, inp_pump_additional
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump_additional.effic_curve_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'PRICE' as idval,
+    energy_price::TEXT AS energyvalue
+   FROM selector_inp_result,  inp_pump_additional
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump_additional.energy_price IS NOT NULL
+UNION
+SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
+    'PATTERN' as idval,
+    energy_pattern_id AS energyvalue
+   FROM selector_inp_result,  inp_pump_additional
+     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+  inp_pump_additional.energy_pattern_id IS NOT NULL
+UNION
+ SELECT NULL AS pump_id,
+    idval,
+    value::character varying AS energyvalue
+   FROM config_param_user
+   JOIN sys_param_user ON id=parameter
+   WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') and 
+config_param_user.cur_user::name = current_user order by 1;
+   
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS 
  SELECT
@@ -69,31 +129,6 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS
            FROM SCHEMA_NAME.config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_energy AS 
- SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    inp_typevalue.idval,
-    inp_pump.energyvalue
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.inp_pump
-     JOIN SCHEMA_NAME.rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_pump.energyparam::text = inp_typevalue.id::text AND inp_typevalue.typevalue::text = 'inp_value_param_energy'::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_pump.energyparam IS NOT NULL
-UNION
- SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    inp_pump_additional.energyparam AS idval,
-    inp_pump_additional.energyvalue
-   FROM SCHEMA_NAME.selector_inp_result,
-    SCHEMA_NAME.inp_pump_additional
-     JOIN SCHEMA_NAME.rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_pump_additional.energyparam IS NOT NULL
-UNION
- SELECT inp_energy.descript AS pump_id,
-    NULL::character varying AS idval,
-    NULL::character varying AS energyvalue
-   FROM SCHEMA_NAME.inp_energy;
-
-*/
 
 --2022/01/03
 
