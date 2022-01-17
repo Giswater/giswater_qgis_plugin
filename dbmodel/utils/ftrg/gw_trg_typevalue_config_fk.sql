@@ -46,7 +46,7 @@ BEGIN
 		--if there is a value - error message, if not create a trigger for the defined typevalue 
 		IF v_count > 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"3032", "function":"2750","debug_msg":null}}$$);';
+       		"data":{"message":"3032", "function":"2750","debug_msg":"'||NEW.typevalue_name||'"}}$$);';
 		ELSE 
 			PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
 		END IF;
