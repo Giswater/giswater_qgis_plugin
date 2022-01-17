@@ -347,7 +347,7 @@ VALUES (3126,'gw_fct_setchangefeaturetype', 'utils', 'function', 'json', 'json',
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
 VALUES (436, 'Change node type', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
 
-UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id >= 0 AND active IS TRUE' WHERE columnname = 'sector_id'
+UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id >= 0 AND active IS TRUE' WHERE columnname = 'sector_id';
 
 --2022/01/17
 drop view if exists v_plan_current_psector_budget;
