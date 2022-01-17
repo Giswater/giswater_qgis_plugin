@@ -43,7 +43,6 @@ v_error_context text;
 v_fid integer;
 v_nodetolerance float;
 v_minlength float = 0;
-v_queryext text;
 
 BEGIN
 
@@ -433,7 +432,7 @@ BEGIN
 
 	RAISE NOTICE '19 - Check flow regulator length fits on destination arc (427)';
 
-	v_queryext = 'SELECT 427, arc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_orifice f, selector_sector s 
+	v_querytext = 'SELECT 427, arc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', a.the_geom FROM selector_sector s, inp_flwreg_orifice f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
 
@@ -451,7 +450,7 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All orifice flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_weir f, selector_sector s 
+	v_querytext = 'SELECT 427, arc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', a.the_geom FROM selector_sector s, inp_flwreg_weir f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
 
@@ -469,7 +468,7 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All weir flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_outlet f, selector_sector s 
+	v_querytext = 'SELECT 427, arc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', a.the_geom FROM selector_sector s, inp_flwreg_pump f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
 
@@ -487,7 +486,7 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_pump f, selector_sector s 
+	v_querytext = 'SELECT 427, arc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', a.the_geom FROM selector_sector s, inp_flwreg_pump f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
 

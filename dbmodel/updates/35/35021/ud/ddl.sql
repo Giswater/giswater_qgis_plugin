@@ -398,3 +398,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_nod
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"elev1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_conduit", "column":"elev2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+
+
+CREATE INDEX temp_arc_index
+  ON temp_arc
+  USING gist
+  (the_geom);
+  
+  
+CREATE INDEX temp_node_index
+  ON temp_node
+  USING gist
+  (the_geom);
