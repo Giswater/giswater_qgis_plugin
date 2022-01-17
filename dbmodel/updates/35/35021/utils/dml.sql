@@ -345,3 +345,60 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (436, 'Change node type', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id >= 0 AND active IS TRUE' WHERE columnname = 'sector_id'
+
+--2022/01/17
+drop view if exists v_plan_current_psector_budget;
+drop view if exists v_edit_plan_psector_x_other;
+ALTER TABLE plan_psector_x_other RENAME COLUMN descript TO observ;
+
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
+AS SELECT plan_psector_x_other.id,
+    plan_psector_x_other.psector_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript AS price_descript,
+    v_price_compost.price,
+    plan_psector_x_other.measurement,
+    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector_x_other.observ,
+    plan_psector.atlas_id
+   FROM plan_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
+  ORDER BY plan_psector_x_other.psector_id;
+  
+CREATE OR REPLACE VIEW v_plan_current_psector_budget
+AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    'arc'::text AS feature_type,
+    v_plan_arc.arccat_id AS featurecat_id,
+    v_plan_arc.arc_id AS feature_id,
+    v_plan_arc.length,
+    (v_plan_arc.total_budget / v_plan_arc.length)::numeric(14,2) AS unitary_cost,
+    v_plan_arc.total_budget
+   FROM v_plan_arc
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+  WHERE plan_psector_x_arc.doable = true
+UNION
+ SELECT row_number() OVER (ORDER BY v_plan_node.node_id) + 9999 AS rid,
+    plan_psector_x_node.psector_id,
+    'node'::text AS feature_type,
+    v_plan_node.nodecat_id AS featurecat_id,
+    v_plan_node.node_id AS feature_id,
+    1 AS length,
+    v_plan_node.budget AS unitary_cost,
+    v_plan_node.budget AS total_budget
+   FROM v_plan_node
+     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+  WHERE plan_psector_x_node.doable = true
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_plan_psector_x_other.id) + 19999 AS rid,
+    v_edit_plan_psector_x_other.psector_id,
+    'other'::text AS feature_type,
+    v_edit_plan_psector_x_other.price_id AS featurecat_id,
+    v_edit_plan_psector_x_other.observ AS feature_id,
+    v_edit_plan_psector_x_other.measurement AS length,
+    v_edit_plan_psector_x_other.price AS unitary_cost,
+    v_edit_plan_psector_x_other.total_budget
+   FROM v_edit_plan_psector_x_other
+  ORDER BY 1, 2, 4;
