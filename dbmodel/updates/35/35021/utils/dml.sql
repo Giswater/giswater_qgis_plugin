@@ -38,24 +38,25 @@ INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY"
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"ARC"}', null, '{"orderBy":4}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}', null, '{"orderBy":5}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', null, '{"orderBy":6}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"POLYGON"}', null, '{"orderBy":7}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', null, '{"orderBy":8}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"EDIT"}', null, '{"orderBy":9}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"MINCUT"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"LINK"}', null, '{"orderBy":7}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"POLYGON"}', null, '{"orderBy":8}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"OTHER"}', null, '{"orderBy":9}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"EDIT"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"MINCUT"}', null, '{"orderBy":11}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"PROFILE"}', null, '{"orderBy":12}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"VISIT"}', null, '{"orderBy":13}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"CATALOG"}', null, '{"orderBy":13}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"INPUT"}', null, '{"orderBy":14}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"DSCENARIO"}', null, '{"orderBy":15}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"RESULT"}', null, '{"orderBy":16}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"COMPARE"}', null, '{"orderBy":17}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"CATALOG"}', null, '{"orderBy":18}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PSECTOR"}', null, '{"orderBy":19}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PRICES"}', null, '{"orderBy":20}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"MAPZONES"}', null, '{"orderBy":21}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"CATALOG"}', null, '{"orderBy":22}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"ADDRESS"}', null, '{"orderBy":23}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":24}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"CATALOG"}', null, '{"orderBy":14}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"INPUT"}', null, '{"orderBy":15}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"DSCENARIO"}', null, '{"orderBy":16}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"RESULT"}', null, '{"orderBy":17}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EPA", "level_2":"COMPARE"}', null, '{"orderBy":18}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"CATALOG"}', null, '{"orderBy":19}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PSECTOR"}', null, '{"orderBy":20}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"PLAN","level_2":"PRICES"}', null, '{"orderBy":21}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"MAPZONES"}', null, '{"orderBy":22}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"ADMIN","level_2":"CATALOG"}', null, '{"orderBy":23}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"ADDRESS"}', null, '{"orderBy":24}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":25}') ON CONFLICT (typevalue, id) DO NOTHING;
 
 
 UPDATE sys_table SET context = NULL, alias = NULL, orderby = null;
@@ -83,6 +84,8 @@ UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "lev
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"NODE"}', alias = 'Node', orderby=1  WHERE id='v_edit_node';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"CONNEC"}',alias = 'Connec', orderby=1  WHERE id='v_edit_connec';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GULLY"}', alias = 'Gully', orderby=1  WHERE id='v_edit_gully';
+
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"LINK"}', alias = 'Link' , orderby=1  WHERE id='v_edit_link';
 
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"POLYGON"}', alias = 'Node polygon' , orderby=1  WHERE id='ve_pol_node';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"POLYGON"}', alias = 'Connec polygon', orderby=2   WHERE id='ve_pol_connec';
