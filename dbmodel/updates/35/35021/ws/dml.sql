@@ -479,3 +479,46 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 DELETE FROM config_form_fields WHERE formname='v_edit_inp_junction' AND columnname='expl_id';
 DELETE FROM config_form_fields WHERE formname='v_edit_inp_dscenario_demand' AND columnname='id';
+
+--2022/01/17
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Roughness catalog' , orderby=1 WHERE id ='cat_mat_roughness';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve catalog' , orderby=2 WHERE id ='v_edit_inp_curve';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve' , orderby=3 WHERE id ='v_edit_inp_curve_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Patterns catalog' , orderby=4 WHERE id ='v_edit_inp_pattern';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Pattern' , orderby=5 WHERE id ='v_edit_inp_pattern_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Dscenario catalog' , orderby=6 WHERE id ='v_edit_cat_dscenario';
+
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Reservoir', orderby=1 where id='v_edit_inp_reservoir';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Tank', orderby=2 where id='v_edit_inp_tank';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Inlet', orderby=3 where id='v_edit_inp_inlet';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Junction', orderby=4 where id='v_edit_inp_junction';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Shortpipe', orderby=5 where id='v_edit_inp_shortpipe';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Valve', orderby=6 where id='v_edit_inp_valve';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Pump', orderby=7 where id='v_edit_inp_pump';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Connec', orderby=8 where id='v_edit_inp_connec';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Pipe', orderby=9 where id='v_edit_inp_pipe';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Virtualvalve', orderby=10 where id='v_edit_inp_virtualvalve';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Pump Additional', orderby=11 where id='inp_pump_additional';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Controls', orderby=12 where id='v_edit_inp_controls';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Rules', orderby=13 where id='v_edit_inp_rules';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Demand Dscenario', orderby=1 where id='v_edit_inp_dscenario_demand';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Pipe Dscenario', orderby=2 where id='v_edit_inp_dscenario_pipe';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Pump Dscenario', orderby=3 where id='v_edit_inp_dscenario_pump';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Reservoir Dscenario', orderby=4 where id='v_edit_inp_dscenario_reservoir';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Shortpipe Dscenario', orderby=5 where id='v_edit_inp_dscenario_shortpipe';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Tank Dscenario', orderby=6 where id='v_edit_inp_dscenario_tank';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Valve Dscenario', orderby=7 where id='v_edit_inp_dscenario_valve';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Hourly Values', orderby=1 where id='v_rpt_node_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Maximum Values', orderby=2 where id='v_rpt_node';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node All Values', orderby=3 where id='v_rpt_node_all';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Hourly Values', orderby=4 where id='v_rpt_arc_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Maximum Values', orderby=5 where id='v_rpt_arc';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc All Values', orderby=6 where id='v_rpt_arc_all';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Hourly Values Compare', orderby=1 where id='v_rpt_comp_node_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Maximum Values Compare', orderby=2 where id='v_rpt_comp_node';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Arc Hourly Values Compare', orderby=3 where id='v_rpt_comp_arc_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Arc Maximum Values Compare', orderby=4 where id='v_rpt_comp_arc';
+

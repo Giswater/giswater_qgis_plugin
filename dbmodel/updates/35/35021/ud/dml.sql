@@ -20,12 +20,12 @@ INSERT INTO config_toolbox VALUES (3118, 'Create Dscenario with values from ToC'
 {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}]' ,
   NULL,TRUE)  ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','Hydrology catalog',1,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_cat_dwf_dscenario', 'Table to manage scenario for dwf', 'role_epa', 'core')
  ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_epa', '{"level_1":"EPA", "level_2":"CATALOG"}','DWF catalog', 2 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_cat_hydrology', 'Table to manage scenario for hydrology','role_epa', 'core')
  ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','OUTFALL','OUTFALL') ON CONFLICT (typevalue, id) DO NOTHING;
@@ -45,40 +45,40 @@ INSERT INTO inp_typevalue VALUES ('inp_value_weirs','ROADWAY','ROADWAY') ON CONF
 
 UPDATE sys_foreignkey SET active=false WHERE typevalue_name ='sys_table_context';
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_outfall', 'Editable view to manage scenario for outfall','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario outfall', 2 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_outfall', 'Editable view to manage scenario for outfall','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_storage', 'Editable view to manage scenario for storage','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario Storage', 3 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_storage', 'Editable view to manage scenario for storage','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_weir', 'Editable view to manage scenario for weir','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario weir', 6 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_weir', 'Editable view to manage scenario for weir','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_pump', 'Editable view to manage scenario for pump','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario pump', 7 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_pump', 'Editable view to manage scenario for pump','role_epa','core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_orifice', 'Editable view to manage scenario for orifice','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario orifice', 8 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_orifice', 'Editable view to manage scenario for orifice','role_epa','core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_outlet', 'Editable view to manage scenario for outlet','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario outlet', 9 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_outlet', 'Editable view to manage scenario for outlet','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_inflows', 'Editable view to manage scenario for inflows','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario inflows', 10 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_inflows', 'Editable view to manage scenario for inflows','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_inflows_pol', 'Editable view to manage scenario for inflows','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario inflows', 10 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_inflows_pol', 'Editable view to manage scenario for inflows','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table (id, descript, sys_role, context, alias, orderby, source) 
-VALUES('v_edit_inp_dscenario_treatment_pol', 'Editable view to manage scenario for treatment','role_epa', '{"level_1":"EPA", "level_2":"DSCENARIO"}','Dscenario treatment', 11 ,'core')
+INSERT INTO sys_table (id, descript, sys_role, source) 
+VALUES('v_edit_inp_dscenario_treatment_pol', 'Editable view to manage scenario for treatment','role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 
@@ -663,3 +663,80 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 DELETE FROM config_form_fields WHERE columnname='offset' AND formname in ('v_edit_inp_orifice', 'v_edit_inp_weir', 'v_edit_inp_outlet');
 DELETE FROM config_form_fields WHERE columnname='id' AND formname in ('v_edit_inp_dwf', 'v_edit_inp_flwreg_pump', 'v_edit_inp_flwreg_weir');
 DELETE FROM config_form_fields WHERE columnname='flwreg_id' AND formname in ('v_edit_inp_flwreg_pump', 'v_edit_inp_flwreg_weir');
+
+--2022/01/17
+insert into sys_table (id, descript, sys_role, source) values ('v_edit_inp_flwreg_orifice', 'View with the information of flow regulators type orifice', 'role_epa', 'core');
+insert into sys_table (id, descript, sys_role, source) values ('v_edit_inp_flwreg_outlet', 'View with the information of flow regulators type outlet', 'role_epa', 'core');
+insert into sys_table (id, descript, sys_role, source) values ('v_edit_inp_flwreg_pump', 'View with the information of flow regulators type pump', 'role_epa', 'core');
+insert into sys_table (id, descript, sys_role, source) values ('v_edit_inp_flwreg_weir', 'View with the information of flow regulators type weir', 'role_epa', 'core');
+
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Dwf scenario catalog' , orderby=1 WHERE id ='cat_dwf_scenario';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Hydro scenario catalog' , orderby=2 WHERE id ='cat_hydrology';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Pattern catalog' , orderby=3 WHERE id ='inp_pattern';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Pattern values' , orderby=4 WHERE id ='inp_pattern_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve catalog' , orderby=5 WHERE id ='v_edit_inp_curve';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve values' , orderby=6 WHERE id ='v_edit_inp_curve_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Timeseries catalog' , orderby=7 WHERE id ='inp_timeseries';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Timeseries values' , orderby=8 WHERE id ='inp_timeseries_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Lid catalog' , orderby=9 WHERE id ='inp_lid_control';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Dscenario catalog' , orderby=10 WHERE id ='v_edit_cat_dscenario';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDROLOGY"}', orderby=1, alias='Inp Raingage' WHERE id='v_edit_raingage';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDROLOGY"}', orderby=2, alias='Inp Subcatchment' WHERE id='v_edit_inp_subcatchment';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDROLOGY"}', orderby=3, alias='Inp LID' WHERE id='v_edit_inp_lid_usage';
+
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Junction', orderby=1 where id='v_edit_inp_junction';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Outfall', orderby=2 where id='v_edit_inp_outfall';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Divider', orderby=3 where id='v_edit_inp_divider';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Storage', orderby=4 where id='v_edit_inp_storage';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Conduit', orderby=5 where id='v_edit_inp_conduit';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Virtual', orderby=6 where id='v_edit_inp_virtual';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Pump', orderby=7 where id='v_edit_inp_pump';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Weir', orderby=8 where id='v_edit_inp_weir';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Outlet', orderby=9 where id='v_edit_inp_outlet';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Orifice', orderby=10 where id='v_edit_inp_orifice';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inflows', orderby=11 where id='inp_inflows';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Dwf', orderby=12 where id='v_edit_inp_dwf';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Transects value', orderby=13 where id='inp_transects_value';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Controls', orderby=14 where id='v_edit_inp_controls';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Orifice', orderby=1 where id='v_edit_inp_flwreg_orifice';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Outlet', orderby=2 where id='v_edit_inp_flwreg_outlet';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Pump', orderby=3 where id='v_edit_inp_flwreg_pump';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Weir', orderby=4 where id='v_edit_inp_flwreg_weir';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Conduit Dscenario', orderby=1 where id='v_edit_inp_dscenario_conduit';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=2 where id='v_edit_inp_dscenario_junction';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=3 where id='v_edit_inp_dscenario_raingage';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Flooding', orderby=1 where id='v_rpt_nodeflooding_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Surcharge', orderby=2 where id='v_rpt_nodesurcharge_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Inflow', orderby=3 where id='v_rpt_nodeinflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Depth', orderby=4 where id='v_rpt_nodedepth_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Flow', orderby=5 where id='v_rpt_arcflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Conduit Surcharge', orderby=6 where id='v_rpt_condsurcharge_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Pumping Summary', orderby=7 where id='v_rpt_pumping_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Flow Class', orderby=8 where id='v_rpt_nodeflowclass_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Pollutant Load', orderby=9 where id='v_rpt_arcpolload_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Outfall flow', orderby=10 where id='v_rpt_outfallflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Outfall load', orderby=11 where id='v_rpt_outfallload_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Storage Volume', orderby=12 where id='v_rpt_storagevol_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Subcatchment Runoff', orderby=13 where id='v_rpt_subcatchrunoff_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Subcatchment Washoff', orderby=14 where id='v_rpt_subcatchwasoff_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='LID Performance', orderby=15 where id='v_rpt_lidperformance_sum';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Flooding Compare', orderby=1 where id='v_rpt_comp_nodeflooding_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Surcharge Compare', orderby=2 where id='v_rpt_comp_nodesurcharge_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Inflow Compare', orderby=3 where id='v_rpt_comp_nodeinflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Depth Compare', orderby=4 where id='v_rpt_comp_nodedepth_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Arc Flow Compare', orderby=5 where id='v_rpt_comp_arcflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Conduit Surcharge Compare', orderby=6 where id='v_rpt_comp_condsurcharge_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Pumping Summary Compare', orderby=7 where id='v_rpt_comp_pumping_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Flow Class Compare', orderby=8 where id='v_rpt_comp_flowclass_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Outfall Flow Compare', orderby=10 where id='v_rpt_comp_outfallflow_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Outfall Load Compare', orderby=11 where id='v_rpt_comp_outfallload_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Storage Volume Compare', orderby=12 where id='v_rpt_comp_storagevol_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Runoff Compare', orderby=13 where id='v_rpt_comp_subcatchrunoff_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Washoff Compare', orderby=14 where id='v_rpt_comp_subcatchwasoff_sum';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='LID Performance Compare', orderby=15 where id='v_rpt_comp_lidperformance_sum';
+
