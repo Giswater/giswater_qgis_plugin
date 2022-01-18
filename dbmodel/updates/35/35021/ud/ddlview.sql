@@ -1209,7 +1209,7 @@ UNION
     'Various connecs'::character varying AS catalog_id,
     'VARIOUS'::character varying AS price_id,
     'PP'::character varying AS unit,
-    'Proportional cost (by meter) from total budget of connecs cost related to arc. The cost is calculated in combination of parameters depth/length from connec table and catalog price from cat_connec table'::character varying AS descript,
+    'Proportional cost (by meter) from total budget of connecs cost related to arc. The cost is calculated from unit cost defined on cat_connec and cat_grate tables'::character varying AS descript,
     null,
     null,
     case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost
