@@ -320,3 +320,13 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (436, 'Change node type', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
 
 UPDATE sys_table SET notify_action = null;
+
+UPDATE sys_fprocess SET fprocess_type='Check om-data' WHERE fid IN (258,389,390,393);
+UPDATE sys_fprocess SET fprocess_type='Check graf-config' WHERE fid IN (178,183,184,185,186,200,267);
+UPDATE sys_fprocess SET fprocess_type='Check epa-data' WHERE fid IN (160,161,162,173,174,226,369,370,374,389,390,420);
+UPDATE sys_fprocess SET fprocess_type='Check epa-network' WHERE fid IN (139,159,224,432);
+UPDATE sys_fprocess SET fprocess_type='Check plan-data' WHERE fid IN (348,426);
+UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fid IN (148,258,363,364,365,366,410);
+UPDATE sys_fprocess SET fprocess_type='Not used' WHERE fid IN (102,119,121,122,123,126,190,191,192,378);
+UPDATE sys_fprocess SET fprocess_name = 'UI export-import', fprocess_type='Function process' WHERE fid = 120;
+UPDATE sys_fprocess SET fprocess_name = 'Nodarcs generation', fprocess_type='Function process' WHERE fid = 124;

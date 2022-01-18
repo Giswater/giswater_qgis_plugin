@@ -14,6 +14,8 @@ AS $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeom":"false"}}$$)
+
+fid: 124
 */
 
 
