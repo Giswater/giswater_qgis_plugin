@@ -50,12 +50,25 @@ CREATE OR REPLACE VIEW v_edit_inp_curve AS
 
 CREATE OR REPLACE VIEW vi_reservoirs AS 
  SELECT node_id,
-    elevation AS head,
-    pattern_id,
-    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
+   CASE WHEN elev IS NOT NULL THEN elev ELSE elevation END AS head, 
+   pattern_id,
+   concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) as "other"
    FROM temp_node
    WHERE epa_type = 'RESERVOIR'
    ORDER BY node_id;
+
+
+CREATE OR REPLACE VIEW ws.vi_reservoirs AS 
+ SELECT rpt_inp_node.node_id,
+        CASE
+            WHEN rpt_inp_node.elev IS NOT NULL THEN rpt_inp_node.elev
+            ELSE rpt_inp_node.elevation
+        END AS head,
+    rpt_inp_node.pattern_id
+   FROM ws.selector_inp_result,
+    ws.rpt_inp_node
+  WHERE rpt_inp_node.epa_type::text = 'RESERVOIR'::text AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
+
 
 
 CREATE OR REPLACE VIEW vi_tanks AS 
