@@ -631,3 +631,6 @@ UPDATE inp_dscenario_demand SET feature_type  ='NODE', pattern_id = 'PTN-HYDRANT
 UPDATE inp_junction SET demand = 0.01 ;
 
 INSERT INTO config_param_user VALUES ('edit_pavement_vdefault','Asphalt',current_user);
+
+INSERT INTO plan_arc_x_pavement VALUES ('2001', 'Slab', 0.5);
+INSERT INTO plan_arc_x_pavement VALUES ('2001', 'Concrete', 0.5);

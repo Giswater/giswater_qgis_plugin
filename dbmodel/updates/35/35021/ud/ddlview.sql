@@ -716,38 +716,6 @@ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "l
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"inlet_offset" }}$$);
 
 
-CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
-SELECT arc_id,
-case when plan_arc.m2pav_cost is not null then plan_arc.thickness else arc.thickness end as thickness,
-case when plan_arc.m2pav_cost is not null then plan_arc.m2pav_cost else arc.m2pav_cost end as m2pav_cost
- FROM
- (SELECT a.arc_id,
-        CASE
-            WHEN v_price_x_catpavement.thickness IS NULL THEN 0::numeric(12,2)
-            ELSE v_price_x_catpavement.thickness
-        END AS thickness,
-        CASE
-            WHEN v_price_x_catpavement.m2pav_cost IS NULL THEN 0::numeric
-            ELSE v_price_x_catpavement.m2pav_cost
-        END AS m2pav_cost
-   FROM v_edit_arc a
-     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = a.pavcat_id::text) arc
-left join 
- (SELECT plan_arc_x_pavement.arc_id,
-        CASE
-            WHEN sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2)
-            ELSE sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2)
-        END AS thickness,
-        CASE
-            WHEN sum(v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2)
-            ELSE sum(v_price_x_catpavement.m2pav_cost::numeric(12,2) * plan_arc_x_pavement.percent)
-        END AS m2pav_cost
-   FROM plan_arc_x_pavement
-     LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text
-  GROUP BY plan_arc_x_pavement.arc_id) plan_arc
-USING (arc_id);
-
-
 DROP VIEW IF EXISTS vi_inflows;
 CREATE OR REPLACE VIEW vi_inflows AS
 SELECT
@@ -1095,6 +1063,170 @@ UNION
      JOIN inp_conduit ON arcparent::text = inp_conduit.arc_id::text;
   
   
+ 
+CREATE OR REPLACE VIEW v_plan_aux_arc_pavement AS 
+ SELECT plan_arc_x_pavement.arc_id,
+    sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
+    sum(v_price_x_catpavement.m2pav_cost * plan_arc_x_pavement.percent)::numeric(12,2) AS m2pav_cost,
+    'Various pavements'::character varying AS pavcat_id,
+    1 AS percent,
+    'VARIOUS' AS price_id
+   FROM plan_arc_x_pavement
+     JOIN v_price_x_catpavement USING (pavcat_id)
+  GROUP BY plan_arc_x_pavement.arc_id
+UNION
+ SELECT v_edit_arc.arc_id,
+    c.thickness,
+    v_price_x_catpavement.m2pav_cost,
+    v_edit_arc.pavcat_id,
+    1 AS percent,
+    p.id
+   FROM v_edit_arc
+     JOIN cat_pavement c ON c.id::text = v_edit_arc.pavcat_id::text
+     JOIN v_price_x_catpavement USING (pavcat_id)
+     LEFT JOIN v_price_compost p ON c.m2_cost::text = p.id::text
+     LEFT JOIN ( SELECT plan_arc_x_pavement.arc_id
+           FROM plan_arc_x_pavement) a USING (arc_id)
+  WHERE a.arc_id IS NULL;
+
+
+CREATE OR REPLACE VIEW v_ui_plan_arc_cost AS 
+ SELECT arc.arc_id,
+    1 AS orderby,
+    'element'::text AS identif,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    1 AS measurement,
+    1::numeric * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
+     JOIN v_price_compost ON cat_arc.cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    2 AS orderby,
+    'm2bottom'::text AS identif,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m2mlbottom AS measurement,
+    v_plan_arc.m2mlbottom * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
+     JOIN v_price_compost ON cat_arc.m2bottom_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    3 AS orderby,
+    'm3protec'::text AS identif,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m3mlprotec AS measurement,
+    v_plan_arc.m3mlprotec * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
+     JOIN v_price_compost ON cat_arc.m3protec_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    4 AS orderby,
+    'm3exc'::text AS identif,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m3mlexc AS measurement,
+    v_plan_arc.m3mlexc * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id::text
+     JOIN v_price_compost ON cat_soil.m3exc_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    5 AS orderby,
+    'm3fill'::text AS identif,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m3mlfill AS measurement,
+    v_plan_arc.m3mlfill * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id::text
+     JOIN v_price_compost ON cat_soil.m3fill_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    6 AS orderby,
+    'm3excess'::text AS identif,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m3mlexcess AS measurement,
+    v_plan_arc.m3mlexcess * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id::text
+     JOIN v_price_compost ON cat_soil.m3excess_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    7 AS orderby,
+    'm2trenchl'::text AS identif,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    v_plan_arc.m2mltrenchl AS measurement,
+    v_plan_arc.m2mltrenchl * v_price_compost.price AS total_cost
+   FROM arc
+     JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id::text
+     JOIN v_price_compost ON cat_soil.m2trenchl_cost::text = v_price_compost.id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+UNION
+ SELECT arc.arc_id,
+    8 AS orderby,
+    'pavement'::text AS identif,
+    a.pavcat_id,
+    price_id,
+    p.unit,
+    p.descript,
+    a.m2pav_cost AS cost,
+    1,
+    a.m2pav_cost AS total_cost
+   FROM arc
+     JOIN v_plan_aux_arc_pavement a ON a.arc_id::text = arc.arc_id::text
+     JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
+     LEFT JOIN v_price_compost p ON a.price_id::text = p.id::text    
+UNION
+ SELECT connec.arc_id,
+    9 AS orderby,
+    'connec'::text AS identif,
+    'Various catalog'::character varying AS catalog_id,
+    'Various prices'::character varying AS price_id,
+    'ut'::character varying AS unit,
+    'Sumatory of connecs cost related to arc. The cost is calculated in combination of parameters depth/length from connec table and catalog price from cat_connec table'::character varying AS descript,
+    NULL::numeric AS cost,
+    count(connec.connec_id) AS measurement,
+    sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS total_cost
+   FROM connec
+     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
+  GROUP BY connec.arc_id
+  ORDER BY 1, 2; 
+  
+    
 -- 2022/01/14
 CREATE OR REPLACE VIEW v_plan_arc AS 
 SELECT d.arc_id,
