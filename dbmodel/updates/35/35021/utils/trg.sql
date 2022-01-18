@@ -20,3 +20,10 @@ CREATE TRIGGER gw_trg_ui_rpt_cat_result
   ON v_ui_rpt_cat_result
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();
+
+
+CREATE TRIGGER gw_trg_edit_psector_x_other
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_plan_psector_x_other
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_psector_x_other('plan');
