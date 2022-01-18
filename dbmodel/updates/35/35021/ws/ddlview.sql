@@ -73,7 +73,7 @@ CREATE OR REPLACE VIEW ws.vi_reservoirs AS
 
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT node_id,
-    elevation,
+    CASE WHEN elev IS NOT NULL THEN elev ELSE elevation END AS elevation, 
     (addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
     (addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
     (addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
@@ -88,7 +88,7 @@ CREATE OR REPLACE VIEW vi_tanks AS
 
 CREATE OR REPLACE VIEW vi_junctions AS 
  SELECT node_id,
-    elevation,
+    CASE WHEN elev IS NOT NULL THEN elev ELSE elevation END AS elevation, 
     demand,
     pattern_id,
     concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type,' ', age) as "other"
