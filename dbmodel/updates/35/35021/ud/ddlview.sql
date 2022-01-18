@@ -1211,22 +1211,23 @@ UNION
      JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
      LEFT JOIN v_price_compost p ON a.price_id::text = p.id::text    
 UNION
- SELECT connec.arc_id,
+ SELECT arc_id,
     9 AS orderby,
     'connec'::text AS identif,
-    'Various catalog'::character varying AS catalog_id,
-    'Various prices'::character varying AS price_id,
-    'ut'::character varying AS unit,
-    'Sumatory of connecs cost related to arc. The cost is calculated in combination of parameters depth/length from connec table and catalog price from cat_connec table'::character varying AS descript,
-    NULL::numeric AS cost,
-    count(connec.connec_id) AS measurement,
-    sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS total_cost
-   FROM connec
-     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-  GROUP BY connec.arc_id
-  ORDER BY 1, 2; 
-  
+    'Various connecs/gullies'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost (by meter) from total budget of connecs and gullies cost related to arc. The cost is calculated in combination of parameters depth/length from connec/gully and catalog price from cat_connec/cat_grate tables'::character varying AS descript,
+    null,
+    null,
+    case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost
+   FROM v_plan_arc
+  ORDER BY 1, 2;
     
+  
+  
+  
+  
 -- 2022/01/14
 CREATE OR REPLACE VIEW v_plan_arc AS 
 SELECT d.arc_id,
@@ -1283,7 +1284,7 @@ SELECT d.arc_id,
     d.length,
     d.budget,
     d.other_budget,
-    d.total_budget,
+    case when other_budget is not null then d.budget + d.other_budget else d.budget end as budget,
     d.the_geom
    FROM ( WITH v_plan_aux_arc_cost AS (
                  WITH v_plan_aux_arc_ml AS (
@@ -1445,29 +1446,28 @@ SELECT d.arc_id,
                     ELSE st_length2d(v_plan_aux_arc_cost.the_geom)::numeric(12,2) * (v_plan_aux_arc_cost.m3mlexc * v_plan_aux_arc_cost.m3exc_cost + v_plan_aux_arc_cost.m2mlbase * v_plan_aux_arc_cost.m2bottom_cost + v_plan_aux_arc_cost.m2mltrenchl * v_plan_aux_arc_cost.m2trenchl_cost + v_plan_aux_arc_cost.m3mlprotec * v_plan_aux_arc_cost.m3protec_cost + v_plan_aux_arc_cost.m3mlfill * v_plan_aux_arc_cost.m3fill_cost + v_plan_aux_arc_cost.m3mlexcess * v_plan_aux_arc_cost.m3excess_cost + v_plan_aux_arc_cost.m2mlpavement * v_plan_aux_arc_cost.m2pav_cost + v_plan_aux_arc_cost.arc_cost)::numeric(14,2)
                 END::numeric(14,2) AS budget,
             v_plan_aux_arc_connec.connec_total_cost + v_plan_aux_arc_gully.gully_total_cost AS other_budget,
-                CASE
-                    WHEN v_plan_aux_arc_cost.cost_unit::text = 'u'::text THEN v_plan_aux_arc_cost.arc_cost +
-                    CASE
-                        WHEN v_plan_aux_arc_connec.connec_total_cost IS NULL THEN 0::numeric
-                        ELSE v_plan_aux_arc_connec.connec_total_cost
-                    END
-                    ELSE st_length2d(v_plan_aux_arc_cost.the_geom)::numeric(12,2) * (v_plan_aux_arc_cost.m3mlexc * v_plan_aux_arc_cost.m3exc_cost + v_plan_aux_arc_cost.m2mlbase * v_plan_aux_arc_cost.m2bottom_cost + v_plan_aux_arc_cost.m2mltrenchl * v_plan_aux_arc_cost.m2trenchl_cost + v_plan_aux_arc_cost.m3mlprotec * v_plan_aux_arc_cost.m3protec_cost + v_plan_aux_arc_cost.m3mlfill * v_plan_aux_arc_cost.m3fill_cost + v_plan_aux_arc_cost.m3mlexcess * v_plan_aux_arc_cost.m3excess_cost + v_plan_aux_arc_cost.m2mlpavement * v_plan_aux_arc_cost.m2pav_cost + v_plan_aux_arc_cost.arc_cost)::numeric(14,2) +
-                    CASE
-                        WHEN v_plan_aux_arc_connec.connec_total_cost IS NULL THEN 0::numeric
-                        ELSE v_plan_aux_arc_connec.connec_total_cost
-                    END
-                END::numeric(14,2) AS total_budget,
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
              JOIN arc ON v_plan_aux_arc_cost.arc_id::text = arc.arc_id::text
-             LEFT JOIN ( SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
-                    sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.connec_depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
+             LEFT JOIN (
+		SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
+                    sum(st_length(l.the_geom) * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * (case when y1 is not null and y2 is not null then (y1+y2)/2 else estimated_depth end) * crossection_width) 
+                    + v_price_x_catconnec.cost_ut)::numeric(12,2) 
+                    AS connec_total_cost
                    FROM connec
+                   JOIN cat_connec ON id = connecat_id
+                   JOIN v_edit_link l ON l.feature_id = connec_id
                      JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-                  GROUP BY connec.arc_id) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text
-             LEFT JOIN ( SELECT DISTINCT ON (gully.arc_id) gully.arc_id,
-                    (sum(v_price_x_catgrate.price) + sum(gully.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * gully.connec_depth * 0.5)))::numeric(12,2) AS gully_total_cost
+                  GROUP BY connec.arc_id
+                  ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text
+             LEFT JOIN (         
+              SELECT DISTINCT ON (gully.arc_id) gully.arc_id,
+                    (sum(v_price_x_catgrate.price) + sum(st_length(l.the_geom) * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * (case when connec_depth is not null then connec_depth else estimated_depth end) * 
+                    crossection_width)))::numeric(12,2) AS gully_total_cost
                    FROM gully
-                     LEFT JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = gully.connec_arccat_id::text
+                     JOIN cat_grate ON id = gratecat_id
+                     JOIN v_edit_link l ON l.feature_id = gully_id
+                     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = gully.connec_arccat_id::text
                      JOIN v_price_x_catgrate ON v_price_x_catgrate.id::text = gully.gratecat_id::text
-                  GROUP BY gully.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+                  GROUP BY gully.arc_id
+                  ) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;

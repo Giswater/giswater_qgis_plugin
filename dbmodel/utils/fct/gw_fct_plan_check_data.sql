@@ -115,6 +115,19 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '326', 1,'INFO: There is/are no row(s) without values on cat_arc.m3protec_cost column.',v_count);
 	END IF;
+
+
+	--check cat_arc estimated depth (437)
+	SELECT count(*) INTO v_count FROM cat_arc WHERE estimated_depth IS NOT NULL and active=TRUE;
+	IF v_table_count>v_count THEN
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '437', 'cat_arc', 'estimated_depth', 2, FALSE, concat('WARNING-437: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.estimated_depth column.'), (v_table_count-v_count));
+	ELSE
+		v_count = 0;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '437', 1,'INFO: There is/are no row(s) without values on cat_arc.estimated_depth column.',v_count);
+	END IF;
+
 	
 	--node catalog
 	SELECT count(*) INTO v_table_count FROM cat_node WHERE active=TRUE;
@@ -152,7 +165,9 @@ BEGIN
 		VALUES (115, '329', 1,'INFO: There is/are no row(s) without values on cat_node.cost_unit column.',v_count);
 	END IF;
 	
+	
 	IF v_project_type='WS' THEN 
+	
 		--check cat_node estimated_depth column (330)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_depth IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
@@ -165,7 +180,8 @@ BEGIN
 		END IF;
 
 	ELSIF v_project_type='UD' THEN 
-		 --check cat_nodeestimated_y column (331)
+	
+		 --check cat_node estimated_y column (331)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_y IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
 			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
@@ -176,6 +192,7 @@ BEGIN
 			VALUES (115, '331', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_y column.',v_count);
 		END IF;
 	END IF;
+
 
 	--connec catalog
 	SELECT count(*) INTO v_table_count FROM cat_connec WHERE active=TRUE;
@@ -222,6 +239,29 @@ BEGIN
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '335', 1,'INFO: There is/are no row(s) without values on cat_connec.cost_m3 column.',v_count);
+	END IF;
+
+	--check cat_connec estimated depth (438)
+	SELECT count(*) INTO v_count FROM cat_connec WHERE estimated_depth IS NOT NULL and active=TRUE;
+	IF v_table_count>v_count THEN
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '438', 'cat_connec', 'estimated_depth', 2, FALSE, concat('WARNING-438: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.estimated_depth column. Without this, connecs must have depth dimensions.'), (v_table_count-v_count));
+	ELSE
+		v_count = 0;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '438', 1,'INFO: There is/are no row(s) without values on cat_connec.estimated_depth column.',v_count);
+	END IF;
+
+	--check cat_connec crossection_width (440)
+	SELECT count(*) INTO v_count FROM cat_connec WHERE crossection_width IS NOT NULL and active=TRUE;
+	IF v_table_count>v_count THEN
+		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+		VALUES (115, '440', 'cat_connec', 'crossection_width', 3, FALSE, concat('ERROR-440: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.crossection_width column. No prices for connecs will be availabl.e'),
+		(v_table_count-v_count));
+	ELSE
+		v_count = 0;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '440', 1,'INFO: There is/are no row(s) without values on cat_connec.crossection_width column.',v_count);
 	END IF;
 
 	--pavement catalog
@@ -333,7 +373,29 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (115, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
 		END IF;
+	
+		--check cat_grate estimated_depth (439)
+		SELECT count(*) INTO v_count FROM cat_grate WHERE estimated_depth IS NOT NULL and active=TRUE;
+		IF v_table_count>v_count THEN
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '439', 'cat_grate', 'estimated_depth', 2, FALSE, concat('WARNING-439: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.estimated_depth column.'), (v_table_count-v_count));
+		ELSE
+			v_count = 0;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (115, '439', 1,'INFO: There is/are no row(s) without values on cat_grate.estimated_depth column.',v_count);
+		END IF;
 
+		--check cat_grate estimated width (441)
+		SELECT count(*) INTO v_count FROM cat_grate WHERE crossection_width IS NOT NULL and active=TRUE;
+		IF v_table_count>v_count THEN
+			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
+			VALUES (115, '441', 'cat_grate', 'crossection_width', 3, FALSE, concat('ERROR-441: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.crossection_width column. No price for gullies will be available'), 
+			(v_table_count-v_count));
+		ELSE
+			v_count = 0;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (115, '441', 1,'INFO: There is/are no row(s) without values on cat_grate.crossection_width column.',v_count);
+		END IF;
 
 		--check cat_grate cost_ut column (345)
 		SELECT count(*) INTO v_count FROM cat_grate WHERE cost_ut IS NOT NULL and active=TRUE;
@@ -483,6 +545,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
 	END IF;
+
+	-- insert spacers
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, '');
 
 	-- get results
 	-- info

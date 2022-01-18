@@ -835,21 +835,19 @@ UNION
      JOIN v_plan_arc ON arc.arc_id::text = v_plan_arc.arc_id::text
      LEFT JOIN v_price_compost p ON a.price_id::text = p.id::text    
 UNION
- SELECT connec.arc_id,
+ SELECT arc_id,
     9 AS orderby,
     'connec'::text AS identif,
-    'Various catalog'::character varying AS catalog_id,
-    'Various prices'::character varying AS price_id,
-    'ut'::character varying AS unit,
-    'Sumatory of connecs cost related to arc. The cost is calculated in combination of parameters depth/length from connec table and catalog price from cat_connec table'::character varying AS descript,
-    NULL::numeric AS cost,
-    count(connec.connec_id) AS measurement,
-    sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS total_cost
-   FROM connec
-     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-  GROUP BY connec.arc_id
+    'Various connecs'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost (by meter) from total budget of connecs cost related to arc. The cost is calculated in combination of parameters depth/length from connec table and catalog price from cat_connec table'::character varying AS descript,
+    null,
+    null,
+    case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost
+   FROM v_plan_arc
   ORDER BY 1, 2;
-  
+ 
  
  -- 2022/01/14
 CREATE OR REPLACE VIEW v_plan_arc AS 
@@ -1084,8 +1082,14 @@ CREATE OR REPLACE VIEW v_plan_arc AS
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
              JOIN arc ON arc.arc_id::text = v_plan_aux_arc_cost.arc_id::text
-             LEFT JOIN ( SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
-                    sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
+             LEFT JOIN (
+     SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
+                    sum(st_length(l.the_geom) * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * (case when depth is not null then depth else estimated_depth end) * crossection_width) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
                    FROM connec
+                   JOIN cat_connec ON id = connecat_id
+                   JOIN v_edit_link l ON l.feature_id = connec_id
                      JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-                  GROUP BY connec.arc_id) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+                  GROUP BY connec.arc_id
+                  ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+
+
