@@ -1152,7 +1152,7 @@ class GwPsector:
                 tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tableright}"
-                       f" (psector_id, unit, price_id, descript, price) "
+                       f" (psector_id, unit, price_id, observ, price) "
                        f" VALUES ({values})")
                 tools_db.execute_sql(sql)
 
