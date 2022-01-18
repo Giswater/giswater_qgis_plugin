@@ -528,7 +528,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 group = layer[4] if layer[4] is not None else group
                 group = group if group is not None else 'GW Layers'
-                tools_qt.add_layer_to_toc(vlayer, group)
+                tools_qt.add_layer_to_toc(vlayer, group, sub_group)
                 style_id = layer[3]
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'

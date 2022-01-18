@@ -638,6 +638,7 @@ def add_layer_to_toc(layer, group=None, sub_group=None):
 
     if group is None:
         QgsProject.instance().addMapLayer(layer)
+        return
     else:
         QgsProject.instance().addMapLayer(layer, False)
         root = QgsProject.instance().layerTreeRoot()
@@ -645,10 +646,13 @@ def add_layer_to_toc(layer, group=None, sub_group=None):
         if sub_group:
             for child in first_group.children():
                 second_group = first_group.findGroup(child.name())
-                if sub_group.lower() == child.name().lower():
+                if second_group and sub_group.lower() == child.name().lower():
                     second_group.insertLayer(0, layer)
-        else:
-            first_group.insertLayer(0, layer)
+                    global_vars.iface.setActiveLayer(layer)
+                    return
+        first_group.insertLayer(0, layer)
+        global_vars.iface.setActiveLayer(layer)
+
 
 def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     """Apply the init function related to the model. It's necessary
