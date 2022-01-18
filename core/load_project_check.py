@@ -202,7 +202,7 @@ class GwLoadProjectCheck:
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                tools_gw.add_layer_database(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                tools_gw.add_layer_database(layer_info['layer'], geom_field, pkey_field, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:
