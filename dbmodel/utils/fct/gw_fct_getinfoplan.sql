@@ -67,48 +67,14 @@ BEGIN
 	-- get parameters
 	 v_device := ((p_data ->>'client')::json->>'device')::integer;
 
+	raise notice '1';
+	
 	-- get fields
 	SELECT gw_fct_getformfields('infoplan', 'form_generic', v_tabname, v_tablename, ((p_data ->>'feature')::json->>'idName'), ((p_data ->>'feature')::json->>'id'), null, null,null, v_device, null)
 		INTO fields_array;
 
-	-- Add resumen values
-	FOREACH aux_json IN ARRAY fields_array
-	LOOP
-		IF (aux_json->>'columnname')  = 'initial_cost' THEN 
-
-			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ml') FROM v_ui_plan_arc_cost WHERE arc_id = (p_data ->>'feature')::json->>'id');
-			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
-				v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ut') FROM v_ui_plan_node_cost WHERE node_id = (p_data ->>'feature')::json->>'id');
-			END IF;
-						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_cost::TEXT);
-
-		ELSIF (aux_json->>'columnname')  = 'length' THEN 
-
-			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_dim := (SELECT concat(st_length(the_geom)::numeric(12,2),' ml') FROM arc WHERE arc_id = (p_data ->>'feature')::json->>'id');
-			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
-				v_dim := '1.00 ut';
-			END IF;
-
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'label', 'Units'::TEXT);						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_dim::TEXT);
-
-		ELSIF (aux_json->>'columnname')  = 'total_cost' THEN 
-
-			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
-			      v_totalcost := (SELECT concat((sum(total_cost*st_length(the_geom))::numeric(12,2)),' ',v_currency) FROM v_ui_plan_arc_cost JOIN arc USING (arc_id) WHERE arc_id = (p_data ->>'feature')::json->>'id');
-			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
-				v_totalcost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency) FROM v_ui_plan_node_cost WHERE node_id = (p_data ->>'feature')::json->>'id');
-			END IF;
-						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_totalcost::TEXT);
-
-		END IF;
-
-	END LOOP;  
-
+	raise notice '2';
+	
 	-- Convert to json
 	fields := array_to_json(fields_array);
     

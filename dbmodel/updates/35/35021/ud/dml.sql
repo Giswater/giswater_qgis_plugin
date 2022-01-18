@@ -739,9 +739,3 @@ UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Sto
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Runoff Compare', orderby=13 where id='v_rpt_comp_subcatchrunoff_sum';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Washoff Compare', orderby=14 where id='v_rpt_comp_subcatchwasoff_sum';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='LID Performance Compare', orderby=15 where id='v_rpt_comp_lidperformance_sum';
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
-VALUES (439, 'Check estimated depth for cat_grate', 'ud', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
-VALUES (441, 'Check crossection width for cat_grate', 'ud', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;

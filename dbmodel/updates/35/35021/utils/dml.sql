@@ -330,12 +330,3 @@ UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fid IN (148,258,3
 UPDATE sys_fprocess SET fprocess_type='Not used' WHERE fid IN (102,119,121,122,123,126,190,191,192,378);
 UPDATE sys_fprocess SET fprocess_name = 'UI export-import', fprocess_type='Function process' WHERE fid = 120;
 UPDATE sys_fprocess SET fprocess_name = 'Nodarcs generation', fprocess_type='Function process' WHERE fid = 124;
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
-VALUES (437, 'Check estimated depth for cat_arc', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
-VALUES (438, 'Check estimated depth for cat_connec', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
-VALUES (440, 'Check crossection width for cat_connec', 'utils', NULL, 'core', NULL,'Function process')  ON CONFLICT (fid) DO NOTHING;

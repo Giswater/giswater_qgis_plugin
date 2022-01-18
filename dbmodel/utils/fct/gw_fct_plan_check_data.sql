@@ -241,29 +241,6 @@ BEGIN
 		VALUES (115, '335', 1,'INFO: There is/are no row(s) without values on cat_connec.cost_m3 column.',v_count);
 	END IF;
 
-	--check cat_connec estimated depth (438)
-	SELECT count(*) INTO v_count FROM cat_connec WHERE estimated_depth IS NOT NULL and active=TRUE;
-	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '438', 'cat_connec', 'estimated_depth', 2, FALSE, concat('WARNING-438: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.estimated_depth column. Without this, connecs must have depth dimensions.'), (v_table_count-v_count));
-	ELSE
-		v_count = 0;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '438', 1,'INFO: There is/are no row(s) without values on cat_connec.estimated_depth column.',v_count);
-	END IF;
-
-	--check cat_connec crossection_width (440)
-	SELECT count(*) INTO v_count FROM cat_connec WHERE crossection_width IS NOT NULL and active=TRUE;
-	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '440', 'cat_connec', 'crossection_width', 3, FALSE, concat('ERROR-440: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.crossection_width column. No prices for connecs will be availabl.e'),
-		(v_table_count-v_count));
-	ELSE
-		v_count = 0;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '440', 1,'INFO: There is/are no row(s) without values on cat_connec.crossection_width column.',v_count);
-	END IF;
-
 	--pavement catalog
 	SELECT count(*) INTO v_table_count FROM cat_pavement;
 
@@ -372,29 +349,6 @@ BEGIN
 			v_count = 0;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (115, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
-		END IF;
-	
-		--check cat_grate estimated_depth (439)
-		SELECT count(*) INTO v_count FROM cat_grate WHERE estimated_depth IS NOT NULL and active=TRUE;
-		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '439', 'cat_grate', 'estimated_depth', 2, FALSE, concat('WARNING-439: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.estimated_depth column.'), (v_table_count-v_count));
-		ELSE
-			v_count = 0;
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '439', 1,'INFO: There is/are no row(s) without values on cat_grate.estimated_depth column.',v_count);
-		END IF;
-
-		--check cat_grate estimated width (441)
-		SELECT count(*) INTO v_count FROM cat_grate WHERE crossection_width IS NOT NULL and active=TRUE;
-		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '441', 'cat_grate', 'crossection_width', 3, FALSE, concat('ERROR-441: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.crossection_width column. No price for gullies will be available'), 
-			(v_table_count-v_count));
-		ELSE
-			v_count = 0;
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '441', 1,'INFO: There is/are no row(s) without values on cat_grate.crossection_width column.',v_count);
 		END IF;
 
 		--check cat_grate cost_ut column (345)
