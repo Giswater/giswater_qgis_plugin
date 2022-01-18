@@ -58,15 +58,15 @@ CREATE OR REPLACE VIEW vi_reservoirs AS
    ORDER BY node_id;
 
 
-CREATE OR REPLACE VIEW ws.vi_reservoirs AS 
+CREATE OR REPLACE VIEW vi_reservoirs AS 
  SELECT rpt_inp_node.node_id,
         CASE
             WHEN rpt_inp_node.elev IS NOT NULL THEN rpt_inp_node.elev
             ELSE rpt_inp_node.elevation
         END AS head,
     rpt_inp_node.pattern_id
-   FROM ws.selector_inp_result,
-    ws.rpt_inp_node
+   FROM selector_inp_result,
+    rpt_inp_node
   WHERE rpt_inp_node.epa_type::text = 'RESERVOIR'::text AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
 
 
