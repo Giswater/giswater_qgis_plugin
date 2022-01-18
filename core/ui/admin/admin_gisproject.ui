@@ -93,11 +93,6 @@
        <widget class="QComboBox" name="cmb_roletype">
         <item>
          <property name="text">
-          <string>admin</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>master</string>
          </property>
         </item>
