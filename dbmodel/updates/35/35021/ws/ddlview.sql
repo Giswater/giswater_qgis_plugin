@@ -713,7 +713,6 @@ UNION
            FROM plan_arc_x_pavement) a USING (arc_id)
   WHERE a.arc_id IS NULL;
 
-
 CREATE OR REPLACE VIEW v_ui_plan_arc_cost AS 
 WITH p AS (
 	SELECT *, a.cost as cat_cost, a.m2bottom_cost as cat_m2bottom_cost, a.m3protec_cost as cat_m3_protec_cost, s.m3exc_cost as cat_m3exc_cost, s.m3fill_cost as cat_m3fill_cost,
@@ -729,7 +728,8 @@ WITH p AS (
     v_price_compost.descript,
     v_price_compost.price AS cost,
     1 AS measurement,
-    1::numeric * v_price_compost.price AS total_cost
+    1::numeric * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_cost::text = v_price_compost.id::text
 UNION
@@ -742,7 +742,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     p.m2mlbottom AS measurement,
-    p.m2mlbottom * v_price_compost.price AS total_cost
+    p.m2mlbottom * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m2bottom_cost::text = v_price_compost.id::text
 UNION
@@ -755,7 +756,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     m3mlprotec AS measurement,
-    m3mlprotec * v_price_compost.price AS total_cost
+    m3mlprotec * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m3_protec_cost::text = v_price_compost.id::text
 UNION
@@ -768,7 +770,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     m3mlexc AS measurement,
-    m3mlexc * v_price_compost.price AS total_cost
+    m3mlexc * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m3exc_cost::text = v_price_compost.id::text
 UNION
@@ -781,7 +784,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     m3mlfill AS measurement,
-    m3mlfill * v_price_compost.price AS total_cost
+    m3mlfill * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m3fill_cost::text = v_price_compost.id::text
 UNION
@@ -794,7 +798,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     m3mlexcess AS measurement,
-    m3mlexcess * v_price_compost.price AS total_cost
+    m3mlexcess * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m3excess_cost::text = v_price_compost.id::text
 UNION
@@ -807,7 +812,8 @@ UNION
     v_price_compost.descript,
     v_price_compost.price AS cost,
     m2mltrenchl AS measurement,
-    m2mltrenchl * v_price_compost.price AS total_cost
+    m2mltrenchl * v_price_compost.price AS total_cost,
+    length
    FROM p
      JOIN v_price_compost ON cat_m2trenchl_cost::text = v_price_compost.id::text
 UNION
@@ -820,7 +826,8 @@ UNION
     case when a.price_id is null then 'Various prices' else a.pavcat_id end as descript,
     a.m2pav_cost AS cost,
     1 as measurement,
-    a.m2pav_cost AS total_cost
+    a.m2pav_cost AS total_cost,
+    length
    FROM p
      JOIN v_plan_aux_arc_pavement a ON a.arc_id::text = p.arc_id::text
      JOIN cat_pavement c ON a.pavcat_id = c.id
@@ -833,9 +840,10 @@ UNION
     'VARIOUS'::character varying AS price_id,
     'PP'::character varying AS unit,
     'Proportional cost (by meter) from total budget of connecs cost related to arc. The cost is calculated by unit cost defined on cat_connec table'::character varying AS descript,
+    case when length is not null then (other_budget)::numeric(12,2) else 0 end as cost,
     null,
-    null,
-    case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost
+    case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost,
+    length
    FROM p
   ORDER BY 1, 2;
  

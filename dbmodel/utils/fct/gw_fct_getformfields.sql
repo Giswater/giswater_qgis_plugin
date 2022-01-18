@@ -73,10 +73,7 @@ v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
 v_currency text;
-v_cost text;
-v_dim text;
-v_totalcost text;
-
+       
 BEGIN
 	
 	-- Set search path to local schema
@@ -160,8 +157,8 @@ BEGIN
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, 
-				CASE WHEN cost IS NOT NULL THEN concat (measurement,'' '',unit,'' x '', cost , 
-				'' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''') ELSE concat(total_cost,'' ',v_currency,''') END as value, null as stylesheet,
+				CASE WHEN measurement IS NOT NULL THEN concat (measurement,'' '',unit,'' x '', cost , 
+				'' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''') ELSE concat(cost, '' ',v_currency,''', '' / '', length ,'' ml = '', total_cost,'' ',v_currency,''') END as value, null as stylesheet,
 				null as widgetcontrols, null as hidden
 				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),'
 			UNION
@@ -177,7 +174,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 		EXECUTE v_querystring INTO fields_array;
 	END IF;
-
+	
 	fields_array := COALESCE(fields_array, '{}');  
 
 	-- for image widgets
@@ -355,45 +352,12 @@ BEGIN
 		
 	END LOOP;
 
+
 	-- for the rest of widgets removing not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
-	
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
-
-		-- plan columns
-		IF (aux_json->>'columnname')  = 'initial_cost' THEN 
-
-			IF p_id = 'arc_id' THEN
-			      v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ml') FROM v_ui_plan_arc_cost WHERE arc_id = p_id);
-			ELSIF p_id = 'node_id' THEN
-				v_cost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency,'/ut') FROM v_ui_plan_node_cost WHERE node_id = p_id);
-			END IF;
-						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_cost::TEXT);
-
-		ELSIF (aux_json->>'columnname')  = 'length' THEN 
-
-			IF p_id = 'arc_id' THEN
-			      v_dim := (SELECT concat(st_length(the_geom)::numeric(12,2),' ml') FROM arc WHERE arc_id = p_id);
-			ELSIF p_id = 'node_id' THEN
-				v_dim := '1.00 ut';
-			END IF;
-
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'label', 'Units'::TEXT);						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_dim::TEXT);
-
-		ELSIF (aux_json->>'columnname')  = 'total_cost' THEN 
-
-			IF p_id = 'arc_id' THEN
-			      v_totalcost := (SELECT concat((sum(total_cost*st_length(the_geom))::numeric(12,2)),' ',v_currency) FROM v_ui_plan_arc_cost JOIN arc USING (arc_id) WHERE arc_id = p_id);
-			ELSIF p_id = 'node_id' THEN
-				v_totalcost := (SELECT concat((sum(total_cost)::numeric(12,2)),' ',v_currency) FROM v_ui_plan_node_cost WHERE node_id = p_id);
-			END IF;
-						
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_totalcost::TEXT);
-		END IF;		
 	END LOOP;
 
 	-- Remove widgetfunction when is null
