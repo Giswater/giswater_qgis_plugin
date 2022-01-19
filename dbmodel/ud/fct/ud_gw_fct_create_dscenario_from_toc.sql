@@ -107,7 +107,7 @@ BEGIN
 		
 		
 		IF v_table = 'inp_dscenario_conduit' THEN
-			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, y1, y2, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage';
+			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage, elev1, elev2';
 			
 		ELSIF v_table = 'inp_dscenario_divider' THEN
 			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
@@ -133,7 +133,7 @@ BEGIN
 			v_columns = v_scenarioid||', poll_id,  node_id, timser_id, form_type, mfactor, factor, base, pattern_id';
 						
 	 	ELSIF v_table = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||', node_id, elev, ymax, y0, ysur, apond, outfallparam';
+			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json, elev, ymax';
 
  		ELSIF v_table = 'inp_dscenario_outfall' THEN
 			v_columns = v_scenarioid||', node_id, outfall_type, stage, curve_id, timser_id, gate';
