@@ -858,7 +858,7 @@ UNION
     'Various connecs'::character varying AS catalog_id,
     'VARIOUS'::character varying AS price_id,
     'PP'::character varying AS unit,
-    'Proportional cost of connections (pjoint cost) using unit_cost form cat_connec table.'::character varying AS descript	
+    'Proportional cost of connections (pjoint cost) using unit_cost form cat_connec table.'::character varying AS descript,
     case when length is not null then (other_budget)::numeric(12,2) else 0 end as cost,
     null,
     case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost,
