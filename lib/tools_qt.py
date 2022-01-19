@@ -532,6 +532,7 @@ def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_tr
     widget.setSelectionBehavior(selection)
     widget.horizontalHeader().setSectionResizeMode(sectionResizeMode)
     widget.horizontalHeader().setStretchLastSection(stretchLastSection)
+    widget.horizontalHeader().setMinimumSectionSize(100)
     widget.setEditTriggers(edit_triggers)
 
 
