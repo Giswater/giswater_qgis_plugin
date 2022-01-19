@@ -1443,7 +1443,7 @@ SELECT d.arc_id,
                     WHEN v_plan_aux_arc_cost.cost_unit::text = 'u'::text THEN v_plan_aux_arc_cost.arc_cost
                     ELSE st_length2d(v_plan_aux_arc_cost.the_geom)::numeric(12,2) * (v_plan_aux_arc_cost.m3mlexc * v_plan_aux_arc_cost.m3exc_cost + v_plan_aux_arc_cost.m2mlbase * v_plan_aux_arc_cost.m2bottom_cost + v_plan_aux_arc_cost.m2mltrenchl * v_plan_aux_arc_cost.m2trenchl_cost + v_plan_aux_arc_cost.m3mlprotec * v_plan_aux_arc_cost.m3protec_cost + v_plan_aux_arc_cost.m3mlfill * v_plan_aux_arc_cost.m3fill_cost + v_plan_aux_arc_cost.m3mlexcess * v_plan_aux_arc_cost.m3excess_cost + v_plan_aux_arc_cost.m2mlpavement * v_plan_aux_arc_cost.m2pav_cost + v_plan_aux_arc_cost.arc_cost)::numeric(14,2)
                 END::numeric(14,2) AS budget,
-            coalesce(v_plan_aux_arc_connec.connec_total_cost,0) + coalesce(v_plan_aux_arc_gully.gully_total_cost,0) + coalesce(v_plan_aux_arc_gully.connec_total_cost,0) AS other_budget,
+            coalesce(v_plan_aux_arc_connec.connec_total_cost,0) + coalesce(v_plan_aux_arc_gully.connec_total_cost,0) AS other_budget,
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
              JOIN arc ON v_plan_aux_arc_cost.arc_id::text = arc.arc_id::text
@@ -1457,8 +1457,7 @@ SELECT d.arc_id,
                   ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text
              LEFT JOIN (         
               SELECT DISTINCT ON (gully.arc_id) gully.arc_id,
-                  (sum(v_price_x_catconnec.cost_ut))::numeric(12,2) as connec_total_cost,
-                   (sum(v_price_x_catgrate.price))::numeric(12,2) as gully_total_cost
+                  (sum(v_price_x_catconnec.cost_ut))::numeric(12,2) as connec_total_cost
                    FROM gully
                      JOIN cat_grate ON id = gratecat_id
                      JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = gully.connec_arccat_id::text
