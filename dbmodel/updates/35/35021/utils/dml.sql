@@ -330,3 +330,8 @@ UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fid IN (148,258,3
 UPDATE sys_fprocess SET fprocess_type='Not used' WHERE fid IN (102,119,121,122,123,126,190,191,192,378);
 UPDATE sys_fprocess SET fprocess_name = 'UI export-import', fprocess_type='Function process' WHERE fid = 120;
 UPDATE sys_fprocess SET fprocess_name = 'Nodarcs generation', fprocess_type='Function process' WHERE fid = 124;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3128, 'gw_fct_getwidgetprices', 'utils', 'function', 'json', 'json', 'Function to manage price values for psector_other tab', 
+'role_epa', null, null) ON CONFLICT (id) DO NOTHING;

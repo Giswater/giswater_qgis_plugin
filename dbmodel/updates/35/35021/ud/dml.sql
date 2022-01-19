@@ -180,6 +180,10 @@ UPDATE sys_param_user SET vdefault = '5.1' WHERE  id = 'inp_options_epaversion';
 
 UPDATE config_function SET style = '{"style":{"point":{"style":"qml", "id":"111"}, "line":{"style":"qml", "id":"110"}}}' WHERE function_name = 'gw_fct_pg2epa_check_result';
 
+UPDATE config_function SET style = 
+'{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}, "line":{"style":"random","field":"fid","width":2,"transparency":0.5},"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}}'
+WHERE function_name = 'gw_fct_pg2epa_check_data';
+
 --2022/01/10
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_conduit', 'flap', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
@@ -700,14 +704,24 @@ update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias
 update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Transects value', orderby=13 where id='inp_transects_value';
 update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Controls', orderby=14 where id='v_edit_inp_controls';
 
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Orifice', orderby=1 where id='v_edit_inp_flwreg_orifice';
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Outlet', orderby=2 where id='v_edit_inp_flwreg_outlet';
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Pump', orderby=3 where id='v_edit_inp_flwreg_pump';
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS", "level_3":"FLOWREG"}', alias='Flowreg Weir', orderby=4 where id='v_edit_inp_flwreg_weir';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"FLOWREG"}', alias='Flowreg Orifice', orderby=1 where id='v_edit_inp_flwreg_orifice';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"FLOWREG"}', alias='Flowreg Outlet', orderby=2 where id='v_edit_inp_flwreg_outlet';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"FLOWREG"}', alias='Flowreg Pump', orderby=3 where id='v_edit_inp_flwreg_pump';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"FLOWREG"}', alias='Flowreg Weir', orderby=4 where id='v_edit_inp_flwreg_weir';
 
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Conduit Dscenario', orderby=1 where id='v_edit_inp_dscenario_conduit';
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=2 where id='v_edit_inp_dscenario_junction';
-UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=3 where id='v_edit_inp_dscenario_raingage';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=2 where id='v_edit_inp_dscenario_divider';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=3 where id='v_edit_inp_dscenario_flwreg_orifice';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Conduit Dscenario', orderby=4 where id='v_edit_inp_dscenario_flwreg_outlet';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=5 where id='v_edit_inp_dscenario_flwreg_pump';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=6 where id='v_edit_inp_dscenario_flwreg_weir';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Conduit Dscenario', orderby=7 where id='v_edit_inp_dscenario_inflows';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=8 where id='v_edit_inp_dscenario_inflows_poll';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=9 where id='v_edit_inp_dscenario_junction';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=10 where id='v_edit_inp_dscenario_outfall';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Conduit Dscenario', orderby=11 where id='v_edit_inp_dscenario_raingage';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Junction Dscenario', orderby=12 where id='v_edit_inp_dscenario_storage';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Raingage Dscenario', orderby=13 where id='v_edit_inp_dscenario_treatment';
 
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Flooding', orderby=1 where id='v_rpt_nodeflooding_sum';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Surcharge', orderby=2 where id='v_rpt_nodesurcharge_sum';
@@ -739,3 +753,5 @@ UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Sto
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Runoff Compare', orderby=13 where id='v_rpt_comp_subcatchrunoff_sum';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Subcatchment Washoff Compare', orderby=14 where id='v_rpt_comp_subcatchwasoff_sum';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='LID Performance Compare', orderby=15 where id='v_rpt_comp_lidperformance_sum';
+
+DELETE FROM config_toolbox WHERE id = 2680;
