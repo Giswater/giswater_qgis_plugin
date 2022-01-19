@@ -871,7 +871,6 @@ UNION
   ORDER BY 1, 2;
 
 
-
  -- 2022/01/14
 CREATE OR REPLACE VIEW v_plan_arc AS 
  SELECT d.arc_id,
