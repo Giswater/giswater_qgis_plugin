@@ -17,3 +17,4 @@
 - Improve the management of undefined (0) sector. Enable on filter selector, force disable on go2epa
 - Force selector for whole user on same cat_manager when new sector is created
 - New function gw_fct_setchangefeaturetype
+- Enhance performance for getinfoplan function and minor refactor for plan (connec and gullies)

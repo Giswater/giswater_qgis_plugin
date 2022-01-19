@@ -71,3 +71,11 @@ ALTER TABLE arc ADD CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id)
 REFERENCES cat_pavement (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"fprocess_type", "dataType":"text", "isUtils":"False"}}$$);
+
+delete from anl_arc;
+ALTER TABLE anl_arc DROP CONSTRAINT anl_arc_pkey;
+ALTER TABLE anl_arc ADD CONSTRAINT anl_arc_pkey PRIMARY KEY(arc_id, cur_user, fid);
+
+delete from anl_node;
+ALTER TABLE anl_node DROP CONSTRAINT anl_node_pkey;
+ALTER TABLE anl_node ADD CONSTRAINT anl_node_pkey PRIMARY KEY(node_id, cur_user, fid);

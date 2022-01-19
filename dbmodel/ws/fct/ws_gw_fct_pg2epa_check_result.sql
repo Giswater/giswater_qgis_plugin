@@ -114,8 +114,8 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (159, 297, 413, 415) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (297) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (159, 297, 396, 413, 415) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (297, 373, 396) AND cur_user=current_user;
 
 	-- get user parameters
 	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
@@ -254,7 +254,6 @@ BEGIN
 		RAISE NOTICE '4 - Check for network mode';
 		IF v_networkmode = 4 THEN
 		
-
 			RAISE NOTICE '4.1- Epa connecs over epa node (413)';
 			v_querytext = 'SELECT * FROM (
 				SELECT DISTINCT t2.connec_id, t2.connecat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
