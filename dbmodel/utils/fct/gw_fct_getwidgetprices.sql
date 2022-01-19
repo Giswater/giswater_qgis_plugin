@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getwidgetprices($${"client":{}, "form":{}, "feature":{},"data":{"tableName":"v_edit_plan_psector_x_other", "psectorId":4}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_getwidgetprices($${"client":{}, "form":{}, "feature":{},"data":{"tableName":"v_edit_plan_psector_x_other", "psectorId":8}}$$)::text
 
 */
 
@@ -35,14 +35,13 @@ BEGIN
 	v_psector_id = (p_data->>'data')::json->>'psectorId';
 
 	-- Get table columns
-	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2)a ' 
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_name FROM information_schema.columns 
+	WHERE table_schema = $1 AND table_name = $2 AND column_name NOT IN (''atlas_id'', ''id'', ''psector_id''))a '
 	INTO v_columns_array
 	USING v_schemaname, v_tablename;
 
-	RAISE NOTICE 'v_columns_array  -> %',v_columns_array;
-
 	-- Get table rows
-	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||')a ' 
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, price_id, unit, price_descript, price, measurement, total_budget, descript FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||')a ' 
 	INTO v_fields_array;
 
 	v_columns := array_to_json(v_columns_array);
@@ -54,10 +53,6 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}'); 
 
 	-- Return
-	
-	RAISE NOTICE 'v_columns -> %',v_columns;
-	RAISE NOTICE 'v_fields -> %',v_fields;
-	
 	RETURN ('{"status":"Accepted"' ||', "version":'|| v_version ||
 		/*', "columns":' || v_columns ||*/
 		/*', "layoutname":"price_layout"'||||*/
