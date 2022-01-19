@@ -1169,7 +1169,7 @@ class GwPsector:
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
         self.update_total(dialog)
 
-    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','descript']
+    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
                            , print_all_rows=False, print_headers=False):
 
         extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
@@ -1213,12 +1213,16 @@ class GwPsector:
                     if key != 'id':
                         if key not in editable_widgets:
                             widget = QLabel()
-                            widget.setObjectName(f"widget_{key}_{self.count}")
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
                             widget.setText(f"  {field.get(key)}  ")
                         else:
                             widget = QLineEdit()
-                            widget.setObjectName(f"widget_{key}_{self.count}")
-                            text = field.get(key) if field.get(key) is not None else ''
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
+                            if f"widget_{key}_{field['price_id']}" in self.dict_to_update:
+                                text = self.dict_to_update[f"widget_{key}_{field['price_id']}"][key]
+                            else:
+                                text = field.get(key) if field.get(key) is not None else ''
+
                             widget.setText(f"{text}")
                             widget.textChanged.connect(partial(self._manage_updates_lineedit, widget, key, field['price_id']))
 
@@ -1230,12 +1234,13 @@ class GwPsector:
 
     def _manage_updates_lineedit(self, widget, key, price_id):
 
-        self.dict_to_update[f"{price_id}_{key}"] = {"price_id":price_id, key:widget.text()}
+        self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
 
 
     def _update_otherprice(self):
 
         sql = ""
+        _filter = ""
         if self.dict_to_update:
             for main_key in self.dict_to_update:
                 sub_list = list(self.dict_to_update[main_key].keys())
