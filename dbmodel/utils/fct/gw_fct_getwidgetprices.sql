@@ -1,0 +1,74 @@
+-- Function: SCHEMA_NAME.gw_fct_getwidgetprices(json)
+
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(json);
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(p_data json)
+  RETURNS json AS
+$BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_getwidgetprices($${"client":{}, "form":{}, "feature":{},"data":{"tableName":"v_edit_plan_psector_x_other", "psectorId":4}}$$)::text
+
+*/
+
+DECLARE
+
+v_schemaname text;
+v_version text;
+v_definition text;
+v_columns json;
+v_columns_array json[];
+v_fields json;
+v_fields_array json[];
+v_tablename text;
+v_psector_id text;
+
+BEGIN
+
+	--  Search path	
+	SET search_path = "SCHEMA_NAME", public;
+
+	v_schemaname = 'SCHEMA_NAME';
+
+	-- Getting variables
+	v_tablename = (p_data->>'data')::json->>'tableName';
+	v_psector_id = (p_data->>'data')::json->>'psectorId';
+
+	-- Get table columns
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2)a ' 
+	INTO v_columns_array
+	USING v_schemaname, v_tablename;
+
+	RAISE NOTICE 'v_columns_array  -> %',v_columns_array;
+
+	-- Get table rows
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM '||v_tablename||' WHERE psector_id = '||v_psector_id||')a ' 
+	INTO v_fields_array;
+
+	v_columns := array_to_json(v_columns_array);
+	v_fields := array_to_json(v_fields_array);
+	
+	-- Control nulls
+	v_version := COALESCE(v_version, '""'); 
+	v_columns := COALESCE(v_columns, '{}'); 
+	v_fields := COALESCE(v_fields, '{}'); 
+
+	-- Return
+	
+	RAISE NOTICE 'v_columns -> %',v_columns;
+	RAISE NOTICE 'v_fields -> %',v_fields;
+	
+	RETURN ('{"status":"Accepted"' ||', "version":'|| v_version ||
+		/*', "columns":' || v_columns ||*/
+		/*', "layoutname":"price_layout"'||||*/
+		', "fields":' || v_fields ||
+		'}')::json;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(json)
+  OWNER TO role_admin;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(json) TO public;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(json) TO role_admin;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getwidgetprices(json) TO role_basic;
