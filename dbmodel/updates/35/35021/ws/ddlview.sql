@@ -713,6 +713,25 @@ UNION
            FROM plan_arc_x_pavement) a USING (arc_id)
   WHERE a.arc_id IS NULL;
 
+
+CREATE OR REPLACE VIEW v_ui_plan_node_cost AS 
+ SELECT node.node_id,
+    1 AS orderby,
+    'element'::text AS identif,
+    cat_node.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    1 AS measurement,
+    1::numeric * v_price_compost.price AS total_cost,
+    null::float as length
+   FROM node
+     JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN v_price_compost ON cat_node.cost::text = v_price_compost.id::text
+     JOIN v_plan_node ON node.node_id::text = v_plan_node.node_id::text;
+
+
 CREATE OR REPLACE VIEW v_ui_plan_arc_cost AS 
 WITH p AS (
 	SELECT *, a.cost as cat_cost, a.m2bottom_cost as cat_m2bottom_cost, a.m3protec_cost as cat_m3_protec_cost, s.m3exc_cost as cat_m3exc_cost, s.m3fill_cost as cat_m3fill_cost,
@@ -839,7 +858,7 @@ UNION
     'Various connecs'::character varying AS catalog_id,
     'VARIOUS'::character varying AS price_id,
     'PP'::character varying AS unit,
-    'Proportional cost (by meter) from total budget of connecs cost related to arc. The cost is calculated by unit cost defined on cat_connec table'::character varying AS descript,
+    'Proportional cost of connections (pjoint cost) using unit_cost form cat_connec table.'::character varying AS descript	
     case when length is not null then (other_budget)::numeric(12,2) else 0 end as cost,
     null,
     case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost,

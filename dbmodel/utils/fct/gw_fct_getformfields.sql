@@ -151,16 +151,18 @@ BEGIN
 	ELSE
 		v_querystring = concat('SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
-				(SELECT concat(unit, ''. '', descript) AS label, 
+				(SELECT 
+				concat(unit, ''. '', descript) AS label , 				
 				identif AS columnname, ''label'' AS widgettype,
 				concat (',quote_literal(p_tabname),',''_'',identif) AS widgetname, ''string'' AS datatype, 
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, 
-				CASE WHEN measurement IS NOT NULL THEN concat (measurement,'' '',unit,'' x '', cost , 
-				'' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''') ELSE concat(cost, '' ',v_currency,''', '' / '', length ,'' ml = '', total_cost,'' ',v_currency,''') END as value, null as stylesheet,
+				CASE WHEN measurement IS NOT NULL THEN concat (measurement,'' '',unit,'' x '', cost , '' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''')   
+				     WHEN measurement IS NULL THEN concat(cost, '' ',v_currency,''', '' / '', length ,'' ml = '', total_cost,'' ',v_currency,''') END as value, 
+				null as stylesheet,
 				null as widgetcontrols, null as hidden
-				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),'
+				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),' AND total_cost IS NOT NULL
 			UNION
 				SELECT label, columnname, widgettype,
 				concat (',quote_literal(p_tabname),',''_'',columnname) AS widgetname, datatype,
