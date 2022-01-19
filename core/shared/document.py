@@ -164,6 +164,7 @@ class GwDocument:
         self.dlg_man = GwDocManagerUi()
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"

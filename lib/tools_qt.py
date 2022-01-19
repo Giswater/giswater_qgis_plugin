@@ -525,10 +525,13 @@ def enable_dialog(dialog, enable, ignore_widgets=['', None]):
                 widget.setEnabled(enable)
 
 
-def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers,
+                         sectionResizeMode=3, stretchLastSection=True):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
+    widget.horizontalHeader().setSectionResizeMode(sectionResizeMode)
+    widget.horizontalHeader().setStretchLastSection(stretchLastSection)
     widget.setEditTriggers(edit_triggers)
 
 
@@ -692,6 +695,8 @@ def set_selection_behavior(dialog):
     widget_list = dialog.findChildren(QTableView)
     for widget in widget_list:
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        widget.horizontalHeader().setSectionResizeMode(3)
+        widget.horizontalHeader().setStretchLastSection(True)
 
 
 def get_folder_path(dialog, widget):
