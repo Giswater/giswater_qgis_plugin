@@ -1106,9 +1106,11 @@ CREATE OR REPLACE VIEW v_ui_plan_node_cost AS
      JOIN v_price_compost ON cat_node.cost::text = v_price_compost.id::text
      JOIN v_plan_node ON node.node_id::text = v_plan_node.node_id::text;
 
+
 CREATE OR REPLACE VIEW v_ui_plan_arc_cost AS 
 WITH p AS (
-	SELECT *, a.cost as cat_cost, a.m2bottom_cost as cat_m2bottom_cost, a.m3protec_cost as cat_m3_protec_cost, s.m3exc_cost as cat_m3exc_cost, s.m3fill_cost as cat_m3fill_cost,
+	SELECT *, a.cost as cat_cost, a.m2bottom_cost as cat_m2bottom_cost, a.connect_cost as cat_connect_cost, a.m3protec_cost as cat_m3_protec_cost, 
+	s.m3exc_cost as cat_m3exc_cost, s.m3fill_cost as cat_m3fill_cost,
 	s.m3excess_cost  as cat_m3excess_cost, s.m2trenchl_cost as cat_m2trenchl_cost
 	FROM v_plan_arc JOIN cat_arc a ON id = arccat_id JOIN cat_soil s ON s.id = soilcat_id
 	  )
@@ -1228,19 +1230,38 @@ UNION
 UNION
  SELECT arc_id,
     9 AS orderby,
-    'connec and gullies'::text AS identif,
-    'Various connec and gullies'::character varying AS catalog_id,
+    'connec'::text AS identif,
+    'Various connecs'::character varying AS catalog_id,
     'VARIOUS'::character varying AS price_id,
     'PP'::character varying AS unit,
-    'Proportional cost of connections (pjoint cost) usign unit_cost from cat_connec/cat_grate tables'::character varying AS descript,
-    case when length is not null then (other_budget)::numeric(12,2) else 0 end as cost,
-    null,
-    case when length is not null then (other_budget/length)::numeric(12,2) else 0 end as total_cost,
-    length
+    'Proportional cost of connec connections (pjoint cost)'::character varying AS descript,
+    min(price) as cost,
+    count(connec_id),
+    (min(price)*count(connec_id)/coalesce(min(length),1))::numeric(12,2) as total_cost,
+    min(length)::numeric(12,2)
    FROM p
+   JOIN v_edit_connec USING (arc_id)
+   JOIN v_price_compost v ON cat_connect_cost = v.id
+   group by (arc_id)
+UNION
+ SELECT arc_id,
+    10 AS orderby,
+    'connec'::text AS identif,
+    'Various connecs'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost of gully connections (pjoint cost)'::character varying AS descript,
+    min(price) as cost,
+    count(gully_id),
+    (min(price)*count(gully_id)/coalesce(min(length),1))::numeric(12,2) as total_cost,
+    min(length)::numeric(12,2)
+   FROM p
+   JOIN v_edit_gully USING (arc_id)
+   JOIN v_price_compost v ON cat_connect_cost = v.id
+   group by (arc_id) 
   ORDER BY 1, 2;
-  
-  
+
+    
 -- 2022/01/14
 CREATE OR REPLACE VIEW v_plan_arc AS 
 SELECT d.arc_id,
@@ -1458,24 +1479,23 @@ SELECT d.arc_id,
                     WHEN v_plan_aux_arc_cost.cost_unit::text = 'u'::text THEN v_plan_aux_arc_cost.arc_cost
                     ELSE st_length2d(v_plan_aux_arc_cost.the_geom)::numeric(12,2) * (v_plan_aux_arc_cost.m3mlexc * v_plan_aux_arc_cost.m3exc_cost + v_plan_aux_arc_cost.m2mlbase * v_plan_aux_arc_cost.m2bottom_cost + v_plan_aux_arc_cost.m2mltrenchl * v_plan_aux_arc_cost.m2trenchl_cost + v_plan_aux_arc_cost.m3mlprotec * v_plan_aux_arc_cost.m3protec_cost + v_plan_aux_arc_cost.m3mlfill * v_plan_aux_arc_cost.m3fill_cost + v_plan_aux_arc_cost.m3mlexcess * v_plan_aux_arc_cost.m3excess_cost + v_plan_aux_arc_cost.m2mlpavement * v_plan_aux_arc_cost.m2pav_cost + v_plan_aux_arc_cost.arc_cost)::numeric(14,2)
                 END::numeric(14,2) AS budget,
-            coalesce(v_plan_aux_arc_connec.connec_total_cost,0) + coalesce(v_plan_aux_arc_gully.connec_total_cost,0) AS other_budget,
+            coalesce(v_plan_aux_arc_connec.connec_total_cost,0) + coalesce(v_plan_aux_arc_gully.gully_total_cost,0) AS other_budget,
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
              JOIN arc ON v_plan_aux_arc_cost.arc_id::text = arc.arc_id::text
              LEFT JOIN (
-		SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
-                  (sum(v_price_x_catconnec.cost_ut))::numeric(12,2) as connec_total_cost
-                   FROM connec
-                   JOIN cat_connec ON id = connecat_id
-                     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-                  GROUP BY connec.arc_id
+		SELECT DISTINCT ON (arc_id) arc_id, (min(price)*count(*))::numeric(12,2) as connec_total_cost
+                   FROM v_edit_connec c
+                   JOIN arc USING (arc_id)
+                   JOIN cat_arc ON id = arccat_id 
+                   LEFT JOIN v_price_compost P ON connect_cost = p.id where arc_id = '18890'
+                  GROUP BY c.arc_id
                   ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text
              LEFT JOIN (         
-              SELECT DISTINCT ON (gully.arc_id) gully.arc_id,
-                  (sum(v_price_x_catconnec.cost_ut))::numeric(12,2) as connec_total_cost
-                   FROM gully
-                     JOIN cat_grate ON id = gratecat_id
-                     JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = gully.connec_arccat_id::text
-                     JOIN v_price_x_catgrate ON v_price_x_catgrate.id::text = gully.gratecat_id::text
-                  GROUP BY gully.arc_id
+              SELECT DISTINCT ON (arc_id) arc_id, (min(price)*count(*))::numeric(12,2) as gully_total_cost
+                   FROM v_edit_gully c
+                   JOIN arc USING (arc_id)
+                   JOIN cat_arc ON id = arccat_id 
+                   LEFT JOIN v_price_compost P ON connect_cost = p.id where arc_id = '18890'
+                  GROUP BY c.arc_id
                   ) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;

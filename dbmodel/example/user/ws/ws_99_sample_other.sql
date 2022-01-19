@@ -634,3 +634,5 @@ INSERT INTO config_param_user VALUES ('edit_pavement_vdefault','Asphalt',current
 
 INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) VALUES ('2001', 'Slab', 0.5);
 INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) VALUES ('2001', 'Concrete', 0.5);
+
+UPDATE cat_arc SET connect_cost = 'N_WATER-CONNECT';
