@@ -296,7 +296,7 @@ class GwElement:
         """ Set default values """
 
         row = tools_gw.get_config_value("edit_elementcat_vdefault")
-        if row:
+        if row[0]:
             sql = f"SELECT elementtype_id, elementtype_id FROM cat_element WHERE id = '{row[0]}'"
             element_type = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.dlg_add_element.element_type, element_type[0], 0)
