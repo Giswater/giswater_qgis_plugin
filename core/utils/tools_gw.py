@@ -1540,32 +1540,35 @@ def fill_combo(widget, field):
 
 def fill_combo_child(dialog, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child is not None:
-        fill_combo(child, combo_child)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        if child is not None:
+            fill_combo(child, combo_child)
 
 
 def manage_combo_child(dialog, combo_parent, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
-        child.setEnabled(True)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
 
-        fill_combo_child(dialog, combo_child)
-        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
-                'enableWhenParent' not in combo_child['widgetcontrols']:
-            return
-
-        combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
-        if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (combo_value not in (None, '')):
-            # The keepDisbled property is used to keep the edition enabled or disabled,
-            # when we activate the layer and call the "enable_all" function
-            child.setProperty('keepDisbled', False)
+        if child:
             child.setEnabled(True)
-        else:
-            child.setProperty('keepDisbled', True)
-            child.setEnabled(False)
+
+            fill_combo_child(dialog, combo_child)
+            if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                    'enableWhenParent' not in combo_child['widgetcontrols']:
+                return
+
+            combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+            if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                    and (combo_value not in (None, '')):
+                # The keepDisbled property is used to keep the edition enabled or disabled,
+                # when we activate the layer and call the "enable_all" function
+                child.setProperty('keepDisbled', False)
+                child.setEnabled(True)
+            else:
+                child.setProperty('keepDisbled', True)
+                child.setEnabled(False)
 
 
 def fill_child(dialog, widget, action, feature_type=''):
