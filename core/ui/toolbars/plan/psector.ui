@@ -12,7 +12,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>1000</width>
+    <width>1050</width>
     <height>16777215</height>
    </size>
   </property>
@@ -26,7 +26,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -904,7 +904,7 @@
               <enum>Qt::LeftToRight</enum>
              </property>
              <property name="text">
-              <string>Total Currency:</string>
+              <string>Total :</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -924,7 +924,7 @@
              </property>
             </spacer>
            </item>
-           <item row="3" column="0" colspan="3">
+           <item row="3" column="1" colspan="2">
             <widget class="Line" name="line_6">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
