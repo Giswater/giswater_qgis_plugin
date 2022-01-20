@@ -203,11 +203,22 @@ BEGIN
 */
 	-- manage check all
 	IF v_checkall THEN
+	
 		IF v_table ='plan_psector' THEN -- to manage only those psectors related to selected exploitations
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
 			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
 		ELSE
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
+		
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+			
+				IF v_tabname = 'tab_exploitation' THEN
+					EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user ON CONFLICT DO NOTHING';
+				ELSIF  v_tabname = 'tab_sector' THEN
+					EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
+				END IF;				
+			ELSE
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
+			END IF;		
 		END IF;
 		
 	ELSIF v_checkall IS FALSE THEN
