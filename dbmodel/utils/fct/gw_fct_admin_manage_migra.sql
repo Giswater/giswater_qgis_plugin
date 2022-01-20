@@ -27,8 +27,7 @@ v_fid integer=437;
 v_schemaname text;
 v_projectype text;
 v_action text;
-v_result json;
-v_result_info json;
+v_result_info text;
 v_version text;
 
 BEGIN
@@ -39,11 +38,6 @@ BEGIN
 
 	SELECT project_type, giswater INTO v_projectype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('TOPOCONTROL FOR DATA MIGRATION'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
-
 	v_action = json_extract_path_text(p_data,'data','parameters','action');
 
 	IF v_action = 'DISABLE' THEN
@@ -57,8 +51,7 @@ BEGIN
 		UPDATE config_param_system SET value = '{"activated":false,"value":0.1}' WHERE parameter IN ('edit_connec_proximity', 'edit_node_proximity');
 		UPDATE config_param_system SET value = TRUE WHERE parameter IN ('edit_topocontrol_disable_error');
 
-		INSERT INTO audit_check_data(fid,  error_message)
-		VALUES (v_fid,  'Control disabled.');
+		v_result_info='Control disabled';
 
 	ELSIF v_action = 'ENABLE' THEN
 
@@ -66,27 +59,34 @@ BEGIN
 		AND text_column=parameter;
 
 		UPDATE config_param_system SET value = FALSE WHERE parameter IN ('edit_topocontrol_disable_error');
-	
+		v_result_info='Control enabled';
+
 		DELETE FROM temp_table WHERE fid=v_fid AND cur_user=current_user;
-		
-		INSERT INTO audit_check_data(fid,  error_message)
-		VALUES (v_fid,  'Control enabled.');
 	END IF;
 
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||''||
-			'}}}')::json, 3130, null, null, null);
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
+			 ',"body":{"form":{}'||
+			 ',"data":{ "info":"'||v_result_info||'",'||
+				'"point":{"geometryType":"", "values":[]}'||','||
+				'"line":{"geometryType":"", "values":[]}'||','||
+				'"polygon":{"geometryType":"", "values":[]}'||
+			   '}}'||
+		'}')::json, 3130, null, null, null);
 
+
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||
+		       '}'||
+	    '}}')::json, 2670, null, null, null);
+	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
 	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
