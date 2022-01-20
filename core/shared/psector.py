@@ -1293,7 +1293,7 @@ class GwPsector:
             if layout.itemAt(i).widget():
                 layout.itemAt(i).widget().deleteLater()
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
-        dialog.lbl_total_count.setText(f"{count}")
+
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit """
