@@ -90,7 +90,7 @@ INSERT INTO plan_price VALUES ('F9H118E1', 't', 'Continuous bituminous mixing fl
 INSERT INTO plan_price VALUES ('S_TRANS', 'm3', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loa', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading, with a route of more than 15 and up to 20 km', 8.1164, NULL);
 INSERT INTO plan_price VALUES ('F931201F', 'm3', 'Base of artificial gravels, with extended and compacted material at 95% of the PM', 'Base of artificial gravels, with extended and compacted material at 95% of the PM', 29.2250, NULL);
 INSERT INTO plan_price VALUES ('F9G1A732', 'm3', 'Concrete flooring without additives HA-30/P/20/IIIa + E of plastic consistency', 'Concrete flooring without additives HA-30/P/20/IIIa + E of plastic consistency, maximum size of aggregate, 20 mm, scattered from truck, manual extended and vibration, riveted finish', 105.6413, NULL);
-INSERT INTO plan_price VALUES ('F9E1311N', 'm2', 'Tile pavement for gray sidewalk of 20x20x4 cm on support of 3 cm of sand', 'Tile pavement for gray sidewalk of 20x20x4 cm, first class, top price, on support of 3 cm of sand, made in the work with concrete mixer of 165 l and portland cement', 35.3418, NULL);
+INSERT INTO plan_price VALUES ('F9E1311N', 'm2', 'Tile pavement for gray sidewalk of 20x20x4 cm on support of 3 cm of sand', 'Tile pavement for gray sidewalk of 20x20x4 cm, first class, top price, on support of 3 cm of sand, made in the work with concrete mixer of 165 l and portland cement', 65.3418, NULL);
 INSERT INTO plan_price VALUES ('F9J12X40', 'm2', 'Primer irrigation with specific cationic bituminous emulsion for irrigation of priming', 'Primer irrigation with specific cationic bituminous emulsion for irrigation of priming, ECI type, with a provision of 1 kg / m2', 0.5221, NULL);
 INSERT INTO plan_price VALUES ('F9H11251', 't', 'Continuous bituminous mixing pavement type AC 16 surf B50 / 70 D (D-12)', 'Continuous bituminous mixing pavement type AC 16 surf B50 / 70 D (D-12), with asphalt penetration bitumen, dense granulometry for tread and granite granulate, extended and compacted', 55.8791, NULL);
 INSERT INTO plan_price VALUES ('F9J13Y40', 'm2', 'Adhesive irrigation with modified bituminous emulsion with fast cationic polymer', 'Adhesive irrigation with modified bituminous emulsion with fast cationic polymers, ECR-1d-m type, with a 1 kg / m2', 0.4334, NULL);
@@ -106,8 +106,6 @@ INSERT INTO plan_price VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual el
 INSERT INTO plan_price VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0, NULL);
 
 
-
-
 INSERT INTO plan_price_compost VALUES (1, 'P_CONCRETE-20', 'F931201F', 0.2000);
 INSERT INTO plan_price_compost VALUES (2, 'P_CONCRETE-20', 'F9G1A732', 0.2000);
 INSERT INTO plan_price_compost VALUES (3, 'P_ASPHALT-10', 'F931201F', 0.2500);
@@ -116,6 +114,6 @@ INSERT INTO plan_price_compost VALUES (5, 'P_ASPHALT-10', 'F9H11251', 0.0960);
 INSERT INTO plan_price_compost VALUES (6, 'P_ASPHALT-10', 'F9J12X40', 1.0000);
 INSERT INTO plan_price_compost VALUES (7, 'P_ASPHALT-10', 'F9J13Y40', 1.0000);
 INSERT INTO plan_price_compost VALUES (8, 'P_SLAB-4P', 'F9E1311N', 1.0000);
-INSERT INTO plan_price_compost VALUES (9, 'P_SLAB-4P', 'F9265C51', 0.1000);
+INSERT INTO plan_price_compost VALUES (9, 'P_SLAB-4P', 'F9265C51', 0.3000);
 
 

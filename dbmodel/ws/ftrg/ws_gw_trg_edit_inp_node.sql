@@ -102,11 +102,8 @@ BEGIN
             WHERE node_id=OLD.node_id;  
 			
         ELSIF v_node_table = 'inp_tank' THEN
-            UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, 
-            minvol=NEW.minvol, curve_id=NEW.curve_id, mixing_model=NEW.mixing_model, reaction_coeff=NEW.reaction_coeff,
-            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id 
-            WHERE node_id=OLD.node_id;
-			
+            UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id, overflow=NEW.overflow WHERE node_id=OLD.node_id;
+
         ELSIF v_node_table = 'inp_pump' THEN          
             UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, 
             status=NEW.status , pump_type=NEW.pump_type, energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id,
@@ -123,10 +120,8 @@ BEGIN
             wall_coeff=NEW.wall_coeff WHERE node_id=OLD.node_id;  
 			
         ELSIF v_node_table = 'inp_inlet' THEN     
-            UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, 
-            curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, mixing_model=NEW.mixing_model, reaction_coeff=NEW.reaction_coeff,
-            init_quality = NEW.init_quality, source_type = NEW.source_type, source_quality = NEW.source_quality, 
-            source_pattern_id = NEW.source_pattern_id WHERE node_id=OLD.node_id;
+            UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,
+            pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;
 			
         END IF;
 

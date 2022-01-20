@@ -30,11 +30,16 @@ ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM inp_typevalue where typevalue = 'inp_value_patternmethod' and id::integer > 20;
 UPDATE inp_typevalue SET id = '14' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET id = '13' WHERE id = '12' AND  typevalue = 'inp_value_patternmethod';
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','SECTOR PATTERN') ON CONFLICT (typevalue, id) DO NOTHING;
 UPDATE inp_typevalue SET idval = 'DEFAULT PATTERN' WHERE id = '11' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'FEATURE PATTERN' WHERE id = '14' AND  typevalue = 'inp_value_patternmethod';
 UPDATE inp_typevalue SET idval = 'DMA PATTERN' WHERE id = '13' AND  typevalue = 'inp_value_patternmethod';
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE sys_param_user SET label  = 'Valve status:',
+descript = 'Defines the status of valves (OPEN, CLOSED) in function of [EPA-TABLES][INVENTORY][MINCUT RESULT]. Inventory is the status of shutoff valve defined on inventory. 
+Mincut Result is the posibility to use a defined status of valves as a result on a mincut scenario.'
+ WHERE id = 'inp_options_valve_mode';
 
 UPDATE inp_typevalue SET idval = 'CONNEC (ALL NODARCS)' WHERE typevalue = 'inp_options_networkmode' AND id  ='4';
 UPDATE inp_typevalue SET idval = 'NODE (BASIC NODARCS)' WHERE typevalue = 'inp_options_networkmode' AND id  ='1';
@@ -93,25 +98,35 @@ VALUES ('inp_options_max_flowchange', 'FLOWCHANGE', 'epaoptions', 'Max. flow cha
 'ws', FALSE, FALSE, 'text', 'linetext', true, '0', TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA');
-INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA');
+INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','DDA','DDA') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_options_demand_model','PDA','DDA') ON CONFLICT (typevalue, id) DO NOTHING;;
 
 UPDATE sys_param_user SET layoutorder = 12 WHERE id IN ('inp_options_quality_mode','inp_options_node_id');
 
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage scenario for junctions', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage scenario for connecs', 'role_epa', 'core');
-INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage scenario for inlets', 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_junction', 'Table to manage dscenario for junctions', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_connec', 'Table to manage dscenario for connecs', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_inlet', 'Table to manage dscenario for inlets', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_virtualvalve', 'Table to manage dscenario for virtualvalves', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('inp_dscenario_pump_additional', 'Table to manage dscenario for additional pumps', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION');
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_junction', 'View to manage dscenario for junctions', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_connec', 'View to manage dscenario for connecs', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_inlet', 'View to manage dscenario for inlets', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_virtualvalve', 'View to manage dscenario for virtualvalves', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('v_edit_inp_dscenario_pump_additional', 'View to manage dscenario for additional pumps', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','JUNCTION','JUNCTION') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','CONNEC','CONNEC') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','UNDEFINED','UNDEFINED') ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3110, 'gw_fct_create_dscenario_from_crm', 'ws', 'function', 'json', 
 'json', 'Function to create dscenarios from CRM. <br>This function store values on CONNEC features.<br>When the network geometry generator works with [NODE] demands are moved 50% to node_1 and node_2.', 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM ws_sample.config_toolbox WHERE id = 3110;
-INSERT INTO ws_sample.config_toolbox(id, alias, functionparams, inputparams, observ, active)
+DELETE FROM config_toolbox WHERE id = 3110;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3110,'Create Demand Dscenario from CRM', '{"featureType":[]}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
@@ -125,7 +140,8 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE config_toolbox SET inputparams =
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
-{"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""}
+{"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
+{"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
 ]', functionparams = '{"featureType":["node", "arc", "connec"]}'
 WHERE id = 3108;
 
@@ -139,12 +155,370 @@ ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id = 3112;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType":["node","connec"]}',
+VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType": {"node":["v_edit_inp_junction"],"connec":["v_edit_inp_connec"]}}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
- {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}
-  ]'
-, NULL, TRUE) 
+ {"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""},
+ {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}
+  ]', NULL, TRUE) 
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET alias = 'Create Network Dscenario from ToC'
-WHERE id = 3108
+WHERE id = 3108;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_sector','form_feature', 'main', 'pattern_id', null, null, 'string', 'combo', 'pattern_id', NULL, NULL,  FALSE,
+FALSE, TRUE, FALSE,FALSE,'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL', TRUE, TRUE, NULL, NULL,NULL,
+'{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}', 
+NULL, NULL, FALSE) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, vdefault)
+VALUES ('edit_node_interpolate', 'hidden', 'Values to use with tool node interpolate',
+'role_edit', 'Values to manage node interpolate tool', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', true, NULL, NULL,
+'{"elevation":{"status":true, "column":"elevation"}, "depth":{"status":true, "column":"depth"}}') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_tabs SET tabactions ='[{"actionName":"actionEdit",  "disabled":false},
+{"actionName":"actionZoom",  "disabled":false},
+{"actionName":"actionCentered",  "disabled":false},
+{"actionName":"actionZoomOut" , "disabled":false},
+{"actionName":"actionCatalog",  "disabled":false},
+{"actionName":"actionWorkcat",  "disabled":false},
+{"actionName":"actionCopyPaste",  "disabled":false},
+{"actionName":"actionLink",  "disabled":false},
+{"actionName":"actionMapZone",  "disabled":false},
+{"actionName":"actionSetToArc",  "disabled":false},
+{"actionName":"actionGetParentId",  "disabled":false},
+{"actionName":"actionGetArcId", "disabled":false},
+{"actionName": "actionRotation","disabled": false},
+{"actionName":"actionInterpolate", "disabled":false}]' WHERE formname='v_edit_node';
+
+INSERT INTO config_form_fields (formname, formtype,tabname, columnname, layoutname,layoutorder,datatype, 
+widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
+widgetfunction, linkedobject, hidden)
+VALUES('v_edit_inp_tank', 'form_feature', 'main','overflow','lyt_data_1', 71, 'string',
+'text','overflow', null,  'Yes or No', false,false, true,false, false, 
+null,  false,  false,  null,null, null,'{"setMultiline":false}', 
+null,null,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_param_system VALUES ('admin_hydrometer_state', '{"0":[0], "1":[1,2,3,4]}', 
+'Variable to map state values from crm to giswater state values in order to identify what state are deprecated to check on function state_control for connecs')
+ ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES ('3194', 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, TRUE, 'utils', NULL)
+ON CONFLICT (id) DO NOTHING;
+
+--2022/01/10
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pump', 'inp_dscenario_pump', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pump', 'inp_dscenario_pump_additional', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_param_energy', 'inp_dscenario_pump_additional', 'energyparam', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+ALTER TABLE inp_dscenario_pump DROP CONSTRAINT IF EXISTS inp_dscenario_pump_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump ADD CONSTRAINT inp_dscenario_pump_pattern_id_fkey FOREIGN KEY (pattern)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_shortpipe', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+ALTER TABLE inp_dscenario_tank DROP CONSTRAINT IF EXISTS inp_dscenario_tank_curve_id_fkey;
+ALTER TABLE inp_dscenario_tank ADD CONSTRAINT inp_dscenario_tank_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_tank DROP CONSTRAINT IF EXISTS inp_tank_curve_id_fkey;
+ALTER TABLE inp_tank ADD CONSTRAINT inp_tank_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_inlet DROP CONSTRAINT IF EXISTS inp_dscenario_inlet_curve_id_fkey;
+ALTER TABLE inp_dscenario_inlet ADD CONSTRAINT inp_dscenario_inlet_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_valve', 'inp_virtualvalve', 'valv_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_virtualvalve', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_typevalue_valve', 'inp_dscenario_virtualvalve', 'valv_type', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_valve', 'inp_dscenario_virtualvalve', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+
+ALTER TABLE inp_dscenario_demand DROP CONSTRAINT IF EXISTS inp_dscenario_demand_feature_type_fkey;
+ALTER TABLE inp_dscenario_demand ADD CONSTRAINT inp_dscenario_demand_feature_type_fkey FOREIGN KEY (feature_type)
+REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+UPDATE sys_foreignkey SET target_field='demand_type' WHERE target_field='deman_type' AND target_table='inp_dscenario_demand';
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_connec', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES ('inp_typevalue', 'inp_value_status_pipe', 'inp_dscenario_connec', 'status', true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_connec', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pipe' AND columnname IN ('status', 'minorloss')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_connec', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pipe' AND columnname IN ('dscenario_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET columnname = 'pjoint_type' WHERE formname='v_edit_inp_connec' AND columnname = 'pjoinyt_type';
+UPDATE config_form_fields SET columnname = 'pjoint_id' WHERE formname='v_edit_inp_connec' AND columnname = 'pjoinyt_id';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_connec', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_connec' AND columnname IN ('connec_id','pjoint_type','pjoint_id','demand','pattern_id', 'peak_factor',
+'status', 'minorloss', 'custom_roughness', 'custom_length', 'custom_dint')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_demand', 'form_feature', 'main', 'source', null, null, 
+'string', 'text', 'source', null, null, false, false, true, false, null, null, null, 
+null, null, null, null, '{"setMultiline":false}', null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_inlet', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pipe' AND columnname IN ('dscenario_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_inlet', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_reservoir' AND columnname IN ('pattern_id','head')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_inlet', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_tank' AND columnname IN ('overflow')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_inlet', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_inlet' AND columnname IN ('node_id','initlevel','minlevel','maxlevel','diameter', 'minvol',
+'curve_id', 'pattern_id', 'overflow', 'head','overflow')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_junction', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pipe' AND columnname IN ('dscenario_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_junction', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_junction' AND columnname IN ('node_id','demand', 'pattern_id', 'peak_factor')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_pump_additional', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pump' AND columnname IN ('dscenario_id','node_id','power', 'curve_id', 'speed',
+'pattern','status')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_pump_additional', 'form_feature', 'main', 'order_id', null, null, 
+'integer', 'text', 'order_id', null, null, false, false, true, false, null, null, null, 
+null, null, null, null, '{"setMultiline":false}', null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_pump_additional', 'form_feature', 'main', 'overflow', null, null, 
+'string', 'text', 'overflow', null, null, false, false, true, false, null, null, null, 
+null, null, null, null, '{"setMultiline":false}', null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_valve', 'form_feature', 'main', 'add_settings', null, null, 
+'double', 'text', 'add_settings', null, null, false, false, true, false, null, null, null, 
+null, null, null, null, '{"setMultiline":false}', null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES ('v_edit_inp_dscenario_valve', 'form_feature', 'main', 'add_settings', null, null, 
+'double', 'text', 'add_settings', null, null, false, false, true, false, null, null, null, 
+null, null, null, null, '{"setMultiline":false}', null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_virtualvalve', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_inlet' AND columnname IN ('diameter')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_virtualvalve', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_pipe' AND columnname IN ('dscenario_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_virtualvalve', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_virtualvalve' AND columnname IN ('dscenario_id','arc_id','valv_type', 'pressure', 'diameter',
+'flow','coef_loss', 'curve_id','minorloss','status','diameter' )
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET dv_isnullvalue= true WHERE widgettype='combo' AND formname ILIKE 'v_edit_inp_dscenario_inp%';
+
+UPDATE sys_param_user SET datatype='integer', vdefault = '40' where id IN ('inp_options_trials', 'inp_options_unbalanced_n');
+UPDATE config_param_user SET value = cast(value::numeric as integer) where parameter IN ('inp_options_trials', 'inp_options_unbalanced_n');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_reservoir', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_dscenario_reservoir' AND columnname IN ('head')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_tank', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_tank' AND columnname IN ('overflow')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_curve', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_cat_dscenario' AND columnname IN ('log')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_pattern', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_cat_dscenario' AND columnname IN ('log')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_shortpipe', formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_pipe' AND columnname IN ('dma_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+DELETE FROM config_form_fields WHERE formname='v_edit_inp_junction' AND columnname='expl_id';
+DELETE FROM config_form_fields WHERE formname='v_edit_inp_dscenario_demand' AND columnname='id';
+
+--2022/01/17
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Roughness catalog' , orderby=1 WHERE id ='cat_mat_roughness';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve catalog' , orderby=2 WHERE id ='v_edit_inp_curve';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Curve' , orderby=3 WHERE id ='v_edit_inp_curve_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Patterns catalog' , orderby=4 WHERE id ='v_edit_inp_pattern';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Pattern' , orderby=5 WHERE id ='v_edit_inp_pattern_value';
+UPDATE sys_table SET context = '{"level_1":"EPA","level_2":"CATALOGS"}' , alias = 'Dscenario catalog' , orderby=6 WHERE id ='v_edit_cat_dscenario';
+
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Reservoir', orderby=1 where id='v_edit_inp_reservoir';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Tank', orderby=2 where id='v_edit_inp_tank';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Inlet', orderby=3 where id='v_edit_inp_inlet';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Junction', orderby=4 where id='v_edit_inp_junction';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Shortpipe', orderby=5 where id='v_edit_inp_shortpipe';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Valve', orderby=6 where id='v_edit_inp_valve';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Pump', orderby=7 where id='v_edit_inp_pump';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Connec', orderby=8 where id='v_edit_inp_connec';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Pipe', orderby=9 where id='v_edit_inp_pipe';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Inp Virtualvalve', orderby=10 where id='v_edit_inp_virtualvalve';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Pump Additional', orderby=11 where id='inp_pump_additional';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Controls', orderby=12 where id='v_edit_inp_controls';
+update sys_table set context = '{"level_1":"EPA","level_2":"HYDRAULICS"}', alias='Rules', orderby=13 where id='v_edit_inp_rules';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Demand Dscenario', orderby=1 where id='v_edit_inp_dscenario_demand';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Pipe Dscenario', orderby=2 where id='v_edit_inp_dscenario_pipe';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Pump Dscenario', orderby=3 where id='v_edit_inp_dscenario_pump';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Reservoir Dscenario', orderby=4 where id='v_edit_inp_dscenario_reservoir';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Shortpipe Dscenario', orderby=5 where id='v_edit_inp_dscenario_shortpipe';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Tank Dscenario', orderby=6 where id='v_edit_inp_dscenario_tank';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"DSCENARIO"}', alias='Valve Dscenario', orderby=7 where id='v_edit_inp_dscenario_valve';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Hourly Values', orderby=1 where id='v_rpt_node_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node Maximum Values', orderby=2 where id='v_rpt_node';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Node All Values', orderby=3 where id='v_rpt_node_all';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Hourly Values', orderby=4 where id='v_rpt_arc_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc Maximum Values', orderby=5 where id='v_rpt_arc';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"RESULTS"}', alias='Arc All Values', orderby=6 where id='v_rpt_arc_all';
+
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Hourly Values Compare', orderby=1 where id='v_rpt_comp_node_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Node Maximum Values Compare', orderby=2 where id='v_rpt_comp_node';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Arc Hourly Values Compare', orderby=3 where id='v_rpt_comp_arc_hourly';
+UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Arc Maximum Values Compare', orderby=4 where id='v_rpt_comp_arc';
+

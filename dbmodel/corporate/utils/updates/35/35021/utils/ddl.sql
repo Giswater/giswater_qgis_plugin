@@ -8,4 +8,20 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO sys_table VALUES ('district', 'Districts on municipality', 'role_admin', 0);
+CREATE TABLE sys_table
+(
+  id text NOT NULL,
+  descript text,
+  sys_role character varying(30),
+  sys_criticity smallint,
+  qgis_toc character varying(30),
+  qgis_criticity smallint,
+  qgis_message text,
+  sys_sequence text,
+  sys_sequence_field text,
+  notify_action json,
+  isaudit boolean,
+  keepauditdays integer,
+  source text,
+  CONSTRAINT sys_table_pkey PRIMARY KEY (id)
+);

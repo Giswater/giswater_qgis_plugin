@@ -95,7 +95,7 @@ BEGIN
 			END IF;
 		
 			UPDATE inp_virtual 
-			SET  to_arc=NEW.to_arc, fusion_node=NEW.fusion_node, add_length=NEW.add_length
+			SET fusion_node=NEW.fusion_node, add_length=NEW.add_length
 			WHERE arc_id=OLD.arc_id;
 		END IF;
 		

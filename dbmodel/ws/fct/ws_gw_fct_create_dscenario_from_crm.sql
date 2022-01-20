@@ -66,6 +66,9 @@ BEGIN
 	-- getting system values
 	v_crm_name := (SELECT code FROM ext_cat_period WHERE id  = v_period);
 	v_periodseconds := (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period);
+	IF v_periodseconds IS NULL THEN
+		SELECT value::integer INTO v_periodseconds FROM config_param_system WHERE parameter = 'admin_crm_periodseconds_vdefault';
+	END IF;
 	
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
@@ -101,11 +104,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 		
-	ELSIF v_periodseconds IS NULL THEN
-		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
-	ELSE 
+	ELSE
+		IF (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period) IS NULL THEN
+			SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+			VALUES (v_fid, null, 2, concat('WARNING: The period has not data on period_seconds columns. The system default value have been used ( ',v_periodseconds,' ) '));
+		END IF;
 
 		-- this factor is calculated assuming period value is on M3
 		v_factor = 1000*(SELECT value::json->>v_demandunits FROM config_param_system WHERE parameter = 'epa_units_factor')::float/v_periodseconds::float;		
@@ -125,7 +129,7 @@ BEGIN
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
-		JOIN v_edit_connec c ON c.connec_id = hc.connec_id
+		JOIN connec c ON c.connec_id = hc.connec_id
 		WHERE cat_period_id  = v_period AND c.expl_id = v_expl
 		order by 2;
 

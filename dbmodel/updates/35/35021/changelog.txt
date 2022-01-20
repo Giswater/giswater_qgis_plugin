@@ -5,6 +5,16 @@
 - New column parent_id for sector
 - Enhance the way of getting node_type when is NULL (UD)
 - Upgrade to EPANET 2.2
+- Upgrade to SWMM 5.1015
 - Refactor how demands are used for EPANET
 - Refactor how CRM is used on EPANET
 - Improve the write inp file creating ';xxxx' valous additional info to trace and debug
+- New column expl_id for catalogs of hydrololgy, dwf_scenario, dscenario and rpt_cat_result
+- New edit filtered views for catalogs of hydrololgy, dwf_scenario, dscenario
+- New column isaudit on sys_fprocess to config which fid's are auditable or not
+- New column fprocess_type on sys_fprocess to categorize processes
+- Refactor of pavcat_id strategy. From independent table to arc (and related views)
+- Improve the management of undefined (0) sector. Enable on filter selector, force disable on go2epa
+- Force selector for whole user on same cat_manager when new sector is created
+- New function gw_fct_setchangefeaturetype
+- Enhance performance for getinfoplan function and minor refactor for plan (connec and gullies)

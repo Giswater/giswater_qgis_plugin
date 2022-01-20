@@ -11,38 +11,38 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_arc_insp
+  ON ve_visit_arc_insp
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('arc');
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent('arc');
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_connec_insp
+  ON ve_visit_connec_insp
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('connec');
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent('connec');
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_node_insp
+  ON ve_visit_node_insp
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('node');
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent('node');
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_noinfra
+  ON ve_visit_noinfra
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent();
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent();
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_gully_insp
+  ON ve_visit_gully_insp
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('gully');
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent('gully');
 
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_arc_rehabit
+  ON ve_visit_arc_rehabit
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('arc');
+  EXECUTE PROCEDURE gw_trg_om_visit_multievent('arc');
   
 UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';

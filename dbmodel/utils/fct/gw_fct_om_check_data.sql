@@ -1028,20 +1028,20 @@ BEGIN
 	RAISE NOTICE '36- Check category_type values which do not exists on man_type table (421)';
 	IF v_project_type = 'WS' THEN
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL)a;
 	ELSE
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, category_type FROM gully WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+		SELECT 'GULLY', gully_id, category_type FROM gully WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL)a;
 	END IF;
 
 	IF v_count > 0 THEN
@@ -1055,25 +1055,25 @@ BEGIN
 	RAISE NOTICE '37- Check function_type values which do not exists on man_type table (422)';
 	IF v_project_type = 'WS' THEN
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, category_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL)a;
 	ELSE
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, function_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, function_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, function_type FROM gully WHERE function_type NOT IN (SELECT function_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+		SELECT 'GULLY', gully_id, function_type FROM gully WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL)a;
 	END IF;
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-		VALUES (125, 3, '422', concat('ERROR-422: There is/are ',v_count,' features with function_type does not exists on man_type_category table.'),v_count);
+		VALUES (125, 3, '422', concat('ERROR-422: There is/are ',v_count,' features with function_type does not exists on man_type_function table.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
 		VALUES (125, 1, '422','INFO: All features has function_type informed on man_type_function table',v_count);
@@ -1083,68 +1083,68 @@ BEGIN
 	RAISE NOTICE '38- Check fluid_type values which do not exists on man_type table (423)';
 	IF v_project_type = 'WS' THEN
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL)a;
 	ELSE
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, fluid_type FROM gully WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+		SELECT 'GULLY', gully_id, fluid_type FROM gully WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL)a;
 	END IF;
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-		VALUES (125, 3, '423', concat('ERROR-423: There is/are ',v_count,' features with fluid_type does not exists on man_type_category table.'),v_count);
+		VALUES (125, 3, '423', concat('ERROR-423: There is/are ',v_count,' features with fluid_type does not exists on man_type_fluid table.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
-		VALUES (125, 1, '423','INFO: All features has fluid_type informed on fluid_type_category table',v_count);
+		VALUES (125, 1, '423','INFO: All features has fluid_type informed on man_type_fluid table',v_count);
 	END IF;
 
 	RAISE NOTICE '39- Check location_type values which do not exists on man_type table (424)';
 	IF v_project_type = 'WS' THEN
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL))a;
+		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL)a;
 	ELSE
 		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL)
+		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL)
+		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL)
+		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, location_type FROM gully WHERE location_type NOT IN (SELECT location_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL))a;
+		SELECT 'GULLY', gully_id, location_type FROM gully WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL)a;
 	END IF;
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-		VALUES (125, 3, '424', concat('ERROR-424: There is/are ',v_count,' features with location_type does not exists on man_type_category table.'),v_count);
+		VALUES (125, 3, '424', concat('ERROR-424: There is/are ',v_count,' features with location_type does not exists on man_type_location table.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
 		VALUES (125, 1, '424','INFO: All features has location_type informed on man_type_location table',v_count);
 	END IF;
 
-	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (429)';
+	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (428)';
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter ='admin_raster_dem') IS true THEN
 		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
-			SELECT 125, 2, '429', 
-			concat('WARNING-429: There is/are ',v_count,' exploitation(s) without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: ',string_agg(name,', ')),v_count 
+			SELECT 125, 2, '428', 
+			concat('WARNING-428: There is/are ',v_count,' exploitation(s) without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: ',string_agg(name,', ')),v_count 
 			FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
-			VALUES (125, 1, '429','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
+			VALUES (125, 1, '428','INFO: Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.',v_count);
 		END IF;
 	END IF;
 

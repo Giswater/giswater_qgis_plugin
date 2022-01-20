@@ -21,7 +21,7 @@ v_networkmode integer;
 v_querytext text;
     
 BEGIN
-
+ 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 	

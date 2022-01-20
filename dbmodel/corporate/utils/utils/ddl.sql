@@ -37,15 +37,6 @@ CREATE TABLE address
   CONSTRAINT address_pkey PRIMARY KEY (id))
 ;
 
-GRANT SELECT ON TABLE address TO role_basic;
-GRANT ALL ON TABLE address TO role_edit;
-GRANT SELECT ON TABLE address TO role_om;
-GRANT SELECT ON TABLE address TO role_epa;
-GRANT SELECT ON TABLE address TO role_master;
-GRANT SELECT ON TABLE address TO role_admin;
-GRANT ALL ON TABLE address TO postgres;
-
-
 
 CREATE TABLE streetaxis
 (
@@ -61,15 +52,6 @@ CREATE TABLE streetaxis
   CONSTRAINT streetaxis_pkey PRIMARY KEY (id))
 ;
 
-GRANT SELECT ON TABLE streetaxis TO role_basic;
-GRANT ALL ON TABLE streetaxis TO role_edit;
-GRANT SELECT ON TABLE streetaxis TO role_om;
-GRANT SELECT ON TABLE streetaxis TO role_epa;
-GRANT SELECT ON TABLE streetaxis TO role_master;
-GRANT SELECT ON TABLE streetaxis TO role_admin;
-GRANT ALL ON TABLE streetaxis TO postgres;
-
-
 
 
 CREATE TABLE municipality
@@ -80,15 +62,6 @@ CREATE TABLE municipality
   the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT municipality_pkey PRIMARY KEY (muni_id)
 );
-
-
-GRANT ALL ON TABLE municipality TO postgres;
-GRANT SELECT ON TABLE municipality TO role_basic;
-GRANT ALL ON TABLE municipality TO role_edit;
-GRANT SELECT ON TABLE municipality TO role_om;
-GRANT SELECT ON TABLE municipality TO role_epa;
-GRANT SELECT ON TABLE municipality TO role_master;
-GRANT SELECT ON TABLE municipality TO role_admin;
 
 
 
@@ -111,15 +84,6 @@ CREATE TABLE plot
   CONSTRAINT plot_pkey PRIMARY KEY (id)
 );
 
-GRANT SELECT ON TABLE plot TO role_basic;
-GRANT ALL ON TABLE plot TO role_edit;
-GRANT SELECT ON TABLE plot TO role_om;
-GRANT SELECT ON TABLE plot TO role_epa;
-GRANT SELECT ON TABLE plot TO role_master;
-GRANT SELECT ON TABLE plot TO role_admin;
-GRANT ALL ON TABLE plot TO postgres;
-
-
 
 
 
@@ -129,14 +93,6 @@ CREATE TABLE type_street
   observ character varying(50),
   CONSTRAINT type_street_pkey PRIMARY KEY (id)
 );
-
-GRANT ALL ON TABLE type_street TO postgres;
-GRANT SELECT ON TABLE type_street TO role_basic;
-GRANT ALL ON TABLE type_street TO role_edit;
-GRANT SELECT ON TABLE type_street TO role_om;
-GRANT SELECT ON TABLE type_street TO role_epa;
-GRANT SELECT ON TABLE type_street TO role_master;
-GRANT SELECT ON TABLE type_street TO role_admin;
 
 
 

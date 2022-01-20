@@ -9,28 +9,24 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_fill_doc_tables()
   RETURNS void AS
-$BODY$DECLARE
-
- rec_doc    record;
- rec_node   record;
- rec_arc   record;
- rec_connec   record;
- rec_gully   record;
-
+$BODY$
+DECLARE
+rec_doc	record;
+rec_node record;
+rec_arc record;
+rec_connec record;
+rec_gully record;
 
 BEGIN
 
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-
-    --Delete previous
-    DELETE FROM doc_x_arc;
-    DELETE FROM doc_x_connec;
-    DELETE FROM doc_x_node;
-    DELETE FROM doc_x_gully;
-    
-      
+	--Delete previous
+	DELETE FROM doc_x_arc;
+	DELETE FROM doc_x_connec;
+	DELETE FROM doc_x_node;
+	DELETE FROM doc_x_gully;
 
         --doc
         FOR rec_doc IN SELECT * FROM doc
@@ -54,18 +50,14 @@ BEGIN
             INSERT INTO doc_x_node (doc_id, node_id) VALUES(rec_doc.id, rec_node.node_id);
             END LOOP;
 
-
             --Insert gully
             FOR rec_gully IN SELECT * FROM gully
             LOOP
             INSERT INTO doc_x_gully (doc_id, gully_id) VALUES(rec_doc.id, rec_gully.gully_id);
-            END LOOP;
-            
+            END LOOP;           
         END LOOP;
 
-
-    RETURN;
-
+	RETURN;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

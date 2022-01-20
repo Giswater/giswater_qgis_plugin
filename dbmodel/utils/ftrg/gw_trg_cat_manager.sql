@@ -16,10 +16,13 @@ DECLARE
  rec_expl integer;
  rec_user text;
  v_new_id integer;
+ v_expl_x_user boolean;
  
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	v_expl_x_user = (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 
 	-- Delete orphan nodes
 	IF (TG_OP = 'INSERT' AND  NEW.username !='{}') THEN
@@ -40,9 +43,13 @@ BEGIN
 		--if username was empty insert config_user_x_expl or combinations for this manager 
 		IF OLD.username ='{}' THEN
 
-			INSERT INTO config_user_x_expl (expl_id, username, manager_id)
-			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+			IF v_expl_x_user IS FALSE THEN
+
+				INSERT INTO config_user_x_expl (expl_id, username, manager_id)
+				SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
+				(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+				
+			END IF;
 
 			INSERT INTO config_user_x_sector (sector_id, username, manager_id)
 			SELECT sector_id, usern, NEW.id  FROM (SELECT unnest(sector_id) sector_id FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
@@ -85,10 +92,14 @@ BEGIN
 			
 		--if user was added insetr new relation into config_user_x_expl
 		ELSIF array_length(NEW.username,1) > array_length(OLD.username,1) THEN
+				
+			IF v_expl_x_user IS FALSE THEN
 		
-			INSERT INTO config_user_x_expl (expl_id, username, manager_id)
-			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+				INSERT INTO config_user_x_expl (expl_id, username, manager_id)
+				SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
+				(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+
+			END IF;
 
 			INSERT INTO config_user_x_sector (sector_id, username, manager_id)
 			SELECT sector_id, usern, NEW.id  FROM (SELECT unnest(sector_id) sector_id FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
@@ -117,9 +128,14 @@ BEGIN
 		
 		--if exploitation was added insert new posible relations into config_user_x_expl
 		ELSIF array_length(NEW.expl_id,1) > array_length(OLD.expl_id,1) OR OLD.expl_id IS NULL THEN 
-			INSERT INTO config_user_x_expl (expl_id, username, manager_id)
-			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+
+			IF v_expl_x_user IS FALSE THEN
+		
+				INSERT INTO config_user_x_expl (expl_id, username, manager_id)
+				SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
+				(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
+			END IF;
+			
 		END IF;
 
 		--if the sector was removed from the cat_manager, replace assignation if exists the same relation user - expl for another manager
@@ -144,9 +160,10 @@ BEGIN
 		
 		--if sector was added insert new posible relations into config_user_x_sector
 		ELSIF array_length(NEW.sector_id,1) > array_length(OLD.sector_id,1) OR OLD.sector_id IS NULL THEN 
-			INSERT INTO config_user_x_sector (sector_id, username, manager_id)
-			SELECT sector, usern, NEW.id  FROM (SELECT unnest(sector_id) sector FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (sector_id,username) DO NOTHING;
+
+				INSERT INTO config_user_x_sector (sector_id, username, manager_id)
+				SELECT sector, usern, NEW.id  FROM (SELECT unnest(sector_id) sector FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
+				(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (sector_id,username) DO NOTHING;
 		END IF;
 
 		RETURN NEW;

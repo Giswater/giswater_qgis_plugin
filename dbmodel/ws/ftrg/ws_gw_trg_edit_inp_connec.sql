@@ -48,7 +48,8 @@ BEGIN
 		END IF;
 
 		UPDATE inp_connec 
-			SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint
+			SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint,
+			status = NEW.status, minorloss = NEW.minorloss
 			WHERE connec_id=OLD.connec_id;
 	   
 		IF (OLD.elevation::TEXT!=NEW.elevation::TEXT) or (OLD.depth::TEXT!=NEW.depth::TEXT) OR (OLD.connecat_id!=NEW.connecat_id) OR (OLD.annotation!=NEW.annotation) or(OLD.epa_type != NEW.epa_type) THEN
@@ -57,7 +58,7 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 		END IF;
 
-		IF NEW.arc_id != OLD.arc_id THEN
+		IF quote_nullable(NEW.arc_id) != quote_nullable(OLD.arc_id) THEN
 			UPDATE v_edit_connec SET arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 		END IF;

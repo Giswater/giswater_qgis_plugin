@@ -43,7 +43,6 @@ v_error_context text;
 v_fid integer;
 v_nodetolerance float;
 v_minlength float = 0;
-v_queryext text;
 
 BEGIN
 
@@ -95,7 +94,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 107, node_id, nodecat_id, ''Orphan node'',
 		the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107 (anl_node): There is/are ',v_count,' node''s orphan. Giswater filters may prevent export, if they are JUNCTION will be disabled on the exportation.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107 (anl_node): There is/are ',v_count,' node''s orphan. If they are JUNCTIONS, on the exportation will be removed.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'107', 'INFO: No node(s) orphan found.',v_count);
@@ -433,9 +432,9 @@ BEGIN
 
 	RAISE NOTICE '19 - Check flow regulator length fits on destination arc (427)';
 
-	v_queryext = 'SELECT 427, arc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_orifice f, selector_sector s 
+	v_querytext = 'SELECT 427, nodarc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_orifice f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
-			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -451,9 +450,9 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All orifice flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_weir f, selector_sector s 
+	v_querytext = 'SELECT 427, nodarc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_weir f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
-			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -469,9 +468,10 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All weir flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_outlet f, selector_sector s 
+	v_querytext = 'SELECT 427, nodarc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_pump f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
-			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
+
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -487,9 +487,9 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlet flow regulators has lengh wich fits target arc.', v_count);
 	END IF;	
 
-	v_queryext = 'SELECT 427, arc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', the_geom FROM inp_flwreg_pump f, selector_sector s 
+	v_querytext = 'SELECT 427, nodarc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_outlet f
 			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
-			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' < st_length(a.the_geom)';
+			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 

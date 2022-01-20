@@ -25,8 +25,6 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
-UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
-	
 TRUNCATE plan_psector_x_arc;
 INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL);
@@ -480,3 +478,14 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'e
 
 UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'autoRepair', 'true'::boolean) WHERE parameter = 'inp_options_debug';
 UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'autoRepair', 'true'::boolean) WHERE id = 'inp_options_debug';
+
+UPDATE inp_flwreg_orifice SET nodarc_id = concat(node_id,'OR',order_id);
+UPDATE inp_flwreg_weir SET nodarc_id = concat(node_id,'WE',order_id);
+UPDATE inp_flwreg_outlet SET nodarc_id = concat(node_id,'OT',order_id);
+UPDATE inp_flwreg_pump SET nodarc_id = concat(node_id,'PU',order_id);
+
+UPDATE inp_flwreg_pump SET to_arc = '18966' WHERE node_id = '18828';
+
+UPDATE arc SET pavcat_id = 'Asphalt';
+
+UPDATE cat_arc SET connect_cost = 'N_CONNECTION';

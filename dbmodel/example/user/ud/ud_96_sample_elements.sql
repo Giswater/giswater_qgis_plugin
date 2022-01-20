@@ -6,30 +6,22 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-ALTER TABLE arc DISABLE TRIGGER gw_trg_notify;
 ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk;
 
 ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 ALTER TABLE connec DISABLE TRIGGER gw_trg_unique_field;
 ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE connec DISABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 ALTER TABLE node DISABLE TRIGGER gw_trg_node_statecontrol;
 ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
 ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE node DISABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE gully DISABLE TRIGGER gw_trg_gully_proximity_insert;
 ALTER TABLE gully DISABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE gully DISABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE link DISABLE TRIGGER gw_trg_link_connecrotation_update;
-ALTER TABLE link DISABLE TRIGGER gw_trg_notify;
-
-
-
 
 INSERT INTO polygon (pol_id, sys_type, text, the_geom, undelete, tstamp, featurecat_id, feature_id) VALUES ('20571', 'GULLY', NULL, '0106000020E76400000100000001030000000100000005000000B2560105618B19411A41BEB09776514195FA89CD9B8B19411B1A0BEA97765141D797D7FB9B8B1941550A6CC49776514100AD913C618B1941C4058B8A97765141B2560105618B19411A41BEB097765141', NULL, '2018-01-31 16:38:51.261241', 'GULLY', '50030');
 INSERT INTO polygon (pol_id, sys_type, text, the_geom, undelete, tstamp, featurecat_id, feature_id) VALUES ('58659', 'STORAGE', NULL, '0106000020E7640000010000000103000000010000000500000038483C72859C1941F22FC97334755141B2CF896D8B9C1941F097C40F35755141D5EC15E9989C1941F9F31B8A34755141882930F5929C1941E67032E83375514138483C72859C1941F22FC97334755141', NULL, '2017-12-30 14:08:12.080475','STORAGE', '238');
@@ -10396,24 +10388,19 @@ INSERT INTO man_wjump (node_id, length, width, sander_depth, prot_surface, acces
 
 INSERT INTO man_wwtp (node_id) VALUES ('236');
 
-ALTER TABLE arc ENABLE TRIGGER gw_trg_notify;
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk;
 
 ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 ALTER TABLE connec ENABLE TRIGGER gw_trg_unique_field;
 ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE connec ENABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 ALTER TABLE node ENABLE TRIGGER gw_trg_node_statecontrol;
 ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
 ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE node ENABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE gully ENABLE TRIGGER gw_trg_gully_proximity_insert;
 ALTER TABLE gully ENABLE TRIGGER gw_trg_typevalue_fk;
-ALTER TABLE gully ENABLE TRIGGER gw_trg_notify;
 
 ALTER TABLE link ENABLE TRIGGER gw_trg_link_connecrotation_update;
-ALTER TABLE link ENABLE TRIGGER gw_trg_notify;

@@ -175,8 +175,8 @@ INSERT INTO cat_owner VALUES ('owner3');
 
 
 INSERT INTO cat_pavement VALUES ('Asphalt', NULL, NULL,'0.10','P_ASPHALT-10');
-INSERT INTO cat_pavement VALUES ('pavement1', NULL, NULL,'0.12','P_ASPHALT-10');
-INSERT INTO cat_pavement VALUES ('pavement2', NULL, NULL,'0.08','P_ASPHALT-10');
+INSERT INTO cat_pavement VALUES ('Slab', NULL, NULL,'0.12','P_SLAB-4P');
+INSERT INTO cat_pavement VALUES ('Concrete', NULL, NULL,'0.08','P_CONCRETE-20');
 
 
 INSERT INTO cat_soil VALUES ('soil1', 'soil 1', NULL, 7.00, 0.25, 0.60, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');

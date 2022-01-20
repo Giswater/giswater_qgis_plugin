@@ -507,7 +507,7 @@ BEGIN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
-		concat('Total length (Km) : ',v_sumlength,'.'));
+		concat('Total length (Km) : ',coalesce(v_sumlength,0::numeric),'.'));
 		
 		IF v_linkoffsets  = 'ELEVATION' THEN
 			SELECT min(((elevmax1-elevmax2)/length)::numeric(12,4)), max(((elevmax1-elevmax2)/length)::numeric(12,4)) 
@@ -540,7 +540,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 
-		v_networkstats = concat('{"Total length (Km) ":',v_sumlength,'}');
+		v_networkstats = concat('{"Total length (Km) ":',coalesce(v_sumlength,0::numeric),'}');
 	END IF;
 
 	UPDATE rpt_cat_result SET network_stats = v_networkstats WHERE result_id = v_result_id;

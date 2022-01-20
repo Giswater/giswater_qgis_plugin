@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test1","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
 -- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
@@ -114,8 +114,8 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (159, 297, 413, 415) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (297) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (159, 297, 396, 413, 415) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (297, 373, 396) AND cur_user=current_user;
 
 	-- get user parameters
 	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
@@ -254,7 +254,6 @@ BEGIN
 		RAISE NOTICE '4 - Check for network mode';
 		IF v_networkmode = 4 THEN
 		
-
 			RAISE NOTICE '4.1- Epa connecs over epa node (413)';
 			v_querytext = 'SELECT * FROM (
 				SELECT DISTINCT t2.connec_id, t2.connecat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
@@ -375,17 +374,27 @@ BEGIN
 	RAISE NOTICE '8 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 	
-		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve"]'::json) as tabname, 
-					 json_array_elements_text('["node", "node"     , "arc" , "node" , "node"]'::json) as colname
+		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve", "virtualvalve", "connec", "inlet", "junction"]'::json) as tabname, 
+					 json_array_elements_text('["node", "node" , "arc" , "node" , "node", "arc", "connec", "node", "node"]'::json) as colname
 		LOOP
 
 			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-			ELSE
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
+
+				IF object_rec.colname IN ('arc', 'node') THEN
+				
+					EXECUTE 'INSERT INTO anl_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
+					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||' JOIN '||
+					object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP BY '||object_rec.colname||'_id, the_geom  having count(arc_id) > 1';
+
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+				ELSE
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+				END IF;
 			END IF;
 		END LOOP;
 	ELSE
@@ -531,6 +540,8 @@ BEGIN
 		      SELECT node_id, fid, 'ERROR-290: Duplicated node. Maybe topological jump problem (0-1-2)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 290
 			UNION
 		      SELECT node_id, fid, 'ERROR-297: Node UNDEFINED as node_1 or node_2', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 297
+		        UNION
+		      SELECT node_id, fid, 'ERROR-396: EPA Node used on more than one scenario', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 396
 			UNION
 		      SELECT node_id, fid, 'ERROR-413: EPA connec over EPA node', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 413
 			UNION
@@ -563,6 +574,8 @@ BEGIN
 			(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid = 232 EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=404
 			EXCEPT SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=139) a USING (arc_id)
 			WHERE cur_user="current_user"() AND fid =232
+			UNION
+			SELECT arc_id as id, fid, 'ERROR-396: Link over nodarc'::text as descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid=396
 		     ) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
@@ -575,7 +588,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
-
+	
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||
@@ -587,9 +600,9 @@ BEGIN
 		'}')::json, 2848, null, null, null);
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

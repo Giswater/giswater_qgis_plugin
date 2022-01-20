@@ -20,6 +20,9 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$) -- ANALYZE GRAF
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$) -- CREATE JSON
 
+SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
+
+
 -- fid: 227
 
 */
@@ -42,6 +45,9 @@ v_response text;
 v_message text;
 v_step integer=0;
 v_autorepair boolean;
+v_expl integer = null;
+v_sector_0 boolean = false;
+
 
 
 BEGIN
@@ -62,7 +68,10 @@ BEGIN
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-
+	IF (SELECT count(expl_id) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
+		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+	END IF;
+	
 	IF v_step=3 THEN
 
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
@@ -95,6 +104,12 @@ BEGIN
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+	
+	-- force only sector =0 disabled
+	IF (SELECT count(*) FROM selector_sector WHERE sector_id = 0 and cur_user = current_user ) = 1 THEN
+		v_sector_0 = true;
+	END IF;
+	DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
 
 	-- setting variables
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
@@ -109,7 +124,7 @@ BEGIN
 
 	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
 	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id, inp_options, status) VALUES (v_result, v_inpoptions, 1);
+	INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
@@ -128,12 +143,9 @@ BEGIN
 	PERFORM gw_fct_pg2epa_manage_varc(v_result);
 	
 	RAISE NOTICE '5 - Call nod2arc function';
-	PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
+	PERFORM gw_fct_pg2epa_nod2arc(v_result);
 	
-	RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
-	PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
-
-	RAISE NOTICE '8 - Trim arcs';
+	RAISE NOTICE '6 - Trim arcs';
 	IF v_networkmode = 2 THEN
 		SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
 	END IF;
@@ -169,17 +181,23 @@ BEGIN
 	RAISE NOTICE '13 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
-	INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
 	SELECT
-	result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+	result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
 	FROM temp_arc;
-	INSERT INTO rpt_inp_node (result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id,
+	
+	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
 	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
-	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
+	SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 	FROM temp_node;
+	
+	-- recover sector 0 (if exists previously)
+	IF v_sector_0 = true THEN
+		INSERT INTO selector_sector VALUES (0,current_user);
+	END IF;
 	
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN

@@ -45,6 +45,7 @@ v_featuretype text;
 v_table text;
 v_columns text;
 v_queryfilter text;
+v_expl integer;
 
 BEGIN
 
@@ -57,6 +58,8 @@ BEGIN
 	-- parameters of action CREATE
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
+	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
+	
 	v_id :=  ((p_data ->>'feature')::json->>'id');
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_tablename :=  ((p_data ->>'feature')::json->>'tableName')::text;
@@ -73,11 +76,6 @@ BEGIN
 	-- create log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario type "DEMAND" with name ''',v_name, ''' have been created.'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Feature type: ',v_featuretype));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selection mode: ',v_selectionmode));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
@@ -89,17 +87,26 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	INSERT INTO cat_dscenario (name, descript,  log) VALUES (v_name, v_descript,  concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
-	RETURNING dscenario_id INTO v_scenarioid ;
+	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
-	RAISE NOTICE 'v_scenarioid %', v_scenarioid;
+	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log) 
+	VALUES ( v_name, v_descript, 'DEMAND', v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
+	RETURNING dscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
 
+		-- insert process
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario ',v_name,' have been created with id:',v_scenarioid,'.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Feature type: ',v_featuretype));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Exploitation: ',v_expl));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selection mode: ',v_selectionmode));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
+		
 		-- queryfilter
 		IF v_selectionmode = 'previousSelection' THEN
 			v_queryfilter = ' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id||' AND demand is not null';
@@ -107,10 +114,9 @@ BEGIN
 			v_queryfilter = ' WHERE demand is not null';
 		END IF;	
 
-		-- insert process
 		IF v_tablename = 'v_edit_inp_junction' THEN
 			v_querytext =  'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
-					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id, concat(''NODE '',node_id) FROM v_edit_inp_junction '||v_queryfilter||;
+					SELECT '|| v_scenarioid||', node_id, ''NODE'', demand, pattern_id, concat(''NODE '',node_id) FROM v_edit_inp_junction '||v_queryfilter;
 
 		ELSIF v_tablename = 'v_edit_inp_connec' THEN		
 			v_querytext = 'INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, source) 
@@ -124,7 +130,7 @@ BEGIN
 		-- log
 		GET DIAGNOSTICS v_count = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with features have been inserted on table ', v_table,'.'));
+		VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' rows with features have been inserted on table ', v_table,'.'));
 		
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;

@@ -27,12 +27,12 @@ BEGIN
 			END IF;
 			
 		IF psector_type_aux='plan' THEN
-			INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, descript)
-			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.descript);
+			INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
+			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
 			
 		ELSIF psector_type_aux='om' THEN
-			INSERT INTO om_psector_x_other (price_id, measurement, psector_id, descript)
-			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.descript);	
+			INSERT INTO om_psector_x_other (price_id, measurement, psector_id, observ)
+			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
 			
 		END IF;
 		
@@ -42,12 +42,12 @@ BEGIN
 	
 		IF psector_type_aux='plan' THEN
 			UPDATE plan_psector_x_other
-			SET measurement=NEW.measurement, descript=NEW.descript
+			SET measurement=NEW.measurement, observ=NEW.observ
 			WHERE id=OLD.id;
 			
 		ELSIF psector_type_aux='om' THEN
 			UPDATE om_psector_x_other
-			SET measurement=NEW.measurement, descript=NEW.descript
+			SET measurement=NEW.measurement, observ=NEW.observ
 			WHERE id=OLD.id;	
 			
 		END IF;

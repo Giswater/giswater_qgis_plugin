@@ -51,6 +51,9 @@ v_ang210 float;
 v_ang120 float;
 v_ymax json;
 v_version text;
+v_project text;
+v_depth1 float;
+v_depth2 float;
 
 p_x float;
 p_y float;
@@ -84,17 +87,24 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
-	SELECT  giswater INTO v_version FROM sys_version order by id desc limit 1;
+	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
 	SELECT value INTO v_value FROM config_param_user WHERE parameter = 'edit_node_interpolate' AND cur_user = current_user;
 	v_srid = (SELECT epsg FROM SCHEMA_NAME.sys_version limit 1);
 
-	v_top_status := (v_value->>'topElev')::json->>'status';
-	v_elev_status := (v_value->>'elev')::json->>'status';
-	v_ymax_status := (v_value->>'ymax')::json->>'status';
-	
-	v_col_top = (v_value->>'topElev')::json->>'column';
-	v_col_ymax = (v_value->>'ymax')::json->>'column';
-	v_col_elev = (v_value->>'elev')::json->>'column';
+	IF v_project='UD' THEN
+		v_top_status := (v_value->>'topElev')::json->>'status';
+		v_elev_status := (v_value->>'elev')::json->>'status';
+		v_ymax_status := (v_value->>'ymax')::json->>'status';
+		
+		v_col_top = (v_value->>'topElev')::json->>'column';
+		v_col_ymax = (v_value->>'ymax')::json->>'column';
+		v_col_elev = (v_value->>'elev')::json->>'column';
+	ELSE
+		v_top_status := (v_value->>'elevation')::json->>'status';
+		v_ymax_status := (v_value->>'depth')::json->>'status';
+		v_col_top = (v_value->>'elevation')::json->>'column';
+		v_col_ymax = (v_value->>'depth')::json->>'column';
+	END IF;
 
 	-- get parameters
 	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
@@ -117,19 +127,36 @@ BEGIN
 
 	-- Get node1 system values
 	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
-	v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
-	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
+	IF v_project='UD' THEN
+		v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
+		v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
+	ELSE
+		v_top1:= (SELECT elevation FROM v_edit_node WHERE node_id=p_node1);
+		v_elev1:= (SELECT elevation - depth FROM v_edit_node WHERE node_id=p_node1);
+		v_depth1:= (SELECT depth FROM v_edit_node WHERE node_id=p_node1);
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - elevation:',v_top1 , ', depth:', v_depth1));
+
+	END IF;
 	
-	INSERT INTO audit_check_data (fid,  criticity, error_message)
-	VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
-	v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
-	v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
+	IF v_project='UD' THEN
+		v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
+		v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', elev:', v_elev2));
+	ELSE
+		v_top2:= (SELECT elevation FROM v_edit_node WHERE node_id=p_node2);
+		v_elev2:= (SELECT elevation - depth FROM v_edit_node WHERE node_id=p_node2);
+		v_depth2:= (SELECT depth FROM v_edit_node WHERE node_id=p_node2);
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (213, 4, concat('System values of node 2 (',p_node1,') - elevation:',v_top2 , ', depth:', v_depth2));
+	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message)
-	VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', elev:', v_elev2));
 
 	-- Calculate distances
 	v_distance01 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -156,22 +183,36 @@ BEGIN
 	END IF;
 
 	-- update values
-	IF v_top_status THEN
-		v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
-	
-	END IF;
-	IF v_ymax_status THEN
-		v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
+	IF v_project='UD' THEN
+
+		IF v_top_status THEN
+			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
 		
-	END IF;
-	IF v_elev_status THEN
-		v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
+		END IF;
+		IF v_ymax_status THEN
+			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
+			
+		END IF;
+		IF v_elev_status THEN
+			v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
+		END IF;
+	ELSE
+		IF v_top_status THEN
+			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elevation:',v_top0::numeric(12,3)::text));
+		END IF;
+
+		IF v_ymax_status THEN
+			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Depth:',(v_top0-v_elev0)::numeric(12,3)::text));
+		END IF;
 	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, 'INFO: To configure columns to set please upsert user variable edit_node_interpolate');
+	INSERT INTO audit_check_data (fid,  criticity, error_message) 
+	VALUES (213, 4, 'INFO: In order to configure columns updated by the process upsert user variable edit_node_interpolate');
 
 	-- get results
 	-- info
@@ -189,7 +230,11 @@ BEGIN
 	v_result_ymax = COALESCE(v_ymax::text,'""');
 	v_result_elev = COALESCE(v_elev::text,'""');
 	
-	v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax, ',"data_',v_col_elev,'":',v_result_elev,'}]');
+	IF v_project='UD' THEN
+		v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax, ',"data_',v_col_elev,'":',v_result_elev,'}]');
+	ELSE
+		v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax,'}]');
+	END IF;
 
 	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');

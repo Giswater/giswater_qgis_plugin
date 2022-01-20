@@ -50,6 +50,8 @@ v_breakpipes boolean;
 v_count integer;
 v_step integer=0;
 v_autorepair boolean;
+v_expl integer = null;
+v_sector_0 boolean = false;
 	
 BEGIN
 
@@ -66,6 +68,9 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	IF (SELECT count(expl_id) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
+		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+	END IF;
 
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 
@@ -106,7 +111,13 @@ BEGIN
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	
+
+	-- force only sector =0 disabled
+	IF (SELECT count(*) FROM selector_sector WHERE sector_id = 0 and cur_user = current_user ) = 1 THEN
+		v_sector_0 = true;
+	END IF;
+	DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
+		
 	-- setting variables
 	IF v_networkmode = 1 THEN 
 		v_onlymandatory_nodarc = TRUE;
@@ -123,7 +134,7 @@ BEGIN
 	
 	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
 	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id, inp_options, status) VALUES (v_result, v_inpoptions, 1);
+	INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
@@ -188,11 +199,11 @@ BEGIN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;
 
-	RAISE NOTICE '14 - Setting dscenarios';
-	PERFORM gw_fct_pg2epa_dscenario(v_result);
-	
-	RAISE NOTICE '15 - Setting valve status';
+	RAISE NOTICE '14 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
+
+	RAISE NOTICE '15 - Setting dscenarios';
+	PERFORM gw_fct_pg2epa_dscenario(v_result);
 		
 	RAISE NOTICE '16 - Advanced settings';
 	IF v_advancedsettings THEN
@@ -258,7 +269,18 @@ BEGIN
 
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
+
+	-- for those elements like filter o flowmeter which they do not have the attribute on the inventory table
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
+	
+	UPDATE temp_node SET dqa_id = 0 WHERE dqa_id IS NULL;
+	UPDATE temp_arc SET dqa_id = 0 WHERE dqa_id IS NULL;
+	
+	UPDATE temp_node SET dma_id = 0 WHERE dma_id IS NULL;
+	UPDATE temp_arc SET dma_id = 0 WHERE dma_id IS NULL;
+	
+	UPDATE temp_node SET presszone_id = 0 WHERE presszone_id IS NULL;
+	UPDATE temp_arc SET presszone_id = 0 WHERE presszone_id IS NULL;
 
 	-- remove pattern when breakPipes is enabled	
 	IF v_breakpipes THEN
@@ -280,6 +302,11 @@ BEGIN
 	status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 	FROM temp_arc;
 
+	-- recover sector 0 (if exists previously)
+	IF v_sector_0 = true THEN
+		INSERT INTO selector_sector VALUES (0,current_user);
+	END IF;
+	
 	RAISE NOTICE '22 - Manage return';
 	IF v_step=1 THEN
 	

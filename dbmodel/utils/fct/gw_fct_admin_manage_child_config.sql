@@ -58,9 +58,13 @@ BEGIN
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-		INSERT INTO sys_table(id, descript, sys_role, sys_criticity, qgis_role, qgis_criticity)
-	    VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0)
-	    ON CONFLICT (id) DO NOTHING;
+		INSERT INTO sys_table(id, descript, sys_role)
+	  VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit')
+	  ON CONFLICT (id) DO NOTHING;
+	  IF (SELECT giswater from sys_version) >'3.5.020' THEN
+			UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), criticity=0, alias = initcap(cf.id)
+	  	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
+	  END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();
 	

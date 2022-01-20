@@ -17,7 +17,7 @@ $BODY$
  /*EXAMPLE
 SELECT audit.gw_fct_audit_checkproject_x_expl($${"client":
 {"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"schemaName":"ws_sample35"}}}$$)::text;
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"schemaName":"SCHEMA_NAME"}}}$$)::text;
 */
 
 
