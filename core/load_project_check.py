@@ -15,7 +15,7 @@ from qgis.core import Qgis
 from .utils import tools_gw
 from .ui.ui_manager import GwProjectCheckUi
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
+from ..lib import tools_qgis, tools_log, tools_qt, tools_os
 
 
 class GwLoadProjectCheck:
@@ -136,51 +136,51 @@ class GwLoadProjectCheck:
                                               'gw_fct_setcheckproject_result', True, False, 0, True,
                                               call_set_tabs_enabled=False)
 
-        if 'missingLayers' in result['body']['data']:
-            critical_level = self._get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'],
-                                                      critical_level)
+        # TODO: Recover key 'missingLayers' to populate tab QGIS project log with Critical and Other layers
+        tools_qt.remove_tab(self.dlg_audit_project.mainTab, "tab_qgis_projlog")
+        # if 'missingLayers' in result['body']['data']:
+            # critical_level = self._get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
 
         tools_qt.hide_void_groupbox(self.dlg_audit_project)
-
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
             tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
 
-    def _get_missing_layers(self, dialog, m_layers, critical_level):
-
-        lyt_critical = dialog.findChild(QGridLayout, "lyt_critical")
-        lyt_others = dialog.findChild(QGridLayout, "lyt_others")
-        for pos, item in enumerate(m_layers):
-            try:
-                if not item:
-                    continue
-                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-                # If it is the case that a layer is necessary for two functions,
-                # and the widget has already been put in another iteration
-                if widget:
-                    continue
-                label = QLabel()
-                label.setObjectName(f"lbl_{item['layer']}")
-                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
-
-                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-                widget = QCheckBox()
-                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.setObjectName(f"{item['layer']}")
-
-                if int(item['criticity']) == 3:
-                    lyt_critical.addWidget(label, pos, 0)
-                    lyt_critical.addWidget(widget, pos, 1)
-                else:
-                    lyt_others.addWidget(label, pos, 0)
-                    lyt_others.addWidget(widget, pos, 1)
-            except KeyError:
-                description = "Key on returned json from ddbb is missed"
-                tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)
-
-        return critical_level
+    # def _get_missing_layers(self, dialog, m_layers, critical_level):
+    #
+    #     lyt_critical = dialog.findChild(QGridLayout, "lyt_critical")
+    #     lyt_others = dialog.findChild(QGridLayout, "lyt_others")
+    #     for pos, item in enumerate(m_layers):
+    #         try:
+    #             if not item:
+    #                 continue
+    #             widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+    #             # If it is the case that a layer is necessary for two functions,
+    #             # and the widget has already been put in another iteration
+    #             if widget:
+    #                 continue
+    #             label = QLabel()
+    #             label.setObjectName(f"lbl_{item['layer']}")
+    #             label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+    #
+    #             critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
+    #             widget = QCheckBox()
+    #             widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    #             widget.setObjectName(f"{item['layer']}")
+    #
+    #             if int(item['criticity']) == 3:
+    #                 lyt_critical.addWidget(label, pos, 0)
+    #                 lyt_critical.addWidget(widget, pos, 1)
+    #             else:
+    #                 lyt_others.addWidget(label, pos, 0)
+    #                 lyt_others.addWidget(widget, pos, 1)
+    #         except KeyError:
+    #             description = "Key on returned json from ddbb is missed"
+    #             tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)
+    #
+    #     return critical_level
 
 
     def _add_selected_layers(self, dialog, m_layers):
