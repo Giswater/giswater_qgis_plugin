@@ -236,6 +236,7 @@ BEGIN
 		END IF;
 	END IF;
 
+/*
 	--Reset the rest of sequences
 	FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
 	LOOP 
@@ -249,6 +250,7 @@ BEGIN
 	v_errortext=concat('Reset all sequences on project data schema.');
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
+*/
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
 	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 	LOOP
