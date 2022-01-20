@@ -169,7 +169,7 @@ BEGIN
 	IF v_sector IS TRUE AND (v_grafclass = 'SECTOR' OR v_grafclass = 'ALL') THEN
 
 		-- check sector.grafconfig values
-		v_querytext = 'SELECT * FROM sector WHERE grafconfig IS NULL and sector_id > 0 AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_sector WHERE grafconfig IS NULL and sector_id > 0 AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -177,7 +177,7 @@ BEGIN
 			VALUES (211, 3, '268', concat('ERROR-268: There is/are ',v_count, ' sectors on sector table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '268', 'INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '268', 'INFO: All sectors has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- check coherence against nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fid:  179)
@@ -220,7 +220,7 @@ BEGIN
 	IF v_dma IS TRUE AND (v_grafclass = 'DMA' OR v_grafclass = 'ALL') THEN
 
 		-- check dma.grafconfig values
-		v_querytext = 'SELECT * FROM dma WHERE grafconfig IS NULL and dma_id > 0  AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_dma WHERE grafconfig IS NULL and dma_id > 0  AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -228,7 +228,7 @@ BEGIN
 			VALUES (211, 3, '269', concat('ERROR-269: There is/are ',v_count, ' dma on dma table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '269','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '269','INFO: All dma has grafconfig values not null.',v_count);
 		END IF;	
 		
 		-- dma : check coherence against nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fid:  180)
@@ -272,7 +272,7 @@ BEGIN
 	IF v_dqa IS TRUE AND (v_grafclass = 'DQA' OR v_grafclass = 'ALL') THEN
 
 		-- check dqa.grafconfig values
-		v_querytext = 'SELECT * FROM dqa WHERE grafconfig IS NULL and dqa_id > 0 AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_dqa WHERE grafconfig IS NULL and dqa_id > 0 AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -280,7 +280,7 @@ BEGIN
 			VALUES (211, 3, '270', concat('ERROR-270: There is/are ',v_count, ' dqa on dqa table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '270','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '270','INFO: All dqa has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- dqa : check coherence against nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fid:  181)
@@ -325,7 +325,7 @@ BEGIN
 	IF v_presszone IS TRUE AND (v_grafclass = 'PRESSZONE' OR v_grafclass = 'ALL') THEN
 
 		-- check presszone.grafconfig values
-		v_querytext = 	'SELECT * FROM presszone WHERE grafconfig IS NULL and presszone_id > 0::text AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_presszone WHERE grafconfig IS NULL and presszone_id > 0::text AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -333,7 +333,7 @@ BEGIN
 			VALUES (211, 4, '271', concat('ERROR-271: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '271','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '271','INFO: All presszones has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- presszone : check coherence against nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fid:  182)
