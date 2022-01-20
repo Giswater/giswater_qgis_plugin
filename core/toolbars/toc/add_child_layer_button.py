@@ -94,7 +94,7 @@ class GwAddChildLayerButton(GwAction):
                 else:
                     the_geom = field['geomField']
                 geom_field = field['tableId']
-                style_id = None
+                style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
 
