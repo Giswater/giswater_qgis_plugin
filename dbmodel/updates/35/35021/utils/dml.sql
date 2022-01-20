@@ -41,7 +41,7 @@ INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY"
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', null, '{"orderBy":7}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"POLYGON"}', null, '{"orderBy":8}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"OTHER"}', null, '{"orderBy":9}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EDIT","level_2":"AUXILIAR"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"AUXILIAR"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"MINCUT"}', null, '{"orderBy":11}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"FLOWTRACE"}', null, '{"orderBy":12}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"VISIT"}', null, '{"orderBy":13}') ON CONFLICT (typevalue, id) DO NOTHING;
@@ -124,9 +124,9 @@ WHERE c2.id = c.id;
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"OTHER"}', alias = 'Dimensioning' , orderby=1  WHERE id='v_edit_dimensions';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"OTHER"}', alias = 'Element' , orderby=2  WHERE id='v_edit_element';
 
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Point' , orderby=1 WHERE id ='v_edit_cad_auxpoint';
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Line' , orderby=2 WHERE id ='v_edit_cad_auxline';
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Cirle' , orderby=3 WHERE id ='v_edit_cad_auxcircle';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Point' , orderby=1 WHERE id ='v_edit_cad_auxpoint';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Line' , orderby=2 WHERE id ='v_edit_cad_auxline';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Cirle' , orderby=3 WHERE id ='v_edit_cad_auxcircle';
 
 
 --OM
