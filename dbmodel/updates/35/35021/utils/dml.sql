@@ -335,3 +335,17 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 return_type, descript, sys_role, sample_query, source)
 VALUES (3128, 'gw_fct_getwidgetprices', 'utils', 'function', 'json', 'json', 'Function to manage price values for psector_other tab', 
 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+
+--2022/01/20
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
+VALUES (437, 'Topocontrol for data migration', 'utils', NULL, 'core',FALSE, 'Function process') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES ('3130', 'gw_fct_admin_manage_migra', 'utils', 'function', 'json', 
+'json', 'Function that disables and enables topo variables for migration purposes', 'role_admin', NULL, 'core') ON CONFLICT (id) DO NOTHING;
+
+delete from config_toolbox where id =3128;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3130, 'Topocontrol for data migration', '{"featureType":[]}', 
+'[{"widgetname":"action", "label":"Topocontrol:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["ENABLE","DISABLE"],"comboNames":["ENABLE","DISABLE"], "selectedId":"ENABLE"}]', NULL, true) 
+ON CONFLICT (id) DO NOTHING;
