@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .task import GwTask
 from ..utils import tools_gw
+from ...lib import tools_log
 
 
 class GwConnectLink(GwTask):
@@ -23,6 +24,7 @@ class GwConnectLink(GwTask):
         super().run()
 
         try:
+            tools_log.log_info(f"Task 'Connect link' execute function 'def _link_selected_features' with parameters: '{self.element_type}', '{self.layer}'")
             result = self._link_selected_features(self.element_type, self.layer)
             self.connect_link_class.cancel_map_tool()
             return result
@@ -33,6 +35,8 @@ class GwConnectLink(GwTask):
 
     def finished(self, result):
         super().finished(result)
+        tools_log.log_info(f"Task 'Connect link' execute function 'def manage_result' from 'connect_link_buttom.py' with parameters: '{self.element_type}', '{self.layer}'")
+
         self.connect_link_class.manage_result(self.json_result, self.layer)
 
 
@@ -54,6 +58,7 @@ class GwConnectLink(GwTask):
             extras = f'"feature_type":"{feature_type.upper()}"'
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
+            tools_log.log_info(f"Task 'Connect link' execute procedure 'gw_fct_setlinktonetwork' with parameters: '{body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
             self.json_result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body,
                                                           aux_conn=self.aux_conn, is_thread=True)
             return True

@@ -10,7 +10,7 @@ example_pump2;1000;1
 example_shape1;0;0;SHAPE;1;Curve description for sector 1
 example_shape1;0.5;0.5
 example_shape1;1;0.2
-example_storage1;0;100;STORAGE;;Curve description for all sectors (because sector_id is null)
+example_storage1;0;100;STORAGE;;Curve description for all sectors (sector_id is null)
 example_storage1;1;100
 example_storage1;2;100
 example_storage1;3;100

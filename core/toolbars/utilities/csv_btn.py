@@ -40,9 +40,13 @@ class GwCSVButton(GwAction):
                                    f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
         tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',
-                                   tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'chk_ignore_header', f"{self.dlg_csv.chk_ignore_header.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_space', f"{self.dlg_csv.rb_space.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_comma', f"{self.dlg_csv.rb_dec_comma.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_period', f"{self.dlg_csv.rb_dec_period.isChecked()}")
+
 
 
     # region private functions
@@ -250,8 +254,15 @@ class GwCSVButton(GwAction):
 
         if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "session") == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
+        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_space', "user", "session") == 'True':
+            self.dlg_csv.rb_space.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
+
+        if tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_comma', "user", "session") == 'True':
+            self.dlg_csv.rb_dec_comma.setChecked(True)
+        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_period', "user", "session") == 'True':
+            self.dlg_csv.rb_dec_period.setChecked(True)
 
 
     def _validate_params(self, dialog):

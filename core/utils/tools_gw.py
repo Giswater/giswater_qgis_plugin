@@ -505,7 +505,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1"):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -518,44 +518,22 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
     uri = tools_db.get_uri()
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
-    if child_layers is not None:
-        for layer in child_layers:
-            if layer[0] != 'Load all':
-                vlayer = tools_qgis.get_layer_by_tablename(layer[0])
-                if vlayer:
-                    continue
-                uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
-                vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                group = layer[4] if layer[4] is not None else group
-                group = group if group is not None else 'GW Layers'
-                tools_qt.add_layer_to_toc(vlayer, group)
-                style_id = layer[3]
-                if style_id is not None:
-                    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                    style = execute_procedure('gw_fct_getstyle', body)
-                    if style is None or style['status'] == 'Failed':
-                        return
-                    if 'styles' in style['body']:
-                        if 'style' in style['body']['styles']:
-                            qml = style['body']['styles']['style']
-                            tools_qgis.create_qml(vlayer, qml)
 
-    else:
-        uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-        vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(vlayer, group)
-        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-        # therefore, we define it with "-1"
-        if style_id not in (None, "-1"):
-            body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-            style = execute_procedure('gw_fct_getstyle', body)
-            if style is None or style['status'] == 'Failed':
-                return
-            if 'styles' in style['body']:
-                if 'style' in style['body']['styles']:
-                    qml = style['body']['styles']['style']
-                    tools_qgis.create_qml(vlayer, qml)
+    uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
+    tools_qt.add_layer_to_toc(vlayer, group, sub_group)
+    # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
+    # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
+    # therefore, we define it with "-1"
+    if style_id not in (None, "-1"):
+        body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+        style = execute_procedure('gw_fct_getstyle', body)
+        if style is None or style['status'] == 'Failed':
+            return
+        if 'styles' in style['body']:
+            if 'style' in style['body']['styles']:
+                qml = style['body']['styles']['style']
+                tools_qgis.create_qml(vlayer, qml)
 
     # Set layer config
     if tablename:
@@ -1562,32 +1540,35 @@ def fill_combo(widget, field):
 
 def fill_combo_child(dialog, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child is not None:
-        fill_combo(child, combo_child)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        if child is not None:
+            fill_combo(child, combo_child)
 
 
 def manage_combo_child(dialog, combo_parent, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
-        child.setEnabled(True)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
 
-        fill_combo_child(dialog, combo_child)
-        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
-                'enableWhenParent' not in combo_child['widgetcontrols']:
-            return
-
-        combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
-        if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (combo_value not in (None, '')):
-            # The keepDisbled property is used to keep the edition enabled or disabled,
-            # when we activate the layer and call the "enable_all" function
-            child.setProperty('keepDisbled', False)
+        if child:
             child.setEnabled(True)
-        else:
-            child.setProperty('keepDisbled', True)
-            child.setEnabled(False)
+
+            fill_combo_child(dialog, combo_child)
+            if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                    'enableWhenParent' not in combo_child['widgetcontrols']:
+                return
+
+            combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+            if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                    and (combo_value not in (None, '')):
+                # The keepDisbled property is used to keep the edition enabled or disabled,
+                # when we activate the layer and call the "enable_all" function
+                child.setProperty('keepDisbled', False)
+                child.setEnabled(True)
+            else:
+                child.setProperty('keepDisbled', True)
+                child.setEnabled(False)
 
 
 def fill_child(dialog, widget, action, feature_type=''):

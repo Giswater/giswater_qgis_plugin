@@ -121,7 +121,7 @@
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Scenario selector</string>
+                   <string>Selector</string>
                   </property>
                  </widget>
                 </item>

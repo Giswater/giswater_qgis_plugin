@@ -196,6 +196,7 @@ class GwAdminButton:
             sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
             tools_db.execute_sql(sql)
 
+        self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
         self.schema = project_name_schema
@@ -919,7 +920,7 @@ class GwAdminButton:
 
         elif self.form_enabled:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-            if any(x in global_vars.dao_db_credentials['db'] for x in ('.', ',')):
+            if any(x in str(global_vars.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
                 self.form_enabled = False
             if schema_name == 'null':
@@ -1376,7 +1377,7 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
-            if any(x in credentials['db'] for x in ('.', ',')):
+            if any(x in str(credentials['db']) for x in ('.', ',')):
                 message = 'Database name contains special characters that are not supported'
                 self.form_enabled = False
             elif str(self.plugin_version) > str(self.project_version):
@@ -3134,6 +3135,7 @@ class GwAdminButton:
             tools_qgis.show_message(msg, 0)
             return
 
+        self.error_count = 0
         # Set background task 'GwCreateSchemaTask'
         description = f"Create schema"
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
@@ -3192,8 +3194,7 @@ class GwAdminButton:
 
             for sub_folder in sub_folders:
                 aux = str(self.ws_project_result[0]).replace('.', '')
-                if (schema_version is None and sub_folder < aux) \
-                    or schema_version is not None and (schema_version < sub_folder < aux):
+                if (schema_version is None and sub_folder <= aux) or schema_version is not None and (schema_version < sub_folder < aux):
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
                     if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name='utils')

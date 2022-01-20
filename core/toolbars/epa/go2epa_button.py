@@ -367,7 +367,7 @@ class GwGo2EpaButton(GwAction):
 
 
     def _go2epa_accept(self):
-        """ Save INP, RPT and result name into GSW file """
+        """ Save INP, RPT and result name"""
 
         # Manage if task is already running
         if hasattr(self, 'go2epa_task') and self.go2epa_task is not None:

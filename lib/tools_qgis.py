@@ -698,7 +698,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
     iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-def remove_layer_from_toc(layer_name, group_name):
+def remove_layer_from_toc(layer_name, group_name, sub_group=None):
     """
     Remove layer from toc if exist
         :param layer_name: Name's layer (String)
@@ -716,11 +716,17 @@ def remove_layer_from_toc(layer_name, group_name):
 
         # Remove group if is void
         root = QgsProject.instance().layerTreeRoot()
-        group = root.findGroup(group_name)
-        if group:
-            layers = group.findLayers()
+        first_group = root.findGroup(group_name)
+        if first_group:
+            if sub_group:
+                second_group = first_group.findGroup(sub_group)
+                if second_group:
+                    layers = second_group.findLayers()
+                    if not layers:
+                        root.removeChildNode(second_group)
+            layers = first_group.findLayers()
             if not layers:
-                root.removeChildNode(group)
+                root.removeChildNode(first_group)
         remove_layer_from_toc(layer_name, group_name)
 
     # Force a map refresh

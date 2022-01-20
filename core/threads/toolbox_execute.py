@@ -127,6 +127,7 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2]
         extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
+        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
         self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
                                                       aux_conn=self.aux_conn, is_thread=True)
 
@@ -148,6 +149,7 @@ class GwToolBoxTask(GwTask):
         if self.body:
             sql += f"{self.body}"
         sql += f");"
+        tools_log.log_info(f"Task 'Toolbox execute' manage json response with parameters: '{self.json_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.json_result, sql, None)
 
         self.dialog.btn_cancel.hide()
