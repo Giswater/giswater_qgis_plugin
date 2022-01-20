@@ -1499,3 +1499,12 @@ SELECT d.arc_id,
                    LEFT JOIN v_price_compost P ON connect_cost = p.id where arc_id = '18890'
                   GROUP BY c.arc_id
                   ) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+                  
+-- 2022/01/20
+DROP VIEW IF EXISTS v_price_x_catgrate;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_grate", "column":"cost_ut","isUtils":"False"}}$$);
+
+DROP VIEW IF EXISTS v_price_x_catconnec;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ut","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ml","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_m3","isUtils":"False"}}$$);
