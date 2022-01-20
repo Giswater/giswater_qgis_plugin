@@ -71,7 +71,8 @@ class GwAddChildLayerButton(GwAction):
                 if 'level_3' in context:
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
                         action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
-                        action.triggered.connect(partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'], context['level_2'], context['level_3']))
+                        action.triggered.connect(partial(self._manage_load_all, fields=json_result['body']['data']['fields'],
+                        group=context['level_1'], sub_group=context['level_2'], sub_sub_group=context['level_3']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all"] = True
                     action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
@@ -79,7 +80,8 @@ class GwAddChildLayerButton(GwAction):
                 else:
                     if f"{context['level_1']}_{context['level_2']}_load_all" not in dict_menu:
                         action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
-                        action.triggered.connect(partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'], context['level_2']))
+                        action.triggered.connect(partial(self._manage_load_all, fields=json_result['body']['data']['fields'],
+                                                         group=context['level_1'], sub_group=context['level_2']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_load_all"] = True
                     action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
@@ -110,8 +112,7 @@ class GwAddChildLayerButton(GwAction):
             if field['context'] is not None:
                 context = json.loads(field['context'])
                 if ('level_3' in context and context['level_3'] == sub_sub_group) or \
-                        (sub_sub_group is None and context['level_1'] == group and context['level_2'] == sub_group
-                         and context['level_3'] == sub_sub_group):
+                   (sub_sub_group is None and context['level_1'] == group and context['level_2'] == sub_group):
                     layer_name = field['tableName']
                     if field['geomField'] == "None":
                         the_geom = None
