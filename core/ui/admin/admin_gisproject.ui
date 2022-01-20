@@ -103,17 +103,12 @@
         </item>
         <item>
          <property name="text">
-          <string>edit</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>om</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>basic</string>
+          <string>inventory</string>
          </property>
         </item>
        </widget>

@@ -502,7 +502,7 @@ class GwPsector:
         symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
                                            table="config_param_system")[0]
         for widget in widgets:
-            if 'widget_total_budget' in widget.objectName():
+            if 'widget_total' in widget.objectName():
                 total_result =  float(total_result) + float(widget.text().replace(symbol, '').strip())
         tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
