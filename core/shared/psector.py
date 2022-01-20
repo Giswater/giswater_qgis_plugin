@@ -10,6 +10,7 @@ import json
 import os
 import operator
 import sys
+import re
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
@@ -374,8 +375,6 @@ class GwPsector:
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_plan_psector.btn_accept.clicked.connect(
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
-        self.dlg_plan_psector.btn_accept.clicked.connect(
-            partial(self._update_otherprice))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         if hasattr(self, 'dlg_psector_mng'):
@@ -498,11 +497,14 @@ class GwPsector:
     def update_total(self, dialog):
         """ Show description of product plan/om _psector as label """
 
-        count = 0
-        widgets = dialog.tab_other_prices.findChildren(QCheckBox)
+        total_result = 0
+        widgets = dialog.tab_other_prices.findChildren(QLabel)
+        symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
+                                           table="config_param_system")[0]
         for widget in widgets:
-            count = count + 1
-        tools_qt.set_widget_text(dialog, 'lbl_total_count', f"{count}")
+            if 'widget_total_budget' in widget.objectName():
+                total_result =  float(total_result) + float(widget.text().replace(symbol, '').strip())
+        tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
 
     def open_dlg_rapports(self):
@@ -1169,6 +1171,7 @@ class GwPsector:
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
         self.update_total(dialog)
 
+
     def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
                            , print_all_rows=False, print_headers=False):
 
@@ -1224,7 +1227,9 @@ class GwPsector:
                                 text = field.get(key) if field.get(key) is not None else ''
 
                             widget.setText(f"{text}")
-                            widget.textChanged.connect(partial(self._manage_updates_lineedit, widget, key, field['price_id']))
+                            widget.editingFinished.connect(partial(self._manage_updates_prices, widget, key, field['price_id']))
+                            widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True ))
+                            widget.editingFinished.connect(partial(self.update_total, dialog))
 
                         layout = dialog.findChild(QGridLayout, 'lyt_price')
                         layout.addWidget(widget, self.count, pos)
@@ -1232,9 +1237,10 @@ class GwPsector:
                         pos = pos + 1
 
 
-    def _manage_updates_lineedit(self, widget, key, price_id):
+    def _manage_updates_prices(self, widget, key, price_id):
 
         self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
+        self._update_otherprice()
 
 
     def _update_otherprice(self):
