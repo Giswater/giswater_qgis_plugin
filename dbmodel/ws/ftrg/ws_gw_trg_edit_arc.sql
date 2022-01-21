@@ -374,6 +374,11 @@ BEGIN
 		IF NEW.function_type IS NULL THEN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
+        
+        --Pavement
+		IF NEW.pavcat_id IS NULL THEN
+			NEW.pavcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_pavementcat_vdefault' AND cur_user = current_user);
+		END IF;
 
 		-- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
