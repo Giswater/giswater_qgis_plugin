@@ -9,48 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2022/01/03
-CREATE TABLE IF NOT EXISTS inp_dscenario_virtualvalve
-(
-  dscenario_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
-  valv_type character varying(18),
-  pressure numeric(12,4),
-  flow numeric(12,4),
-  coef_loss numeric(12,4),
-  curve_id character varying(16),
-  minorloss numeric(12,4),
-  status character varying(12) DEFAULT 'ACTIVE'::character varying,
-  add_settings double precision,
-  CONSTRAINT inp_dscenario_virtualvalve_pkey PRIMARY KEY (arc_id, dscenario_id),
-  CONSTRAINT inp_dscenario_virtualvalve_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id)
-      REFERENCES inp_virtualvalve (arc_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_virtualvalve_status_check CHECK (status::text = ANY (ARRAY['ACTIVE'::character varying::text, 'CLOSED'::character varying::text, 'OPEN'::character varying::text])),
-  CONSTRAINT inp_dscenario_virtualvalve_valv_type_check CHECK (valv_type::text = ANY (ARRAY['FCV'::character varying::text, 'GPV'::character varying::text, 'PBV'::character varying::text, 'PRV'::character varying::text, 'PSV'::character varying::text, 'TCV'::character varying::text]))
-);
-
-CREATE TABLE IF NOT EXISTS inp_dscenario_pump_additional
-(
-  dscenario_id integer NOT NULL,
-  node_id character varying(16) NOT NULL,
-  power character varying,
-  curve_id character varying,
-  speed numeric(12,6),
-  pattern character varying,
-  status character varying(12),
-  CONSTRAINT inp_dscenario_pump_additional_pkey PRIMARY KEY (node_id, dscenario_id),
-  CONSTRAINT inp_dscenario_pump_additional_curve_id_fkey FOREIGN KEY (curve_id)
-      REFERENCES inp_curve (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_pump_additional_node_id_fkey FOREIGN KEY (node_id)
-      REFERENCES node (node_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT inp_dscenario_pump_additional_status_check CHECK (status::text = ANY (ARRAY['CLOSED'::character varying::text, 'OPEN'::character varying::text]))
-);
-
 -- JUNCTION REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
@@ -72,6 +30,12 @@ UPDATE inp_junction j SET source_pattern_id = s.pattern_id FROM inp_source s WHE
 
 
 --PUMP REFACTOR 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump", "column":"pattern", "newName":"pattern_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_pump", "column":"pattern", "newName":"pattern_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump_additional", "column":"pattern", "newName":"pattern_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_pump_additional", "column":"pattern", "newName":"pattern_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump_importinp", "column":"pattern", "newName":"pattern_id"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"effic_curve_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
@@ -79,6 +43,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump", 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"effic_curve_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"effic_curve_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
 UPDATE inp_pump SET effic_curve_id=energyvalue 
 WHERE energyparam ilike '%EFFIC%' AND energyvalue in (select id from inp_curve);
@@ -147,7 +115,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_tank", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
-UPDATE inp_tank j SET mixing_model = mix_type,mixing_fraction=value FROM inp_mixing s WHERE s.node_id = j.node_id;
+UPDATE inp_tank j SET mixing_model = mix_type, mixing_fraction=value FROM inp_mixing s WHERE s.node_id = j.node_id;
 UPDATE inp_tank j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.node_id;
 UPDATE inp_tank j SET source_type = sourc_type FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_tank j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;

@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
 drop view if exists vi_reactions;
 drop view if exists vi_curves;
 drop view if exists vi_energy;
@@ -37,101 +39,98 @@ AND cur_user=current_user order by 1;
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_energy AS 
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'EFFIC' as idval,
-    effic_curve_id AS energyvalue
-   FROM selector_inp_result, inp_pump
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump.effic_curve_id IS NOT NULL
+'EFFIC' as idval,
+effic_curve_id AS energyvalue
+FROM selector_inp_result, inp_pump
+LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump.effic_curve_id IS NOT NULL
 UNION
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'PRICE' as idval,
-    energy_price::TEXT AS energyvalue
-   FROM selector_inp_result,  inp_pump
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump.energy_price IS NOT NULL
+'PRICE' as idval,
+energy_price::TEXT AS energyvalue
+FROM selector_inp_result,  inp_pump
+LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump.energy_price IS NOT NULL
 UNION
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'PATTERN' as idval,
-    energy_pattern_id AS energyvalue
-   FROM selector_inp_result,   inp_pump
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump.energy_pattern_id IS NOT NULL
+'PATTERN' as idval,
+energy_pattern_id AS energyvalue
+FROM selector_inp_result,   inp_pump
+LEFT JOIN rpt_inp_arc ON concat(inp_pump.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump.energy_pattern_id IS NOT NULL
 UNION
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'EFFIC' as idval,
-    effic_curve_id AS energyvalue
-   FROM selector_inp_result, inp_pump_additional
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump_additional.effic_curve_id IS NOT NULL
+'EFFIC' as idval,
+effic_curve_id AS energyvalue
+FROM selector_inp_result, inp_pump_additional
+LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump_additional.effic_curve_id IS NOT NULL
 UNION
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'PRICE' as idval,
-    energy_price::TEXT AS energyvalue
-   FROM selector_inp_result,  inp_pump_additional
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump_additional.energy_price IS NOT NULL
+'PRICE' as idval,
+energy_price::TEXT AS energyvalue
+FROM selector_inp_result,  inp_pump_additional
+LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump_additional.energy_price IS NOT NULL
 UNION
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
-    'PATTERN' as idval,
-    energy_pattern_id AS energyvalue
-   FROM selector_inp_result,  inp_pump_additional
-     LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
-  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
-  inp_pump_additional.energy_pattern_id IS NOT NULL
+'PATTERN' as idval,
+energy_pattern_id AS energyvalue
+FROM selector_inp_result,  inp_pump_additional
+LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_arc.arc_id::text
+WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
+inp_pump_additional.energy_pattern_id IS NOT NULL
 UNION
- SELECT NULL AS pump_id,
-    idval,
-    value::character varying AS energyvalue
-   FROM config_param_user
-   JOIN sys_param_user ON id=parameter
-   WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') and 
+SELECT NULL AS pump_id,
+idval,
+value::character varying AS energyvalue
+FROM config_param_user
+JOIN sys_param_user ON id=parameter
+WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') and 
 config_param_user.cur_user::name = current_user order by 1;
    
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS 
- SELECT
-        CASE
-            WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
-            ELSE a.curve_id
-        END AS curve_id,
-    a.x_value::numeric(12,4) AS x_value,
-    a.y_value::numeric(12,4) AS y_value,
-    NULL::text AS other
-   FROM ( SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
-                   FROM SCHEMA_NAME.inp_curve_value sub
-                  WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
-            inp_curve_value.curve_id,
-            concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
-            NULL::numeric AS x_value,
-            NULL::numeric AS y_value
-           FROM SCHEMA_NAME.inp_curve
-             JOIN SCHEMA_NAME.inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
-        UNION
-         SELECT inp_curve_value.id,
-            inp_curve_value.curve_id,
-            inp_curve.curve_type,
-            inp_curve_value.x_value,
-            inp_curve_value.y_value
-           FROM SCHEMA_NAME.inp_curve_value
-             JOIN SCHEMA_NAME.inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
-  ORDER BY 1, 4 DESC) a
-  WHERE (a.curve_id::text IN ( SELECT vi_tanks.curve_id
-           FROM SCHEMA_NAME.vi_tanks)) OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head
-           FROM SCHEMA_NAME.vi_pumps)) OR (a.curve_id::text IN ( SELECT vi_valves.setting
-           FROM SCHEMA_NAME.vi_valves)) OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue
-           FROM SCHEMA_NAME.vi_energy
-          WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.value
-           FROM SCHEMA_NAME.config_param_user
-          WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
-
+SELECT
+CASE WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
+ELSE a.curve_id
+END AS curve_id,
+a.x_value::numeric(12,4) AS x_value,
+a.y_value::numeric(12,4) AS y_value,
+NULL::text AS other
+FROM ( SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
+    FROM SCHEMA_NAME.inp_curve_value sub
+    WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
+    inp_curve_value.curve_id,
+    concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
+    NULL::numeric AS x_value,
+    NULL::numeric AS y_value
+    FROM SCHEMA_NAME.inp_curve
+    JOIN SCHEMA_NAME.inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
+    UNION
+    SELECT inp_curve_value.id,
+    inp_curve_value.curve_id,
+    inp_curve.curve_type,
+    inp_curve_value.x_value,
+    inp_curve_value.y_value
+    FROM SCHEMA_NAME.inp_curve_value
+    JOIN SCHEMA_NAME.inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
+    ORDER BY 1, 4 DESC) a
+WHERE (a.curve_id::text IN ( SELECT vi_tanks.curve_id
+FROM SCHEMA_NAME.vi_tanks)) OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head
+FROM SCHEMA_NAME.vi_pumps)) OR (a.curve_id::text IN ( SELECT vi_valves.setting
+FROM SCHEMA_NAME.vi_valves)) OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue
+FROM SCHEMA_NAME.vi_energy
+WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.value
+FROM SCHEMA_NAME.config_param_user
+WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
 --2022/01/03
-
 DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
 SELECT p.dscenario_id,
@@ -143,11 +142,12 @@ emitter_coeff,
 init_quality,
 source_type,
 source_quality,
-source_pattern_id
-FROM selector_sector,selector_inp_dscenario, v_node
+source_pattern_id,
+n.the_geom
+FROM selector_sector,selector_inp_dscenario, v_node n
 JOIN inp_dscenario_junction p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 DROP VIEW IF EXISTS v_edit_inp_junction;
@@ -183,16 +183,17 @@ p.node_id,
 p.power,
 p.curve_id,
 p.speed,
-p.pattern,
+p.pattern_id,
 p.status,
 effic_curve_id,
 energy_price,
-energy_pattern_id
+energy_pattern_id,
+n.the_geom
 FROM selector_sector,
-selector_inp_dscenario,v_node
+selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 
@@ -207,17 +208,17 @@ n.state,
 n.state_type,
 n.annotation,
 n.dma_id,
-inp_pump_additional.power,
-inp_pump_additional.curve_id,
-inp_pump_additional.speed,
-inp_pump_additional.pattern,
-inp_pump_additional.status,
+p.power,
+p.curve_id,
+p.speed,
+p.pattern_id,
+p.status,
 effic_curve_id,
 energy_price,
 energy_pattern_id,
 n.the_geom
 FROM selector_sector,v_node n
-JOIN inp_pump_additional USING (node_id)
+JOIN inp_pump_additional p USING (node_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
@@ -225,19 +226,21 @@ DROP VIEW IF EXISTS v_edit_inp_dscenario_pump_additional;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS 
 SELECT d.dscenario_id,
 p.node_id,
+p.order_id,
 p.power,
 p.curve_id,
 p.speed,
-p.pattern,
+p.pattern_id,
 p.status,
 effic_curve_id,
 energy_price,
-energy_pattern_id
+energy_pattern_id,
+n.the_geom
 FROM selector_sector,
-selector_inp_dscenario,v_node
+selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump_additional p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 DROP VIEW IF EXISTS v_edit_inp_pump;
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
@@ -256,7 +259,7 @@ concat(node_id,'_n2a') as nodarc_id,
 power,
 curve_id,
 speed,
-pattern,
+pattern_id,
 to_arc,
 status,
 pump_type,
@@ -270,7 +273,6 @@ WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "cu
 
 
 
-
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pipe;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_dscenario_pipe AS 
  SELECT d.dscenario_id,
@@ -280,13 +282,13 @@ p.status,
 p.roughness,
 p.dint,
 bulk_coeff,
-wall_coeff
-FROM SCHEMA_NAME.selector_sector,
-SCHEMA_NAME.selector_inp_dscenario,
-SCHEMA_NAME.v_arc
- JOIN SCHEMA_NAME.inp_dscenario_pipe p USING (arc_id)
- JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
-  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+wall_coeff,
+a.the_geom
+FROM selector_sector,selector_inp_dscenario, v_arc a
+JOIN SCHEMA_NAME.inp_dscenario_pipe p USING (arc_id)
+JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
+WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
@@ -321,13 +323,13 @@ p.node_id,
 p.minorloss,
 p.status,
 bulk_coeff,
-wall_coeff
-FROM SCHEMA_NAME.selector_sector,
-SCHEMA_NAME.selector_inp_dscenario,
-SCHEMA_NAME.v_node
-JOIN SCHEMA_NAME.inp_dscenario_shortpipe p USING (node_id)
-JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+wall_coeff,
+n.the_geom
+FROM selector_sector, selector_inp_dscenario, v_node n
+JOIN inp_dscenario_shortpipe p USING (node_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND 
+p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_shortpipe;
@@ -371,14 +373,13 @@ reaction_coeff,
 init_quality,
 source_type,
 source_quality,
-source_pattern_id
-FROM SCHEMA_NAME.selector_sector,
-SCHEMA_NAME.selector_inp_dscenario,
-SCHEMA_NAME.v_node
-JOIN SCHEMA_NAME.inp_dscenario_tank p USING (node_id)
-JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
-
+source_pattern_id,
+n.the_geom
+FROM selector_sector, selector_inp_dscenario, v_node n
+JOIN inp_dscenario_tank p USING (node_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
   
 DROP VIEW IF EXISTS v_edit_inp_tank;
@@ -421,7 +422,8 @@ p.head,
 init_quality,
 source_type,
 source_quality,
-source_pattern_id
+source_pattern_id,
+n.the_geom
 FROM selector_sector,
 selector_inp_dscenario, v_node n
 JOIN inp_dscenario_reservoir p USING (node_id)
@@ -467,11 +469,12 @@ p.curve_id,
 p.minorloss,
 p.status,
 p.add_settings,
-init_quality
-FROM selector_sector, selector_inp_dscenario, v_node
+init_quality,
+n.the_geom
+FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_valve p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
   
 DROP VIEW IF EXISTS v_edit_inp_valve;
@@ -510,17 +513,20 @@ SELECT d.dscenario_id,
 p.arc_id,
 p.valv_type,
 p.pressure,
+P.diameter,
 p.flow,
 p.coef_loss,
 p.curve_id,
 p.minorloss,
 p.status,
 --p.add_settings,
-init_quality
-FROM selector_sector, selector_inp_dscenario, v_arc
+init_quality,
+a.the_geom
+FROM selector_sector, selector_inp_dscenario, v_arc a
 JOIN inp_dscenario_virtualvalve p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
@@ -573,11 +579,13 @@ reaction_coeff,
 init_quality,
 source_type,
 source_quality,
-source_pattern_id
-FROM selector_sector, selector_inp_dscenario, v_node
+source_pattern_id,
+n.the_geom
+FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_inlet p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_inp_inlet;
@@ -641,4 +649,3 @@ connec.the_geom
 FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
 WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;*/
-  
