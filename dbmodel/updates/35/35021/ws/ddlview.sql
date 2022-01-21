@@ -1113,5 +1113,8 @@ CREATE OR REPLACE VIEW v_plan_arc AS
                   GROUP BY c.arc_id, price
                   ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
 
-
-
+-- 2022/01/20
+DROP VIEW IF EXISTS v_price_x_catconnec;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ut","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ml","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_m3","isUtils":"False"}}$$);

@@ -18,3 +18,5 @@
 - Force selector for whole user on same cat_manager when new sector is created
 - New function gw_fct_setchangefeaturetype
 - Enhance performance for getinfoplan function and minor refactor for plan (connec and gullies)
+- Drop price columns realted to connec and gully catalogs (cost_ut, cost_ml, cost_m3)
+- New function gw_fct_admin_manage_migra

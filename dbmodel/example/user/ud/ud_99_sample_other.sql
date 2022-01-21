@@ -227,8 +227,6 @@ SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
-UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';
-
 UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_cost = 'VIRTUAL_M3' WHERE id = 'VIRTUAL';
 
 UPDATE element SET code = concat ('E',element_id);
