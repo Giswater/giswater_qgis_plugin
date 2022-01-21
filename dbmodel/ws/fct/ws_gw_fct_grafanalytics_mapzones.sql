@@ -100,9 +100,10 @@ UPDATE arc SET dma_id=0 where expl_id IN (1,2)
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"true"}}}');
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"true"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones($${"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]",
+"updateFeature":"TRUE", "updateMapZone":2,"geomParamUpdate":15,"debug":"true", "valueForDisconnected":"9"}}}$$);
 
+ 
 INSTRUCTIONS
 flag: 0 open, 1 closed
 water: 0 dry, 1 wet
@@ -171,6 +172,7 @@ v_usepsector boolean;
 v_error boolean = false;
 v_nodemapzone text;
 rec_conflict record;
+v_valuefordisconnected integer;
 
 BEGIN
 	-- Search path
@@ -191,6 +193,7 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 
+	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_updatefeature = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
@@ -199,7 +202,7 @@ BEGIN
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
-	
+
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
@@ -411,6 +414,12 @@ BEGIN
 			SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND v_edit_arc.state > 0;
 
+			-- close custom nodes acording config parameters
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+
 			-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
 			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
 			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
@@ -498,12 +507,6 @@ BEGIN
 			-- close custom nodes acording init parameters
 			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
-
-			-- close custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
-			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
-			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 			
 			-- open custom nodes acording init parameters
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
@@ -698,7 +701,7 @@ BEGIN
 				FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
 				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz)a
 				USING (node_id))a
-				WHERE m1::text != m2::text'
+				WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
 				
 				LOOP						
 					-- update & count features
@@ -941,19 +944,27 @@ BEGIN
 	END IF;
 
 	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Mapzones dynamic analysis done succesfull';
-    ELSE
-
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-        
-    END IF;
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Mapzones dynamic analysis done succesfull';
+	ELSE
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+		
+	END IF;
 
 	RAISE NOTICE 'FINISH MAPZONE';
 
+	-- value4disconnecteds
+	IF v_valuefordisconnected IS NOT NULL OR v_valuefordisconnected <> 0 THEN
+
+		EXECUTE 'UPDATE arc t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text = ''0''';
+		EXECUTE 'UPDATE node t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text = ''0''';
+		EXECUTE 'UPDATE connec t SET '||v_field||'  = '||v_valuefordisconnected||' FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text = ''0''';
+
+	END IF;
+			
     	-- restore state selector (if it's needed)
 	IF v_usepsector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
