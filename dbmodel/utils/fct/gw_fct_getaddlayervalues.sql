@@ -43,9 +43,8 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 	
-	SELECT array_agg(row_to_json(d)) FROM (SELECT context, alias as "layerName", st.id as "tableName",CASE WHEN c.column_name IS NULL THEN 'None' ELSE c.column_name END AS "geomField", i.column_name as "tableId", ss.id as style_id FROM sys_table st
+	SELECT array_agg(row_to_json(d)) FROM (SELECT context, alias as "layerName", st.id as "tableName",CASE WHEN c.column_name IS NULL THEN 'None' ELSE c.column_name END AS "geomField", i.column_name as "tableId", st.style_id FROM sys_table st
 	join config_typevalue ct ON ct.id= context
-	left join sys_style ss on ss.idval = st.id
 	left join information_schema.columns c on st.id =c.table_name and udt_name='geometry' and c.table_schema='SCHEMA_NAME'
 	left join information_schema.columns i on st.id =i.table_name and i.ordinal_position=1 and i.table_schema='SCHEMA_NAME'
 	WHERE typevalue = 'sys_table_context'
