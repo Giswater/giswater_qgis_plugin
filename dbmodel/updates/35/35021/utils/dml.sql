@@ -352,3 +352,6 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES ( 'sys_style', 'id', 'sys_table','style_id',true);
+
+/*INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
+SELECT 'edit_typevalue','grate_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='grate_param_1';*/
