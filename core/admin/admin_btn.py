@@ -543,21 +543,25 @@ class GwAdminButton:
                 if new_project:
                     if self.dev_commit is True:
                         if str(sub_folder) > '31100':
-                            self.update_minor31to39(folder_update, new_project, project_type, no_ct)
-
+                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            if status is False:
+                                return False
                     else:
                         if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            self.update_minor31to39(folder_update, new_project, project_type, no_ct)
-
+                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            if status is False:
+                                return False
                 else:
                     if self.dev_commit is True:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                            self.update_minor31to39(folder_update, new_project, project_type, no_ct)
-
+                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            if status is False:
+                                return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            self.update_minor31to39(folder_update, new_project, project_type, no_ct)
-
+                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            if status is False:
+                                return False
         return True
 
 

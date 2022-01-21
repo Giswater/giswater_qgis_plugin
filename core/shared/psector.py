@@ -133,8 +133,11 @@ class GwPsector:
         num_value.setValidator(QIntValidator())
         where = " WHERE typevalue = 'psector_type' "
         self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
+
+        # Manage other_price tab variables
         self.price_loaded = False
         self.header_exist = None
+        self.load_signals = False
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
@@ -854,8 +857,8 @@ class GwPsector:
         if self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
-            field_id_right = "price_id"
-            self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
+            if not self.load_signals:
+                self.price_selector(self.dlg_plan_psector, tableleft, tableright)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
@@ -1079,8 +1082,10 @@ class GwPsector:
         return json_result
 
 
-    def price_selector(self, dialog, tableleft, tableright, field_id_right):
+    def price_selector(self, dialog, tableleft, tableright):
 
+
+        self.load_signals = True
 
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
