@@ -660,3 +660,5 @@ UPDATE config_toolbox SET inputparams =
 
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":9, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2768;
+
+INSERT INTO config_param_system VALUES ('admin_sample', 'TRUE', 'Only existing in sample projects');

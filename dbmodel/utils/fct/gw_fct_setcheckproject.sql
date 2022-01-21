@@ -236,21 +236,21 @@ BEGIN
 		END IF;
 	END IF;
 
-/*
 	--Reset the rest of sequences
-	FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
-	LOOP 
-		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
-		EXECUTE v_query_string INTO v_max_seq_id;	
-		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
-		END IF;
-	END LOOP;
+    IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_sample') IS TRUE THEN
+        FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
+        LOOP 
+            v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
+            EXECUTE v_query_string INTO v_max_seq_id;	
+            IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
+                EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
+            END IF;
+        END LOOP;
 
-	v_errortext=concat('Reset all sequences on project data schema.');
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-
-*/
+        v_errortext=concat('Reset all sequences on project data schema.');
+        INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+    END IF;
+    
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
 	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 	LOOP
