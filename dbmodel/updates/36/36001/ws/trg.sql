@@ -37,3 +37,19 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve');
 CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_virtualvalve
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtualvalve');
 
+DROP TRIGGER IF EXISTS gw_trg_vi_emitters ON vi_emitters;
+CREATE TRIGGER gw_trg_vi_emitters INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_emitters FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_emitters');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_sources ON vi_sources;
+CREATE TRIGGER gw_trg_vi_sources INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_sources FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_sources');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_quality ON vi_quality;
+CREATE TRIGGER gw_trg_vi_quality INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_quality FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_quality');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_mixing ON vi_mixing;
+CREATE TRIGGER gw_trg_vi_mixing INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_mixing FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_mixing');
+

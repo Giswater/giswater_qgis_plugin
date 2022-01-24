@@ -131,6 +131,174 @@ WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.va
 FROM SCHEMA_NAME.config_param_user
 WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
+
+CREATE OR REPLACE VIEW vi_emitters AS 
+SELECT node_id,
+emitter_coeff
+FROM selector_inp_result, inp_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE emitter_coeff IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+emitter_coeff
+FROM selector_inp_result, inp_dscenario_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE emitter_coeff IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_quality AS 
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_dscenario_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE inp_inlet.init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_dscenario_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE inp_dscenario_inlet.init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_sources AS 
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (inp_junction.source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_dscenario_junction
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_dscenario_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_reservoir
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_dscenario_reservoir
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+source_type,
+source_quality,
+source_pattern_id
+FROM selector_inp_result, inp_dscenario_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text;
+
+
+
+
+CREATE OR REPLACE VIEW vi_mixing AS 
+SELECT node_id,
+mixing_model,
+mixing_fraction
+FROM selector_inp_result, inp_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+mixing_model,
+mixing_fraction
+FROM selector_inp_result, inp_dscenario_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+mixing_model,
+mixing_fraction
+FROM selector_inp_result, inp_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+mixing_model,
+mixing_fraction
+FROM selector_inp_result, inp_dscenario_inlet
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) 
+AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text;
+
 --2022/01/03
 DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
