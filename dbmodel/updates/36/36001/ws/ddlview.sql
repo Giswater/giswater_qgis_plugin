@@ -185,7 +185,7 @@ source_quality,
 source_pattern_id
 FROM selector_inp_result, inp_junction
 LEFT JOIN rpt_inp_node USING (node_id)
-WHERE (inp_junction.source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
 AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
 AND selector_inp_result.cur_user = "current_user"()::text
 UNION
