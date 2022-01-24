@@ -109,7 +109,7 @@ BEGIN
 
 	-- update addparam for inp_pump
 	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
-	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
+	'", "effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
 	-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
@@ -190,7 +190,7 @@ BEGIN
 	UPDATE temp_arc SET 
 	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
-	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
+	addparam=concat('{"bulk_coeff":"',inp_pipe.bulk_coeff, '","wall_coeff":"',inp_pipe.wall_coeff,'"}')
 	FROM inp_pipe WHERE temp_arc.arc_id=inp_pipe.arc_id;
 
 	raise notice 'updating inp_virtualvalve';
@@ -225,7 +225,7 @@ BEGIN
 
 	-- update addparam for inp_pump_importinp
 	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',p.status,'",
-	"energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"FLOWPUMP"}')
+	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"FLOWPUMP"}')
 	FROM inp_pump_importinp p WHERE temp_arc.arc_id=p.arc_id;
 
     RETURN 1;

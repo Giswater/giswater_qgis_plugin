@@ -102,8 +102,8 @@ BEGIN
 
 			--addparam
 			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',
-						 arc_rec.addparam::json->>'to_arc','", "energyparam":"',pump_rec.energyparam,'","energyvalue":"',pump_rec.energyvalue,'","pump_type":"',
-						 arc_rec.addparam::json->>'pump_type','"}');	
+						 arc_rec.addparam::json->>'to_arc','", "effic_curve_id":"',pump_rec.effic_curve_id,'","energy_price":"',pump_rec.energy_price,'","energy_pattern_id":"',
+						 pump_rec.energy_pattern_id,'","pump_type":"', arc_rec.addparam::json->>'pump_type','"}');	
 
 			-- Inserting into temp_arc
 			INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, 
