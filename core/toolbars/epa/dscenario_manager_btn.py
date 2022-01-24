@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-import re
 from functools import partial
 from sip import isdeleted
 
@@ -14,7 +12,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
+from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
@@ -40,7 +38,7 @@ class GwDscenarioManagerButton(GwAction):
         self._open_dscenario_manager()
 
 
-    # region private functions
+    # region dscenario manager
 
     def _open_dscenario_manager(self):
         """ Open dscenario manager """
@@ -59,11 +57,10 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
-        # self.fill_table(self.dlg_dscenario_manager, self.tbl_dscenario, 'v_edit_cat_dscenario')
-        self._fill_tbl()
+        self._fill_manager_table()
 
         # Connect main dialog signals
-        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
+        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
         self.dlg_dscenario_manager.btn_execute.clicked.connect(partial(self._open_toolbox_function, None))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
@@ -79,7 +76,51 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
 
+    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
+        """ Mount and execute the query for gw_fct_getlist """
+
+        feature = f'"tableName":"{table_name}"'
+        filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+        if filter_id is not None:
+            filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
+        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return False
+        complet_list = json_result
+        if not complet_list:
+            return False
+
+        return complet_list
+
+
+    def _fill_manager_table(self, filter_name=""):
+        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+
+        complet_list = self._get_list("v_edit_cat_dscenario", filter_name)
+
+        if complet_list is False:
+            return False, False
+        for field in complet_list['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']: continue
+            model = self.tbl_dscenario.model()
+            if model is None:
+                model = QStandardItemModel()
+                self.tbl_dscenario.setModel(model)
+            model.removeRows(0, model.rowCount())
+
+            if field['value']:
+                self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, field)
+                self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, field)
+            # TODO: config_form_tableview
+            # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
+            tools_qt.set_tableview_config(self.tbl_dscenario)
+
+        return complet_list
+
+
     def _manage_active_functions(self):
+        """ Fill combobox with functions """
 
         values = [[3042, "Manage values"]]
         if global_vars.project_type == 'ws':
@@ -91,7 +132,47 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_actions, values, index_to_show=1)
 
 
+    def _open_toolbox_function(self, function=None):
+        """ Execute currently selected function from combobox """
+
+        if function is None:
+            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_actions')
+
+        toolbox_btn = GwToolBoxButton(None, None, None, None, None)
+        connect = partial(self._fill_manager_table, self.filter_name.text())
+        toolbox_btn.open_function_by_id(function, connect_signal=connect)
+        return
+
+
+    def _delete_selected_dscenario(self):
+        """ Deletes the selected dscenario """
+
+        # Get selected row
+        selected_list = self.tbl_dscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected dscenario id
+        index = self.tbl_dscenario.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        message = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
+        if answer:
+            sql = f"DELETE FROM v_edit_cat_dscenario WHERE dscenario_id = {value}"
+            tools_db.execute_sql(sql)
+
+            # Refresh tableview
+            self._fill_manager_table(self.filter_name.text())
+
+    # endregion
+
+    # region dscenario
+
     def _open_dscenario(self, index):
+        """ Create custom dialog for selected dscenario and fill initial table """
 
         # Get selected dscenario_id
         row = index.row()
@@ -106,27 +187,6 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
-
-        # Get layers of every feature_type
-
-        # Setting lists
-        self.ids = []
-        self.list_ids = {}
-        self.list_ids['arc'] = []
-        self.list_ids['node'] = []
-        self.list_ids['connec'] = []
-        self.list_ids['gully'] = []
-        self.list_ids['element'] = []
-
-        # Setting layers
-        self.layers = {}
-        self.layers['gully'] = []
-        self.layers['element'] = []
-        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
-        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
-        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
-        if self.project_type.upper() == 'UD':
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
@@ -148,7 +208,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.dlg_dscenario.rejected.connect(self._selection_end)
 
-        self._fill_table()
+        self._fill_dscenario_table()
 
         sql = f"SELECT name FROM v_edit_cat_dscenario WHERE dscenario_id = {self.selected_dscenario_id}"
         row = tools_db.get_row(sql)
@@ -157,14 +217,8 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario', title=f"{title}")
 
 
-    def _fill_table(self, hidde=False, set_edit_triggers=QTableView.DoubleClicked, expr=None):
-        """ Set a model with selected filter.
-            Attach that model to selected table
-            @setEditStrategy:
-            0: OnFieldChange
-            1: OnRowChange
-            2: OnManualSubmit
-        """
+    def _fill_dscenario_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+        """ Fill dscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
         if isdeleted(self.dlg_dscenario):
@@ -184,12 +238,10 @@ class GwDscenarioManagerButton(GwAction):
         model.setSort(0, 0)
         model.select()
 
-        # When change some field we need to refresh Qtableview and filter by psector_id
+        # Set widget & model properties
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # model.beforeUpdate.connect(partial(self._manage_before_update, model))
-        # model.dataChanged.connect(partial(self._fill_tbl, self.filter_name.text()))
-        # model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
+        # In order to make the first column not editable, we need to override the QSqlTableModel flags
         model.flags = lambda index: self.flags(index, model)
 
         # Check for errors
@@ -202,6 +254,7 @@ class GwDscenarioManagerButton(GwAction):
         else:
             widget.setModel(model)
 
+        # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
         if col_idx is not False:
             widget.setColumnHidden(col_idx, True)
@@ -209,9 +262,6 @@ class GwDscenarioManagerButton(GwAction):
         geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
         if geom_col_idx is not False:
             widget.setColumnHidden(geom_col_idx, True)
-
-        # if hidde:
-        #     self.refresh_table(dialog, widget)
 
 
     def flags(self, index, model):
@@ -226,9 +276,10 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _manage_current_changed(self):
+        """ Manages tab changes """
 
         # Fill current table
-        self._fill_table()
+        self._fill_dscenario_table()
 
         # Manage insert typeahead
         viewname = "v_edit_" + self.feature_type
@@ -239,6 +290,8 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _manage_feature_type(self):
+        """ Manages current tableview feature type (node, arc, nodarc, etc.) """
+
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         self.feature_type = 'node'
         feature_type = 'feature_id'
@@ -254,6 +307,7 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _manage_highlight(self, qtableview, view, index):
+        """ Creates rubberband to indicate which feature is selected """
 
         table = view.replace("_dscenario", "")
         feature_type = 'feature_id'
@@ -263,12 +317,13 @@ class GwDscenarioManagerButton(GwAction):
             if col_idx is not False:
                 feature_type = x
                 break
-        if feature_type != 'feature_type':
+        if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.hilight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
     def _manage_insert(self):
+        """ Insert feature to dscenario via the button """
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
@@ -277,10 +332,11 @@ class GwDscenarioManagerButton(GwAction):
         tools_db.execute_sql(sql)
 
         # Refresh tableview
-        self._fill_table()
+        self._fill_dscenario_table()
 
 
     def _manage_delete(self):
+        """ Delete features from dscenario via the button """
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         # Get selected row
@@ -313,10 +369,11 @@ class GwDscenarioManagerButton(GwAction):
                 tools_db.execute_sql(sql)
 
             # Refresh tableview
-            self._fill_table()
+            self._fill_dscenario_table()
 
 
     def _manage_select(self):
+        """ Button snapping """
 
         self._manage_feature_type()
 
@@ -341,7 +398,7 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _selection_init(self):
-        """ Set canvas map tool to an instance of class 'GwSelectManager' """
+        """ Set canvas map tool to selection """
 
         tools_gw.disconnect_signal('dscenario_snapping')
         self.iface.actionSelect().trigger()
@@ -372,8 +429,6 @@ class GwDscenarioManagerButton(GwAction):
 
             if selected_ids:
                 inserted = {f'{self.feature_type}': []}
-                self.list_ids = selected_ids
-                print(f"{self.list_ids}")
                 tableview = self.dlg_dscenario.main_tab.currentWidget()
                 view = tableview.objectName()
                 for f in selected_ids:
@@ -381,92 +436,17 @@ class GwDscenarioManagerButton(GwAction):
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
                     if result:
                         inserted[f'{self.feature_type}'].append(f)
-                self._fill_table()
+                self._fill_dscenario_table()
 
                 # Just select the inserted features
                 tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
 
 
     def _selection_end(self):
+        """ Stop selection mode """
+
         tools_gw.disconnect_signal('dscenario_snapping')
         tools_gw.remove_selection()
         self.iface.actionPan().trigger()
-
-
-    def _delete_selected_dscenario(self):
-
-        # Get selected row
-        selected_list = self.tbl_dscenario.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        # Get selected dscenario id
-        index = self.tbl_dscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
-
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
-        if answer:
-            sql = f"DELETE FROM v_edit_cat_dscenario WHERE dscenario_id = {value}"
-            tools_db.execute_sql(sql)
-
-            # Refresh tableview
-            self._fill_tbl(self.filter_name.text())
-
-
-    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
-        """ Mount and execute the query for gw_fct_getlist """
-
-        feature = f'"tableName":"{table_name}"'
-        filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
-        if filter_id is not None:
-            filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
-        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
-        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
-        if json_result is None or json_result['status'] == 'Failed':
-            return False
-        complet_list = json_result
-        if not complet_list:
-            return False
-
-        return complet_list
-
-
-    def _fill_tbl(self, filter_name=""):
-        """ Fill table with initial data into QTableView """
-
-        complet_list = self._get_list("v_edit_cat_dscenario", filter_name)
-
-        if complet_list is False:
-            return False, False
-        for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
-            model = self.tbl_dscenario.model()
-            if model is None:
-                model = QStandardItemModel()
-                self.tbl_dscenario.setModel(model)
-            model.removeRows(0, model.rowCount())
-
-            if field['value']:
-                self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, field)
-                self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, field)
-            # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
-            tools_qt.set_tableview_config(self.tbl_dscenario)
-
-        return complet_list
-
-
-    def _open_toolbox_function(self, function=None):
-
-        if function is None:
-            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_actions')
-
-        toolbox_btn = GwToolBoxButton(None, None, None, None, None)
-        connect = partial(self._fill_tbl, self.filter_name.text())
-        toolbox_btn.open_function_by_id(function, connect_signal=connect)
-        return
 
     # endregion
