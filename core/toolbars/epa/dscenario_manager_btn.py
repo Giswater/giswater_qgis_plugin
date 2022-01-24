@@ -12,7 +12,7 @@ from sip import isdeleted
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtCore import Qt, QRegExp
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
 
@@ -186,10 +186,11 @@ class GwDscenarioManagerButton(GwAction):
 
         # When change some field we need to refresh Qtableview and filter by psector_id
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # model.beforeUpdate.connect(partial(self.manage_update_state, model))
+        # model.beforeUpdate.connect(partial(self._manage_before_update, model))
         # model.dataChanged.connect(partial(self._fill_tbl, self.filter_name.text()))
         # model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
+        model.flags = lambda index: self.flags(index, model)
 
         # Check for errors
         if model.lastError().isValid():
@@ -201,12 +202,27 @@ class GwDscenarioManagerButton(GwAction):
         else:
             widget.setModel(model)
 
+        col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
+        if col_idx is not False:
+            widget.setColumnHidden(col_idx, True)
+
         geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
         if geom_col_idx is not False:
             widget.setColumnHidden(geom_col_idx, True)
 
         # if hidde:
         #     self.refresh_table(dialog, widget)
+
+
+    def flags(self, index, model):
+
+        flags = QSqlTableModel.flags(model, index)
+
+        if index.column() == 1:
+            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            return flags
+
+        return QSqlTableModel.flags(model, index)
 
 
     def _manage_current_changed(self):
@@ -235,6 +251,7 @@ class GwDscenarioManagerButton(GwAction):
 
         if feature_type != 'feature_id':
             self.feature_type = feature_type.split('_')[0]
+
 
     def _manage_highlight(self, qtableview, view, index):
 
