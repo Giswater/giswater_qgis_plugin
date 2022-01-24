@@ -353,3 +353,5 @@ ON CONFLICT (id) DO NOTHING;
 ALTER TABLE sys_table  ADD CONSTRAINT sys_table_style_id_fkey FOREIGN KEY (style_id)
 REFERENCES sys_style(id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+UPDATE arc a SET pavcat_id = p.pavcat_id FROM plan_arc_x_pavement p WHERE a.arc_id = p.arc_id;
+DELETE FROM plan_arc_x_pavement;

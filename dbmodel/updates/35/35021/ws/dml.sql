@@ -145,7 +145,6 @@ UPDATE config_toolbox SET inputparams =
 ]', functionparams = '{"featureType":["node", "arc", "connec"]}'
 WHERE id = 3108;
 
-DELETE FROM sys_function WHERE id = 3112;
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3112, 'gw_fct_create_dscenario_demand', 'ws', 'function', 'json', 
@@ -153,7 +152,7 @@ VALUES (3112, 'gw_fct_create_dscenario_demand', 'ws', 'function', 'json',
 It moves demand & pattern data from source to inp_dscenario_demand. Works with epa layers (connec or junction) which means need to be loaded.', 'role_epa', null, null) 
 ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM config_toolbox WHERE id = 3112;
+
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3112,'Create Demand Dscenario from ToC', '{"featureType": {"node":["v_edit_inp_junction"],"connec":["v_edit_inp_connec"]}}',
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},

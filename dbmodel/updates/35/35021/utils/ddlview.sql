@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/22
- CREATE VIEW v_edit_cat_dscenario AS
+ CREATE OR REPLACE VIEW v_edit_cat_dscenario AS
  SELECT DISTINCT ON (dscenario_id)
   dscenario_id,
   c.name,
