@@ -84,7 +84,7 @@ VALUES ('v_rtc_period_hydrometer', 'Shows the hydrometer periods.','role_basic',
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (142, 'Check dint value for cat_node acting as [SHORTPIPE or VALVE or PUMP]', 'ws')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess VALUES (153, 'Inlets with null mandatory values', 'ws')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (fid) DO NOTHING;
 
