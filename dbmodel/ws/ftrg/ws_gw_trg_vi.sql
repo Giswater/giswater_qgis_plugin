@@ -108,17 +108,43 @@ BEGIN
 	  ELSIF v_view='vi_reactions' THEN
 
 	  	IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
-	  		UPDATE inp_pipe SET reactionparam = NEW.idval, reactionvalue = NEW.reactionvalue WHERE arc_id=NEW.arc_id;
-	  	ELSE 
-	  		INSERT INTO inp_reactions (descript) VALUES (concat(NEW.idval,' ', NEW.arc_id,' ',NEW.reactionvalue));
+	  		IF NEW.param = 'BULK' THEN 
+	  			UPDATE inp_pipe SET bulk_coeff = NEW.coeff WHERE arc_id=NEW.arc_id;
+	  		ELSIF NEW.param = 'WALL' THEN 
+	  			UPDATE inp_pipe SET wall_coeff = NEW.coeff WHERE arc_id=NEW.arc_id;
+	  		END IF;
+	  	ELSIF NEW.arc_id ilike 'ORDER BUL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ORDER BULK','')) WHERE parameter = 'inp_reactions_global_order';
+	  	ELSIF NEW.pump_id ilike 'ORDER WALL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ORDER WALL','')) WHERE parameter = 'inp_reactions_global_order';
+	  	ELSIF NEW.arc_id ilike 'GLOBAL BUL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'GLOBAL BULK','')) WHERE parameter = 'inp_reactions_global_bulk';
+	  	ELSIF NEW.pump_id ilike 'GLOBAL WALL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'GLOBAL WALL','')) WHERE parameter = 'inp_reactions_global_wall'; 
+	  	ELSIF NEW.pump_id ilike 'ROUGHNESS CORRELATION%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ROUGHNESS CORRELATION','')) WHERE parameter = 'inp_reactions_wall_coeff_correlation'; 
+	  	ELSIF NEW.pump_id ilike 'LIMITING POTENTIAL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ROUGHNESS CORRELATION','')) WHERE parameter = '	inp_reactions_limit_concentration';	
 	  	END IF;
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		UPDATE inp_pump_importinp SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
-	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
-	  	ELSE
-	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 
+	  		IF NEW.idval ILIKE '%PRICE%'
+	  			UPDATE inp_pump_importinp SET energy_price = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		ELSIF NEW.idval ILIKE '%EFFIC%'
+	  			UPDATE inp_pump_importinp SET effic_curve_id = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		ELSIF  NEW.idval ILIKE '%PATTERN%'
+	  			UPDATE inp_pump_importinp SET energy_pattern_id = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		END IF;
+	  	ELSIF NEW.pump_id ilike 'GLOBAL EFFIC%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL EFFIC','')) WHERE parameter = 'inp_energy_pump_effic';
+	  	ELSIF NEW.pump_id ilike 'GLOBAL PATTERN%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL PATTERN','')) WHERE parameter = 'inp_energy_price_pattern'; 
+	  	ELSIF NEW.pump_id ilike 'GLOBAL PRICE%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL PRICE','')) WHERE parameter = 'inp_energy_price'; 
 	  	END IF;
 
 	  ELSIF v_view='vi_mixing' THEN

@@ -257,4 +257,4 @@ UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRela
 WHERE columnname='pattern_id';
 
 UPDATE config_form_fields set columnname='pattern_id' 
-WHERE columnname='pattern' AND (formname ilike '%inp_pump%' or formname ilike 'inp_dscenario_pump');
+WHERE columnname='pattern' AND (formname ilike '%inp_pump%' or formname ilike '%inp_dscenario_pump%');

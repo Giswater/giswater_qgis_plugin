@@ -12,8 +12,8 @@ drop view if exists vi_reactions;
 drop view if exists vi_curves;
 drop view if exists vi_energy;
 
-drop view if exists ws_sample35.vi_reactions;
-CREATE OR REPLACE VIEW ws_sample35.vi_reactions AS 
+drop view if exists vi_reactions;
+CREATE OR REPLACE VIEW vi_reactions AS 
 SELECT 'BULK' as param,
 inp_pipe.arc_id,
 inp_pipe.bulk_coeff::text as coeff
@@ -35,7 +35,8 @@ FROM config_param_user
 JOIN sys_param_user ON id=parameter
 WHERE (parameter='inp_reactions_bulk_order' OR parameter = 'inp_reactions_wall_order' OR parameter = 'inp_reactions_global_bulk' OR 
 parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_concentration' OR parameter ='inp_reactions_wall_coeff_correlation')
-AND cur_user=current_user order by 1;
+AND value IS NOT NULL AND  cur_user=current_user order by 1;
+
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_energy AS 
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
@@ -86,12 +87,12 @@ LEFT JOIN rpt_inp_arc ON concat(inp_pump_additional.node_id, '_n2a') = rpt_inp_a
 WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND 
 inp_pump_additional.energy_pattern_id IS NOT NULL
 UNION
-SELECT NULL AS pump_id,
-idval,
-value::character varying AS energyvalue
+SELECT idval AS pump_id,
+value::text AS idval,
+NULL::text AS energyvalue
 FROM config_param_user
 JOIN sys_param_user ON id=parameter
-WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') and 
+WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') AND value IS NOT NULL AND 
 config_param_user.cur_user::name = current_user order by 1;
    
 

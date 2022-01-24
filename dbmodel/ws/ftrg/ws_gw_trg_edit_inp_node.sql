@@ -105,7 +105,7 @@ BEGIN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id, overflow=NEW.overflow WHERE node_id=OLD.node_id;
 
         ELSIF v_node_table = 'inp_pump' THEN          
-            UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, 
+            UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, to_arc=NEW.to_arc, 
             status=NEW.status , pump_type=NEW.pump_type, energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id,
             effic_curve_id=NEW.effic_curve_id
             WHERE node_id=OLD.node_id;
