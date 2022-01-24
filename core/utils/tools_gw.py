@@ -505,7 +505,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -520,6 +520,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
 
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    if alias:
+        tablename = alias
     vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
     tools_qt.add_layer_to_toc(vlayer, group, sub_group)
     # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
