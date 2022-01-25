@@ -45,6 +45,7 @@ from .cad.aux_point_add_button import GwAuxPointAddButton
 from .epa.go2epa_button import GwGo2EpaButton
 from .epa.go2epa_manager_button import GwGo2EpaManagerButton
 from .epa.go2epa_selector_button import GwGo2EpaSelectorButton
+from .epa.dscenario_manager_btn import GwDscenarioManagerButton
 
 # Plan
 from .plan.psector_button import GwPsectorButton
