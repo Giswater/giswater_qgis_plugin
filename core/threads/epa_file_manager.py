@@ -380,9 +380,9 @@ class GwEpaFileManager(GwTask):
         # Set file to execute
         opener = None
         if global_vars.project_type in 'ws':
-            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}runepanet.exe"
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
         elif global_vars.project_type in 'ud':
-            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm50022.exe"
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if opener is None:
             return False

@@ -10,6 +10,7 @@ import json
 import os
 import operator
 import sys
+import re
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
@@ -18,7 +19,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QHeaderView
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -41,6 +42,7 @@ class GwPsector:
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.emit_point = None
         self.vertex_marker = None
+        self.dict_to_update = {}
 
 
     def get_psector(self, psector_id=None, is_api=False):
@@ -63,6 +65,7 @@ class GwPsector:
 
         # Get layers of every feature_type
         self.list_elemets = {}
+        self.dict_to_update = {}
 
         # Get layers of every feature_type
 
@@ -131,6 +134,11 @@ class GwPsector:
         where = " WHERE typevalue = 'psector_type' "
         self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
+        # Manage other_price tab variables
+        self.price_loaded = False
+        self.header_exist = None
+        self.load_signals = False
+
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = tools_db.get_rows(sql)
@@ -173,8 +181,7 @@ class GwPsector:
             self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        selected_rows = self.dlg_plan_psector.findChild(QTableView, "selected_rows")
-        selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        all_rows.horizontalHeader().setSectionResizeMode(3)
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
         # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
@@ -215,7 +222,7 @@ class GwPsector:
             if not row:
                 return
 
-            self.dlg_plan_psector.setWindowTitle(f"Plan psector - {row['name']}")
+            self.dlg_plan_psector.setWindowTitle(f"Plan psector - {row['name']} ({row['psector_id']})")
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
@@ -380,10 +387,6 @@ class GwPsector:
 
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
-        self.dlg_plan_psector.btn_select.clicked.connect(
-            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_unselect.clicked.connect(
-            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
 
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
 
@@ -494,23 +497,17 @@ class GwPsector:
             widget.setText("")
 
 
-    def update_total(self, dialog, qtable):
+    def update_total(self, dialog):
         """ Show description of product plan/om _psector as label """
 
-        try:
-            model = qtable.model()
-            if model is None:
-                return
-
-            total = 0
-            psector_id = tools_qt.get_text(dialog, 'psector_id')
-            for x in range(0, model.rowCount()):
-                if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                    if str(qtable.model().record(x).value('total_budget')) != 'NULL':
-                        total += float(qtable.model().record(x).value('total_budget'))
-            tools_qt.set_widget_text(dialog, 'lbl_total', str(total))
-        except Exception:
-            pass
+        total_result = 0
+        widgets = dialog.tab_other_prices.findChildren(QLabel)
+        symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
+                                           table="config_param_system")[0]
+        for widget in widgets:
+            if 'widget_total' in widget.objectName():
+                total_result =  float(total_result) + float(widget.text().replace(symbol, '').strip())
+        tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
 
     def open_dlg_rapports(self):
@@ -860,9 +857,8 @@ class GwPsector:
         if self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
-            field_id_right = "price_id"
-            self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
-            self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
+            if not self.load_signals:
+                self.price_selector(self.dlg_plan_psector, tableleft, tableright)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
@@ -993,6 +989,7 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
 
         name_exist = self.check_name(psector_name)
+
         if name_exist and not self.update:
             message = "The name is current in use"
             tools_qgis.show_warning(message)
@@ -1011,36 +1008,12 @@ class GwPsector:
             message = "Check fields from table or view"
             tools_qgis.show_warning(message, parameter=viewname)
             return
-
         columns = []
         for row in rows:
             columns.append(str(row[0]))
 
-        if self.update:
-            if columns:
-                sql = "UPDATE " + tablename + " SET "
-                for column_name in columns:
-                    if column_name != 'psector_id':
-                        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, column_name)
-                        if widget_type is QCheckBox:
-                            value = tools_qt.is_checked(self.dlg_plan_psector, column_name)
-                        elif widget_type is QDateEdit:
-                            date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        elif widget_type is QComboBox:
-                            combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
-                            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
-                        else:
-                            value = tools_qt.get_text(self.dlg_plan_psector, column_name)
-                        if value is None or value == 'null':
-                            sql += column_name + " = null, "
-                        else:
-                            sql += f"{column_name} = $${value}$$, "
+        if not self.update:
 
-                sql = sql[:len(sql) - 2]
-                sql += f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}'"
-
-        else:
             values = "VALUES("
             if columns:
                 sql = f"INSERT INTO {tablename} ("
@@ -1071,9 +1044,9 @@ class GwPsector:
                 values = values[:len(values) - 2] + ")"
                 sql += values
 
-        if not self.update:
             sql += " RETURNING psector_id;"
             new_psector_id = tools_db.execute_returning(sql)
+
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id:
                 row = tools_gw.get_config_value('plan_psector_vdefault')
@@ -1085,8 +1058,6 @@ class GwPsector:
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
-                tools_db.execute_sql(sql)
-        else:
             tools_db.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
@@ -1111,7 +1082,10 @@ class GwPsector:
         return json_result
 
 
-    def price_selector(self, dialog, tableleft, tableright, field_id_right):
+    def price_selector(self, dialog, tableleft, tableright):
+
+
+        self.load_signals = True
 
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
@@ -1119,35 +1093,24 @@ class GwPsector:
         self.fill_table(dialog, tbl_all_rows, tableleft)
         tools_gw.set_tablemodel_config(dialog, tbl_all_rows, tableleft)
 
-        # fill QTableView selected_rows
-        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
+        if not self.price_loaded:
+            self.price_loaded = True
+            self.count = -1
+            psector_id = tools_qt.get_text(dialog, 'psector_id')
+            self._manage_widgets_price(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
 
-        # Button select
+        # Button select (Create new labels)
         dialog.btn_select.clicked.connect(
-            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+            partial(self.create_label, dialog, tbl_all_rows, 'id', tableright, "price_id"))
         tbl_all_rows.doubleClicked.connect(
-            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+            partial(self.create_label, dialog, tbl_all_rows, 'id', tableright, "price_id"))
 
         # Button unselect
-        dialog.btn_unselect.clicked.connect(
-            partial(self.rows_unselector, dialog, tbl_selected_rows, tableright, field_id_right))
+        dialog.btn_remove.clicked.connect(
+            partial(self.rows_unselector, dialog, tableright))
 
 
-    def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
-        """
-            :param dialog: (QDialog)
-            :param tbl_all_rows: QTableView origin
-            :param tbl_selected_rows: QTableView destini
-            :param id_ori: Refers to the id of the source table
-            :param tableright: table destini
-            :param id_des: Refers to the id of the target table, on which the query will be made
-            :param field_id:
-        """
+    def create_label(self, dialog, tbl_all_rows, id_ori, tableright, id_des):
 
         selected_list = tbl_all_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1160,10 +1123,11 @@ class GwPsector:
             id_ = tbl_all_rows.model().record(row).value(id_ori)
             expl_id.append(id_)
 
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
+
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             values = ""
-            psector_id = tools_qt.get_text(dialog, 'psector_id')
             values += f"'{psector_id}', "
             if tbl_all_rows.model().record(row).value('unit') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('unit')}', "
@@ -1195,44 +1159,146 @@ class GwPsector:
                 tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tableright}"
-                       f" (psector_id, unit, price_id, descript, price) "
+                       f" (psector_id, unit, price_id, observ, price) "
                        f" VALUES ({values})")
                 tools_db.execute_sql(sql)
 
-        # Refresh
-        expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
-        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
+        self._manage_widgets_price(dialog, tableright, psector_id, expl_id)
 
 
-    def rows_unselector(self, dialog, tbl_selected_rows, tableright, field_id_right):
+    def _manage_widgets_price(self, dialog, tableright, psector_id, print_all_rows=False, print_headers=True):
 
-        query = (f"DELETE FROM {tableright}"
-                 f" WHERE {tableright}.{field_id_right} = ")
-        selected_list = tbl_selected_rows.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        for i in reversed(range(layout.count())):
+            if layout.itemAt(i).widget():
+                layout.itemAt(i).widget().deleteLater()
+        self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
+        self.update_total(dialog)
+
+
+    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
+                           , print_all_rows=False, print_headers=False):
+
+        extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
+        body = tools_gw.create_body(extras=extras)
+        complet_result = tools_gw.execute_procedure('gw_fct_getwidgetprices', body)
+
+        if not complet_result or complet_result['fields'] == {}:
             return
-        expl_id = []
-        psector_id = tools_qt.get_text(dialog, 'psector_id')
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = str(tbl_selected_rows.model().record(row).value(field_id_right))
-            expl_id.append(id_)
-        for i in range(0, len(expl_id)):
-            sql = f"{query}'{expl_id[i]}' AND psector_id = '{psector_id}'"
+
+
+        if print_headers or self.header_exist is None:
+            self.header_exist = True
+            pos = 1
+            self.count = self.count + 1
+            for key in complet_result['fields'][0].keys():
+                if key != 'id':
+                    lbl = QLabel()
+                    lbl.setObjectName(f"lbl_{key}_{self.count}")
+                    lbl.setText(f"  {key}  ")
+    
+                    layout = dialog.findChild(QGridLayout, 'lyt_price')
+                    layout.addWidget(lbl, self.count, pos)
+                    layout.setColumnStretch(2, 1)
+                    pos = pos + 1
+
+        for field in complet_result['fields']:
+            if field['price_id'] in expl_id or print_all_rows:
+                self.count = self.count + 1
+                pos = 0
+
+                # Create check
+                check = QCheckBox()
+                check.setObjectName(f"{field['id']}")
+
+                layout = dialog.findChild(QGridLayout, 'lyt_price')
+                layout.addWidget(check, self.count, pos)
+                layout.setColumnStretch(2, 1)
+                pos = pos + 1
+
+                for key in complet_result['fields'][0].keys():
+                    if key != 'id':
+                        if key not in editable_widgets:
+                            widget = QLabel()
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
+                            widget.setText(f"  {field.get(key)}  ")
+                        else:
+                            widget = QLineEdit()
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
+                            if f"widget_{key}_{field['price_id']}" in self.dict_to_update:
+                                text = self.dict_to_update[f"widget_{key}_{field['price_id']}"][key]
+                            else:
+                                text = field.get(key) if field.get(key) is not None else ''
+
+                            widget.setText(f"{text}")
+                            widget.editingFinished.connect(partial(self._manage_updates_prices, widget, key, field['price_id']))
+                            widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True ))
+                            widget.editingFinished.connect(partial(self.update_total, dialog))
+
+                        layout = dialog.findChild(QGridLayout, 'lyt_price')
+                        layout.addWidget(widget, self.count, pos)
+                        layout.setColumnStretch(2, 1)
+                        pos = pos + 1
+
+
+    def _manage_updates_prices(self, widget, key, price_id):
+
+        self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
+        self._update_otherprice()
+
+
+    def _update_otherprice(self):
+
+        sql = ""
+        _filter = ""
+        if self.dict_to_update:
+            for main_key in self.dict_to_update:
+                sub_list = list(self.dict_to_update[main_key].keys())
+                for sub_key in sub_list:
+                    if sub_key == 'price_id':
+                        _filter = self.dict_to_update[main_key][sub_key]
+                    else:
+                        sql += f"UPDATE v_edit_plan_psector_x_other SET {sub_key} = '{self.dict_to_update[main_key][sub_key]}' " \
+                               f"WHERE psector_id = {tools_qt.get_text(self.dlg_plan_psector, self.psector_id)} AND price_id = '{_filter}';\n"
             tools_db.execute_sql(sql)
 
-        # Refresh
-        expr = f" psector_id = '{psector_id}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
-        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
+    def _manage_widgets(self, dialog, lbl, widget, count, pos):
+
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        layout.addWidget(lbl, count, pos)
+        layout.addWidget(widget, count, pos+1)
+        layout.setColumnStretch(2, 1)
+
+
+    def rows_unselector(self, dialog, tableright):
+
+        query = (f"DELETE FROM {tableright}"
+                 f" WHERE {tableright}.id = ")
+
+        select_widgets = dialog.tab_other_prices.findChildren(QCheckBox)
+        selected_ids = []
+        count = 0
+        for check in select_widgets:
+            if check.isChecked():
+                selected_ids.append(check.objectName())
+            else:
+                count = count + 1
+
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
+        for i in range(0, len(selected_ids)):
+            sql = f"{query}'{selected_ids[i]}' AND psector_id = '{psector_id}'"
+            tools_db.execute_sql(sql)
+
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        for i in reversed(range(layout.count())):
+            if layout.itemAt(i).widget():
+                layout.itemAt(i).widget().deleteLater()
+        self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
+        self.update_total(dialog)
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit """
@@ -1290,7 +1356,6 @@ class GwPsector:
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.beforeUpdate.connect(partial(self.manage_update_state, model))
         model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
-        model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
 
         # Check for errors
@@ -1308,7 +1373,7 @@ class GwPsector:
 
 
     def refresh_table(self, dialog, widget):
-        """ Refresh qTableView 'selected_rows' """
+        """ Refresh qTableView """
 
         widget.selectAll()
         selected_list = widget.selectionModel().selectedRows()
@@ -1703,7 +1768,7 @@ class GwPsector:
                   f'"isAlone":"False", "disableParent":"False", '
                   f'"value":"True"')
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure("gw_fct_setselectors", body)
+        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
         tools_gw.manage_current_selections_docker(result)
 
 

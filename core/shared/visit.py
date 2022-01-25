@@ -457,12 +457,18 @@ class GwVisit(QObject):
 
 
     def _reconnect_table_signals(self, table_object):
-        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
-            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                    table_object))
-        self.dlg_visit_manager.btn_open.clicked.connect(
-            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                    table_object))
+        try:
+            self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                        table_object))
+        except RuntimeError:
+            pass
+        try:
+            self.dlg_visit_manager.btn_open.clicked.connect(
+                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                        table_object))
+        except RuntimeError:
+            pass
 
 
     def _set_signals(self):

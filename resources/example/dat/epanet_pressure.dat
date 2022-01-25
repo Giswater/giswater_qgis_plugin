@@ -1,0 +1,7 @@
+;epanet pressure calibration file
+;node  time value
+;----------------
+ 1001    0    32
+ 1002    0    40
+ 1003    0    35
+ 1004    0    32

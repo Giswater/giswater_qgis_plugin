@@ -10,6 +10,11 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 Changelog=Version 3.5.021
     - Update version of EPANET 
+    - Update QGIS templates: delete Admin group, delete some unusual layers and enhance symbology
+    - Enhance psector_raports.ui
+    - Enhance debug message on threads execution
+    - Refactor and enhance button add_child_layer. Manage more layers and categories
+    - Refactor tab other_prices on psector form
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
