@@ -336,8 +336,11 @@ class GwAdminButton:
             schema_name = self._get_schema_name()
             sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
             tools_db.execute_sql(sql)
-            status = self.load_updates(project_type, update_changelog=True)
+            status = self.load_updates(project_type, update_changelog=True, schema_name=schema_name)
             if status:
+                # Check if schema utils exists and execute update
+                self._update_utils(schema_name)
+                # Set info project
                 self._set_info_project()
                 if 'body' in status:
                     tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
@@ -3152,13 +3155,16 @@ class GwAdminButton:
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
 
-    def _update_utils(self):
+    def _update_utils(self, schema_name=None):
 
-        self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        if schema_name is None:
+            self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        else:
+            self.ws_project_name = schema_name
         sql = f"SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
         row = tools_db.get_row(sql)
         if row:
-            self._update_utils_schema(row)
+            self._update_utils_schema(row, schema_name)
 
 
     def _load_base_utils(self):
@@ -3183,7 +3189,7 @@ class GwAdminButton:
         return True
 
 
-    def _update_utils_schema(self, schema_version=None):
+    def _update_utils_schema(self, schema_version=None, schema_name=None):
 
         folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
 
@@ -3204,16 +3210,22 @@ class GwAdminButton:
                         status = self._load_sql(folder_update, utils_schema_name='utils')
                         if status is False:
                             return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
-                    if self._process_folder(folder_update):
-                        status = self._load_sql(folder_update, utils_schema_name=self.ws_project_name)
-                        if status is False:
-                            return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
-                    if self._process_folder(folder_update):
-                        status = self._load_sql(folder_update, utils_schema_name=self.ud_project_name)
-                        if status is False:
-                            return False
+                    if self.project_type_selected == 'ws':
+                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
+                        if self._process_folder(folder_update):
+                            if schema_name is None:
+                                schema_name = self.ws_project_name
+                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
+                            if status is False:
+                                return False
+                    if self.project_type_selected == 'ud':
+                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
+                        if self._process_folder(folder_update):
+                            if schema_name is None:
+                                schema_name = self.ud_project_name
+                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
+                            if status is False:
+                                return False
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
                     if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)
