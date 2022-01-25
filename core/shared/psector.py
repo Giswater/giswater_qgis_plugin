@@ -1768,7 +1768,7 @@ class GwPsector:
                   f'"isAlone":"False", "disableParent":"False", '
                   f'"value":"True"')
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure("gw_fct_setselectors", body)
+        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
         tools_gw.manage_current_selections_docker(result)
 
 
