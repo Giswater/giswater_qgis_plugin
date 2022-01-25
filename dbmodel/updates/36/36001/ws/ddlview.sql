@@ -11,6 +11,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 drop view if exists vi_reactions;
 drop view if exists vi_curves;
 drop view if exists vi_energy;
+drop view if exists vi_emitters;
+drop view if exists vi_quality;
+drop view if exists vi_sources;
+drop view if exists vi_mixing;
 
 drop view if exists vi_reactions;
 CREATE OR REPLACE VIEW vi_reactions AS 
