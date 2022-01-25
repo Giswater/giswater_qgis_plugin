@@ -2358,7 +2358,8 @@ def remove_selection(remove_groups=True, layers=None):
     if remove_groups and layers is not None:
         for key, elems in layers.items():
             for layer in layers[key]:
-                layer.removeSelection()
+                if layer:
+                    layer.removeSelection()
 
     global_vars.canvas.refresh()
 
