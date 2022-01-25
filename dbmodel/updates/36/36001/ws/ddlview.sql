@@ -153,6 +153,7 @@ AND selector_inp_result.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW vi_quality AS 
+CREATE OR REPLACE VIEW vi_quality AS 
 SELECT node_id,
 init_quality
 FROM selector_inp_result, inp_junction
@@ -179,8 +180,49 @@ init_quality
 FROM selector_inp_result, inp_dscenario_inlet
 LEFT JOIN rpt_inp_node USING (node_id)
 WHERE inp_dscenario_inlet.init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_dscenario_tank
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_reservoir
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT node_id,
+init_quality
+FROM selector_inp_result, inp_dscenario_reservoir
+LEFT JOIN rpt_inp_node USING (node_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT arc_id,
+init_quality
+FROM selector_inp_result, inp_virtualvalve
+LEFT JOIN rpt_inp_arc USING (arc_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text 
+AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+SELECT arc_id,
+init_quality
+FROM selector_inp_result, inp_dscenario_virtualvalve
+LEFT JOIN rpt_inp_arc USING (arc_id)
+WHERE init_quality IS NOT NULL AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text 
 AND selector_inp_result.cur_user = "current_user"()::text;
-
 
 CREATE OR REPLACE VIEW vi_sources AS 
 SELECT node_id,

@@ -262,7 +262,7 @@ WHERE columnname='pattern' AND (formname ilike '%inp_pump%' or formname ilike '%
 
 --FK
 DELETE FROM sys_foreignkey WHERE typevalue_name = 'inp_typevalue_source' AND target_table='inp_source';
-DELETE FROM sys_foreignkey WHERE typevalue_name = 'inp_value_mixing' AND target_table='mix_type';
+DELETE FROM sys_foreignkey WHERE typevalue_name = 'inp_value_mixing' AND target_table='inp_mixing';
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
 VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_junction', 'source_type', true);

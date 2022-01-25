@@ -432,7 +432,7 @@ BEGIN
 			SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 			-- improve velocity for demands using directy tables in spite of vi_pipes view
-			INSERT INTO inp_dscenario_demands (dscenario_id, feature_id, demand, pattern_id, demand_type, source) 
+			INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source) 
 			SELECT 1, csv1, csv2::numeric(12,6), csv3, csv4, 'IMPORTINP' 
 			FROM temp_csv where source='[DEMANDS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 
