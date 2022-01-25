@@ -53,3 +53,18 @@ DROP TRIGGER IF EXISTS gw_trg_vi_mixing ON vi_mixing;
 CREATE TRIGGER gw_trg_vi_mixing INSTEAD OF INSERT OR UPDATE OR DELETE
 ON vi_mixing FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_mixing');
 
+DROP TRIGGER IF EXISTS gw_trg_vi_pumps ON vi_pumps;
+CREATE TRIGGER gw_trg_vi_pumps INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_pumps FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_pumps');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_curves ON vi_curves;
+CREATE TRIGGER gw_trg_vi_curves INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_curves FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_curves');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_energy ON vi_energy;
+CREATE TRIGGER gw_trg_vi_energy INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_energy FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_energy');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_reactions ON vi_reactions;
+CREATE TRIGGER gw_trg_vi_reactions INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_reactions FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_reactions');

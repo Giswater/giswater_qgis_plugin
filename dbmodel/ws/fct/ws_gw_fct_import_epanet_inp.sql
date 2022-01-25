@@ -480,7 +480,7 @@ BEGIN
 
 				--inserting values on editable view
 				v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source='||quote_literal(v_rec_table.target)||'
-				AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
+				AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id;';
 
 				raise notice 'v_sql %', v_sql;
 				EXECUTE v_sql;
@@ -590,8 +590,8 @@ BEGIN
 					EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 					IF v_epatablename = 'inp_pump' THEN
-						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, pump_type)
-						SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id,to_arc, pump_type)
+						SELECT v_node_id, power, curve_id, speed, pattern_id, status, effic_curve_id,  energy_price, energy_pattern_id, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
@@ -633,11 +633,11 @@ BEGIN
 				WHERE  b.arc_id = concat(inp_shortpipe.node_id,'_n2a');
 
 				-- transform pump additional from node to inp_pump_additional table		
-				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status, energyparam, energyvalue)
+				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
 				select 
 				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
 				(substring(reverse(arc_id),0,2))::integer,
-				power, curve_id, speed, pattern, status, energyparam, energyvalue
+				power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id
 				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
 				-- update state=0 pump additionals 
@@ -834,7 +834,7 @@ BEGIN
 	    '}}')::json, 2522, null, null, null);
 	
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
+/*	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
 		{"message":"-----------------------------"},
@@ -845,7 +845,7 @@ BEGIN
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
-	
+	*/
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

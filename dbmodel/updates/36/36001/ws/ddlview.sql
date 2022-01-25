@@ -15,6 +15,7 @@ drop view if exists vi_emitters;
 drop view if exists vi_quality;
 drop view if exists vi_sources;
 drop view if exists vi_mixing;
+drop view if exists vi_pumps;
 
 drop view if exists vi_reactions;
 CREATE OR REPLACE VIEW vi_reactions AS 
@@ -42,7 +43,7 @@ parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_conc
 AND value IS NOT NULL AND  cur_user=current_user order by 1;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_energy AS 
+CREATE OR REPLACE VIEW vi_energy AS 
 SELECT concat('PUMP ', rpt_inp_arc.arc_id) AS pump_id,
 'EFFIC' as idval,
 effic_curve_id AS energyvalue
@@ -99,8 +100,34 @@ JOIN sys_param_user ON id=parameter
 WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') AND value IS NOT NULL AND 
 config_param_user.cur_user::name = current_user order by 1;
    
+CREATE OR REPLACE VIEW vi_pumps AS 
+SELECT temp_arc.arc_id,
+temp_arc.node_1,
+temp_arc.node_2,
+    CASE
+        WHEN (temp_arc.addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (temp_arc.addparam::json ->> 'power'::text)
+        ELSE NULL::text
+    END AS power,
+    CASE
+        WHEN (temp_arc.addparam::json ->> 'curve_id'::text) <> ''::text THEN ('HEAD'::text || ' '::text) || (temp_arc.addparam::json ->> 'curve_id'::text)
+        ELSE NULL::text
+    END AS head,
+    CASE
+        WHEN (temp_arc.addparam::json ->> 'speed'::text) <> ''::text THEN ('SPEED'::text || ' '::text) || (temp_arc.addparam::json ->> 'speed'::text)
+        ELSE NULL::text
+    END AS speed,
+    CASE
+        WHEN (temp_arc.addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (temp_arc.addparam::json ->> 'pattern'::text)
+        ELSE NULL::text
+    END AS pattern_id,
+concat(';', temp_arc.sector_id, ' ', temp_arc.dma_id, ' ', temp_arc.presszone_id, ' ', temp_arc.dqa_id, ' ', temp_arc.minsector_id, ' ', temp_arc.arccat_id) AS other
+FROM temp_arc
+WHERE temp_arc.epa_type::text = 'PUMP'::text AND NOT (temp_arc.arc_id::text IN ( SELECT vi_valves.arc_id
+FROM vi_valves))
+ORDER BY temp_arc.arc_id;
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_curves AS 
+
+CREATE OR REPLACE VIEW vi_curves AS 
 SELECT
 CASE WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
 ELSE a.curve_id
@@ -152,7 +179,6 @@ WHERE emitter_coeff IS NOT NULL AND rpt_inp_node.result_id::text = selector_inp_
 AND selector_inp_result.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW vi_quality AS 
 CREATE OR REPLACE VIEW vi_quality AS 
 SELECT node_id,
 init_quality
@@ -304,7 +330,6 @@ LEFT JOIN rpt_inp_node USING (node_id)
 WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
 AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text 
 AND selector_inp_result.cur_user = "current_user"()::text;
-
 
 
 

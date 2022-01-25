@@ -59,8 +59,8 @@ BEGIN
 				NEW.power=NULL;	   
 	    END IF;
 	    
-	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern)
-	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern);
+	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern_id)
+	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern_id);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
 	  ELSIF v_view='vi_valves' THEN
@@ -134,13 +134,13 @@ BEGIN
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		IF NEW.idval ILIKE '%PRICE%'
+	  		IF NEW.idval ILIKE '%PRICE%' THEN
 	  			UPDATE inp_pump_importinp SET energy_price = NEW.energyvalue 
 	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
-	  		ELSIF NEW.idval ILIKE '%EFFIC%'
+	  		ELSIF NEW.idval ILIKE '%EFFIC%' THEN
 	  			UPDATE inp_pump_importinp SET effic_curve_id = NEW.energyvalue 
 	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
-	  		ELSIF  NEW.idval ILIKE '%PATTERN%'
+	  		ELSIF  NEW.idval ILIKE '%PATTERN%' THEN
 	  			UPDATE inp_pump_importinp SET energy_pattern_id = NEW.energyvalue 
 	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
 	  		END IF;
