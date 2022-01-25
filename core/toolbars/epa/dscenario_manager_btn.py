@@ -233,12 +233,9 @@ class GwDscenarioManagerButton(GwAction):
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
-
-        # Set widget & model properties
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        widget.setEditTriggers(set_edit_triggers)
         # In order to make the first column not editable, we need to override the QSqlTableModel flags
         model.flags = lambda index: self.flags(index, model)
+
 
         # Check for errors
         if model.lastError().isValid():
@@ -249,6 +246,10 @@ class GwDscenarioManagerButton(GwAction):
             widget.model().setFilter(expr)
         else:
             widget.setModel(model)
+
+        # Set widget & model properties
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers)
+        tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
