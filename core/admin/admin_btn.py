@@ -338,8 +338,6 @@ class GwAdminButton:
             tools_db.execute_sql(sql)
             status = self.load_updates(project_type, update_changelog=True, schema_name=schema_name)
             if status:
-                # Check if schema utils exists and execute update
-                self._update_utils(schema_name)
                 # Set info project
                 self._set_info_project()
                 if 'body' in status:
@@ -384,6 +382,8 @@ class GwAdminButton:
             status = self.update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
+            # Check if schema utils exists and execute update
+            self._update_utils(schema_name)
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 
