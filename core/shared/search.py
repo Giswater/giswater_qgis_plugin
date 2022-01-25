@@ -317,7 +317,7 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 25))
+            tools_qgis.draw_polygon(points, self.rubber_band)
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self._workcat_open_table_items(item)
@@ -326,17 +326,7 @@ class GwSearch:
         # Tab 'psector'
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-            self.manage_new_psector.get_psector(item['sys_id'], is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
-            if not list_coord:
-                msg = "Empty coordinate list"
-                tools_qgis.show_warning(msg)
-                return
-            points = tools_qgis.get_geometry_vertex(list_coord)
-            self._reset_rubber_band()
-            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
-            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+            self.manage_new_psector.get_psector(item['sys_id'], list_coord)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
@@ -899,26 +889,6 @@ class GwSearch:
 
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
-
-
-    def _draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
-        """
-        Draw 'polygon' over canvas following list of points
-            :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-        """
-
-        rubber_band.setIconSize(20)
-        polygon = QgsGeometry.fromPolygonXY([points])
-        rubber_band.setToGeometry(polygon, None)
-        rubber_band.setColor(border)
-        if fill_color:
-            rubber_band.setFillColor(fill_color)
-        rubber_band.setWidth(width)
-        rubber_band.show()
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, rubber_band.reset)
 
 
     def _document_insert(self, dialog, tablename, field, field_value):

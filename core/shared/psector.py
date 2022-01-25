@@ -9,8 +9,8 @@ import csv
 import json
 import os
 import operator
-import sys
 import re
+import sys
 from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
@@ -19,8 +19,8 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QHeaderView
-from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout
+from qgis.core import QgsLayoutExporter, QgsProject
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
@@ -45,7 +45,7 @@ class GwPsector:
         self.dict_to_update = {}
 
 
-    def get_psector(self, psector_id=None, is_api=False):
+    def get_psector(self, psector_id=None, list_coord=None):
         """ Buttons 45 and 81: New psector """
 
         row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -306,51 +306,32 @@ class GwPsector:
                    f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
             tools_db.execute_sql(sql)
             self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
-            layer = None
-            if not is_api:
-                layername = f'v_edit_plan_psector'
-                layer = tools_qgis.get_layer_by_tablename(layername, show_warning_=False)
 
-            if layer:
+            self.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
 
-                expr_filter = f"psector_id = '{psector_id}'"
-                (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-                if not is_valid:
+            if not list_coord:
+
+                sql = f"SELECT st_astext(st_envelope(the_geom)) FROM v_edit_plan_psector WHERE psector_id = {psector_id}"
+                row = tools_db.get_row(sql)
+                if row[0]:
+                    list_coord = re.search('\(\((.*)\)\)', str(row[0]))
+                else:
+                    msg = "Empty coordinate list"
+                    tools_qgis.show_warning(msg)
                     return
 
-                tools_qgis.select_features_by_expr(layer, expr)
-
-                # Get canvas extend in order to create a QgsRectangle
-                ext = self.canvas.extent()
-                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-                canvas_rec = QgsRectangle(start_point, end_point)
-                canvas_width = ext.xMaximum() - ext.xMinimum()
-                canvas_height = ext.yMaximum() - ext.yMinimum()
-                # Get boundingBox(QgsRectangle) from selected feature
-                try:
-                    feature = layer.selectedFeatures()[0]
-                except IndexError:
-                    feature = layer.selectedFeatures()
-
-                if feature != []:
-                    if feature.geometry().get() is not None:
-                        psector_rec = feature.geometry().boundingBox()
-                        # Do zoom when QgsRectangles don't intersect
-                        if not canvas_rec.intersects(psector_rec):
-                            self.zoom_to_selected_features(layer)
-                        if psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100:
-                            self.zoom_to_selected_features(layer)
-                        layer.removeSelection()
+            points = tools_qgis.get_geometry_vertex(list_coord)
+            tools_gw.reset_rubberband(self.rubber_band)
+            tools_qgis.draw_polygon(points, self.rubber_band)
+            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-
         else:
-
             # Set psector_status vdefault
             sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
             result = tools_db.get_row(sql)
