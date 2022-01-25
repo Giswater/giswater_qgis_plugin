@@ -65,10 +65,6 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
-        # selection_model = self.dlg_dscenario_manager.tbl_dscenario.selectionModel()
-        # selection_model.selectionChanged.connect(partial(self._fill_info))
-        # self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
-
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
 
