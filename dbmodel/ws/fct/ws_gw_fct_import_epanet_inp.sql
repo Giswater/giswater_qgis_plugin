@@ -168,10 +168,10 @@ BEGIN
 			DELETE FROM inp_curve_value;
 			DELETE FROM inp_controls;
 			DELETE FROM inp_rules;
-			DELETE FROM inp_emitter;
-			DELETE FROM inp_quality;
-			DELETE FROM inp_source;
-			DELETE FROM inp_mixing;
+			--DELETE FROM inp_emitter;
+			--DELETE FROM inp_quality;
+			--DELETE FROM inp_source;
+			--DELETE FROM inp_mixing;
 			DELETE FROM config_param_user;
 			DELETE FROM inp_label;
 			DELETE FROM inp_backdrop;

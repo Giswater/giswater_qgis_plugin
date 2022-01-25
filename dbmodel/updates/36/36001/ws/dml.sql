@@ -258,3 +258,34 @@ WHERE columnname='pattern_id';
 
 UPDATE config_form_fields set columnname='pattern_id' 
 WHERE columnname='pattern' AND (formname ilike '%inp_pump%' or formname ilike '%inp_dscenario_pump%');
+
+
+--FK
+DELETE FROM sys_foreignkey WHERE typevalue_name = 'inp_typevalue_source' AND target_table='inp_source';
+DELETE FROM sys_foreignkey WHERE typevalue_name = 'inp_value_mixing' AND target_table='mix_type';
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_junction', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_dscenario_junction', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_tank', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_dscenario_tank', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_reservoir', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_dscenario_reservoir', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_inlet', 'source_type', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_typevalue_source', 'inp_dscenario_inlet', 'source_type', true);
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_value_mixing', 'inp_tank', 'mixing_model', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_value_mixing', 'inp_dscenario_tank', 'mixing_model', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_value_mixing', 'inp_inlet', 'mixing_model', true);
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,  active) 
+VALUES ('inp_typevalue', 'inp_value_mixing', 'inp_dscenario_inlet', 'mixing_model', true);
