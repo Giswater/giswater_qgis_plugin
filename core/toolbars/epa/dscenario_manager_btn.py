@@ -66,7 +66,7 @@ class GwDscenarioManagerButton(GwAction):
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
-        self.dlg_dscenario_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
+        self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
@@ -202,7 +202,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_dscenario.btn_snapping.clicked.connect(partial(self._manage_select))
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
-        self.dlg_dscenario.rejected.connect(self._selection_end)
+        self.dlg_dscenario.finished.connect(self._selection_end)
+        self.dlg_dscenario.finished.connect(partial(tools_gw.close_dialog, self.dlg_dscenario, True))
 
         self._fill_dscenario_table()
 
