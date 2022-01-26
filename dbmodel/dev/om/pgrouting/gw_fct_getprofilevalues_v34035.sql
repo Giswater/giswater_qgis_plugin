@@ -227,15 +227,16 @@ BEGIN
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM dblink(''host=serverip port=serverport user=username password=pwd dbname=gis'' ,''SELECT * FROM pgr_dijkstra(''''SELECT arc_id::int8 as id, 
-			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc'''', '||v_init||'::int8,'||v_end||'::int8)'')
+			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
 			as return(seq integer, path_seq integer, node bigint, edge bigint, cost double precision, agg_cost double precision))a
-			USING (arc_id)';
+			USING (arc_id)
+			WHERE b.state > 0';
 
 		-- insert node values on anl_node table
 		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
 			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
 			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM dblink(''host=serverip port=serverport user=username password=pwd dbname=gis'' ,''SELECT * FROM pgr_dijkstra(''''SELECT arc_id::int8 as id, 
-			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc'''', '||v_init||'::int8,'||v_end||'::int8)'')
+			node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, gis_length::float as reverse_cost FROM ud_fdw.v_edit_arc WHERE node_1 is not null AND node_2 is not null'''', '||v_init||'::int8,'||v_end||'::int8)'')
 			as return(seq integer, path_seq integer, node bigint, edge bigint, cost double precision, agg_cost double precision))a
 			USING (node_id)';
 
