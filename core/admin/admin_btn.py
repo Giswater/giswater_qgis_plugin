@@ -174,7 +174,7 @@ class GwAdminButton:
                     tools_qt.show_info_box(msg, "Warning")
                     return
 
-        elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
+        elif self.rdb_sample.isChecked():
 
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
@@ -412,7 +412,6 @@ class GwAdminButton:
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
         self.project_descript = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_descript')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
-        self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
@@ -433,9 +432,6 @@ class GwAdminButton:
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
-
-        if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
-            self.rdb_sample_dev.setVisible(False)
 
         # Manage SRID
         self._manage_srid()

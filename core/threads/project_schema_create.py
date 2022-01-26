@@ -177,10 +177,6 @@ class GwCreateSchemaTask(GwTask):
         elif self.admin.rdb_sample.isChecked() and example_data:
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
-        elif self.admin.rdb_sample_dev.isChecked():
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
-            self.admin.load_sample_data(project_type=project_type)
-            self.admin.load_dev_data(project_type=project_type)
         elif self.admin.rdb_data.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
