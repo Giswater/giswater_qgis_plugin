@@ -170,6 +170,14 @@ BEGIN
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
 
+	--Check if user has migration mode enabled
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+	  	v_node_proximity_control = FALSE;
+	  	v_connec_proximity_control = FALSE;
+	  	v_gully_proximity=FALSE;
+	  	v_dsbl_error=TRUE;
+ 	END IF;
+
 	-- get user parameters
 	SELECT (value)::boolean INTO v_edit_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
 	SELECT (value)::boolean INTO v_arc_insert_automatic_endpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;

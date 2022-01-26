@@ -26,7 +26,7 @@ DECLARE
 v_fid integer=437;
 v_schemaname text;
 v_projectype text;
-v_action text;
+v_action boolean;
 v_result_info text;
 v_version text;
 
@@ -38,31 +38,15 @@ BEGIN
 
 	SELECT project_type, giswater INTO v_projectype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
-	v_action = json_extract_path_text(p_data,'data','parameters','action');
+	v_action = json_extract_path_text(p_data,'data','parameters','action')::boolean;
 
-	IF v_action = 'DISABLE' THEN
-
-		DELETE FROM temp_table WHERE fid=v_fid AND cur_user=current_user;
-
-		INSERT INTO temp_table (fid, text_column, addparam)
-		SELECT v_fid, parameter, value::json FROM config_param_system 
-		WHERE parameter IN ('edit_connec_proximity', 'edit_node_proximity');
-
-		UPDATE config_param_system SET value = '{"activated":false,"value":0.1}' WHERE parameter IN ('edit_connec_proximity', 'edit_node_proximity');
-		UPDATE config_param_system SET value = TRUE WHERE parameter IN ('edit_topocontrol_disable_error');
-
-		v_result_info='Control disabled';
-
-	ELSIF v_action = 'ENABLE' THEN
-
-		UPDATE config_param_system SET value = addparam FROM temp_table WHERE cur_user = current_user AND fid=v_fid
-		AND text_column=parameter;
-
-		UPDATE config_param_system SET value = FALSE WHERE parameter IN ('edit_topocontrol_disable_error');
-		v_result_info='Control enabled';
-
-		DELETE FROM temp_table WHERE fid=v_fid AND cur_user=current_user;
-	END IF;
+	IF v_action IS TRUE THEN
+		INSERT INTO config_param_user (parameter, value, cur_user)
+		VALUES ('edit_disable_topocontrol', v_action::text, current_user )
+		ON CONFLICT DO UPDATE SET value=v_action::text;
+	ELSE
+		DELETE FROM config_param_user WHERE parameter='edit_disable_topocontrol' and cur_user =current_user;
+	END IF;	
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -77,15 +61,6 @@ BEGIN
 			   '}}'||
 		'}')::json, 3130, null, null, null);
 
-
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-	             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||
-		       '}'||
-	    '}}')::json, 2670, null, null, null);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

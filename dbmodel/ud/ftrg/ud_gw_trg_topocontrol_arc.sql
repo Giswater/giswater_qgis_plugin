@@ -65,7 +65,12 @@ BEGIN
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 	SELECT value::boolean INTO v_keepdepthvalues FROM config_param_user WHERE parameter='edit_arc_keepdepthval_when_reverse_geom' AND cur_user = current_user;
 
-	
+	--Check if user has migration mode enabled
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+  		v_samenode_init_end_control = FALSE;
+  		v_dsbl_error = TRUE;
+  	END IF;
+
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node 
