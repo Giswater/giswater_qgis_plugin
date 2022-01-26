@@ -516,6 +516,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param style_id: Id of the style we want to load (integer or String)
     """
 
+    tablename_og = tablename
     uri = tools_db.get_uri()
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
 
@@ -539,7 +540,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     # Set layer config
     if tablename:
-        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
+        feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
         extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
         body = create_body(feature=feature, extras=extras)
         execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
