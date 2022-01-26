@@ -174,7 +174,7 @@ BEGIN
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
 	  	v_node_proximity_control = FALSE;
 	  	v_connec_proximity_control = FALSE;
-	  	v_gully_proximity=FALSE;
+	  	v_gully_proximity_control=FALSE;
  	END IF;
 
 	-- get user parameters
@@ -774,6 +774,11 @@ BEGIN
 		END LOOP;  
 	END IF;
 	
+	--Check if user has migration mode enabled
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+	  	v_status = TRUE;
+ 	END IF;
+
 	-- Convert to json
 	v_fields := array_to_json(v_fields_array);
 

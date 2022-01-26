@@ -27,6 +27,7 @@ v_fid integer=437;
 v_schemaname text;
 v_projectype text;
 v_action boolean;
+v_result json;
 v_result_info text;
 v_version text;
 
@@ -39,16 +40,28 @@ BEGIN
 	SELECT project_type, giswater INTO v_projectype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
 	v_action = json_extract_path_text(p_data,'data','parameters','action')::boolean;
+	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('TOPOCONTROL FOR DATA MIGRATION'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+
 
 	IF v_action IS TRUE THEN
 		INSERT INTO config_param_user (parameter, value, cur_user)
 		VALUES ('edit_disable_topocontrol', v_action::text, current_user )
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_action::text;
-		v_result_info='Migration mode activated. Topocontrol is disabled';
+		INSERT INTO audit_check_data(fid,  error_message)
+		VALUES (v_fid,  'Migration mode activated. Topocontrol is disabled');
 	ELSE
 		DELETE FROM config_param_user WHERE parameter='edit_disable_topocontrol' and cur_user =current_user;
-		v_result_info='Work mode activated. Topocontrol is enabled';
+		INSERT INTO audit_check_data(fid,  error_message)
+		VALUES (v_fid,  'Work mode activated. Topocontrol is enabled');
 	END IF;	
+
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -56,7 +69,7 @@ BEGIN
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
-			 ',"data":{ "info":"'||v_result_info||'",'||
+			 ',"data":{ "info":'||v_result_info||','||
 				'"point":{"geometryType":"", "values":[]}'||','||
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
