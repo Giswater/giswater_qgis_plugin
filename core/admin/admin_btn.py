@@ -1195,7 +1195,7 @@ class GwAdminButton:
         new_name = self._bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
 
         msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info", force_action=True)
         if result:
             self._rename_project_data_schema(str(project_name), str(new_name))
             return True
