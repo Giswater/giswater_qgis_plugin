@@ -631,6 +631,7 @@ class GwAdminButton:
 
     def load_sample_data(self, project_type):
 
+        global_vars.dao.commit()
         folder = os.path.join(self.folder_example, 'user', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
