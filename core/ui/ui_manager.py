@@ -178,10 +178,6 @@ FORM_CLASS = _get_ui_class('go2epa_options.ui', 'epa')
 class GwGo2EpaOptionsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('hydrology_selector.ui', 'epa')
-class GwHydrologySelectorUi(GwDialog, FORM_CLASS):
-    pass
-
 FROM_CLASS = _get_ui_class('dscenario_manager.ui', 'epa')
 class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
     pass
