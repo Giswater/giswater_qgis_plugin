@@ -639,7 +639,7 @@ class GwLoadProject(QObject):
     def _manage_focus_changed(self, old, new):
         """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """
 
-        if new is None:
+        if new is None or not hasattr(new, 'window'):
             return
 
         table_dialog = new.window()
