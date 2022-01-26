@@ -175,7 +175,6 @@ BEGIN
 	  	v_node_proximity_control = FALSE;
 	  	v_connec_proximity_control = FALSE;
 	  	v_gully_proximity=FALSE;
-	  	v_dsbl_error=TRUE;
  	END IF;
 
 	-- get user parameters

@@ -40,6 +40,7 @@ BEGIN
 
   IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
   	v_node_proximity_control = FALSE;
+  	v_dsbl_error=TRUE;
   END IF;
 
     -- Lookig for state=0

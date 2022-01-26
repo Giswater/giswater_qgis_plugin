@@ -43,9 +43,11 @@ BEGIN
 	IF v_action IS TRUE THEN
 		INSERT INTO config_param_user (parameter, value, cur_user)
 		VALUES ('edit_disable_topocontrol', v_action::text, current_user )
-		ON CONFLICT DO UPDATE SET value=v_action::text;
+		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_action::text;
+		v_result_info='Migration mode activated. Topocontrol is disabled';
 	ELSE
 		DELETE FROM config_param_user WHERE parameter='edit_disable_topocontrol' and cur_user =current_user;
+		v_result_info='Work mode activated. Topocontrol is enabled';
 	END IF;	
 
 	-- Control nulls
