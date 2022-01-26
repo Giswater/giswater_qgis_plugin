@@ -174,6 +174,8 @@ class GwDscenarioManagerButton(GwAction):
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
         self.selected_dscenario_id = index.sibling(row, column_index).data()
+        column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_type')
+        self.selected_dscenario_type = index.sibling(row, column_index).data()
 
         # Create dialog
         self.dlg_dscenario = GwDscenarioUi()
@@ -184,6 +186,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
 
+        default_tab_idx = 0
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
               f"AND table_name LIKE 'v_edit_inp_dscenario%'"
@@ -196,6 +199,11 @@ class GwDscenarioManagerButton(GwAction):
                 qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
                 tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
+
+                if view.split('_')[-1].upper() == self.selected_dscenario_type:
+                    default_tab_idx = tab_idx
+
+        self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
