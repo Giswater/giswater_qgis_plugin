@@ -18,8 +18,8 @@ from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .shared.search import GwSearch
 from .utils import tools_gw
-from .load_project_check import GwLoadProjectCheck
 from .threads.project_layers_config import GwProjectLayersConfig
+from .threads.project_check import GwProjectCheckTask
 from .threads.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
@@ -498,7 +498,7 @@ class GwLoadProject(QObject):
 
         if global_vars.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project = GwLoadProjectCheck()
+            self.check_project = GwProjectCheckTask()
 
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
