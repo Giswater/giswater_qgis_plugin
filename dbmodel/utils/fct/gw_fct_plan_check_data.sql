@@ -208,39 +208,6 @@ BEGIN
 		VALUES (115, '332', 1,'INFO: There is/are no row(s) without values on cat_connec.active column column.',v_count);
 	END IF;
 
-	--check cat_connec cost_ut column (333)
-	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_ut IS NOT NULL and active=TRUE;
-	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '333', 'cat_connec', 'cost_ut', 2, FALSE, concat('WARNING-333: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ut column.'), (v_table_count-v_count));
-	ELSE
-		v_count = 0;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '333', 1,'INFO: There is/are no row(s) without values on cat_connec.cost_ut column.',v_count);
-	END IF;
-
-	--check cat_connec cost_ml column (334)
-	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_ml IS NOT NULL and active=TRUE;
-	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '334', 'cat_connec', 'cost_ml', 2, FALSE, concat('WARNING-334: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_ml column.'), (v_table_count-v_count));
-	ELSE
-		v_count = 0;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '334', 1,'INFO: There is/are no row(s) without values on cat_connec.cost_ml column.',v_count);
-	END IF;
-
-	--check cat_connec cost_m3 column (335)
-	SELECT count(*) INTO v_count FROM cat_connec WHERE cost_m3 IS NOT NULL and active=TRUE;
-	IF v_table_count>v_count THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '335', 'cat_connec', 'cost_m3', 2, FALSE, concat('WARNING-335: There are ',(v_table_count-v_count),' row(s) without values on cat_connec.cost_m3 column.'), (v_table_count-v_count));
-	ELSE
-		v_count = 0;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '335', 1,'INFO: There is/are no row(s) without values on cat_connec.cost_m3 column.',v_count);
-	END IF;
-
 	--pavement catalog
 	SELECT count(*) INTO v_table_count FROM cat_pavement;
 
