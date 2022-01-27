@@ -420,7 +420,7 @@ BEGIN
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
 			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 
-			-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
+			-- set header node for mapzones
 			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
 			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
 
@@ -450,10 +450,6 @@ BEGIN
 
 			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
 
-			-- close customized stoppers acording on grafconfig column on mapzone table
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((grafconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((grafconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
-	
 			-- close checkvalves on the opposite sense where they are working
 			UPDATE temp_anlgraf SET flag=1 WHERE id IN (
 					SELECT id FROM temp_anlgraf JOIN (
@@ -470,7 +466,7 @@ BEGIN
 					SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from sector 
-					where grafconfig is not null order by 1,2) a 
+					where grafconfig is not null and active is true order by 1,2) a 
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 			
 			ELSIF v_class = 'DMA' THEN
@@ -480,7 +476,7 @@ BEGIN
 					SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from dma 
-					where grafconfig is not null order by 1,2) a
+					where grafconfig is not null and active is true order by 1,2) a
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 
 			ELSIF v_class = 'DQA' THEN
@@ -490,7 +486,7 @@ BEGIN
 					SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from dqa  
-					where grafconfig is not null order by 1,2) a
+					where grafconfig is not null and active is true order by 1,2) a
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 
 			ELSIF v_class = 'PRESSZONE' THEN
@@ -500,7 +496,7 @@ BEGIN
 					SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from presszone
-					where grafconfig is not null order by 1,2) a
+					where grafconfig is not null and active is true order by 1,2) a
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);		
 			END IF;
 
@@ -604,7 +600,8 @@ BEGIN
 						UNION SELECT a.node_2, a.arc_id FROM arc a JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' AND cur_user = current_user)a
 						JOIN
 						(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id,
-						json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id, '||quote_ident(v_fieldmp)||' FROM '||quote_ident(v_table)||') b
+						json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id, '||quote_ident(v_fieldmp)||' FROM '||quote_ident(v_table)||'
+						WHERE active IS TRUE) b
 						USING (node_id, arc_id)
 						LIMIT 1'
 						INTO v_floodfromnode;
@@ -618,7 +615,7 @@ BEGIN
 				-- update arc table
 				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM anl_arc a JOIN 
 						(SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||
-						quote_ident(v_table)||') b
+						quote_ident(v_table)||' WHERE active IS TRUE) b 
 						 ON  nodeparent = descript WHERE fid='||v_fid||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 				EXECUTE v_querytext;
 
@@ -636,7 +633,8 @@ BEGIN
 
 				-- in case of conflict it is profilactic to set this update
 				EXECUTE 'UPDATE node SET '||v_field||' = a.'||v_field||' FROM
-				(WITH arcparent AS (SELECT '||v_field||', json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id FROM '||v_table||')
+				(WITH arcparent AS (SELECT '||v_field||', json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id 
+				FROM '||v_table||' WHERE active is true)
 				SELECT node_1 as node_id, arc.'||v_field||' FROM arc JOIN arcparent USING (arc_id)
 				UNION
 				SELECT node_2, arc.'||v_field||' FROM arc JOIN arcparent USING (arc_id)	
@@ -699,7 +697,7 @@ BEGIN
 
 				-- manage conflicts
 				FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
-				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz)a
+				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz WHERE active is true)a
 				USING (node_id))a
 				WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
 				
