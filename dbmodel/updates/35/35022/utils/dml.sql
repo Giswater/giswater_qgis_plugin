@@ -16,5 +16,5 @@ VALUES ('edit_disable_topocontrol', 'hidden', 'If true topocontrol and feature p
 'role_admin', true, 'utils', false, 'boolean', 'check', false, true,'core');
 
 --2022/01/27
-DELETE FROM sys_fprocess where fid in (333, 334, 335);
+DELETE FROM sys_fprocess where fid in (333, 334, 335, 179);
 
