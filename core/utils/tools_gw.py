@@ -528,6 +528,15 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
     # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
     # therefore, we define it with "-1"
+
+    if style_id in (None, "-1"):
+        # Get style_id from tablename
+        sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
+        row = tools_db.get_row(sql)
+        if row:
+            style_id = row[0]
+
+    # Apply style to layer if it has one configured
     if style_id not in (None, "-1"):
         body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
         style = execute_procedure('gw_fct_getstyle', body)
@@ -543,7 +552,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
         extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
         body = create_body(feature=feature, extras=extras)
-        json_result = execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
+        json_result = execute_procedure('gw_fct_getinfofromid', body)
         config_layer_attributes(json_result, vlayer, alias)
 
     global_vars.iface.mapCanvas().refresh()

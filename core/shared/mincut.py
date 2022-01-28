@@ -1775,6 +1775,9 @@ class GwMincut:
             element_id = snapped_feat.attribute(f'{elem_type}_id')
             layer.select([feature_id])
 
+            # Ensure that Mincut layers are loaded
+            self._load_missing_layers()
+
             # Create task to manage Mincut execution
             self.dlg_mincut.btn_cancel_task.show()
             self.dlg_mincut.btn_cancel.hide()
@@ -1783,6 +1786,18 @@ class GwMincut:
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
                 partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
+
+
+    def _load_missing_layers(self):
+        """ Adds any missing Mincut layers to TOC """
+
+        layers_to_load = {'v_om_mincut': "Mincut init point", 'v_om_mincut_valve': "Mincut result valve",
+                          'v_om_mincut_node': "Mincut result node", 'v_om_mincut_connec': "Mincut result connec",
+                          'v_om_mincut_arc': "Mincut result arc"}
+        for tablename, alias in layers_to_load.items():
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                tools_gw.add_layer_database(tablename, alias=alias, group="OM", sub_group="Mincut")
 
 
     def _cancel_task(self):
