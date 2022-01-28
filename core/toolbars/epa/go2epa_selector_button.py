@@ -26,10 +26,25 @@ class GwGo2EpaSelectorButton(GwAction):
     def clicked_event(self):
         """ Button 29: Epa result selector """
 
+        self._load_missing_layers()
         self._open_go2epa_selector()
 
 
     # region private functions
+
+    def _load_missing_layers(self):
+        """ Adds any missing Compare layers to TOC """
+
+        layers_to_load = {'v_rpt_comp_arc': "Arc Maximum Values Compare", 'v_rpt_comp_arc_hourly': "Arc Hourly Values Compare",
+                          'v_rpt_comp_node': "Node Maximum Values Compare", 'v_rpt_comp_node_hourly': "Node Hourly Values Compare"}
+        for tablename, alias in layers_to_load.items():
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                pk = "id"
+                if 'hourly' not in tablename:
+                    pk = f"{tablename.split('_')[-1]}_id"
+                tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
+
 
     def _open_go2epa_selector(self):
 
