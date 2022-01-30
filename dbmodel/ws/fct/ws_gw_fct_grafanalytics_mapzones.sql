@@ -420,6 +420,12 @@ BEGIN
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
 			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 
+			-- open custom nodes acording config parameters
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+
 			-- set header node for mapzones
 			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
 			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
@@ -745,7 +751,7 @@ BEGIN
 						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM v_edit_arc WHERE state >0 group by '||quote_ident(v_field)||') 
 						SELECT '||quote_ident(v_field)||
 						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
-						v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
+						v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
 						ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 						)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||
 						quote_ident(v_fieldmp)||' NOT IN (''0'', ''-1'')';
@@ -957,10 +963,9 @@ BEGIN
 	-- value4disconnecteds
 	IF v_valuefordisconnected IS NOT NULL OR v_valuefordisconnected <> 0 THEN
 
-		EXECUTE 'UPDATE arc t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text = ''0''';
-		EXECUTE 'UPDATE node t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text = ''0''';
-		EXECUTE 'UPDATE connec t SET '||v_field||'  = '||v_valuefordisconnected||' FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text = ''0''';
-
+		EXECUTE 'UPDATE arc t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text IN (''0'',''-1'')';
+		EXECUTE 'UPDATE node t SET '||v_field||' = '||v_valuefordisconnected||' FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text  IN (''0'',''-1'')';
+		EXECUTE 'UPDATE connec t SET '||v_field||'  = '||v_valuefordisconnected||' FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text  IN (''0'',''-1'')';
 	END IF;
 			
     	-- restore state selector (if it's needed)
