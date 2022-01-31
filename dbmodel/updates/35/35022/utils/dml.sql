@@ -27,3 +27,9 @@ widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "lay
 WHERE columnname='sector_id' AND (formname ilike '%pattern%' OR formname ilike '%inp_curve%' OR formname ilike '%inp_timeseries%');
 
 UPDATE sys_function SET project_type='utils', descript='Allows editing inp patterns view' WHERE id=3062;
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'query_filter', ' AND id<2'::text) WHERE parameter = 'basic_selector_tab_network_state';
+
+UPDATE sys_table SET sys_role='role_master' WHERE id IN ('plan_psector_x_arc', 'plan_psector_x_node', 'plan_psector_x_connec', 'plan_psector_x_gully', 'plan_psector_x_other');
+
+UPDATE config_form_tabs SET sys_role='role_basic' WHERE formname='selector_basic' AND tabname='tab_psector';
