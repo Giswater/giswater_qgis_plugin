@@ -18,3 +18,7 @@ VALUES ('edit_disable_topocontrol', 'hidden', 'If true topocontrol and feature p
 --2022/01/27
 DELETE FROM sys_fprocess where fid in (333, 334, 335, 179);
 
+--2022/01/31
+ALTER TABLE plan_price DROP CONSTRAINT plan_price_unit_check;
+
+
