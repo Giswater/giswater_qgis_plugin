@@ -457,7 +457,9 @@ BEGIN
 
 		INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 		SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') 
+		AND error_message NOT LIKE 'DATA%'
+		AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			
 	END IF;
 
