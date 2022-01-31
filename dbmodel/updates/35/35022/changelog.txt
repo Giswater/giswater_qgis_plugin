@@ -1,3 +1,4 @@
 3.5.022
 *************
 - Add modifcation_date column to om_mincut
+- Use value of inverted_slope on fct_anl_arc_inverted
