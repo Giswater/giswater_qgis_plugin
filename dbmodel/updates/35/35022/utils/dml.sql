@@ -21,4 +21,9 @@ DELETE FROM sys_fprocess where fid in (333, 334, 335, 179);
 --2022/01/31
 ALTER TABLE plan_price DROP CONSTRAINT plan_price_unit_check;
 
+UPDATE config_form_fields SET columnname='expl_id', label='expl_id', 
+dv_querytext='SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ',
+widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'
+WHERE columnname='sector_id' AND (formname ilike '%pattern%' OR formname ilike '%inp_curve%' OR formname ilike '%inp_timeseries%');
 
+UPDATE sys_function SET project_type='utils', descript='Allows editing inp patterns view' WHERE id=3062;
