@@ -141,6 +141,6 @@ UPDATE sys_foreignkey SET target_table='inp_loadings' WHERE target_table='inp_lo
 UPDATE sys_foreignkey SET target_table='inp_inflows_poll' WHERE target_table='inp_inflows_pol_x_node';
 
 UPDATE sys_table SET id=replace(id,'inp_dscenario_','inp_dscenario_flwreg_') WHERE id in ('inp_dscenario_weir','inp_dscenario_pump','inp_dscenario_orifice',
-'inp_dscenario_outlet')
+'inp_dscenario_outlet');
 UPDATE sys_table SET id='temp_arc_flowregulator' WHERE id='temp_flowregulator';
 UPDATE sys_table SET id='inp_dscenario_inflows_poll' WHERE id='inp_dscenario_inflows_pol';
