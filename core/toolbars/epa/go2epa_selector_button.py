@@ -44,7 +44,6 @@ class GwGo2EpaSelectorButton(GwAction):
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:
-                print(f"{tablename=}, {alias=}")
                 lyr = tools_qgis.get_layer_by_tablename(tablename)
                 if not lyr:
                     pk = "id"
