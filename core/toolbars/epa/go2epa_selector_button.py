@@ -26,7 +26,12 @@ class GwGo2EpaSelectorButton(GwAction):
     def clicked_event(self):
         """ Button 29: Epa result selector """
 
-        self._load_missing_layers()
+        tools_qgis.set_cursor_wait()
+        try:
+            self._load_missing_layers()
+        except Exception:
+            pass
+        tools_qgis.restore_cursor()
         self._open_go2epa_selector()
 
 
@@ -35,15 +40,17 @@ class GwGo2EpaSelectorButton(GwAction):
     def _load_missing_layers(self):
         """ Adds any missing Compare layers to TOC """
 
-        layers_to_load = {'v_rpt_comp_arc': "Arc Maximum Values Compare", 'v_rpt_comp_arc_hourly': "Arc Hourly Values Compare",
-                          'v_rpt_comp_node': "Node Maximum Values Compare", 'v_rpt_comp_node_hourly': "Node Hourly Values Compare"}
-        for tablename, alias in layers_to_load.items():
-            lyr = tools_qgis.get_layer_by_tablename(tablename)
-            if not lyr:
-                pk = "id"
-                if 'hourly' not in tablename:
-                    pk = f"{tablename.split('_')[-1]}_id"
-                tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
+        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_rpt_comp_%' AND alias IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            for tablename, alias in rows:
+                print(f"{tablename=}, {alias=}")
+                lyr = tools_qgis.get_layer_by_tablename(tablename)
+                if not lyr:
+                    pk = "id"
+                    if global_vars.project_type == 'ws' and 'hourly' not in tablename:
+                        pk = f"{tablename.split('_')[-1]}_id"
+                    tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
 
 
     def _open_go2epa_selector(self):
