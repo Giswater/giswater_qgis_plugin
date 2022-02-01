@@ -79,6 +79,6 @@ SELECT DISTINCT p.id,
    p.value
    FROM selector_expl s, inp_timeseries t
    JOIN inp_timeseries_value p ON t.id=timser_id
-WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
 ORDER BY p.id;
 
