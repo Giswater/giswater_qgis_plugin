@@ -78,7 +78,7 @@ BEGIN
 
 	--if project check is executed look only for possible errors, if it's users check - look for info and errors
 	IF v_log_project = 'Project' THEN
-		v_target= '''ERROR''';
+		v_target= '''ERROR'',''DATA''';
 	ELSE
 		v_target = '''ERROR'',''INFO''';
 	END IF;
