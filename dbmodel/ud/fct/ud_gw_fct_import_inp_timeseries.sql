@@ -59,7 +59,7 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Timeseries id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
 
 				-- insert inp_timeseries
-				INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, sector_id, log) 
+				INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, expl_id, log) 
 				VALUES (rec_csv.csv1, rec_csv.csv5, rec_csv.csv6, rec_csv.csv1, rec_csv.csv7, rec_csv.csv8::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 				
 				-- insert into inp_timeseries_value
