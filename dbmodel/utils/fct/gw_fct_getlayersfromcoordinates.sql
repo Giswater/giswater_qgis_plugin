@@ -28,7 +28,9 @@ v_point public.geometry;
 v_sensibility float;
 v_sensibility_f float;
 v_ids json[];
-v_id varchar;
+v_ids_item json;
+v_id text;
+v_featuretype text;
 v_layer text;
 v_sql text;
 v_sql2 text;
@@ -59,6 +61,11 @@ v_infotype integer;
 v_epsg integer;
 v_icon text;
 v_client_epsg integer;
+v_project_type text;
+
+v_valve_id text;
+v_valve_text text;
+v_closed_valve bool;
 
   
 BEGIN
@@ -70,6 +77,9 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
+
+	-- Get project type
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -202,6 +212,28 @@ BEGIN
 					ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 					INTO v_ids
 					USING v_point, v_sensibility;
+
+					-- Get closest valve if there is one
+					IF v_project_type = 'WS' AND v_ids IS NOT NULL THEN
+						FOREACH v_ids_item IN ARRAY v_ids 
+						LOOP
+							v_id := v_ids_item->>'id';
+							v_sql2 = 'SELECT '||v_parenttype||'_type FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''';
+							raise notice 'v_sql2 ---> %', v_sql2;
+							EXECUTE v_sql2 INTO v_featuretype;
+							EXECUTE 'SELECT system_id FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_featuretype;
+							IF v_featuretype = 'VALVE' AND v_valve_text IS NULL THEN
+								raise notice 'VALVE FOUND!! ->> %',v_id;
+								v_valve_id := v_id;
+								EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
+								IF v_closed_valve IS True THEN
+									v_valve_text := 'Open valve ('||v_id||')';
+								ELSE
+									v_valve_text := 'Close valve ('||v_id||')';
+								END IF;
+							END IF;
+						END LOOP;
+					END IF;
 				ELSE 
 					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 					SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
@@ -234,16 +266,21 @@ BEGIN
 			x = x+1;
 		END IF;
 	END LOOP;
+	
+	IF v_valve_text IS NOT NULL THEN
+		v_valve_text := ', "valve": {"id": "'||v_valve_id||'", "text": "'||v_valve_text||'"}';
+	END IF;
     
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
+	v_valve_text := COALESCE(v_valve_text, '');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||
-			',"data":{"layersNames":' || fields ||'}}'||
+			',"data":{"layersNames":' || fields ||''|| v_valve_text ||'}}'||
 	    '}')::json, 2590, null, null, null);
 
 	-- Exception handling
