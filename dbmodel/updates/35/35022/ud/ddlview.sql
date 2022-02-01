@@ -82,3 +82,88 @@ SELECT DISTINCT p.id,
 WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
 ORDER BY p.id;
 
+DROP VIEW IF EXISTS vi_outlets;
+CREATE OR REPLACE VIEW vi_outlets AS 
+SELECT arc_id,
+node_1,
+node_2,
+offsetval as offset,
+outlet_type,
+case when curve_id is null then cd1::text else curve_id end as other1,
+cd2::text AS other2,
+f.flap::varchar AS other3
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='OUTLET';
+
+DROP VIEW IF EXISTS vi_orifices;
+CREATE OR REPLACE VIEW vi_orifices AS 
+SELECT arc_id,
+node_1,
+node_2,
+ori_type,
+offsetval as offset,
+cd,
+f.flap,
+orate,
+close_time
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='ORIFICE';
+
+DROP VIEW IF EXISTS vi_weirs;
+CREATE OR REPLACE VIEW vi_weirs AS 
+SELECT arc_id,
+node_1,
+node_2,
+weir_type,
+offsetval as offset,
+cd,
+f.flap,
+ec,
+cd2,
+surcharge,
+road_width,
+road_surf,
+coef_curve
+FROM temp_arc_flowregulator f
+JOIN temp_arc USING (arc_id)
+WHERE type='WEIR';
+
+DROP VIEW vi_outfalls;
+CREATE OR REPLACE VIEW vi_outfalls AS 
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as outfall_type,
+addparam::json->>'gate' as other1,
+null::text as other2
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' IN ('FREE','NORMAL')
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as outfall_type,
+addparam::json->>'state' as other1,
+addparam::json->>'gate' as other2
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'FIXED'
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as outfall_type,
+addparam::json->>'curve_id' as other1,
+addparam::json->>'gate' as other2
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'TIDAL'
+UNION
+SELECT 
+node_id,
+elev,
+addparam::json->>'outfall_type' as outfall_type,
+addparam::json->>'timser_id' as other1,
+addparam::json->>'gate' as other2
+FROM temp_node WHERE epa_type  ='OUTFALL' 
+AND addparam::json->>'outfall_type' = 'TIMESERIES';

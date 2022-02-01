@@ -23,3 +23,15 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_timeseries('inp_timeseries');
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_timeseries ON v_edit_inp_timeseries_value;
 CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_timeseries_value
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_timeseries('inp_timeseries_value');
+
+CREATE TRIGGER gw_trg_vi_outlets INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_outlets
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_outlets');
+
+CREATE TRIGGER gw_trg_vi_orifices INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_orifices
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_orifices');
+
+CREATE TRIGGER gw_trg_vi_weirs INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_weirs
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_weirs');
+
+CREATE TRIGGER gw_trg_vi_outfalls INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_outfalls
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_outfalls');
