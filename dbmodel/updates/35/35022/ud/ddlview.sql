@@ -167,3 +167,33 @@ addparam::json->>'timser_id' as other1,
 addparam::json->>'gate' as other2
 FROM temp_node WHERE epa_type  ='OUTFALL' 
 AND addparam::json->>'outfall_type' = 'TIMESERIES';
+
+
+
+CREATE OR REPLACE VIEW vi_raingages AS 
+SELECT r.rg_id,
+    r.form_type,
+    r.intvl,
+    r.scf,
+    inp_typevalue.idval AS raingage_type,
+    r.timser_id AS other1,
+    NULL::character varying AS other2,
+    NULL::character varying AS other3
+   FROM selector_inp_result s, rpt_inp_raingage r
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'TIMESERIES'::text 
+  AND s.result_id::text = r.result_id::text AND s.cur_user = current_user
+UNION
+ SELECT r.rg_id,
+    r.form_type,
+    r.intvl,
+    r.scf,
+    inp_typevalue.idval AS raingage_type,
+    r.fname AS other1,
+    r.sta AS other2,
+    r.units AS other3
+   FROM selector_inp_result s,
+    rpt_inp_raingage r
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text
+  AND s.result_id::text = r.result_id::text AND s.cur_user = current_user;
