@@ -51,3 +51,34 @@ CREATE OR REPLACE VIEW v_edit_inp_pattern_value AS
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY inp_pattern_value.id;
 
+
+-- 2022/02/01
+CREATE OR REPLACE VIEW vi_curves AS 
+ SELECT
+        CASE
+            WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
+            ELSE a.curve_id
+        END AS curve_id,
+    a.x_value::numeric(12,4) AS x_value,
+    a.y_value::numeric(12,4) AS y_value,
+    NULL::text AS other
+   FROM ( SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
+                   FROM inp_curve_value sub
+                  WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
+            inp_curve_value.curve_id,
+            concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
+            NULL::numeric AS x_value,
+            NULL::numeric AS y_value
+           FROM inp_curve
+             JOIN inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
+        UNION
+         SELECT inp_curve_value.id,
+            inp_curve_value.curve_id,
+            inp_curve.curve_type,
+            inp_curve_value.x_value,
+            inp_curve_value.y_value
+           FROM inp_curve_value
+             JOIN inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
+  ORDER BY 1, 4 DESC) a
+  WHERE (a.curve_id::text IN (SELECT addparam::json->>'curve_id' FROM temp_node 
+						UNION SELECT addparam::json->>'curve_id' FROM temp_arc));
