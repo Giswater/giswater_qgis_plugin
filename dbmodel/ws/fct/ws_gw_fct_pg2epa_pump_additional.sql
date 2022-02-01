@@ -101,7 +101,7 @@ BEGIN
 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
 
 			--addparam
-			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',
+			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern_id":"', pump_rec.pattern_id,'","to_arc":"',
 						 arc_rec.addparam::json->>'to_arc','", "effic_curve_id":"',pump_rec.effic_curve_id,'","energy_price":"',pump_rec.energy_price,'","energy_pattern_id":"',
 						 pump_rec.energy_pattern_id,'","pump_type":"', arc_rec.addparam::json->>'pump_type','"}');	
 
