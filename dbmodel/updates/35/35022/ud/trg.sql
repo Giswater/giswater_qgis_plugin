@@ -35,3 +35,15 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_weirs');
 
 CREATE TRIGGER gw_trg_vi_outfalls INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_outfalls
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_outfalls');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_junctions ON vi_junctions;
+CREATE TRIGGER gw_trg_vi_junctions INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_junctions
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_junctions');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_xsections ON vi_xsections;
+CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_xsections
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_adjustments ON vi_adjustments;
+CREATE TRIGGER gw_trg_vi_adjustments INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_adjustments
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_adjustments');

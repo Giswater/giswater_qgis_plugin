@@ -113,16 +113,20 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
 			IF NEW.divider_type LIKE 'CUTOFF' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'CUTOFF', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'CUTOFF', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'OVERFLOW' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'OVERFLOW', NEW.other1::numeric, NEW.other2, NEW.other3);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'OVERFLOW', NEW.other1::numeric, NEW.other2, NEW.other3::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'TABULAR' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'TABULAR', NEW.other1, NEW.other2, NEW.other3, NEW.other4);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'TABULAR', NEW.other1, NEW.other2, NEW.other3, NEW.other4::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'WEIR' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, ht, cd, y0, ysur, apond) VALUES (NEW.node_id, NEW.arc_id,'WEIR', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, ht, cd, y0, ysur, apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'WEIR', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6::numeric);
 			END IF;
 			
 		ELSIF v_view='vi_storage' THEN
@@ -132,11 +136,11 @@ BEGIN
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
 				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0,apond, fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6, NEW.other7, NEW.other8);
+				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
 				
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
+				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric);
 			END IF;	
 			
 		ELSIF v_view='vi_pumps' THEN 
