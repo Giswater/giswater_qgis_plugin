@@ -15,3 +15,11 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_pattern('inp_pattern');
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_pattern ON v_edit_inp_pattern_value;
 CREATE TRIGGER gw_trg_edit_inp_pattern INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pattern_value
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_pattern('inp_pattern_value');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_timeseries ON v_edit_inp_timeseries;
+CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_timeseries
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_timeseries('inp_timeseries');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_timeseries ON v_edit_inp_timeseries_value;
+CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_timeseries_value
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_timeseries('inp_timeseries_value');

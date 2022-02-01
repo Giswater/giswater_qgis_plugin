@@ -3,3 +3,5 @@
 - Add modifcation_date column to om_mincut
 - Use value of inverted_slope on fct_anl_arc_inverted
 - Don't show PLANIFIED on selector_state but allow role_basic on selector_psector tab
+- New edit filtered view for timeseries and patterns in ud
+- Views related to curves, patterns and timeseries filtered by exploitation instead of sector

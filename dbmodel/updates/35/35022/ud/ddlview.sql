@@ -50,3 +50,35 @@ CREATE OR REPLACE VIEW v_edit_inp_pattern_value AS
      JOIN inp_pattern_value USING (pattern_id)
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY inp_pattern_value.id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries AS 
+SELECT DISTINCT p.id,
+    p.timser_type,
+    p.times_type,
+    p.idval,
+    p.descript,
+    p.fname,
+    p.expl_id,
+    p.log
+   FROM selector_expl s, inp_timeseries p
+WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+ORDER BY p.id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries_value AS 
+SELECT DISTINCT p.id,
+   p.timser_id,
+   t.timser_type,
+   t.times_type,
+   t.idval,
+   t.expl_id,
+   p.date,
+   p.hour,
+   p."time",
+   p.value
+   FROM selector_expl s, inp_timeseries t
+   JOIN inp_timeseries_value p ON t.id=timser_id
+WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+ORDER BY p.id;
+

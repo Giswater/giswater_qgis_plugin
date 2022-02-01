@@ -33,3 +33,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 UPDATE sys_table SET sys_role='role_master' WHERE id IN ('plan_psector_x_arc', 'plan_psector_x_node', 'plan_psector_x_connec', 'plan_psector_x_gully', 'plan_psector_x_other');
 
 UPDATE config_form_tabs SET sys_role='role_basic' WHERE formname='selector_basic' AND tabname='tab_psector';
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3132, 'gw_trg_edit_inp_timeseries', 'ud', 'function trigger', NULL, NULL, 'Allows editing inp timeseries view', 'role_epa', NULL, 'core');
