@@ -19,7 +19,7 @@ from ...shared.info import GwInfo
 from ...toolbars.maptool import GwMaptool
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis
+from ....lib import tools_qgis, tools_db
 
 
 class GwInfoButton(GwMaptool):
@@ -113,6 +113,13 @@ class GwInfoButton(GwMaptool):
         info_action.trigger()
 
 
+    def _reset_rubber_bands(self):
+        for rb in self.rubberband_list:
+            tools_gw.reset_rubberband(rb)
+        if hasattr(self, "rubber_band"):
+            tools_qgis.reset_rubber_band(self.rubber_band)
+
+
     def _get_layers_from_coordinates(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
@@ -172,6 +179,16 @@ class GwInfoButton(GwMaptool):
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
+
+        # Open/close valve
+        if 'valve' in json_result['body']['data']:
+            valve_id = json_result['body']['data']['valve']['id']
+            valve_text = json_result['body']['data']['valve']['text']
+            action_valve = QAction(f"{valve_text}", None)
+            action_valve.triggered.connect(partial(self._toggle_valve_state, valve_id))
+            action_valve.hovered.connect(partial(self._reset_rubber_bands))
+            main_menu.addAction(action_valve)
+            main_menu.addSeparator()
         main_menu.exec_(click_point)
 
 
@@ -197,6 +214,13 @@ class GwInfoButton(GwMaptool):
                 rb.setWidth(5)
                 rb.show()
                 rb_list.append(rb)
+
+
+    def _toggle_valve_state(self, valve_id):
+
+        sql = f"UPDATE v_edit_node SET closed_valve = NOT closed_valve WHERE node_id = '{valve_id}'"
+        tools_db.execute_sql(sql)
+        tools_qgis.refresh_map_canvas()
 
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):
