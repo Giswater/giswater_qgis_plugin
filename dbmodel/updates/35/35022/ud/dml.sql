@@ -133,3 +133,9 @@ VALUES ('v_edit_inp_timeseries_value', 'View to edit timeseries values, filtered
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_table SET alias=NULL, orderby=NULL, context=NULL WHERE id IN ('inp_timeseries', 'inp_timeseries_value');
+
+UPDATE sys_foreignkey SET target_table='inp_washoff' WHERE target_table='inp_washoff_land_x_pol';
+UPDATE sys_foreignkey SET target_table='inp_buildup' WHERE target_table='inp_buildup_land_x_pol';
+UPDATE sys_foreignkey SET target_table='inp_coverage' WHERE target_table='inp_coverage_land_x_subc';
+UPDATE sys_foreignkey SET target_table='inp_loadings' WHERE target_table='inp_loadings_pol_x_subc';
+UPDATE sys_foreignkey SET target_table='inp_inflows_poll' WHERE target_table='inp_inflows_pol_x_node';
