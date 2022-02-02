@@ -3649,7 +3649,7 @@ class GwInfo(QObject):
 
         # Form handling so that the user cannot change values until the process is finished
         self.dlg_cf.setEnabled(False)
-        global_vars.notify.task_finished.connect(self._enable_buttons)
+        # global_vars.notify.task_finished.connect(self._enable_buttons)
 
         # Get widgets values
         values = {}
@@ -3687,7 +3687,7 @@ class GwInfo(QObject):
 
     def _enable_buttons(self):
         self.dlg_cf.setEnabled(True)
-        global_vars.notify.task_finished.disconnect()
+        # global_vars.notify.task_finished.disconnect()
 
 
     def _mouse_moved(self, layer, point):
