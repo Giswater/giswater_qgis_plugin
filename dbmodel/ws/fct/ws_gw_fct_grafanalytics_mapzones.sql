@@ -829,7 +829,7 @@ BEGIN
 						(SELECT DISTINCT arc.'||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 						group by '||quote_ident(v_field)||'
 						UNION
-						SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
+						SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
 						as geom FROM connec c, v_edit_link link
 						WHERE c.'||quote_ident(v_field)||' NOT IN (''0'', ''-1'') 
 						AND c.state > 0
@@ -849,7 +849,7 @@ BEGIN
 						(SELECT DISTINCT dma_id FROM arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
 						group by dma_id
 						UNION
-						SELECT c.dma_id, (st_buffer(st_collect(link.the_geom),5/2)) 
+						SELECT c.dma_id, (st_buffer(st_collect(link.the_geom),5/2, ,'endcap=flat join=round')) 
 						as geom FROM v_edit_link link, connec c
 						WHERE c.dma_id::text != '0' 
 						AND c.dma_id IN
