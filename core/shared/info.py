@@ -2544,7 +2544,7 @@ class GwInfo(QObject):
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
                f"FROM ext_cat_period AS t1 "
                f"JOIN (SELECT * FROM v_ui_hydroval_x_connec WHERE connec_id = '" + str(self.feature_id) + "' "
-			   f") AS t2 on t1.id = t2.cat_period_id "
+               f") AS t2 on t1.id = t2.cat_period_id "
                f"ORDER BY t2.cat_period_id DESC")
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -3114,67 +3114,6 @@ class GwInfo(QObject):
         gal = GwVisitGallery()
         gal.manage_gallery()
         gal.fill_gallery(self.visit_id, self.event_id)
-
-
-    def _open_visit_doc(self):
-        """ Open document of selected record of the table """
-
-        # Get all documents for one visit
-        sql = (f"SELECT doc_id FROM doc_x_visit"
-               f" WHERE visit_id = '{self.visit_id}'")
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return
-
-        num_doc = len(rows)
-        if num_doc == 1:
-            # If just one document is attached directly open
-
-            # Get path of selected document
-            sql = (f"SELECT path"
-                   f" FROM v_ui_doc"
-                   f" WHERE id = '{rows[0][0]}'")
-            row = tools_db.get_row(sql)
-            if not row:
-                return
-
-            path = str(row[0])
-
-            # Parse a URL into components
-            url = parse.urlsplit(path)
-
-            # Open selected document
-            # Check if path is URL
-            if url.scheme == "http" or url.scheme == "https":
-                webbrowser.open(path)
-            else:
-
-                if not os.path.exists(path):
-                    message = "File not found"
-                    tools_qgis.show_warning(message, parameter=path)
-                else:
-                    status, message = tools_os.open_file(path)
-                    if status is False and message is not None:
-                        tools_qgis.show_warning(message, parameter=path)
-
-        else:
-            # If more then one document is attached open dialog with list of documents
-            self.dlg_load_doc = GwVisitDocumentUi()
-            tools_gw.load_settings(self.dlg_load_doc)
-            self.dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load_doc))
-            btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
-            btn_open_doc.clicked.connect(self._open_selected_doc)
-
-            lbl_visit_id = self.dlg_load_doc.findChild(QLineEdit, "visit_id")
-            lbl_visit_id.setText(str(self.visit_id))
-
-            self.tbl_list_doc = self.dlg_load_doc.findChild(QListWidget, "tbl_list_doc")
-            self.tbl_list_doc.itemDoubleClicked.connect(partial(self._open_selected_doc))
-            for row in rows:
-                item_doc = QListWidgetItem(str(row[0]))
-                self.tbl_list_doc.addItem(item_doc)
-
-            tools_gw.open_dialog(self.dlg_load_doc, dlg_name='visit_document')
 
 
     def _open_selected_doc(self):
@@ -3830,7 +3769,7 @@ def open_visit_event(**kwargs):
 
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
-    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['targetwidget']}")
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
     complet_result = kwargs['complet_result']
 
     # Get selected rows
@@ -4051,6 +3990,153 @@ def _reload_table(**kwargs):
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:
             return False
+
+# endregion
+
+# region event
+
+
+def open_visit_document(**kwargs):
+    """ Open document of selected record of the table """
+
+    # search visit_id in table (targetwidget, columnfind)
+    func_params = kwargs['func_params']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    visit_id = index.sibling(row, column_index).data()
+
+    # Get all documents for one visit
+    sql = (f"SELECT doc_id FROM doc_x_visit"
+           f" WHERE visit_id = '{visit_id}'")
+    rows = tools_db.get_rows(sql)
+    if not rows:
+        return
+
+    num_doc = len(rows)
+    if num_doc == 1:
+        # If just one document is attached directly open
+
+        # Get path of selected document
+        sql = (f"SELECT path"
+               f" FROM v_ui_doc"
+               f" WHERE id = '{rows[0][0]}'")
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        path = str(row[0])
+
+        # Parse a URL into components
+        url = parse.urlsplit(path)
+
+        # Open selected document
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            webbrowser.open(path)
+        else:
+
+            if not os.path.exists(path):
+                message = "File not found"
+                tools_qgis.show_warning(message, parameter=path)
+            else:
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
+
+    else:
+        # If more then one document is attached open dialog with list of documents
+        dlg_load_doc = GwVisitDocumentUi()
+        tools_gw.load_settings(dlg_load_doc)
+        dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, dlg_load_doc))
+
+        btn_open_doc = dlg_load_doc.findChild(QPushButton, "btn_open")
+        tbl_list_doc = dlg_load_doc.findChild(QListWidget, "tbl_list_doc")
+        lbl_visit_id = dlg_load_doc.findChild(QLineEdit, "visit_id")
+
+        lbl_visit_id.setText(str(visit_id))
+        btn_open_doc.clicked.connect(partial(open_selected_doc, tbl_list_doc))
+        tbl_list_doc.itemDoubleClicked.connect(partial(open_selected_doc, tbl_list_doc))
+        for row in rows:
+            item_doc = QListWidgetItem(str(row[0]))
+            tbl_list_doc.addItem(item_doc)
+
+        tools_gw.open_dialog(dlg_load_doc, dlg_name='visit_document')
+
+
+def open_selected_doc(tbl_list_doc):
+
+    # Selected item from list
+    if tbl_list_doc.currentItem() is None:
+        msg = "No document selected."
+        tools_qgis.show_message(msg, 1)
+        return
+
+    selected_document = tbl_list_doc.currentItem().text()
+
+    # Get path of selected document
+    sql = (f"SELECT path FROM v_ui_doc"
+           f" WHERE id = '{selected_document}'")
+    row = tools_db.get_row(sql)
+    if not row:
+        return
+
+    path = str(row[0])
+
+    # Parse a URL into components
+    url = parse.urlsplit(path)
+
+    # Open selected document
+    # Check if path is URL
+    if url.scheme == "http" or url.scheme == "https":
+        webbrowser.open(path)
+    else:
+        if not os.path.exists(path):
+            message = "File not found"
+            tools_qgis.show_warning(message, parameter=path)
+        else:
+            status, message = tools_os.open_file(path)
+            if status is False and message is not None:
+                tools_qgis.show_warning(message, parameter=path)
+
+
+def open_gallery(**kwargs):
+    """ Open gallery of selected record of the table """
+
+    dialog = kwargs['dialog']
+    func_params = kwargs['func_params']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    ids = {}
+    i = 0
+    for col in func_params['columnfind']:
+        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'][i])
+        ids[col] = index.sibling(row, column_index).data()
+        i += 1
+    visit_id = ids['visit_id']
+    event_id = ids['event_id']
+
+    # Open Gallery
+    gal = GwVisitGallery()
+    gal.manage_gallery()
+    gal.fill_gallery(visit_id, event_id)
 
 # endregion
 
