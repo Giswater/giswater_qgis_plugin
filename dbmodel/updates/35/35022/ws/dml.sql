@@ -2415,3 +2415,11 @@ UPDATE config_toolbox SET inputparams =
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":9, "isMandatory":false, "placeholder":"5-30", "value":""}
 ]'
 where id = 2710;
+
+
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_pump_additional', 'View to edit additional pumps','role_epa', '{"level_1":"EPA","level_2":"HYDRAULICS"}', 11, 
+'Pump additional', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_table SET context = null, orderby=null where id = 'inp_pump_additional';

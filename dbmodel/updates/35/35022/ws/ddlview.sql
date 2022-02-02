@@ -82,3 +82,18 @@ CREATE OR REPLACE VIEW vi_curves AS
   ORDER BY 1, 4 DESC) a
   WHERE (a.curve_id::text IN (SELECT addparam::json->>'curve_id' FROM temp_node 
 						UNION SELECT addparam::json->>'curve_id' FROM temp_arc));
+
+
+CREATE OR REPLACE VIEW v_edit_inp_pump_additional AS 
+ SELECT
+    p.node_id,
+    p.order_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern,
+    p.status
+   FROM inp_pump_additional p
+   JOIN v_edit_inp_pump USING (node_id);
+						
+		
