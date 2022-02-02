@@ -144,3 +144,18 @@ UPDATE sys_table SET id=replace(id,'inp_dscenario_','inp_dscenario_flwreg_') WHE
 'inp_dscenario_outlet');
 UPDATE sys_table SET id='temp_arc_flowregulator' WHERE id='temp_flowregulator';
 UPDATE sys_table SET id='inp_dscenario_inflows_poll' WHERE id='inp_dscenario_inflows_pol';
+
+
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_lid_usage', 'View to edit dscenario for lids','role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 13, 
+'Lid dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, alias, source)
+VALUES ('inp_dscenario_lid_usage', 'Table to manage dscenario for lids','role_epa', 'Lid dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_table SET alias = 'Inflow Dscenario' WHERE id = 'v_edit_inp_dscenario_inflows';
+UPDATE sys_table SET alias = 'Raingage Dscenario' WHERE id = 'v_edit_inp_dscenario_raingage';
+UPDATE sys_table SET alias = 'Storage Dscenario' WHERE id = 'v_edit_inp_dscenario_storage';
+UPDATE sys_table SET alias = 'Outfall Dscenario' WHERE id = 'v_edit_inp_dscenario_outfall';

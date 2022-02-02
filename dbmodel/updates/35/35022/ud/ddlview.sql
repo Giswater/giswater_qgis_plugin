@@ -197,3 +197,27 @@ UNION
      LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
   WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text
   AND s.result_id::text = r.result_id::text AND s.cur_user = current_user;
+
+ 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_lid_usage AS 
+ SELECT 
+    dscenario_id,
+    l.hydrology_id,
+    l.subc_id,
+    l.lidco_id,
+    l.numelem,
+    l.area,
+    l.width,
+    l.initsat,
+    l.fromimp,
+    l.toperv,
+    l.rptfile,
+    l.descript,
+    s.the_geom
+   FROM inp_dscenario_lid_usage l
+     JOIN v_edit_inp_subcatchment s USING (subc_id)
+  WHERE s.hydrology_id = l.hydrology_id;
+
+
+
+  

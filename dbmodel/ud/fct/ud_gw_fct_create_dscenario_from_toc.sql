@@ -104,8 +104,6 @@ BEGIN
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE 
 		-- getting columns
-		
-		
 		IF v_table = 'inp_dscenario_conduit' THEN
 			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage, elev1, elev2';
 			
@@ -134,6 +132,9 @@ BEGIN
 						
 	 	ELSIF v_table = 'inp_dscenario_junction' THEN
 			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json, elev, ymax';
+
+		ELSIF v_table = 'inp_dscenario_lid_usage' THEN
+			v_columns = v_scenarioid||', hydrology_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript';
 
  		ELSIF v_table = 'inp_dscenario_outfall' THEN
 			v_columns = v_scenarioid||', node_id, outfall_type, stage, curve_id, timser_id, gate';

@@ -47,3 +47,8 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
 DROP TRIGGER IF EXISTS gw_trg_vi_adjustments ON vi_adjustments;
 CREATE TRIGGER gw_trg_vi_adjustments INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_adjustments
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_adjustments');
+
+DROP TRIGGER IF EXISTS  gw_trg_edit_inp_dscenario ON v_edit_inp_dscenario_lid_usage;
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_lid_usage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('LID-USAGE');
+
