@@ -12,6 +12,8 @@ import sys
 import subprocess
 import urllib.parse as parse
 import webbrowser
+import re
+from chardet import detect
 
 from qgis.PyQt.QtWidgets import QFileDialog
 
@@ -66,6 +68,11 @@ def open_file(file_path):
     except Exception:
         return False, None
 
+
+def get_encoding_type(file_path):
+    with open(file_path, 'rb') as f:
+        rawdata = f.read()
+    return detect(rawdata)['encoding']
 
 
 def get_relative_path(filepath, levels=1):
@@ -125,6 +132,22 @@ def get_folder_size(folder):
             size += os.path.getsize(filepath)
 
     return size
+
+
+def get_number_of_files(folder):
+    """ Get number of files of @folder and its subfolders """
+
+    if not os.path.exists(folder):
+        return 0
+
+    file_count = sum(len(files) for _, _, files in os.walk(folder))
+    return file_count
+
+
+def ireplace(old, new, text):
+    """ Replaces @old by @new in @text (case-insensitive) """
+
+    return re.sub('(?i)'+re.escape(old), lambda m: new, text)
 
 
 def manage_pg_service(section):

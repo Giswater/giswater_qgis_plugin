@@ -152,6 +152,7 @@ class GwVisit(QObject):
         self.user_name = self.dlg_add_visit.findChild(QLineEdit, "user_name")
         self.ext_code = self.dlg_add_visit.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg_add_visit.findChild(QComboBox, "visitcat_id")
+        self.exploitation = self.dlg_add_visit.findChild(QComboBox, "expl_id")
 
         # tab 'Event'
         self.tbl_event = self.dlg_add_visit.findChild(QTableView, "tbl_event")
@@ -441,7 +442,7 @@ class GwVisit(QObject):
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser('dialogs', 'visit_manager_keep_open', "user", "init", prefix=True)
+        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'visit_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
 
@@ -456,12 +457,18 @@ class GwVisit(QObject):
 
 
     def _reconnect_table_signals(self, table_object):
-        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
-            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                    table_object))
-        self.dlg_visit_manager.btn_open.clicked.connect(
-            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                    table_object))
+        try:
+            self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                        table_object))
+        except RuntimeError:
+            pass
+        try:
+            self.dlg_visit_manager.btn_open.clicked.connect(
+                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
+                        table_object))
+        except RuntimeError:
+            pass
 
 
     def _set_signals(self):
@@ -537,9 +544,13 @@ class GwVisit(QObject):
             widget_name = f'tbl_visit_x_{self.feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
+            tools_gw.disconnect_signal('visit')
+            tools_gw.connect_signal(global_vars.canvas.selectionChanged,
+                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                    'visit', 'set_locked_relation_canvas_selectionChanged')
             tools_qgis.select_features_by_ids(self.feature_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
+            tools_gw.disconnect_signal('visit')
 
 
     def _manage_accepted(self):
@@ -552,8 +563,12 @@ class GwVisit(QObject):
         if self.current_tab_index == self._tab_index('tab_visit'):
             self._manage_leave_visit_tab()
 
+        expl_value = tools_qt.get_combo_value(self.dlg_add_visit, self.exploitation)
+        if expl_value not in (None, 'None', ''):
+            tools_gw.set_config_parser('btn_add_visit', 'expl_id', expl_value)
         # Remove all previous selections
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('visit')
         self.layers = tools_gw.remove_selection(layers=self.layers)
 
         # Update geometry field (if user have selected a point)
@@ -610,6 +625,7 @@ class GwVisit(QObject):
 
             # Remove all previous selections
             tools_qgis.disconnect_signal_selection_changed()
+            tools_gw.disconnect_signal('visit')
             self.layers = tools_gw.remove_selection(layers=self.layers)
         except Exception as e:
             tools_log.log_info(f"manage_rejected: {e}")
@@ -713,6 +729,8 @@ class GwVisit(QObject):
         self.current_visit.visitcat_id = tools_qt.get_combo_value(self.dlg_add_visit, 'visitcat_id', 0)
         self.current_visit.descript = tools_qt.get_text(self.dlg_add_visit, 'descript', False, False)
         self.current_visit.status = tools_qt.get_combo_value(self.dlg_add_visit, 'status', 0)
+        if self.expl_id is None:
+            self.expl_id = tools_qt.get_combo_value(self.dlg_add_visit, self.exploitation)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
 
@@ -1040,9 +1058,13 @@ class GwVisit(QObject):
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
+        tools_gw.disconnect_signal('visit')
+        tools_gw.connect_signal(global_vars.canvas.selectionChanged,
+                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                'visit', 'get_features_visit_feature_type_canvas_selectionChanged')
         tools_qgis.select_features_by_ids(feature_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('visit')
 
 
     def _filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
@@ -1129,6 +1151,26 @@ class GwVisit(QObject):
                        f"WHERE id = '{visit_id}'")
                 status = tools_db.get_row(sql)
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
+
+        # Fill ComboBox exploitation
+        sql = "SELECT exploitation.expl_id, name FROM selector_expl JOIN exploitation USING (expl_id) " \
+              "WHERE cur_user=current_user"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.exploitation, rows, 1, sort_by=0)
+            if visit_id is None:
+                if self.expl_id is not None:
+                    tools_qt.set_combo_value(self.exploitation, self.expl_id, 0, add_new=False)
+                else:
+                    default_expl = tools_gw.get_config_parser('btn_add_visit', 'expl_id', "user", "session")
+                    if default_expl not in (None, 'None', ''):
+                        tools_qt.set_combo_value(self.exploitation, default_expl, 0, add_new=False)
+            else:
+                sql = (f"SELECT expl_id "
+                       f"FROM om_visit "
+                       f"WHERE id = '{visit_id}'")
+                row = tools_db.get_row(sql)
+                tools_qt.set_combo_value(self.exploitation, row[0], 0)
 
         # Relations tab
         # fill feature_type

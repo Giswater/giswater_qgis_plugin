@@ -34,7 +34,7 @@ class GwPointAddButton(GwAction):
         self.menu.setObjectName("GW_point_menu")
         self._fill_point_menu()
 
-        self.menu.aboutToShow.connect(self._check_reload)
+        self.menu.aboutToShow.connect(self._fill_point_menu)
 
         if toolbar is not None:
             self.action.setMenu(self.menu)
@@ -50,14 +50,6 @@ class GwPointAddButton(GwAction):
     # region private functions
 
 
-    def _check_reload(self):
-        """ Check for reload button """
-        check_reload = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
-        check_reload = tools_os.set_boolean(check_reload)
-        if check_reload:
-            self._fill_point_menu()
-
-
     def _fill_point_menu(self):
         """ Fill add point menu """
 
@@ -68,6 +60,9 @@ class GwPointAddButton(GwAction):
             self.menu.removeAction(action)
             del action
         action_group = self.action.property('action_group')
+
+        # Update featurecatvalues
+        global_vars.feature_cat = tools_gw.manage_feature_cat()
 
         # Get list of different connec, gully and node types
         features_cat = global_vars.feature_cat

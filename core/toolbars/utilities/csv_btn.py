@@ -40,9 +40,13 @@ class GwCSVButton(GwAction):
                                    f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
         tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',
-                                   tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'chk_ignore_header', f"{self.dlg_csv.chk_ignore_header.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_space', f"{self.dlg_csv.rb_space.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_comma', f"{self.dlg_csv.rb_dec_comma.isChecked()}")
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_period', f"{self.dlg_csv.rb_dec_period.isChecked()}")
+
 
 
     # region private functions
@@ -82,6 +86,9 @@ class GwCSVButton(GwAction):
         if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
             self._preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_csv)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
@@ -162,8 +169,9 @@ class GwCSVButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-            msg = result['message']['text']
-            tools_qt.show_info_box(msg)
+            if 'message' in result:
+                msg = result['message']['text']
+                tools_qt.show_info_box(msg)
 
 
     def _update_info(self, dialog):
@@ -228,7 +236,7 @@ class GwCSVButton(GwAction):
         """ Load QGIS settings related with csv options """
 
         value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "session")
-        tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
+        tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0, add_new=False)
 
         value = tools_gw.get_config_parser('btn_csv2pg', 'txt_import', "user", "session")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)
@@ -241,10 +249,20 @@ class GwCSVButton(GwAction):
             unicode = 'latin1'
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
+        if tools_gw.get_config_parser('btn_csv2pg', 'chk_ignore_header', "user", "session") == 'True':
+            self.dlg_csv.chk_ignore_header.setChecked(True)
+
         if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "session") == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
+        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_space', "user", "session") == 'True':
+            self.dlg_csv.rb_space.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
+
+        if tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_comma', "user", "session") == 'True':
+            self.dlg_csv.rb_dec_comma.setChecked(True)
+        elif tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_period', "user", "session") == 'True':
+            self.dlg_csv.rb_dec_period.setChecked(True)
 
 
     def _validate_params(self, dialog):
@@ -302,7 +320,7 @@ class GwCSVButton(GwAction):
 
             for x in range(0, len(row)):
                 value = row[x].strip().replace("\n", "")
-                field[f"csv{x + 1}"] = f"{value}"
+                field[f"csv{x + 1}"] = f"{value}" if value else None
             fields.append(field)
             cont += 1
             progress = (100 * cont) / row_count
@@ -311,7 +329,13 @@ class GwCSVButton(GwAction):
         if not fields:
             return False
 
-        values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
+        decimal_sep = "null"
+        if dialog.rb_dec_comma.isChecked():
+            decimal_sep = '","'
+        elif dialog.rb_dec_period.isChecked():
+            decimal_sep = '"."'
+
+        values = f'"separator": {decimal_sep}, "values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
         result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 

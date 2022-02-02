@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget, QCheckBox
 from qgis.core import QgsPointXY, QgsGeometry
 
 from .document import GwDocument
@@ -38,34 +38,22 @@ class GwSearch:
         self.project_type = global_vars.project_type
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
         self.is_mincut = False
-
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
 
-    def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
-
-        # If search is open, dont let user open another one
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
-
-        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
-        if docker_search and dlg_mincut is None:
-            return
-        if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
-            return
+    def open_search(self, dlg_search, dlg_mincut=None):
 
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
-            self._init_dialog()
-        form = ""
 
         # If dlg_mincut is None we are not opening from mincut
+        form = ""
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
@@ -74,7 +62,6 @@ class GwSearch:
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
         qgis_project_add_schema = global_vars.project_vars['add_schema']
-
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
@@ -108,6 +95,12 @@ class GwSearch:
                     label = QLabel()
                     label.setObjectName('lbl_' + field['label'])
                     label.setText(field['label'].capitalize())
+
+                    if 'tooltip' in field:
+                        label.setToolTip(field['tooltip'])
+                    else:
+                        label.setToolTip(field['label'].capitalize())
+
                     widget = None
                     if field['widgettype'] == 'typeahead':
                         completer = QCompleter()
@@ -116,6 +109,8 @@ class GwSearch:
                         self.lineedit_list.append(widget)
                     elif field['widgettype'] == 'combo':
                         widget = self._add_combobox(field)
+                    elif field['widgettype'] == 'check':
+                        widget = tools_gw.add_checkbox(field)
                     gridlayout.addWidget(label, x, 0)
                     gridlayout.addWidget(widget, x, 1)
                     x += 1
@@ -128,9 +123,8 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_gw.set_config_parser('btn_search', 'open_search', 'true')
             tools_qt.manage_translation('search', self.dlg_search)
-
+            self._init_dialog()
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
@@ -193,9 +187,11 @@ class GwSearch:
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
+
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
 
 
     def _reset_rubber_band(self):
@@ -204,11 +200,9 @@ class GwSearch:
         tools_gw.reset_rubberband(self.aux_rubber_band)
 
 
-
     def _close_search(self):
 
         self.dlg_search = None
-        tools_gw.set_config_parser('btn_search', 'open_search', 'false')
 
 
     def _set_typeahead_completer(self, widget, completer=None):
@@ -323,7 +317,7 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 25))
+            tools_qgis.draw_polygon(points, self.rubber_band)
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self._workcat_open_table_items(item)
@@ -332,17 +326,7 @@ class GwSearch:
         # Tab 'psector'
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-            self.manage_new_psector.get_psector(item['sys_id'], is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
-            if not list_coord:
-                msg = "Empty coordinate list"
-                tools_qgis.show_warning(msg)
-                return
-            points = tools_qgis.get_geometry_vertex(list_coord)
-            self._reset_rubber_band()
-            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
-            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+            self.manage_new_psector.get_psector(item['sys_id'], list_coord)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
@@ -374,9 +358,11 @@ class GwSearch:
         form_search_add = ''
         extras_search_add = ''
         result = None
+        line_edit = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
+        chk_list = self.dlg_search.main_tab.widget(index).findChildren(QCheckBox)
         form_search += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
         form_search_add += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
 
@@ -402,9 +388,12 @@ class GwSearch:
             if str(value) == '':
                 return
 
-            qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
+            qgis_project_add_schema = global_vars.project_vars['add_schema']
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
+            if chk_list:
+                chk_list = chk_list[0]
+                extras_search += f', "{chk_list.property("columnname")}":"{chk_list.isChecked()}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search, extras=extras_search)
             result = tools_gw.execute_procedure('gw_fct_setsearch', body, rubber_band=self.rubber_band)
@@ -507,7 +496,7 @@ class GwSearch:
     def _open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
+        qgis_project_infotype = global_vars.project_vars['info_type']
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -634,6 +623,7 @@ class GwSearch:
         text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_end, False, False)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
+
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -657,7 +647,7 @@ class GwSearch:
     def _restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
 
-        qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
                 continue
@@ -901,26 +891,6 @@ class GwSearch:
                 widget.setText(f"Total arcs length: {length}")
 
 
-    def _draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
-        """
-        Draw 'polygon' over canvas following list of points
-            :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-        """
-
-        rubber_band.setIconSize(20)
-        polygon = QgsGeometry.fromPolygonXY([points])
-        rubber_band.setToGeometry(polygon, None)
-        rubber_band.setColor(border)
-        if fill_color:
-            rubber_band.setFillColor(fill_color)
-        rubber_band.setWidth(width)
-        rubber_band.show()
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, rubber_band.reset)
-
-
     def _document_insert(self, dialog, tablename, field, field_value):
         """
         Insert a document related to the current visit
@@ -979,4 +949,5 @@ class GwSearch:
             self.aux_rubber_band.show()
         except AttributeError:
             pass
-    # endregions
+
+    # endregion

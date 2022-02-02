@@ -17,6 +17,7 @@ class GwPgDao(object):
         self.set_search_path = None
         self.conn = None
         self.cursor = None
+        self.pid = None
 
 
     def init_db(self):
@@ -25,6 +26,7 @@ class GwPgDao(object):
         try:
             self.conn = psycopg2.connect(self.conn_string)
             self.cursor = self.get_cursor()
+            self.pid = self.conn.get_backend_pid()
             status = True
         except psycopg2.DatabaseError as e:
             self.last_error = e
@@ -89,15 +91,17 @@ class GwPgDao(object):
     def get_poll(self):
         """ Check if the connection is established """
 
+        status = True
         try:
             if self.check_cursor():
                 self.conn.poll()
         except psycopg2.InterfaceError:
             self.reset_db()
+            status = False
         except psycopg2.OperationalError:
             self.reset_db()
+            status = False
         finally:
-            status = not self.cursor.closed
             return status
 
 

@@ -26,21 +26,21 @@ class GwTask(QgsTask, QObject):
         self.duration = duration
         self.aux_conn = None
 
+
     def run(self):
 
         global_vars.session_vars['threads'].append(self)
         self.aux_conn = global_vars.dao.get_aux_conn()
-
         tools_log.log_info(f"Started task {self.description()}")
         iface.actionOpenProject().setEnabled(False)
         iface.actionNewProject().setEnabled(False)
+        return True
 
 
     def finished(self, result):
 
         global_vars.session_vars['threads'].remove(self)
         global_vars.dao.delete_aux_con(self.aux_conn)
-
         iface.actionOpenProject().setEnabled(True)
         iface.actionNewProject().setEnabled(True)
         if result:

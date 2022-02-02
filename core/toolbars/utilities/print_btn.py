@@ -28,9 +28,6 @@ class GwPrintButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.destroyed = False
-        self.printer = None
-        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
     def clicked_event(self):
@@ -42,7 +39,11 @@ class GwPrintButton(GwAction):
 
     def _open_print(self):
 
+        self.destroyed = False
+        self.printer = None
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
         self.my_json = {}
+
         composers_list = self._get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."
@@ -104,7 +105,8 @@ class GwPrintButton(GwAction):
         # Control if no have composers
         if composers_list != '"{}"':
             self._accept(self.dlg_composer, self.my_json)
-            self.iface.mapCanvas().extentsChanged.connect(partial(self._accept, self.dlg_composer, self.my_json))
+            tools_gw.connect_signal(self.iface.mapCanvas().extentsChanged, partial(self._accept, self.dlg_composer, self.my_json),
+                                    'print', 'open_print_extentsChanged_accept')
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
@@ -187,6 +189,7 @@ class GwPrintButton(GwAction):
 
     def _destructor(self):
         self.iface.mapCanvas().setRotation(self.initial_rotation)
+        tools_gw.disconnect_signal('print')
         self.destroyed = True
         if self.rubber_band:
             self.iface.mapCanvas().scene().removeItem(self.rubber_band)
@@ -233,6 +236,8 @@ class GwPrintButton(GwAction):
         composer_templates = []
         active_composers = tools_qgis.get_composers_list()
         for composer in active_composers:
+            if not isinstance(composer, QgsPrintLayout):
+                continue
             composer_map = []
             composer_template = {'ComposerTemplate': composer.name()}
             index = 0
@@ -308,7 +313,7 @@ class GwPrintButton(GwAction):
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
                 label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])

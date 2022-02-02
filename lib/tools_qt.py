@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
     QDateEdit, QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
     QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox, \
     QToolButton
-from qgis.core import QgsExpression, QgsProject
+from qgis.core import QgsExpression, QgsProject, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
 
 from . import tools_log, tools_os, tools_qgis
@@ -366,12 +366,13 @@ def get_combo_value(dialog, widget, index=0, add_quote=False):
     return value
 
 
-def set_combo_value(combo, value, item1):
+def set_combo_value(combo, value, item1, add_new=True):
     """
     Set text to combobox populate with more than 1 item for row
         :param combo: QComboBox widget to manage
         :param value: element to show
         :param item1: element to compare
+        :param add_new: if True it will add the value even if it's not in the combo
     """
 
     for i in range(0, combo.count()):
@@ -381,7 +382,7 @@ def set_combo_value(combo, value, item1):
             return True
 
     # Add new value if @value not in combo
-    if value not in ("", None, 'None', 'none', '-1', -1):
+    if add_new and value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
         # Control if the QComboBox has been previously filled
         if combo.count() > 0:
@@ -524,10 +525,14 @@ def enable_dialog(dialog, enable, ignore_widgets=['', None]):
                 widget.setEnabled(enable)
 
 
-def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers,
+                         sectionResizeMode=3, stretchLastSection=True):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
+    widget.horizontalHeader().setSectionResizeMode(sectionResizeMode)
+    widget.horizontalHeader().setStretchLastSection(stretchLastSection)
+    widget.horizontalHeader().setMinimumSectionSize(100)
     widget.setEditTriggers(edit_triggers)
 
 
@@ -569,7 +574,7 @@ def set_action_checked(action, enabled, dialog=None):
 
 def set_calendar_empty(widget):
     """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
-    widget.setEmpty()
+    widget.displayNull(False)  # False is for 'updateCalendar' parameter. If True it sets a default date instead of NULL
 
 
 def add_horizontal_spacer():
@@ -609,14 +614,16 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     :return:
     """
 
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
+    if global_vars.schema_name and global_vars.schema_name not in table_name:
+        table_name = f"{global_vars.schema_name}.{table_name}"
 
     # Set model
     model = QSqlTableModel(db=global_vars.qgis_db_credentials)
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
+    if expr_filter is not None:
+        model.setFilter(expr_filter)
     model.select()
 
     # Check for errors
@@ -625,11 +632,9 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
 
     # Attach model to tableview
     qtable.setModel(model)
-    if expr_filter:
-        qtable.model().setFilter(expr_filter)
 
 
-def add_layer_to_toc(layer, group=None):
+def add_layer_to_toc(layer, group=None, sub_group=None):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
     :param group: Name of the group that will be created in the toc (string)
@@ -637,13 +642,26 @@ def add_layer_to_toc(layer, group=None):
 
     if group is None:
         QgsProject.instance().addMapLayer(layer)
+        return
     else:
         QgsProject.instance().addMapLayer(layer, False)
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup(group)
-        if my_group is None:
-            my_group = root.insertGroup(0, group)
-        my_group.insertLayer(0, layer)
+        first_group = root.findGroup(group)
+        if first_group and sub_group:
+            for child in first_group.children():
+                second_group = first_group.findGroup(child.name())
+                if second_group and sub_group.lower() == child.name().lower():
+                    second_group.insertLayer(0, layer)
+                    global_vars.iface.setActiveLayer(layer)
+                    return
+            first_group.insertLayer(0, layer)
+            global_vars.iface.setActiveLayer(layer)
+        else:
+            root = QgsProject.instance().layerTreeRoot()
+            my_group = root.findGroup("GW Layers")
+            if my_group is None:
+                my_group = root.insertGroup(0, "GW Layers")
+            my_group.insertLayer(0, layer)
 
 
 def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
@@ -678,6 +696,8 @@ def set_selection_behavior(dialog):
     widget_list = dialog.findChildren(QTableView)
     for widget in widget_list:
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        widget.horizontalHeader().setSectionResizeMode(3)
+        widget.horizontalHeader().setStretchLastSection(True)
 
 
 def get_folder_path(dialog, widget):
@@ -931,12 +951,16 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
     msg = tr(text, context_name)
     if parameter:
         msg += ": " + str(parameter)
+    if len(msg) > 750:
+        msg = msg[:750] + "\n[...]"
     msg_box.setText(msg)
     if title:
         title = tr(title, context_name)
         msg_box.setWindowTitle(title)
     if inf_text:
         inf_text = tr(inf_text, context_name)
+        if len(inf_text) > 500:
+            inf_text = inf_text[:500] + "\n[...]"
         msg_box.setInformativeText(inf_text)
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
@@ -958,6 +982,8 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
             msg += ": " + str(parameter)
 
     msg_box = QMessageBox()
+    if len(msg) > 750:
+        msg = msg[:750] + "\n[...]"
     msg_box.setText(msg)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     if title:
@@ -965,6 +991,8 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
         msg_box.setWindowTitle(title)
     if inf_text:
         inf_text = tr(inf_text, context_name)
+        if len(inf_text) > 500:
+            inf_text = inf_text[:500] + "\n[...]"
         msg_box.setInformativeText(inf_text)
     msg_box.setDefaultButton(QMessageBox.No)
     msg_box.exec_()
@@ -1177,8 +1205,8 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
         if not is_valid:
             return expr
 
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
+    if global_vars.schema_name and global_vars.schema_name not in table_name:
+        table_name = f"{global_vars.schema_name}.{table_name}"
 
     # Set a model with selected filter expression
     model = QSqlTableModel(db=global_vars.qgis_db_credentials)

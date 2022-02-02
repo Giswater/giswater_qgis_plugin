@@ -34,6 +34,35 @@ class GwConnectLinkButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
+    def activate(self):
+
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
+
+        # Rubber band
+        tools_gw.reset_rubberband(self.rubber_band)
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.set_snapping_status()
+
+        # Set snapping to 'connec' and 'gully'
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+
+        # Change cursor
+        cursor = tools_gw.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
+            tools_qgis.show_info(message)
+
+
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
 
@@ -55,6 +84,16 @@ class GwConnectLinkButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
+
+        # Manage if task is already running
+        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
+            try:
+                if self.connect_link_task.isActive():
+                    message = "Connect link task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
 
         if event.button() == Qt.LeftButton:
 
@@ -117,7 +156,7 @@ class GwConnectLinkButton(GwMaptool):
                 number_connec_features += layer_connec.selectedFeatureCount()
             if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
                 message = "Number of features selected in the group of"
-                title = "Interpolate value - Do you want to update values"
+                title = "Connect to network"
                 answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
                 if answer:
                     # Create link
@@ -131,39 +170,6 @@ class GwConnectLinkButton(GwMaptool):
 
             if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
                 self.cancel_map_tool()
-
-
-    def activate(self):
-
-        # Check button
-        self.action.setChecked(True)
-
-        # Rubber band
-        tools_gw.reset_rubberband(self.rubber_band)
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
-        # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_connec(False)
-        self.snapper_manager.config_snap_to_gully(False)
-
-        # Change cursor
-        cursor = tools_gw.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
-            tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-
-        super().deactivate()
 
 
     def manage_result(self, result, layer):
@@ -196,6 +202,16 @@ class GwConnectLinkButton(GwMaptool):
 
     def manage_gully_result(self):
 
+        # Manage if task is already running
+        if hasattr(self, 'connect_link_task') and self.connect_link_task is not None:
+            try:
+                if self.connect_link_task.isActive():
+                    message = "Connect link task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
         if layer_gully:
             # Check selected records
@@ -203,7 +219,7 @@ class GwConnectLinkButton(GwMaptool):
             number_features += layer_gully.selectedFeatureCount()
             if number_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_gully).isVisible():
                 message = "Number of features selected in the group of"
-                title = "Interpolate value - Do you want to update values"
+                title = "Connect to network"
                 answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
                 if answer:
                     # Create link

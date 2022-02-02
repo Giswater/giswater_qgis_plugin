@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+from functools import partial
+
 import console
 import os.path
 import shlex
@@ -14,11 +16,12 @@ from random import randrange
 
 from qgis.PyQt.QtCore import Qt, QTimer, QSettings
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QDockWidget, QApplication
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, QgsSnappingUtils, QgsTolerance, \
     QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, QgsLineSymbol, QgsRendererCategory, \
     QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.core import QgsExpression, QgsVectorLayer
+from qgis.utils import iface
 
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
@@ -64,8 +67,10 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
         dev_duration = user_parameters['show_message_durations']
     # If is set, use this value
     if dev_duration not in (None, "None"):
-        duration = int(dev_duration)
-
+        if message_level in (1, 2) and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
     msg = None
     if text:
         msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
@@ -73,8 +78,50 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    if len(global_vars.session_vars['threads']) == 0:
-        global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+    iface.messageBar().pushMessage(title, msg, message_level, duration)
+
+    # Check if logger to file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text)
+
+
+def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True):
+    """
+    Show message to the user with selected message level and a button to open the url
+        :param text: The text to be shown (String)
+        :param url: The url that will be opened by the button. It will also show after the message (String)
+        :param btn_text: The text of the button (String)
+        :param message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)}
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param logger_file: Whether it should log the message in a file or not (bool)
+    """
+
+    global user_parameters
+
+    # Get optional parameter 'show_message_durations'
+    dev_duration = None
+    if 'show_message_durations' in user_parameters:
+        dev_duration = user_parameters['show_message_durations']
+    # If is set, use this value
+    if dev_duration not in (None, "None"):
+        if message_level in (1, 2) and int(dev_duration) < 10:
+            duration = 10
+        else:
+            duration = int(dev_duration)
+    msg = None
+    if text:
+        msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
+
+    # Create the message with the button
+    widget = iface.messageBar().createMessage(f"{msg}", f"{url}")
+    button = QPushButton(widget)
+    button.setText(f"{btn_text}")
+    button.pressed.connect(partial(tools_os.open_file, url))
+    widget.layout().addWidget(button)
+
+    # Show the message
+    iface.messageBar().pushWidget(widget, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
@@ -157,14 +204,14 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir):
     """ Get @parameter from metadata.txt file """
 
     # Check if metadata file exists
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = f"Metadata file not found: {metadata_file}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         return default_value
 
     value = None
@@ -174,7 +221,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_
         value = metadata.get('general', parameter)
     except configparser.NoOptionError:
         message = f"Parameter not found: {parameter}"
-        global_vars.iface.messageBar().pushMessage("", message, 1, 20)
+        iface.messageBar().pushMessage("", message, 1, 20)
         value = default_value
     finally:
         return value
@@ -200,43 +247,32 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
+def get_major_version(plugin_dir, default_version='3.5'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
     return major_version
 
 
-def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir):
+def get_build_version(plugin_dir, default_version='35001'):
     """ Get plugin build version from metadata.txt file """
 
     build_version = get_plugin_metadata('version', default_version, plugin_dir).replace(".", "")
     return build_version
 
 
-def get_project_variables():
-    """ Manage QGIS project variables """
-
-    global_vars.project_vars = {}
-    global_vars.project_vars['info_type'] = get_project_variable('gwInfoType')
-    global_vars.project_vars['add_schema'] = get_project_variable('gwAddSchema')
-    global_vars.project_vars['main_schema'] = get_project_variable('gwMainSchema')
-    global_vars.project_vars['project_role'] = get_project_variable('gwProjectRole')
-    global_vars.project_vars['project_type'] = get_project_variable('gwProjectType')
-
-
 def enable_python_console():
     """ Enable Python console and Log Messages panel """
 
     # Manage Python console
-    python_console = global_vars.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
+    python_console = iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
     if python_console:
         python_console.setVisible(True)
     else:
         console.show_console()
 
     # Manage Log Messages panel
-    message_log = global_vars.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+    message_log = iface.mainWindow().findChild(QDockWidget, 'MessageLog')
     if message_log:
         message_log.setVisible(True)
 
@@ -343,7 +379,7 @@ def get_primary_key(layer=None):
 
     uri_pk = None
     if layer is None:
-        layer = global_vars.iface.activeLayer()
+        layer = iface.activeLayer()
     if layer is None:
         return uri_pk
     uri = layer.dataProvider().dataSourceUri().lower()
@@ -441,7 +477,7 @@ def get_points_from_geometry(layer, feature):
         list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
         list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
     else:
-        tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
+        tools_log.log_info("NO FEATURE TYPE DEFINED")
 
     return list_points
 
@@ -452,22 +488,22 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     try:
         global_vars.canvas.xyCoordinates.disconnect()
     except TypeError as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        print(f"{type(e).__name__} --> {e}")
 
     if emit_point is not None:
         try:
             emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+            print(f"{type(e).__name__} --> {e}")
 
     if vertex_marker is not None:
         try:
             vertex_marker.hide()
         except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
+            print(f"{type(e).__name__} --> {e}")
 
     if action_pan:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def refresh_map_canvas(_restore_cursor=False):
@@ -483,12 +519,19 @@ def refresh_map_canvas(_restore_cursor=False):
 
 def set_cursor_wait():
     """ Change cursor to 'WaitCursor' """
+    while get_override_cursor() is not None:
+        restore_cursor()
     QApplication.setOverrideCursor(Qt.WaitCursor)
+
+
+def get_override_cursor():
+    return QApplication.overrideCursor()
 
 
 def restore_cursor():
     """ Restore to previous cursors """
-    QApplication.restoreOverrideCursor()
+    while get_override_cursor() is not None:
+        QApplication.restoreOverrideCursor()
 
 
 def disconnect_signal_selection_changed():
@@ -499,7 +542,7 @@ def disconnect_signal_selection_changed():
     except Exception:
         pass
     finally:
-        global_vars.iface.actionPan().trigger()
+        iface.actionPan().trigger()
 
 
 def select_features_by_expr(layer, expr):
@@ -618,11 +661,11 @@ def restore_user_layer(layer_name, user_current_layer=None):
     """ Set active layer, preferably @user_current_layer else @layer_name """
 
     if user_current_layer:
-        global_vars.iface.setActiveLayer(user_current_layer)
+        iface.setActiveLayer(user_current_layer)
     else:
         layer = get_layer_by_tablename(layer_name)
         if layer:
-            global_vars.iface.setActiveLayer(layer)
+            iface.setActiveLayer(layer)
 
 
 def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
@@ -668,10 +711,10 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         layer.setRenderer(renderer)
 
     layer.triggerRepaint()
-    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
+    iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-def remove_layer_from_toc(layer_name, group_name):
+def remove_layer_from_toc(layer_name, group_name, sub_group=None):
     """
     Remove layer from toc if exist
         :param layer_name: Name's layer (String)
@@ -689,26 +732,48 @@ def remove_layer_from_toc(layer_name, group_name):
 
         # Remove group if is void
         root = QgsProject.instance().layerTreeRoot()
-        group = root.findGroup(group_name)
-        if group:
-            layers = group.findLayers()
+        first_group = root.findGroup(group_name)
+        if first_group:
+            if sub_group:
+                second_group = first_group.findGroup(sub_group)
+                if second_group:
+                    layers = second_group.findLayers()
+                    if not layers:
+                        root.removeChildNode(second_group)
+            layers = first_group.findLayers()
             if not layers:
-                root.removeChildNode(group)
+                root.removeChildNode(first_group)
         remove_layer_from_toc(layer_name, group_name)
 
+    # Force a map refresh
+    refresh_map_canvas()  # First refresh all the layers
+    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
-def get_plugin_settings_value(key, default_value=""):
+def clean_layer_group_from_toc(group_name):
+    """
+    Remove all "broken" layers from a group
+        :param group_name: Group's name (String)
+    """
+
+    root = QgsProject.instance().layerTreeRoot()
+    group = root.findGroup(group_name)
+    if group:
+        layers = group.findLayers()
+        for layer in layers:
+            if layer.layer() is None:
+                group.removeChildNode(layer)
+        # Remove group if is void
+        layers = group.findLayers()
+        if not layers:
+            root.removeChildNode(group)
+
+
+def get_plugin_settings_value(section, key, default_value=""):
     """ Get @value of QSettings located in @key """
 
-    key = global_vars.plugin_name + "/" + key
-    value = global_vars.qgis_settings.value(key, default_value)
+    key = section + "/" + key
+    value = QSettings().value(key, default_value)
     return value
-
-
-def set_plugin_settings_value(key, value):
-    """ Set @value to QSettings of selected @value located in @key """
-
-    global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
 
 
 def get_layer_by_layername(layername, log_info=False):
@@ -797,8 +862,8 @@ def set_margin(layer, margin):
     xmax = extent.xMaximum() + margin
     ymax = extent.yMaximum() + margin
     extent.set(xmin, ymin, xmax, ymax)
-    global_vars.iface.mapCanvas().setExtent(extent)
-    global_vars.iface.mapCanvas().refresh()
+    iface.mapCanvas().setExtent(extent)
+    iface.mapCanvas().refresh()
 
 
 def create_qml(layer, style):
@@ -880,7 +945,7 @@ def get_geometry_from_json(feature):
         type_ = feature['geometry']['type']
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
-    except AttributeError as e:
+    except AttributeError or TypeError as e:
         tools_log.log_info(f"{type(e).__name__} --> {e}")
         return None
 
@@ -947,7 +1012,7 @@ def check_query_layer(layer):
 
 def get_epsg():
 
-    epsg = global_vars.iface.mapCanvas().mapSettings().destinationCrs().authid()
+    epsg = iface.mapCanvas().mapSettings().destinationCrs().authid()
     epsg = epsg.split(':')[1]
 
     return epsg
@@ -1062,5 +1127,23 @@ def _get_multi_coordinates(feature):
     coordinates = coordinates[:-2] + ")"
     return coordinates
 
+
+def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None):
+    """
+    Draw 'polygon' over canvas following list of points
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    """
+
+    rubber_band.setIconSize(20)
+    polygon = QgsGeometry.fromPolygonXY([points])
+    rubber_band.setToGeometry(polygon, None)
+    rubber_band.setColor(border)
+    rubber_band.setFillColor(QColor(0, 0, 0, 0))
+    rubber_band.setWidth(width)
+    rubber_band.show()
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        QTimer.singleShot(duration_time, rubber_band.reset)
 
 # endregion

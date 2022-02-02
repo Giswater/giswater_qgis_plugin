@@ -48,6 +48,9 @@ class GwFeatureDeleteButton(GwAction):
         # Hide button delete another feature
         self.dlg_feature_delete.btn_delete_another.setVisible(False)
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_feature_delete)
+
         # Configure feature_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
@@ -64,7 +67,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set listeners
         self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))
-        self.dlg_feature_delete.rejected.connect(tools_qgis.disconnect_signal_selection_changed)
+        self.dlg_feature_delete.rejected.connect(partial(tools_gw.disconnect_signal, 'feature_delete'))
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
         self.dlg_feature_delete.btn_delete_another.clicked.connect(partial(self._delete_another_feature))
 
@@ -90,6 +93,7 @@ class GwFeatureDeleteButton(GwAction):
 
         # Set delete feature tab as current index
         self.dlg_feature_delete.mainTab.setCurrentIndex(0)
+        tools_gw.disable_tab_log(self.dlg_feature_delete)
 
 
     def _filter_typeahead(self, widget, completer, model):
@@ -121,10 +125,8 @@ class GwFeatureDeleteButton(GwAction):
     def connect_signal_selection_changed(self):
         """ Connect signal selectionChanged """
 
-        try:
-            self.canvas.selectionChanged.connect(partial(self._manage_selection))
-        except Exception:
-            pass
+        tools_gw.connect_signal(self.canvas.selectionChanged, partial(self._manage_selection),
+                                'feature_delete', 'connect_signal_selection_changed_selectionChanged_manage_selection')
 
 
     # region private functions
@@ -185,7 +187,6 @@ class GwFeatureDeleteButton(GwAction):
         # Set visible button delete another feature
         self.dlg_feature_delete.btn_delete_another.setVisible(True)
 
-
         # Close dialog
         if not change_tab:
             tools_gw.close_dialog(self.dlg_feature_delete)
@@ -194,7 +195,7 @@ class GwFeatureDeleteButton(GwAction):
     def _selection_init(self):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
-        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 

@@ -10,7 +10,7 @@ from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
-from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao, tools_os
+from . import tools_log, tools_qt, tools_qgis, tools_pgdao, tools_os
 
 
 def create_list_for_completer(sql):
@@ -87,11 +87,11 @@ def check_column(tablename, columname, schemaname=None):
     return row
 
 
-def check_role(role_name):
+def check_role(role_name, is_admin=None):
     """ Check if @role_name exists """
 
     sql = f"SELECT * FROM pg_roles WHERE rolname = '{role_name}'"
-    row = get_row(sql, log_info=False)
+    row = get_row(sql, log_info=False, is_admin=is_admin)
     return row
 
 
@@ -273,6 +273,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     global_vars.dao = tools_pgdao.GwPgDao()
     global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
     status = global_vars.dao.init_db()
+    tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
     if not status:
         msg = "Database connection error (psycopg2). Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(msg)
@@ -313,6 +314,7 @@ def connect_to_database_service(service, sslmode=None):
         global_vars.dao = tools_pgdao.GwPgDao()
         global_vars.dao.set_conn_string(conn_string)
         status = global_vars.dao.init_db()
+        tools_log.log_info(f"PostgreSQL PID: {global_vars.dao.pid}")
         if not status:
             msg = "Service database connection error (psycopg2). Please open plugin log file to get more details"
             global_vars.session_vars['last_error'] = tools_qt.tr(msg)
@@ -334,13 +336,17 @@ def get_postgis_version():
     return postgis_version
 
 
-def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None):
+def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None, is_admin=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
+    if global_vars.dao is None:
+        tools_log.log_warning("The connection to the database is broken.", parameter=sql)
+        return None
     sql = _get_sql(sql, log_sql, params)
     row = global_vars.dao.get_row(sql, commit, aux_conn=aux_conn)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
-    if not row:
+
+    if not row and not is_admin:
         # Check if any error has been raised
         if global_vars.session_vars['last_error']:
             tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql)
@@ -353,6 +359,9 @@ def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_con
 def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
+    if global_vars.dao is None:
+        tools_log.log_warning("The connection to the database is broken.", parameter=sql)
+        return None
     sql = _get_sql(sql, log_sql, params)
     rows = None
     rows2 = global_vars.dao.get_rows(sql, commit)
@@ -373,17 +382,18 @@ def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_em
     return rows
 
 
-def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None):
+def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None, is_thread=False, show_exception=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_db(sql, stack_level_increase=1)
     result = global_vars.dao.execute_sql(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not result:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, filepath=filepath)
+        if show_exception and not is_thread:
+            tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, filepath=filepath)
         return False
 
     return True
@@ -398,7 +408,7 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=1)
+        tools_log.log_db(sql, stack_level_increase=1)
     value = global_vars.dao.execute_returning(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not value:
@@ -477,10 +487,17 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
 
         not_version = False
         credentials = tools_qgis.get_layer_source(layer)
-        # Get sslmode from user init config file
-        tools_config.manage_init_config_file()
-        sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_default)
-        credentials['sslmode'] = sslmode
+
+        # If sslmode is not defined
+        sslmode = sslmode_default
+        if not credentials['sslmode']:
+            # If service is defined: get sslmode from .pg_service file
+            if credentials['service']:
+                tools_log.log_info(f"Getting sslmode from .pg_service file")
+                credentials_service = tools_os.manage_pg_service(credentials['service'])
+                sslmode = credentials_service['sslmode'] if credentials_service['sslmode'] else sslmode_default
+            credentials['sslmode'] = sslmode
+
         global_vars.schema_name = credentials['schema']
         conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
         status, credentials = connect_to_database_credentials(credentials, conn_info)
@@ -512,11 +529,11 @@ def get_layer_source_from_credentials(sslmode_default, layer_name='v_edit_node')
             credentials['service'] = settings.value('service')
 
             sslmode_settings = settings.value('sslmode')
-            sslmode = sslmode_settings
-            if isinstance(sslmode_settings, str):
-                sslmode_settings = sslmode_settings.lower().replace("ssl", "")
-                sslmode_dict = {'0': 'prefer', '1': 'disable', '3': 'require'}
-                sslmode = sslmode_dict.get(sslmode_settings, sslmode_settings)
+            try:
+                sslmode_dict = {0: 'prefer', 1: 'disable', 3: 'require'}
+                sslmode = sslmode_dict.get(sslmode_settings, sslmode_default)
+            except ValueError:
+                sslmode = sslmode_settings
             credentials['sslmode'] = sslmode
             settings.endGroup()
 
@@ -542,9 +559,15 @@ def get_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
-                      global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
-                      global_vars.dao_db_credentials['password'])
+    if global_vars.dao_db_credentials['service']:
+        uri.setConnection(global_vars.dao_db_credentials['service'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+    else:
+        uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+            global_vars.dao_db_credentials['password'])
+
     return uri
 
 # region private functions
@@ -556,7 +579,7 @@ def _get_sql(sql, log_sql=False, params=None):
     if params:
         sql = global_vars.dao.mogrify(sql, params)
     if log_sql:
-        tools_log.log_info(sql, stack_level_increase=2)
+        tools_log.log_db(sql, bold='b', stack_level_increase=2)
 
     return sql
 

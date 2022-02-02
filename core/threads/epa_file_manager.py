@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 import os
 import re
 import subprocess
@@ -26,18 +27,22 @@ class GwEpaFileManager(GwTask):
 
         super().__init__(description)
         self.go2epa = go2epa
+        self.json_result = None
+        self.rpt_result = None
+        self.fid = 140
+        self.function_name = None
+        self.initialize_variables()
+        self.set_variables_from_go2epa()
+
+
+    def initialize_variables(self):
+
         self.exception = None
         self.error_msg = None
         self.message = None
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
-        self.json_result = None
-        self.rpt_result = None
-        self.file_rpt = None
-        self.fid = 140
-        self.set_variables_from_go2epa()
-        self.funtion_name = None
 
 
     def set_variables_from_go2epa(self):
@@ -48,11 +53,8 @@ class GwEpaFileManager(GwTask):
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
         self.go2epa_export_inp = self.go2epa.export_inp
-        self.exec_epa = self.go2epa.exec_epa
-        self.import_result = self.go2epa.import_result
-        self.project_type = self.go2epa.project_type
-        self.plugin_dir = self.go2epa.plugin_dir
-        self.net_geom = self.go2epa.net_geom
+        self.go2epa_execute_epa = self.go2epa.exec_epa
+        self.go2epa_import_result = self.go2epa.import_result
         self.export_subcatch = self.go2epa.export_subcatch
 
 
@@ -60,27 +62,28 @@ class GwEpaFileManager(GwTask):
 
         super().run()
 
-        # Initialize instance variables
-        self.exception = None
-        self.error_msg = None
-        self.message = None
-        self.common_msg = ""
-        self.function_failed = False
-        self.complet_result = None
-
+        self.initialize_variables()
+        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _get_steps'")
+        steps = self._get_steps()
         status = True
-        if not self._exec_function_pg2epa():
-            self.funtion_name = 'gw_fct_pg2epa_main'
-            return False
+        if self.go2epa_export_inp or self.go2epa_execute_epa:
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
+            status = self._exec_function_pg2epa(steps)
+            if not status:
+                self.function_name = 'gw_fct_pg2epa_main'
+                return False
 
         if self.go2epa_export_inp:
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _export_inp'")
             status = self._export_inp()
 
-        if status and self.exec_epa:
+        if status and self.go2epa_execute_epa:
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _execute_epa'")
             status = self._execute_epa()
 
-        if status and self.import_result:
-            self.funtion_name = 'gw_fct_rpt2pg_main'
+        if status and self.go2epa_import_result:
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _import_rpt'")
+            self.function_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
         return status
@@ -90,21 +93,16 @@ class GwEpaFileManager(GwTask):
 
         super().finished(result)
 
-        sql = f"SELECT {self.funtion_name}("
-        if self.body:
-            sql += f"{self.body}"
-        sql += f");"
-        tools_gw.manage_json_response(self.json_result, sql, None)
-
         self.dlg_go2epa.btn_cancel.setEnabled(False)
+        self.dlg_go2epa.btn_accept.setEnabled(True)
+
+        self._close_file()
         if self.isCanceled():
             return
 
-        self._close_file()
-
         # If PostgreSQL function returned null
-        if self.complet_result is None:
-            msg = f"Database returned null. Check postgres function '{self.funtion_name}'"
+        if (self.go2epa_export_inp or self.go2epa_export_inp) and self.complet_result is None:
+            msg = f"Database returned null. Check postgres function '{self.function_name}'"
             tools_log.log_warning(msg)
 
         elif result:
@@ -114,24 +112,37 @@ class GwEpaFileManager(GwTask):
                     if self.complet_result['status'] == "Accepted":
                         if 'body' in self.complet_result:
                             if 'data' in self.complet_result['body']:
+                                tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
+                                                   f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
+                                                   f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
-                                                        'INP results', True, True, 1, False, close=False,
+                                                        None, True, True, 1, True, close=False,
                                                         call_set_tabs_enabled=False)
 
-            if self.import_result and self.rpt_result:
+            if self.go2epa_import_result and self.rpt_result:
                 if 'status' in self.rpt_result:
                     if self.rpt_result['status'] == "Accepted":
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
+                                tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
+                                    f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
+                                                   f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
-                                                        'RPT results', True, True, 1, False, close=False,
+                                                        None, True, True, 1, True, close=False,
                                                         call_set_tabs_enabled=False)
                         self.message = self.rpt_result['message']['text']
+            sql = f"SELECT {self.function_name}("
+            if self.body:
+                sql += f"{self.body}"
+            sql += f");"
+            tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
+            tools_gw.manage_json_response(self.complet_result, sql, None)
 
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
             if self.message is not None:
-                tools_qt.show_info_box(self.message)
+                tools_log.log_info(self.message)
             self.go2epa.check_result_id()
             return
 
@@ -184,34 +195,89 @@ class GwEpaFileManager(GwTask):
 
     # region private functions
 
-    def _exec_function_pg2epa(self):
+    def _exec_function_pg2epa(self, steps):
 
-        max_retries = 3
-        attempt = 0
         self.json_result = None
+        status = False
         self.setProgress(0)
 
         extras = f'"resultId":"{self.result_name}"'
-        extras += f', "useNetworkGeom":"{self.net_geom}"'
-        extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        self.body = tools_gw.create_body(extras=extras)
+        if global_vars.project_type == 'ud':
+            extras += f', "dumpSubcatch":"{self.export_subcatch}"'
 
-        status = False
-        while self.json_result is None and attempt < max_retries:
-            attempt += 1
-            tools_log.log_warning(f"Attempt {attempt} of {max_retries}")
-            self.json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, is_thread=True)
-            self.complet_result = self.json_result
-            if self.json_result is None or not self.json_result:
-                tools_log.log_warning("Function failed")
+        if steps == 3:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
+            if self.isCanceled():
+                return False
+            if json_result is not None:
+                self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
+                tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 2 with parameters: "
+                                   f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                         aux_conn=self.aux_conn, is_thread=True)
+                if self.isCanceled():
+                    return False
+                if json_result is not None:
+                    self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+                    tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
+                                       f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                    json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                             aux_conn=self.aux_conn, is_thread=True)
+                    if self.isCanceled():
+                        return False
+        elif steps == 2:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
+            if self.isCanceled():
+                return False
+            if json_result is not None:
+                self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+                tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
+                                   f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                         aux_conn=self.aux_conn, is_thread=True)
+                if self.isCanceled():
+                    return False
+
+        elif steps == 1:
+            self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
+            if self.isCanceled():
+                return False
+        else:  # steps == 0
+            extras += f', "step": 0'
+            self.body = tools_gw.create_body(extras=extras)
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 0 with parameters: "
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                                     aux_conn=self.aux_conn, is_thread=True)
+            if self.isCanceled():
+                return False
+
+        # Manage json result
+        self.json_result = json_result
+        self.complet_result = json_result
+        if json_result is None or not json_result:
+            self.function_failed = True
+        elif 'status' in json_result:
+            if json_result['status'] == 'Failed':
+                tools_log.log_warning(json_result)
                 self.function_failed = True
-            elif 'status' in self.json_result:
-                if self.json_result['status'] == 'Failed':
-                    tools_log.log_warning(self.json_result)
-                    self.function_failed = True
-                else:
-                    status = True
-                break
+            else:
+                status = True
+        if self.isCanceled():
+            return False
 
         return status
 
@@ -221,12 +287,18 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return False
 
-        tools_log.log_info(f"Create inp file into POSTGRESQL")
+        tools_log.log_info(f"Export INP file into PostgreSQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
             return False
 
+        if self.file_inp == "null":
+            message = "You have to set this parameter"
+            self.error_msg = f"{message}: INP file"
+            return False
+
+        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file' with parameters: '{self.file_inp}', '{self.complet_result['body']['file']}'")
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
@@ -238,13 +310,50 @@ class GwEpaFileManager(GwTask):
 
         tools_log.log_info(f"Write inp file........: {folder_path}")
 
-        file1 = open(folder_path, "w")
+        # Generate generic INP file
+        file_inp = open(folder_path, "w")
+        read = True
         for row in all_rows:
-            if 'text' in row and row['text'] is not None:
+            # Use regexp to check which targets to read (everyone except GULLY)
+            if bool(re.match('\[(.*?)\]', row['text'])) and \
+                    ('GULLY' in row['text'] or 'LINK' in row['text'] or
+                     'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+                read = False
+            elif bool(re.match('\[(.*?)\]', row['text'])):
+                read = True
+            if 'text' in row and row['text'] is not None and read:
                 line = row['text'].rstrip() + "\n"
-                file1.write(line)
+                file_inp.write(line)
 
-        self._close_file(file1)
+        self._close_file(file_inp)
+
+        if global_vars.project_type == 'ud' and f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
+
+
+            # Replace extension .inp
+            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_file = open(aditional_path, "w")
+            read = True
+            save_file = False
+            for row in all_rows:
+                # Use regexp to check which targets to read (only TITLE and aditional target)
+                if bool(re.match('\[(.*?)\]', row['text'])) and \
+                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
+                         'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+                    read = True
+                    if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
+                       'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
+                        save_file = True
+                elif bool(re.match('\[(.*?)\]', row['text'])):
+                    read = False
+                if 'text' in row and row['text'] is not None and read:
+                    line = row['text'].rstrip() + "\n"
+                    aditional_file.write(line)
+
+            self._close_file(aditional_file)
+
+            if save_file is False:
+                os.remove(aditional_path)
 
 
     def _execute_epa(self):
@@ -270,10 +379,10 @@ class GwEpaFileManager(GwTask):
 
         # Set file to execute
         opener = None
-        if self.project_type in 'ws':
-            opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet20012.exe"
-        elif self.project_type in 'ud':
-            opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm50022.exe"
+        if global_vars.project_type in 'ws':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
+        elif global_vars.project_type in 'ud':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if opener is None:
             return False
@@ -298,9 +407,11 @@ class GwEpaFileManager(GwTask):
         status = False
         try:
             # Call import function
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file' with parameters: '{self.file_rpt}'")
             status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_import_function'")
             status = self._exec_import_function()
         except Exception as e:
             self.error_msg = str(e)
@@ -432,7 +543,8 @@ class GwEpaFileManager(GwTask):
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
         self.body = tools_gw.create_body(extras=extras)
-        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body)
+        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
+                                                      aux_conn=self.aux_conn, is_thread=True)
         self.rpt_result = self.json_result
         if self.json_result is None or not self.json_result:
             self.function_failed = True
@@ -447,5 +559,17 @@ class GwEpaFileManager(GwTask):
         self.common_msg += "Import RPT file finished."
 
         return True
+
+
+    def _get_steps(self):
+
+        value = tools_gw.get_config_value('inp_options_debug')
+        value = json.loads(value[0])
+        try:
+            steps = int(value['steps'])
+        except KeyError or ValueError:
+            steps = 0
+
+        return steps
 
     # endregion

@@ -124,28 +124,18 @@ class GwToolBoxTask(GwTask):
             return False
 
         if len(widget_list) > 0:
-            extras = extras[:-2] + '}'
-        else:
-            extras += '}'
+            extras = extras[:-2]
+        extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True, aux_conn=self.aux_conn, is_thread=True)
+        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
+                                                      aux_conn=self.aux_conn, is_thread=True)
+
         if self.isCanceled():
             return False
         if self.json_result['status'] == 'Failed':
             return False
         if not self.json_result or self.json_result is None:
-            return False
-
-        try:
-            # getting simbology capabilities
-            if 'setStyle' in self.json_result['body']['data']:
-                set_sytle = self.json_result['body']['data']['setStyle']
-                if set_sytle == "Mapzones":
-                    # call function to simbolize mapzones
-                    tools_gw.set_style_mapzones()
-
-        except KeyError as e:
-            self.exception = e
             return False
 
         return True
@@ -159,6 +149,7 @@ class GwToolBoxTask(GwTask):
         if self.body:
             sql += f"{self.body}"
         sql += f");"
+        tools_log.log_info(f"Task 'Toolbox execute' manage json response with parameters: '{self.json_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.json_result, sql, None)
 
         self.dialog.btn_cancel.hide()
@@ -177,7 +168,7 @@ class GwToolBoxTask(GwTask):
         elif result is False and global_vars.session_vars['last_error_msg'] is not None:
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
         elif result:
-            tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
+            tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, False, False)
         # If sql function return null
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"

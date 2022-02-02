@@ -15,6 +15,7 @@ from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars
 from ...lib import tools_qgis
+from . import tools_gw
 
 
 class GwSnapManager(object):
@@ -64,7 +65,9 @@ class GwSnapManager(object):
         """ Store the project user snapping configuration """
 
         # Get an array containing the snapping options for all the layers
-        self.previous_snapping = self.get_snapping_options()
+        self.snapping_config = self.get_snapping_options()
+        self.snapping_config.setEnabled(True)
+        self.previous_snapping = self.snapping_config
 
 
     def set_snapping_status(self, enable=False):
@@ -99,73 +102,71 @@ class GwSnapManager(object):
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
-    def config_snap_to_arc(self, msg=True):
+    def config_snap_to_arc(self):
         """ Set snapping to 'arc' """
-
-        self.show_snap_message(msg, 'arc')
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
+        segment_flag = tools_gw.get_segment_flag(2)
         layer_settings = self.config_snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
-            layer_settings.setType(2)
+            tools_gw.set_snapping_type(layer_settings, segment_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
         self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_node(self, msg=True):
+    def config_snap_to_node(self):
         """ Set snapping to 'node' """
 
-        self.show_snap_message(msg, 'node')
-
         QgsProject.instance().blockSignals(True)
+        vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setType(1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
         self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_connec(self, msg=True):
+    def config_snap_to_connec(self):
         """ Set snapping to 'connec' """
-
-        self.show_snap_message(msg, 'connec')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'), QgsPointLocator.Vertex, True)
+        vertex_flag = tools_gw.get_vertex_flag(1)
+        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'),
+            QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setType(1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_connec'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_gully(self, msg=True):
+    def config_snap_to_gully(self):
         """ Set snapping to 'gully' """
-
-        self.show_snap_message(msg, 'gully')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'), QgsPointLocator.Vertex, True)
+        vertex_flag = tools_gw.get_vertex_flag(1)
+        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'),
+            QgsPointLocator.Vertex, True)
         if layer_settings:
-            layer_settings.setType(1)
+            tools_gw.set_snapping_type(layer_settings, vertex_flag)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_gully'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
@@ -345,14 +346,17 @@ class GwSnapManager(object):
 
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
-            active_layer = tools_qgis.get_layer_by_tablename('version')
+            active_layer = tools_qgis.get_layer_by_tablename('sys_version')
             global_vars.iface.setActiveLayer(active_layer)
 
         # Snapper
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(partial(self._get_mouse_move, vertex_marker))
-        emit_point.canvasClicked.connect(partial(self._get_xy, vertex_marker, emit_point))
+        tools_gw.connect_signal(global_vars.canvas.xyCoordinates, partial(self._get_mouse_move, vertex_marker),
+                                'snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_xy, vertex_marker, emit_point),
+                                'snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
 
 
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
@@ -367,20 +371,6 @@ class GwSnapManager(object):
         vertex_marker.setColor(colors[color_type])
         vertex_marker.setIconSize(icon_size)
         vertex_marker.setPenWidth(pen_width)
-
-
-    def show_snap_message(self, msg, feature_type=None):
-
-        if msg is False:
-            return
-        if global_vars.user_level['level'] not in (None, 'None'):
-            if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
-                if msg is True:
-                    msg = f'Snap to'
-                    tools_qgis.show_info(msg, 1, parameter=feature_type)
-                elif type(msg) is str:
-                    tools_qgis.show_info(msg, 1)
-
 
     # region private functions
 
@@ -402,14 +392,17 @@ class GwSnapManager(object):
     def _get_xy(self, vertex_marker, emit_point, point):
         """ Get coordinates of selected point """
 
-        # Setting x, y coordinates from point
+        event_point = self.get_event_point(point=point)
+        result = self.snap_to_project_config_layers(event_point)
+        point = self.get_snapped_point(result)
+        # Setting x, y coordinates from snapped point
         self.point_xy['x'] = point.x()
         self.point_xy['y'] = point.y()
 
         message = "Geometry has been added!"
         tools_qgis.show_info(message)
-        emit_point.canvasClicked.disconnect()
-        global_vars.canvas.xyCoordinates.disconnect()
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
+        tools_gw.disconnect_signal('snap_managers', f'{hash(self)}_xyCoordinates_get_mouse_move')
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
 

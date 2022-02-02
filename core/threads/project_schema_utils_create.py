@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_db, tools_log
 
 
 class GwCreateSchemaUtilsTask(GwTask):
@@ -25,7 +25,7 @@ class GwCreateSchemaUtilsTask(GwTask):
 
 
     def run(self):
-        """ Automatic mincut: Execute function 'gw_fct_mincut' """
+        """"""
 
         super().run()
         self.is_test = self.params['is_test']
@@ -40,6 +40,27 @@ class GwCreateSchemaUtilsTask(GwTask):
             status = self.admin._update_utils_schema(schema_version)
             if not status and self.admin.dev_commit is False:
                 return False
+
+            # After create schema utils:
+            # execute gw_fct_admin_schema_utils_fk for mains schema
+            sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
+            tools_db.execute_sql(sql)
+            sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
+            tools_db.execute_sql(sql)
+
+            # execute gw_fct_admin_role_permissions
+            sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_role_permissions();"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
+            tools_db.execute_sql(sql)
+
+            # Insert into config_param_system utils schema version
+            sql = f"INSERT INTO utils.config_param_system (id, parameter, value, data_type, descript)" \
+                  f" VALUES (10, 'utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
+            tools_log.log_info(f"Task 'Create schema' execute sql: '{sql}'")
+            tools_db.execute_sql(sql)
+
             return True
 
         except KeyError as e:
@@ -63,5 +84,5 @@ class GwCreateSchemaUtilsTask(GwTask):
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
-        self.admin._manage_process_result(self.params['project_name_schema'], self.params['project_type'], is_utils=True)
+        self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'], is_utils=True)
 

@@ -9,22 +9,26 @@ import csv
 import json
 import os
 import operator
+import re
 import sys
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton
-from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout
+from qgis.core import QgsLayoutExporter, QgsProject
+from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
+from ..utils.snap_manager import GwSnapManager
 
 
 class GwPsector:
@@ -36,9 +40,12 @@ class GwPsector:
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.emit_point = None
+        self.vertex_marker = None
+        self.dict_to_update = {}
 
 
-    def get_psector(self, psector_id=None, is_api=False):
+    def get_psector(self, psector_id=None, list_coord=None):
         """ Buttons 45 and 81: New psector """
 
         row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -58,6 +65,7 @@ class GwPsector:
 
         # Get layers of every feature_type
         self.list_elemets = {}
+        self.dict_to_update = {}
 
         # Get layers of every feature_type
 
@@ -97,6 +105,8 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34")
@@ -110,6 +120,8 @@ class GwPsector:
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
+        self.workcat_id = self.dlg_plan_psector.findChild(QLineEdit, "workcat_id")
+        self.parent_id = self.dlg_plan_psector.findChild(QLineEdit, "parent_id")
 
         scale = self.dlg_plan_psector.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
@@ -121,6 +133,11 @@ class GwPsector:
         num_value.setValidator(QIntValidator())
         where = " WHERE typevalue = 'psector_type' "
         self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
+
+        # Manage other_price tab variables
+        self.price_loaded = False
+        self.header_exist = None
+        self.load_signals = False
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
@@ -164,8 +181,7 @@ class GwPsector:
             self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        selected_rows = self.dlg_plan_psector.findChild(QTableView, "selected_rows")
-        selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        all_rows.horizontalHeader().setSectionResizeMode(3)
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
         # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
@@ -198,7 +214,7 @@ class GwPsector:
                                 set_edit_triggers=QTableView.DoubleClicked)
                 tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
-                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
+                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
                    f" FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
             row = tools_db.get_row(sql)
@@ -206,7 +222,7 @@ class GwPsector:
             if not row:
                 return
 
-            self.dlg_plan_psector.setWindowTitle(f"Plan psector - {row['name']}")
+            self.dlg_plan_psector.setWindowTitle(f"Plan psector - {row['name']} ({row['psector_id']})")
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
@@ -247,6 +263,8 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "atlas_id", row)
             self.fill_widget(self.dlg_plan_psector, "scale", row)
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
+            self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
+            self.fill_widget(self.dlg_plan_psector, "parent_id", row)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
@@ -266,6 +284,7 @@ class GwPsector:
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(partial(
                 tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+            self.qtbl_connec.clicked.connect(partial(self._enable_set_to_arc))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
@@ -273,6 +292,7 @@ class GwPsector:
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(partial(
                     tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+                self.qtbl_gully.clicked.connect(partial(self._enable_set_to_arc))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -286,61 +306,51 @@ class GwPsector:
                    f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
             tools_db.execute_sql(sql)
             self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
-            layer = None
-            if not is_api:
-                layername = f'v_edit_plan_psector'
-                layer = tools_qgis.get_layer_by_tablename(layername, show_warning_=False)
 
-            if layer:
+            self.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
 
-                expr_filter = f"psector_id = '{psector_id}'"
-                (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-                if not is_valid:
+            if not list_coord:
+
+                sql = f"SELECT st_astext(st_envelope(the_geom)) FROM v_edit_plan_psector WHERE psector_id = {psector_id}"
+                row = tools_db.get_row(sql)
+                if row[0]:
+                    list_coord = re.search('\(\((.*)\)\)', str(row[0]))
+                else:
+                    msg = "Empty coordinate list"
+                    tools_qgis.show_warning(msg)
                     return
 
-                tools_qgis.select_features_by_expr(layer, expr)
-
-                # Get canvas extend in order to create a QgsRectangle
-                ext = self.canvas.extent()
-                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-                canvas_rec = QgsRectangle(start_point, end_point)
-                canvas_width = ext.xMaximum() - ext.xMinimum()
-                canvas_height = ext.yMaximum() - ext.yMinimum()
-                # Get boundingBox(QgsRectangle) from selected feature
-                try:
-                    feature = layer.selectedFeatures()[0]
-                except IndexError:
-                    feature = layer.selectedFeatures()
-
-                if feature != []:
-                    if feature.geometry().get() is not None:
-                        psector_rec = feature.geometry().boundingBox()
-                        # Do zoom when QgsRectangles don't intersect
-                        if not canvas_rec.intersects(psector_rec):
-                            self.zoom_to_selected_features(layer)
-                        if psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100:
-                            self.zoom_to_selected_features(layer)
-                        layer.removeSelection()
+            points = tools_qgis.get_geometry_vertex(list_coord)
+            tools_gw.reset_rubberband(self.rubber_band)
+            tools_qgis.draw_polygon(points, self.rubber_band)
+            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-
         else:
-
             # Set psector_status vdefault
             sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_status, str(result[1]), 1)
+
+            # Set check active True as default for new pesectors
+            tools_qt.set_checked(self.dlg_plan_psector, "active", True)
+
+        if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
+
+        # Exclude the layer v_edit_element for adding relations
+        self.excluded_layers = ['v_edit_element']
 
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -358,10 +368,6 @@ class GwPsector:
 
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
-        self.dlg_plan_psector.btn_select.clicked.connect(
-            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_unselect.clicked.connect(
-            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
 
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
 
@@ -371,10 +377,21 @@ class GwPsector:
             partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
+        self.dlg_plan_psector.btn_select_arc.clicked.connect(
+            partial(self._replace_arc))
+        self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
+            partial(self._set_to_arc))
+
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(self._enable_arc_replace))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(self._enable_set_to_arc))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -461,23 +478,17 @@ class GwPsector:
             widget.setText("")
 
 
-    def update_total(self, dialog, qtable):
+    def update_total(self, dialog):
         """ Show description of product plan/om _psector as label """
 
-        try:
-            model = qtable.model()
-            if model is None:
-                return
-
-            total = 0
-            psector_id = tools_qt.get_text(dialog, 'psector_id')
-            for x in range(0, model.rowCount()):
-                if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                    if str(qtable.model().record(x).value('total_budget')) != 'NULL':
-                        total += float(qtable.model().record(x).value('total_budget'))
-            tools_qt.set_widget_text(dialog, 'lbl_total', str(total))
-        except Exception:
-            pass
+        total_result = 0
+        widgets = dialog.tab_other_prices.findChildren(QLabel)
+        symbol = tools_gw.get_config_value(parameter="admin_currency", columns="value::json->> 'symbol'",
+                                           table="config_param_system")[0]
+        for widget in widgets:
+            if 'widget_total' in widget.objectName():
+                total_result =  float(total_result) + float(widget.text().replace(symbol, '').strip())
+        tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
 
     def open_dlg_rapports(self):
@@ -496,13 +507,13 @@ class GwPsector:
         self.dlg_psector_rapport.btn_path.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_path', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_path', "user", "session")
         tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_composer', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_composer', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
-        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv', "user", "init")
+        value = tools_gw.get_config_parser('btn_psector', 'psector_rapport_chk_csv', "user", "session")
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
 
         if tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
@@ -553,13 +564,13 @@ class GwPsector:
     def generate_rapports(self):
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path', txt_path)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
         chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer', chk_composer)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_composer', chk_composer)
         chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail', chk_csv_detail)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv_detail', chk_csv_detail)
         chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv', chk_csv)
+        tools_gw.set_config_parser('btn_psector', 'psector_rapport_chk_csv', chk_csv)
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
@@ -827,9 +838,8 @@ class GwPsector:
         if self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
-            field_id_right = "price_id"
-            self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
-            self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
+            if not self.load_signals:
+                self.price_selector(self.dlg_plan_psector, tableleft, tableright)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
@@ -922,6 +932,7 @@ class GwPsector:
         self.reset_model_psector("other")
         tools_gw.close_dialog(self.dlg_plan_psector)
         tools_qgis.disconnect_snapping()
+        tools_gw.disconnect_signal('psector')
         tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -959,6 +970,7 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
 
         name_exist = self.check_name(psector_name)
+
         if name_exist and not self.update:
             message = "The name is current in use"
             tools_qgis.show_warning(message)
@@ -977,36 +989,12 @@ class GwPsector:
             message = "Check fields from table or view"
             tools_qgis.show_warning(message, parameter=viewname)
             return
-
         columns = []
         for row in rows:
             columns.append(str(row[0]))
 
-        if self.update:
-            if columns:
-                sql = "UPDATE " + tablename + " SET "
-                for column_name in columns:
-                    if column_name != 'psector_id':
-                        widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, column_name)
-                        if widget_type is QCheckBox:
-                            value = tools_qt.is_checked(self.dlg_plan_psector, column_name)
-                        elif widget_type is QDateEdit:
-                            date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        elif widget_type is QComboBox:
-                            combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
-                            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
-                        else:
-                            value = tools_qt.get_text(self.dlg_plan_psector, column_name)
-                        if value is None or value == 'null':
-                            sql += column_name + " = null, "
-                        else:
-                            sql += f"{column_name} = $${value}$$, "
+        if not self.update:
 
-                sql = sql[:len(sql) - 2]
-                sql += f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}'"
-
-        else:
             values = "VALUES("
             if columns:
                 sql = f"INSERT INTO {tablename} ("
@@ -1037,9 +1025,9 @@ class GwPsector:
                 values = values[:len(values) - 2] + ")"
                 sql += values
 
-        if not self.update:
             sql += " RETURNING psector_id;"
             new_psector_id = tools_db.execute_returning(sql)
+
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id:
                 row = tools_gw.get_config_value('plan_psector_vdefault')
@@ -1051,8 +1039,6 @@ class GwPsector:
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
-                tools_db.execute_sql(sql)
-        else:
             tools_db.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
@@ -1073,10 +1059,14 @@ class GwPsector:
         extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
+        tools_gw.manage_current_selections_docker(json_result)
         return json_result
 
 
-    def price_selector(self, dialog, tableleft, tableright, field_id_right):
+    def price_selector(self, dialog, tableleft, tableright):
+
+
+        self.load_signals = True
 
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
@@ -1084,35 +1074,24 @@ class GwPsector:
         self.fill_table(dialog, tbl_all_rows, tableleft)
         tools_gw.set_tablemodel_config(dialog, tbl_all_rows, tableleft)
 
-        # fill QTableView selected_rows
-        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
+        if not self.price_loaded:
+            self.price_loaded = True
+            self.count = -1
+            psector_id = tools_qt.get_text(dialog, 'psector_id')
+            self._manage_widgets_price(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
 
-        # Button select
+        # Button select (Create new labels)
         dialog.btn_select.clicked.connect(
-            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+            partial(self.create_label, dialog, tbl_all_rows, 'id', tableright, "price_id"))
         tbl_all_rows.doubleClicked.connect(
-            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+            partial(self.create_label, dialog, tbl_all_rows, 'id', tableright, "price_id"))
 
         # Button unselect
-        dialog.btn_unselect.clicked.connect(
-            partial(self.rows_unselector, dialog, tbl_selected_rows, tableright, field_id_right))
+        dialog.btn_remove.clicked.connect(
+            partial(self.rows_unselector, dialog, tableright))
 
 
-    def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
-        """
-            :param dialog: (QDialog)
-            :param tbl_all_rows: QTableView origin
-            :param tbl_selected_rows: QTableView destini
-            :param id_ori: Refers to the id of the source table
-            :param tableright: table destini
-            :param id_des: Refers to the id of the target table, on which the query will be made
-            :param field_id:
-        """
+    def create_label(self, dialog, tbl_all_rows, id_ori, tableright, id_des):
 
         selected_list = tbl_all_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1125,10 +1104,11 @@ class GwPsector:
             id_ = tbl_all_rows.model().record(row).value(id_ori)
             expl_id.append(id_)
 
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
+
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             values = ""
-            psector_id = tools_qt.get_text(dialog, 'psector_id')
             values += f"'{psector_id}', "
             if tbl_all_rows.model().record(row).value('unit') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('unit')}', "
@@ -1160,44 +1140,146 @@ class GwPsector:
                 tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tableright}"
-                       f" (psector_id, unit, price_id, descript, price) "
+                       f" (psector_id, unit, price_id, observ, price) "
                        f" VALUES ({values})")
                 tools_db.execute_sql(sql)
 
-        # Refresh
-        expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
-        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
+        self._manage_widgets_price(dialog, tableright, psector_id, expl_id)
 
 
-    def rows_unselector(self, dialog, tbl_selected_rows, tableright, field_id_right):
+    def _manage_widgets_price(self, dialog, tableright, psector_id, print_all_rows=False, print_headers=True):
 
-        query = (f"DELETE FROM {tableright}"
-                 f" WHERE {tableright}.{field_id_right} = ")
-        selected_list = tbl_selected_rows.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        for i in reversed(range(layout.count())):
+            if layout.itemAt(i).widget():
+                layout.itemAt(i).widget().deleteLater()
+        self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
+        self.update_total(dialog)
+
+
+    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
+                           , print_all_rows=False, print_headers=False):
+
+        extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
+        body = tools_gw.create_body(extras=extras)
+        complet_result = tools_gw.execute_procedure('gw_fct_getwidgetprices', body)
+
+        if not complet_result or complet_result['fields'] == {}:
             return
-        expl_id = []
-        psector_id = tools_qt.get_text(dialog, 'psector_id')
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = str(tbl_selected_rows.model().record(row).value(field_id_right))
-            expl_id.append(id_)
-        for i in range(0, len(expl_id)):
-            sql = f"{query}'{expl_id[i]}' AND psector_id = '{psector_id}'"
+
+
+        if print_headers or self.header_exist is None:
+            self.header_exist = True
+            pos = 1
+            self.count = self.count + 1
+            for key in complet_result['fields'][0].keys():
+                if key != 'id':
+                    lbl = QLabel()
+                    lbl.setObjectName(f"lbl_{key}_{self.count}")
+                    lbl.setText(f"  {key}  ")
+    
+                    layout = dialog.findChild(QGridLayout, 'lyt_price')
+                    layout.addWidget(lbl, self.count, pos)
+                    layout.setColumnStretch(2, 1)
+                    pos = pos + 1
+
+        for field in complet_result['fields']:
+            if field['price_id'] in expl_id or print_all_rows:
+                self.count = self.count + 1
+                pos = 0
+
+                # Create check
+                check = QCheckBox()
+                check.setObjectName(f"{field['id']}")
+
+                layout = dialog.findChild(QGridLayout, 'lyt_price')
+                layout.addWidget(check, self.count, pos)
+                layout.setColumnStretch(2, 1)
+                pos = pos + 1
+
+                for key in complet_result['fields'][0].keys():
+                    if key != 'id':
+                        if key not in editable_widgets:
+                            widget = QLabel()
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
+                            widget.setText(f"  {field.get(key)}  ")
+                        else:
+                            widget = QLineEdit()
+                            widget.setObjectName(f"widget_{key}_{field['price_id']}")
+                            if f"widget_{key}_{field['price_id']}" in self.dict_to_update:
+                                text = self.dict_to_update[f"widget_{key}_{field['price_id']}"][key]
+                            else:
+                                text = field.get(key) if field.get(key) is not None else ''
+
+                            widget.setText(f"{text}")
+                            widget.editingFinished.connect(partial(self._manage_updates_prices, widget, key, field['price_id']))
+                            widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True ))
+                            widget.editingFinished.connect(partial(self.update_total, dialog))
+
+                        layout = dialog.findChild(QGridLayout, 'lyt_price')
+                        layout.addWidget(widget, self.count, pos)
+                        layout.setColumnStretch(2, 1)
+                        pos = pos + 1
+
+
+    def _manage_updates_prices(self, widget, key, price_id):
+
+        self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
+        self._update_otherprice()
+
+
+    def _update_otherprice(self):
+
+        sql = ""
+        _filter = ""
+        if self.dict_to_update:
+            for main_key in self.dict_to_update:
+                sub_list = list(self.dict_to_update[main_key].keys())
+                for sub_key in sub_list:
+                    if sub_key == 'price_id':
+                        _filter = self.dict_to_update[main_key][sub_key]
+                    else:
+                        sql += f"UPDATE v_edit_plan_psector_x_other SET {sub_key} = '{self.dict_to_update[main_key][sub_key]}' " \
+                               f"WHERE psector_id = {tools_qt.get_text(self.dlg_plan_psector, self.psector_id)} AND price_id = '{_filter}';\n"
             tools_db.execute_sql(sql)
 
-        # Refresh
-        expr = f" psector_id = '{psector_id}'"
-        # Refresh model with selected filter
-        self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
-        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
+    def _manage_widgets(self, dialog, lbl, widget, count, pos):
+
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        layout.addWidget(lbl, count, pos)
+        layout.addWidget(widget, count, pos+1)
+        layout.setColumnStretch(2, 1)
+
+
+    def rows_unselector(self, dialog, tableright):
+
+        query = (f"DELETE FROM {tableright}"
+                 f" WHERE {tableright}.id = ")
+
+        select_widgets = dialog.tab_other_prices.findChildren(QCheckBox)
+        selected_ids = []
+        count = 0
+        for check in select_widgets:
+            if check.isChecked():
+                selected_ids.append(check.objectName())
+            else:
+                count = count + 1
+
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
+        for i in range(0, len(selected_ids)):
+            sql = f"{query}'{selected_ids[i]}' AND psector_id = '{psector_id}'"
+            tools_db.execute_sql(sql)
+
+        layout = dialog.findChild(QGridLayout, 'lyt_price')
+
+        for i in reversed(range(layout.count())):
+            if layout.itemAt(i).widget():
+                layout.itemAt(i).widget().deleteLater()
+        self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
+        self.update_total(dialog)
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit """
@@ -1208,7 +1290,7 @@ class GwPsector:
         if query == 'null':
             query = ""
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
-               f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {tableright}"
+               f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {schema_name}.{tableright}"
                f" WHERE psector_id = '{psector_id}')")
         self.fill_table_by_query(qtable, sql)
 
@@ -1238,6 +1320,10 @@ class GwPsector:
             2: OnManualSubmit
         """
 
+        # Manage exception if dialog is closed
+        if isdeleted(dialog):
+            return
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -1249,8 +1335,8 @@ class GwPsector:
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
+        model.beforeUpdate.connect(partial(self.manage_update_state, model))
         model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
-        model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
 
         # Check for errors
@@ -1268,7 +1354,7 @@ class GwPsector:
 
 
     def refresh_table(self, dialog, widget):
-        """ Refresh qTableView 'selected_rows' """
+        """ Refresh qTableView """
 
         widget.selectAll()
         selected_list = widget.selectionModel().selectedRows()
@@ -1277,6 +1363,34 @@ class GwPsector:
             row = selected_list[i].row()
             if str(widget.model().record(row).value('psector_id')) != tools_qt.get_text(dialog, 'psector_id'):
                 widget.hideRow(i)
+
+
+    def manage_update_state(self, model, row, record):
+        """
+        Manage new state of planned features.
+            :param model: QSqlModel of QTableView
+            :param row: index of updating row (passed by signal)
+            :param record: QSqlRecord (passed by signal)
+        """
+
+        # Get table name via current tab name (arc, node, connec or gully)
+        index_tab = self.dlg_plan_psector.tab_feature.currentIndex()
+        tab_name = self.dlg_plan_psector.tab_feature.tabText(index_tab)
+        table_name = tab_name.lower()
+
+        # Get selected feature's state
+        feature_id = record.value(f'{table_name}_id')  # Get the id
+        sql = f"SELECT {table_name}.state FROM {table_name} WHERE {table_name}_id='{feature_id}';"
+        sql_row = tools_db.get_row(sql)
+        if sql_row:
+            old_state = sql_row[0]  # Original state
+            new_state = record.value('state')  # New state
+            if old_state == 2 and new_state == 0:
+                msg = "This value is mandatory for planned feature. If you are looking to unlink feature from this " \
+                      "psector please delete row. If delete is not allowed its because feature is only used on this " \
+                      "psector and needs to be removed from canvas"
+                tools_qgis.show_warning(msg)
+                model.revert()
 
 
     def document_insert(self):
@@ -1379,7 +1493,6 @@ class GwPsector:
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
-
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
@@ -1473,7 +1586,7 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        keep_open_form = tools_gw.get_config_parser('dialogs', 'psector_manager_keep_open', "user", "init", prefix=True)
+        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
@@ -1625,13 +1738,19 @@ class GwPsector:
 
     def set_label_current_psector(self, dialog):
 
-        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+        sql = ("SELECT t1.psector_id, t1.name FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
         if not row:
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[1])
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{row[0]}, '
+                  f'"isAlone":"False", "disableParent":"False", '
+                  f'"value":"True"')
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
+        tools_gw.manage_current_selections_docker(result)
 
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
@@ -1708,5 +1827,268 @@ class GwPsector:
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False
         return all_checked
+
+
+    def _set_to_arc(self):
+
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'set_to_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id),
+                                'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
+
+
+    def _set_arc_id(self, point):
+
+        # Check if there is a connec/gully selected
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        selected_rows = []
+        selected_qtbl = None
+        if tab_idx == 2:
+            selected_rows = self.qtbl_connec.selectionModel().selectedRows()
+            selected_qtbl = self.qtbl_connec
+            if len(selected_rows) == 0:
+                message = "Any record selected"
+                tools_qgis.show_warning(message)
+                return
+        elif tab_idx == 3:
+            selected_rows = self.qtbl_gully.selectionModel().selectedRows()
+            selected_qtbl = self.qtbl_gully
+            if len(selected_rows) == 0:
+                message = "Any record selected"
+                tools_qgis.show_warning(message)
+                return
+
+        # Get the point
+        event_point = self.snapper_manager.get_event_point(point=point)
+        self.arc_id = None
+
+        # Manage current psector
+        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        current_psector = row[0]
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+        if str(current_psector) != str(selected_psector):
+            message = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(message)
+
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{selected_psector}' "
+                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+            tools_db.execute_sql(sql)
+
+        # Snap point
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_arc:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.arc_id = snapped_feat.attribute('arc_id')
+                self.arc_cat_id = snapped_feat.attribute('arccat_id')
+
+                # Set highlight
+                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
+                try:
+                    geometry = feature.geometry()
+                    self.rubber_band.setToGeometry(geometry, None)
+                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band.setWidth(5)
+                    self.rubber_band.show()
+                except AttributeError:
+                    pass
+
+        if self.arc_id is None: return
+
+        for row in selected_rows:
+            cell = row.siblingAtColumn(tools_qt.get_col_index_by_col_name(selected_qtbl, 'arc_id'))
+            selected_qtbl.model().setData(cell, self.arc_id)
+
+
+    def _replace_arc(self):
+
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
+                                'replace_arc_xyCoordinates_mouse_move_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_replace_form, 'psector',
+                                'replace_arc_ep_canvasClicked_open_arc_replace_form')
+
+
+    def _open_arc_replace_form(self, point):
+
+        self.dlg_replace_arc = GwReplaceArc()
+        tools_gw.load_settings(self.dlg_replace_arc)
+
+        event_point = self.snapper_manager.get_event_point(point=point)
+        self.arc_id = None
+
+        # Manage current psector
+        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        current_psector = row[0]
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+        if str(current_psector) != str(selected_psector):
+            message = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(message)
+
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{selected_psector}' "
+                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+            tools_db.execute_sql(sql)
+
+        # Snap point
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_arc:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.arc_id = snapped_feat.attribute('arc_id')
+                self.arc_cat_id = snapped_feat.attribute('arccat_id')
+
+                # Set highlight
+                feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
+                try:
+                    geometry = feature.geometry()
+                    self.rubber_band.setToGeometry(geometry, None)
+                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band.setWidth(5)
+                    self.rubber_band.show()
+                except AttributeError:
+                    pass
+
+        if self.arc_id is None: return
+
+        # Populate combo arccat
+        sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows, 1)
+
+        # Set text current arccat
+        self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)
+
+        # Disconnect Snapping
+        self.snapper_manager.recover_snapping_options()
+        tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('psector')
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_replace_arc)
+
+        # Triggers
+        self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
+        self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
+        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band))
+
+        # Open form
+        tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
+
+
+    def _set_plan_replace_feature(self):
+
+        new_arc_cat = f'"{tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)}"'
+
+        feature = f'"featureType":"ARC", "ids":["{self.arc_id}"]'
+        extras = f'"catalog":{new_arc_cat}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
+
+        # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
+        if self.project_type.upper() == 'UD':
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
+
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc', isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec', isQStandardItemModel=True)
+        if self.project_type.upper() == 'UD':
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully', isQStandardItemModel=True)
+
+        message = json_result['message']['text']
+        if message is not None:
+            tools_qt.show_info_box(message)
+
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'])
+
+        if not change_tab:
+            self.dlg_replace_arc.close()
+            tools_gw.reset_rubberband(self.rubber_band)
+
+
+    def _enable_arc_replace(self):
+
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+
+        self.dlg_plan_psector.btn_select_arc.setEnabled(False)
+        if tab_idx == 0:
+            self.dlg_plan_psector.btn_select_arc.setEnabled(True)
+
+
+    def _enable_set_to_arc(self):
+
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        if self.qtbl_connec.selectionModel() is None:
+            return
+        if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+        elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
+            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+
+
+    def _mouse_move_arc(self, point):
+
+        if not self.layer_arc:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(self.layer_arc)
+
+        # Get clicked point and add marker
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
     # endregion

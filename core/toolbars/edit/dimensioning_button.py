@@ -5,10 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings
 
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
+from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis
 
 
@@ -22,26 +23,12 @@ class GwDimensioningButton(GwMaptool):
 
 
     # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-    def canvasMoveEvent(self, event):
-        pass
-
-
-    def canvasReleaseEvent(self, event):
-        pass
-
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.action.trigger()
-            return
-
 
     def activate(self):
 
-        # Check button
-        self.action.setChecked(True)
+        # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
+        if hasattr(self.action, "setChecked"):
+            self.action.setChecked(True)
 
         self.layer = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
         if self.layer:
@@ -60,22 +47,18 @@ class GwDimensioningButton(GwMaptool):
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            self.snapper_manager.config_snap_to_arc(False)
-            self.snapper_manager.config_snap_to_connec(False)
-            self.snapper_manager.config_snap_to_gully(False)
-            self.snapper_manager.config_snap_to_node(False)
+            self.snapper_manager.config_snap_to_arc()
+            self.snapper_manager.config_snap_to_connec()
+            self.snapper_manager.config_snap_to_gully()
+            self.snapper_manager.config_snap_to_node()
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool
-            self.layer.featureAdded.connect(self._open_new_dimensioning)
-
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
+            tools_gw.connect_signal(self.layer.featureAdded, self._open_new_dimensioning,
+                                    'dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
 
     # endregion
+
 
     # region private functions
 
@@ -96,6 +79,7 @@ class GwDimensioningButton(GwMaptool):
         self.dimensioning = GwDimensioning()
         self.dimensioning.points = list_points
         self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
+        tools_gw.disconnect_signal('dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
         super().deactivate()
 
     # endregion

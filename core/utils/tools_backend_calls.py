@@ -13,10 +13,10 @@ import webbrowser
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit
 
-
+from ... import global_vars
 from ..shared.document import GwDocument
 from ..shared.element import GwElement
 from ..shared.info import GwInfo
@@ -377,6 +377,33 @@ def get_info_node(**kwargs):
         return
 
 
+def set_style_mapzones(**kwargs):
+    """ A bridge function to call tools_gw->set_style_mapzones """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    tools_gw.set_style_mapzones()
+
+
+def add_query_layer(**kwargs):
+    """ Create and add a QueryLayer to ToC """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    query = kwargs['query']
+    layer_name = kwargs['layerName'] if 'layerName' in kwargs else 'QueryLayer'
+    group = kwargs['group'] if 'group' in kwargs else 'GW Layers'
+
+    uri = tools_db.get_uri()
+
+    querytext = f"(SELECT row_number() over () AS _uid_,* FROM ({query}) AS query_table)"
+    pk = '_uid_'
+
+    uri.setDataSource("", querytext, None, "", pk)
+    vlayer = QgsVectorLayer(uri.uri(False), f'{layer_name}', "postgres")
+
+    if vlayer.isValid():
+        tools_qt.add_layer_to_toc(vlayer, group)
+
+
 def refresh_attribute_table(**kwargs):
     """ Set layer fields configured according to client configuration.
         At the moment manage:
@@ -396,7 +423,7 @@ def refresh_attribute_table(**kwargs):
             continue
 
         # Get sys variale
-        qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
+        qgis_project_infotype = global_vars.project_vars['info_type']
 
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -454,7 +481,6 @@ def refresh_attribute_table(**kwargs):
                           'field_iso_format': False}
                 editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                 layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
-
 
 
 def refresh_canvas(**kwargs):
@@ -575,9 +601,22 @@ def load_qml(**kwargs):
     return True
 
 
+def update_catfeaturevalues(**kwargs):
+    """
+    Reload global_vars.feature_cat
+
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[
+                              {"name":"update_catfeaturevalues", "parameters":{}}]} ,
+                              "user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+                IN TRIGGER -> gw_trg_cat_feature
+    """
+    global_vars.feature_cat = tools_gw.manage_feature_cat()
+
+
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
-            widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
+        widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget)) """
+
     status, message = tools_os.open_file(widget.text())
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=widget.text())
@@ -717,81 +756,40 @@ def _reload_table(**kwargs):
 # endregion
 
 
+def get_selector(**kwargs):
+    """
+    Refreshes the selectors if the selector dialog is open
 
+    Called form PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[
+                              {"name":"get_selector","parameters":{"tab":"tab_psector"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
+    """
+
+    tab_name = kwargs['tab'] if 'tab' in kwargs else None
+    global_vars.signal_manager.refresh_selectors.emit(tab_name)
+
+
+def show_message(**kwargs):
+    """
+    Shows a message in the message bar.
+
+    Called from PostgreSQL -> PERFORM pg_notify(v_channel,
+                              '{"functionAction":{"functions":[{"name":"show_message", "parameters":
+                              {"level":1, "duration":10, "text":"Current psector have been selected"}}]}
+                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
+    Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
+    """
+
+    text = kwargs['text'] if 'text' in kwargs else 'No message found'
+    level = kwargs['level'] if 'level' in kwargs else 1
+    duration = kwargs['duration'] if 'duration' in kwargs else 10
+
+    global_vars.signal_manager.show_message.emit(text, level, duration)
 
 
 # region unused functions atm
-def show_message(**kwargs):
-
-    """
-    PERFORM pg_notify(current_user,
-              '{"functionAction":{"functions":[{"name":"show_message","parameters":
-              {"message":"line 1 \n line 2","tabName":"Notify channel",
-              "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"ws_sample"}');
-
-    functions called in -> getattr(self, function_name)(**params):
-    Show message in console log,
-    :param kwargs: dict with all needed
-        kwargs: ['message']: message to show
-        kwargs: ['tabName']: tab where the info will be displayed
-        kwargs: ['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black),
-                     1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
-        kwargs: ['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue),
-                    4 = None(black)
-        kwargs: ['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
-        kwargs: ['styleSheet']['bold']: if is true, then print as bold
-    :return:
-    """
-
-    # Set default styleSheet
-    color = "black"
-    level = 0
-    bold = ''
-
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
-    if 'styleSheet' in kwargs:
-        color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
-        level = kwargs['styleSheet']['level'] if 'level' in kwargs['styleSheet'] else 0
-        if 'bold' in kwargs['styleSheet']:
-            bold = 'b' if kwargs['styleSheet']['bold'] else ''
-        else:
-            bold = ''
-
-    msg = f'<font color="{color}"><{bold}>{msg}</font>'
-    QgsMessageLog.logMessage(msg, tab_name, level)
-
-
-def show_messagebox(**kwargs):
-    """ Shows a message box with detail information """
-
-    msg = kwargs['message'] if 'message' in kwargs else 'No message found'
-    title = kwargs['title'] if 'title' in kwargs else 'New message'
-    inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
-    msg_box = QMessageBox()
-    msg_box.setText(msg)
-    if title:
-        title = tools_qt.tr(title)
-        msg_box.setWindowTitle(title)
-    if inf_text:
-        inf_text = tools_qt.tr(inf_text)
-        msg_box.setInformativeText(inf_text)
-    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-    msg_box.setStandardButtons(QMessageBox.Ok)
-    msg_box.setDefaultButton(QMessageBox.Ok)
-    msg_box.open()
-
-
-def raise_notice(**kwargs):
-    """ Used to show raise notices sent by postgresql
-    Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-
-    """
-
-    msg_list = kwargs['msg']
-    for msg in msg_list:
-        tools_log.log_info(f"{msg}")
-
 
 def get_all_layers(group, all_layers):
 

@@ -30,7 +30,7 @@
           <string>Visit</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="lbl_descript">
             <property name="font">
              <font>
@@ -60,16 +60,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="visit_id">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="frame">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="6" column="3">
            <widget class="QComboBox" name="visitcat_id">
             <property name="editable">
@@ -77,49 +67,6 @@
             </property>
             <property name="sizeAdjustPolicy">
              <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="0" colspan="4">
-           <widget class="QPushButton" name="btn_add_geom">
-            <property name="text">
-             <string>Add geom</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lbl_code">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="text">
-             <string>Code:</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <property name="margin">
-             <number>3</number>
             </property>
            </widget>
           </item>
@@ -155,6 +102,59 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="visit_id">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="frame">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lbl_code">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="text">
+             <string>Code:</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0" colspan="4">
+           <widget class="QPushButton" name="btn_add_geom">
+            <property name="text">
+             <string>Add geom</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="3">
            <widget class="QDateTimeEdit" name="startdate">
             <property name="enabled">
@@ -171,6 +171,16 @@
              <string>dd/MM/yyyy</string>
             </property>
             <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="user_name">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="frame">
              <bool>true</bool>
             </property>
            </widget>
@@ -213,66 +223,6 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="3">
-           <widget class="QComboBox" name="status">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="3">
-           <widget class="QLineEdit" name="ext_code">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="frame">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QLineEdit" name="user_name">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="frame">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QDateTimeEdit" name="enddate">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="date">
-             <date>
-              <year>2016</year>
-              <month>1</month>
-              <day>1</day>
-             </date>
-            </property>
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="lbl_status">
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Status:</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lbl_end_date">
             <property name="maximumSize">
@@ -311,9 +261,6 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0" colspan="4">
-           <widget class="QTextEdit" name="descript"/>
-          </item>
           <item row="6" column="0">
            <widget class="QLabel" name="lbl_visitcat_id">
             <property name="font">
@@ -343,6 +290,36 @@
              <number>3</number>
             </property>
            </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QComboBox" name="feature_type"/>
+          </item>
+          <item row="8" column="3">
+           <widget class="QComboBox" name="status">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QLineEdit" name="ext_code">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frame">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Feature type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0" colspan="4">
+           <widget class="QTextEdit" name="descript"/>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_id">
@@ -376,15 +353,48 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Feature type:</string>
+          <item row="2" column="3">
+           <widget class="QDateTimeEdit" name="enddate">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="date">
+             <date>
+              <year>2016</year>
+              <month>1</month>
+              <day>1</day>
+             </date>
+            </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="5" column="3">
-           <widget class="QComboBox" name="feature_type"/>
+          <item row="8" column="0">
+           <widget class="QLabel" name="lbl_status">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Status:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="lbl_expl">
+            <property name="text">
+             <string>Exploitation:*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="3">
+           <widget class="QComboBox" name="expl_id"/>
           </item>
          </layout>
         </widget>

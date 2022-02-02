@@ -5,13 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import csv
 import os
 from functools import partial
 import json
 
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
-    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem
+    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -28,10 +30,11 @@ class GwToolBoxButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        if icon_path is not None:
+            super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
-        self.no_clickable_items = ['Giswater', 'Processes', 'Reports']
+        self.no_clickable_items = ['Processes', 'Reports']
         self.temp_layers_added = []
 
 
@@ -39,6 +42,53 @@ class GwToolBoxButton(GwAction):
 
         self._open_toolbox()
 
+
+    def open_function_by_id(self, func_id, connect_signal=None):
+
+        self.dlg_functions = GwToolboxManagerUi()
+        tools_gw.load_settings(self.dlg_functions)
+        self.dlg_functions.progressBar.setVisible(False)
+        self.dlg_functions.btn_cancel.hide()
+        self.dlg_functions.btn_close.show()
+
+        self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
+        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
+                                                                          self.dlg_functions.cmb_layers))
+        self.dlg_functions.rbt_previous.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_previous))
+        self.dlg_functions.rbt_layer.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_layer))
+        self.dlg_functions.rbt_layer.setChecked(True)
+
+        extras = f'"function":{func_id}'
+        extras += ', "isToolbox":false'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+        sql = f"SELECT alias FROM config_toolbox WHERE id = {func_id}"
+        self.function_selected = f"{tools_db.get_row(sql)[0]}"
+        status = self._populate_functions_dlg(self.dlg_functions, json_result['body']['data']['processes'])
+        if not status:
+            message = "Function not found"
+            tools_qgis.show_message(message, parameter=self.function_selected)
+            return
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_functions)
+
+        # Connect signals
+        self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
+        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
+                                                           self.dlg_functions, self.dlg_functions.cmb_layers,
+                                                           json_result['body']['data']['processes']))
+        self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        if connect_signal is not None:
+            self.dlg_functions.rejected.connect(connect_signal)
+
+        # Open form and set title
+        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
+        tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
     def remove_layers(self):
 
@@ -60,7 +110,7 @@ class GwToolBoxButton(GwAction):
             if len(parent_group.findLayers()) == 0:
                 root.removeChildNode(parent_group)
 
-        self.iface.mapCanvas().refresh()
+        global_vars.iface.mapCanvas().refresh()
 
 
     def set_selected_layer(self, dialog, combo):
@@ -70,7 +120,7 @@ class GwToolBoxButton(GwAction):
         if layer is None:
             tools_qgis.show_warning("Layer not found", parameter=layer_name)
             return None
-        self.iface.setActiveLayer(layer)
+        global_vars.iface.setActiveLayer(layer)
         return layer
 
 
@@ -102,11 +152,12 @@ class GwToolBoxButton(GwAction):
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
 
+
     # region private functions
 
     def _open_toolbox(self):
 
-        self.no_clickable_items = ['Giswater', 'Processes', 'Reports']
+        self.no_clickable_items = ['Processes', 'Reports']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
         if not row:
@@ -117,16 +168,17 @@ class GwToolBoxButton(GwAction):
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
 
-
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
         if json_result or json_result['status'] != 'Failed':
-
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
             tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
+
+        # Set shortcut keys
+        self.dlg_toolbox.key_escape.connect(partial(tools_gw.close_docker))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
@@ -134,6 +186,7 @@ class GwToolBoxButton(GwAction):
             tools_gw.docker_dialog(self.dlg_toolbox)
         else:
             tools_gw.open_dialog(self.dlg_toolbox)
+
 
     def _filter_functions(self, text):
 
@@ -158,17 +211,19 @@ class GwToolBoxButton(GwAction):
         if 'reports' in index.parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
+            function_name = index.sibling(index.row(), 0).data()
             self.function_selected = index.sibling(index.row(), 1).data()
 
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
 
             # Set listeners
-            self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, None, None))  # WIP!!
+            self.dlg_reports.btn_export_path.clicked.connect(self._select_file_report)
+            self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, self.dlg_reports.tbl_reports, self.dlg_reports.txt_export_path))
             self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
             self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
-            extras = f'"filterText":null, "listName":"{self.function_selected}"'
+            extras = f'"filterText":null, "listId":"{self.function_selected}"'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
             if not json_result or json_result['status'] == 'Failed':
@@ -210,7 +265,7 @@ class GwToolBoxButton(GwAction):
                     widget.stateChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'datetime':
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    widget.dateChanged.connect(partial(self._update_tbl_reports))
+                    widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
@@ -228,7 +283,7 @@ class GwToolBoxButton(GwAction):
                     for row in range(numrows):
                         for column in range(numcols):
                             column_name = dict_keys[column]
-                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem((f"{field['value'][row][column_name]}")))
+                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{field['value'][row][column_name]}"))
 
                     continue
 
@@ -239,6 +294,7 @@ class GwToolBoxButton(GwAction):
                 if widget:
                     layout.addWidget(widget, 1, order)
 
+            self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
 
         elif 'giswater' in index.parent().data().lower():
@@ -269,6 +325,11 @@ class GwToolBoxButton(GwAction):
                 tools_qgis.show_message(message, parameter=self.function_selected)
                 return
 
+            # Disable tab log
+            tools_gw.disable_tab_log(self.dlg_functions)
+
+            # Connect signals
+            self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
             self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
                 self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data']['processes']))
             self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
@@ -297,7 +358,8 @@ class GwToolBoxButton(GwAction):
                 continue
             _json = {"filterName":f"{widget.objectName()}", "filterValue":f"{value}"}
             filters.append(_json)
-        extras = f'"filter":{json.dumps(filters)}, "listName":"{self.function_selected}"'
+
+        extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
         if not json_result or json_result['status'] == 'Failed':
@@ -308,7 +370,6 @@ class GwToolBoxButton(GwAction):
             if field['widgettype'] == 'list' and 'value' in field and field['value'] is not None:
                 numrows = len(field['value'])
                 numcols = len(field['value'][0])
-
                 self.dlg_reports.tbl_reports.setColumnCount(numcols)
                 self.dlg_reports.tbl_reports.setRowCount(numrows)
 
@@ -322,8 +383,8 @@ class GwToolBoxButton(GwAction):
                 for row in range(numrows):
                     for column in range(numcols):
                         column_name = dict_keys[column]
-                        self.dlg_reports.tbl_reports.setItem(row, column,
-                                                             QTableWidgetItem((f"{field['value'][row][column_name]}")))
+                        item = f"{field['value'][row][column_name]}"
+                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
             elif field['widgettype'] == 'list' and 'value' in field and field['value'] is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
@@ -352,13 +413,13 @@ class GwToolBoxButton(GwAction):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_checked(dialog, widget, value)
-            elif type(widget) is QComboBox and widget.property('selectedId') is None:
+            elif type(widget) is QComboBox and widget.property('selectedId') in (None,'','NULL'):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') is None:
+            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
@@ -388,6 +449,17 @@ class GwToolBoxButton(GwAction):
 
     def _execute_function(self, description, dialog, combo, result):
 
+        # Manage if task is already running
+        if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+            try:
+                if self.toolbox_task.isActive():
+                    message = "Toolbox task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
+        self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)
@@ -400,6 +472,26 @@ class GwToolBoxButton(GwAction):
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
+
+
+    def _manage_btn_run(self, index):
+        """
+        Disable btn_accept when on tab info log and/or if toolbox_task is active
+            :param index: tab index (passed by signal)
+        """
+
+        if index == 1:
+            self.dlg_functions.btn_run.setEnabled(False)
+        else:
+            # Disable if task is active, enabled otherwise
+            if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+                try:
+                    if self.toolbox_task.isActive():
+                        self.dlg_functions.btn_run.setEnabled(False)
+                        return
+                except RuntimeError:
+                    pass
+            self.dlg_functions.btn_run.setEnabled(True)
 
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
@@ -438,6 +530,7 @@ class GwToolBoxButton(GwAction):
 
                 status = True
                 break
+
         return status
 
 
@@ -459,8 +552,12 @@ class GwToolBoxButton(GwAction):
                f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
                f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
                f"UNION SELECT child_layer, feature_type, 2 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}') as t "
-               f"ORDER BY c, tablename")
+               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
+               F" UNION "
+               f"SELECT concat('v_edit_',epa_table), feature_type as type, 9 as c FROM sys_feature_epa_type "
+               f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
+               f" AND feature_type = '{feature_type.upper()}') as t"
+               f" ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -500,21 +597,13 @@ class GwToolBoxButton(GwAction):
         model = QStandardItemModel()
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
-        main_parent = QStandardItem('{}'.format('Giswater'))
-        font = main_parent.font()
-        font.setPointSize(8)
-        main_parent.setFont(font)
 
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-        path_icon_blue = self.icon_folder + os.sep + '36.png'
-        path_icon_red = self.icon_folder + os.sep + '100.png'
-        if os.path.exists(path_icon_blue):
-            icon = QIcon(path_icon_blue)
-            main_parent.setIcon(icon)
+        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        path_icon_blue = icon_folder + os.sep + '36.png'
+        path_icon_red = icon_folder + os.sep + '100.png'
 
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
-        main_parent.appendRow(section_processes)
         for group, functions in result['processes']['fields'].items():
             parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
             self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
@@ -546,7 +635,6 @@ class GwToolBoxButton(GwAction):
 
         # Section Reports
         reports_processes = QStandardItem('{}'.format('Reports'))
-        main_parent.appendRow(reports_processes)
         for group, functions in result['reports']['fields'].items():
             parent1 = QStandardItem(f'{group}   [{len(functions)} Reports functions]')
             self.no_clickable_items.append(f'{group}   [{len(functions)} Reports functions]')
@@ -558,16 +646,26 @@ class GwToolBoxButton(GwAction):
                 font.setPointSize(8)
                 label.setFont(font)
                 parent1.appendRow([label, func_name])
-
                 if os.path.exists(path_icon_blue):
                     icon = QIcon(path_icon_blue)
                     label.setIcon(icon)
 
             reports_processes.appendRow(parent1)
 
-        model.appendRow(main_parent)
-        index = model.indexFromItem(main_parent)
-        trv_widget.expand(index)
+        if os.path.exists(path_icon_blue):
+            icon = QIcon(path_icon_blue)
+            section_processes.setIcon(icon)
+            reports_processes.setIcon(icon)
+
+        model.appendRow(section_processes)
+        model.appendRow(reports_processes)
+
+        section_index = model.indexFromItem(section_processes)
+        reports_index = model.indexFromItem(reports_processes)
+
+        trv_widget.expand(section_index)
+        trv_widget.expand(reports_index)
+
         if expand:
             trv_widget.expandAll()
 
@@ -581,13 +679,30 @@ class GwToolBoxButton(GwAction):
 
 
     def _cancel_task(self):
+
         if hasattr(self, 'toolbox_task'):
             self.toolbox_task.cancel()
 
 
+    def _select_file_report(self):
+        """ Select CSV file """
+
+        file_report = tools_qt.get_text(self.dlg_reports, 'txt_export_path')
+        # Set default value if necessary
+        if file_report is None or file_report == '':
+            file_report = global_vars.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(file_report)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = tools_qt.tr("Save report file")
+        file_report, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+        tools_qt.set_widget_text(self.dlg_reports, self.dlg_reports.txt_export_path, file_report)
+
+
     def _export_reports(self, dialog, table, path):
 
-        return
         folder_path = tools_qt.get_text(dialog, path)
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
@@ -596,36 +711,22 @@ class GwToolBoxButton(GwAction):
         path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
-        if qtable_1:
-            model_1 = qtable_1.model()
+        if table:
+            model = table.model()
         else:
             return
-
-        model_2 = None
-        if qtable_2:
-            model_2 = qtable_2.model()
 
         # Convert qtable values into list
         all_rows = []
         headers = []
-        for i in range(0, model_1.columnCount()):
-            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+        for i in range(0, model.columnCount()):
+            headers.append(str(model.headerData(i, Qt.Horizontal)))
         all_rows.append(headers)
-        for rows in range(0, model_1.rowCount()):
+        for rows in range(0, model.rowCount()):
             row = []
-            for col in range(0, model_1.columnCount()):
-                row.append(str(model_1.data(model_1.index(rows, col))))
+            for col in range(0, model.columnCount()):
+                row.append(str(model.data(model.index(rows, col))))
             all_rows.append(row)
-        if qtable_2 is not None:
-            headers = []
-            for i in range(0, model_2.columnCount()):
-                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
-            all_rows.append(headers)
-            for rows in range(0, model_2.rowCount()):
-                row = []
-                for col in range(0, model_2.columnCount()):
-                    row.append(str(model_2.data(model_2.index(rows, col))))
-                all_rows.append(row)
 
         # Write list into csv file
         try:
@@ -633,11 +734,20 @@ class GwToolBoxButton(GwAction):
                 msg = "Are you sure you want to overwrite this file?"
                 answer = tools_qt.show_question(msg, "Overwrite")
                 if answer:
-                    self._write_to_csv(dialog, folder_path, all_rows)
+                    self._write_to_csv(folder_path, all_rows)
             else:
-                self._write_to_csv(dialog, folder_path, all_rows)
+                self._write_to_csv(folder_path, all_rows)
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
+
+
+    def _write_to_csv(self, folder_path=None, all_rows=None):
+
+        with open(folder_path, "w") as output:
+            writer = csv.writer(output, delimiter=';', lineterminator='\n')
+            writer.writerows(all_rows)
+        message = "The csv file has been successfully exported"
+        tools_qgis.show_info(message)
 
     # endregion

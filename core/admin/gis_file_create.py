@@ -57,7 +57,7 @@ class GwGisFileCreate:
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
         if os.path.exists(qgs_path):
             message = "Do you want to overwrite file?"
-            answer = tools_qt.show_question(message, "overwrite file")
+            answer = tools_qt.show_question(message, "overwrite file", force_action=True)
             if not answer:
                 return False, qgs_path
 
@@ -188,20 +188,13 @@ class GwGisFileCreate:
             datasource = f"service='{self.layer_source['service']}'"
 
         else:
-
             datasource = (f"dbname='{self.layer_source['db']}' host={self.layer_source['host']} "
                           f"port={self.layer_source['port']}")
 
-            content = content.replace("__DBNAME__", self.layer_source['db'])
-            content = content.replace("__HOST__", self.layer_source['host'])
-            credentials = self.layer_source['port']
             if export_passwd:
                 username = self.layer_source['user']
                 password = self.layer_source['password']
-                credentials = f"{self.layer_source['port']} username={username} password={password}"
                 datasource += f" username={username} password={password}"
-
-            content = content.replace("__PORT__", credentials)
 
         content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
         content = content.replace("__DATASOURCE__", datasource)

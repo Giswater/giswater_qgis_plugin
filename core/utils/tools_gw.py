@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
-import json
 import os
 import random
 import re
@@ -20,22 +19,26 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
+    QIntValidator, QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget
-from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
-    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu
+from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
+    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
 from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
+from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
+from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -77,102 +80,105 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
-    x, y = dialog.pos().x(), dialog.pos().y()
-    if isinstance(dialog, GwMainWindow):
-        x, y = x + 7, y + 24
-    elif isinstance(dialog, GwDialog):
-        x, y = x + 8, y + 31
-
     try:
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+        x, y = dialog.geometry().x(), dialog.geometry().y()
+        w, h = dialog.geometry().width(), dialog.geometry().height()
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
     except Exception:
         pass
 
 
+def initialize_parsers():
+    """ Initialize parsers of configuration files: init, session, giswater, user_params """
+
+    for config in global_vars.list_configs:
+        filepath, parser = _get_parser_from_filename(config)
+        global_vars.configs[config][0] = filepath
+        global_vars.configs[config][1] = parser
+
+
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
-                      chk_user_params=True, get_none=False) -> str:
+                      chk_user_params=True, get_none=False, force_reload=False) -> str:
     """ Load a simple parser value """
 
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
+
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+    parser = global_vars.configs[file_name][1]
+
+    # Needed to avoid errors with giswater plugins
+    if path is None:
+        tools_log.log_warning(f"get_config_parser: Config file is not set")
+        return None
+
     value = None
-    try:
-        raw_parameter = parameter
-
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
+    raw_parameter = parameter
+    if parser is None:
+        tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return None
-
-        path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
-        if not os.path.exists(path):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            return value
-
         parser.read(path)
-        if not parser.has_section(section) or not parser.has_option(section, parameter):
-            if chk_user_params and config_type in "user":
-                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-            # return value
-        else:
-            value = parser[section][parameter]
 
-        # If there is a value and you don't want to get the comment, it only gets the value part
-        if value is not None and not get_comment:
-            value = value.split('#')[0].strip()
+    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+    if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
 
-        if not get_none and str(value) in "None":
-            value = None
+    if config_type == 'user' and prefix and global_vars.project_type is not None:
+        parameter = f"{global_vars.project_type}_{parameter}"
 
-        # Check if the parameter exists in the inventory, if not creates it
+    if not parser.has_section(section) or not parser.has_option(section, parameter):
         if chk_user_params and config_type in "user":
-            _check_user_params(section, raw_parameter, file_name, prefix)
+            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+    else:
+        value = parser[section][parameter]
 
-    except Exception as e:
-        tools_log.log_warning(str(e))
-        tools_log.log_warning(global_vars.project_vars)
+    # If there is a value and you don't want to get the comment, it only gets the value part
+    if value is not None and not get_comment:
+        value = value.split('#')[0].strip()
+
+    if not get_none and str(value) in "None":
         value = None
-    finally:
-        return value
+
+    # Check if the parameter exists in the inventory, if not creates it
+    if chk_user_params and config_type in "user":
+        _check_user_params(section, raw_parameter, file_name, prefix)
+
+    return value
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
                       comment=None, prefix=True, chk_user_params=True):
     """ Save simple parser value """
 
-    value = f"{value}"  # Cast to str because parser only allow strings
-    try:
-        raw_parameter = parameter
+    if config_type not in ("user", "project"):
+        tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
+        return None
 
+    # Get configuration filepath and parser object
+    path = global_vars.configs[file_name][0]
+
+    try:
+
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser.read(path)
+
+        raw_parameter = parameter
         if config_type == 'user' and prefix and global_vars.project_type is not None:
             parameter = f"{global_vars.project_type}_{parameter}"
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        elif config_type in "project":
-            path_folder = global_vars.plugin_dir
-        else:
-            tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return
 
-        config_folder = path_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + f"{file_name}.config"
-        parser.read(path)
         # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
+
+        # Cast to str because parser only allow strings
+        value = f"{value}"
         if value is not None:
             # Add the comment to the value if there is one
             if comment is not None:
@@ -192,6 +198,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
+
     except Exception as e:
         tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
         return
@@ -251,12 +258,92 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg):
+def close_dialog(dlg, delete_dlg=True):
     """ Close dialog """
 
     save_settings(dlg)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
+    if delete_dlg:
+        try:
+            dlg.deleteLater()
+        except RuntimeError:
+            pass
+
+
+def connect_signal(obj, pfunc, section, signal_name):
+    """
+    Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
+    :param obj: the object to which the signal will be connected
+    :param pfunc: the partial object containing the function to connect and the arguments if needed
+    :param section: the name of the parent category
+    :param signal_name: the name of the signal. Should be {functionname}_{obj}_{pfunc} like -> {replace_arc}_{xyCoordinates}_{mouse_move_arc}
+    :return: the signal. If failed to connect it will return None
+    """
+
+    if section not in global_vars.active_signals:
+        global_vars.active_signals[section] = {}
+    # If the signal is already connected, don't reconnect it, just return it.
+    if signal_name in global_vars.active_signals[section]:
+        _, signal, _ = global_vars.active_signals[section][signal_name]
+        return signal
+    # Try to connect signal and save it in the dict
+    try:
+        signal = obj.connect(pfunc)
+        global_vars.active_signals[section][signal_name] = (obj, signal, pfunc)
+        return signal
+    except Exception as e:
+        pass
+    return None
+
+
+def disconnect_signal(section, signal_name=None, pop=True):
+    """
+    Disconnects a signal
+        :param section: the name of the parent category
+        :param signal_name: the name of the signal
+        :param pop: should always be True, if False it won't remove the signal from the dict.
+        :return: 2 things -> (object which had the signal connected, partial function that was connected with the signal)
+                 (None, None) if it couldn't find the signal
+    """
+
+    if section not in global_vars.active_signals:
+        return None, None
+
+    if signal_name is None:
+        old_signals = []
+        for signal in global_vars.active_signals[section]:
+            old_signals.append(disconnect_signal(section, signal, False))
+        for signal in old_signals:
+            global_vars.active_signals[section].pop(signal, None)
+    if signal_name not in global_vars.active_signals[section]:
+        return None, None
+
+    obj, signal, pfunc = global_vars.active_signals[section][signal_name]
+    try:
+        obj.disconnect(signal)
+    except Exception as e:
+        pass
+    finally:
+        if pop:
+            global_vars.active_signals[section].pop(signal_name, None)
+            return obj, pfunc
+        return signal_name
+
+
+def reconnect_signal(section, signal_name):
+    """
+    Disconnects and reconnects a signal
+        :param section: the name of the parent category
+        :param signal_name: the name of the signal
+        :return: True if successfully reconnected, False otherwise (bool)
+    """
+
+    obj, pfunc = disconnect_signal(section, signal_name)  # Disconnect the signal
+    if obj is not None and pfunc is not None:
+        connect_signal(obj, pfunc, section, signal_name)  # Reconnect it
+        return True
+    return False
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
@@ -264,7 +351,7 @@ def create_body(form='', feature='', filter_fields='', extras=None):
 
     info_types = {'full': 1}
     info_type = info_types.get(global_vars.project_vars['info_type'])
-    lang = QgsApplication.locale().upper()
+    lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     client = f'$${{"client":{{"device":4, "lang":"{lang}"'
     if info_type is not None:
@@ -422,7 +509,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -433,53 +520,44 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         :param style_id: Id of the style we want to load (integer or String)
     """
 
+    tablename_og = tablename
     uri = tools_db.get_uri()
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
-    if child_layers is not None:
-        for layer in child_layers:
-            if layer[0] != 'Load all':
-                vlayer = tools_qgis.get_layer_by_tablename(layer[0])
-                if vlayer:
-                    continue
-                uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
-                vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                group = layer[4] if layer[4] is not None else group
-                group = group if group is not None else 'GW Layers'
-                tools_qt.add_layer_to_toc(vlayer, group)
-                style_id = layer[3]
-                if style_id is not None:
-                    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                    style = execute_procedure('gw_fct_getstyle', body)
-                    if style is None or style['status'] == 'Failed':
-                        return
-                    if 'styles' in style['body']:
-                        if 'style' in style['body']['styles']:
-                            qml = style['body']['styles']['style']
-                            tools_qgis.create_qml(vlayer, qml)
 
-    else:
-        uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-        vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(vlayer, group)
-        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-        # therefore, we define it with "-1"
-        if style_id not in (None, "-1"):
-            body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-            style = execute_procedure('gw_fct_getstyle', body)
-            if style is None or style['status'] == 'Failed':
-                return
-            if 'styles' in style['body']:
-                if 'style' in style['body']['styles']:
-                    qml = style['body']['styles']['style']
-                    tools_qgis.create_qml(vlayer, qml)
+    uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    if alias:
+        tablename = alias
+    vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
+    tools_qt.add_layer_to_toc(vlayer, group, sub_group)
+    # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
+    # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
+    # therefore, we define it with "-1"
+
+    if style_id in (None, "-1"):
+        # Get style_id from tablename
+        sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
+        row = tools_db.get_row(sql)
+        if row:
+            style_id = row[0]
+
+    # Apply style to layer if it has one configured
+    if style_id not in (None, "-1"):
+        body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+        style = execute_procedure('gw_fct_getstyle', body)
+        if style is None or style['status'] == 'Failed':
+            return
+        if 'styles' in style['body']:
+            if 'style' in style['body']['styles']:
+                qml = style['body']['styles']['style']
+                tools_qgis.create_qml(vlayer, qml)
 
     # Set layer config
     if tablename:
-        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
+        feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
         extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
         body = create_body(feature=feature, extras=extras)
-        execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
+        json_result = execute_procedure('gw_fct_getinfofromid', body)
+        config_layer_attributes(json_result, vlayer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -514,15 +592,15 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
             if counter > 0:
                 counter = len(data[k]['features'])
                 geometry_type = data[k]['geometryType']
+                aux_layer_name = layer_name
                 try:
                     if not layer_name:
-                        layer_name = data[k]['layerName']
+                        aux_layer_name = data[k]['layerName']
                 except KeyError:
-                    layer_name = 'Temporal layer'
+                    aux_layer_name = str(k)
                 if del_old_layers:
-                    tools_qgis.remove_layer_from_toc(layer_name, group)
-                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                layer_name = None
+                    tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+                v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
                 fill_layer_temp(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
@@ -546,6 +624,133 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
+
+
+def config_layer_attributes(json_result, layer, layer_name, thread=None):
+
+    for field in json_result['body']['data']['fields']:
+        valuemap_values = {}
+
+        # Get column index
+        field_index = layer.fields().indexFromName(field['columnname'])
+
+        # Hide selected fields according table config_form_fields.hidden
+        if 'hidden' in field:
+            config = layer.attributeTableConfig()
+            columns = config.columns()
+            for column in columns:
+                if column.name == str(field['columnname']):
+                    column.hidden = field['hidden']
+                    break
+            config.setColumns(columns)
+            layer.setAttributeTableConfig(config)
+
+        # Set alias column
+        if field['label']:
+            layer.setFieldAlias(field_index, field['label'])
+
+        # widgetcontrols
+        if 'widgetcontrols' in field:
+
+            # Set field constraints
+            if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                if field['widgetcontrols']['setQgisConstraints'] is True:
+                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
+                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrengthHard)
+
+        if 'ismandatory' in field and not field['ismandatory']:
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrengthSoft)
+
+        # Manage editability
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError:
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
+
+        # delete old values on ValueMap
+        editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+        # Manage ValueRelation configuration
+        use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
+                 and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+        if use_vr:
+            value_relation = field['widgetcontrols']['valueRelation']
+            if 'activated' in value_relation and value_relation['activated']:
+                try:
+                    vr_layer = value_relation['layer']
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                    vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                    vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                    vr_allow_nullvalue = value_relation['nullValue']  # Get null values
+                    vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                    if vr_filter_expression is None:
+                        vr_filter_expression = ''
+
+                    # Create and apply ValueRelation config
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                 'Key': f'{vr_key_column}',
+                                                                                 'Value': f'{vr_value_column}',
+                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
+                                                                                 'FilterExpression': f'{vr_filter_expression}'})
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+                except Exception as e:
+                    if thread:
+                        thread.exception = e
+                        thread.vr_errors.add(layer_name)
+                        if 'layer' in value_relation:
+                            thread.vr_missing.add(value_relation['layer'])
+                        thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
+                                         f"layers {thread.vr_missing} are not present on QGIS project"
+                    use_vr = False
+
+        if not use_vr:
+            # Manage new values in ValueMap
+            if field['widgettype'] == 'combo':
+                if 'comboIds' in field:
+                    # Set values
+                    for i in range(0, len(field['comboIds'])):
+                        valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                # Set values into valueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'check':
+                config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'datetime':
+                config = {'allow_null': True,
+                          'calendar_popup': True,
+                          'display_format': 'yyyy-MM-dd',
+                          'field_format': 'yyyy-MM-dd',
+                          'field_iso_format': False}
+                editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'textarea':
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            else:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+        # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit',
+                                                           {'IsMultiline': field['widgetcontrols']['setMultiline']})
+            else:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
+            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
@@ -579,6 +784,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
         if call_set_tabs_enabled:
@@ -604,6 +810,12 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
             pass
 
     return text, change_tab
+
+
+def disable_tab_log(dialog):
+    qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
+        qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
 def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
@@ -712,7 +924,7 @@ def enable_all(dialog, result):
 
 def set_stylesheet(field, widget, wtype='label'):
 
-    if field['stylesheet'] is not None:
+    if 'stylesheet' in field and field['stylesheet'] is not None:
         if wtype in field['stylesheet']:
             widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
     return widget
@@ -763,6 +975,7 @@ def set_tabs_enabled(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     for x in range(0, qtabwidget.count() - 1):
         qtabwidget.widget(x).setEnabled(False)
+    qtabwidget.setTabEnabled(qtabwidget.count()-1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
     if btn_accept:
@@ -965,6 +1178,11 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                             pass
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                if 'datatype' in field:
+                    if field['datatype'] == 'int':
+                        widget.setValidator(QIntValidator())
+                    elif field['datatype'] == 'float':
+                        widget.setValidator(QDoubleValidator())
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
@@ -988,12 +1206,15 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'value' in field and field['value'] not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                 widget.setDate(date)
-                widget.dateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
-                    widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'spinboxDecimals' in field['widgetcontrols']:
+                        widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                    if 'maximumNumber' in field['widgetcontrols']:
+                        widget.setMaximum(field['widgetcontrols']['maximumNumber'])
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
@@ -1097,8 +1318,17 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
+
+    # Search for the widget and remove it if it's in the list
+    idx_del = None
+    for i in range(len(list)):
+        if list[i]['widget'] == elem['widget']:
+            idx_del = i
+            break
+    if idx_del is not None:
+        list.pop(idx_del)
+
     list.append(elem)
-    tools_log.log_info(str(list))
 
 
 def add_button(**kwargs):
@@ -1546,32 +1776,35 @@ def fill_combo(widget, field):
 
 def fill_combo_child(dialog, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child is not None:
-        fill_combo(child, combo_child)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        if child is not None:
+            fill_combo(child, combo_child)
 
 
 def manage_combo_child(dialog, combo_parent, combo_child):
 
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
-        child.setEnabled(True)
+    if 'widgetname' in combo_child:
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
 
-        fill_combo_child(dialog, combo_child)
-        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
-                'enableWhenParent' not in combo_child['widgetcontrols']:
-            return
-
-        combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
-        if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (combo_value not in (None, '')):
-            # The keepDisbled property is used to keep the edition enabled or disabled,
-            # when we activate the layer and call the "enable_all" function
-            child.setProperty('keepDisbled', False)
+        if child:
             child.setEnabled(True)
-        else:
-            child.setProperty('keepDisbled', True)
-            child.setEnabled(False)
+
+            fill_combo_child(dialog, combo_child)
+            if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                    'enableWhenParent' not in combo_child['widgetcontrols']:
+                return
+
+            combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+            if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                    and (combo_value not in (None, '')):
+                # The keepDisbled property is used to keep the edition enabled or disabled,
+                # when we activate the layer and call the "enable_all" function
+                child.setProperty('keepDisbled', False)
+                child.setEnabled(True)
+            else:
+                child.setProperty('keepDisbled', True)
+                child.setEnabled(False)
 
 
 def fill_child(dialog, widget, action, feature_type=''):
@@ -1642,8 +1875,49 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
-                      json_loads=False, rubber_band=None, aux_conn=None, is_thread=False, check_function=True):
+def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None,
+        aux_conn=None, is_thread=False, check_function=True):
+    """ Manage execution of database function @function_name
+        If execution failed, execute it again up to the value indicated in parameter 'exec_procedure_max_retries'
+    """
+
+    # Define dictionary with results
+    dict_result= {}
+    status = False
+    function_failed = False
+    json_result = None
+    complet_result = None
+
+    attempt = 0
+    while json_result is None and attempt < global_vars.exec_procedure_max_retries:
+        attempt += 1
+        if attempt == 1:
+            tools_log.log_info(f"Starting process...")
+        else:
+            tools_log.log_info(f"Retrieving process ({attempt}/{global_vars.exec_procedure_max_retries})...")
+        json_result = execute_procedure(function_name, parameters, schema_name, commit, log_sql, rubber_band, aux_conn,
+            is_thread, check_function)
+        complet_result = json_result
+        if json_result is None or not json_result:
+            function_failed = True
+        elif 'status' in json_result:
+            if json_result['status'] == 'Failed':
+                tools_log.log_warning(json_result)
+                function_failed = True
+            else:
+                status = True
+            break
+
+    dict_result['status'] = status
+    dict_result['function_failed'] = function_failed
+    dict_result['json_result'] = json_result
+    dict_result['complet_result'] = complet_result
+
+    return dict_result
+
+
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, rubber_band=None,
+        aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1660,9 +1934,11 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return None
 
-    # Execute function. If failed, always log it
+    # Manage schema_name and parameters
     if schema_name:
         sql = f"SELECT {schema_name}.{function_name}("
+    elif schema_name is None and global_vars.schema_name:
+        sql = f"SELECT {global_vars.schema_name}.{function_name}("
     else:
         sql = f"SELECT {function_name}("
     if parameters:
@@ -1670,42 +1946,32 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     sql += f");"
 
     # Get log_sql for developers
-    dev_log_sql = get_config_parser('system', 'log_sql', "user", "init", False)
+    dev_log_sql = get_config_parser('log', 'log_sql', "user", "init", False)
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 
+    # Execute database function
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
-
-    # Control null
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
         return None
 
     # Get json result
-    if json_loads:
-        # If content of row[0] is not a to json, cast it
-        json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-    else:
-        json_result = row[0]
-
-    # Log result
-    if log_result:
-        tools_log.log_info(json_result, stack_level_increase=1)
+    json_result = row[0]
+    if log_sql:
+        tools_log.log_db(json_result, header="SERVER RESPONSE")
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        tools_log.log_warning(f"Function error: {function_name}")
         manage_json_exception(json_result, sql)
         return False
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
         manage_json_exception(json_result, sql, is_thread=is_thread)
-        if is_thread:
-            return json_result,  global_vars.session_vars['last_error_msg']
-        else:
-            return json_result
+        return json_result
+
     try:
         if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
             json_result = manage_json_geometry(json_result)
@@ -1825,6 +2091,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
         return_manager = json_result['body']['returnManager']
     except KeyError:
         return
+
     srid = global_vars.data_epsg
     try:
         margin = None
@@ -1834,7 +2101,6 @@ def manage_json_return(json_result, sql, rubber_band=None):
             margin = return_manager['zoom']['margin']
 
         if 'style' in return_manager and 'ruberband' in return_manager['style']:
-            # Set default values
             width = 3
             color = QColor(255, 0, 0, 125)
             if 'transparency' in return_manager['style']['ruberband']:
@@ -1852,17 +2118,18 @@ def manage_json_return(json_result, sql, rubber_band=None):
                 if key.lower() in ('point', 'line', 'polygon'):
                     if key not in json_result['body']['data']:
                         continue
-                    if 'features' not in json_result['body']['data'][key]:
-                        continue
-                    if len(json_result['body']['data'][key]['features']) == 0:
-                        continue
 
+                    # Remove the layer if it exists
                     layer_name = f'{key}'
                     if 'layerName' in json_result['body']['data'][key]:
                         if json_result['body']['data'][key]['layerName']:
                             layer_name = json_result['body']['data'][key]['layerName']
-
                     tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
+
+                    if 'features' not in json_result['body']['data'][key]:
+                        continue
+                    if len(json_result['body']['data'][key]['features']) == 0:
+                        continue
 
                     # Get values for create and populate layer
                     counter = len(json_result['body']['data'][key]['features'])
@@ -1879,12 +2146,14 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         if 'transparency' in return_manager['style'][key]['values']:
                             opacity = return_manager['style'][key]['values']['transparency']
                     if style_type[key]['style'] == 'categorized':
+                        if 'transparency' in return_manager['style'][key]:
+                            opacity = return_manager['style'][key]['transparency']
                         color_values = {}
                         for item in json_result['body']['returnManager']['style'][key]['values']:
-                            color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity * 255)
+                            color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
-                        size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                        size = style_type[key]['width'] if 'width' in style_type[key] and style_type[key]['width'] else 2
                         tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
 
                     elif style_type[key]['style'] == 'random':
@@ -1924,6 +2193,9 @@ def manage_json_return(json_result, sql, rubber_band=None):
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+    finally:
+        # Clean any broken temporal layers (left with no data)
+        tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
 def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
@@ -1953,38 +2225,55 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
 
 
 def get_project_type(schemaname=None):
-    """ Get project type from table 'version' """
+    """ Get project type from table 'sys_version' """
 
-    # init variables
     project_type = None
     if schemaname is None and global_vars.schema_name is None:
         return None
     elif schemaname in (None, 'null', ''):
         schemaname = global_vars.schema_name
 
-    # start process
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
-    if exists:
-        sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            project_type = row[0]
-    else:
-        tablename = "version"
-        exists = tools_db.check_table(tablename, schemaname)
-        if exists:
-            sql = f"SELECT lower(wsoftware) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
-            row = tools_db.get_row(sql)
-            if row:
-                project_type = row[0]
-        else:
-            tablename = "version_tm"
-            exists = tools_db.check_table(tablename, schemaname)
-            if exists:
-                project_type = "tm"
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_type = row[0]
 
     return project_type
+
+
+def get_project_info(schemaname=None):
+    """ Get project information from table 'sys_version' """
+
+    project_info_dict = None
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = (f"SELECT lower(project_type), epsg, giswater, language "
+           f"FROM {schemaname}.{tablename} "
+           f"ORDER BY id DESC LIMIT 1")
+    row = tools_db.get_row(sql)
+    if row:
+        project_info_dict = {'project_type': row[0],
+                             'project_epsg': row[1],
+                             'project_version': row[2],
+                             'project_language': row[3],
+                             }
+
+    return project_info_dict
 
 
 def get_layers_from_feature_type(feature_type):
@@ -2123,20 +2412,20 @@ def manage_layer_manager(json_result, sql=None):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
+                    segment_flag = get_vertex_flag(2)
                     layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
-                        layer_settings.setType(2)
+                        layer_settings.setTypeFlag(segment_flag)
                         layer_settings.setTolerance(15)
                         layer_settings.setEnabled(True)
                     else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
                     snapping_config = snapper_manager.get_snapping_options()
                     snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
                     QgsProject.instance().snappingConfigChanged.emit(snapping_config)
             snapper_manager.set_snap_mode()
             del snapper_manager
-
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
@@ -2146,7 +2435,7 @@ def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
-        class_object.feature_type = get_signal_change_tab(dialog)
+        class_object.feature_type = get_signal_change_tab(dialog, excluded_layers=class_object.excluded_layers)
     except AttributeError:
         # In case the dialog has no tab
         pass
@@ -2287,8 +2576,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
-    tools_log.log_info(class_object.list_ids[feature_type])
-
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
@@ -2305,7 +2592,8 @@ def remove_selection(remove_groups=True, layers=None):
     if remove_groups and layers is not None:
         for key, elems in layers.items():
             for layer in layers[key]:
-                layer.removeSelection()
+                if layer:
+                    layer.removeSelection()
 
     global_vars.canvas.refresh()
 
@@ -2360,7 +2648,7 @@ def init_docker(docker_param='qgis_info_docker'):
         close_docker()
         global_vars.session_vars['docker_type'] = docker_param
         global_vars.session_vars['dialog_docker'] = GwDocker()
-        global_vars.session_vars['dialog_docker'].dlg_closed.connect(close_docker)
+        global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
         manage_docker_options()
     else:
         global_vars.session_vars['dialog_docker'] = None
@@ -2369,7 +2657,7 @@ def init_docker(docker_param='qgis_info_docker'):
     return global_vars.session_vars['dialog_docker']
 
 
-def close_docker():
+def close_docker(option_name='position'):
     """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
         remove from iface and del class
     """
@@ -2384,7 +2672,7 @@ def close_docker():
                     del widget
                     global_vars.session_vars['dialog_docker'].setWidget(None)
                     global_vars.session_vars['docker_type'] = None
-                    set_config_parser('docker', 'position', f'{docker_pos}')
+                    set_config_parser('docker', option_name, f'{docker_pos}')
                 global_vars.iface.removeDockWidget(global_vars.session_vars['dialog_docker'])
                 global_vars.session_vars['dialog_docker'] = None
     except AttributeError:
@@ -2392,13 +2680,13 @@ def close_docker():
         global_vars.session_vars['dialog_docker'] = None
 
 
-def manage_docker_options():
+def manage_docker_options(option_name='position'):
     """ Check if user want dock the dialog or not """
 
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker', 'position', "user", "session"))
+        pos = int(get_config_parser('docker', option_name, "user", "session"))
         global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dialog_docker'].position = pos
@@ -2500,6 +2788,8 @@ def fill_tableview_rows(widget, field):
     for item in field['value']:
         row = []
         for value in item.values():
+            if value is None:
+                value = ""
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
             model.appendRow(row)
@@ -2531,16 +2821,19 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
             message = "Widget not found"
             tools_log.log_info(message, parameter=widget_name)
             return None
+
     elif type(table_object) is QTableView:
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
         tools_log.log_info(msg)
         return None
+
     table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     if widget_name is not None:
         set_tablemodel_config(dialog, widget_name, table_name)
+
     return expr
 
 
@@ -2592,7 +2885,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
-    row = tools_db.get_row(sql, log_sql=False)
+    row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
         if row[0]:
@@ -2778,11 +3071,26 @@ def set_epsg():
     global_vars.project_epsg = epsg
 
 
+def refresh_selectors(tab_name=None):
+    """ Refreshes the selectors' UI if it's open """
+
+    # Get the selector UI if it's open
+    windows = [x for x in QApplication.allWidgets() if not getattr(x, "isHidden", False)
+               and (issubclass(type(x), GwSelectorUi))]
+
+    if windows:
+        try:
+            dialog = windows[0]
+            selector = dialog.property('GwSelector')
+            if tab_name is None:
+                tab_name = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
+            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=tab_name)
+        except Exception:
+            pass
+
+
 def open_dlg_help():
-    """
-    Opens the help page for the last focused dialog
-        :return:
-    """
+    """ Opens the help page for the last focused dialog """
 
     parser = configparser.ConfigParser()
     path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
@@ -2798,6 +3106,40 @@ def open_dlg_help():
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
     finally:
         return True
+
+
+def manage_current_selections_docker(result, open=False):
+    """
+    Manage labels for the current_selections docker
+        :param result: looks the data in result['body']['data']['userValues']
+        :param open: if it has to create a new docker or just update it
+    """
+
+    if not result or 'body' not in result or 'data' not in result['body']:
+        return
+
+    title = "Gw Selectors: "
+    if 'userValues' in result['body']['data']:
+        for user_value in result['body']['data']['userValues']:
+            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
+                sql = f"SELECT name FROM cat_workspace WHERE id = {user_value['value']}"
+                row = tools_db.get_row(sql, log_info=False)
+                if row:
+                    title += f"{row[0]} | "
+            elif user_value['value']:
+                title += f"{user_value['value']} | "
+
+        if global_vars.session_vars['current_selections'] is None:
+            global_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
+        else:
+            global_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
+        if open:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
 
 
 def create_sqlite_conn(file_name):
@@ -2823,14 +3165,19 @@ def create_sqlite_conn(file_name):
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
-    inv_sections = _get_user_params_sections()
+    parser = global_vars.configs['user_params'][1]
+    if parser is None:
+        return
+
+    # Get the sections of the user params inventory
+    inv_sections = parser.sections()
 
     # For each section (inventory)
     for section in inv_sections:
 
         file_name = section.split('.')[0]
         section_name = section.split('.')[1]
-        parameters = _get_user_params_parameters(section)
+        parameters = parser.options(section)
 
         # For each parameter (inventory)
         for parameter in parameters:
@@ -2838,7 +3185,9 @@ def user_params_to_userconfig():
             # Manage if parameter need prefix and project_type is not defined
             if parameter.startswith("_") and global_vars.project_type is None:
                 continue
-
+            if parameter.startswith("#"):
+                continue
+                
             _pre = False
             inv_param = parameter
             # If it needs a prefix
@@ -2847,12 +3196,14 @@ def user_params_to_userconfig():
                 parameter = inv_param[1:]
             # If it's just a comment line
             if parameter.startswith("#"):
+                # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
                 set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
                 continue
 
             # If it's a normal value
             # Get value[section][parameter] of the user config file
             value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
+
             # If this value (user config file) is None (doesn't exist, isn't set, etc.)
             if value is None:
                 # Read the default value for that parameter
@@ -2872,13 +3223,58 @@ def user_params_to_userconfig():
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
+    if global_vars.user_folder_dir is None:
+        return
+
     init_parser = configparser.ConfigParser()
     session_parser = configparser.ConfigParser()
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
-    # Get deprecated vars for init
+    # Remove deprecated sections for init
     path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    init_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_init', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not init_parser.has_section(section):
+                continue
+            init_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        init_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated sections for session
+    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
+    session_parser.read(path)
+    vars = get_config_parser('system', 'deprecated_section_session', "project", "giswater")
+    if vars is not None:
+        for var in vars.split(','):
+            section = var.split('.')[0].strip()
+            if not session_parser.has_section(section):
+                continue
+            session_parser.remove_section(section)
+
+    with open(path, 'w') as configfile:
+        session_parser.write(configfile)
+        configfile.close()
+
+    # Remove deprecated vars for init
+    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     init_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
     if vars is not None:
@@ -2892,12 +3288,17 @@ def remove_deprecated_config_vars():
                     init_parser.remove_option(section, f"{proj}{option}")
             else:
                 init_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         init_parser.write(configfile)
         configfile.close()
 
-    # Get deprecated vars for session
+    # Remove deprecated vars for session
     path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    if not os.path.exists(path):
+        tools_log.log_warning(f"File not found: {path}")
+        return
+
     session_parser.read(path)
     vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
     if vars is not None:
@@ -2911,6 +3312,7 @@ def remove_deprecated_config_vars():
                     session_parser.remove_option(section, f"{proj}{option}")
             else:
                 session_parser.remove_option(section, option)
+
     with open(path, 'w') as configfile:
         session_parser.write(configfile)
         configfile.close()
@@ -2922,14 +3324,110 @@ def hide_widgets_form(dialog, dlg_name):
     if row:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
-            if widget.objectName() and widget.objectName() in row[0]:
+            if widget.objectName() and f'"{widget.objectName()}"' in row[0]:
                 lbl_widget = dialog.findChild(QLabel, f"lbl_{widget.objectName()}")
                 if lbl_widget:
                     lbl_widget.setVisible(False)
                 widget.setVisible(False)
 
 
+def get_project_version(schemaname=None):
+    """ Get project version from table 'sys_version' """
+
+    if schemaname in (None, 'null', ''):
+        schemaname = global_vars.schema_name
+
+    project_version = None
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if not exists:
+        tools_qgis.show_warning(f"Table not found: '{tablename}'")
+        return None
+
+    sql = f"SELECT giswater FROM {schemaname}.{tablename} ORDER BY id DESC LIMIT 1"
+    row = tools_db.get_row(sql)
+    if row:
+        project_version = row[0]
+
+    return project_version
+
+
+def export_layers_to_gpkg(layers, path):
+    """ This function is not used on Giswater Project at the moment. """
+
+    uri = tools_db.get_uri()
+    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    is_first = True
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.driverName = "GPKG"
+
+    for layer in layers:
+
+        uri.setDataSource(schema_name, f"{layer['name']}", "the_geom", None, f"{layer['id']}")
+        vlayer = QgsVectorLayer(uri.uri(), f"{layer['name']}", 'postgres')
+
+        if is_first:
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
+            is_first = False
+        else:
+            # switch mode to append layer instead of overwriting the file
+            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+            options.layerName = vlayer.name()
+            QgsVectorFileWriter.writeAsVectorFormatV2(vlayer, path, QgsCoordinateTransformContext(), options)
+
+
+# region compatibility QGIS version functions
+
+def set_snapping_type(layer_settings, value):
+
+    if Qgis.QGIS_VERSION_INT < 31200:
+        layer_settings.setType(value)
+    elif Qgis.QGIS_VERSION_INT >= 31200:
+        layer_settings.setTypeFlag(value)
+
+
+def get_segment_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag
+    else:
+        segment_flag = default_value
+
+    return segment_flag
+
+
+def get_vertex_flag(default_value):
+
+    if Qgis.QGIS_VERSION_INT >= 31200:
+        vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag
+    else:
+        vertex_flag = default_value
+
+    return vertex_flag
+
+
+def create_giswater_menu(project_loaded=False):
+    """ Create Giswater menu """
+    if global_vars.load_project_menu is None:
+        global_vars.load_project_menu = GwMenuLoad()
+    global_vars.load_project_menu.read_menu(project_loaded)
+
+
+def unset_giswater_menu():
+    """ Unset Giswater menu (when plugin is disabled or reloaded) """
+
+    menu_giswater = global_vars.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
+    if menu_giswater not in (None, "None"):
+        menu_giswater.clear()  # I think it's good to clear the menu before deleting it, just in case
+        menu_giswater.deleteLater()
+        global_vars.load_project_menu = None
+
+# endregion
+
+
 # region private functions
+
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
@@ -2957,12 +3455,14 @@ def _check_user_params(section, parameter, file_name, prefix=False):
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
+
     # Check if the parameter needs the prefix or not
     if prefix and global_vars.project_type is not None:
         parameter = f"_{parameter}"
+
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
-                                    chk_user_params=False)
+                                    get_comment=True, chk_user_params=False)
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
@@ -2971,24 +3471,26 @@ def _check_user_params(section, parameter, file_name, prefix=False):
         return check_value
 
 
-def _get_user_params_sections():
-    """ Get the sections of the user params inventory """
+def _get_parser_from_filename(filename):
+    """ Get parser of file @filename.config """
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    return parser.sections()
-
-
-def _get_user_params_parameters(section: str):
-    """ Get the parameters of a section from the user params inventory """
-
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
-    parser.read(path)
-    if parser.has_section(section):
-        return parser.options(section)
+    if filename in ('init', 'session'):
+        folder = global_vars.user_folder_dir
+    elif filename in ('dev', 'giswater', 'user_params'):
+        folder = global_vars.plugin_dir
     else:
-        return None
+        return None, None
+
+    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+    filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
+    if not os.path.exists(filepath):
+        tools_log.log_warning(f"File not found: {filepath}")
+        return filepath, None
+
+    if not parser.read(filepath):
+        tools_log.log_warning(f"Error parsing file: {filepath}")
+        return filepath, None
+
+    return filepath, parser
 
 # endregion

@@ -52,6 +52,7 @@ class GwNodeData:
         self.descript = None
         self.data_type = None
         self.surface_type = None
+        self.none_values = None
 
 
 class GwProfileButton(GwAction):
@@ -69,6 +70,7 @@ class GwProfileButton(GwAction):
         self.links = []
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
+        self.none_values = []
 
 
     def clicked_event(self):
@@ -105,6 +107,8 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self._clear_profile)
         self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self._remove_selection, actionpan=True))
+        self.dlg_draw_profile.dlg_closed.connect(partial(self._reset_profile_variables))
+        self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.disconnect_signal, 'profile'))
 
         # Set shortcut keys
         self.dlg_draw_profile.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_draw_profile))
@@ -128,6 +132,12 @@ class GwProfileButton(GwAction):
 
     # region private functions
 
+    def _reset_profile_variables(self):
+
+        self.initNode = None
+        self.endNode = None
+        self.first_node = True
+
 
     def _get_profile(self):
 
@@ -136,6 +146,7 @@ class GwProfileButton(GwAction):
         self.links.clear()
         self.nodes = []
         self.links = []
+        self.none_values = []
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
@@ -176,6 +187,10 @@ class GwProfileButton(GwAction):
         self.plot.show()
         mng = self.plot.get_current_fig_manager()
         mng.window.showMaximized()
+
+        if len(self.none_values) > 0:
+            message = "There are missing values in these nodes:"
+            tools_qt.show_info_box(message, inf_text=self.none_values)
 
 
     def _save_profile(self):
@@ -292,21 +307,34 @@ class GwProfileButton(GwAction):
 
     def _activate_snapping_node(self):
 
-        self.initNode = None
-        self.endNode = None
-        self.first_node = True
+        if hasattr(self, "first_node"):
+            self.snapper_manager.remove_marker()
+        self.initNode = None if not hasattr(self, "initNode") else self.initNode
+        self.endNode = None if not hasattr(self, "endNode") else self.endNode
+        self.first_node = True if not hasattr(self, "first_node") else self.first_node
+
+        if self.first_node is False:
+            message = f"First node already selected with id: {self.initNode}. Select second one."
+            tools_qgis.show_info(message)
 
         # Set vertex marker propierties
         self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
         # Create the appropriate map tool and connect the gotPoint() signal.
+        if hasattr(self, "emit_point") and self.emit_point is not None:
+            tools_gw.disconnect_signal('profile', 'ep_canvasClicked_snapping_node')
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
-        self.snapper_manager.show_snap_message(False)
-        self.canvas.xyCoordinates.connect(self._mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self._snapping_node))
+
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move,
+                                'profile', 'activate_snapping_node_xyCoordinates_mouse_move')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._snapping_node),
+                                'profile', 'ep_canvasClicked_snapping_node')
+        # To activate action pan and not move the canvas accidentally we have to override the canvasReleaseEvent.
+        # The "e" is the QgsMapMouseEvent given by the function
+        self.emit_point.canvasReleaseEvent = lambda e: self._action_pan()
 
 
     def _mouse_move(self, point):
@@ -343,9 +371,12 @@ class GwProfileButton(GwAction):
                 if self.first_node:
                     self.initNode = element_id
                     self.first_node = False
+                    message = f"Node 1 selected"
+                    tools_qgis.show_info(message, parameter=element_id)
                 else:
                     self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                    tools_gw.disconnect_signal('profile')
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                     self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
@@ -385,11 +416,14 @@ class GwProfileButton(GwAction):
                     self.id_list = [i.id() for i in it]
                     self.layer_arc.selectByIds(self.id_list)
 
-                    # Center shortest path in canvas - ZOOM SELECTION
-                    self.canvas.zoomToSelected(self.layer_arc)
+                    # Next profile will be done from scratch
+                    self.first_node = True
 
-                    # Set action pan
-                    self.iface.actionPan().trigger()
+
+    def _action_pan(self):
+        if self.first_node:
+            # Set action pan
+            self.iface.actionPan().trigger()
 
 
     def _draw_profile(self, arcs, nodes, terrains):
@@ -454,7 +488,7 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
-
+        
 
     def _set_profile_layout(self):
         """ Set properties of main window """
@@ -723,9 +757,12 @@ class GwProfileButton(GwAction):
                  verticalalignment='center')
 
         # Print title
-        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
+        # Set default value if no title is given
+        if title in ('', None):
+            title = f"PROFILE {self.initNode} - {self.endNode}"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
-                 title.upper(), fontsize=title_size, color=title_color, fontweight=title_weight,
+                 title, fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
 
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
@@ -894,8 +931,12 @@ class GwProfileButton(GwAction):
             # defining variables
             y2_prev = self.nodes[index - 1].y2
             elev2_prev = self.nodes[index - 1].elev2
-            y1 = self.nodes[0].y1
-            elev1 = self.nodes[0].elev1
+            y1 = self.nodes[index].y1
+            elev1 = self.nodes[index].elev1
+
+            if y2_prev in (None, 'None') or self.nodes[index].descript['ymax'] in (None, 'None') or y1 in (None, 'None')\
+                    or elev2_prev in (None, 'None') or self.nodes[index].descript['elev'] in (None, 'None') or elev1 in (None, 'None'):
+                self.none_values.append(self.nodes[index].descript['code'])
 
             # Fill y_max
             plt.annotate(
@@ -1197,8 +1238,12 @@ class GwProfileButton(GwAction):
         geom1 = self.nodes[self.n - 1].geom
 
         # Draw main text
+        try:
+            reference_plane = self.profile_json['body']['data']['legend']['referencePlane']
+        except KeyError:
+            reference_plane = "REFERENCE"
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(0.5) * self.height_row - self.height_row / 2,
-                 'REFERENCE: ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                 f"{reference_plane}: {round(self.min_top_elev - 1 * self.height_row, 2)}\n ",
                  fontsize=8.5,
                  color=text_color, fontweight=text_weight,
                  verticalalignment='center')
@@ -1295,6 +1340,7 @@ class GwProfileButton(GwAction):
 
         # Clear selection
         self._remove_selection()
+        self._reset_profile_variables()
 
 
     def _delete_profile(self):
