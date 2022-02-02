@@ -68,6 +68,8 @@ class GwAddChildLayerButton(GwAction):
                 if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
                     menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(f"{context['level_3']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+
+                alias = field['layerName'] if field['layerName'] is not None else field['tableName']
                 if 'level_3' in context:
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
                         action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
@@ -75,7 +77,7 @@ class GwAddChildLayerButton(GwAction):
                         group=context['level_1'], sub_group=context['level_2'], sub_sub_group=context['level_3']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all"] = True
-                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
+                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
                 else:
                     if f"{context['level_1']}_{context['level_2']}_load_all" not in dict_menu:
@@ -84,7 +86,7 @@ class GwAddChildLayerButton(GwAction):
                                                          group=context['level_1'], sub_group=context['level_2']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_load_all"] = True
-                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
+                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
                     dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
 
                 if f"{field['tableName']}" in layer_list:
@@ -99,9 +101,8 @@ class GwAddChildLayerButton(GwAction):
                 style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
-
                 action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                 group, sub_group, style_id, field['layerName']))
+                                                 group, sub_group, style_id, alias))
 
         main_menu.exec_(click_point)
 
