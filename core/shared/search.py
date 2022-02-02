@@ -317,9 +317,7 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
-            if rb_duration == "0": rb_duration = None
-            tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
+            tools_qgis.draw_polygon(points, self.rubber_band)
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self._workcat_open_table_items(item)
