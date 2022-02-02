@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>960</width>
     <height>633</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1050</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -845,7 +845,7 @@
          <item row="1" column="0">
           <widget class="QTableView" name="all_rows">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -867,11 +867,21 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>956</width>
-            <height>269</height>
+            <width>916</width>
+            <height>246</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
+           <item row="3" column="1" colspan="2">
+            <widget class="Line" name="line_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3">
+            <layout class="QGridLayout" name="lyt_price"/>
+           </item>
            <item row="4" column="0">
             <spacer name="horizontalSpacer_27">
              <property name="orientation">
@@ -894,9 +904,6 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
-           </item>
-           <item row="0" column="0" colspan="3">
-            <layout class="QGridLayout" name="lyt_price"/>
            </item>
            <item row="4" column="1">
             <widget class="QLabel" name="lbl_total">
@@ -923,13 +930,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="Line" name="line_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
