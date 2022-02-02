@@ -302,11 +302,11 @@ BEGIN
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
 
 			-- Getting the sign of the filter
-			IF v_value::json->>'filterSign' is not null THEN
+			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL THEN
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
-					v_value = '''%'||v_value||'%''';
+					v_value = '%'||v_value||'%'; 
 				END IF;
 			ELSE
 				IF v_listtype = 'attributeTable' THEN
@@ -323,7 +323,7 @@ BEGIN
 
 			-- creating the query_text
 			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||v_value ||'::text';
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '''||v_value ||'''::text';
 
 			ELSIF v_field='limit' THEN
 				v_query_result := v_query_result;

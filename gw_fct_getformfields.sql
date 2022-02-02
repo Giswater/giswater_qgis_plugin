@@ -63,6 +63,7 @@ v_querystring text;
 v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
+v_currency text;
        
 BEGIN
 	raise notice '11 p_formname -->%',p_formname ;
@@ -74,8 +75,8 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_version;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row' INTO v_version;
+	v_currency :=(SELECT value::json->>'symbol' FROM config_param_system WHERE parameter='admin_currency');
 
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -171,12 +172,16 @@ raise notice 'p_formname -->%',p_formname ;
 	ELSE
 		v_querystring = concat('SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
-				(SELECT concat(unit, ''. '', descript) AS label, identif AS columnname, ''label'' AS widgettype,
-				concat (tabname,''_'',identif) AS widgetname, ''string'' AS datatype, 
+				(SELECT 
+				concat(unit, ''. '', descript) AS label , 
+				identif AS columnname, ''label'' AS widgettype,
+				identif AS widgetname, ''string'' AS datatype, 
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
-				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , 
-				'' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
+				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, 
+				CASE WHEN lower(unit)!=''pp'' THEN concat (measurement,'' '',unit,'' x '', cost , '' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''')   
+				     WHEN lower(unit) =''pp'' THEN concat (''('',measurement,'' ut. x '', cost , '' ',v_currency,''', '' ) / '', length ,'' ml = '', total_cost,'' ',v_currency,''') END as value, 
+				null as stylesheet,
 				null as widgetcontrols, null as hidden
 				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_literal(p_formname),'
 			UNION
@@ -187,6 +192,7 @@ raise notice 'p_formname -->%',p_formname ;
 				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
 				FROM config_form_fields WHERE formname  = ''infoplan'' ORDER BY layoutname, layoutorder) a
 			ORDER BY 1) b');
+
 		v_debug_vars := json_build_object('p_tablename', p_tablename, 'p_idname', p_idname, 'p_formname', p_formname);
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 0);
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
