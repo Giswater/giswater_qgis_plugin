@@ -1128,6 +1128,7 @@ def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, du
 
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, rubber_band.reset)
+        # Qtimer singleShot works with ms, we manage transformation to seconds
+        QTimer.singleShot(int(duration_time)*1000, rubber_band.reset)
 
 # endregion

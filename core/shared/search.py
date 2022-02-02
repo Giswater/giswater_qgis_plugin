@@ -317,7 +317,9 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            tools_qgis.draw_polygon(points, self.rubber_band)
+            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
+            if rb_duration == "0": rb_duration = None
+            tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self._workcat_open_table_items(item)
@@ -528,11 +530,9 @@ class GwSearch:
         self._update_selector_workcat(workcat_id)
         current_selectors = self._get_current_selectors()
         self._force_expl(workcat_id)
-        # TODO ZOOM TO SELECTED WORKCAT
-        # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = GwSearchWorkcatUi()
-
+        
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")
         tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112")
         tools_gw.add_icon(self.items_dialog.btn_doc_new, "34")
@@ -607,7 +607,6 @@ class GwSearch:
         self._workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
-        #
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"

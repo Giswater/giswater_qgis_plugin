@@ -20,7 +20,7 @@ from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColo
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout
-from qgis.core import QgsLayoutExporter, QgsProject
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
@@ -320,11 +320,26 @@ class GwPsector:
                     tools_qgis.show_warning(msg)
                     return
 
+            # Get canvas extend in order to create a QgsRectangle
+            ext = self.canvas.extent()
+            start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+            end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
+            canvas_rec = QgsRectangle(start_point, end_point)
+            canvas_width = ext.xMaximum() - ext.xMinimum()
+            canvas_height = ext.yMaximum() - ext.yMinimum()
+
             points = tools_qgis.get_geometry_vertex(list_coord)
+            polygon = QgsGeometry.fromPolygonXY([points])
+            psector_rec = polygon.boundingBox()
             tools_gw.reset_rubberband(self.rubber_band)
-            tools_qgis.draw_polygon(points, self.rubber_band)
-            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
+            if rb_duration == "0": rb_duration = None
+            tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
+
+            # Manage Zoom to rectangle
+            if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
+                max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+                tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
