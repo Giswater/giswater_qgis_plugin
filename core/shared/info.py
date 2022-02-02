@@ -2675,18 +2675,19 @@ class GwInfo(QObject):
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
             self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=True, column_filter=feature_key, value_filter=self.feature_id))
-        self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
-        self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
-        btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+            self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+                visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
+            self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+                visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
-        # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
-        tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
-        tools_qt.fill_table(widget, table_name, filter_)
-        self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
-                               column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+            btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+
+            # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
+            tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
+            tools_qt.fill_table(widget, table_name, filter_)
+            self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                                   column_filter=feature_key, value_filter=self.feature_id, widget=widget)
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
