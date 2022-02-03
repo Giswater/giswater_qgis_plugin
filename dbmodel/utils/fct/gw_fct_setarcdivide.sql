@@ -128,16 +128,6 @@ BEGIN
 	-- Get project type
 	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	
-	-- set sequences
-	FOR rec_table IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence LIKE '%visit%'
-	LOOP 
-		v_query_string:= 'SELECT max('||rec_table.sys_sequence_field||') FROM '||rec_table.id||';' ;
-		EXECUTE v_query_string INTO v_max_seq_id;	
-		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||rec_table.sys_sequence||' '','||v_max_seq_id||', true)';			
-		END IF;
-	END LOOP;
-
 	-- Get node values
 	SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
 	SELECT state INTO v_state_node FROM node WHERE node_id=v_node_id;

@@ -487,5 +487,3 @@ UPDATE inp_flwreg_pump SET to_arc = '18966' WHERE node_id = '18828';
 UPDATE arc SET pavcat_id = 'Asphalt';
 
 UPDATE cat_arc SET connect_cost = 'N_CONNECTION';
-
-INSERT INTO config_param_system VALUES ('admin_sample', 'TRUE', 'Only existing in sample projects');

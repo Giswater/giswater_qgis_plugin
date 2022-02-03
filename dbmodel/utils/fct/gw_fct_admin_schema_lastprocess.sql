@@ -52,7 +52,10 @@ v_fid integer = 133;
 v_result text;
 v_result_info text;
 v_status text;
-	
+v_rectable record;
+v_max_seq_id integer;
+v_querytext text;
+
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -292,6 +295,18 @@ BEGIN
 		
 		-- automatize graf analytics config for ws
 		UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
+
+		FOR v_rectable IN 
+		(SELECT table_name, column_name, sequence_name FROM information_schema.columns,   information_schema.sequences
+		WHERE table_schema ='SCHEMA_NAME' and sequence_schema ='SCHEMA_NAME' and  column_default ILIKE '%' || sequence_name || '%'
+		AND sequence_name!='urn_id_seq' AND sequence_name!='doc_seq')
+        LOOP 
+            v_querytext:= 'SELECT max('||v_rectable.column_name||') FROM '||v_rectable.table_name||';' ;
+            EXECUTE v_querytext INTO v_max_seq_id;	
+            IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
+                EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sequence_name||' '','||v_max_seq_id||', true)';			
+            END IF;
+        END LOOP;
 
 	ELSIF v_isnew IS FALSE THEN
 

@@ -41,14 +41,7 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         IF v_isutils IS FALSE OR v_isutils IS NULL THEN	
-        
-            -- use sequence only if is configured on sys_table.sys_sequence
-            IF (SELECT sys_sequence FROM sys_table WHERE id='ext_address')= 'ext_address_id_seq' THEN
-                IF NEW.id IS NULL THEN
-                    NEW.id=(SELECT nextval('ext_address_id_seq'));
-                END IF;
-            END IF;
-            
+                 
        		--get muni and expl_id value if its null
             IF NEW.muni_id IS NULL THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
