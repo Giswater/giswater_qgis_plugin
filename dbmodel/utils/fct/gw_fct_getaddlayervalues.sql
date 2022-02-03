@@ -43,13 +43,18 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 	
-	SELECT array_agg(row_to_json(d)) FROM (SELECT context, alias as "layerName", st.id as "tableName",CASE WHEN c.column_name IS NULL THEN 'None' ELSE c.column_name END AS "geomField", i.column_name as "tableId", st.style_id FROM sys_table st
+	SELECT array_agg(row_to_json(d)) FROM (SELECT context, alias as "layerName", st.id as "tableName",
+	CASE WHEN c.column_name IS NULL THEN 'None' 
+	WHEN c.column_name = 'envelope' THEN 'rast'
+	ELSE c.column_name END AS "geomField",
+	CASE WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
+	ELSE st.addparam->>'pkey' END AS "tableId", st.style_id 
+	FROM sys_table st
 	join config_typevalue ct ON ct.id= context
 	left join information_schema.columns c on st.id =c.table_name and udt_name='geometry' and c.table_schema='SCHEMA_NAME'
 	left join information_schema.columns i on st.id =i.table_name and i.ordinal_position=1 and i.table_schema='SCHEMA_NAME'
 	WHERE typevalue = 'sys_table_context'
 	ORDER BY  json_extract_path_text(camelstyle::json,'orderBy')::integer,orderby, alias)d into v_fields_array;
-
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
