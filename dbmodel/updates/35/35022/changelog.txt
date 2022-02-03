@@ -5,3 +5,4 @@
 - Don't show PLANIFIED on selector_state but allow role_basic on selector_psector tab
 - New edit filtered view for timeseries and patterns in ud
 - Views related to curves, patterns and timeseries filtered by exploitation instead of sector
+- New field addparam on sys_table

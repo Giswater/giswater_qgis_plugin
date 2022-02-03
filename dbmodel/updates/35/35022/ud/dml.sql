@@ -159,3 +159,50 @@ UPDATE sys_table SET alias = 'Inflow Dscenario' WHERE id = 'v_edit_inp_dscenario
 UPDATE sys_table SET alias = 'Raingage Dscenario' WHERE id = 'v_edit_inp_dscenario_raingage';
 UPDATE sys_table SET alias = 'Storage Dscenario' WHERE id = 'v_edit_inp_dscenario_storage';
 UPDATE sys_table SET alias = 'Outfall Dscenario' WHERE id = 'v_edit_inp_dscenario_outfall';
+
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_flwreg_weir', 'Editable view to manage scenario for weir', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 6 ,'Weir Dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_flwreg_pump', 'Editable view to manage scenario for pump', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 5 ,'Pump Dscenario', 'core') 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_flwreg_orifice', 'Editable view to manage scenario for orifice', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 3 ,'Orifice Dscenario', 'core') 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_flwreg_outlet', 'Editable view to manage scenario for outlet', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 4 ,'Outlet Dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_inflows_poll', 'Editable view to manage scenario for inflow pollutants', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 8 ,'Inflow pollutants Dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_dscenario_treatment', 'Editable view to manage scenario for treatment', 'role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 13 ,'Treatment Dscenario', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_inflows', 'Editable view to manage inflows', 'role_epa', '{"level_1":"EPA","level_2":"HYDRAULICS"}', 11 ,'Inp Inflows', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_inflows_poll', 'Editable view to manage inflow pollutants', 'role_epa', '{"level_1":"EPA","level_2":"HYDRAULICS"}', 12 ,'Inflow Pollutants', 'core')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_inp_treatment', 'Editable view to manage treatments', 'role_epa', '{"level_1":"EPA","level_2":"HYDRAULICS"}', 16 ,'Treatment', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_table SET context=NULL, orderby=NULL, alias=NULL WHERE id='inp_inflows';
+
+update sys_table set orderby=13 where id='v_edit_inp_dwf';
+update sys_table set orderby=14 where id='inp_transects_value';
+update sys_table set orderby=15 where id='v_edit_inp_controls';
+
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id"}' WHERE id IN ('v_edit_inp_dscenario_inflows','v_edit_inp_dscenario_junction', 'v_edit_inp_dscenario_outfall',
+'v_edit_inp_dscenario_storage', 'v_edit_inp_dwf');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, nodarc_id"}' WHERE id IN ('v_edit_inp_dscenario_flwreg_orifice', 'v_edit_inp_dscenario_flwreg_outlet', 'v_edit_inp_dscenario_flwreg_pump',
+'v_edit_inp_dscenario_flwreg_weir');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, arc_id"}' WHERE id IN ('v_edit_inp_dscenario_conduit','');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, rg_id"}' WHERE id IN ('v_edit_inp_dscenario_raingage');
+UPDATE sys_table SET addparam='{"pkey":"hydrology_id, subc_id"}' WHERE id IN ('v_edit_inp_subcatchment');
+UPDATE sys_table SET addparam='{"pkey":"node_id, poll_id"}' WHERE id IN ('v_edit_inp_inflows_poll','v_edit_inp_treatment');
+
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id, poll_id"}' WHERE id IN ('v_edit_inp_dscenario_treatment', 'v_edit_inp_dscenario_inflows_poll');
+UPDATE sys_table SET addparam='{"pkey":"hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_lid_usage');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_dscenario_lid_usage');

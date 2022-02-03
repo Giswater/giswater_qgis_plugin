@@ -2423,3 +2423,12 @@ VALUES ('v_edit_inp_pump_additional', 'View to edit additional pumps','role_epa'
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_table SET context = null, orderby=null where id = 'inp_pump_additional';
+
+--2022/02/03
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, connec_id"}' WHERE id IN ('v_edit_inp_dscenario_connec');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id"}' WHERE id IN ('v_edit_inp_dscenario_inlet','v_edit_inp_dscenario_junction', 
+'v_edit_inp_dscenario_pump', 'v_edit_inp_dscenario_reservoir', 'v_edit_inp_dscenario_shortpipe', 'v_edit_inp_dscenario_tank', 'v_edit_inp_dscenario_valve');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, arc_id"}' WHERE id IN ('v_edit_inp_dscenario_pipe','v_edit_inp_dscenario_virtualvalve');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, feature_id"}' WHERE id IN ('v_edit_inp_dscenario_demand');
+UPDATE sys_table SET addparam='{"pkey":"node_id, order_id"}' WHERE id IN ('v_edit_inp_pump_additional');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id, order_id"}' WHERE id IN ('v_edit_inp_dscenario_pump_additional');

@@ -11,4 +11,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pattern", "column":"sector_id", "newName":"expl_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_curve", "column":"sector_id", "newName":"expl_id"}}$$);
 
-ALTER TABLE cat_soil ALTER COLUMN y_param SET DEFAULT 1;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_table", "column":"addparam", "dataType":"json", "isUtils":"True"}}$$);
