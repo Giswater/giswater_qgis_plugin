@@ -15,3 +15,7 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_pattern('inp_pattern');
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_pattern ON v_edit_inp_pattern_value;
 CREATE TRIGGER gw_trg_edit_inp_pattern INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pattern_value
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_pattern('inp_pattern_value');
+
+CREATE TRIGGER gw_trg_edit_inp_pump_additional INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pump_additional
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump_additional');
+

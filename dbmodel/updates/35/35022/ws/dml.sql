@@ -2432,3 +2432,13 @@ UPDATE sys_table SET addparam='{"pkey":"dscenario_id, arc_id"}' WHERE id IN ('v_
 UPDATE sys_table SET addparam='{"pkey":"dscenario_id, feature_id"}' WHERE id IN ('v_edit_inp_dscenario_demand');
 UPDATE sys_table SET addparam='{"pkey":"node_id, order_id"}' WHERE id IN ('v_edit_inp_pump_additional');
 UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id, order_id"}' WHERE id IN ('v_edit_inp_dscenario_pump_additional');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_pump_additional', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='inp_pump_additional' 
+AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern', 'status')
+ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
