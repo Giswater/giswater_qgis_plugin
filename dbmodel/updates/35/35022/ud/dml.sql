@@ -148,11 +148,11 @@ UPDATE sys_table SET id='inp_dscenario_inflows_poll' WHERE id='inp_dscenario_inf
 
 INSERT INTO sys_table(id, descript, sys_role, context, orderby, alias, source)
 VALUES ('v_edit_inp_dscenario_lid_usage', 'View to edit dscenario for lids','role_epa', '{"level_1":"EPA","level_2":"DSCENARIO"}', 13, 
-'Lid dscenario', 'core')
+'Lid Dscenario', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, alias, source)
-VALUES ('inp_dscenario_lid_usage', 'Table to manage dscenario for lids','role_epa', 'Lid dscenario', 'core')
+VALUES ('inp_dscenario_lid_usage', 'Table to manage dscenario for lids','role_epa', 'Lid Dscenario', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_table SET alias = 'Inflow Dscenario' WHERE id = 'v_edit_inp_dscenario_inflows';
@@ -206,3 +206,21 @@ UPDATE sys_table SET addparam='{"pkey":"node_id, poll_id"}' WHERE id IN ('v_edit
 UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id, poll_id"}' WHERE id IN ('v_edit_inp_dscenario_treatment', 'v_edit_inp_dscenario_inflows_poll');
 UPDATE sys_table SET addparam='{"pkey":"hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_lid_usage');
 UPDATE sys_table SET addparam='{"pkey":"dscenario_id, hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_dscenario_lid_usage');
+
+UPDATE config_form_fields SET columnname='numelem', label='numelem' WHERE columnname='number' AND formname='v_edit_inp_lid_usage';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_lid_usage', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_lid_usage'  ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_dscenario_lid_usage', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_dscenario_inflows' AND columnname='dscenario_id' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
