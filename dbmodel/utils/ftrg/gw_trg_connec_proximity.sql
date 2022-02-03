@@ -35,7 +35,8 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing connecs  
-		v_numConnecs:= (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
+		v_numConnecs:= (SELECT COUNT(*) FROM connec c WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) 
+			AND c.connec_id != NEW.connec_id AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
@@ -50,7 +51,9 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- Existing connecs  
-		v_numConnecs := (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
+		v_numConnecs := (SELECT COUNT(*) FROM connec c 
+		WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) AND c.connec_id != NEW.connec_id
+		AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));

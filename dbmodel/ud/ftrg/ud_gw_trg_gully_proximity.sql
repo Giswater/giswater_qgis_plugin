@@ -31,7 +31,8 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing gullys  
-		v_numConnecs:= (SELECT COUNT(*) FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom, v_gully_proximity) AND v_edit_gully.gully_id != NEW.gully_id);
+		v_numConnecs:= (SELECT COUNT(*) FROM gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
+		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
 		
 		-- Existing arc
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
@@ -45,8 +46,9 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		-- Existing gullys  
-		v_numConnecs := (SELECT COUNT(*) FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom, v_gully_proximity) AND v_edit_gully.gully_id != NEW.gully_id);
-		
+		v_numConnecs :=  (SELECT COUNT(*) FROM gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
+		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
+
 		-- Existing arc
 		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
 		IF v_arc IS NOT NULL THEN
