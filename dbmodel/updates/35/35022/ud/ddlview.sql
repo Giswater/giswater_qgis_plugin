@@ -218,6 +218,20 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_lid_usage AS
      JOIN v_edit_inp_subcatchment s USING (subc_id)
   WHERE s.hydrology_id = l.hydrology_id;
 
-
-
-  
+DROP VIEW v_edit_inp_lid_usage;
+CREATE OR REPLACE VIEW v_edit_inp_lid_usage AS 
+ SELECT l.hydrology_id,
+    l.subc_id,
+    l.lidco_id,
+    l.numelem,
+    l.area,
+    l.width,
+    l.initsat,
+    l.fromimp,
+    l.toperv,
+    l.rptfile,
+    l.descript,
+    s.the_geom
+FROM inp_lid_usage l
+JOIN v_edit_inp_subcatchment s USING (subc_id)
+WHERE s.hydrology_id = l.hydrology_id;

@@ -7,3 +7,4 @@
 - Views related to curves, patterns and timeseries filtered by exploitation instead of sector
 - New field addparam on sys_table
 - Remove fields sys_sequence and sys_sequence_field from sys_table
+- UD: Rename field number to numelem on inp_lid_usage

@@ -27,3 +27,5 @@ CREATE TABLE inp_dscenario_lid_usage
   descript text,
   CONSTRAINT inp_dscenario_lid_usage_pkey 
   PRIMARY KEY (dscenario_id, hydrology_id, subc_id, lidco_id));
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_lid_usage", "column":"number", "newName":"numelem"}}$$);

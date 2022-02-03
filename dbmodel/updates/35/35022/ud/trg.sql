@@ -52,3 +52,7 @@ DROP TRIGGER IF EXISTS  gw_trg_edit_inp_dscenario ON v_edit_inp_dscenario_lid_us
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_lid_usage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('LID-USAGE');
 
+DROP TRIGGER IF EXISTS  gw_trg_edit_inp_lid_usage ON v_edit_inp_lid_usage;
+CREATE TRIGGER gw_trg_edit_inp_lid_usage INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_lid_usage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_lid_usage();
+
