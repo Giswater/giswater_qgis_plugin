@@ -29,7 +29,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, QgsProviderRegistry
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -517,43 +517,52 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     """
 
     tablename_og = tablename
-    uri = tools_db.get_uri()
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
-
+    uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-    if alias:
-        tablename = alias
-    vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-    tools_qt.add_layer_to_toc(vlayer, group, sub_group)
-    # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-    # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-    # therefore, we define it with "-1"
 
-    if style_id in (None, "-1"):
-        # Get style_id from tablename
-        sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
-        row = tools_db.get_row(sql)
-        if row:
-            style_id = row[0]
+    if the_geom == "rast":
+        connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
+                     f"user={global_vars.dao_db_credentials['user']} password={global_vars.dao_db_credentials['password']} " \
+                     f"port={global_vars.dao_db_credentials['port']} mode=2 schema={global_vars.dao_db_credentials['schema']} " \
+                     f"column={the_geom} table={tablename}"
+        if alias: tablename = alias
+        layer = QgsRasterLayer(connString, tablename)
+        tools_qt.add_layer_to_toc(layer, group, sub_group)
 
-    # Apply style to layer if it has one configured
-    if style_id not in (None, "-1"):
-        body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-        style = execute_procedure('gw_fct_getstyle', body)
-        if style is None or style['status'] == 'Failed':
-            return
-        if 'styles' in style['body']:
-            if 'style' in style['body']['styles']:
-                qml = style['body']['styles']['style']
-                tools_qgis.create_qml(vlayer, qml)
+    else:
+        if alias: tablename = alias
+        layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
+        tools_qt.add_layer_to_toc(layer, group, sub_group)
 
-    # Set layer config
-    if tablename:
-        feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
-        extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
-        body = create_body(feature=feature, extras=extras)
-        json_result = execute_procedure('gw_fct_getinfofromid', body)
-        config_layer_attributes(json_result, vlayer, alias)
+        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
+        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
+        # therefore, we define it with "-1"
+        if style_id in (None, "-1"):
+            # Get style_id from tablename
+            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
+            row = tools_db.get_row(sql)
+            if row:
+                style_id = row[0]
+
+        # Apply style to layer if it has one configured
+        if style_id not in (None, "-1"):
+            body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+            style = execute_procedure('gw_fct_getstyle', body)
+            if style is None or style['status'] == 'Failed':
+                return
+            if 'styles' in style['body']:
+                if 'style' in style['body']['styles']:
+                    qml = style['body']['styles']['style']
+                    tools_qgis.create_qml(layer, qml)
+
+            # Set layer config
+            if tablename:
+                feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
+                extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+                body = create_body(feature=feature, extras=extras)
+                json_result = execute_procedure('gw_fct_getinfofromid', body)
+                config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 

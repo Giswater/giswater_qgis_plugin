@@ -332,7 +332,9 @@ def get_layer_source_table_name(layer):
     total = len(uri)
     pos_end_schema = uri.rfind('.')
     pos_fi = uri.find('" ')
-    if pos_ini != -1 and pos_fi != -1:
+    if uri.find('pg:') != -1:
+        uri_table = uri[pos_ini + 6:total]
+    elif pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
     else:
         uri_table = uri[pos_end_schema + 2:total - 1]
