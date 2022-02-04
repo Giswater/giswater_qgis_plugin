@@ -647,6 +647,42 @@ def _manage_document_new(doc, **kwargs):
     tools_qt.set_widget_text(dialog,  f"{tab_name}_{func_params['sourcewidget']}", doc.doc_id)
     add_object(**kwargs)
 
+
+def _reload_table(**kwargs):
+    """ Get inserted element_id and add it to current feature """
+    dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+
+    list_tables = dialog.tab_main.widget(index_tab).findChildren(QTableView)
+    complet_result = kwargs['complet_result']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+    widget_list = []
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+
+    for table in list_tables:
+        widgetname = table.objectName()
+        columnname = table.property('columnname')
+        if columnname is None:
+            msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
+            tools_qgis.show_info(msg, 1)
+            continue
+
+        # Get value from filter widgets
+        filter_fields = get_filter_qtableview(dialog, widget_list)
+
+        # if tab dont have any filter widget
+        if filter_fields in ('', None):
+            filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
+
+        linkedobject = table.property('linkedobject')
+        complet_list, widget_list = fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
+        if complet_list is False:
+            return False
+
 # endregion
 
 

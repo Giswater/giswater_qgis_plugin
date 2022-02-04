@@ -1742,7 +1742,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-        widget = tools_gw.add_calendar(dialog, field)
+        widget = tools_gw.add_calendar(dialog, field, **kwargs)
         widget = self._set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
 

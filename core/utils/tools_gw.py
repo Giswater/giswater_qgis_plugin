@@ -1556,8 +1556,9 @@ def add_hyperlink(field):
     return widget
 
 
-def add_calendar(dialog, field):
+def add_calendar(dialog, field, **kwargs):
 
+    module = tools_backend_calls
     widget = QgsDateTimeEdit()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1574,13 +1575,32 @@ def add_calendar(dialog, field):
         widget.clear()
 
     real_name = widget.objectName()
-    if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
-        func_name = field['widgetfunction']['functionName']
-        exist = tools_os.check_python_function(tools_backend_calls, func_name)
-        if not exist:
-            msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
-            tools_qgis.show_message(msg, 2)
-            return widget
+
+    function_name = None
+    func_params = ""
+    if 'widgetfunction' in field:
+        if 'module' in field['widgetfunction']:
+            module = globals()[field['widgetfunction']['module']]
+        if 'functionName' in field['widgetfunction']:
+            if field['widgetfunction']['functionName']:
+                function_name = field['widgetfunction']['functionName']
+                exist = tools_os.check_python_function(module, function_name)
+                if not exist:
+                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+                if 'parameters' in field['widgetfunction']:
+                    func_params = field['widgetfunction']['parameters']
+            else:
+                message = "Parameter button_function is null for button"
+                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+    kwargs['widget'] = widget
+    kwargs['message_level'] = 1
+    kwargs['function_name'] = function_name
+    kwargs['func_params'] = func_params
+    if function_name:
+        widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     btn_calendar = widget.findChild(QToolButton)
     btn_calendar.clicked.connect(partial(tools_qt.set_calendar_empty, widget))
