@@ -14,7 +14,7 @@ from functools import partial
 
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings, QRegularExpression
 from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
@@ -3089,7 +3089,7 @@ class GwInfo(QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
+        tab_name = self.tab_main.widget(index_tab).findChildren(QGridLayout)[1].objectName().replace('lyt_', "")[:-2]
         complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
 
         if complet_list is False:
@@ -3105,9 +3105,10 @@ class GwInfo(QObject):
             tools_qt.set_tableview_config(widget)
 
         widget_list = []
-        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
         return complet_list, widget_list
 
         "***********************OLD CODE ************************************"
@@ -3160,6 +3161,7 @@ class GwInfo(QObject):
            module = tools_backend_calls -> def open_rpt_result(**kwargs)
                                         -> def filter_table(self, **kwargs)
          """
+
         model = None
         for widget in widget_list:
             if type(widget) is QTableView:
@@ -3172,8 +3174,10 @@ class GwInfo(QObject):
         for widget in widget_list:
             if widget.property('isfilter') is not True: continue
             widgetfunction = False
+            func_params = None
             if widget.property('widgetfunction') is not None and 'functionName' in widget.property('widgetfunction'):
                 widgetfunction = widget.property('widgetfunction')['functionName']
+                func_params = widget.property('widgetfunction').get('parameters')
             if widgetfunction is False: continue
 
             linkedobject = ""
@@ -3182,7 +3186,7 @@ class GwInfo(QObject):
 
             kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "linkedobject": linkedobject,
                       "columnname": columnname, "widget": widget, "widgetname": widgetname, "widget_list": widget_list,
-                      "feature_id": self.feature_id}
+                      "feature_id": self.feature_id, "func_params": func_params}
             if type(widget) is QLineEdit:
                 widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
             elif type(widget) is QComboBox:
@@ -4004,6 +4008,50 @@ def _open_file(dlg_event_full):
     status, message = tools_os.open_file(path)
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=path)
+
+# endregion
+
+# region Tab document
+
+
+def set_filter_table_man(**kwargs):
+    """ Get values selected by the user and sets a new filter for its table model """
+
+    dialog = kwargs['dialog']
+    func_params = kwargs['func_params']
+    qtable = dialog.findChild(QTableView, func_params['targetwidget'])
+    date_document_from = dialog.findChild(QgsDateTimeEdit, "document_date_from")
+    date_document_to = dialog.findChild(QgsDateTimeEdit, "document_date_to")
+
+    field_id = str(kwargs['complet_result']['body']['feature']['idName'])
+    feature_id = kwargs['complet_result']['body']['feature']['id']
+
+    # Get selected dates
+    date_from = date_document_from.date()
+    date_to = date_document_to.date()
+    if date_from > date_to:
+        message = "Selected date interval is not valid"
+        tools_qgis.show_warning(message)
+        return
+
+    # Create interval dates
+    format_low = 'yyyy-MM-dd 00:00:00.000'
+    format_high = 'yyyy-MM-dd 23:59:59.999'
+    interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
+
+    # Set filter
+    expr = f"{field_id} = '{feature_id}'"
+    expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
+
+    # Get selected values in Comboboxes
+    doc_type_widget = dialog.findChild(QComboBox, "document_doc_type")
+    doc_type_value = tools_qt.get_combo_value(dialog, doc_type_widget, 0)
+    if doc_type_value != 'null' and doc_type_value is not None:
+        expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
+
+    # Refresh model with selected filter
+    qtable.model().setFilter(expr)
+    qtable.model().select()
 
 # endregion
 

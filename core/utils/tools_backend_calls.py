@@ -239,7 +239,12 @@ def filter_table(**kwargs):
     widgetname = kwargs['widgetname']
     linkedobject = kwargs['linkedobject']
     feature_id = kwargs['feature_id']
-    filter_fields = get_filter_qtableview(dialog, widget_list)
+    func_params = kwargs.get('func_params')
+    colname = None
+    if func_params:
+        colname = func_params.get('columnfind')
+    print(f"{colname}")
+    filter_fields = get_filter_qtableview(dialog, widget_list, colname=colname)
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
@@ -593,12 +598,14 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     return complet_list, widget_list
 
 
-def get_filter_qtableview(dialog, widget_list):
+def get_filter_qtableview(dialog, widget_list, colname=None):
 
     filter_fields = ""
     for widget in widget_list:
         if widget.property('isfilter'):
-            columnname = widget.property('columnname')
+            columnname = colname
+            if columnname is None:
+                columnname = widget.property('columnname')
             filter_sign = "ILIKE"
             if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
                 if widget.property('widgetcontrols')['filterSign'] is not None:

@@ -1556,21 +1556,21 @@ def add_hyperlink(field):
     return widget
 
 
-def add_calendar(dialog, field, **kwargs):
+def add_calendar(dlg, fld, **kwargs):
 
     module = tools_backend_calls
     widget = QgsDateTimeEdit()
-    widget.setObjectName(field['widgetname'])
-    if 'widgetcontrols' in field and field['widgetcontrols']:
-        widget.setProperty('widgetcontrols', field['widgetcontrols'])
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
+    widget.setObjectName(fld['widgetname'])
+    if 'widgetcontrols' in fld and fld['widgetcontrols']:
+        widget.setProperty('widgetcontrols', fld['widgetcontrols'])
+    if 'columnname' in fld:
+        widget.setProperty('columnname', fld['columnname'])
     widget.setAllowNull(True)
     widget.setCalendarPopup(True)
     widget.setDisplayFormat('dd/MM/yyyy')
-    if 'value' in field and field['value'] not in ('', None, 'null'):
-        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
-        tools_qt.set_calendar(dialog, widget, date)
+    if 'value' in fld and fld['value'] not in ('', None, 'null'):
+        date = QDate.fromString(fld['value'].replace('/', '-'), 'yyyy-MM-dd')
+        tools_qt.set_calendar(dlg, widget, date)
     else:
         widget.clear()
 
@@ -1578,19 +1578,19 @@ def add_calendar(dialog, field, **kwargs):
 
     function_name = None
     func_params = ""
-    if 'widgetfunction' in field:
-        if 'module' in field['widgetfunction']:
-            module = globals()[field['widgetfunction']['module']]
-        if 'functionName' in field['widgetfunction']:
-            if field['widgetfunction']['functionName']:
-                function_name = field['widgetfunction']['functionName']
+    if 'widgetfunction' in fld:
+        if 'module' in fld['widgetfunction']:
+            module = globals()[fld['widgetfunction']['module']]
+        if 'functionName' in fld['widgetfunction']:
+            if fld['widgetfunction']['functionName']:
+                function_name = fld['widgetfunction']['functionName']
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
                     msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                     tools_qgis.show_message(msg, 2)
                     return widget
-                if 'parameters' in field['widgetfunction']:
-                    func_params = field['widgetfunction']['parameters']
+                if 'parameters' in fld['widgetfunction']:
+                    func_params = fld['widgetfunction']['parameters']
             else:
                 message = "Parameter button_function is null for button"
                 tools_qgis.show_message(message, 2, parameter=widget.objectName())
@@ -1599,8 +1599,8 @@ def add_calendar(dialog, field, **kwargs):
     kwargs['message_level'] = 1
     kwargs['function_name'] = function_name
     kwargs['func_params'] = func_params
-    if function_name:
-        widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
+    # if function_name:
+    #     widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     btn_calendar = widget.findChild(QToolButton)
     btn_calendar.clicked.connect(partial(tools_qt.set_calendar_empty, widget))
@@ -1749,8 +1749,9 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field):
+def add_combo(field, **kwargs):
 
+    module = tools_backend_calls
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1767,6 +1768,34 @@ def add_combo(field):
         widget.setEnabled(bool(field['iseditable']))
         if not field['iseditable']:
             widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    real_name = widget.objectName()
+    function_name = None
+    func_params = ""
+    if 'widgetfunction' in field:
+        if 'module' in field['widgetfunction']:
+            module = globals()[field['widgetfunction']['module']]
+        if 'functionName' in field['widgetfunction']:
+            if field['widgetfunction']['functionName']:
+                function_name = field['widgetfunction']['functionName']
+                exist = tools_os.check_python_function(module, function_name)
+                if not exist:
+                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+                if 'parameters' in field['widgetfunction']:
+                    func_params = field['widgetfunction']['parameters']
+            else:
+                message = "Parameter button_function is null for button"
+                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+    kwargs['widget'] = widget
+    kwargs['message_level'] = 1
+    kwargs['function_name'] = function_name
+    kwargs['func_params'] = func_params
+    if function_name:
+        widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+
     return widget
 
 
