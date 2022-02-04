@@ -37,3 +37,11 @@ UPDATE config_form_tabs SET sys_role='role_basic' WHERE formname='selector_basic
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
 VALUES (3132, 'gw_trg_edit_inp_timeseries', 'ud', 'function trigger', NULL, NULL, 'Allows editing inp timeseries view', 'role_epa', NULL, 'core');
+
+UPDATE inp_pattern SET expl_id = a.expl_id FROM arc a WHERE inp_pattern.expl_id=a.sector_id;
+UPDATE inp_curve SET expl_id = a.expl_id FROM arc a WHERE inp_curve.expl_id=a.sector_id;
+
+ALTER TABLE inp_pattern ADD CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

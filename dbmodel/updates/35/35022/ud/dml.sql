@@ -224,3 +224,8 @@ SELECT 'v_edit_inp_dscenario_lid_usage', formtype, tabname, columnname, layoutna
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname ='v_edit_inp_dscenario_inflows' AND columnname='dscenario_id' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE inp_timeseries SET expl_id = a.expl_id FROM arc a WHERE inp_timeseries.expl_id=a.sector_id;
+
+ALTER TABLE inp_timeseries ADD CONSTRAINT inp_timeseries_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
