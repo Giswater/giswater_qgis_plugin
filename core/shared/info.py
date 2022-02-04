@@ -2853,104 +2853,6 @@ class GwInfo(QObject):
         self._set_filter_table_event(widget)
 
 
-    def _open_visit_event(self):
-        """ Open event of selected record of the table """
-        # TODO: DELETE THIS
-        # Open dialog event_standard
-        self.dlg_event_full = GwVisitEventFullUi()
-        tools_gw.load_settings(self.dlg_event_full)
-        self.dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
-        # Get all data for one visit
-        sql = (f"SELECT * FROM om_visit_event"
-               f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}';")
-        row = tools_db.get_row(sql)
-        if not row:
-            return
-
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.id, row['id'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value, row['value'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.text, row['text'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
-        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
-        self._populate_tbl_docs_x_event()
-
-        # Set all QLineEdit readOnly(True)
-
-        widget_list = self.dlg_event_full.findChildren(QTextEdit)
-        aux = self.dlg_event_full.findChildren(QLineEdit)
-        for w in aux:
-            widget_list.append(w)
-        for widget in widget_list:
-            widget.setReadOnly(True)
-            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
-                                 " color: rgb(100, 100, 100)}")
-        self.dlg_event_full.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
-        self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self._open_file)
-        tools_qt.set_tableview_config(self.dlg_event_full.tbl_docs_x_event)
-        tools_gw.open_dialog(self.dlg_event_full, 'visit_event_full')
-
-
-    def _populate_tbl_docs_x_event(self):
-        # TODO: DELETE THIS
-        # Create and set model
-        model = QStandardItemModel()
-        self.dlg_event_full.tbl_docs_x_event.setModel(model)
-        self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-        self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
-        # Get columns name and set headers of model with that
-        columns_name = tools_db.get_columns_list('om_visit_event_photo')
-        headers = []
-        for x in columns_name:
-            headers.append(x[0])
-        headers = ['value', 'filetype', 'fextension']
-        model.setHorizontalHeaderLabels(headers)
-
-        # Get values in order to populate model
-        sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
-               f"WHERE visit_id='{self.visit_id}' AND event_id='{self.event_id}'")
-        rows = tools_db.get_rows(sql)
-        if rows is None:
-            return
-
-        for row in rows:
-            item = []
-            for value in row:
-                if value is not None:
-                    if type(value) != str:
-                        item.append(QStandardItem(str(value)))
-                    else:
-                        item.append(QStandardItem(value))
-                else:
-                    item.append(QStandardItem(None))
-            if len(row) > 0:
-                model.appendRow(item)
-
-
-    def _open_file(self):
-        # TODO: DELETE THIS
-        # Get row index
-        index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = tools_qt.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
-        path = index.sibling(index.row(), column_index).data()
-        status, message = tools_os.open_file(path)
-        if status is False and message is not None:
-            tools_qgis.show_warning(message, parameter=path)
-
-
     def _tbl_event_clicked(self, table_name):
 
         # Enable/Disable buttons
@@ -3077,79 +2979,6 @@ class GwInfo(QObject):
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
         manage_visit.manage_visits(self.feature_type, self.feature_id)
-
-
-    def _update_visit_table(self):
-        """ Convenience fuction set as slot to update table after a Visit GUI close. """
-        table_name = "v_ui_event_x_" + self.feature_type
-        tools_gw.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
-        self.tbl_event_cf.model().select()
-
-
-    def _new_visit(self):
-        """ Call button 64: om_add_visit """
-
-        # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = tools_qt.get_combo_value(self.dlg_cf, self.tab_type + '_expl_id', 0)
-        if expl_id == -1:
-            msg = "Widget expl_id not found"
-            tools_qgis.show_warning(msg)
-            return
-
-        manage_visit = GwVisit()
-        manage_visit.visit_added.connect(self._update_visit_table)
-        # TODO: the following query fix a (for me) misterious bug
-        # the DB connection is not available during manage_visit.manage_visit first call
-        # so the workaroud is to do a unuseful query to have the dao active
-        sql = "SELECT id FROM om_visit LIMIT 1;"
-        tools_db.get_rows(sql)
-        manage_visit.get_visit(feature_type=self.feature_type, feature_id=self.feature_id, expl_id=expl_id,
-                               is_new_from_cf=True)
-
-
-    def _open_gallery(self):
-        """ Open gallery of selected record of the table """
-
-        # Open Gallery
-        gal = GwVisitGallery()
-        gal.manage_gallery()
-        gal.fill_gallery(self.visit_id, self.event_id)
-
-
-    def _open_selected_doc(self):
-
-        # Selected item from list
-        if self.tbl_list_doc.currentItem() is None:
-            msg = "No document selected."
-            tools_qgis.show_message(msg, 1)
-            return
-
-        selected_document = self.tbl_list_doc.currentItem().text()
-
-        # Get path of selected document
-        sql = (f"SELECT path FROM v_ui_doc"
-               f" WHERE id = '{selected_document}'")
-        row = tools_db.get_row(sql)
-        if not row:
-            return
-
-        path = str(row[0])
-
-        # Parse a URL into components
-        url = parse.urlsplit(path)
-
-        # Open selected document
-        # Check if path is URL
-        if url.scheme == "http" or url.scheme == "https":
-            webbrowser.open(path)
-        else:
-            if not os.path.exists(path):
-                message = "File not found"
-                tools_qgis.show_warning(message, parameter=path)
-            else:
-                status, message = tools_os.open_file(path)
-                if status is False and message is not None:
-                    tools_qgis.show_warning(message, parameter=path)
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
@@ -3725,6 +3554,8 @@ class GwInfo(QObject):
     # endregion
 # region Static functions used by the widgets in the custom form
 
+# region Tab relation
+
 
 def open_selected_feature(**kwargs):
     """
@@ -3757,134 +3588,9 @@ def open_selected_feature(**kwargs):
         tools_log.log_info("FAIL open_selected_feature")
         return
 
+# endregion
 
-def open_visit_event(**kwargs):
-    """
-    Open event of selected record of the table
-        Function called in:
-            def add_button(**kwargs) -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
-            def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
-                                        widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-    """
-
-    dialog = kwargs['dialog']
-    func_params = kwargs['func_params']
-    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
-    complet_result = kwargs['complet_result']
-
-    # Get selected rows
-    selected_list = qtable.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
-        return
-
-    index = selected_list[0]
-    row = index.row()
-    ids = {}
-    i = 0
-    for col in func_params['columnfind']:
-        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'][i])
-        ids[col] = index.sibling(row, column_index).data()
-        i += 1
-    visit_id = ids['visit_id']
-    event_id = ids['event_id']
-
-    # Open dialog event_standard
-    dlg_event_full = GwVisitEventFullUi()
-    tools_gw.load_settings(dlg_event_full)
-    dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, dlg_event_full))
-    # Get all data for one visit
-    sql = (f"SELECT * FROM om_visit_event"
-           f" WHERE id = '{event_id}' AND visit_id = '{visit_id}';")
-    row = tools_db.get_row(sql)
-    if not row:
-        return
-
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.id, row['id'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.event_code, row['event_code'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.visit_id, row['visit_id'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.position_id, row['position_id'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.position_value, row['position_value'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.parameter_id, row['parameter_id'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value, row['value'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value1, row['value1'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value2, row['value2'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom1, row['geom1'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom2, row['geom2'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom3, row['geom3'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.xcoord, row['xcoord'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.ycoord, row['ycoord'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.compass, row['compass'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.tstamp, row['tstamp'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.text, row['text'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.index_val, row['index_val'])
-    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.is_last, row['is_last'])
-    _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id)
-
-    # Set all QLineEdit readOnly(True)
-
-    widget_list = dlg_event_full.findChildren(QTextEdit)
-    aux = dlg_event_full.findChildren(QLineEdit)
-    for w in aux:
-        widget_list.append(w)
-    for widget in widget_list:
-        widget.setReadOnly(True)
-        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
-                             " color: rgb(100, 100, 100)}")
-    dlg_event_full.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_event_full))
-    dlg_event_full.tbl_docs_x_event.doubleClicked.connect(partial(_open_file, dlg_event_full))
-    tools_qt.set_tableview_config(dlg_event_full.tbl_docs_x_event)
-    tools_gw.open_dialog(dlg_event_full, 'visit_event_full')
-
-
-def _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id):
-
-    # Create and set model
-    model = QStandardItemModel()
-    dlg_event_full.tbl_docs_x_event.setModel(model)
-    dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
-    # Get columns name and set headers of model with that
-    columns_name = tools_db.get_columns_list('om_visit_event_photo')
-    headers = []
-    for x in columns_name:
-        headers.append(x[0])
-    headers = ['value', 'filetype', 'fextension']
-    model.setHorizontalHeaderLabels(headers)
-
-    # Get values in order to populate model
-    sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
-           f"WHERE visit_id='{visit_id}' AND event_id='{event_id}'")
-    rows = tools_db.get_rows(sql)
-    if rows is None:
-        return
-
-    for row in rows:
-        item = []
-        for value in row:
-            if value is not None:
-                if type(value) != str:
-                    item.append(QStandardItem(str(value)))
-                else:
-                    item.append(QStandardItem(value))
-            else:
-                item.append(QStandardItem(None))
-        if len(row) > 0:
-            model.appendRow(item)
-
-
-def _open_file(dlg_event_full):
-
-    # Get row index
-    index = dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
-    column_index = tools_qt.get_col_index_by_col_name(dlg_event_full.tbl_docs_x_event, 'value')
-    path = index.sibling(index.row(), column_index).data()
-    status, message = tools_os.open_file(path)
-    if status is False and message is not None:
-        tools_qgis.show_warning(message, parameter=path)
-
-# region element
+# region Tab element
 
 
 def open_selected_element(**kwargs):
@@ -3993,7 +3699,41 @@ def _reload_table(**kwargs):
 
 # endregion
 
-# region event
+# region Tab event
+
+
+def new_visit(**kwargs):
+    """ Call button 64: om_add_visit """
+
+    dlg_cf = kwargs['dialog']
+    feature_type = kwargs['complet_result']['body']['feature']['childType']
+    feature_id = kwargs['complet_result']['body']['feature']['id']
+    # Get expl_id to save it on om_visit and show the geometry of visit
+    expl_id = tools_qt.get_combo_value(dlg_cf, 'data_expl_id', 0)
+    if expl_id == -1:
+        msg = "Widget expl_id not found"
+        tools_qgis.show_warning(msg)
+        return
+
+    date_event_from = dlg_cf.findChild(QDateEdit, "date_event_from")
+    date_event_to = dlg_cf.findChild(QDateEdit, "date_event_to")
+    tbl_event_cf = dlg_cf.findChild(QTableView, "tbl_event_cf")
+    manage_visit = GwVisit()
+    manage_visit.visit_added.connect(partial(_update_visit_table, feature_type, date_event_from, date_event_to, tbl_event_cf))
+    # TODO: the following query fix a (for me) misterious bug
+    # the DB connection is not available during manage_visit.manage_visit first call
+    # so the workaroud is to do a unuseful query to have the dao active
+    sql = "SELECT id FROM om_visit LIMIT 1;"
+    tools_db.get_rows(sql)
+    manage_visit.get_visit(feature_type=feature_type, feature_id=feature_id, expl_id=expl_id,
+                           is_new_from_cf=True)
+
+
+def _update_visit_table(feature_type, date_event_from, date_event_to, tbl_event_cf):
+    """ Convenience fuction set as slot to update table after a Visit GUI close. """
+    table_name = "v_ui_event_x_" + feature_type
+    tools_gw.set_dates_from_to(date_event_from, date_event_to, table_name, 'visit_start', 'visit_end')
+    tbl_event_cf.model().select()
 
 
 def open_visit_document(**kwargs):
@@ -4137,6 +3877,133 @@ def open_gallery(**kwargs):
     gal = GwVisitGallery()
     gal.manage_gallery()
     gal.fill_gallery(visit_id, event_id)
+
+
+def open_visit_event(**kwargs):
+    """
+    Open event of selected record of the table
+        Function called in:
+            def add_button(**kwargs) -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+            def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
+                                        widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """
+
+    dialog = kwargs['dialog']
+    func_params = kwargs['func_params']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
+    complet_result = kwargs['complet_result']
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    ids = {}
+    i = 0
+    for col in func_params['columnfind']:
+        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'][i])
+        ids[col] = index.sibling(row, column_index).data()
+        i += 1
+    visit_id = ids['visit_id']
+    event_id = ids['event_id']
+
+    # Open dialog event_standard
+    dlg_event_full = GwVisitEventFullUi()
+    tools_gw.load_settings(dlg_event_full)
+    dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, dlg_event_full))
+    # Get all data for one visit
+    sql = (f"SELECT * FROM om_visit_event"
+           f" WHERE id = '{event_id}' AND visit_id = '{visit_id}';")
+    row = tools_db.get_row(sql)
+    if not row:
+        return
+
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.id, row['id'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.event_code, row['event_code'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.visit_id, row['visit_id'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.position_id, row['position_id'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.position_value, row['position_value'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.parameter_id, row['parameter_id'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value, row['value'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value1, row['value1'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.value2, row['value2'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom1, row['geom1'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom2, row['geom2'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.geom3, row['geom3'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.xcoord, row['xcoord'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.ycoord, row['ycoord'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.compass, row['compass'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.tstamp, row['tstamp'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.text, row['text'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.index_val, row['index_val'])
+    tools_qt.set_widget_text(dlg_event_full, dlg_event_full.is_last, row['is_last'])
+    _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id)
+
+    # Set all QLineEdit readOnly(True)
+
+    widget_list = dlg_event_full.findChildren(QTextEdit)
+    aux = dlg_event_full.findChildren(QLineEdit)
+    for w in aux:
+        widget_list.append(w)
+    for widget in widget_list:
+        widget.setReadOnly(True)
+        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
+                             " color: rgb(100, 100, 100)}")
+    dlg_event_full.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_event_full))
+    dlg_event_full.tbl_docs_x_event.doubleClicked.connect(partial(_open_file, dlg_event_full))
+    tools_qt.set_tableview_config(dlg_event_full.tbl_docs_x_event)
+    tools_gw.open_dialog(dlg_event_full, 'visit_event_full')
+
+
+def _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id):
+
+    # Create and set model
+    model = QStandardItemModel()
+    dlg_event_full.tbl_docs_x_event.setModel(model)
+    dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
+    dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+    # Get columns name and set headers of model with that
+    columns_name = tools_db.get_columns_list('om_visit_event_photo')
+    headers = []
+    for x in columns_name:
+        headers.append(x[0])
+    headers = ['value', 'filetype', 'fextension']
+    model.setHorizontalHeaderLabels(headers)
+
+    # Get values in order to populate model
+    sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
+           f"WHERE visit_id='{visit_id}' AND event_id='{event_id}'")
+    rows = tools_db.get_rows(sql)
+    if rows is None:
+        return
+
+    for row in rows:
+        item = []
+        for value in row:
+            if value is not None:
+                if type(value) != str:
+                    item.append(QStandardItem(str(value)))
+                else:
+                    item.append(QStandardItem(value))
+            else:
+                item.append(QStandardItem(None))
+        if len(row) > 0:
+            model.appendRow(item)
+
+
+def _open_file(dlg_event_full):
+
+    # Get row index
+    index = dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
+    column_index = tools_qt.get_col_index_by_col_name(dlg_event_full.tbl_docs_x_event, 'value')
+    path = index.sibling(index.row(), column_index).data()
+    status, message = tools_os.open_file(path)
+    if status is False and message is not None:
+        tools_qgis.show_warning(message, parameter=path)
 
 # endregion
 
