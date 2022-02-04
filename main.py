@@ -271,7 +271,9 @@ class Giswater(QObject):
             tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
                                     'main', 'newProjectCreated')
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
-                                    'main', 'actionSaveProject')
+                                    'main', 'actionSaveProject_save_toolbars_position')
+            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self.save_project,
+                                    'main', 'actionSaveProject_save_project')
         except AttributeError:
             pass
 
@@ -383,6 +385,11 @@ class Giswater(QObject):
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+
+
+    def save_project(self):
+        project = QgsProject.instance()
+        project.write()
 
 
     def _remove_dockers(self):
