@@ -173,6 +173,7 @@ v_error boolean = false;
 v_nodemapzone text;
 rec_conflict record;
 v_valuefordisconnected integer;
+v_floodonlymapzone text;
 
 BEGIN
 	-- Search path
@@ -193,6 +194,8 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 
+
+	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_updatefeature = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
@@ -202,11 +205,11 @@ BEGIN
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
+	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-
 
 	-- data quality analysis
 	IF v_checkdata = 'FULL' THEN
@@ -341,6 +344,12 @@ BEGIN
 			DELETE FROM selector_psector WHERE cur_user=current_user;
 		END IF;
 
+		-- managing floodonlymapzne <-> floodfromnode
+		IF v_floodonlymapzone IS NOT NULL THEN
+			EXECUTE 'SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' FROM '||v_table||' WHERE '||v_field||'::text = '||v_floodonlymapzone||'::text LIMIT 1'
+			INTO v_floodfromnode;
+		END IF;	
+
 		-- start build log message
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 		IF upper(v_class) ='PRESSZONE' THEN
@@ -354,7 +363,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 		
 		IF v_floodfromnode IS NOT NULL THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood from mode is ENABLED. Graphic log (disconnected arcs & connecs) have been disabled. Used node:',v_floodfromnode,'.'));
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('''Flood from node'' or ''Flood only mapzone'' have been ACTIVATED. Graphic log have been disabled. Used node:',v_floodfromnode,'.'));
 		END IF;	
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 
@@ -536,7 +545,7 @@ BEGIN
 				-- reset water flag
 				UPDATE temp_anlgraf SET water=0;
 
-				raise notice '---------------- Feature_id % ', v_featureid;
+				raise notice '---------------- Feature_id % v_cont1 %', v_featureid, v_cont1;
 				
 				------------------
 				-- starting engine
@@ -681,54 +690,56 @@ BEGIN
 						WHERE connec.connec_id=a.connec_id;
 				END IF;
 
-				-- disconnected arcs
-				SELECT count(*) INTO v_count FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
-				ELSE
-					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: ', v_count ,' arc''s have been disconnected'));
-				END IF;
+				IF v_floodfromnode IS NULL THEN
 
-				-- disconnected connecs
-				SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
-				ELSE
-					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: ', v_count ,' connec''s have been disconnected'));
-				END IF;
+					-- disconnected arcs
+					SELECT count(*) INTO v_count FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
+					ELSE
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 1, concat('INFO: ', v_count ,' arc''s have been disconnected'));
+					END IF;
 
-				-- manage conflicts
-				FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
-				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz WHERE active is true)a
-				USING (node_id))a
-				WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
-				
-				LOOP						
-					-- update & count features
-					--arc
-					EXECUTE 'UPDATE arc t SET '||v_field||' = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
-					GET DIAGNOSTICS v_count1 = row_count;
+					-- disconnected connecs
+					SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+					ELSE
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 1, concat('INFO: ', v_count ,' connec''s have been disconnected'));
+					END IF;
 
-					-- node
-					EXECUTE 'UPDATE node t SET '||v_field||' = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
-
-					-- connec
-					EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
-					GET DIAGNOSTICS v_count = row_count;
-					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
-
-					-- log
-					EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
+					-- manage conflicts
+					FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
+					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz WHERE active is true)a
+					USING (node_id))a
+					WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
 					
-					-- update mapzone geometry
-					EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
-				END LOOP;
+					LOOP						
+						-- update & count features
+						--arc
+						EXECUTE 'UPDATE arc t SET '||v_field||' = -1 FROM v_edit_arc v WHERE t.arc_id = v.arc_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
+						GET DIAGNOSTICS v_count1 = row_count;
 
+						-- node
+						EXECUTE 'UPDATE node t SET '||v_field||' = -1 FROM v_edit_node v WHERE t.node_id = v.node_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
+
+						-- connec
+						EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
+						GET DIAGNOSTICS v_count = row_count;
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
+						VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
+
+						-- log
+						EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
+						
+						-- update mapzone geometry
+						EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
+					END LOOP;
+				END IF;
 			ELSE
 				-- message
 				INSERT INTO audit_check_data (fid, criticity, error_message)
