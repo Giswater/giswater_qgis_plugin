@@ -74,9 +74,9 @@ BEGIN
 			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM temp_arc
 			)z
 		) a
-	JOIN vu_arc arc USING (arc_id)
-	JOIN vu_node n1 ON node_1 = node_id
-	JOIN vu_node n2 ON node_2 = n2.node_id
+	JOIN v_arc arc USING (arc_id)
+	JOIN v_node n1 ON node_1 = node_id
+	JOIN v_node n2 ON node_2 = n2.node_id
 	ORDER BY arc_id, locate;
 
 	RAISE NOTICE 'new nodes on temp_node table ';
