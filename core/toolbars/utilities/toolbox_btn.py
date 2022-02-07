@@ -267,6 +267,10 @@ class GwToolBoxButton(GwAction):
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
                     widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
+                    if field['value'] is None:
+                        msg = "No results found. Please check values set on selector of state and exploitation"
+                        tools_qgis.show_warning(msg)
+                        return
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
 
