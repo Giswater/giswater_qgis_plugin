@@ -224,20 +224,20 @@ BEGIN
 			INSERT INTO inp_landuses (landus_id, sweepint, availab, lastsweep) VALUES (NEW.landus_id, NEW.sweepint, NEW.availab, NEW.lastsweep);
 			
 		ELSIF v_view='vi_coverages' THEN 
-			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
+			INSERT INTO inp_coverage(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
 			
-			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id, 1) ON CONFLICT  (landus_id, hydrology_id) DO NOTHING;
+			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id) ON CONFLICT  (landus_id) DO NOTHING;
 
 		ELSIF v_view='vi_buildup' THEN
-			INSERT INTO inp_buildup_land_x_pol(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
+			INSERT INTO inp_buildup(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
 			VALUES (NEW.landus_id, NEW.poll_id, NEW.funcb_type, NEW.c1, NEW.c2, NEW.c3, NEW.perunit);
 			
 		ELSIF v_view='vi_washoff' THEN
-			INSERT INTO inp_washoff_land_x_pol (landus_id, poll_id, funcw_type, c1, c2, sweepeffic, bmpeffic) 
+			INSERT INTO inp_washoff (landus_id, poll_id, funcw_type, c1, c2, sweepeffic, bmpeffic) 
 			VALUES (NEW.landus_id, NEW.poll_id, NEW.funcw_type, NEW.c1, NEW.c2, NEW.sweepeffic, NEW.bmpeffic);
 			
 		ELSIF v_view='vi_treatment' THEN
-			INSERT INTO inp_treatment_node_x_pol (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
+			INSERT INTO inp_treatment (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
 			
 		ELSIF v_view='vi_dwf' THEN
 		
@@ -267,14 +267,14 @@ BEGIN
 				INSERT INTO inp_inflows(node_id, timser_id, sfactor, base, pattern_id) VALUES (NEW.node_id,NEW.timser_id, NEW.sfactor,
 				NEW.base,NEW.pattern_id);
 			ELSE
-				INSERT INTO inp_inflows_pol_x_node (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
+				INSERT INTO inp_inflows_poll (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
 				SELECT NEW.node_id,NEW.timser_id, NEW.type_flow, inp_typevalue.id, NEW.mfactor,
 				NEW.sfactor,NEW.base,NEW.pattern_id
 				FROM inp_typevalue WHERE NEW.type=idval AND typevalue='inp_value_inflows';
 			END IF;	
 			
 		ELSIF v_view='vi_loadings' THEN
-			INSERT INTO inp_loadings_pol_x_subc (subc_id, poll_id, ibuildup, hydrology_id) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup, 1);
+			INSERT INTO inp_loadings (subc_id, poll_id, ibuildup, hydrology_id) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup, 1);
 			
 		ELSIF v_view='vi_rdii' THEN
 			INSERT INTO inp_rdii(node_id, hydro_id, sewerarea) VALUES (NEW.node_id, NEW.hydro_id, NEW.sewerarea);

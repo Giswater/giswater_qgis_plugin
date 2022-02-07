@@ -357,7 +357,7 @@ BEGIN
 
 			-- improve velocity for inflows using directly tables in spite of vi_inflows view
 			INSERT INTO inp_inflows(node_id, timser_id, sfactor, base, pattern_id) 
-			SELECT csv1, csv3, csv4::numeric, csv5::numeric, csv6
+			SELECT csv1, csv3, csv5::numeric, csv6::numeric,  csv7::numeric
 			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
 			AND csv2 = 'FLOW';
 
