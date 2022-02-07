@@ -45,3 +45,8 @@ ALTER TABLE inp_pattern ADD CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (exp
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- 07/02/2022
+UPDATE  config_report SET filterparam = '[{"columnname":"arccat_id", "label":"Arc catalog:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id","isNullValue":"true"},{"columnname":"expl_id", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"}]' WHERE id = 100;
