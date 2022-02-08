@@ -35,7 +35,7 @@ BEGIN
 		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
 		
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
 
 		-- If there is an arc
 		IF v_arc IS NOT NULL THEN
@@ -50,7 +50,7 @@ BEGIN
 		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
 		IF v_arc IS NOT NULL THEN
 			UPDATE gully SET pjoint_type = 'GULLY', pjoint_id = NEW.gully_id, arc_id = v_arc WHERE gully_id = OLD.gully_id;
 			DELETE FROM link WHERE feature_id = OLD.gully_id AND feature_type ='GULLY' RETURNING exit_id, exit_type INTO v_id, v_type;
