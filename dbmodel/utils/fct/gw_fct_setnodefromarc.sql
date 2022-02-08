@@ -78,9 +78,9 @@ BEGIN
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fid, geom_point)
-	SELECT 	116, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2)
+	SELECT 	116, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2)
 	UNION 
-	SELECT 	116, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2);
+	SELECT 	116, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2);
 		
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fid = 116
