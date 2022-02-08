@@ -32,6 +32,7 @@ class GwElement:
 
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
         """ Button 33: Add element """
+
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.new_element_id = new_element_id
 
@@ -684,10 +685,11 @@ class GwElement:
             self._set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
             self._set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                                            field_id='expl_id', field_name='name')
-            self.dlg_add_element.builtdate.setText(
-                tools_gw.get_config_value('edit_builtdate_vdefault')[0].replace('/', '-'))
-            self.dlg_add_element.enddate.setText(
-                tools_gw.get_config_value('edit_enddate_vdefault')[0].replace('/', '-'))
+
+            builtdate = tools_gw.get_config_value('edit_builtdate_vdefault')
+            if builtdate: self.dlg_add_element.builtdate.setText(builtdate[0].replace('/', '-'))
+            enddate = tools_gw.get_config_value('edit_enddate_vdefault')
+            if enddate: self.dlg_add_element.enddate.setText(enddate[0].replace('/', '-'))
             self._set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
                                            field_id='id', field_name='id')
             if single_tool_mode is not None:
