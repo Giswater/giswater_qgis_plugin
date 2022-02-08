@@ -355,16 +355,46 @@ BEGIN
 			FROM temp_csv where source='[DWF]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
 			AND csv2 != 'FLOW';
 
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv4
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv4 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv5
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv5 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv6
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv6 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv7
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv7 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
 			-- improve velocity for inflows using directly tables in spite of vi_inflows view
 			INSERT INTO inp_inflows(node_id, timser_id, sfactor, base, pattern_id) 
-			SELECT csv1, csv3, csv5::numeric, csv6::numeric,  csv7::numeric
+			SELECT csv1, csv3, csv5::numeric, csv6::numeric,  csv7
 			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
 			AND csv2 = 'FLOW';
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv7
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 = 'FLOW' AND csv7 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
 
 			INSERT INTO inp_inflows_poll (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
 			SELECT csv1, csv3, csv2, csv4, csv5::numeric, csv6::numeric, csv7::numeric, csv8
 			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
 			AND csv2 != 'FLOW';
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv8
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 != 'FLOW' AND csv8 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
 
 			-- delete those custom_length with same value of real_length
 			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
@@ -585,6 +615,8 @@ BEGIN
 			DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
 			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
 			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
+			DELETE FROM cat_feature_arc WHERE id NOT IN (SELECT arc_type FROM arc);
+			DELETE FROM cat_feature_node WHERE id NOT IN (SELECT node_type FROM node);
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT arc_type FROM arc) AND feature_type = 'ARC';
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT node_type FROM node) AND feature_type = 'NODE';
 
