@@ -28,6 +28,7 @@ v_featurecat text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_force_delete boolean;
+v_autoupdate_fluid boolean;
 
 BEGIN
 
@@ -42,6 +43,7 @@ BEGIN
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
+    v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
@@ -578,7 +580,7 @@ BEGIN
 
         END IF;       
 		--update values of related connecs;
-		IF NEW.fluid_type != OLD.fluid_type THEN
+		IF NEW.fluid_type != OLD.fluid_type AND v_autoupdate_fluid IS TRUE THEN
 			UPDATE connec SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
 		END IF;
 
