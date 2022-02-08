@@ -657,14 +657,14 @@ BEGIN
 						rec_aux2.arc_id,
 						parameter_id,
 						value_param
-						FROM man_addfields_value WHERE feature_id=v_arc_id ON CONFLICT (feature_id, parameter_id) DO NOTHING;;
+						FROM man_addfields_value WHERE feature_id=v_arc_id ON CONFLICT (feature_id, parameter_id) DO NOTHING;
 						
 						INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 						SELECT 
 						rec_aux1.arc_id,
 						parameter_id,
 						value_param
-						FROM man_addfields_value WHERE feature_id=v_arc_id ON CONFLICT (feature_id, parameter_id) DO NOTHING;;
+						FROM man_addfields_value WHERE feature_id=v_arc_id ON CONFLICT (feature_id, parameter_id) DO NOTHING;
 						
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Copy elements is not avaliable from old arc to new arc when node.state = 2');
