@@ -1627,7 +1627,7 @@ class GwPsector:
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            if cur_psector is not None and (str(id_) == str(cur_psector[0])):
+            if cur_psector and (str(id_) == str(cur_psector[0])):
                 message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
                 tools_qt.show_exception_message('Current psector', tools_qt.tr(message))
