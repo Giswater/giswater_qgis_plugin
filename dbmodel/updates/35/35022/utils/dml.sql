@@ -47,7 +47,7 @@ ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- 07/02/2022
-UPDATE  config_report SET filterparam = '[{"columnname":"arccat_id", "label":"Arc catalog:", "widgettype":"combo","datatype":"text","layoutorder":1,
+UPDATE config_report SET filterparam = '[{"columnname":"arccat_id", "label":"Arc catalog:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id","isNullValue":"true"},{"columnname":"expl_id", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"}]' WHERE id = 100;
 
@@ -63,3 +63,9 @@ VALUES ('tabname_typevalue', 'tab_macrosector', 'Macrosector', 'Macrosector', nu
 
 INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 VALUES ('selector_basic', 'tab_macrosector', 'Macrosector', 'Macrosector', 'role_epa', NULL, NULL, 4,7);
+
+UPDATE config_form_fields SET hidden = FALSE WHERE formname='v_edit_sector' AND columnname='macrosector_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id",
+"valueColumn": "name", "filterExpression": "sector_id > -1 AND active IS TRUE"}}' WHERE formname='v_edit_sector' and columnname='parent_id';
+
