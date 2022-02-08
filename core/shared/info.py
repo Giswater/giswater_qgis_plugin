@@ -711,13 +711,27 @@ class GwInfo(QObject):
         self.action_copy_paste.triggered.connect(
             partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
         self.action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, self.action_rotation))
-        self.action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
+        self.action_link.triggered.connect(partial(self.action_open_link))
         self.action_section.triggered.connect(partial(self._open_section_form))
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
         return dlg_cf, fid
+
+
+    def action_open_link(self):
+        """ Manage def open_file from action 'Open Link' """
+        
+        try:
+            widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
+            for widget in widget_list:
+                path = widget.text()
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
+        except Exception:
+            pass
 
 
     def _get_feature_type(self, complet_result):
