@@ -645,7 +645,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
-		'WARNING-295: There were ',v_count,' missed inp rows on inp_connec. They have been automatic inserted'), v_count);
+		'WARNING-295: There is/are ',v_count,' missed inp rows on inp_connec. They have been automatic inserted'), v_count);
 		INSERT INTO inp_connec SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;		
 		v_count=0;
 	ELSE
@@ -659,7 +659,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '371',concat(
-		'ERROR-371: There were ',v_count,' rows with missed matcat_id on cat_arc table. Fix it before continue'), v_count);
+		'ERROR-371: There is/are ',v_count,' rows with missed matcat_id on cat_arc table. Fix it before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -777,8 +777,8 @@ BEGIN
 	
 	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
 
-	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, v_edit_node n1
-		      JOIN (SELECT node_1 node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc) b USING (node_id)
+	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 JOIN v_state_node USING (node_id)
+		      JOIN (SELECT node_1 node_id FROM arc WHERE state = 1 UNION SELECT node_2 FROM arc WHERE state = 1) b USING (node_id)
 		      WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s WHERE s.sector_id = b.sector_id AND cur_user=current_user';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
