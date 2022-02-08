@@ -656,7 +656,7 @@ BEGIN
 		FROM temp_csv
 		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
 			and source in ('[OUTFALLS]','[JUNCTIONS]','[STORAGES]','[DIVIDERS]','[CONDUITS]','[PUMPS]','[ORIFICES]','[WEIRS]','[OUTLETS]','[SUBCATCHMENTS]', '[AQUIFERS]', 
-							'[RAINGAGE]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
+							'[RAINGAGES]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
 		GROUP BY source ORDER BY 1) a;
 	
 	--Control nulls
