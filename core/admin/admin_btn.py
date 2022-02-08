@@ -2140,9 +2140,13 @@ class GwAdminButton:
 
     def _dlg_replace_accept(self):
 
-        dict_to_replace = {}
+        dict_to_replace_unordered = {}
         for widget in self.dlg_replace.findChildren(QLineEdit):
-            dict_to_replace[f'{widget.objectName()}'] = f'{widget.text()}'
+            dict_to_replace_unordered[f'{widget.objectName()}'] = f'{widget.text()}'
+
+        dict_to_replace = {}
+        for k in sorted(dict_to_replace_unordered, key=len, reverse=True):
+            dict_to_replace[k] = dict_to_replace_unordered[k]
 
         all_valid = True
         news = []
