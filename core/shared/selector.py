@@ -179,6 +179,10 @@ class GwSelector:
                     else:
                         widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
                     widget.setText('Check all')
+                    if hasattr(self, 'checkall'):
+                        widget.stateChanged.disconnect()
+                        widget.setChecked(self.checkall)
+                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
@@ -266,12 +270,14 @@ class GwSelector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
+            self.checkall = False
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
                       f'"isAlone":"{is_alone}", "disableParent":"{disable_parent}", '
                       f'"value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
+            self.checkall = check_all
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
 
