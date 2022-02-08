@@ -50,3 +50,16 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCA
 UPDATE  config_report SET filterparam = '[{"columnname":"arccat_id", "label":"Arc catalog:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id","isNullValue":"true"},{"columnname":"expl_id", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"}]' WHERE id = 100;
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type, datatype)
+VALUES ('basic_selector_tab_macrosector', '{"table":"macrosector","selector":"selector_sector","table_id":"macrosector_id",
+"selector_id":"sector_id","label":"macrosector_id, '' - '', m.name","orderBy":"macrosector_id","manageAll":true,
+"query_filter":" AND macrosector_id > 0","typeaheadForced":true,"sectorFromMacroexpl":true,"explFromMacroexpl":false}', 
+'Variable to configure all options related to search for the specificic tab',
+'Selector variables', FALSE, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue', 'tab_macrosector', 'Macrosector', 'Macrosector', null);
+
+INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
+VALUES ('selector_basic', 'tab_macrosector', 'Macrosector', 'Macrosector', 'role_epa', NULL, NULL, 4,7);

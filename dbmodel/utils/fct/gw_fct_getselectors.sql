@@ -69,6 +69,7 @@ v_useatlas boolean;
 v_message text;
 v_uservalues json;
 v_action text;
+v_zonetable text;
 
 BEGIN
 
@@ -191,31 +192,47 @@ BEGIN
 			
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
-		IF v_tab.tabname ='tab_macroexploitation' THEN
-			FOR rec_macro IN (SELECT * FROM macroexploitation) LOOP
-				SELECT count(expl_id) as count INTO v_count_expl FROM exploitation WHERE macroexpl_id=rec_macro.macroexpl_id group by macroexpl_id;
-				SELECT count(*) INTO v_count_selector FROM selector_expl JOIN exploitation USING (expl_id) 
-				WHERE macroexpl_id=rec_macro.macroexpl_id AND cur_user=current_user;
+		IF v_tab.tabname ='tab_macroexploitation' OR v_tab.tabname='tab_macrosector' THEN
+			
+			IF v_tab.tabname ='tab_macroexploitation' THEN
+				v_zonetable='exploitation';
+			ELSIF v_tab.tabname='tab_macrosector' THEN
+				v_zonetable='sector';
+			END IF;
 
-				IF v_count_expl = v_count_selector THEN
-					IF v_ids IS NULL THEN 
-						v_ids=rec_macro.macroexpl_id;
-					ELSE
-						v_ids=concat(v_ids,rec_macro.macroexpl_id);
+			v_query = concat('SELECT ',v_table_id,' AS id FROM ', v_table);
+			v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+				FOR rec_macro IN EXECUTE v_query LOOP
+					EXECUTE 'SELECT count('||v_selector_id||') as count  FROM '||v_zonetable||' WHERE '||v_table_id||'='||rec_macro.id||' group by '||v_table_id||''
+					INTO v_count_expl;
+
+					EXECUTE'SELECT count(*) FROM '||v_selector||' JOIN '||v_zonetable||'  USING ('||v_selector_id||') 
+					WHERE '||v_table_id||'='||rec_macro.id||' AND cur_user=current_user'
+					INTO v_count_selector;
+
+					IF v_count_expl = v_count_selector THEN
+						IF v_ids IS NULL THEN 
+							EXECUTE 'SELECT '||rec_macro.id||''
+							INTO v_ids;
+						ELSE
+							EXECUTE 'SELECT concat('||v_ids||','','','||rec_macro.id||')'
+							INTO v_ids;
+						END IF;
 					END IF;
-				END IF;
-			END LOOP;
+				END LOOP;
 
 			IF v_ids IS NULL THEN v_ids='0'; END IF;
 
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 					v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-					FROM ' , v_table , ' m JOIN  exploitation USING (',v_table_id,') 
+					FROM ' , v_table , ' m JOIN  ' , v_zonetable , '  USING (',v_table_id,') 
 					WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 					v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-					FROM ' , v_table , ' m JOIN  exploitation  USING (',v_table_id,')
+					FROM ' , v_table , ' m JOIN   ' , v_zonetable , '    USING (',v_table_id,')
 					WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
 					 v_fullfilter ,' ORDER BY orderby asc) a');
 

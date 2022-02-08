@@ -60,7 +60,7 @@ v_sectorfromexpl boolean;
 v_explfromsector boolean;
 v_sectorfrommacroexpl boolean;
 v_explmuni text;
-
+v_zonetable text;
 BEGIN
 
 	-- Set search path to local schema
@@ -116,6 +116,11 @@ BEGIN
 	v_explfromsector = v_parameter_selector->>'explFromSector';
 	v_sectorfrommacroexpl = v_parameter_selector->>'sectorFromMacroexpl';
 
+	IF v_tabname='tab_macroexploitation' THEN
+		v_zonetable = 'exploitation';
+	ELSIF v_tabname='tab_macrosector' THEN
+		v_zonetable = 'sector';
+	END IF;
 
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
@@ -215,9 +220,13 @@ BEGIN
 					EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user ON CONFLICT DO NOTHING';
 				ELSIF  v_tabname = 'tab_sector' THEN
 					EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
-				END IF;				
+				END IF;			
+			ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 			ELSE
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' 
+				ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 			END IF;		
 		END IF;
 		
@@ -230,16 +239,18 @@ BEGIN
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 		END IF;
 
-		IF v_tabname='tab_macroexploitation' THEN
+
+		IF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
 			-- manage value
 			IF v_value THEN
 				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
-				SELECT '|| v_columnname ||', current_user FROM exploitation WHERE '||v_tableid||' = '||v_id||';';
+				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||';';
 			ELSE
 				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND 
-				' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM exploitation WHERE '||v_tableid||' = '||v_id||');';
+				' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||');';
 			END IF;
+
 		ELSE
 			-- manage value
 			IF v_value THEN
@@ -252,7 +263,7 @@ BEGIN
 	END IF;
 
 	-- manage parents
-	IF v_tabname IN ('tab_psector', 'tab_dscenario') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
+	IF v_tabname IN ('tab_psector', 'tab_dscenario', 'tab_sector') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
 
 		-- getting name
 		v_name = substring (v_tabname,5,99);
