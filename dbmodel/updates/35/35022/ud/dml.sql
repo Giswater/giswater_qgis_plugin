@@ -229,3 +229,14 @@ UPDATE inp_timeseries SET expl_id = a.expl_id FROM arc a WHERE inp_timeseries.ex
 
 ALTER TABLE inp_timeseries ADD CONSTRAINT inp_timeseries_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+--2022/02/08
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('inp_value_catarc', 'VERT_ELLIPSE', 'VERT_ELLIPSE');
+
+ALTER TABLE cat_arc_shape DROP CONSTRAINT cat_arc_shape_check;
+ALTER TABLE cat_arc_shape
+ADD CONSTRAINT cat_arc_shape_check CHECK (epa::text = ANY (ARRAY['VERT_ELLIPSE'::character varying,'ARCH'::character varying, 'BASKETHANDLE'::character varying, 'CIRCULAR'::character varying, 'CUSTOM'::character varying, 'DUMMY'::character varying, 'EGG'::character varying, 'FILLED_CIRCULAR'::character varying, 'FORCE_MAIN'::character varying, 'HORIZ_ELLIPSE'::character varying, 'HORSESHOE'::character varying, 'IRREGULAR'::character varying, 'MODBASKETHANDLE'::character varying, 'PARABOLIC'::character varying, 'POWER'::character varying, 'RECT_CLOSED'::character varying, 'RECT_OPEN'::character varying, 'RECT_ROUND'::character varying, 'RECT_TRIANGULAR'::character varying, 'SEMICIRCULAR'::character varying, 'SEMIELLIPTICAL'::character varying, 'TRAPEZOIDAL'::character varying, 'TRIANGULAR'::character varying, 'VIRTUAL'::character varying]::text[]));
+
+INSERT INTO cat_arc_shape
+VALUES ('VERT_ELLIPSE', 'VERT_ELLIPSE') ON CONFLICT (id) DO NOTHING;
