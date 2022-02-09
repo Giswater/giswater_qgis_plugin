@@ -69,3 +69,8 @@ UPDATE config_form_fields SET hidden = FALSE WHERE formname='v_edit_sector' AND 
 UPDATE config_form_fields SET widgetcontrols = '{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id",
 "valueColumn": "name", "filterExpression": "sector_id > -1 AND active IS TRUE"}}' WHERE formname='v_edit_sector' and columnname='parent_id';
 
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('sys_table_context', '{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":24}', NULL);
+
+UPDATE sys_table SET context='{"level_1":"BASEMAP","level_2":"CARTO"}', orderby = 1, alias='DEM', addparam='{"geom":"rast"}' 
+WHERE id IN ('v_ext_raster_dem');
