@@ -128,6 +128,7 @@ v_querytext1 text;
 v_querytext2 text;
 v_count_int integer;
 object_rec record;
+v_vnode_status boolean;
 
 BEGIN
 
@@ -158,6 +159,7 @@ BEGIN
   	SELECT value::json->>'hs' INTO v_hstext FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
   	SELECT (value::json->>'arc')::json->>'cat_geom1' INTO v_arc_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
+  	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
   	-- set value to v_linksdistance if null
 	IF v_linksdistance IS NULL THEN
@@ -277,7 +279,8 @@ BEGIN
 		ELSIF v_project_type = 'WS' THEN
 			SELECT count(*) INTO v_count FROM anl_node WHERE (elevation IS NULL or depth is null) AND fid = 222 and cur_user = current_user;
 		END IF;
-		IF v_linksdistance > 0 AND v_count = 0 THEN
+		
+		IF v_linksdistance > 0 AND v_count = 0 and v_vnode_status IS NOT False THEN
 
 			-- get vnode values
 			EXECUTE 'INSERT INTO anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
