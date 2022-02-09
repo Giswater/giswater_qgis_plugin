@@ -244,7 +244,8 @@ def filter_table(**kwargs):
     if func_params:
         colname = func_params.get('columnfind')
     print(f"{colname}")
-    filter_fields = get_filter_qtableview(dialog, widget_list, colname=colname)
+    filter_fields = get_filter_qtableview(dialog, widget_list, complet_result)
+    print(f"{filter_fields}")
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
@@ -598,14 +599,19 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     return complet_list, widget_list
 
 
-def get_filter_qtableview(dialog, widget_list, colname=None):
+def get_filter_qtableview(dialog, widget_list, complet_result):
 
-    filter_fields = ""
+    field_id = str(complet_result['body']['feature']['idName'])
+    feature_id = complet_result['body']['feature']['id']
+    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
+
     for widget in widget_list:
         if widget.property('isfilter'):
-            columnname = colname
-            if columnname is None:
-                columnname = widget.property('columnname')
+            columnname = widget.property('columnname')
+            if widget.property('widgetfunction'):
+                if widget.property('widgetfunction')['parameters'] \
+                        and 'columnfind' in widget.property('widgetfunction')['parameters']:
+                    columnname = widget.property('widgetfunction')['parameters']['columnfind']
             filter_sign = "ILIKE"
             if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
                 if widget.property('widgetcontrols')['filterSign'] is not None:
@@ -613,9 +619,12 @@ def get_filter_qtableview(dialog, widget_list, colname=None):
             if type(widget) == QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
             elif type(widget) is QgsDateTimeEdit:
-                value = tools_qt.get_calendar_date(dialog, widget)
+                value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
             else:
                 value = tools_qt.get_text(dialog, widget, False, False)
+
+            if not value or value == -1:
+                continue
 
             filter_fields += f'"{columnname}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
 
@@ -679,7 +688,7 @@ def _reload_table(**kwargs):
             continue
 
         # Get value from filter widgets
-        filter_fields = get_filter_qtableview(dialog, widget_list)
+        filter_fields = get_filter_qtableview(dialog, widget_list, kwargs['complet_result'])
 
         # if tab dont have any filter widget
         if filter_fields in ('', None):

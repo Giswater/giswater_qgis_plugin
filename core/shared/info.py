@@ -1840,7 +1840,7 @@ class GwInfo(QObject):
         widget = tools_gw.add_tableview(complet_result, field, dialog, module)
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, field['columnname'], 1, True)
         tools_qt.set_tableview_config(widget)
         return widget
 
@@ -3101,7 +3101,7 @@ class GwInfo(QObject):
             if widget is None: continue
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)  # TODO: field['widgetname'] has the tab name prefix.
             tools_qt.set_tableview_config(widget)
 
         widget_list = []
@@ -3690,7 +3690,7 @@ def _reload_table(**kwargs):
             continue
 
         # Get value from filter widgets
-        filter_fields = tools_backend_calls.get_filter_qtableview(dialog, widget_list)
+        filter_fields = tools_backend_calls.get_filter_qtableview(dialog, widget_list, kwargs['complet_result'])
 
         # if tab dont have any filter widget
         if filter_fields in ('', None):
@@ -3700,6 +3700,36 @@ def _reload_table(**kwargs):
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:
             return False
+
+# endregion
+
+# region Tab visit
+
+
+def open_visit_files(**kwargs):
+    func_params = kwargs['func_params']
+    qtable = tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
+
+    # Get selected row
+    selected_list = qtable.selectionModel().selectedRows()
+    message = "Any record selected"
+    if not selected_list:
+        tools_qgis.show_warning(message)
+        return
+    selected_row = selected_list[0].row()
+    if not selected_row:
+        tools_qgis.show_warning(message)
+        return
+    visit_id = qtable.model().record(selected_row).value("visit_id")
+
+    sql = (f"SELECT value FROM om_visit_event_photo"
+           f" WHERE visit_id = '{visit_id}'")
+    rows = tools_db.get_rows(sql)
+    for path in rows:
+        # Open selected document
+        status, message = tools_os.open_file(path[0])
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path[0])
 
 # endregion
 
@@ -4008,50 +4038,6 @@ def _open_file(dlg_event_full):
     status, message = tools_os.open_file(path)
     if status is False and message is not None:
         tools_qgis.show_warning(message, parameter=path)
-
-# endregion
-
-# region Tab document
-
-
-def set_filter_table_man(**kwargs):
-    """ Get values selected by the user and sets a new filter for its table model """
-
-    dialog = kwargs['dialog']
-    func_params = kwargs['func_params']
-    qtable = dialog.findChild(QTableView, func_params['targetwidget'])
-    date_document_from = dialog.findChild(QgsDateTimeEdit, "document_date_from")
-    date_document_to = dialog.findChild(QgsDateTimeEdit, "document_date_to")
-
-    field_id = str(kwargs['complet_result']['body']['feature']['idName'])
-    feature_id = kwargs['complet_result']['body']['feature']['id']
-
-    # Get selected dates
-    date_from = date_document_from.date()
-    date_to = date_document_to.date()
-    if date_from > date_to:
-        message = "Selected date interval is not valid"
-        tools_qgis.show_warning(message)
-        return
-
-    # Create interval dates
-    format_low = 'yyyy-MM-dd 00:00:00.000'
-    format_high = 'yyyy-MM-dd 23:59:59.999'
-    interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
-
-    # Set filter
-    expr = f"{field_id} = '{feature_id}'"
-    expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
-
-    # Get selected values in Comboboxes
-    doc_type_widget = dialog.findChild(QComboBox, "document_doc_type")
-    doc_type_value = tools_qt.get_combo_value(dialog, doc_type_widget, 0)
-    if doc_type_value != 'null' and doc_type_value is not None:
-        expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
-
-    # Refresh model with selected filter
-    qtable.model().setFilter(expr)
-    qtable.model().select()
 
 # endregion
 
