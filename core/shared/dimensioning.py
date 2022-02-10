@@ -65,9 +65,10 @@ class GwDimensioning:
                 return False
             db_return = json_result
 
-        # get id from db response
-        self.fid = db_return['body']['feature']['id']
-
+            # get id from db response
+            self.fid = int(db_return['body']['feature']['id']) + 1
+        else:
+            self.fid = int(db_return['body']['feature']['id'])
         # ACTION SIGNALS
         action_snapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         action_snapping.triggered.connect(partial(self._snapping, action_snapping))
@@ -138,7 +139,8 @@ class GwDimensioning:
                 tools_gw.enable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         tools_qt.hide_void_groupbox(self.dlg_dim)
-
+        self.iface.actionPan().trigger()
+        
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
