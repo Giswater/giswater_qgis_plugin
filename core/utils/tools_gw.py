@@ -1750,9 +1750,8 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field, **kwargs):
+def add_combo(field):
 
-    module = tools_backend_calls
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1769,33 +1768,6 @@ def add_combo(field, **kwargs):
         widget.setEnabled(bool(field['iseditable']))
         if not field['iseditable']:
             widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-
-    real_name = widget.objectName()
-    function_name = None
-    func_params = ""
-    if 'widgetfunction' in field:
-        if 'module' in field['widgetfunction']:
-            module = globals()[field['widgetfunction']['module']]
-        if 'functionName' in field['widgetfunction']:
-            if field['widgetfunction']['functionName']:
-                function_name = field['widgetfunction']['functionName']
-                exist = tools_os.check_python_function(module, function_name)
-                if not exist:
-                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                    tools_qgis.show_message(msg, 2)
-                    return widget
-                if 'parameters' in field['widgetfunction']:
-                    func_params = field['widgetfunction']['parameters']
-            else:
-                message = "Parameter button_function is null for button"
-                tools_qgis.show_message(message, 2, parameter=widget.objectName())
-
-    kwargs['widget'] = widget
-    kwargs['message_level'] = 1
-    kwargs['function_name'] = function_name
-    kwargs['func_params'] = func_params
-    if function_name:
-        widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
