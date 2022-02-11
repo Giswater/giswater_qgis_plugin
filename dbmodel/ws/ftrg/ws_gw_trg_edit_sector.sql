@@ -88,7 +88,7 @@ BEGIN
 
 		ELSIF TG_OP = 'UPDATE' THEN
 
-			IF ((NEW.parent_id <> OLD.parent_id) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL)) AND (SELECT parent_id FROM sector WHERE parent_id = NEW.sector_id) IS NULL THEN
+			IF ((NEW.parent_id <> OLD.parent_id) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL)) AND (SELECT parent_id FROM sector WHERE parent_id = NEW.sector_id LIMIT 1) IS NULL THEN
 
 				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||OLD.parent_id||')';
 				FOR v_row IN EXECUTE v_querytext
