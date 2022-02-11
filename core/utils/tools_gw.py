@@ -1358,6 +1358,8 @@ def add_button(**kwargs):
         widget.setText(field['value'])
         # TODO: Check this
         widget.setProperty('value', field['value'])
+    if 'tooltip' in field:
+        widget.setToolTip(field['tooltip'])
 
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
@@ -1679,6 +1681,8 @@ def add_lineedit(field):
     if 'value' in field:
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
+    if 'tooltip' in field:
+        widget.setToolTip(field['tooltip'])
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
