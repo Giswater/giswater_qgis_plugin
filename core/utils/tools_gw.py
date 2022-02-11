@@ -1724,6 +1724,7 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
     else:
+        return widget
         message = "Parameter widgetfunction.functionName is null for widget"
         tools_qgis.show_message(message, 2, parameter=real_name)
 

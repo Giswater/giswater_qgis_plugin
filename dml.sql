@@ -32,11 +32,17 @@ INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hy
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydro_val_3', 'lyt_hydro_val_3','lytHydroVal3');
 
 INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
-    VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydrometer WHERE hydrometer_id IS NOT NULL', 4);
+    VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL', 4);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
-    VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydro_val_1', 1, 'string', 'combo', 'Cat period filter:', false, false, true, false, true, 'SELECT DISTINCT(t1.code), t2.cat_period_id FROM ext_cat_period as t1 JOIN (SELECT * FROM v_ui_hydroval_x_connec) AS t2 ON t1.id = t2.cat_period_id ORDER BY t2.cat_period_id DESC ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydro_val_1', 0, 'string', 'combo', 'Cat period filter:', false, false, true, false, true, 'SELECT DISTINCT(t1.code), t2.cat_period_id FROM ext_cat_period as t1 JOIN (SELECT * FROM v_ui_hydroval_x_connec) AS t2 ON t1.id = t2.cat_period_id ORDER BY t2.cat_period_id DESC ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydro_val_1', 2, 'string', 'combo', 'Customer code:', false, false, true, false, true, 'SELECT hydrometer_id, hydrometer_customer_code FROM v_rtc_hydrometer ORDER BY hydrometer_customer_code ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'hspacer_lyt_hydro_val_1', 'lyt_hydro_val_1', 10, 'hspacer', false, false, true, false);
 
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'tbl_hydrometer_value', 'lyt_hydro_val_3', 1, 'tableview', false, false, true, false, false, '{"saveValue": false}', NULL, 'tbl_hydrometer_value');
 
 
 
