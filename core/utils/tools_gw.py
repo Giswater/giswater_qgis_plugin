@@ -1086,7 +1086,7 @@ def build_dialog_info(dialog, result, my_json=None):
     fields = result['body']['data']
     if 'fields' not in fields:
         return
-    grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
+    grid_layout = dialog.findChild(QGridLayout, 'lyt_main_1')
 
     for order, field in enumerate(fields["fields"]):
         if 'hidden' in field and field['hidden']:

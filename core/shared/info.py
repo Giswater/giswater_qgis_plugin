@@ -3558,42 +3558,6 @@ class GwInfo(QObject):
     # endregion
 # region Static functions used by the widgets in the custom form
 
-# region Tab relation
-
-
-def open_selected_feature(**kwargs):
-    """
-    Open selected feature from @qtable
-        function called in -> def add_tableview(complet_result, field, dialog, module=sys.modules[__name__])
-        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-    """
-    qtable = kwargs['qtable']
-    complet_list = kwargs['complet_result']
-    func_params = kwargs['func_params']
-
-    # Get selected rows
-    selected_list = qtable.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_qgis.show_warning(message)
-        return
-
-    index = selected_list[0]
-    row = index.row()
-    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
-    feature_id = index.sibling(row, column_index).data()
-    table_name = complet_list['body']['feature']['tableName']
-    if 'tablefind' in func_params:
-        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['tablefind'])
-        table_name = index.sibling(row, column_index).data()
-    info_feature = GwInfo('tab_data')
-    complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
-    if not complet_result:
-        tools_log.log_info("FAIL open_selected_feature")
-        return
-
-# endregion
-
 # region Tab element
 
 
@@ -3700,6 +3664,90 @@ def _reload_table(**kwargs):
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:
             return False
+
+# endregion
+
+# region Tab relation
+
+
+def open_selected_feature(**kwargs):
+    """
+    Open selected feature from @qtable
+        function called in -> def add_tableview(complet_result, field, dialog, module=sys.modules[__name__])
+        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """
+    qtable = kwargs['qtable']
+    complet_list = kwargs['complet_result']
+    func_params = kwargs['func_params']
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    feature_id = index.sibling(row, column_index).data()
+    table_name = complet_list['body']['feature']['tableName']
+    if 'tablefind' in func_params:
+        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['tablefind'])
+        table_name = index.sibling(row, column_index).data()
+    info_feature = GwInfo('tab_data')
+    complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type='tab_data')
+    if not complet_result:
+        tools_log.log_info("FAIL open_selected_feature")
+        return
+
+# endregion
+
+# region Tab hydrometer
+
+
+def open_selected_hydro(**kwargs):
+    qtable = kwargs['qtable']
+
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+
+    table_name = 'v_ui_hydrometer'
+    column_index = tools_qt.get_col_index_by_col_name(qtable, 'hydrometer_id')
+    feature_id = index.sibling(row, column_index).data()
+
+    # return
+    info_feature = GwInfo('tab_data')
+    complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id,
+                                                    tab_type='tab_data')
+    if not complet_result:
+        tools_log.log_info("FAIL open_selected_hydro")
+        return
+
+
+def open_hydro_url(**kwargs):
+    func_params = kwargs['func_params']
+    targetwidget = func_params['targetwidget']
+    tbl_hydrometer = tools_qt.get_widget(kwargs['dialog'], f"{targetwidget}")
+
+    selected_list = tbl_hydrometer.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    row = selected_list[0].row()
+    url = tbl_hydrometer.model().record(row).value("hydrometer_link")
+    if url != '':
+        status, message = tools_os.open_file(url)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=url)
 
 # endregion
 
