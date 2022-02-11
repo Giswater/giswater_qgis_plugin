@@ -107,7 +107,6 @@ BEGIN
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
 
-
 	v_query = concat('SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=',quote_literal(v_selector_type),
 	' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),
 	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby');
@@ -196,32 +195,14 @@ BEGIN
 			
 			IF v_tab.tabname ='tab_macroexploitation' THEN
 				v_zonetable='exploitation';
+				EXECUTE 'SELECT array_agg(macroexpl_id) FROM macroexploitation' INTO v_ids;
 			ELSIF v_tab.tabname='tab_macrosector' THEN
+				EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 				v_zonetable='sector';
 			END IF;
 
-			v_query = concat('SELECT ',v_table_id,' AS id FROM ', v_table);
-			v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
-				FOR rec_macro IN EXECUTE v_query LOOP
-					EXECUTE 'SELECT count('||v_selector_id||') as count  FROM '||v_zonetable||' WHERE '||v_table_id||'='||rec_macro.id||' group by '||v_table_id||''
-					INTO v_count_expl;
-
-					EXECUTE'SELECT count(*) FROM '||v_selector||' JOIN '||v_zonetable||'  USING ('||v_selector_id||') 
-					WHERE '||v_table_id||'='||rec_macro.id||' AND cur_user=current_user'
-					INTO v_count_selector;
-
-					IF v_count_expl = v_count_selector THEN
-						IF v_ids IS NULL THEN 
-							EXECUTE 'SELECT '||rec_macro.id||''
-							INTO v_ids;
-						ELSE
-							EXECUTE 'SELECT concat('||v_ids||','','','||rec_macro.id||')'
-							INTO v_ids;
-						END IF;
-					END IF;
-				END LOOP;
+			v_ids = replace(v_ids,'{','');
+			v_ids = replace(v_ids,'}','');	
 
 			IF v_ids IS NULL THEN v_ids='0'; END IF;
 
