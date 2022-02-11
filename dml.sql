@@ -5,10 +5,27 @@ INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tablevi
 
 
 -- TAB CONNECTIONS -- UD
+INSERT INTO ud_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_1', 'lyt_connection_1','lytConnection1');
+INSERT INTO ud_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_2', 'lyt_connection_2','lytConnection2');
+INSERT INTO ud_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_3', 'lyt_connection_3','lytConnection3');
+
+INSERT INTO ud_sample35.config_form_list(listname, query_text, device)
+    VALUES ('tbl_connection_upstream', 'SELECT * FROM v_ui_node_x_connection_upstream WHERE rid IS NOT NULL', 4);
+INSERT INTO ud_sample35.config_form_list(listname, query_text, device)
+    VALUES ('tbl_connection_downstream', 'SELECT * FROM v_ui_node_x_connection_downstream WHERE rid IS NOT NULL', 4);
+
+INSERT INTO ud_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
+    VALUES ('node', 'form_feature', 'connection', 'tbl_upstream', 'lyt_connection_2', 1, 'tableview', 'Upstream features:', false, false, false, false, false, '{"saveValue": false, "labelPosition": "top"}', '{"functionName": "open_selected_feature", "module": "info", "parameters":{"columnfind":"feature_id", "tablefind":"sys_table_id"}}', 'tbl_connection_upstream');
+INSERT INTO ud_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
+    VALUES ('node', 'form_feature', 'connection', 'tbl_downstream', 'lyt_connection_3', 1, 'tableview', 'Downstream features:', false, false, false, false, false, '{"saveValue": false, "labelPosition": "top"}', '{"functionName": "open_selected_feature", "module": "info", "parameters":{"columnfind":"feature_id", "tablefind":"sys_table_id"}}', 'tbl_connection_downstream');
+
+
+
+
 -- TAB HYDROMETER
-INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_1', 'lyt_hydrometer_1','lytHyrometer1');
-INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_2', 'lyt_hydrometer_2','lytHyrometer2');
-INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_3', 'lyt_hydrometer_3','lytHyrometer3');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_1', 'lyt_hydrometer_1','lytHydrometer1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_2', 'lyt_hydrometer_2','lytHydrometer2');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_hydrometer_3', 'lyt_hydrometer_3','lytHydrometer3');
 
 INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
     VALUES ('tbl_hydrometer', 'SELECT * FROM v_ui_hydrometer WHERE hydrometer_id IS NOT NULL', 4);
@@ -37,7 +54,7 @@ INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
     VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydro_val_1', 0, 'string', 'combo', 'Cat period filter:', false, false, true, false, true, 'SELECT DISTINCT(t1.code), t2.cat_period_id FROM ext_cat_period as t1 JOIN (SELECT * FROM v_ui_hydroval_x_connec) AS t2 ON t1.id = t2.cat_period_id ORDER BY t2.cat_period_id DESC ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject)
-    VALUES ('connec', 'form_feature', 'hydrometer_value', 'cat_period_id_filter', 'lyt_hydro_val_1', 2, 'string', 'combo', 'Customer code:', false, false, true, false, true, 'SELECT hydrometer_id, hydrometer_customer_code FROM v_rtc_hydrometer ORDER BY hydrometer_customer_code ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
+    VALUES ('connec', 'form_feature', 'hydrometer_value', 'hyd_customer_code', 'lyt_hydro_val_1', 2, 'string', 'combo', 'Customer code:', false, false, true, false, true, 'SELECT hydrometer_id, hydrometer_customer_code FROM v_rtc_hydrometer ORDER BY hydrometer_customer_code ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value');
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('connec', 'form_feature', 'hydrometer_value', 'hspacer_lyt_hydro_val_1', 'lyt_hydro_val_1', 10, 'hspacer', false, false, true, false);
 
