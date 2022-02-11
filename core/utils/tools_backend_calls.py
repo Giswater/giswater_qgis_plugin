@@ -231,7 +231,7 @@ def filter_table(**kwargs):
          at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
                     widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
      """
-    print(f"TEST 10")
+
     complet_result = kwargs['complet_result']
     model = kwargs['model']
     dialog = kwargs['dialog']
@@ -243,9 +243,7 @@ def filter_table(**kwargs):
     colname = None
     if func_params:
         colname = func_params.get('columnfind')
-    print(f"{colname}")
     filter_fields = get_filter_qtableview(dialog, widget_list, complet_result)
-    print(f"{filter_fields}")
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
@@ -319,8 +317,8 @@ def get_info_node(**kwargs):
     widget = kwargs['widget']
 
     feature_id = tools_qt.get_text(dialog, widget)
-    customForm = GwInfo('tab_data')
-    complet_result, dialog = customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
+    custom_form = GwInfo('tab_data')
+    complet_result, dialog = custom_form.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                        tab_type='tab_data', is_docker=False)
     if not complet_result:
         tools_log.log_info("FAIL open_node")
@@ -572,7 +570,6 @@ def open_url(widget):
         tools_qgis.show_warning(message, parameter=widget.text())
 
 
-# region private functions
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
@@ -634,6 +631,7 @@ def get_filter_qtableview(dialog, widget_list, complet_result):
     return filter_fields
 
 
+# region private functions
 def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id=''):
 
     form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
