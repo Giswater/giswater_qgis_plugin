@@ -103,7 +103,23 @@ BEGIN
 		UPDATE temp_node t SET ysur = d.ysur FROM v_edit_inp_dscenario_junction d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;	
 		UPDATE temp_node t SET apond = d.apond FROM v_edit_inp_dscenario_junction d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;	
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
+
+		-- update lid-usage
+		UPDATE temp_lid_usage t SET numelem = d.numelem FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.numelem IS NOT NULL;	
+		UPDATE temp_lid_usage t SET area = d.area FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.area IS NOT NULL;	
+		UPDATE temp_lid_usage t SET width = d.width FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.width IS NOT NULL;	
+		UPDATE temp_lid_usage t SET initsat = d.initsat FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.initsat IS NOT NULL;	
+		UPDATE temp_lid_usage t SET fromimp = d.fromimp FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.fromimp IS NOT NULL;	
+		UPDATE temp_lid_usage t SET toperv = d.toperv FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.toperv IS NOT NULL;	
+		UPDATE temp_lid_usage t SET rptfile = d.rptfile FROM v_edit_inp_dscenario_lid_usage d 
+		WHERE t.subc_id = d.subc_id AND t.lidco_id = d.lidco_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.rptfile IS NOT NULL;	
 
 		-- TODO: update outfallparam
 

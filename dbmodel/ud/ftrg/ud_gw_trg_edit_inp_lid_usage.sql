@@ -19,17 +19,17 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
     
-		INSERT INTO inp_lid_usage (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv,rptfile, descript, hydrology_id) 
-		VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript, NEW.hydrology_id);
+		INSERT INTO inp_lid_usage (hydrology_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv,rptfile, descript, hydrology_id) 
+		VALUES (NEW.hydrology_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript, NEW.hydrology_id);
 		
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 		
 		UPDATE inp_lid_usage 
-		SET subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, "number"=NEW."number", area=NEW.area, width=NEW.width, initsat=NEW.initsat, fromimp=NEW.fromimp,
+		SET subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, numelem=NEW.numelem, area=NEW.area, width=NEW.width, initsat=NEW.initsat, fromimp=NEW.fromimp,
 		toperv=NEW.toperv, rptfile=NEW.rptfile, descript=NEW.descript, hydrology_id = NEW.hydrology_id
-		WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
+		WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id AND lidco_id = OLD.lidco_id;
                 
 		RETURN NEW;
    

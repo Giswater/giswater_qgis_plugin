@@ -240,3 +240,7 @@ ADD CONSTRAINT cat_arc_shape_check CHECK (epa::text = ANY (ARRAY['VERT_ELLIPSE':
 
 INSERT INTO cat_arc_shape
 VALUES ('VERT_ELLIPSE', 'VERT_ELLIPSE') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET functionparams = '{"featureType":["node", "arc", "lids", "raingage"]}' WHERE id = 3118;
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');

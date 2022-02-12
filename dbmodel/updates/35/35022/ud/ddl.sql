@@ -29,3 +29,33 @@ CREATE TABLE inp_dscenario_lid_usage
   PRIMARY KEY (dscenario_id, hydrology_id, subc_id, lidco_id));
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_lid_usage", "column":"number", "newName":"numelem"}}$$);
+
+
+
+CREATE TABLE temp_lid_usage
+(
+  subc_id character varying(16) NOT NULL,
+  lidco_id character varying(16) NOT NULL,
+  numelem smallint,
+  area numeric(16,6),
+  width numeric(12,4),
+  initsat numeric(12,4),
+  fromimp numeric(12,4),
+  toperv smallint,
+  rptfile character varying(10),
+  CONSTRAINT temp_lid_usage_pkey 
+  PRIMARY KEY (subc_id, lidco_id));
+
+
+CREATE OR REPLACE VIEW vi_lid_usage AS 
+ SELECT temp_lid_usage.subc_id,
+    temp_lid_usage.lidco_id,
+    temp_lid_usage.numelem::integer AS number,
+    temp_lid_usage.area,
+    temp_lid_usage.width,
+    temp_lid_usage.initsat,
+    temp_lid_usage.fromimp,
+    temp_lid_usage.toperv::integer AS toperv,
+    temp_lid_usage.rptfile
+   FROM v_edit_inp_subcatchment
+     JOIN temp_lid_usage ON temp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;

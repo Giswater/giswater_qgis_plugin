@@ -43,7 +43,7 @@ BEGIN
 	TRUNCATE temp_arc_flowregulator;
 	TRUNCATE temp_gully;
 	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
-
+	TRUNCATE temp_lid_usage;
 
 	-- set all timeseries of raingage using user's value
 	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
@@ -238,6 +238,10 @@ BEGIN
 	-- rpt_inp_raingage
 	INSERT INTO rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
+
+	-- lid usage
+	INSERT INTO temp_lid_usage
+	SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile FROM inp_lid_usage;
 	
 	RETURN 1;	
 END;
