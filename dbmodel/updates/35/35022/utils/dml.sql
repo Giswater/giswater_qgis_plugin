@@ -53,9 +53,8 @@ UPDATE config_report SET filterparam = '[{"columnname":"arccat_id", "label":"Arc
 
 INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type, datatype)
 VALUES ('basic_selector_tab_macrosector', '{"table":"macrosector","selector":"selector_sector","table_id":"macrosector_id",
-"selector_id":"sector_id","label":"macrosector_id, '' - '', m.name","orderBy":"macrosector_id","manageAll":true,
-"query_filter":" AND macrosector_id > 0","typeaheadForced":true,"sectorFromMacroexpl":true,"explFromMacroexpl":false}', 
-'Variable to configure all options related to search for the specificic tab',
+"selector_id":"sector_id","label":"macrosector_id, '' - '', m.name","orderBy":"macrosector_id","manageAll":true,"selectionMode":"keepPreviousUsingShift",
+"query_filter":" AND macrosector_id > 0","typeaheadForced":true, "sectorFromMacroexpl":true,"explFromMacroexpl":false}', 'Variable to config selector tab macrosector',
 'Selector variables', FALSE, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
