@@ -68,7 +68,8 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_tablename :=  ((p_data ->>'feature')::json->>'tableName')::text;
 	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
-	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
+	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario'); -- for all in exception of v_edit_raingage
+	v_table = replace(v_table,'v_edit','inp_dscenario'); -- for v_edit_raingage
 	
 	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
 
@@ -153,6 +154,8 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 			VALUES (v_fid, null, 3, concat('ERROR: The table choosed does not fit with any epa dscenario. Please try another one.'));
 			v_finish = true;
+			
+			DELETE FROM cat_dscenario WHERE dscenario_id = v_scenarioid;
 		END IF;
 		
 		IF v_finish IS NOT TRUE THEN
