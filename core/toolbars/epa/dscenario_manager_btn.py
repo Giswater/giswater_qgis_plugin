@@ -188,8 +188,8 @@ class GwDscenarioManagerButton(GwAction):
 
         default_tab_idx = 0
         # Select all dscenario views
-        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
-              f"AND table_name LIKE 'v_edit_inp_dscenario%'"
+        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = ANY (current_schemas(false)) " \
+              f"AND table_name LIKE 'inp_dscenario%'"
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]
