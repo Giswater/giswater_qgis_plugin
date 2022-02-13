@@ -19,8 +19,8 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
     
-		INSERT INTO inp_lid_usage (hydrology_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv,rptfile, descript, hydrology_id) 
-		VALUES (NEW.hydrology_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript, NEW.hydrology_id);
+		INSERT INTO inp_lid_usage (hydrology_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv,rptfile, descript) 
+		VALUES (NEW.hydrology_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, NEW.descript);
 		
 		RETURN NEW;
 
@@ -34,7 +34,7 @@ BEGIN
 		RETURN NEW;
    
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM inp_lid_usage WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
+		DELETE FROM inp_lid_usage WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id AND lidco_id = OLD.lidco_id;
 
 		RETURN NULL;
    
