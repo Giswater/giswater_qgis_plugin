@@ -59,3 +59,9 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
     temp_lid_usage.rptfile
    FROM v_edit_inp_subcatchment
      JOIN temp_lid_usage ON temp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+
+ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_lid_usage_fkey FOREIGN KEY (hydrology_id, subc_id, lidco_id)
+REFERENCES inp_lid_usage (hydrology_id, subc_id, lidco_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
