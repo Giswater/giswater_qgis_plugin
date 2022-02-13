@@ -235,3 +235,22 @@ CREATE OR REPLACE VIEW v_edit_inp_lid_usage AS
 FROM inp_lid_usage l
 JOIN v_edit_inp_subcatchment s USING (subc_id)
 WHERE s.hydrology_id = l.hydrology_id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_raingage AS 
+ SELECT p.dscenario_id,
+    p.rg_id,
+    p.form_type,
+    p.intvl,
+    p.scf,
+    p.rgage_type,
+    p.timser_id,
+    p.fname,
+    p.sta,
+    p.units,
+    the_geom
+   FROM selector_inp_dscenario,
+    v_edit_raingage
+     JOIN inp_dscenario_raingage p USING (rg_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
