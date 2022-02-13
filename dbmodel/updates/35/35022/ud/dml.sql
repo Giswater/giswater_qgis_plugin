@@ -244,3 +244,10 @@ VALUES ('VERT_ELLIPSE', 'VERT_ELLIPSE') ON CONFLICT (id) DO NOTHING;
 UPDATE config_toolbox SET functionparams = '{"featureType":["node", "arc", "lids", "raingage"]}' WHERE id = 3118;
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
+
+
+UPDATE config_toolbox SET inputparams = 
+'[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+ {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
+ {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}]'
+WHERE id = 3118;
