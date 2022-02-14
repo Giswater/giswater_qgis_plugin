@@ -12,7 +12,7 @@ from qgis.gui import QgsDateTimeEdit
 from .task import GwTask
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt
+from ...lib import tools_log, tools_qt, tools_qgis
 
 
 class GwToolBoxTask(GwTask):
@@ -63,20 +63,26 @@ class GwToolBoxTask(GwTask):
             selection_mode = self.toolbox.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
-            feature_id_list = '"id":['
+            feature_id_list = '"id":{'
             if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
-                feature_id_list += ']'
+                feature_id_list += '}'
             elif selection_mode == 'previousSelection' and layer is not None:
+                pks = tools_qgis.get_primary_key(layer)
+                if pks:
+                    pks = pks.split(",")
                 features = layer.selectedFeatures()
                 feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
-                for feature in features:
-                    feature_id = feature.attribute(feature_type + "_id")
-                    feature_id_list += f'"{feature_id}", '
+                for pk in pks:
+                    feature_id_list += f'"{pk}":[ '
+                    for feature in features:
+                        feature_id = feature.attribute(pk)
+                        feature_id_list += f'"{feature_id}", '
+                    if len(features) > 0:
+                        feature_id_list = feature_id_list[:-2] + '], '
                 if len(features) > 0:
-                    feature_id_list = feature_id_list[:-2] + ']'
+                    feature_id_list = feature_id_list[:-2] + '}'
                 else:
-                    feature_id_list += ']'
-
+                    feature_id_list += '}'
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
                 feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
