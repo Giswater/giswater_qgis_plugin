@@ -118,7 +118,7 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_active_functions(self):
         """ Fill combobox with functions """
 
-        values = [[3042, "Manage values"]]
+        values = [[3042, "Manage values"], [3134, "Create empty dscenario"]]
         if global_vars.project_type == 'ws':
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
