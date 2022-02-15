@@ -145,8 +145,7 @@ class GwMincutTools:
         self.dlg_selector.rejected.connect(partial(tools_gw.save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(tools_gw.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        selector_vars = {}
-        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
+        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
 
         tools_gw.open_dialog(self.dlg_selector, dlg_name='selector')
 
