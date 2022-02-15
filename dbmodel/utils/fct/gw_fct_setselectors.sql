@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ud"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
@@ -177,7 +177,7 @@ BEGIN
 		IF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
 
 			-- manage isalone
-			IF v_isalone OR v_checkall IS FALSE THEN
+			IF v_isalone THEN
 				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 			END IF;
 		
@@ -191,6 +191,11 @@ BEGIN
 			END IF;
 
 		ELSE
+			-- manage isalone
+			IF v_isalone THEN
+				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+			END IF;
+		
 			-- manage value
 			IF v_value THEN
 				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
