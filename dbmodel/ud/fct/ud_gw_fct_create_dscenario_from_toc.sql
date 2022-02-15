@@ -74,7 +74,7 @@ BEGIN
 	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario'); -- for all in exception of v_edit_raingage
 	v_table = replace(v_table,'v_edit','inp_dscenario'); -- for v_edit_raingage
 	
-	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');END IF;
+	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id::text,'[','('),']',')'),'"','');END IF;
 
 	IF v_id IS NULL THEN v_id = '()';END IF;
 	
@@ -96,7 +96,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
+	PERFORM setval('ud.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
 	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log) 
 	VALUES ( v_name, v_descript, v_type, v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
@@ -175,7 +175,7 @@ BEGIN
 			ELSIF  v_selectionmode = 'previousSelection' THEN
 				v_where = ' WHERE ';
 				FOR _key, _value IN
-			       SELECT * FROM jsonb_each(v_id)
+			       SELECT * FROM jsonb_each(v_id::jsonb)
 			    LOOP
 					_value = replace(replace(replace(_value, '"', ''''), '[', ''), ']', '');
 					v_where = concat(v_where, _key, ' IN (', _value, ') AND ');
