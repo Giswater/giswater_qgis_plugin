@@ -617,21 +617,10 @@ class GwToolBoxButton(GwAction):
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                row = tools_db.check_function(function['functionname'])
-                if not row:
-                    if os.path.exists(path_icon_red):
-                        icon = QIcon(path_icon_red)
-                        label.setIcon(icon)
-                        label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']}" \
-                            f" configured on the table config_toolbox, but not found in the database"
-                        label.setToolTip(msg)
-                        self.no_clickable_items.append(str(function['alias']))
-                else:
-                    if os.path.exists(path_icon_blue):
-                        icon = QIcon(path_icon_blue)
-                        label.setIcon(icon)
-                        label.setToolTip(function['functionname'])
+                if os.path.exists(path_icon_blue):
+                    icon = QIcon(path_icon_blue)
+                    label.setIcon(icon)
+                    label.setToolTip(function['functionname'])
 
                 parent1.appendRow([label, func_name])
             section_processes.appendRow(parent1)
