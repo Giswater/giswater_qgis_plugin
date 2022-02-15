@@ -48,6 +48,9 @@ v_table text;
 v_columns text;
 v_finish boolean = false;
 v_expl integer;
+v_where text;
+_key   text;
+_value text;
 
 BEGIN
 
@@ -69,7 +72,7 @@ BEGIN
 	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
 	
 	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
-	v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');
+	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');END IF;
 
 	IF v_id IS NULL THEN v_id = '()';END IF;
 	
@@ -143,7 +146,15 @@ BEGIN
 			IF v_selectionmode = 'wholeSelection' THEN
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
 			ELSIF  v_selectionmode = 'previousSelection' THEN
-				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)||' WHERE '||lower(v_featuretype)||'_id::integer IN '||v_id;
+				v_where = ' WHERE ';
+				FOR _key, _value IN
+			       SELECT * FROM jsonb_each(v_id)
+			    LOOP
+					_value = replace(replace(replace(_value, '"', ''''), '[', ''), ']', '');
+					v_where = concat(v_where, _key, ' IN (', _value, ') AND ');
+				END LOOP;
+				v_where = substr(v_where, 1, length(v_where) - 5);
+				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)|| v_where;
 			END IF;
 
 			EXECUTE v_querytext;	
