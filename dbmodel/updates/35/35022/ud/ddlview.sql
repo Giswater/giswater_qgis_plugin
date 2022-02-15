@@ -201,7 +201,7 @@ UNION
  
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_lid_usage AS 
  SELECT 
-    dscenario_id,
+    sd.dscenario_id,
     l.hydrology_id,
     l.subc_id,
     l.lidco_id,
@@ -214,9 +214,10 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_lid_usage AS
     l.rptfile,
     l.descript,
     s.the_geom
-   FROM inp_dscenario_lid_usage l
+   FROM selector_inp_dscenario sd, inp_dscenario_lid_usage l
      JOIN v_edit_inp_subcatchment s USING (subc_id)
-  WHERE s.hydrology_id = l.hydrology_id;
+  WHERE s.hydrology_id = l.hydrology_id AND l.dscenario_id = sd.dscenario_id and cur_user = current_user;
+
 
 DROP VIEW v_edit_inp_lid_usage;
 CREATE OR REPLACE VIEW v_edit_inp_lid_usage AS 
