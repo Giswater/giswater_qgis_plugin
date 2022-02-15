@@ -27,12 +27,6 @@ BEGIN
 --	Set search path to local schema
 	SET search_path = SCHEMA_NAME, public;
 
-	v_sector := (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_presszone := (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_dqa := (SELECT value::json->>'DQA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_dma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_minsector := (SELECT value::json->>'MINSECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-
 	IF (TG_OP = 'INSERT') THEN
 		v_new_data := row_to_json(NEW.*);
 		INSERT INTO audit.log (schema,table_name,user_name,action,newdata,query)
@@ -40,19 +34,8 @@ BEGIN
 		RETURN NEW;
 	ELSIF (TG_OP = 'UPDATE') THEN
     
-		IF TG_TABLE_NAME IN ('arc','node','connec') THEN
+		IF current_query() like '%gw_fct_grafanalytics_mapzones%' THEN
 		
-			IF (v_sector AND NEW.sector_id != OLD.sector_id) OR
-				(v_presszone AND NEW.presszone_id != OLD.presszone_id) OR
-				(v_dma AND NEW.dma_id != OLD.dma_id) OR
-				(v_dqa AND NEW.dqa_id != OLD.dqa_id) OR
-				(v_minsector AND NEW.minsector_id != OLD.minsector_id) THEN
-			ELSE
-				v_old_data := row_to_json(OLD.*);
-				v_new_data := row_to_json(NEW.*);
-				INSERT INTO audit.log (schema,table_name,user_name,action,olddata,newdata,query) 
-				VALUES (TG_TABLE_SCHEMA::TEXT,TG_TABLE_NAME::TEXT,session_user::TEXT,substring(TG_OP,1,1),v_old_data,v_new_data, current_query());
-			END IF;
 		ELSE
 			v_old_data := row_to_json(OLD.*);
 			v_new_data := row_to_json(NEW.*);
