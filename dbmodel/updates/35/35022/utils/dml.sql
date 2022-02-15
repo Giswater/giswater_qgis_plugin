@@ -73,3 +73,27 @@ VALUES ('sys_table_context', '{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{
 
 UPDATE sys_table SET context='{"level_1":"BASEMAP","level_2":"CARTO"}', orderby = 1, alias='DEM', addparam='{"geom":"rast"}' 
 WHERE id IN ('v_ext_raster_dem');
+
+INSERT INTO sys_fprocess VALUES (438, 'Create dscenario with empty values', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
+return_type, descript, sys_role, sample_query, source)
+VALUES (3134, 'gw_fct_create_dscenario_empty', 'utils', 'function', 'json', 'json', 'Function to create empty dscenario', 'role_epa', null, null) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3134, 'Create empty Dscenario', '{"featureType":[]}', '[
+{"widgetname":"name", "label":"Name:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+
+{"widgetname":"descript", "label":"Descript: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+
+{"widgetname":"parent", "label":"Parent: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Parent for dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+
+{"widgetname":"type", "label":"Type: (*)","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_dscenario''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":""},
+
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}
+]', NULL, true) 
+ON CONFLICT (id) DO NOTHING;
