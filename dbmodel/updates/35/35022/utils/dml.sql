@@ -97,3 +97,6 @@ VALUES (3134, 'Create empty Dscenario', '{"featureType":[]}', '[
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}
 ]', NULL, true) 
 ON CONFLICT (id) DO NOTHING;
+
+-- 15/02/2022
+UPDATE sys_style SET idval='v_edit_arc' WHERE id=101;
