@@ -35,8 +35,8 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 	
-	WITH geomtable AS (SELECT column_name, table_name from information_schema.columns WHERE udt_name='geometry' and table_schema='ws_sample35'),
-	idtable AS (SELECT column_name, table_name from information_schema.columns WHERE ordinal_position=1 and table_schema='ws_sample35')
+	WITH geomtable AS (SELECT column_name, table_name from information_schema.columns WHERE udt_name='geometry' and table_schema='SCHEMA_NAME'),
+	idtable AS (SELECT column_name, table_name from information_schema.columns WHERE ordinal_position=1 and table_schema='SCHEMA_NAME')
 	SELECT array_agg(row_to_json(d)) FROM (SELECT context, alias as "layerName", st.id as "tableName",
 	CASE WHEN c.column_name IS NULL THEN 'None' 
 	WHEN st.addparam->>'geom' IS NOT NULL THEN st.addparam->>'geom'
