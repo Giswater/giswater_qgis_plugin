@@ -1507,6 +1507,8 @@ class GwPsector:
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
+        selection_model = self.qtbl_psm.selectionModel()
+        selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.set_label_current_psector(self.dlg_psector_mng)
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -1798,6 +1800,32 @@ class GwPsector:
 
 
     # region private functions
+
+
+    def _fill_txt_infolog(self, selected):
+        """
+         Fill txt_infolog from epa_result_manager form with current data selected for columns:
+             'name', 'priority', 'status', 'exploitation', 'type', 'descript', 'text1', 'text2', 'observ'
+         """
+
+        # Get id of selected row
+        row = selected.indexes()
+        if not row:
+            return
+
+        msg = ""
+
+        cols = ['Name', 'Priority', 'Status', 'Exploitation', 'Type', 'Descript', 'text1', 'text2', 'Observ']
+
+        for col in cols:
+            # Get column index for column
+            col_ind = tools_qt.get_col_index_by_col_name(self.qtbl_psm, f"{col.lower()}")
+            text = f'{row[col_ind].data()}'
+            msg += f"<b>{col}: </b><br>{text}<br><br>"
+
+        # Set message text into widget
+        tools_qt.set_widget_text(self.dlg_psector_mng, 'txt_infolog', msg)
+
 
     def _enable_layers(self, is_cheked):
         """ Manage checkbox state and act accordingly with the layers """
