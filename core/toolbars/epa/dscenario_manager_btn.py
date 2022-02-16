@@ -108,9 +108,9 @@ class GwDscenarioManagerButton(GwAction):
             if field['value']:
                 self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, field)
                 self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, field)
-            # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
-            tools_qt.set_tableview_config(self.tbl_dscenario)
+        # TODO: config_form_tableview
+        # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
+        tools_qt.set_tableview_config(self.tbl_dscenario)
 
         return complet_list
 
