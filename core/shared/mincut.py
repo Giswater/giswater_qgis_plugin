@@ -1776,7 +1776,7 @@ class GwMincut:
             layer.select([feature_id])
 
             # Ensure that Mincut layers are loaded
-            self._load_missing_layers()
+            tools_gw.load_missing_layers('v_om_mincut%', "OM", "Mincut")
 
             # Create task to manage Mincut execution
             self.dlg_mincut.btn_cancel_task.show()
@@ -1786,18 +1786,6 @@ class GwMincut:
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
                 partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
-
-
-    def _load_missing_layers(self):
-        """ Adds any missing Mincut layers to TOC """
-
-        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_om_mincut%' AND alias IS NOT NULL"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            for tablename, alias in rows:
-                lyr = tools_qgis.get_layer_by_tablename(tablename)
-                if not lyr:
-                    tools_gw.add_layer_database(tablename, alias=alias, group="OM", sub_group="Mincut")
 
 
     def _cancel_task(self):

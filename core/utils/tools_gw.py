@@ -761,6 +761,18 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
+def load_missing_layers(filter, group="GW Layers", sub_group=None):
+    """ Adds any missing Mincut layers to TOC """
+
+    sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filter}' AND alias IS NOT NULL"
+    rows = tools_db.get_rows(sql)
+    if rows:
+        for tablename, alias in rows:
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                add_layer_database(tablename, alias=alias, group=group, sub_group=sub_group)
+
+
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
     """
     Populate txt_infolog QTextEdit widget
