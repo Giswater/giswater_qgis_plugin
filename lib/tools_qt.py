@@ -634,7 +634,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     qtable.setModel(model)
 
 
-def add_layer_to_toc(layer, group=None, sub_group=None):
+def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
     :param group: Name of the group that will be created in the toc (string)
@@ -643,25 +643,32 @@ def add_layer_to_toc(layer, group=None, sub_group=None):
     if group is None:
         QgsProject.instance().addMapLayer(layer)
         return
-    else:
-        QgsProject.instance().addMapLayer(layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        first_group = root.findGroup(group)
-        if first_group and sub_group:
-            for child in first_group.children():
-                second_group = first_group.findGroup(child.name())
-                if second_group and sub_group.lower() == child.name().lower():
-                    second_group.insertLayer(0, layer)
-                    global_vars.iface.setActiveLayer(layer)
-                    return
-            first_group.insertLayer(0, layer)
-            global_vars.iface.setActiveLayer(layer)
-        else:
-            root = QgsProject.instance().layerTreeRoot()
-            my_group = root.findGroup("GW Layers")
-            if my_group is None:
-                my_group = root.insertGroup(0, "GW Layers")
-            my_group.insertLayer(0, layer)
+
+    QgsProject.instance().addMapLayer(layer, False)
+    root = QgsProject.instance().layerTreeRoot()
+    first_group = root.findGroup(group)
+    if create_groups:
+        if not first_group:
+            first_group = root.insertGroup(0, group)
+        if not first_group.findGroup(sub_group):
+            first_group.insertGroup(0, sub_group)
+
+    if first_group and sub_group:
+        for child in first_group.children():
+            second_group = first_group.findGroup(child.name())
+            if second_group and sub_group.lower() == child.name().lower():
+                second_group.insertLayer(0, layer)
+                global_vars.iface.setActiveLayer(layer)
+                return
+        first_group.insertLayer(0, layer)
+        global_vars.iface.setActiveLayer(layer)
+        return
+
+    root = QgsProject.instance().layerTreeRoot()
+    my_group = root.findGroup("GW Layers")
+    if my_group is None:
+        my_group = root.insertGroup(0, "GW Layers")
+    my_group.insertLayer(0, layer)
 
 
 def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
