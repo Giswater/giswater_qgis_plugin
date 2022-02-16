@@ -119,7 +119,7 @@ class GwAddChildLayerButton(GwAction):
                         the_geom = None
                     else:
                         the_geom = field['geomField']
-                    geom_field = field['tableId']
+                    geom_field = field['tableId'].replace(" ", "")
                     style_id = field['style_id']
                     group = context['level_1']
                     sub_group = context['level_2']
