@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
+import json
 import os
 import random
 import re
@@ -2697,6 +2698,8 @@ def fill_tableview_rows(widget, field):
         for value in item.values():
             if value is None:
                 value = ""
+            if issubclass(type(value), dict):
+                value = json.dumps(value)
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
             model.appendRow(row)
