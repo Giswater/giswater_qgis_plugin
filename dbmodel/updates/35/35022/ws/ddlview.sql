@@ -97,3 +97,15 @@ CREATE OR REPLACE VIEW v_edit_inp_pump_additional AS
    JOIN v_edit_inp_pump USING (node_id);
 						
 		
+DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS 
+ SELECT 
+    d.dscenario_id,
+    p.node_id,
+    p.minorloss,
+    p.status,
+    v.the_geom
+   FROM selector_inp_dscenario, v_edit_inp_shortpipe v
+     JOIN inp_dscenario_shortpipe p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
