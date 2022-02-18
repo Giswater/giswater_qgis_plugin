@@ -445,7 +445,21 @@ BEGIN
 		
 		v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
         EXECUTE v_sql;
-				
+		
+		--in case a project is dhc, insert cable
+		IF (SELECT value FROM config_param_system WHERE parameter='dhc_plugin_version') is not null then
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='dhc_edit_insert_cable' 
+			AND cur_user=current_user) is true AND (SELECT json_extract_path_text(value::json,'cableFeaturecat')
+				FROM config_param_system WHERE parameter='dhc_edit_insert_cable') != NEW.arc_type THEN
+					raise notice 'execute';
+					EXECUTE 'SELECT dhc_fct_edit_cable($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+					"data":{"filterFields":{}, "pageInfo":{},"arcId":"'||NEW.arc_id::text||'", 
+					"arcGeom":"'||NEW.the_geom::text||'", "muniId":"'||NEW.muni_id::text||'", "explId":"'||NEW.expl_id::text||'",
+					"state":"'||NEW.state::text||'","stateType":"'||NEW.state_type::text||'", "arcId":"'||NEW.arc_id||'" }}$$);';
+			END IF;
+		END IF;
+
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
