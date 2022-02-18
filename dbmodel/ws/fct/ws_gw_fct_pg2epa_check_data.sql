@@ -321,7 +321,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '275',concat(
-		'ERROR-275: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values at least on mandatory on the mandatory column for Pressure valves.'),v_count);
+		'ERROR-275: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values at least on the mandatory column for Pressure valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -333,7 +333,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
 		VALUES (v_fid, v_result_id, 3,'276', concat(
-		'ERROR-276: There is/are ',v_count,' GPV valve(s) with null values at least on mandatory on the mandatory column for General purpose valves.'),v_count);
+		'ERROR-276: There is/are ',v_count,' GPV valve(s) with null values at least on the mandatory column for General purpose valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
