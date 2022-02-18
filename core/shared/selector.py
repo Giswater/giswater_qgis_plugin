@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
-    QWidget, QApplication
+    QWidget, QApplication, QDockWidget
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
@@ -315,6 +315,12 @@ class GwSelector:
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)
+
+        if tab_name == 'tab_exploitation':
+            docker_search = global_vars.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+            if docker_search:
+                search_class = docker_search.property('class')
+                search_class.refresh_tab()
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):

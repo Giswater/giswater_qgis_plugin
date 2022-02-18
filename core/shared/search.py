@@ -51,6 +51,7 @@ class GwSearch:
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
+            self.dlg_search.setProperty('class', self)
 
         # If dlg_mincut is None we are not opening from mincut
         form = ""
@@ -180,6 +181,31 @@ class GwSearch:
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
+
+
+    def refresh_tab(self, tab_name="tab_hydro"):
+        form = f'"singleTab":"{tab_name}"'
+
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        if qgis_project_add_schema is None:
+            body = tools_gw.create_body(form=form)
+        else:
+            extras = f'"addSchema":"{qgis_project_add_schema}"'
+            body = tools_gw.create_body(form=form, extras=extras)
+        complet_list = tools_gw.execute_procedure('gw_fct_getsearch', body)
+
+        main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        for tab in complet_list["form"]:
+            for field in tab['fields']:
+                try:
+                    if field['widgettype'] == 'combo':
+                        widget = main_tab.findChild(QComboBox, field['widgetname'])
+                        list_items = self._get_list_items(widget, field)
+                        tools_qt.fill_combo_values(widget, list_items, 1)
+                except Exception:
+                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+                          f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+                    tools_qgis.show_message(msg, 2)
 
 
     # region private functions
