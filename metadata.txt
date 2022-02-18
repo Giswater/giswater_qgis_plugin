@@ -14,6 +14,7 @@ Changelog=Version 3.5.022
     - Manage draw polygon rubberband using new user variable "show_psector_ruberband_duration"
     - Manage raster_layers and layers with more than one PK on add giswater layer button
     - Update templates with new style for EPA result arcs and using QGIS 3.22 (WS)
+    - Add "Open/Close valve" quick access in right-click with Info
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
