@@ -65,6 +65,7 @@ v_project_type text;
 
 v_valve_id text;
 v_valve_text text;
+v_valve_tablename text;
 v_closed_valve bool;
 
   
@@ -213,27 +214,26 @@ BEGIN
 					INTO v_ids
 					USING v_point, v_sensibility;
 
-					-- Get closest valve if there is one
-					IF v_project_type = 'WS' AND v_ids IS NOT NULL THEN
-						FOREACH v_ids_item IN ARRAY v_ids 
-						LOOP
-							v_id := v_ids_item->>'id';
-							v_sql2 = 'SELECT '||v_parenttype||'_type FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''';
-							raise notice 'v_sql2 ---> %', v_sql2;
-							EXECUTE v_sql2 INTO v_featuretype;
-							EXECUTE 'SELECT system_id FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_featuretype;
-							IF v_featuretype = 'VALVE' AND v_valve_text IS NULL THEN
-								raise notice 'VALVE FOUND!! ->> %',v_id;
-								v_valve_id := v_id;
-								EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
-								IF v_closed_valve IS True THEN
-									v_valve_text := 'Open valve ('||v_id||')';
-								ELSE
-									v_valve_text := 'Close valve ('||v_id||')';
-								END IF;
-							END IF;
-						END LOOP;
-					END IF;
+                    -- Get closest valve if there is one
+                    IF v_project_type = 'WS' AND v_ids IS NOT NULL THEN
+                        FOREACH v_ids_item IN ARRAY v_ids 
+                        LOOP
+                            v_id := v_ids_item->>'id';
+                            v_sql2 = 'SELECT '||v_parenttype||'_type FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''';
+                            EXECUTE v_sql2 INTO v_featuretype;
+                            IF (SELECT system_id FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
+	                            EXECUTE 'SELECT child_layer FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_valve_tablename;
+                                raise notice 'VALVE FOUND!! ->> %',v_id;
+                                v_valve_id := v_id;
+                                EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
+                                IF v_closed_valve IS True THEN
+                                    v_valve_text := 'Open valve ('||v_id||')';
+                                ELSE
+                                    v_valve_text := 'Close valve ('||v_id||')';
+                                END IF;
+                            END IF;
+                        END LOOP;
+                    END IF;
 				ELSE 
 					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 					SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
@@ -268,7 +268,8 @@ BEGIN
 	END LOOP;
 	
 	IF v_valve_text IS NOT NULL THEN
-		v_valve_text := ', "valve": {"id": "'||v_valve_id||'", "text": "'||v_valve_text||'"}';
+		v_valve_text := ', "valve": {"id": "'||v_valve_id||'", "text": "'||v_valve_text||
+						'", "tableName":"'||v_valve_tablename||'", "value": "'||(NOT v_closed_valve)||'"}';
 	END IF;
     
 	fields := array_to_json(fields_array);
