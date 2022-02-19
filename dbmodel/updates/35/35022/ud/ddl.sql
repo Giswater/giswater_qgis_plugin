@@ -11,10 +11,14 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_timeseries", "column":"sector_id", "newName":"expl_id"}}$$);
 
 
+DROP VIEW v_edit_inp_lid_usage;
+DELETE FROM sys_table WHERE id IN ('v_edit_inp_lid_usage', 'inp_lid_usage');
+ALTER TABLE inp_lid_usage RENAME TO _inp_lid_usage_;
+
+
 CREATE TABLE inp_dscenario_lid_usage
 (
   dscenario_id integer NOT NULL,
-  hydrology_id integer NOT NULL,
   subc_id character varying(16) NOT NULL,
   lidco_id character varying(16) NOT NULL,
   numelem smallint,
@@ -26,7 +30,7 @@ CREATE TABLE inp_dscenario_lid_usage
   rptfile character varying(10),
   descript text,
   CONSTRAINT inp_dscenario_lid_usage_pkey 
-  PRIMARY KEY (dscenario_id, hydrology_id, subc_id, lidco_id));
+  PRIMARY KEY (dscenario_id, subc_id, lidco_id));
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_lid_usage", "column":"number", "newName":"numelem"}}$$);
 

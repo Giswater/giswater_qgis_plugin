@@ -204,8 +204,7 @@ UPDATE sys_table SET addparam='{"pkey":"hydrology_id, subc_id"}' WHERE id IN ('v
 UPDATE sys_table SET addparam='{"pkey":"node_id, poll_id"}' WHERE id IN ('v_edit_inp_inflows_poll','v_edit_inp_treatment');
 
 UPDATE sys_table SET addparam='{"pkey":"dscenario_id, node_id, poll_id"}' WHERE id IN ('v_edit_inp_dscenario_treatment', 'v_edit_inp_dscenario_inflows_poll');
-UPDATE sys_table SET addparam='{"pkey":"hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_lid_usage');
-UPDATE sys_table SET addparam='{"pkey":"dscenario_id, hydrology_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_dscenario_lid_usage');
+UPDATE sys_table SET addparam='{"pkey":"dscenario_id, subc_id, lidco_id"}' WHERE id IN ('v_edit_inp_dscenario_lid_usage');
 
 UPDATE config_form_fields SET columnname='numelem', label='numelem' WHERE columnname='number' AND formname='v_edit_inp_lid_usage';
 
@@ -241,13 +240,20 @@ ADD CONSTRAINT cat_arc_shape_check CHECK (epa::text = ANY (ARRAY['VERT_ELLIPSE':
 INSERT INTO cat_arc_shape
 VALUES ('VERT_ELLIPSE', 'VERT_ELLIPSE') ON CONFLICT (id) DO NOTHING;
 
-UPDATE config_toolbox SET functionparams = '{"featureType":["node", "arc", "lids", "raingage"]}' WHERE id = 3118;
+UPDATE config_toolbox SET functionparams = '{"featureType":["node", "arc", "subcatchment", "raingage"]}' WHERE id = 3118;
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
-
 
 UPDATE config_toolbox SET inputparams = 
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
  {"widgetname":"type", "label":"Scenario type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"SELECT id, idval FROM inp_typevalue where typevalue = ''inp_typevalue_dscenario''", "selectedId":""},
  {"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}]'
 WHERE id = 3118;
+
+-- 19/02/2022
+DELETE FROM sys_function WHERE function_name = 'gw_trg_edit_inp_lid_usage';
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, source, layoutname, layoutorder, label)
+VALUES ('epa_lidco_vdefault', 'config', 'Default value for lids when automatic creation for ToC (Subcatchments)', 'role_epa', true, 'ud', false, 'text', 'combo', true, 
+'SELECT DISTINCT lidco_id as id,lidco_id as idval FROM inp_lid_control', 'core', 'lyt_epa', 1, 'LID Dscenario vdefault')
+ON CONFLICT (id) DO NOTHING;
