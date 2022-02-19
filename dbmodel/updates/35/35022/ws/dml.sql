@@ -626,3 +626,5 @@ AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern
  UPDATE sys_style SET id=141 WHERE id=10 AND idval='v_edit_inp_junction';
  
  UPDATE  config_form_fields SET formname = 'v_edit_inp_dscenario_connec' WHERE formname = 'v_edit_inp_connec' AND columnname = 'dscenario_id';
+
+ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'mapzone','{"dma", "dqa", "presszone", "sector"}'::text) WHERE parameter = 'utils_grafanalytics_automatic_trigger';

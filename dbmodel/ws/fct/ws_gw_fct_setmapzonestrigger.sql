@@ -14,11 +14,11 @@ $BODY$
 
 	
 -- MAPZONES
-SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"node", "tableName":"ve_node_valvula", "id":"1295"},"data":{"fields":{"closed":"False"}}}$$)
 
+ SELECT ws_sample.gw_fct_setmapzonestrigger($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, 
+ "feature":{"id":"1088", "tableName":"ve_node_shutoff_valve", "featureType":"node" }, 
+ "data":{"filterFields":{}, "pageInfo":{}, "fields":{"closed": "true"}}}$$);
+ 
 */
 
 DECLARE
@@ -33,6 +33,7 @@ v_closedstatus boolean;
 v_automaticmapzonetrigger boolean;
 v_type text;
 v_mapzone text;
+v_mapzone_array text[];
 v_count integer;
 v_count_2 integer;
 v_mapzone_id integer;
@@ -78,17 +79,10 @@ BEGIN
 			v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			
 			-- FOR v_mapzone
-			FOR v_mapzone IN 
-			SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'presszone', value::json->>'PRESSZONE' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dma', value::json->>'DMA' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
-			WHERE status::boolean is true
+			FOR v_mapzone IN SELECT unnest(v_mapzone_array)
 			LOOP
 				-- getting current mapzone
 				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id) INTO v_value;
@@ -114,6 +108,7 @@ BEGIN
 					IF v_mapzone_id IS NOT NULL THEN
 						EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
 						INTO v_nodeheader;
+						
 						RAISE NOTICE 'v_nodeheader %', v_nodeheader;
 
 						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":"true", 
