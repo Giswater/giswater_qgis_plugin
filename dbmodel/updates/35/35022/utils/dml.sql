@@ -100,3 +100,6 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 15/02/2022
 UPDATE sys_style SET idval='v_edit_arc' WHERE id=101;
+
+-- 19/02/2022
+UPDATE sys_param_user SET layoutname = 'lyt_inventory', layoutorder = 20+layoutorder WHERE layoutname = 'lyt_edit';
