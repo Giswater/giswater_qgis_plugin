@@ -142,10 +142,10 @@ BEGIN
 
 							PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
 										
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. This operation have been affected mapzones scenario. Take a look on map for check it"}';
+							v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. This operation have been affected mapzones scenario. Take a look on map for check it"}';
 						ELSE
 								
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
+							v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
 						END IF;		
 
 					ELSIF v_closedstatus IS FALSE THEN
@@ -156,7 +156,7 @@ BEGIN
 						ELSIF v_count =  2 THEN
 						
 							IF v_count_2 = 2 THEN			
-								v_message = concat('{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
+								v_message = concat('{"level": 2, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
 							ELSIF  v_count_2 = 1 THEN
 								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
 							END IF;

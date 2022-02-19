@@ -93,7 +93,6 @@ BEGIN
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 	v_fieldsreload := (p_data ->> 'data')::json->> 'reload';
 	v_afterinsert := json_extract_path_text (p_data,'data','afterInsert')::text;
-	v_directupdate := (p_data ->> 'data')::json->> 'directUpdate'::text;
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
@@ -198,11 +197,7 @@ BEGIN
 
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 
-	-- trigger automatic mapzones
-	IF v_projecttype = 'WS' AND v_closedstatus IS NOT NULL AND v_afterinsert IS FALSE THEN
-		EXECUTE 'SELECT gw_fct_setmapzonestrigger($$'||p_data||'$$)' INTO v_message;
-	END IF;
-
+	
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');   
