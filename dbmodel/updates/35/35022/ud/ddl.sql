@@ -32,9 +32,6 @@ CREATE TABLE inp_dscenario_lid_usage
   CONSTRAINT inp_dscenario_lid_usage_pkey 
   PRIMARY KEY (dscenario_id, subc_id, lidco_id));
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_lid_usage", "column":"number", "newName":"numelem"}}$$);
-
-
 
 CREATE TABLE temp_lid_usage
 (
@@ -66,6 +63,3 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
 
 ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_dscenario_id_fkey FOREIGN KEY (dscenario_id)
 REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_lid_usage_fkey FOREIGN KEY (hydrology_id, subc_id, lidco_id)
-REFERENCES inp_lid_usage (hydrology_id, subc_id, lidco_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
