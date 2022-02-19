@@ -624,3 +624,5 @@ AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern
  ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
  
  UPDATE sys_style SET id=141 WHERE id=10 AND idval='v_edit_inp_junction';
+ 
+ UPDATE  config_form_fields SET formname = 'v_edit_inp_dscenario_connec' WHERE formname = 'v_edit_inp_connec' AND columnname = 'dscenario_id';
