@@ -239,10 +239,6 @@ BEGIN
 	INSERT INTO rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
 
-	-- lid usage
-	INSERT INTO temp_lid_usage
-	SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile FROM inp_lid_usage;
-	
 	RETURN 1;	
 END;
 $BODY$

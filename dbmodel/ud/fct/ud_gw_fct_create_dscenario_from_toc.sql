@@ -147,7 +147,7 @@ BEGIN
 			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json, elev, ymax';
 
 		ELSIF v_targettable = 'inp_dscenario_lid_usage' THEN
-			v_columns = v_scenarioid||', subc_id, '||quote_literal(v_lidco)||',null,null,null,null,null,null,null, descript';
+			v_columns = v_scenarioid||', subc_id, '||quote_literal(v_lidco)||', null, area, width, null, null, null, null, descript';
 
  		ELSIF v_targettable = 'inp_dscenario_outfall' THEN
 			v_columns = v_scenarioid||', node_id, outfall_type, stage, curve_id, timser_id, gate';
