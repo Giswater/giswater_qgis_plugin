@@ -366,37 +366,37 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self._auto_mincut)
-        tools_gw.add_icon(action, "126")
+        tools_gw.add_icon(action, "126", sub_folder="24x24")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionRefreshMincut")
         action.triggered.connect(self._refresh_mincut)
-        tools_gw.add_icon(action, "125")
+        tools_gw.add_icon(action, "125", sub_folder="24x24")
         self.action_refresh_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self._custom_mincut, action))
-        tools_gw.add_icon(action, "123")
+        tools_gw.add_icon(action, "123", sub_folder="24x24")
         self.action_custom_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionChangeValveStatus")
         action.triggered.connect(partial(self._change_valve_status, action))
-        tools_gw.add_icon(action, "124")
+        tools_gw.add_icon(action, "124", sub_folder="24x24")
         self.action_change_valve_status = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self._add_connec)
-        tools_gw.add_icon(action, "121")
+        tools_gw.add_icon(action, "121", sub_folder="24x24")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self._add_hydrometer)
-        tools_gw.add_icon(action, "122")
+        tools_gw.add_icon(action, "122", sub_folder="24x24")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self._mincut_composer)
-        tools_gw.add_icon(action, "181")
+        tools_gw.add_icon(action, "181", sub_folder="24x24")
         self.action_mincut_composer = action
 
         # Set shortcut keys
@@ -1067,8 +1067,8 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
-        tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_connec.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_connec.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
@@ -1227,8 +1227,8 @@ class GwMincut:
         # self.dlg_hydro.btn_snapping.setEnabled(False)
 
         # Set icons
-        tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_hydro.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_hydro.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_hydro.btn_delete, "112", sub_folder="24x24")
 
         # Set signals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self._insert_hydro))

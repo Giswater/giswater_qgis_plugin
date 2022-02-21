@@ -557,9 +557,9 @@ class GwSearch:
 
         self.items_dialog = GwSearchWorkcatUi()
         
-        tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")
-        tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112")
-        tools_gw.add_icon(self.items_dialog.btn_doc_new, "34")
+        tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.items_dialog.btn_doc_new, "34", sub_folder="24x24")
         tools_gw.add_icon(self.items_dialog.btn_open_doc, "170")
 
         tools_gw.load_settings(self.items_dialog)

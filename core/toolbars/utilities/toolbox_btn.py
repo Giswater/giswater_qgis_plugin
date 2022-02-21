@@ -601,9 +601,8 @@ class GwToolBoxButton(GwAction):
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
 
-        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep
         path_icon_blue = icon_folder + os.sep + '36.png'
-        path_icon_red = icon_folder + os.sep + '100.png'
 
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))

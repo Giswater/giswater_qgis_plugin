@@ -82,8 +82,8 @@ class GwElement:
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
-        tools_gw.add_icon(self.dlg_add_element.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_add_element.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_element.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_element.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections

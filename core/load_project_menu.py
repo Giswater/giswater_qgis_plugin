@@ -48,7 +48,7 @@ class GwMenuLoad(QObject):
         if project_loaded:
             # region Toolbar
             toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}24x24{os.sep}36.png"
             toolbars_icon = QIcon(icon_path)
             toolbars_menu.setIcon(toolbars_icon)
             self.main_menu.addMenu(toolbars_menu)

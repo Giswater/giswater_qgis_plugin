@@ -44,7 +44,7 @@ class GwMincutTools:
                                    'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_mincut_man.date_from.setEnabled(False)
         self.dlg_mincut_man.date_to.setEnabled(False)
-        tools_gw.add_icon(self.dlg_mincut_man.btn_selector_mincut, "191")
+        tools_gw.add_icon(self.dlg_mincut_man.btn_selector_mincut, "191", sub_folder="24x24")
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_mincut_man.findChild(QLineEdit, "txt_mincut_id")

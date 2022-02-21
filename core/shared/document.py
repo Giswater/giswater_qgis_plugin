@@ -79,8 +79,8 @@ class GwDocument:
             layer.selectByIds([feature.id()])
 
         # Set icons
-        tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
 
