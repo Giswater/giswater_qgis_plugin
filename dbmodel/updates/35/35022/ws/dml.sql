@@ -628,3 +628,8 @@ AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern
  UPDATE  config_form_fields SET formname = 'v_edit_inp_dscenario_connec' WHERE formname = 'v_edit_inp_connec' AND columnname = 'dscenario_id';
 
  UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'mapzone','{"dma", "dqa", "presszone", "sector"}'::text) WHERE parameter = 'utils_grafanalytics_automatic_trigger';
+
+ --2022/02/21
+ INSERT INTO config_param_system
+("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('om_mincut_hydrometer_filter', '{"field1": "customer_code", "field2": "hydrometer_customer_code"}', 'Mincut hydrometer filter', 'Mincut hydrometer filter:', NULL, NULL, false, NULL, 'ws', false, false, 'json', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
