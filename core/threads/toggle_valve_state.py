@@ -22,6 +22,7 @@ class GwToggleValveTask(GwTask):
         super().__init__(description)
         self.params = params
         self.result = None
+        self.json_result = None
 
 
     def run(self):
@@ -29,13 +30,13 @@ class GwToggleValveTask(GwTask):
         super().run()
 
         body = self.params['body']
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, is_thread=True, aux_conn=self.aux_conn)
-        if not json_result:
+        self.json_result = tools_gw.execute_procedure('gw_fct_setfields', body, is_thread=True, aux_conn=self.aux_conn)
+        if not self.json_result:
             tools_log.log_info("Function gw_fct_setfields failed")
             return False
-        if json_result and json_result['status'] != 'Failed':
-            json_result = tools_gw.execute_procedure('gw_fct_setmapzonestrigger', body, is_thread=True, aux_conn=self.aux_conn)
-            if not json_result:
+        if self.json_result and self.json_result['status'] != 'Failed':
+            self.json_result = tools_gw.execute_procedure('gw_fct_setmapzonestrigger', body, is_thread=True, aux_conn=self.aux_conn)
+            if not self.json_result:
                 tools_log.log_info("Function gw_fct_setmapzonestrigger failed")
                 return False
             tools_log.log_info("Function gw_fct_setmapzonestrigger finished successfully")
@@ -60,7 +61,11 @@ class GwToggleValveTask(GwTask):
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
             return
 
-        tools_qgis.show_info("Mapzones update done successfully")
-        tools_qgis.refresh_map_canvas()
+        if self.json_result:
+            if self.json_result['level'] in (1, 2):
+                tools_qt.show_info_box(self.json_result['text'])
+            if self.json_result['level'] == 0:
+                tools_qgis.show_info(self.json_result['text'])
+            tools_qgis.refresh_map_canvas()
 
         self.setProgress(100)

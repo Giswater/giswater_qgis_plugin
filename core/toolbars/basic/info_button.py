@@ -229,7 +229,6 @@ class GwInfoButton(GwMaptool):
         feature += f'"tableName":"{table_name}", '
         feature += f' "featureType":"node" '
         extras = f'"fields":{{"closed": "{value}"}}'
-        extras += f', "directUpdate": "true"'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
         # Get utils_grafanalytics_automatic_trigger param
@@ -246,9 +245,14 @@ class GwInfoButton(GwMaptool):
             return
 
         # If param is true show question and create thread
-        msg = "This process may modify the current mapzones and it may take a little bit of time.\n" \
-              "Would you like to continue?"
-        answer = tools_qt.show_question(msg)
+        msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+        if global_vars.user_level['level'] in ('1', '2'):
+            msg += "\nWould you like to continue?"
+            answer = tools_qt.show_question(msg)
+        else:
+            tools_qgis.show_info(msg)
+            answer = True
+
         if answer:
             params = {"body": body}
             self.valve_thread = GwToggleValveTask("Update mapzones", params)

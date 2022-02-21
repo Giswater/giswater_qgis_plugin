@@ -20,7 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
+from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
@@ -29,6 +29,7 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
+from ..threads.toggle_valve_state import GwToggleValveTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
@@ -1872,6 +1873,15 @@ class GwInfo(QObject):
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
+        # Get utils_grafanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        thread = row[0] if row else None
+        if thread:
+            thread = json.loads(thread)
+            thread = tools_os.set_boolean(thread['status'], default=False)
+            if 'closed' not in _json:
+                thread = False
+
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
             QgsProject.instance().blockSignals(False)
@@ -1891,6 +1901,22 @@ class GwInfo(QObject):
                 msg_level = 1
             tools_qgis.show_message(msg_text, message_level=msg_level)
             self._reload_fields(dialog, json_result, p_widget)
+
+            if thread:
+                # If param is true show question and create thread
+                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                if global_vars.user_level['level'] in ('1', '2'):
+                    msg += "\nWould you like to continue?"
+                    answer = tools_qt.show_question(msg)
+                else:
+                    tools_qgis.show_info(msg)
+                    answer = True
+
+                if answer:
+                    params = {"body": body}
+                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                    QgsApplication.taskManager().addTask(self.valve_thread)
+                    QgsApplication.taskManager().triggerTask(self.valve_thread)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
             QgsProject.instance().blockSignals(False)
