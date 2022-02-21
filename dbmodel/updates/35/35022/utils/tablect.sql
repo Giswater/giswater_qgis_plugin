@@ -47,3 +47,27 @@ WHERE NEW.expl_id = 0 OR OLD.expl_id = 0 DO INSTEAD NOTHING;
 DROP RULE IF EXISTS exploitation_del_undefined ON exploitation;
 CREATE RULE exploitation_del_undefined AS ON DELETE TO exploitation
 WHERE OLD.expl_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macroexploitation_undefined ON macroexploitation;
+CREATE RULE macroexploitation_undefined AS ON UPDATE TO macroexploitation
+WHERE NEW.macroexpl_id = 0 OR OLD.macroexpl_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macroexploitation_del_undefined ON macroexploitation;
+CREATE RULE macroexploitation_del_undefined AS ON DELETE TO macroexploitation
+WHERE OLD.macroexpl_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macrosector_undefined ON macrosector;
+CREATE RULE macrosector_undefined AS ON UPDATE TO macrosector
+WHERE NEW.macrosector_id = 0 OR OLD.macrosector_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macrosector_del_undefined ON macrosector;
+CREATE RULE macrosector_del_undefined AS ON DELETE TO macrosector
+WHERE OLD.macrosector_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macrodma_undefined ON macrodma;
+CREATE RULE macrodma_undefined AS ON UPDATE TO macrodma
+WHERE NEW.macrodma_id = 0 OR OLD.macrodma_id = 0 DO INSTEAD NOTHING;
+
+DROP RULE IF EXISTS macrodma_del_undefined ON macrodma;
+CREATE RULE macrodma_del_undefined AS ON DELETE TO macrodma
+WHERE OLD.macrodma_id = 0 DO INSTEAD NOTHING;
