@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 import os
 from datetime import datetime
 from functools import partial
@@ -1100,7 +1101,7 @@ class GwMincut:
         """ Set autocompleter for 'customer_code' """
 
         # Get list of 'customer_code'
-        sql = "SELECT DISTINCT(customer_code) FROM v_edit_connec"
+        sql = f"SELECT DISTINCT({self.col1}) FROM v_edit_connec"
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1202,6 +1203,15 @@ class GwMincut:
         self.list_ids['connec'] = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
+        # Get hydrometer filter columns
+        self.col1 = "customer_code"
+        self.col2 = "hydrometer_customer_code"
+        row = tools_gw.get_config_value('om_mincut_hydrometer_filter', table='config_param_system')
+        if row:
+            values = json.loads(row[0])
+            self.col1 = values['field1']
+            self.col2 = values['field2']
+
         # Check if id exist in table 'om_mincut'
         sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
@@ -1263,13 +1273,14 @@ class GwMincut:
             return
 
         # Get 'hydrometers' related with this 'connec'
-        sql = (f"SELECT DISTINCT(hydrometer_customer_code)"
+        sql = (f"SELECT DISTINCT({self.col2})"
                f" FROM v_rtc_hydrometer"
                f" WHERE connec_id = '{connec_id}'")
         rows = tools_db.get_rows(sql)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer_hydro.setModel(model)
@@ -1295,7 +1306,7 @@ class GwMincut:
 
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
-               f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
+               f" WHERE {self.col2} = '{hydrometer_cc}'")
         row = tools_db.get_row(sql)
         if not row:
             message = "Selected hydrometer_id not found"
@@ -1495,7 +1506,7 @@ class GwMincut:
         """ Get 'connec_id' from @customer_code """
 
         sql = (f"SELECT connec_id FROM v_edit_connec"
-               f" WHERE customer_code = '{customer_code}'")
+               f" WHERE {self.col1} = '{customer_code}'")
         row = tools_db.get_row(sql)
         if not row:
             message = "Any connec_id found with this customer_code"
@@ -1543,7 +1554,7 @@ class GwMincut:
             id_feature = widget.model().record(row).value("connec_id")
             del_id.append(id_feature)
             # Id to ask
-            customer_code = widget.model().record(row).value("customer_code")
+            customer_code = widget.model().record(row).value(f"{self.col1}")
             inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
@@ -1592,7 +1603,7 @@ class GwMincut:
         inf_text = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value("hydrometer_customer_code")
+            id_feature = widget.model().record(row).value(f"{self.col2}")
             hydro_id = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
             del_id.append(hydro_id)
