@@ -734,7 +734,7 @@ BEGIN
 						VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
 
 						-- log
-						EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND '||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
+						EXECUTE 'UPDATE anl_arc a SET descript = ''-1'' FROM arc v WHERE a.arc_id =  v.arc_id AND v.'||v_field||'::text  = ''-1'' AND fid = '||v_fid||' AND cur_user = current_user';
 						
 						-- update mapzone geometry
 						EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
