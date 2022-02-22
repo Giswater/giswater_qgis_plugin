@@ -429,12 +429,6 @@ BEGIN
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceClosed'')::json) FROM '
 			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 
-			-- open custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
-			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
-			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
-
 			-- set header node for mapzones
 			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
 			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
@@ -462,6 +456,13 @@ BEGIN
 					AND v.active IS TRUE)';
 
 			EXECUTE v_querytext;
+
+			-- open custom nodes acording config parameters
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
+			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
+
 
 			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
 
