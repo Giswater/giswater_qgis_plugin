@@ -361,7 +361,10 @@ BEGIN
 
 	v_querytext = 'SELECT * FROM (
 		SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
-		FROM selector_sector s, v_edit_node AS t1 JOIN v_edit_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		FROM selector_sector s, node AS t1 
+		JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		JOIN v_state_node v ON t2.node_id = v.node_id
+		JOIN v_state_node v ON t1.node_id = v.node_id
 		WHERE t1.node_id != t2.node_id 
 		AND s.sector_id = t1.sector_id AND cur_user = current_user 
 		ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
