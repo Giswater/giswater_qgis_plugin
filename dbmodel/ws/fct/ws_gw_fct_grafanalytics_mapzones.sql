@@ -874,6 +874,18 @@ BEGIN
 					*/
 
 				EXECUTE v_querytext;
+			ELSIF v_updatemapzgeom = 5 THEN
+
+				v_geomparamupdate_divide = v_geomparamupdate/2;
+
+				SELECT value into v_querytext FROM config_param_system WHERE parameter='utils_grafanalytics_custom_geometry_constructor';
+				EXECUTE 'SELECT replace(replace(replace(replace(replace('||quote_literal(v_querytext)||',''v_table'', '||quote_literal(v_table)||'),
+				''v_fieldmp'', '||quote_literal(v_fieldmp)||'), ''v_field'', '||quote_literal(v_field)||'), ''v_fid'', '||quote_literal(v_fid)||'),
+				 ''v_geomparamupdate'', '||quote_literal(v_geomparamupdate)||')'
+				INTO v_querytext;
+
+				EXECUTE v_querytext;
+
 			END IF;
 				
 			IF v_updatemapzgeom > 0 THEN		
@@ -1022,3 +1034,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+

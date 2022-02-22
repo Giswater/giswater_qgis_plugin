@@ -633,3 +633,32 @@ AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern
  INSERT INTO config_param_system
 ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('om_mincut_hydrometer_filter', '{"field1": "customer_code", "field2": "hydrometer_customer_code"}', 'Mincut hydrometer filter', 'Mincut hydrometer filter:', NULL, NULL, false, NULL, 'ws', false, false, 'json', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled,  project_type, datatype)
+VALUES ('utils_grafanalytics_custom_geometry_constructor', 'UPDATE v_table set the_geom = geom FROM
+        (SELECT v_field, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+        (SELECT v_field, st_buffer(st_collect(the_geom), v_geomparamupdate) as geom 
+        FROM v_edit_arc arc
+        where arc.state > 0 AND  v_field NOT IN ('0', '-1') AND arc.v_field IN
+        (SELECT DISTINCT arc.v_field FROM arc JOIN anl_arc USING (arc_id) WHERE fid = v_fid and cur_user = current_user)
+        group by v_field
+        UNION
+        SELECT v_field, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
+        WHERE v_edit_connec.state > 0 AND v_field NOT IN ('0', '-1')
+        AND v_edit_connec.v_field IN
+        (SELECT DISTINCT arc.v_field FROM arc JOIN anl_arc USING (arc_id) WHERE fid = v_fid and cur_user = current_user)
+        AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+        group by v_field
+        )a group by v_field)b 
+        WHERE b.v_field=v_table.v_fieldmp',
+'Custom query used to draw mapzones', 'Custom query for mapzones:', false, 'ws', 'text');
+
+
+INSERT INTO config_report(alias, query_text, vdefault, filterparam)
+VALUES ('Water consumption by period and dma','SELECT p.code, dma_id, name as dma_name, round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
+JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
+JOIN connec c using (connec_id) JOIN dma using(dma_id)GROUP BY p.code, dma_id,dma_name',
+'{"orderBy":"1", "orderType": "DESC"}','[{"columnname":"cat_period_id", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select id as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
+{"columnname":"dma_id", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select dma_id as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]');
