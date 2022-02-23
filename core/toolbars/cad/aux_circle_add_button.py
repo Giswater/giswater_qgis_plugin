@@ -15,7 +15,7 @@ from qgis.gui import QgsVertexMarker
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxCircleUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwAuxCircleAddButton(GwMaptool):
@@ -74,6 +74,14 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def activate(self):
 
+        tools_qgis.set_cursor_wait()
+        try:
+            # Load missing cad aux layers
+            self._load_missing_layers()
+        except Exception:
+            pass
+        tools_qgis.restore_cursor()
+
         self.snap_to_selected_layer = False
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):
@@ -125,6 +133,21 @@ class GwAuxCircleAddButton(GwMaptool):
     # endregion
 
     # region private functions
+
+    def _load_missing_layers(self):
+        """ Adds any missing Mincut layers to TOC """
+
+        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_edit_cad_aux%' AND alias IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            for tablename, alias in rows:
+                lyr = tools_qgis.get_layer_by_tablename(tablename)
+                if not lyr:
+                    geom = f'geom_{alias.lower()}'
+                    if tablename == 'v_edit_cad_auxcircle':
+                        geom = 'geom_polygon'
+                    tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
+
 
     def _init_create_circle_form(self, point):
 

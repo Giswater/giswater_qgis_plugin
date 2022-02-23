@@ -175,7 +175,7 @@ class Giswater(QObject):
         global_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
-        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
+        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}24x24{os.sep}"
         major_version = tools_qgis.get_major_version(plugin_dir=plugin_dir)
         user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
         global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
@@ -271,7 +271,9 @@ class Giswater(QObject):
             tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
                                     'main', 'newProjectCreated')
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
-                                    'main', 'actionSaveProject')
+                                    'main', 'actionSaveProject_save_toolbars_position')
+            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self.save_project,
+                                    'main', 'actionSaveProject_save_project')
         except AttributeError:
             pass
 
@@ -383,6 +385,11 @@ class Giswater(QObject):
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+
+
+    def save_project(self):
+        project = QgsProject.instance()
+        project.write()
 
 
     def _remove_dockers(self):

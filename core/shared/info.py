@@ -20,7 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
+from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
@@ -29,7 +29,10 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
+
 from ..utils import tools_gw, tools_backend_calls
+from ..threads.toggle_valve_state import GwToggleValveTask
+
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
@@ -579,16 +582,16 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_rotation, "107c", "24x24")
         tools_gw.add_icon(self.action_catalog, "195")
         tools_gw.add_icon(self.action_workcat, "193")
-        tools_gw.add_icon(self.action_mapzone, "213")
-        tools_gw.add_icon(self.action_set_to_arc, "212")
+        tools_gw.add_icon(self.action_mapzone, "213", sub_folder="24x24")
+        tools_gw.add_icon(self.action_set_to_arc, "212", sub_folder="24x24")
         tools_gw.add_icon(self.action_get_arc_id, "209")
         tools_gw.add_icon(self.action_get_parent_id, "210")
         tools_gw.add_icon(self.action_zoom_in, "103")
         tools_gw.add_icon(self.action_zoom_out, "107")
         tools_gw.add_icon(self.action_centered, "104")
-        tools_gw.add_icon(self.action_link, "173")
+        tools_gw.add_icon(self.action_link, "173", sub_folder="24x24")
         tools_gw.add_icon(self.action_section, "207")
-        tools_gw.add_icon(self.action_help, "73")
+        tools_gw.add_icon(self.action_help, "73", sub_folder="24x24")
         tools_gw.add_icon(self.action_interpolate, "194")
 
 
@@ -725,13 +728,27 @@ class GwInfo(QObject):
         self.action_copy_paste.triggered.connect(
             partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
         self.action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, self.action_rotation))
-        self.action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
+        self.action_link.triggered.connect(partial(self.action_open_link))
         self.action_section.triggered.connect(partial(self._open_section_form))
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
         return dlg_cf, fid
+
+
+    def action_open_link(self):
+        """ Manage def open_file from action 'Open Link' """
+        
+        try:
+            widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
+            for widget in widget_list:
+                path = widget.text()
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
+        except Exception:
+            pass
 
 
     def _get_feature_type(self, complet_result):
@@ -1873,6 +1890,15 @@ class GwInfo(QObject):
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
+        # Get utils_grafanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        thread = row[0] if row else None
+        if thread:
+            thread = json.loads(thread)
+            thread = tools_os.set_boolean(thread['status'], default=False)
+            if 'closed' not in _json:
+                thread = False
+
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
             QgsProject.instance().blockSignals(False)
@@ -1892,6 +1918,22 @@ class GwInfo(QObject):
                 msg_level = 1
             tools_qgis.show_message(msg_text, message_level=msg_level)
             self._reload_fields(dialog, json_result, p_widget)
+
+            if thread:
+                # If param is true show question and create thread
+                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                if global_vars.user_level['level'] in ('1', '2'):
+                    msg += "\nWould you like to continue?"
+                    answer = tools_qt.show_question(msg)
+                else:
+                    tools_qgis.show_info(msg)
+                    answer = True
+
+                if answer:
+                    params = {"body": body}
+                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                    QgsApplication.taskManager().addTask(self.valve_thread)
+                    QgsApplication.taskManager().triggerTask(self.valve_thread)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
             QgsProject.instance().blockSignals(False)
@@ -2537,7 +2579,7 @@ class GwInfo(QObject):
 
         # Form handling so that the user cannot change values until the process is finished
         self.dlg_cf.setEnabled(False)
-        global_vars.notify.task_finished.connect(self._enable_buttons)
+        # global_vars.notify.task_finished.connect(self._enable_buttons)
 
         # Get widgets values
         values = {}
@@ -2575,7 +2617,7 @@ class GwInfo(QObject):
 
     def _enable_buttons(self):
         self.dlg_cf.setEnabled(True)
-        global_vars.notify.task_finished.disconnect()
+        # global_vars.notify.task_finished.disconnect()
 
 
     def _mouse_moved(self, layer, point):

@@ -348,7 +348,9 @@ def get_layer_source_table_name(layer):
     total = len(uri)
     pos_end_schema = uri.rfind('.')
     pos_fi = uri.find('" ')
-    if pos_ini != -1 and pos_fi != -1:
+    if uri.find('pg:') != -1:
+        uri_table = uri[pos_ini + 6:total]
+    elif pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
     else:
         uri_table = uri[pos_end_schema + 2:total - 1]
@@ -1144,6 +1146,7 @@ def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, du
 
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, rubber_band.reset)
+        # Qtimer singleShot works with ms, we manage transformation to seconds
+        QTimer.singleShot(int(duration_time)*1000, rubber_band.reset)
 
 # endregion

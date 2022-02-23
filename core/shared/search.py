@@ -51,6 +51,7 @@ class GwSearch:
         # If dlg_search is not None we are going to open search independently.
         if dlg_search:
             self.dlg_search = dlg_search
+            self.dlg_search.setProperty('class', self)
 
         # If dlg_mincut is None we are not opening from mincut
         form = ""
@@ -180,6 +181,31 @@ class GwSearch:
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
+
+
+    def refresh_tab(self, tab_name="tab_hydro"):
+        form = f'"singleTab":"{tab_name}"'
+
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        if qgis_project_add_schema is None:
+            body = tools_gw.create_body(form=form)
+        else:
+            extras = f'"addSchema":"{qgis_project_add_schema}"'
+            body = tools_gw.create_body(form=form, extras=extras)
+        complet_list = tools_gw.execute_procedure('gw_fct_getsearch', body)
+
+        main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        for tab in complet_list["form"]:
+            for field in tab['fields']:
+                try:
+                    if field['widgettype'] == 'combo':
+                        widget = main_tab.findChild(QComboBox, field['widgetname'])
+                        list_items = self._get_list_items(widget, field)
+                        tools_qt.fill_combo_values(widget, list_items, 1)
+                except Exception:
+                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+                          f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+                    tools_qgis.show_message(msg, 2)
 
 
     # region private functions
@@ -528,14 +554,12 @@ class GwSearch:
         self._update_selector_workcat(workcat_id)
         current_selectors = self._get_current_selectors()
         self._force_expl(workcat_id)
-        # TODO ZOOM TO SELECTED WORKCAT
-        # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = GwSearchWorkcatUi()
-
-        tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")
-        tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112")
-        tools_gw.add_icon(self.items_dialog.btn_doc_new, "34")
+        
+        tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.items_dialog.btn_doc_new, "34", sub_folder="24x24")
         tools_gw.add_icon(self.items_dialog.btn_open_doc, "170")
 
         tools_gw.load_settings(self.items_dialog)
@@ -607,7 +631,6 @@ class GwSearch:
         self._workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
-        #
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"

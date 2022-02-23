@@ -327,8 +327,8 @@ class GwEpaFileManager(GwTask):
 
         self._close_file(file_inp)
 
-        if global_vars.project_type == 'ud' and f"{tools_gw.get_config_value('inp_options_networkmode')[0]}" == "2":
-
+        networkmode = tools_gw.get_config_value('inp_options_networkmode')
+        if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
             aditional_path = folder_path.replace('.inp', f'.gul')
@@ -564,12 +564,13 @@ class GwEpaFileManager(GwTask):
     def _get_steps(self):
 
         value = tools_gw.get_config_value('inp_options_debug')
-        value = json.loads(value[0])
-        try:
-            steps = int(value['steps'])
-        except KeyError or ValueError:
-            steps = 0
+        if value:
+            value = json.loads(value[0])
+            try:
+                steps = int(value['steps'])
+            except KeyError or ValueError:
+                steps = 0
 
-        return steps
+            return steps
 
     # endregion

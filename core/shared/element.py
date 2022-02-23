@@ -32,6 +32,7 @@ class GwElement:
 
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
         """ Button 33: Add element """
+
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.new_element_id = new_element_id
 
@@ -81,8 +82,8 @@ class GwElement:
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
-        tools_gw.add_icon(self.dlg_add_element.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_add_element.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_element.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_element.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
@@ -296,7 +297,7 @@ class GwElement:
         """ Set default values """
 
         row = tools_gw.get_config_value("edit_elementcat_vdefault")
-        if row[0]:
+        if row is not None and row[0]:
             sql = f"SELECT elementtype_id, elementtype_id FROM cat_element WHERE id = '{row[0]}'"
             element_type = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.dlg_add_element.element_type, element_type[0], 0)
@@ -683,10 +684,11 @@ class GwElement:
             self._set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
             self._set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                                            field_id='expl_id', field_name='name')
-            self.dlg_add_element.builtdate.setText(
-                tools_gw.get_config_value('edit_builtdate_vdefault')[0].replace('/', '-'))
-            self.dlg_add_element.enddate.setText(
-                tools_gw.get_config_value('edit_enddate_vdefault')[0].replace('/', '-'))
+
+            builtdate = tools_gw.get_config_value('edit_builtdate_vdefault')
+            if builtdate: self.dlg_add_element.builtdate.setText(builtdate[0].replace('/', '-'))
+            enddate = tools_gw.get_config_value('edit_enddate_vdefault')
+            if enddate: self.dlg_add_element.enddate.setText(enddate[0].replace('/', '-'))
             self._set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
                                            field_id='id', field_name='id')
             if single_tool_mode is not None:

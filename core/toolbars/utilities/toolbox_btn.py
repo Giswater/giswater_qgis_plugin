@@ -267,6 +267,10 @@ class GwToolBoxButton(GwAction):
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
                     widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
+                    if field['value'] is None:
+                        msg = "No results found. Please check values set on selector of state and exploitation"
+                        tools_qgis.show_warning(msg)
+                        return
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
 
@@ -549,15 +553,14 @@ class GwToolBoxButton(GwAction):
 
         list_items = []
         sql = (f"SELECT tablename, type FROM "
-               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
-               f"UNION SELECT child_layer, feature_type, 2 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
+               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c FROM cat_feature "
+               f"UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature "
                F" UNION "
-               f"SELECT concat('v_edit_',epa_table), feature_type as type, 9 as c FROM sys_feature_epa_type "
+               f"SELECT concat('v_edit_',epa_table), feature_type as type, 4 as c FROM sys_feature_epa_type "
                f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
-               f" AND feature_type = '{feature_type.upper()}') as t"
-               f" ORDER BY c, tablename")
+			   f"UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
+			   f"UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
+               f" WHERE type = '{feature_type.upper()}' ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -598,9 +601,8 @@ class GwToolBoxButton(GwAction):
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
 
-        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep
         path_icon_blue = icon_folder + os.sep + '36.png'
-        path_icon_red = icon_folder + os.sep + '100.png'
 
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
@@ -614,21 +616,10 @@ class GwToolBoxButton(GwAction):
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                row = tools_db.check_function(function['functionname'])
-                if not row:
-                    if os.path.exists(path_icon_red):
-                        icon = QIcon(path_icon_red)
-                        label.setIcon(icon)
-                        label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']}" \
-                            f" configured on the table config_toolbox, but not found in the database"
-                        label.setToolTip(msg)
-                        self.no_clickable_items.append(str(function['alias']))
-                else:
-                    if os.path.exists(path_icon_blue):
-                        icon = QIcon(path_icon_blue)
-                        label.setIcon(icon)
-                        label.setToolTip(function['functionname'])
+                if os.path.exists(path_icon_blue):
+                    icon = QIcon(path_icon_blue)
+                    label.setIcon(icon)
+                    label.setToolTip(function['functionname'])
 
                 parent1.appendRow([label, func_name])
             section_processes.appendRow(parent1)

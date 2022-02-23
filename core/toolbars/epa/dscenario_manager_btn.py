@@ -108,9 +108,9 @@ class GwDscenarioManagerButton(GwAction):
             if field['value']:
                 self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, field)
                 self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, field)
-            # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
-            tools_qt.set_tableview_config(self.tbl_dscenario)
+        # TODO: config_form_tableview
+        # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', 1, True)
+        tools_qt.set_tableview_config(self.tbl_dscenario)
 
         return complet_list
 
@@ -118,7 +118,7 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_active_functions(self):
         """ Fill combobox with functions """
 
-        values = [[3042, "Manage values"]]
+        values = [[3042, "Manage values"], [3134, "Create empty dscenario"]]
         if global_vars.project_type == 'ws':
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
@@ -182,14 +182,14 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_dscenario)
 
         # Add icons
-        tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
 
         default_tab_idx = 0
         # Select all dscenario views
-        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false)) " \
-              f"AND table_name LIKE 'v_edit_inp_dscenario%'"
+        sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = ANY (current_schemas(false)) " \
+              f"AND table_name LIKE 'inp_dscenario%'"
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]

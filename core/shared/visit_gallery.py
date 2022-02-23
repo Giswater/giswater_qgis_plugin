@@ -116,8 +116,8 @@ class GwVisitGallery:
         self.btn_next.clicked.connect(self._next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton, "btn_previous")
         self.btn_previous.clicked.connect(self._previous_gallery)
-        tools_gw.add_icon(self.btn_previous, "109")
-        tools_gw.add_icon(self.btn_next, "108")
+        tools_gw.add_icon(self.btn_previous, "109", sub_folder="24x24")
+        tools_gw.add_icon(self.btn_next, "108", sub_folder="24x24")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_gallery))
 
@@ -235,8 +235,8 @@ class GwVisitGallery:
 
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
-        tools_gw.add_icon(self.btn_slidePrevious, "109")
-        tools_gw.add_icon(self.btn_slideNext, "108")
+        tools_gw.add_icon(self.btn_slidePrevious, "109", sub_folder="24x24")
+        tools_gw.add_icon(self.btn_slideNext, "108", sub_folder="24x24")
 
         self.dlg_gallery_zoom.rejected.connect(partial(tools_gw.close_dialog, self.dlg_gallery_zoom))
 

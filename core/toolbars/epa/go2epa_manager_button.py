@@ -9,9 +9,9 @@ import json
 
 from functools import partial
 
-from qgis.PyQt.QtCore import QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView
-from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtCore import Qt, QRegExp
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
@@ -48,22 +48,88 @@ class GwGo2EpaManagerButton(GwAction):
         # Fill combo box and table view
         self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        message = tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        self._fill_manager_table()
+        model = self.dlg_manager.tbl_rpt_cat_result.model()
+        model.itemChanged.connect(partial(self._update_data))
+        model.flags = lambda index: self.flags(index, model)
 
         # Set signals
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
-                                                            'rpt_cat_result', 'result_id'))
+                                                            'v_ui_rpt_cat_result', 'result_id'))
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.editTextChanged.connect(self._filter_by_result_id)
+        self.dlg_manager.txt_result_id.editTextChanged.connect(partial(self._fill_manager_table))
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
+
+
+    def _fill_manager_table(self, filter_id=None):
+        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+
+        complet_list = self._get_list("v_ui_rpt_cat_result", filter_id)
+
+        if complet_list is False:
+            return False, False
+        for field in complet_list['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']: continue
+            model = self.dlg_manager.tbl_rpt_cat_result.model()
+            if model is None:
+                model = QStandardItemModel()
+                self.dlg_manager.tbl_rpt_cat_result.setModel(model)
+            model.removeRows(0, model.rowCount())
+
+            if field['value']:
+                self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, field)
+                self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
+
+        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result', isQStandardItemModel=True)
+        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.DoubleClicked)
+
+        return complet_list
+
+
+    def _get_list(self, table_name='v_ui_rpt_cat_result', filter_id=None):
+        """ Mount and execute the query for gw_fct_getlist """
+
+        feature = f'"tableName":"{table_name}"'
+        filter_fields = f'"limit": -1'
+        if filter_id:
+            filter_fields += f', "result_id": {{"filterSign":"=", "value":"{filter_id}"}}'
+        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return False
+        complet_list = json_result
+        if not complet_list:
+            return False
+
+        return complet_list
+
+
+    def flags(self, index, model):
+
+        # print(index.column())
+        if index.column() != 1:
+            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            return flags
+
+        return QStandardItemModel.flags(model, index)
+
+
+    def _update_data(self, item):
+
+        index = item.index()
+        result_id = index.sibling(index.row(), 0).data()
+        value = index.sibling(index.row(), index.column()).data()
+
+        sql = f"UPDATE v_ui_rpt_cat_result SET expl_id = {value} WHERE result_id = '{result_id}';"
+        result = tools_db.execute_sql(sql)
+        if result:
+            self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+
 
     def _fill_txt_infolog(self, selected):
         """
