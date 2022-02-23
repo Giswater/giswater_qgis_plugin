@@ -109,3 +109,25 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS
      JOIN inp_dscenario_shortpipe p USING (node_id)
      JOIN cat_dscenario d USING (dscenario_id)
   WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+  
+--2022/02/23
+DROP VIEW IF EXISTS v_plan_psector_arc;
+CREATE OR REPLACE VIEW v_plan_psector_arc AS
+SELECT row_number() OVER () AS rid,
+arc.arc_id,
+plan_psector_x_arc.psector_id,
+arc.code, 
+arc.arccat_id,
+cat_arc.arctype_id,
+cat_feature.system_id,
+arc.state AS original_state,
+arc.state_type AS original_state_type,
+plan_psector_x_arc.state AS plan_state,
+plan_psector_x_arc.doable,
+plan_psector_x_arc.addparam::text,
+arc.the_geom
+FROM selector_psector, arc
+JOIN plan_psector_x_arc USING (arc_id)
+JOIN cat_arc ON cat_arc.id=arc.arccat_id
+JOIN cat_feature ON cat_feature.id=cat_arc.arctype_id
+WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
