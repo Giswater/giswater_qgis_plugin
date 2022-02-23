@@ -152,6 +152,12 @@ class GwPsector:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_expl_id, rows, 1)
 
+        # Populate combo workcat_id
+        sql = "SELECT id FROM cat_work"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_box(self.dlg_plan_psector, self.dlg_plan_psector.workcat_id, rows, True)
+        tools_qt.set_autocompleter(self.dlg_plan_psector.workcat_id)
+
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
         rows = tools_db.get_rows(sql)
@@ -263,7 +269,6 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "atlas_id", row)
             self.fill_widget(self.dlg_plan_psector, "scale", row)
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
-            self.fill_widget(self.dlg_plan_psector, "workcat_id", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter

@@ -292,7 +292,17 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="workcat_id"/>
+          <widget class="QComboBox" name="workcat_id">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label">
