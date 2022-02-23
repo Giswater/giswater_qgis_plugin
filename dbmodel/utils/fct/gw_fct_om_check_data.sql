@@ -807,10 +807,10 @@ BEGIN
 
 	IF v_count = 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '266', concat('WARNING-266: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '), v_count);
+		VALUES (125, 2, '266', concat('ERROR-266: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '), v_count);
 	ELSIF v_count > 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '266', concat('WARNING-266: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '), v_count);
+		VALUES (125, 2, '266', concat('ERROR-266: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
