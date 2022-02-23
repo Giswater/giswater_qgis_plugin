@@ -3,6 +3,21 @@ INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tablevi
 
 
 
+-- TAB EPA
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_epa_1', 'lyt_epa_1','lytEpa1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_epa_data_1', 'lyt_epa_data_1','lytEpaData1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_epa_data_2', 'lyt_epa_data_2','lytEpaData2');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_epa_3', 'lyt_epa_3','lytEpa3');
+INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
+    VALUES ('tbl_inp_pipe', 'SELECT * FROM v_edit_inp_pipe WHERE arc_id IS NOT NULL', 4);
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('v_edit_inp_pipe', 'form_feature', 'epa', 'minorloss', 'lyt_epa_data_1', 1, 'string', 'text', 'Minorloss:', 'Minorloss', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
+    VALUES ('arc', 'form_feature', 'epa', 'tbl_inp_pipe', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_pipe');
+
+
 
 -- TAB ELEMENTS -- ARC FET
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_element_1', 'lyt_element_1','lytElements1');

@@ -87,6 +87,7 @@ class GwInfo(QObject):
 
         try:
             # Manage tab signal
+            self.tab_epa_loaded = False
             self.tab_element_loaded = False
             self.tab_relations_loaded = False
             self.tab_connections_loaded = False
@@ -2311,6 +2312,11 @@ class GwInfo(QObject):
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
         # Tab 'Relations'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_epa' and not self.tab_epa_loaded:
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
+            self.tab_epa_loaded = True
+        # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
@@ -2389,7 +2395,7 @@ class GwInfo(QObject):
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
-            tools_qt.set_tableview_config(widget)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
 
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
