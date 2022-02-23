@@ -196,20 +196,18 @@ class GwFeatureEndButton(GwAction):
 
 
     def _fill_workids(self):
-        """ Auto fill descriptions and workid's """
+        """ Auto fill workid """
 
         workcat_id = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
-        sql = (f"SELECT descript, builtdate "
+        sql = (f"SELECT builtdate "
                f"FROM cat_work "
                f"WHERE id = '{workcat_id}'")
         row = tools_db.get_row(sql)
         if row:
-            tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
             tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
         else:
-            tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.descript, '')
             tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
@@ -235,7 +233,6 @@ class GwFeatureEndButton(GwAction):
         self.statetype_id_end = tools_qt.get_combo_value(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
         self.enddate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.enddate)
         self.workcatdate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.builtdate)
-        self.description = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.descript, False, False)
 
         self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
 
@@ -315,7 +312,7 @@ class GwFeatureEndButton(GwAction):
 
         feature = f'"featureType":"{feature_type}", "featureId":{id_list}'
         extras = f'"state_type":"{self.statetype_id_end}", '
-        extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
+        extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}"'
         if self.workcat_id_end not in (None, 'null', ''):
             extras += f', "workcat_id_end":"{self.workcat_id_end}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
@@ -512,10 +509,6 @@ class GwFeatureEndButton(GwAction):
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = tools_qt.get_text(self.dlg_new_workcat, "descript")
-        if descript != "null":
-            fields += 'descript, '
-            values += f"'{descript}', "
         link = tools_qt.get_text(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
