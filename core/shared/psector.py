@@ -43,6 +43,7 @@ class GwPsector:
         self.emit_point = None
         self.vertex_marker = None
         self.dict_to_update = {}
+        self.my_json = {}
 
 
     def get_psector(self, psector_id=None, list_coord=None):
@@ -120,7 +121,7 @@ class GwPsector:
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
-        self.workcat_id = self.dlg_plan_psector.findChild(QLineEdit, "workcat_id")
+        self.workcat_id = self.dlg_plan_psector.findChild(QComboBox, "workcat_id")
         self.parent_id = self.dlg_plan_psector.findChild(QLineEdit, "parent_id")
 
         scale = self.dlg_plan_psector.findChild(QLineEdit, "scale")
@@ -153,10 +154,9 @@ class GwPsector:
         tools_qt.fill_combo_values(self.cmb_expl_id, rows, 1)
 
         # Populate combo workcat_id
-        sql = "SELECT id FROM cat_work"
+        sql = "SELECT id as id, id as idval FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_plan_psector, self.dlg_plan_psector.workcat_id, rows, True)
-        tools_qt.set_autocompleter(self.dlg_plan_psector.workcat_id)
+        tools_qt.fill_combo_values(self.dlg_plan_psector.workcat_id, rows, add_empty=True)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
@@ -253,6 +253,8 @@ class GwPsector:
                 tools_db.execute_sql(sql)
                 msg = "Your exploitation selector has been updated"
                 tools_qgis.show_warning(msg, 1)
+            workcat_id = row['workcat_id']
+            tools_qt.set_combo_value(self.workcat_id, workcat_id, 0)
 
             tools_qt.set_checked(self.dlg_plan_psector, "active", row['active'])
             self.fill_widget(self.dlg_plan_psector, "name", row)
@@ -351,6 +353,8 @@ class GwPsector:
             if message:
                 tools_qgis.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+
+            self._connect_editing_finished()
         else:
             # Set psector_status vdefault
             sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
@@ -377,6 +381,7 @@ class GwPsector:
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
+        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self._manage_accept, psector_id))
         self.dlg_plan_psector.btn_accept.clicked.connect(
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
@@ -940,6 +945,7 @@ class GwPsector:
         """ Close dialog and disconnect snapping """
 
         tools_gw.reset_rubberband(self.rubber_band)
+        self._clear_my_json()
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
@@ -1805,6 +1811,47 @@ class GwPsector:
 
 
     # region private functions
+
+
+    def _manage_accept(self, psector_id):
+
+        if not self.my_json:
+            return
+
+        updates = ""
+        for key, value in self.my_json.items():
+            updates += f"{key} = '{value}', "
+        if updates:
+            updates = updates[:-2]
+            sql = f"UPDATE v_edit_plan_psector SET {updates} WHERE psector_id = {psector_id}"
+            if tools_db.execute_sql(sql):
+                msg = "Psector values updated successfully"
+                tools_qgis.show_info(msg)
+            self._clear_my_json()
+
+
+    def _clear_my_json(self):
+        self.my_json = {}
+
+
+    def _connect_editing_finished(self):
+        try:
+            # Widgets
+            dialog = self.dlg_plan_psector
+            widgets = dialog.General.findChildren(QWidget)
+            more_widgets = dialog.additional_info.findChildren(QWidget)
+            widgets.extend(more_widgets)
+            for widget in widgets:
+                if type(widget) == QLineEdit:
+                    widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                elif type(widget) == QComboBox:
+                    widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                elif type(widget) == QCheckBox:
+                    widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+                elif type(widget) == QTextEdit:
+                    widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        except RuntimeError:
+            pass
 
 
     def _fill_txt_infolog(self, selected):

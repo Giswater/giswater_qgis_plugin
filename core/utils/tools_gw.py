@@ -1426,10 +1426,14 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
         value = tools_qt.get_calendar_date(dialog, widget)
 
+    key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
+    if key == '' or key is None:
+        return _json
+
     if str(value) == '' or value is None:
-        _json[str(widget.property('columnname'))] = None
+        _json[key] = None
     else:
-        _json[str(widget.property('columnname'))] = str(value)
+        _json[key] = str(value)
     return _json
 
 
