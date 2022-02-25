@@ -624,7 +624,7 @@ class GwInfo(QObject):
                 widget_pos = field['layoutorder'] + widget_offset
 
                 # The data tab is somewhat special (it has 2 columns)
-                if 'lyt_data' in layout.objectName():
+                if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
                 # If the widget has a label
                 elif label:
