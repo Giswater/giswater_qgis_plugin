@@ -3397,8 +3397,7 @@ class GwInfo(QObject):
 
         doc = GwDocument()
         doc.get_document(feature=feature, feature_type=self.feature_type)
-        doc.dlg_add_doc.accepted.connect(partial(self._manage_document_new, dialog, doc))
-        doc.dlg_add_doc.rejected.connect(partial(self._manage_document_new, dialog, doc))
+        doc.doc_added.connect(partial(self._manage_document_new, doc))
 
         # Set completer
         tools_gw.set_completer_object(dialog, self.table_object)
@@ -3409,13 +3408,13 @@ class GwInfo(QObject):
         # doc.open_dialog(doc.dlg_add_doc)
 
 
-    def _manage_document_new(self, dialog, doc):
+    def _manage_document_new(self, doc):
         """ Get inserted doc_id and add it to current feature """
 
-        if doc.doc_id is None:
+        if not doc.doc_id:
             return
 
-        tools_qt.set_widget_text(dialog, "doc_id", doc.doc_id)
+        tools_qt.set_widget_text(self.dlg_cf, "doc_id", doc.doc_id)
         self._add_object(self.tbl_document, "doc", "v_ui_doc")
 
 

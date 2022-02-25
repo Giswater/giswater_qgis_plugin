@@ -10,6 +10,7 @@ import webbrowser
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
@@ -17,11 +18,13 @@ from ... import global_vars
 from ...lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
-class GwDocument:
+class GwDocument(QObject):
+    doc_added = pyqtSignal()
 
     def __init__(self, single_tool=True):
         """ Class to control action 'Add document' of toolbar 'edit' """
 
+        QObject.__init__(self)
         # parameter to set if the document manager is working as
         # single tool or integrated in another tool
         self.single_tool_mode = single_tool
@@ -263,6 +266,7 @@ class GwDocument:
                     sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
                            f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
                 self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                self.doc_added.emit()
             else:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
@@ -272,6 +276,7 @@ class GwDocument:
                     for file in self.files_path:
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file)
                         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                        self.doc_added.emit()
         # If document exists perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
