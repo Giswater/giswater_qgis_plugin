@@ -34,6 +34,7 @@ v_version text;
 v_epsg integer;
 v_featuretype text;
 v_featuretable text;
+v_expl_id integer;
 
 BEGIN
 
@@ -56,27 +57,31 @@ BEGIN
 	FOR v_element IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = 235
 	LOOP 
 		IF v_featuretype='node' THEN
-			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory) VALUES
+			v_expl_id = (SELECT expl_id from node where node_id=v_element.csv1);
+			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory, expl_id) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5, v_element.csv6::integer, 1, v_element.csv7::integer, 
-			v_element.csv8, v_element.csv9, TRUE) RETURNING element_id INTO v_idlast;
+			v_element.csv8, v_element.csv9, TRUE, v_expl_id) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_node (element_id, node_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='arc' THEN 
-			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory) VALUES
+			v_expl_id = (SELECT expl_id from arc where arc_id=v_element.csv1);
+			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory, expl_id) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5, v_element.csv6::integer, 1, v_element.csv7::integer, 
-			v_element.csv8, v_element.csv9, TRUE) RETURNING element_id INTO v_idlast;
+			v_element.csv8, v_element.csv9, TRUE, v_expl_id) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_arc (element_id, arc_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='connec' THEN	
-			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory) VALUES
+			v_expl_id = (SELECT expl_id from connec where connec_id=v_element.csv1);
+			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory, expl_id) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5, v_element.csv6::integer, 1, v_element.csv7::integer, 
-			v_element.csv8, v_element.csv9, TRUE) RETURNING element_id INTO v_idlast;
+			v_element.csv8, v_element.csv9, TRUE, v_expl_id) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_connec (element_id, connec_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='gully' THEN
-			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory) VALUES
+			v_expl_id = (SELECT expl_id from gully where gully_id=v_element.csv1);
+			INSERT INTO element (element_id, code, elementcat_id,observ, comment, num_elements, state, state_type, workcat_id, verified, inventory, expl_id) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5, v_element.csv6::integer, 1, v_element.csv7::integer, 
-			v_element.csv8, v_element.csv9, TRUE) RETURNING element_id INTO v_idlast;
+			v_element.csv8, v_element.csv9, TRUE, v_expl_id) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_gully (element_id, gully_id) VALUES (v_idlast, v_element.csv1);
 		END IF;	
 	END LOOP;
