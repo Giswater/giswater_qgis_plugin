@@ -297,7 +297,7 @@ WHERE formname='v_edit_inp_dscenario_lid_usage' and columnname='lidco_id';
 DELETE FROM config_form_fields WHERE formname='inp_lidusage_subc_x_lidco';
 
 INSERT INTO config_form_fields 
-SELECT 'lid_control_value', formtype, tabname, columnname, layoutname, layoutorder, 
+SELECT 'inp_lidcontrol_value', formtype, tabname, columnname, layoutname, layoutorder, 
        datatype, widgettype, label, tooltip, placeholder, ismandatory, 
        isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
        dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
@@ -305,7 +305,7 @@ SELECT 'lid_control_value', formtype, tabname, columnname, layoutname, layoutord
 FROM config_form_fields WHERE formname='inp_lid_control' and columnname IN ('lidco_type', 'lidco_id');
 
 UPDATE config_form_fields SET dv_querytext='SELECT  lidco_id as id, lidco_id as idval FROM inp_lidcontrol WHERE lidco_id IS NOT NULL ' 
-WHERE formname='lid_control_value' and columnname='lidco_id';
+WHERE formname='inp_lidcontrol_value' and columnname='lidco_id';
 
 UPDATE config_form_fields SET formname='inp_lidcontrol' WHERE formname='inp_lid_control';
 
