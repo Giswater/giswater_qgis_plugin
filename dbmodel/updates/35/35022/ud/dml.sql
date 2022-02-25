@@ -208,6 +208,8 @@ UPDATE sys_table SET addparam='{"pkey":"dscenario_id, subc_id, lidco_id"}' WHERE
 
 UPDATE config_form_fields SET columnname='numelem', label='numelem' WHERE columnname='number' AND formname='v_edit_inp_lid_usage';
 
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden)
@@ -255,5 +257,60 @@ DELETE FROM sys_function WHERE function_name = 'gw_trg_edit_inp_lid_usage';
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, source, layoutname, layoutorder, label)
 VALUES ('epa_lidco_vdefault', 'config', 'Default value for lids when automatic creation for ToC (Subcatchments)', 'role_epa', true, 'ud', false, 'text', 'combo', true, 
-'SELECT DISTINCT lidco_id as id,lidco_id as idval FROM inp_lid_control', 'core', 'lyt_epa', 1, 'LID Dscenario vdefault')
+'SELECT DISTINCT lidco_id as id,lidco_id as idval FROM inp_lidcontrol', 'core', 'lyt_epa', 1, 'LID Dscenario vdefault')
 ON CONFLICT (id) DO NOTHING;
+
+-- 25/02/2022
+
+DELETE FROM sys_foreignkey WHERE typevalue_name ='inp_value_lidcontrol';
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE inp_typevalue SET typevalue='inp_value_lidtype'
+WHERE typevalue = 'inp_value_lidcontrol' AND id IN ('BC','GR','IT','PP','RP','RD','RG','VS');
+
+UPDATE inp_typevalue SET typevalue='inp_value_lidlayer'
+WHERE typevalue = 'inp_value_lidcontrol';
+
+UPDATE sys_typevalue SET typevalue_name='inp_value_lidtype' WHERE typevalue_name ='inp_value_lidcontrol';
+INSERT INTO sys_typevalue VALUES ('inp_typevalue', 'inp_value_lidlayer');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,active)
+VALUES ('inp_typevalue', 'inp_value_lidtype','inp_lidcontrol','lidco_type', true);
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,active)
+VALUES ('inp_typevalue', 'inp_value_lidlayer','inp_lidcontrol_value','lidlayer', true);
+
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE sys_table SET id='inp_lidcontrol' WHERE id='inp_lid_control';
+
+INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, source)
+VALUES ('inp_lidcontrol_value', 'Defines values of scale-independent LID controls that can be deployed within subcatchments.', 'role_epa', null, 
+'{"level_1":"EPA","level_2":"CATALOGS"}', 10, 'Lid values', 'core');
+
+UPDATE sys_table SET orderby=11 WHERE id='v_edit_cat_dscenario';
+
+UPDATE config_form_fields SET dv_querytext='SELECT  lidco_id as id, lidco_id as idval FROM inp_lidcontrol WHERE lidco_id IS NOT NULL ' 
+WHERE formname='v_edit_inp_dscenario_lid_usage' and columnname='lidco_id';
+
+DELETE FROM config_form_fields WHERE formname='inp_lidusage_subc_x_lidco';
+
+INSERT INTO config_form_fields 
+SELECT 'lid_control_value', formtype, tabname, columnname, layoutname, layoutorder, 
+       datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+       isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, 
+       dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+       widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='inp_lid_control' and columnname IN ('lidco_type', 'lidco_id');
+
+UPDATE config_form_fields SET dv_querytext='SELECT  lidco_id as id, lidco_id as idval FROM inp_lidcontrol WHERE lidco_id IS NOT NULL ' 
+WHERE formname='lid_control_value' and columnname='lidco_id';
+
+UPDATE config_form_fields SET formname='inp_lidcontrol' WHERE formname='inp_lid_control';
+
+UPDATE config_form_fields SET formname='inp_lidcontrol' WHERE formname='inp_lid_control';
+UPDATE config_form_fields SET columnname='lidlayer', label='lidlayer', dv_querytext='SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_lidlayer''' WHERE formname='inp_lidcontrol' AND columnname='lidco_type';
+UPDATE config_form_fields SET dv_querytext='SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_lidtype''' WHERE formname='inp_lidcontrol' AND columnname='lidco_type';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

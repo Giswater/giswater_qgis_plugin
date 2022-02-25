@@ -63,3 +63,25 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
 
 ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_dscenario_id_fkey FOREIGN KEY (dscenario_id)
 REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+CREATE TABLE inp_lidcontrol(
+lidco_id character varying(16) NOT NULL PRIMARY KEY,
+lidco_type character varying(10),
+observ text,
+log text
+);
+
+ALTER TABLE inp_lid_control RENAME TO _inp_lid_control_;
+
+CREATE TABLE inp_lidcontrol_value(
+id serial NOT NULL PRIMARY KEY,
+lidco_id character varying(16) NOT NULL,
+lidlayer character varying(10) NOT NULL,
+value_2 numeric(12,4),
+value_3 numeric(12,4),
+value_4 numeric(12,4),
+value_5 numeric(12,4),
+value_6 numeric(12,4),
+value_7 numeric(12,4),
+value_8 numeric(12,4));
