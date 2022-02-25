@@ -324,9 +324,12 @@ BEGIN
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
-			INSERT INTO inp_lid_control (lidco_id, lidco_type, value_2, value_3, value_4, value_5, value_6, value_7, value_8)
+			INSERT INTO inp_lidcontrol (lidco_id, lidco_type)
+			SELECT NEW.lidco_id, inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.lidco_type)=idval AND typevalue='inp_value_lidtype';
+
+			INSERT INTO inp_lidcontrol_value (lidco_id, lidcolayer, value_2, value_3, value_4, value_5, value_6, value_7, value_8)
 			SELECT NEW.lidco_id, inp_typevalue.id, NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6, NEW.other7
-			FROM inp_typevalue WHERE upper(NEW.lidco_type)=idval AND typevalue='inp_value_lidcontrol';
+			FROM inp_typevalue WHERE upper(NEW.lidco_type)=idval AND typevalue='inp_value_lidlayer';
 			
 		ELSIF v_view='vi_lid_usage' THEN
 			INSERT INTO inp_lidusage_subc_x_lidco (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv, rptfile, hydrology_id) 
