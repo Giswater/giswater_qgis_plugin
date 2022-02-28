@@ -59,3 +59,9 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('inp_dscenario_lid_usage')
 DROP TRIGGER IF EXISTS gw_trg_edit_foreignkey ON inp_subcatchment;
 CREATE TRIGGER gw_trg_edit_foreignkey AFTER INSERT OR UPDATE OF subc_id OR DELETE ON inp_subcatchment
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('inp_subcatchment');
+
+CREATE TRIGGER gw_trg_vi_lid INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_lid
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_lid');
+
+CREATE TRIGGER gw_trg_vi_lid_usage INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_lid_usage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_lid_usage');

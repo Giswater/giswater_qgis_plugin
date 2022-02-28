@@ -321,3 +321,5 @@ SET  widgettype='combo', dv_querytext='SELECT lidco_id as  id, lidco_id as idval
 WHERE formname='inp_lid_value' AND columnname='lidco_id';
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+UPDATE config_fprocess SET tablename = 'vi_lid' WHERE target='[LID_CONTROLS]';

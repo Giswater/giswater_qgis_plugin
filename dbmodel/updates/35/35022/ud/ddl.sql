@@ -48,10 +48,11 @@ CREATE TABLE temp_lid_usage
   PRIMARY KEY (subc_id, lidco_id));
 
 
+DROP VIEW IF EXISTS vi_lid_usage;
 CREATE OR REPLACE VIEW vi_lid_usage AS 
  SELECT temp_lid_usage.subc_id,
     temp_lid_usage.lidco_id,
-    temp_lid_usage.numelem::integer AS number,
+    temp_lid_usage.numelem::integer,
     temp_lid_usage.area,
     temp_lid_usage.width,
     temp_lid_usage.initsat,

@@ -257,3 +257,33 @@ JOIN plan_psector_x_arc USING (arc_id)
 JOIN cat_arc ON cat_arc.id=arc.arccat_id
 JOIN cat_feature ON cat_feature.id=arc.arc_type
 WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS vi_lid;
+CREATE OR REPLACE VIEW vi_lid AS 
+ SELECT inp_lid.lidco_id,
+    inp_typevalue.idval AS lidco_type,
+    null as other1,
+    null as other2,
+    null as other3,
+    null as other4,
+    null as other5,
+    null as other6,
+    null AS other7
+   FROM inp_lid
+   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid.lidco_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_lidtype'::text
+  UNION
+  SELECT inp_lid_value.lidco_id,
+    inp_typevalue.idval AS lidlayer,
+    inp_lid_value.value_2 as other1,
+    inp_lid_value.value_3 as other2,
+    inp_lid_value.value_4 as other3,
+    inp_lid_value.value_5 as other4,
+    inp_lid_value.value_6 as other5,
+    inp_lid_value.value_7 as other6,
+    inp_lid_value.value_8 AS other7
+   FROM inp_lid_value
+   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text
+  ORDER BY lidco_id
