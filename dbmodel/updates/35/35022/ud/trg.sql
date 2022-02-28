@@ -51,3 +51,11 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_adjustments');
 DROP TRIGGER IF EXISTS  gw_trg_edit_inp_dscenario ON v_edit_inp_dscenario_lid_usage;
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_lid_usage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('LID-USAGE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_foreignkey ON inp_dscenario_lid_usage;
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER INSERT OR UPDATE OF subc_id OR DELETE ON inp_dscenario_lid_usage
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('inp_dscenario_lid_usage');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_foreignkey ON inp_subcatchment;
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER INSERT OR UPDATE OF subc_id OR DELETE ON inp_subcatchment
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('inp_subcatchment');

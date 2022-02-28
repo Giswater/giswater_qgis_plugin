@@ -103,3 +103,6 @@ UPDATE sys_style SET idval='v_edit_arc' WHERE id=101;
 
 -- 19/02/2022
 UPDATE sys_param_user SET layoutname = 'lyt_inventory', layoutorder = 20+layoutorder WHERE layoutname = 'lyt_edit';
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3194, 'The value can not be inserted',  'It is not present on a table', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
