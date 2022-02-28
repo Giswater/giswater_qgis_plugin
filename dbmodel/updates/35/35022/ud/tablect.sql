@@ -8,5 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/02/25
-ALTER TABLE inp_lidcontrol_value ADD CONSTRAINT inp_lidcontrol_lidco_id_fkey FOREIGN KEY (lidco_id)
-REFERENCES inp_lidcontrol (lidco_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_lid_value ADD CONSTRAINT inp_lid_lidco_id_fkey FOREIGN KEY (lidco_id)
+REFERENCES inp_lid (lidco_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_lidco_id_fkey FOREIGN KEY (lidco_id)
+REFERENCES inp_lid (lidco_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

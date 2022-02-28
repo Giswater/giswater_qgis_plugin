@@ -657,7 +657,7 @@ VALUES ('utils_grafanalytics_custom_geometry_constructor', 'UPDATE v_table set t
 INSERT INTO config_report(alias, query_text, vdefault, filterparam)
 VALUES ('Water consumption by period and dma','SELECT p.code, dma_id, name as dma_name, round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
 JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
-JOIN connec c using (connec_id) JOIN dma using(dma_id)GROUP BY p.code, dma_id,dma_name',
+JOIN connec c using (connec_id) JOIN dma using(dma_id) GROUP BY p.code, dma_id,dma_name',
 '{"orderBy":"1", "orderType": "DESC"}','[{"columnname":"cat_period_id", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select id as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
 {"columnname":"dma_id", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,

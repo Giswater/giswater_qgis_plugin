@@ -65,7 +65,7 @@ ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_dscen
 REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-CREATE TABLE inp_lidcontrol(
+CREATE TABLE inp_lid(
 lidco_id character varying(16) NOT NULL PRIMARY KEY,
 lidco_type character varying(10),
 observ text,
@@ -74,7 +74,7 @@ log text
 
 ALTER TABLE inp_lid_control RENAME TO _inp_lid_control_;
 
-CREATE TABLE inp_lidcontrol_value(
+CREATE TABLE inp_lid_value(
 id serial NOT NULL PRIMARY KEY,
 lidco_id character varying(16) NOT NULL,
 lidlayer character varying(10) NOT NULL,
