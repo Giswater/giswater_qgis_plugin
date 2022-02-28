@@ -88,10 +88,10 @@ BEGIN
 
 		  END IF;
 
-		  RETURN NEW;
+	
 	  END IF;
 
-
+	RETURN NEW;
 
 END; 
 $BODY$
