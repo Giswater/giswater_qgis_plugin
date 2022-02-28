@@ -68,7 +68,7 @@ REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE
 
 CREATE TABLE inp_lid(
 lidco_id character varying(16) NOT NULL PRIMARY KEY,
-lidco_type character varying(10),
+lidco_type character varying(10) NOT NULL,
 observ text,
 log text
 );
