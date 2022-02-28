@@ -662,3 +662,7 @@ JOIN connec c using (connec_id) JOIN dma using(dma_id) GROUP BY p.code, dma_id,d
 "dvquerytext":"Select id as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
 {"columnname":"dma_id", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select dma_id as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]');
+
+
+--28/02/2022
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'depth'::text,'{"min":0, "max":10}'::json) WHERE parameter = 'epa_outlayer_values';
