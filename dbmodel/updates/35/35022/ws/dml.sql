@@ -639,12 +639,12 @@ VALUES ('utils_grafanalytics_custom_geometry_constructor', 'UPDATE v_table set t
         (SELECT v_field, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
         (SELECT v_field, st_buffer(st_collect(the_geom), v_geomparamupdate) as geom 
         FROM v_edit_arc arc
-        where arc.state > 0 AND  v_field NOT IN ('0', '-1') AND arc.v_field IN
+        where arc.state > 0 AND  v_field NOT IN (''0'', ''-1'') AND arc.v_field IN
         (SELECT DISTINCT arc.v_field FROM arc JOIN anl_arc USING (arc_id) WHERE fid = v_fid and cur_user = current_user)
         group by v_field
         UNION
         SELECT v_field, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
-        WHERE v_edit_connec.state > 0 AND v_field NOT IN ('0', '-1')
+        WHERE v_edit_connec.state > 0 AND v_field NOT IN (''0'', ''-1'')
         AND v_edit_connec.v_field IN
         (SELECT DISTINCT arc.v_field FROM arc JOIN anl_arc USING (arc_id) WHERE fid = v_fid and cur_user = current_user)
         AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
