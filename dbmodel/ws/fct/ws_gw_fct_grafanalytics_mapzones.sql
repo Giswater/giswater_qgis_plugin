@@ -235,11 +235,15 @@ BEGIN
 		PERFORM gw_fct_grafanalytics_check_data(v_input);
 		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3 AND result_id IS NOT NULL;
 
-	ELSIF v_checkdata = 'NONE' THEN 
-	
+	ELSE
+		IF (SELECT count(*) FROM config_graf_valve WHERE active is TRUE) < 1 THEN
+			DELETE FROM audit_check_data WHERE fid = 211 and cur_user = current_user;
+			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) VALUES ('ERROR: config_graf_valve table is not configured', 211, current_user, 3);
+			v_count1 = 1;
+		END IF;
 	END IF;
 
-	v_count = v_count1 + v_count2;
+	v_count = coalesce(v_count1,0) + coalesce(v_count2,0);
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 0 THEN
