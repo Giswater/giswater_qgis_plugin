@@ -7,6 +7,6 @@
 - Views related to curves, patterns and timeseries filtered by exploitation instead of sector
 - New field addparam on sys_table
 - Remove fields sys_sequence and sys_sequence_field from sys_table
-- UD: Rename field number to numelem on inp_lid_usage
 - Add default qml style to all layers available on Add Giswater Layer tool
-- Create 2 tables to define lid controls - inp_lidcontrol and inp_lidcontrol_values
+- Create 2 tables to define lid controls - inp_lid and inp_lid_values
+- Add new outlayer value for epa (depth) on ws projects
