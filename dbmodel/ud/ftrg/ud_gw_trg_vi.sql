@@ -323,7 +323,7 @@ BEGIN
 				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
 			END IF;
 			
-		ELSIF v_view='vi_lid' THEN 
+		ELSIF v_view='vi_lid_controls' THEN 
 			INSERT INTO inp_lid (lidco_id, lidco_type)
 			SELECT NEW.lidco_id, inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.lidco_type)=id AND typevalue='inp_value_lidtype';
 
