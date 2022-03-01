@@ -261,29 +261,32 @@ WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_p
 
 DROP VIEW IF EXISTS vi_lid;
 CREATE OR REPLACE VIEW vi_lid AS 
- SELECT inp_lid.lidco_id,
-    inp_typevalue.idval AS lidco_type,
-    null as other1,
-    null as other2,
-    null as other3,
-    null as other4,
-    null as other5,
-    null as other6,
-    null AS other7
+SELECT lidco_id, lidco_type, other1, other2, other3, other4, other5, other6, other7 FROM (
+ SELECT 
+  0::integer AS id,
+ inp_lid.lidco_id,
+    lidco_type,
+    NULL::numeric AS other1,
+    NULL::numeric AS other2,
+    NULL::numeric AS other3,
+    NULL::numeric AS other4,
+    NULL::numeric AS other5,
+    NULL::numeric AS other6,
+    NULL::numeric AS other7
    FROM inp_lid
-   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid.lidco_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_lidtype'::text
-  UNION
-  SELECT inp_lid_value.lidco_id,
-    inp_typevalue.idval AS lidlayer,
-    inp_lid_value.value_2 as other1,
-    inp_lid_value.value_3 as other2,
-    inp_lid_value.value_4 as other3,
-    inp_lid_value.value_5 as other4,
-    inp_lid_value.value_6 as other5,
-    inp_lid_value.value_7 as other6,
+UNION
+ SELECT 
+ inp_lid_value.id,
+ inp_lid_value.lidco_id,
+    inp_typevalue.idval AS lidco_type,
+    inp_lid_value.value_2 AS other1,
+    inp_lid_value.value_3 AS other2,
+    inp_lid_value.value_4 AS other3,
+    inp_lid_value.value_5 AS other4,
+    inp_lid_value.value_6 AS other5,
+    inp_lid_value.value_7 AS other6,
     inp_lid_value.value_8 AS other7
    FROM inp_lid_value
-   LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text
-  ORDER BY lidco_id
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text)a
+  ORDER BY lidco_id,id ASC;
