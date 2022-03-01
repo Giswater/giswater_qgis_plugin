@@ -489,4 +489,4 @@ UPDATE arc SET pavcat_id = 'Asphalt';
 UPDATE cat_arc SET connect_cost = 'N_CONNECTION';
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
-"data":{"isNewProject":"FALSE", "gwVersion":"3.3.031", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);
+"data":{"isNewProject":"FALSE", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);

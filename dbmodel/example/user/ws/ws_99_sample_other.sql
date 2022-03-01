@@ -662,4 +662,4 @@ UPDATE config_toolbox SET inputparams =
 WHERE id = 2768;
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
-"data":{"isNewProject":"FALSE", "gwVersion":"3.3.031", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);
+"data":{"isNewProject":"FALSE", "projectType":"WS", "epsg":25831, "isSample":"TRUE"}}$$);
