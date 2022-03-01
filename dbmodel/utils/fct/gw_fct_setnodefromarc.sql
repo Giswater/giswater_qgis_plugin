@@ -50,6 +50,7 @@ v_state_type integer;
 v_builtdate date;
 v_nodecat_id text;
 v_arclist json;
+v_count integer;
 
 BEGIN
 
@@ -75,6 +76,10 @@ BEGIN
 	--  Reset values
 	DELETE FROM temp_table WHERE cur_user=current_user AND fid = 116;
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid = 116;
+	DELETE FROM audit_check_data WHERE cur_user=current_user AND fid = 116;
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, concat('BUILT MISSING NODES USING START/END VERTICES'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, '-------------------------------------------------------------');
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fid, geom_point)
@@ -85,8 +90,8 @@ BEGIN
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fid = 116
 	LOOP
-	        -- Check existing nodes  
-	        numNodes:= 0;
+	    -- Check existing nodes  
+	    numNodes:= 0;
 		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_buffer));
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
@@ -124,9 +129,23 @@ BEGIN
 	END IF;	
 
 	-- get log
+	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=116;
+
+	IF v_count=0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (116,  'There are no nodes to be repaired.', 0);
+	ELSE
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			VALUES (116,  concat (v_count,' nodes have been created to repair topology'), v_count);
+
+			INSERT INTO audit_check_data(fid,  error_message, fcount)
+			SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+			FROM anl_node WHERE cur_user="current_user"() AND fid=116;
+	END IF;
+	
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid = 116) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 116) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -167,9 +186,10 @@ BEGIN
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":"'||v_version||'"'||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ 
