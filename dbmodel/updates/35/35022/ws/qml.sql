@@ -6522,3 +6522,9 @@ INSERT INTO sys_style VALUES('165','v_rpt_comp_node_hourly','qml',
   <layerOpacity>1</layerOpacity>
   <layerGeometryType>0</layerGeometryType>
 </qgis>', true) ON CONFLICT (id) DO NOTHING;
+
+
+-- 22/03/01
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'label1','Connec customer code:'::text) WHERE parameter = 'om_mincut_hydrometer_filter';
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'label2','Hydrometer customer code:'::text) WHERE parameter = 'om_mincut_hydrometer_filter';
