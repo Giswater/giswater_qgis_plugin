@@ -1206,11 +1206,15 @@ class GwMincut:
         # Get hydrometer filter columns
         self.col1 = "customer_code"
         self.col2 = "hydrometer_customer_code"
+        self.lbl1 = "Connec customer code:"
+        self.lbl2 = "Hydrometer customer code:"
         row = tools_gw.get_config_value('om_mincut_hydrometer_filter', table='config_param_system')
         if row:
             values = json.loads(row[0])
             self.col1 = values['field1']
             self.col2 = values['field2']
+            self.lbl1 = values['label1']
+            self.lbl2 = values['label2']
 
         # Check if id exist in table 'om_mincut'
         sql = (f"SELECT id FROM om_mincut"
@@ -1240,6 +1244,10 @@ class GwMincut:
         tools_gw.add_icon(self.dlg_hydro.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_hydro.btn_delete, "112", sub_folder="24x24")
 
+        # Set labels
+        self.dlg_hydro.lbl_ccc.setText(self.lbl1)
+        self.dlg_hydro.lbl_hcc.setText(self.lbl2)
+
         # Set signals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self._insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self._delete_records_hydro))
@@ -1256,7 +1264,7 @@ class GwMincut:
             # Read selection and reload table
             self._select_features_hydro()
 
-        tools_gw.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
+        tools_gw.open_dialog(self.dlg_hydro)
 
 
     def _auto_fill_hydro_id(self):
