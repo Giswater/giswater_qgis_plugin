@@ -228,12 +228,14 @@ FROM config_form_fields WHERE formname ='v_edit_inp_dscenario_inflows' AND colum
 
 UPDATE inp_timeseries SET expl_id = a.expl_id FROM arc a WHERE inp_timeseries.expl_id=a.sector_id;
 
+ALTER TABLE inp_timeseries DROP CONSTRAINT IF EXISTS inp_timeseries_expl_id_fkey;
 ALTER TABLE inp_timeseries ADD CONSTRAINT inp_timeseries_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 --2022/02/08
 INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('inp_value_catarc', 'VERT_ELLIPSE', 'VERT_ELLIPSE');
+VALUES ('inp_value_catarc', 'VERT_ELLIPSE', 'VERT_ELLIPSE')
+ON CONFLICT (typevalue, id) DO NOTHING;
 
 ALTER TABLE cat_arc_shape DROP CONSTRAINT cat_arc_shape_check;
 ALTER TABLE cat_arc_shape
@@ -244,7 +246,8 @@ VALUES ('VERT_ELLIPSE', 'VERT_ELLIPSE') ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET functionparams = '{"featureType":["node", "arc", "subcatchment", "raingage"]}' WHERE id = 3118;
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS')
+ON CONFLICT(typevalue, id) DO NOTHING;
 
 UPDATE config_toolbox SET inputparams = 
 '[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},

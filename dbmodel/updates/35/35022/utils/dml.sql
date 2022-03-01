@@ -13,13 +13,14 @@ where id = 3130;
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, source)
 VALUES ('edit_disable_topocontrol', 'hidden', 'If true topocontrol and feature proximity is disabled to allow data migration',
-'role_admin', true, 'utils', false, 'boolean', 'check', false, true,'core');
+'role_admin', true, 'utils', false, 'boolean', 'check', false, true,'core')
+ON CONFLICT (id) DO NOTHING;
 
 --2022/01/27
 DELETE FROM sys_fprocess where fid in (333, 334, 335, 179);
 
 --2022/01/31
-ALTER TABLE plan_price DROP CONSTRAINT plan_price_unit_check;
+ALTER TABLE plan_price DROP CONSTRAINT IF EXISTS plan_price_unit_check;
 
 UPDATE config_form_fields SET columnname='expl_id', label='expl_id', 
 dv_querytext='SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ',
@@ -36,13 +37,17 @@ UPDATE config_form_tabs SET sys_role='role_basic' WHERE formname='selector_basic
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, 
 return_type, descript, sys_role, sample_query, source)
-VALUES (3132, 'gw_trg_edit_inp_timeseries', 'ud', 'function trigger', NULL, NULL, 'Allows editing inp timeseries view', 'role_epa', NULL, 'core');
+VALUES (3132, 'gw_trg_edit_inp_timeseries', 'ud', 'function trigger', NULL, NULL, 'Allows editing inp timeseries view', 'role_epa', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
 
 UPDATE inp_pattern SET expl_id = a.expl_id FROM arc a WHERE inp_pattern.expl_id=a.sector_id;
 UPDATE inp_curve SET expl_id = a.expl_id FROM arc a WHERE inp_curve.expl_id=a.sector_id;
 
+ALTER TABLE inp_pattern DROP CONSTRAINT IF EXISTS inp_pattern_expl_id_fkey;
 ALTER TABLE inp_pattern ADD CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_curve DROP CONSTRAINT IF EXISTS inp_curve_expl_id_fkey;
 ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -55,13 +60,16 @@ INSERT INTO config_param_system(parameter, value, descript, label, isenabled, la
 VALUES ('basic_selector_tab_macrosector', '{"table":"macrosector","selector":"selector_sector","table_id":"macrosector_id",
 "selector_id":"sector_id","label":"macrosector_id, '' - '', m.name","orderBy":"macrosector_id","manageAll":true,"selectionMode":"keepPreviousUsingShift",
 "query_filter":" AND macrosector_id > 0","typeaheadForced":true, "sectorFromMacroexpl":true,"explFromMacroexpl":false}', 'Variable to config selector tab macrosector',
-'Selector variables', FALSE, null, 'utils', 'json') ON CONFLICT(parameter) DO NOTHING;
+'Selector variables', FALSE, null, 'utils', 'json') 
+ON CONFLICT(parameter) DO NOTHING;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
-VALUES ('tabname_typevalue', 'tab_macrosector', 'Macrosector', 'Macrosector', null);
+VALUES ('tabname_typevalue', 'tab_macrosector', 'Macrosector', 'Macrosector', null)
+ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
-VALUES ('selector_basic', 'tab_macrosector', 'Macrosector', 'Macrosector', 'role_epa', NULL, NULL, 4,7);
+VALUES ('selector_basic', 'tab_macrosector', 'Macrosector', 'Macrosector', 'role_epa', NULL, NULL, 4,7)
+ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 UPDATE config_form_fields SET hidden = FALSE WHERE formname='v_edit_sector' AND columnname='macrosector_id';
 
@@ -69,7 +77,9 @@ UPDATE config_form_fields SET widgetcontrols = '{"setMultiline": false, "valueRe
 "valueColumn": "name", "filterExpression": "sector_id > -1 AND active IS TRUE"}}' WHERE formname='v_edit_sector' and columnname='parent_id';
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
-VALUES ('sys_table_context', '{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":24}', NULL);
+VALUES ('sys_table_context', '{"level_1":"BASEMAP","level_2":"CARTO"}', null, '{"orderBy":24}', NULL)
+ON CONFLICT (typevalue, id) DO NOTHING;
+
 
 UPDATE sys_table SET context='{"level_1":"BASEMAP","level_2":"CARTO"}', orderby = 1, alias='DEM', addparam='{"geom":"rast"}' 
 WHERE id IN ('v_ext_raster_dem');

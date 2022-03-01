@@ -11,12 +11,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_timeseries", "column":"sector_id", "newName":"expl_id"}}$$);
 
 
-DROP VIEW v_edit_inp_lid_usage;
+DROP VIEW IF EXISTS v_edit_inp_lid_usage;
 DELETE FROM sys_table WHERE id IN ('v_edit_inp_lid_usage', 'inp_lid_usage');
-ALTER TABLE inp_lid_usage RENAME TO _inp_lid_usage_;
+ALTER TABLE IF EXISTS inp_lid_usage RENAME TO _inp_lid_usage_;
 
 
-CREATE TABLE inp_dscenario_lid_usage
+CREATE TABLE IF NOT EXISTS inp_dscenario_lid_usage
 (
   dscenario_id integer NOT NULL,
   subc_id character varying(16) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE inp_dscenario_lid_usage
   PRIMARY KEY (dscenario_id, subc_id, lidco_id));
 
 
-CREATE TABLE temp_lid_usage
+CREATE TABLE IF NOT EXISTS temp_lid_usage
 (
   subc_id character varying(16) NOT NULL,
   lidco_id character varying(16) NOT NULL,
