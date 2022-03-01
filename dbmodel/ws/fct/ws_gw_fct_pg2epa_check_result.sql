@@ -506,8 +506,8 @@ BEGIN
 	END IF;
 	
 	-- depth
-	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else depth end as elev FROM temp_node) a 
-	WHERE elev < (v_outlayer_depth->>'min')::float OR elev > (v_outlayer_depth->>'max')::float;
+	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_node) a 
+	WHERE depth < (v_outlayer_depth->>'min')::float OR depth > (v_outlayer_depth->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '407', concat('ERROR-407: There is/are ',v_count,' node(s) with outlayer values on depth column'),v_count);
