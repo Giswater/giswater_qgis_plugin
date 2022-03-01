@@ -259,8 +259,8 @@ JOIN cat_feature ON cat_feature.id=arc.arc_type
 WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
-DROP VIEW IF EXISTS vi_lid;
-CREATE OR REPLACE VIEW vi_lid AS 
+DROP VIEW IF EXISTS vi_lid_controls;
+CREATE OR REPLACE VIEW vi_lid_controls AS 
 SELECT lidco_id, lidco_type, other1, other2, other3, other4, other5, other6, other7 FROM (
  SELECT 
   0::integer AS id,
