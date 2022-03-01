@@ -33,7 +33,7 @@ v_closedstatus boolean;
 v_automaticmapzonetrigger boolean;
 v_type text;
 v_mapzone text;
-v_mapzone_array text[];
+v_mapzone_array json;
 v_count integer;
 v_count_2 integer;
 v_mapzone_id integer;
@@ -82,7 +82,7 @@ BEGIN
 			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			
 			-- FOR v_mapzone
-			FOR v_mapzone IN SELECT unnest(v_mapzone_array)
+			FOR v_mapzone IN SELECT json_array_elements_text(v_mapzone_array)
 			LOOP
 				-- getting current mapzone
 				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id) INTO v_value;
