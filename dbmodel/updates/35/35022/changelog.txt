@@ -10,3 +10,8 @@
 - Add default qml style to all layers available on Add Giswater Layer tool
 - Create 2 tables to define lid controls - inp_lid and inp_lid_values
 - Add new outlayer value for epa (depth) on ws projects
+- Configure new default raport - water consumption by period and dma
+- Create option of defining customized mapzone drawing definition
+- Add rules to control ids of 0 and -1 on mapzones
+- Define new shape of UD pipes - VERT_ELLIPSE
+- Add possibility of defining macrosector selector
