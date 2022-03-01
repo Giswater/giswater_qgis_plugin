@@ -1867,7 +1867,7 @@ class GwPsector:
 
         msg = ""
 
-        cols = ['Name', 'Priority', 'Status', 'Exploitation', 'Type', 'Descript', 'text1', 'text2', 'Observ']
+        cols = ['Name', 'Priority', 'Status', 'expl_id', 'Descript', 'text1', 'text2', 'Observ']
 
         for col in cols:
             # Get column index for column
