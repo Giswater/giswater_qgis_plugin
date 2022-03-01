@@ -37,6 +37,7 @@ v_gwversion text;
 v_language text;
 v_epsg integer;
 v_isnew boolean;
+v_issample boolean;
 v_descript text;
 v_name text;
 v_author text;
@@ -68,6 +69,7 @@ BEGIN
 	v_projecttype := (p_data ->> 'data')::json->> 'projectType';
 	v_epsg := (p_data ->> 'data')::json->> 'epsg';
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
+	v_issample := (p_data ->> 'data')::json->> 'isSample';
 	v_descript := (p_data ->> 'data')::json->> 'descript';
 	v_name := (p_data ->> 'data')::json->> 'name';
 	v_author := (p_data ->> 'data')::json->> 'author';
@@ -296,18 +298,6 @@ BEGIN
 		-- automatize graf analytics config for ws
 		UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
 
-		FOR v_rectable IN 
-		(SELECT table_name, column_name, sequence_name FROM information_schema.columns,   information_schema.sequences
-		WHERE table_schema ='SCHEMA_NAME' and sequence_schema ='SCHEMA_NAME' and  column_default ILIKE '%' || sequence_name || '%'
-		AND sequence_name!='urn_id_seq' AND sequence_name!='doc_seq')
-        LOOP 
-            v_querytext:= 'SELECT max('||v_rectable.column_name||') FROM '||v_rectable.table_name||';' ;
-            EXECUTE v_querytext INTO v_max_seq_id;	
-            IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-                EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sequence_name||' '','||v_max_seq_id||', true)';			
-            END IF;
-        END LOOP;
-
 	ELSIF v_isnew IS FALSE THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
@@ -339,6 +329,21 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
 		v_message='Project sucessfully updated';
 
+	END IF;
+
+	--reset sequences for a new project or for a sample
+	IF v_isnew IS TRUE OR v_issample IS TRUE THEN
+		FOR v_rectable IN 
+		(SELECT table_name, column_name, sequence_name FROM information_schema.columns,   information_schema.sequences
+		WHERE table_schema ='SCHEMA_NAME' and sequence_schema ='SCHEMA_NAME' and  column_default ILIKE '%' || sequence_name || '%'
+		AND sequence_name!='urn_id_seq' AND sequence_name!='doc_seq')
+        LOOP 
+            v_querytext:= 'SELECT max('||v_rectable.column_name||') FROM '||v_rectable.table_name||';' ;
+            EXECUTE v_querytext INTO v_max_seq_id;	
+            IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
+                EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sequence_name||' '','||v_max_seq_id||', true)';			
+            END IF;
+        END LOOP;
 	END IF;
 
 	-- last process
