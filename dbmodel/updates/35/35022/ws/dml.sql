@@ -627,7 +627,7 @@ AND columnname IN ('node_id', 'order_id', 'power', 'curve_id', 'speed', 'pattern
  
  UPDATE  config_form_fields SET formname = 'v_edit_inp_dscenario_connec' WHERE formname = 'v_edit_inp_connec' AND columnname = 'dscenario_id';
 
- UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'mapzone','{"dma", "dqa", "presszone", "sector"}'::text) WHERE parameter = 'utils_grafanalytics_automatic_trigger';
+ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'mapzone','["DMA", "DQA", "PRESSZONE", "SECTOR"]'::json) WHERE parameter = 'utils_grafanalytics_automatic_trigger';
 
  --2022/02/21
  INSERT INTO config_param_system
