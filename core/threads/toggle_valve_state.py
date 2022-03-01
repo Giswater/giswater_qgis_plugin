@@ -34,6 +34,7 @@ class GwToggleValveTask(GwTask):
         if not self.json_result:
             tools_log.log_info("Function gw_fct_setfields failed")
             return False
+        tools_qgis.refresh_map_canvas()
         if self.json_result and self.json_result['status'] != 'Failed':
             self.json_result = tools_gw.execute_procedure('gw_fct_setmapzonestrigger', body, is_thread=True, aux_conn=self.aux_conn)
             if not self.json_result:
@@ -66,6 +67,5 @@ class GwToggleValveTask(GwTask):
                 tools_qt.show_info_box(self.json_result['text'])
             if self.json_result['level'] == 0:
                 tools_qgis.show_info(self.json_result['text'])
-            tools_qgis.refresh_map_canvas()
 
         self.setProgress(100)

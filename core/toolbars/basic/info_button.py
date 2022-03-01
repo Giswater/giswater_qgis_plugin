@@ -247,7 +247,7 @@ class GwInfoButton(GwMaptool):
         # If param is true show question and create thread
         msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
         if global_vars.user_level['level'] in ('1', '2'):
-            msg += "\nWould you like to continue?"
+            msg += " Would you like to continue?"
             answer = tools_qt.show_question(msg)
         else:
             tools_qgis.show_info(msg)
