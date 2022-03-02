@@ -755,3 +755,6 @@ UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='Sub
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"COMPARE"}', alias='LID Performance Compare', orderby=15 where id='v_rpt_comp_lidperformance_sum';
 
 DELETE FROM config_toolbox WHERE id = 2680;
+
+UPDATE sys_param_user SET id ='edit_pavementcat_vdefault' WHERE id = 'edit_pavement_vdefault';
+UPDATE config_param_user SET parameter ='edit_pavementcat_vdefault' WHERE parameter = 'edit_pavement_vdefault';

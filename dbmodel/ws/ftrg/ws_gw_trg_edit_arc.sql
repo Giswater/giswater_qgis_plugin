@@ -28,6 +28,7 @@ v_featurecat text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_force_delete boolean;
+v_autoupdate_fluid boolean;
 
 BEGIN
 
@@ -42,6 +43,7 @@ BEGIN
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
+    v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
@@ -374,6 +376,11 @@ BEGIN
 		IF NEW.function_type IS NULL THEN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
+        
+        --Pavement
+		IF NEW.pavcat_id IS NULL THEN
+			NEW.pavcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_pavementcat_vdefault' AND cur_user = current_user);
+		END IF;
 
 		-- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
@@ -438,7 +445,21 @@ BEGIN
 		
 		v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
         EXECUTE v_sql;
-				
+		
+		--in case a project is dhc, insert cable
+		IF (SELECT value FROM config_param_system WHERE parameter='dhc_plugin_version') is not null then
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='dhc_edit_insert_cable' 
+			AND cur_user=current_user) is true AND (SELECT json_extract_path_text(value::json,'cableFeaturecat')
+				FROM config_param_system WHERE parameter='dhc_edit_insert_cable') != NEW.arc_type THEN
+					raise notice 'execute';
+					EXECUTE 'SELECT dhc_fct_edit_cable($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
+					"data":{"filterFields":{}, "pageInfo":{},"arcId":"'||NEW.arc_id::text||'", 
+					"arcGeom":"'||NEW.the_geom::text||'", "muniId":"'||NEW.muni_id::text||'", "explId":"'||NEW.expl_id::text||'",
+					"state":"'||NEW.state::text||'","stateType":"'||NEW.state_type::text||'", "arcId":"'||NEW.arc_id||'" }}$$);';
+			END IF;
+		END IF;
+
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -573,7 +594,7 @@ BEGIN
 
         END IF;       
 		--update values of related connecs;
-		IF NEW.fluid_type != OLD.fluid_type THEN
+		IF NEW.fluid_type != OLD.fluid_type AND v_autoupdate_fluid IS TRUE THEN
 			UPDATE connec SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
 		END IF;
 

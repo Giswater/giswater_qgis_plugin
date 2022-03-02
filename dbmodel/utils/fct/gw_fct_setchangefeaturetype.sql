@@ -91,7 +91,7 @@ BEGIN
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
 	INTO v_category;
 	IF v_category IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type=NULL;';
+		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 
 	EXECUTE 'SELECT n.function_type FROM '||v_feature_layer||' n JOIN man_type_function m ON n.function_type=m.function_type
@@ -99,7 +99,7 @@ BEGIN
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
 	INTO v_function;
 	IF v_function IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type=NULL;';
+		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 	
 	EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
@@ -107,7 +107,7 @@ BEGIN
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
 	INTO v_fluid;
 	IF v_fluid IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=NULL;';
+		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 
 	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
@@ -115,7 +115,7 @@ BEGIN
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
 	INTO v_location;
 	IF v_location IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=NULL;';
+		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 
 	IF v_project_type = 'WS' THEN

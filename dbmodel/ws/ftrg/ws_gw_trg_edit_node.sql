@@ -782,7 +782,12 @@ BEGIN
 					v_sql='INSERT INTO '||v_new_epatable||' (node_id) VALUES ('||NEW.node_id||')';
 					EXECUTE v_sql;
 				END IF;
-				
+			END IF;
+
+			IF NEW.closed_valve != OLD.closed_valve THEN
+				UPDATE man_valve 
+				SET closed=NEW.closed_valve
+				WHERE node_id=OLD.node_id;
 			END IF;
 		END IF;
 

@@ -227,8 +227,6 @@ SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
-UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';
-
 UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_cost = 'VIRTUAL_M3' WHERE id = 'VIRTUAL';
 
 UPDATE element SET code = concat ('E',element_id);
@@ -489,3 +487,34 @@ UPDATE inp_flwreg_pump SET to_arc = '18966' WHERE node_id = '18828';
 UPDATE arc SET pavcat_id = 'Asphalt';
 
 UPDATE cat_arc SET connect_cost = 'N_CONNECTION';
+
+INSERT INTO inp_lid VALUES ('BIO-RETENTION','BC');
+INSERT INTO inp_lid VALUES ('VEGE-SWALE','VS');
+INSERT INTO inp_lid VALUES ('RAIN-GARDEN','RG');
+INSERT INTO inp_lid VALUES ('PAV-PERMEABLE','PP');
+INSERT INTO inp_lid VALUES ('GREEN-ROOF','GR');
+INSERT INTO inp_lid VALUES ('INFIL-TRENCH','IT');
+INSERT INTO inp_lid VALUES ('RAIN-BARREL','IT');
+
+INSERT INTO inp_lid_value VALUES (1,'GREEN-ROOF','SURFACE',3,0,0,0,0);
+INSERT INTO inp_lid_value VALUES (2,'GREEN-ROOF','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
+INSERT INTO inp_lid_value VALUES (3,'GREEN-ROOF','STORAGE',30,0.5,0,0);
+INSERT INTO inp_lid_value VALUES (4,'GREEN-ROOF','DRAINMAT',5,0.5,0,6);
+INSERT INTO inp_lid_value VALUES (5,'PAV-PERMEABLE','SURFACE',3,0,0,0,0);
+INSERT INTO inp_lid_value VALUES (6,'PAV-PERMEABLE','PAVEMENT',40,0.5,0.1,0.5,0);
+INSERT INTO inp_lid_value VALUES (7,'PAV-PERMEABLE','STORAGE',30,0.5,0,0);
+INSERT INTO inp_lid_value VALUES (8,'INFIL-TRENCH','SURFACE',3,0,0,0,0);
+INSERT INTO inp_lid_value VALUES (9,'INFIL-TRENCH','STORAGE',30,0.5,0,0);
+INSERT INTO inp_lid_value VALUES (10,'RAIN-GARDEN','SURFACE',3,0,0,0,0);
+INSERT INTO inp_lid_value VALUES (11,'RAIN-GARDEN','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
+INSERT INTO inp_lid_value VALUES (12,'VEGE-SWALE','SURFACE',3,0.5,0.03,0.5,0.5);
+INSERT INTO inp_lid_value VALUES (13,'VEGE-SWALE','STORAGE',30,0.5,0,0);
+INSERT INTO inp_lid_value VALUES (14,'BIO-RETENTION','SURFACE',3,0,0,0,0);
+INSERT INTO inp_lid_value VALUES (15,'BIO-RETENTION','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
+INSERT INTO inp_lid_value VALUES (16,'BIO-RETENTION','STORAGE',30,0.5,0,0);
+INSERT INTO inp_lid_value VALUES (17,'RAIN-BARREL','STORAGE',30,1,0,0);
+INSERT INTO inp_lid_value VALUES (18,'RAIN-BARREL','DRAIN',5,0.5,0,6);
+
+
+SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
+"data":{"isNewProject":"FALSE", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);

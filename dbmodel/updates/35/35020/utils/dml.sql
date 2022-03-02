@@ -83,6 +83,8 @@ INSERT INTO sys_table(id, descript, sys_role, sys_criticity)
 VALUES ('v_rtc_period_hydrometer', 'Shows the hydrometer periods.','role_basic', 0)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (142, 'Check dint value for cat_node acting as [SHORTPIPE or VALVE or PUMP]', 'ws');
-INSERT INTO sys_fprocess VALUES (153, 'Inlets with null mandatory values', 'ws');
+INSERT INTO sys_fprocess VALUES (142, 'Check dint value for cat_node acting as [SHORTPIPE or VALVE or PUMP]', 'ws')
+ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess VALUES (153, 'Inlets with null mandatory values', 'ws')
+ON CONFLICT (fid) DO NOTHING;
 

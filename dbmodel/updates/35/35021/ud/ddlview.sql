@@ -1330,26 +1330,26 @@ SELECT d.arc_id,
                                     ELSE ((v_arc.y1 + v_arc.y2) / 2::numeric)::numeric(12,2)
                                 END AS mean_y,
                             v_arc.arccat_id,
-                            v_price_x_catarc.geom1,
-                            v_price_x_catarc.z1,
-                            v_price_x_catarc.z2,
-                            v_price_x_catarc.area,
-                            v_price_x_catarc.width,
-                            v_price_x_catarc.bulk,
+                            COALESCE(v_price_x_catarc.geom1,0)::numeric(12,4) as geom1,
+                            COALESCE(v_price_x_catarc.z1, 0::numeric)::numeric(12,2) AS z1,
+                            COALESCE(v_price_x_catarc.z2, 0::numeric)::numeric(12,2) AS z2,
+                            COALESCE(v_price_x_catarc.area, 0::numeric)::numeric(12,4) AS area,
+                            COALESCE(v_price_x_catarc.width, 0::numeric)::numeric(12,2) AS width,
+                            COALESCE(v_price_x_catarc.bulk / 1000::numeric, 0::numeric)::numeric(12,2) AS bulk,
                             v_price_x_catarc.cost_unit,
-                            v_price_x_catarc.cost::numeric(12,2) AS arc_cost,
-                            v_price_x_catarc.m2bottom_cost::numeric(12,2) AS m2bottom_cost,
-                            v_price_x_catarc.m3protec_cost::numeric(12,2) AS m3protec_cost,
+                            COALESCE(v_price_x_catarc.cost, 0::numeric)::numeric(12,2) AS arc_cost,
+                            COALESCE(v_price_x_catarc.m2bottom_cost, 0::numeric)::numeric(12,2) AS m2bottom_cost,
+                            COALESCE(v_price_x_catarc.m3protec_cost, 0::numeric)::numeric(12,2) AS m3protec_cost,
                             v_price_x_catsoil.id AS soilcat_id,
-                            v_price_x_catsoil.y_param,
-                            v_price_x_catsoil.b,
-                            v_price_x_catsoil.trenchlining,
-                            v_price_x_catsoil.m3exc_cost::numeric(12,2) AS m3exc_cost,
-                            v_price_x_catsoil.m3fill_cost::numeric(12,2) AS m3fill_cost,
-                            v_price_x_catsoil.m3excess_cost::numeric(12,2) AS m3excess_cost,
-                            v_price_x_catsoil.m2trenchl_cost::numeric(12,2) AS m2trenchl_cost,
-                            v_plan_aux_arc_pavement.thickness,
-                            v_plan_aux_arc_pavement.m2pav_cost,
+                            COALESCE(v_price_x_catsoil.y_param, 10::numeric)::numeric(5,2) AS y_param,
+                            COALESCE(v_price_x_catsoil.b, 0::numeric)::numeric(5,2) AS b,
+                            COALESCE(v_price_x_catsoil.trenchlining, 0::numeric) AS trenchlining,
+                            COALESCE(v_price_x_catsoil.m3exc_cost, 0::numeric)::numeric(12,2) AS m3exc_cost,
+                            COALESCE(v_price_x_catsoil.m3fill_cost, 0::numeric)::numeric(12,2) AS m3fill_cost,
+                            COALESCE(v_price_x_catsoil.m3excess_cost, 0::numeric)::numeric(12,2) AS m3excess_cost,
+                            COALESCE(v_price_x_catsoil.m2trenchl_cost, 0::numeric)::numeric(12,2) AS m2trenchl_cost,
+                            COALESCE(v_plan_aux_arc_pavement.thickness, 0::numeric)::numeric(12,2) AS thickness,
+                            COALESCE(v_plan_aux_arc_pavement.m2pav_cost, 0::numeric) AS m2pav_cost,
                             v_arc.state,
                             v_arc.expl_id,
                             v_arc.the_geom
@@ -1499,3 +1499,12 @@ SELECT d.arc_id,
                    LEFT JOIN v_price_compost P ON connect_cost = p.id where arc_id = '18890'
                   GROUP BY c.arc_id
                   ) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+                  
+-- 2022/01/20
+DROP VIEW IF EXISTS v_price_x_catgrate;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_grate", "column":"cost_ut","isUtils":"False"}}$$);
+
+DROP VIEW IF EXISTS v_price_x_catconnec;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ut","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_ml","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_connec", "column":"cost_m3","isUtils":"False"}}$$);

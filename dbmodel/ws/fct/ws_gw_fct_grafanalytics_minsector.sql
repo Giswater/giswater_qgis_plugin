@@ -253,8 +253,7 @@ BEGIN
 			-- insert arc results into audit table
 			INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
 			SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, v_arc::text
-			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id
-			ON CONFLICT (fid, arc_id, cur_user) DO NOTHING;
+			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id;
 			GET DIAGNOSTICS v_affectedrow =row_count;
 
 		END LOOP;

@@ -71,3 +71,6 @@ ALTER TABLE arc ADD CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id)
 REFERENCES cat_pavement (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"fprocess_type", "dataType":"text", "isUtils":"False"}}$$);
+
+-- 21/01/2022
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_table", "column":"style_id", "dataType":"integer", "isUtils":"False"}}$$);

@@ -422,23 +422,45 @@ BEGIN
 	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
-		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall" ]'::json) as tabname, 
-					 json_array_elements_text('["node" ,"arc", "rg", "nodarc", "nodarc", "nodarc", "nodarc", "node", "node"]'::json) as colname
+		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall", "inflows_poll", "treatment", "lid_usage" ]'::json) as tabname, 
+					 json_array_elements_text('["node_id" ,"arc_id", "rg_id", "nodarc_id", "nodarc_id", "nodarc_id", "nodarc_id", "node_id", "node_id", "node_id", "node_id", "subc_id, lidco_id"]'::json) as colname,
+ 					 json_array_elements_text('["anl_node" ,"anl_arc", "", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_node", "anl_node", "", "anl_node", "anl_polygon"]'::json) as tablename
 		LOOP
 
-			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||'_id HAVING count(*) > 1) a' INTO v_count;
+			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||' HAVING count(*) > 1) a' INTO v_count;
 			IF v_count > 0 THEN
+		
+				IF object_rec.tablename IN ('anl_arc', 'anl_node') THEN
 				
-				IF object_rec.colname IN ('arc', 'node') THEN
-				
-					EXECUTE 'INSERT INTO anl_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
-					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||' JOIN '||
-					object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP BY '||object_rec.colname||'_id, the_geom  having count(arc_id) > 1';
+					EXECUTE 'INSERT INTO '||object_rec.tablename||' ('||object_rec.colname||', fid, descript, the_geom) 
+					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||
+					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
-				ELSE
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (',object_rec.tablename,'): There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));	
+
+				ELSIF object_rec.tablename = 'anl_nodarc' THEN
+
+					EXECUTE 'INSERT INTO anl_arc (arc_id, fid, descript, the_geom)
+					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||
+					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
+
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_arc): There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));	
+
+				ELSIF object_rec.tablename = 'anl_polygon' THEN
+
+					EXECUTE 'INSERT INTO anl_polygon (pol_id, pol_type, fid, descript, the_geom)
+					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||
+					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
+
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (',object_rec.tablename,'): There is/are ', v_count, ' ',
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));	
+				
+				ELSE				
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
 					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				

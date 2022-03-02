@@ -42,19 +42,6 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_statety
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN sys_param_user ON sys_param_user.id=parameter 

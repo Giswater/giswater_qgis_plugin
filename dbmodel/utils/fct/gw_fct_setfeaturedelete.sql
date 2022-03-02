@@ -105,6 +105,14 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of disconnected documents: ',v_count));
 	END IF;
 
+	--update position_id related to node
+	EXECUTE 'SELECT count(*) FROM om_visit_event where position_id = '''||v_feature_id||''''
+	INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE 'UPDATE om_visit_event SET position_id = NULL where position_id = '''||v_feature_id||''';';
+	END IF;
+
 	IF v_feature_type='node' THEN 
 
 		--remove scada related to node

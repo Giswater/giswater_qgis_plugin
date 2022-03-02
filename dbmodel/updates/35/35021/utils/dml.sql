@@ -41,7 +41,7 @@ INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY"
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', null, '{"orderBy":7}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"POLYGON"}', null, '{"orderBy":8}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"OTHER"}', null, '{"orderBy":9}') ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"EDIT","level_2":"AUXILIAR"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"AUXILIAR"}', null, '{"orderBy":10}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"MINCUT"}', null, '{"orderBy":11}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"FLOWTRACE"}', null, '{"orderBy":12}') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('sys_table_context','{"level_1":"OM","level_2":"VISIT"}', null, '{"orderBy":13}') ON CONFLICT (typevalue, id) DO NOTHING;
@@ -124,9 +124,9 @@ WHERE c2.id = c.id;
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"OTHER"}', alias = 'Dimensioning' , orderby=1  WHERE id='v_edit_dimensions';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"OTHER"}', alias = 'Element' , orderby=2  WHERE id='v_edit_element';
 
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Point' , orderby=1 WHERE id ='v_edit_cad_auxpoint';
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Line' , orderby=2 WHERE id ='v_edit_cad_auxline';
-UPDATE sys_table SET context ='{"level_1":"EDIT","level_2":"AUXILIAR"}', alias = 'Cirle' , orderby=3 WHERE id ='v_edit_cad_auxcircle';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Point' , orderby=1 WHERE id ='v_edit_cad_auxpoint';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Line' , orderby=2 WHERE id ='v_edit_cad_auxline';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}', alias = 'Cirle' , orderby=3 WHERE id ='v_edit_cad_auxcircle';
 
 
 --OM
@@ -335,3 +335,23 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 return_type, descript, sys_role, sample_query, source)
 VALUES (3128, 'gw_fct_getwidgetprices', 'utils', 'function', 'json', 'json', 'Function to manage price values for psector_other tab', 
 'role_epa', null, null) ON CONFLICT (id) DO NOTHING;
+
+--2022/01/20
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
+VALUES (437, 'Topocontrol for data migration', 'utils', NULL, 'core',FALSE, 'Function process') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES ('3130', 'gw_fct_admin_manage_migra', 'utils', 'function', 'json', 
+'json', 'Function that disables and enables topo variables for migration purposes', 'role_admin', NULL, 'core') ON CONFLICT (id) DO NOTHING;
+
+delete from config_toolbox where id =3128;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3130, 'Topocontrol for data migration', '{"featureType":[]}', 
+'[{"widgetname":"action", "label":"Topocontrol:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["ENABLE","DISABLE"],"comboNames":["ENABLE","DISABLE"], "selectedId":"ENABLE"}]', NULL, true) 
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE sys_table  ADD CONSTRAINT sys_table_style_id_fkey FOREIGN KEY (style_id)
+REFERENCES sys_style(id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+UPDATE arc a SET pavcat_id = p.pavcat_id FROM plan_arc_x_pavement p WHERE a.arc_id = p.arc_id;
+DELETE FROM plan_arc_x_pavement;

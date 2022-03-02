@@ -26,6 +26,8 @@ BEGIN
 			NEW.sector_id=(SELECT nextval('SCHEMA_NAME.sector_sector_id_seq'::regclass));
 		END IF;
 
+		NEW.active = TRUE;
+
 		INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, grafconfig, stylesheet, active, parent_id)
 		VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, 
 		NEW.grafconfig::json, NEW.stylesheet::json, NEW.active, NEW.parent_id);
@@ -49,13 +51,21 @@ BEGIN
 		IF TG_OP = 'INSERT' THEN
 
 			IF NEW.parent_id IS NULL THEN
-			
+		
 				IF (SELECT count(*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 					NEW.parent_id = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user LIMIT 1) ;
+				END IF;
+
+				-- profilactic control in case of parent_id null
+				IF NEW.parent_id IS NULL THEN
+					INSERT INTO config_user_x_sector VALUES (NEW.sector_id, v_user);		
+					INSERT INTO selector_sector VALUES (NEW.sector_id, v_user);		
 				END IF;
 			END IF;
 
 			IF  NEW.parent_id IS NOT NULL THEN
+
+				UPDATE sector SET parent_id = NEW.parent_id WHERE sector_id = NEW.sector_id;
 
 				-- manage cat_manager
 				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a 
@@ -78,18 +88,20 @@ BEGIN
 
 		ELSIF TG_OP = 'UPDATE' THEN
 
-			IF (NEW.parent_id <> OLD.parent_id) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL) THEN
+			IF ((NEW.parent_id <> OLD.parent_id) OR (OLD.parent_id IS NULL AND NEW.parent_id IS NOT NULL)) AND (SELECT parent_id FROM sector WHERE parent_id = NEW.sector_id LIMIT 1) IS NULL THEN
 
-				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||OLD.sector_id||')';
+				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||OLD.parent_id||')';
 				FOR v_row IN EXECUTE v_querytext
 				LOOP
+					raise notice 'v_row1 %', v_row;
 					v_sector_id = array_remove (v_row.sector_id, OLD.sector_id);
 					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
 				END LOOP;
 			
-				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.sector_id||')';
+				v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||NEW.parent_id||')';
 				FOR v_row IN EXECUTE v_querytext
 				LOOP
+					raise notice 'v_row2 %', v_row;
 					v_sector_id = array_append (v_row.sector_id, NEW.sector_id);
 					UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
 				END LOOP;
@@ -97,13 +109,16 @@ BEGIN
 			END IF;
 			
 			RETURN NEW;
-		ELSE
+			
+		ELSIF TG_OP = 'DELETE' THEN
+		
 			v_querytext = 'SELECT * FROM cat_manager WHERE id IN (SELECT id FROM (SELECT id, unnest(sector_id) sector_id FROM cat_manager)a WHERE sector_id = '||OLD.sector_id||')';
 			FOR v_row IN EXECUTE v_querytext
 			LOOP
 				v_sector_id = array_remove (v_row.sector_id, OLD.sector_id);
 				UPDATE cat_manager SET sector_id = v_sector_id WHERE id = v_row.id;
 			END LOOP;
+			
 			RETURN NULL;	
 		END IF;
 	ELSE 

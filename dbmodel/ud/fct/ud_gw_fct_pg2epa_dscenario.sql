@@ -103,7 +103,12 @@ BEGIN
 		UPDATE temp_node t SET ysur = d.ysur FROM v_edit_inp_dscenario_junction d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;	
 		UPDATE temp_node t SET apond = d.apond FROM v_edit_inp_dscenario_junction d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;	
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
+
+		-- insert lid-usage
+		INSERT INTO temp_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript 
+		FROM v_edit_inp_dscenario_lid_usage
+		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
 		-- TODO: update outfallparam
 

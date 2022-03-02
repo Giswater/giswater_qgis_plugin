@@ -34,7 +34,8 @@ v_floodfromnode text;
 v_forceclosed text;
 v_forceopen text;
 v_usepsector text;
-
+v_valuefordisconnected integer;
+v_floodonlymapzone text;
 
 BEGIN
 
@@ -49,6 +50,9 @@ BEGIN
 	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
 	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen');
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
+	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
+	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
+
 
 	-- control of null values
 	IF v_paramupdate IS NULL THEN v_paramupdate = 5; END IF;
@@ -57,9 +61,13 @@ BEGIN
 	IF v_forceopen IS NULL THEN v_forceopen = ''; END IF;
 	IF v_usepsector IS NULL THEN v_usepsector = FALSE ; END IF;
 	IF v_updatemapzone IS NULL THEN v_updatemapzone = 1; END IF;
+	IF v_valuefordisconnected IS NULL THEN v_valuefordisconnected = 0; END IF;
+	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 
+	
 	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
-	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE"}}}');
+	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
+	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'"}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 

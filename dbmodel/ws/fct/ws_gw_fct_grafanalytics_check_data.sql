@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors","grafClass":"SECTOR"}}}$$)
 
 -- fid: main:211,
-	other: 176,179,180,181,192,208,209,367
+	other: 176,180,181,192,208,209,367
 
 select * FROM audit_check_data WHERE fid=211 AND cur_user=current_user; 
 
@@ -82,7 +82,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=211 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,179,180,181,182,208,209);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (211, null, 4, concat('DATA QUALITY ANALYSIS ACORDING GRAF ANALYTICS RULES'));
@@ -169,7 +169,7 @@ BEGIN
 	IF v_sector IS TRUE AND (v_grafclass = 'SECTOR' OR v_grafclass = 'ALL') THEN
 
 		-- check sector.grafconfig values
-		v_querytext = 'SELECT * FROM sector WHERE grafconfig IS NULL and sector_id > 0 AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_sector WHERE grafconfig IS NULL and sector_id > 0 AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -177,42 +177,8 @@ BEGIN
 			VALUES (211, 3, '268', concat('ERROR-268: There is/are ',v_count, ' sectors on sector table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '268', 'INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '268', 'INFO: All sectors has grafconfig values not null.',v_count);
 		END IF;	
-
-		-- check coherence against nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fid:  179)
-		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
-		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-		active FROM sector WHERE grafconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''SECTOR'' AND (a.node_id IS NULL
-		OR node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM sector WHERE active IS TRUE))
-		AND '||v_edit||'node.state > 0';
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-		IF v_count > 0 THEN
-			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS NULL') INTO v_count;
-			IF v_count > 0 THEN
-				EXECUTE concat 
-				('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 179, node_id, nodecat_id,
-				''The cat_feature_node.grafdelimiter of this node is SECTOR but it is not configured on sector.grafconfig'', the_geom, expl_id FROM (', v_querytext,')a');
-				INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-				VALUES (211, 2, '179', concat('WARNING-179: There is/are ',v_count,
-				' node(s) with cat_feature_node.graf_delimiter=''SECTOR'' not configured on the sector table.'),v_count);
-			END IF;
-			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS FALSE') INTO v_count;
-			IF v_count > 0 THEN
-				EXECUTE concat 
-				('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 179, node_id, nodecat_id,
-				''The cat_feature_node.grafdelimiter of this node is SECTOR but node is configured for unactive mapzone'', the_geom, expl_id FROM ('
-					, v_querytext,')a WHERE active IS FALSE');
-				INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-				VALUES (211, 2, '179', concat('WARNING-179: There is/are ',v_count,
-				' node(s) with cat_feature_node.graf_delimiter=''SECTOR'' configured for unactive mapzone.'),v_count);
-			END IF;
-
-		ELSE
-			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			VALUES (211, 1, '179', 'INFO: All nodes with cat_feature_node.grafdelimiter=''SECTOR'' are defined as nodeParent on sector.grafconfig',v_count);
-		END IF;
 
 	END IF;
 
@@ -220,7 +186,7 @@ BEGIN
 	IF v_dma IS TRUE AND (v_grafclass = 'DMA' OR v_grafclass = 'ALL') THEN
 
 		-- check dma.grafconfig values
-		v_querytext = 'SELECT * FROM dma WHERE grafconfig IS NULL and dma_id > 0  AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_dma WHERE grafconfig IS NULL and dma_id > 0  AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -228,7 +194,7 @@ BEGIN
 			VALUES (211, 3, '269', concat('ERROR-269: There is/are ',v_count, ' dma on dma table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '269','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '269','INFO: All dma has grafconfig values not null.',v_count);
 		END IF;	
 		
 		-- dma : check coherence against nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fid:  180)
@@ -272,7 +238,7 @@ BEGIN
 	IF v_dqa IS TRUE AND (v_grafclass = 'DQA' OR v_grafclass = 'ALL') THEN
 
 		-- check dqa.grafconfig values
-		v_querytext = 'SELECT * FROM dqa WHERE grafconfig IS NULL and dqa_id > 0 AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_dqa WHERE grafconfig IS NULL and dqa_id > 0 AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -280,7 +246,7 @@ BEGIN
 			VALUES (211, 3, '270', concat('ERROR-270: There is/are ',v_count, ' dqa on dqa table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '270','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '270','INFO: All dqa has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- dqa : check coherence against nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fid:  181)
@@ -325,7 +291,7 @@ BEGIN
 	IF v_presszone IS TRUE AND (v_grafclass = 'PRESSZONE' OR v_grafclass = 'ALL') THEN
 
 		-- check presszone.grafconfig values
-		v_querytext = 	'SELECT * FROM presszone WHERE grafconfig IS NULL and presszone_id > 0::text AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_presszone WHERE grafconfig IS NULL and presszone_id > 0::text AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -333,7 +299,7 @@ BEGIN
 			VALUES (211, 4, '271', concat('ERROR-271: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 1, '271','INFO: All mapzones has grafconfig values not null.',v_count);
+			VALUES (211, 1, '271','INFO: All presszones has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- presszone : check coherence against nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fid:  182)
@@ -431,7 +397,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (176,179,180,181,182,208,209)) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (176,180,181,182,208,209)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 

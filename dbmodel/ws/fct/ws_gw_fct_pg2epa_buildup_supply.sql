@@ -41,6 +41,9 @@ v_pressureprv float;
 v_pressurepsv float;
 v_statuspsv text;
 v_forcestatuspsv text;
+v_forcestatusfcv text;
+v_statusfcv text;
+v_flow float;
 
 BEGIN
 
@@ -62,6 +65,9 @@ BEGIN
 	SELECT (value::json->>'PSV')::json->>'status' INTO v_statuspsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'PSV')::json->>'forceStatus' INTO v_forcestatuspsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT ((value::json->>'PSV')::json->>'pressure')::float INTO v_pressurepsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'FCV')::json->>'status' INTO v_statuspsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'FCV')::json->>'forceStatus' INTO v_forcestatusfcv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT ((value::json->>'FCV')::json->>'flow')::float INTO v_flow FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve1 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pumpStation')::json->>'defaultCurve' INTO v_defaultcurve2 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
@@ -71,10 +77,10 @@ BEGIN
 	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = v.node_type WHERE v.node_id = n.node_id;
 
 	RAISE NOTICE 'setting pump curves (pump_type = 1) where curve_id is null';
-	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve1) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='1';
+	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve1) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='HEADPUMP';
 
 	RAISE NOTICE 'setting pump curves (pump_type = 2) where curve_id is null';
-	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve2) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='2';
+	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve2) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='FLOWPUMP';
 
 	RAISE NOTICE 'setting pressure for PRV valves';
 	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressureprv) 
@@ -83,6 +89,10 @@ BEGIN
 	RAISE NOTICE 'setting pressure for PSV valves';
 	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressurepsv) 
 	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'pressure'='';
+
+	RAISE NOTICE 'setting flow for FCV valves';
+	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'flow', v_flow) 
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'flow'='';
 
 	RAISE NOTICE 'setting curve for BINODE2ARC-PRV valves';
 	UPDATE temp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', 0) 
@@ -119,17 +129,17 @@ BEGIN
 	END LOOP;
 
 	RAISE NOTICE 'set pressure groups';
-	UPDATE temp_arc SET status= v_statuspg WHERE status IS NULL AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '1'); 
+	UPDATE temp_arc SET status= v_statuspg WHERE status IS NULL AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = 'HEADPUMP'); 
 	
 	IF v_forcestatuspg IS NOT NULL THEN
-		UPDATE temp_arc SET status=v_forcestatuspg WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '1');
+		UPDATE temp_arc SET status=v_forcestatuspg WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = 'HEADPUMP');
 	END IF;
 	
 	RAISE NOTICE 'set pump stations';
-	UPDATE temp_arc SET status= v_statusps WHERE status IS NULL AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
+	UPDATE temp_arc SET status= v_statusps WHERE status IS NULL AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = 'FLOWPUMP'); 
 
 	IF v_forcestatusps IS NOT NULL THEN
-		UPDATE temp_arc SET status= v_forcestatusps WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
+		UPDATE temp_arc SET status= v_forcestatusps WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = 'FLOWPUMP'); 
 	END IF;
 		
 	RAISE NOTICE 'set prv valves';
@@ -144,6 +154,13 @@ BEGIN
 	
 	IF v_forcestatusprv IS NOT NULL THEN
 		UPDATE temp_arc SET status= v_forcestatuspsv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'PRV'); 
+	END IF;
+
+	RAISE NOTICE 'set fcv valves';
+	UPDATE temp_arc SET status=v_statusfcv WHERE status IS NULL  AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'FCV');
+	
+	IF v_forcestatusprv IS NOT NULL THEN
+		UPDATE temp_arc SET status= v_forcestatusfcv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'FCV'); 
 	END IF;
 
     RETURN 1;

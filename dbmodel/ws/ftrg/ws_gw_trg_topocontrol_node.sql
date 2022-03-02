@@ -56,6 +56,12 @@ BEGIN
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT value INTO v_psector_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_vdefault';
 
+	--Check if user has migration mode enabled
+  IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+  	v_node_proximity_control = FALSE;
+  	v_dsbl_error = TRUE;
+  END IF;
+
 	-- For state=0
 	IF NEW.state=0 THEN
 		RAISE WARNING 'Topology is not enabled with state=0. The feature will be inserted but disconected of the network!';

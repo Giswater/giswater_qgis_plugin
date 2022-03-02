@@ -28,12 +28,18 @@ BEGIN
 	SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='edit_connec_proximity';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+  	v_connec_proximity_control = FALSE;
+  	v_dsbl_error=TRUE;
+  END IF;
+
 	IF TG_OP = 'INSERT' THEN
 		-- Existing connecs  
-		v_numConnecs:= (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
+		v_numConnecs:= (SELECT COUNT(*) FROM connec c WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) 
+			AND c.connec_id != NEW.connec_id AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
 
 		-- If there is an arc
 		IF v_arc IS NOT NULL THEN
@@ -45,10 +51,12 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- Existing connecs  
-		v_numConnecs := (SELECT COUNT(*) FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom, v_connec_proximity) AND v_edit_connec.connec_id != NEW.connec_id);
+		v_numConnecs := (SELECT COUNT(*) FROM connec c 
+		WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) AND c.connec_id != NEW.connec_id
+		AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
-		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001));
+		v_arc:= (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, 0.001) LIMIT 1);
 		IF v_arc IS NOT NULL THEN
 			UPDATE connec SET pjoint_type = 'CONNEC', pjoint_id = NEW.connec_id, arc_id = v_arc WHERE connec_id = OLD.connec_id;
 			DELETE FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC' RETURNING exit_id, exit_type INTO v_id, v_type;

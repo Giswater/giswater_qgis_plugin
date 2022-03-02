@@ -40,7 +40,8 @@ BEGIN
 		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id=rec_virtual.arc_id;
 
 		IF fusion_node_aux IS NULL THEN
-			fusion_node_aux:=(SELECT node_id FROM temp_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION') OR (node_id=rec_virtual.node_2 AND node_type='JUNCTION'));
+			fusion_node_aux:=(SELECT node_id FROM temp_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION') 
+							  OR (node_id=rec_virtual.node_2 AND node_type='JUNCTION') LIMIT 1);
 		END IF;
 
 		-- Taking values from the fusion node (as node1)

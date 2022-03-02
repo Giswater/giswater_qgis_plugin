@@ -774,6 +774,7 @@ BEGIN
 			WHERE node_id = OLD.node_id;		
 		END IF;
 			
+		raise notice '%', v_man_table;
 		IF v_man_table ='man_junction' THEN			
 			UPDATE man_junction SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;

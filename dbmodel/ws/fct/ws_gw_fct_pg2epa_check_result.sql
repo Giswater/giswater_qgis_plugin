@@ -76,6 +76,7 @@ v_periodtype integer;
 object_rec record;
 v_graphiclog boolean;
 v_outlayer_elevation json;
+v_outlayer_depth json;
 v_minlength float;
 
 
@@ -91,6 +92,7 @@ BEGIN
 	-- select system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::json->>'elevation' INTO v_outlayer_elevation FROM config_param_system WHERE parameter = 'epa_outlayer_values';
+	SELECT value::json->>'elevation' INTO v_outlayer_depth FROM config_param_system WHERE parameter = 'epa_outlayer_values';
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 	
 	-- get user values
@@ -501,6 +503,17 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All nodes has elevation without outlayer values.'),v_count);
+	END IF;
+	
+	-- depth
+	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_node) a 
+	WHERE depth < (v_outlayer_depth->>'min')::float OR depth > (v_outlayer_depth->>'max')::float;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '407', concat('ERROR-407: There is/are ',v_count,' node(s) with outlayer values on depth column'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All nodes has depth without outlayer values.'),v_count);
 	END IF;
 
 	-- insert spacers for log

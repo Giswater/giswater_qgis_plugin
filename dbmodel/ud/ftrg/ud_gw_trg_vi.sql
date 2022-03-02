@@ -113,16 +113,20 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
 			IF NEW.divider_type LIKE 'CUTOFF' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'CUTOFF', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'CUTOFF', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'OVERFLOW' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'OVERFLOW', NEW.other1::numeric, NEW.other2, NEW.other3);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'OVERFLOW', NEW.other1::numeric, NEW.other2, NEW.other3::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'TABULAR' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'TABULAR', NEW.other1, NEW.other2, NEW.other3, NEW.other4);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'TABULAR', NEW.other1, NEW.other2, NEW.other3, NEW.other4::numeric);
 				
 			ELSIF NEW.divider_type LIKE 'WEIR' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, ht, cd, y0, ysur, apond) VALUES (NEW.node_id, NEW.arc_id,'WEIR', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, ht, cd, y0, ysur, apond) 
+				VALUES (NEW.node_id, NEW.arc_id,'WEIR', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6::numeric);
 			END IF;
 			
 		ELSIF v_view='vi_storage' THEN
@@ -132,11 +136,11 @@ BEGIN
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
 				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0,apond, fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6, NEW.other7, NEW.other8);
+				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
 				
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
+				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric);
 			END IF;	
 			
 		ELSIF v_view='vi_pumps' THEN 
@@ -220,20 +224,20 @@ BEGIN
 			INSERT INTO inp_landuses (landus_id, sweepint, availab, lastsweep) VALUES (NEW.landus_id, NEW.sweepint, NEW.availab, NEW.lastsweep);
 			
 		ELSIF v_view='vi_coverages' THEN 
-			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
+			INSERT INTO inp_coverage(subc_id, landus_id, percent, hydrology_id) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent, 1);
 			
-			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id, 1) ON CONFLICT  (landus_id, hydrology_id) DO NOTHING;
+			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id) ON CONFLICT  (landus_id) DO NOTHING;
 
 		ELSIF v_view='vi_buildup' THEN
-			INSERT INTO inp_buildup_land_x_pol(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
+			INSERT INTO inp_buildup(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
 			VALUES (NEW.landus_id, NEW.poll_id, NEW.funcb_type, NEW.c1, NEW.c2, NEW.c3, NEW.perunit);
 			
 		ELSIF v_view='vi_washoff' THEN
-			INSERT INTO inp_washoff_land_x_pol (landus_id, poll_id, funcw_type, c1, c2, sweepeffic, bmpeffic) 
+			INSERT INTO inp_washoff (landus_id, poll_id, funcw_type, c1, c2, sweepeffic, bmpeffic) 
 			VALUES (NEW.landus_id, NEW.poll_id, NEW.funcw_type, NEW.c1, NEW.c2, NEW.sweepeffic, NEW.bmpeffic);
 			
 		ELSIF v_view='vi_treatment' THEN
-			INSERT INTO inp_treatment_node_x_pol (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
+			INSERT INTO inp_treatment (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
 			
 		ELSIF v_view='vi_dwf' THEN
 		
@@ -263,14 +267,14 @@ BEGIN
 				INSERT INTO inp_inflows(node_id, timser_id, sfactor, base, pattern_id) VALUES (NEW.node_id,NEW.timser_id, NEW.sfactor,
 				NEW.base,NEW.pattern_id);
 			ELSE
-				INSERT INTO inp_inflows_pol_x_node (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
+				INSERT INTO inp_inflows_poll (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
 				SELECT NEW.node_id,NEW.timser_id, NEW.type_flow, inp_typevalue.id, NEW.mfactor,
 				NEW.sfactor,NEW.base,NEW.pattern_id
 				FROM inp_typevalue WHERE NEW.type=idval AND typevalue='inp_value_inflows';
 			END IF;	
 			
 		ELSIF v_view='vi_loadings' THEN
-			INSERT INTO inp_loadings_pol_x_subc (subc_id, poll_id, ibuildup, hydrology_id) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup, 1);
+			INSERT INTO inp_loadings (subc_id, poll_id, ibuildup, hydrology_id) VALUES (NEW.subc_id, NEW.poll_id, NEW.ibuildup, 1);
 			
 		ELSIF v_view='vi_rdii' THEN
 			INSERT INTO inp_rdii(node_id, hydro_id, sewerarea) VALUES (NEW.node_id, NEW.hydro_id, NEW.sewerarea);
@@ -320,13 +324,16 @@ BEGIN
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
-			INSERT INTO inp_lid_control (lidco_id, lidco_type, value_2, value_3, value_4, value_5, value_6, value_7, value_8)
+			INSERT INTO inp_lid (lidco_id, lidco_type)
+			SELECT NEW.lidco_id, inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.lidco_type)=id AND typevalue='inp_value_lidtype';
+
+			INSERT INTO inp_lid_value (lidco_id, lidlayer, value_2, value_3, value_4, value_5, value_6, value_7, value_8)
 			SELECT NEW.lidco_id, inp_typevalue.id, NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6, NEW.other7
-			FROM inp_typevalue WHERE upper(NEW.lidco_type)=idval AND typevalue='inp_value_lidcontrol';
+			FROM inp_typevalue WHERE upper(NEW.lidco_type)=id AND typevalue='inp_value_lidlayer';
 			
 		ELSIF v_view='vi_lid_usage' THEN
-			INSERT INTO inp_lidusage_subc_x_lidco (subc_id, lidco_id, "number", area, width, initsat, fromimp, toperv, rptfile, hydrology_id) 
-			VALUES (NEW.subc_id, NEW.lidco_id, NEW."number", NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile, 1);
+			INSERT INTO temp_lid_usage (subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile) 
+			VALUES (NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile);
 			
 		ELSIF v_view='vi_adjustments' THEN
 			INSERT INTO inp_adjustments (adj_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7, value_8, value_9, value_10, value_11, value_12)

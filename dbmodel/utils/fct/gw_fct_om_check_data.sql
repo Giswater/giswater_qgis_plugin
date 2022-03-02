@@ -12,11 +12,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_check_data(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_om_check_data($${
+SELECT SCHEMA_NAME.gw_fct_om_check_data($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
 
-SELECT gw_fct_om_check_data($${
+SELECT SCHEMA_NAME.gw_fct_om_check_data($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)
 
@@ -281,9 +281,9 @@ BEGIN
 
 	RAISE NOTICE '11 - check if drawn arc direction is the same as defined node_1, node_2 (223)';
 
-	v_querytext = 'SELECT a.arc_id , arccat_id, a.the_geom, a.expl_id FROM arc a, node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.0001) and node_2 = node_id
+	v_querytext = 'SELECT a.arc_id , arccat_id, a.the_geom, a.expl_id FROM '||v_edit||'arc a, '||v_edit||'node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.0001) and node_2 = node_id
 			UNION
-			SELECT a.arc_id , arccat_id, a.the_geom, a.expl_id  FROM arc a, node n WHERE st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.0001) and node_1 = node_id';
+			SELECT a.arc_id , arccat_id, a.the_geom, a.expl_id  FROM '||v_edit||'arc a, '||v_edit||'node n WHERE st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.0001) and node_1 = node_id';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
@@ -485,7 +485,7 @@ BEGIN
 	IF v_project_type ='UD' THEN
 
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec UNION SELECT gully_id FROM '||v_edit||'gully) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
@@ -498,7 +498,7 @@ BEGIN
 		END IF;	
 	ELSIF v_project_type='WS' THEN
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
@@ -550,19 +550,21 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '20 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
-	IF (SELECT count(*) FROM arc ) < 5000 THEN -- too big
+	v_querytext='SELECT count(*) FROM '||v_edit||'arc';
+	EXECUTE v_querytext INTO v_count;
+	IF v_count < 5000 THEN -- too big
 	
-		v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom, '||v_edit||'connec.expl_id
-			FROM '||v_edit||'link
-			LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-			INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
-			WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
-			AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1 and '||v_edit||'connec.connec_id IS NOT NULL
-			and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
-			LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-			LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
-			WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-			ORDER BY '||v_edit||'link.feature_type, link_id';
+		v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id
+			FROM '||v_edit||'link l
+			LEFT JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
+			INNER JOIN '||v_edit||'arc a ON st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+			WHERE exit_type = ''VNODE'' AND (a.arc_id <> c.arc_id or c.arc_id is null) 
+			AND l.feature_type = ''CONNEC'' AND a.state=1 and c.connec_id IS NOT NULL
+			and l.feature_id NOT IN (SELECT connec_id FROM '||v_edit||'node n,'||v_edit||'link l
+			LEFT JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
+			LEFT JOIN vnode v ON l.exit_id=v.vnode_id::text
+			WHERE exit_type = ''VNODE'' AND st_dwithin(v.the_geom, n.the_geom,0.01))
+			ORDER BY l.feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -578,17 +580,17 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-			v_querytext = 'SELECT  gully.gully_id,  gully.gratecat_id,  gully.the_geom, gully.expl_id
-						FROM link
-						LEFT JOIN gully ON link.feature_id = gully.gully_id 
-						INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint(link.the_geom), 0.01)
-						WHERE exit_type = ''VNODE'' AND (arc.arc_id <> gully.arc_id or gully.arc_id is null) 
-						AND link.feature_type = ''GULLY'' AND arc.state=1 AND gully.gully_id IS NOT NULL
-						and link.feature_id NOT IN (SELECT gully_id FROM node,link
-						LEFT JOIN gully ON link.feature_id = gully.gully_id 
-						LEFT JOIN vnode ON link.exit_id=vnode.vnode_id::text
-						WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-						ORDER BY link.feature_type, link_id';
+			v_querytext = 'SELECT  g.gully_id,  g.gratecat_id,  g.the_geom, g.expl_id
+						FROM '||v_edit||'link l
+						LEFT JOIN '||v_edit||'gully g ON l.feature_id = g.gully_id 
+						INNER JOIN '||v_edit||'arc a ON st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+						WHERE exit_type = ''VNODE'' AND (a.arc_id <> g.arc_id or g.arc_id is null) 
+						AND l.feature_type = ''GULLY'' AND a.state=1 AND g.gully_id IS NOT NULL
+						and l.feature_id NOT IN (SELECT gully_id FROM '||v_edit||'node n,'||v_edit||'link l
+						LEFT JOIN '||v_edit||'gully g ON l.feature_id = g.gully_id 
+						LEFT JOIN vnode v ON l.exit_id=v.vnode_id::text
+						WHERE exit_type = ''VNODE'' AND st_dwithin(v.the_geom, n.the_geom,0.01))
+						ORDER BY l.feature_type, link_id';
 
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -607,7 +609,7 @@ BEGIN
 
 	
 	RAISE NOTICE '21 - Check vnode inconsistency (vnode without link) (259)';
-	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN link ON vnode_id = exit_id::integer where link_id IS NULL';
+	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN '||v_edit||'link ON vnode_id = exit_id::integer where link_id IS NULL';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
@@ -626,7 +628,7 @@ BEGIN
 	
 
 	RAISE NOTICE '22 - links without feature_id (260)';
-	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
+	v_querytext = 'SELECT link_id, the_geom FROM '||v_edit||'link where feature_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -639,7 +641,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '23 - links without exit_id (261)';
-	v_querytext = 'SELECT link_id, the_geom FROM link where exit_id is null and state > 0';
+	v_querytext = 'SELECT link_id, the_geom FROM '||v_edit||'link where exit_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -774,7 +776,7 @@ BEGIN
 
 	RAISE NOTICE '27 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
 
-	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
+	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where userdefined_geom  = false AND st_length(the_geom) > 100'
 	INTO v_count;
 
 	IF v_count > 0 THEN
@@ -805,10 +807,10 @@ BEGIN
 
 	IF v_count = 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '266', concat('WARNING-266: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '), v_count);
+		VALUES (125, 2, '266', concat('ERROR-266: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '), v_count);
 	ELSIF v_count > 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '266', concat('WARNING-266: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '), v_count);
+		VALUES (125, 2, '266', concat('ERROR-266: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
@@ -841,11 +843,11 @@ BEGIN
 	RAISE NOTICE '30 - Connecs and gullies with different expl_id than arc (291)';
 
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM connec c JOIN arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
+		v_querytext = 'SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT * FROM (SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM connec c JOIN arc b using (arc_id) 
+		v_querytext = 'SELECT * FROM (SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) 
 		WHERE b.expl_id::text != c.expl_id::text
-		UNION SELECT DISTINCT  gully_id, gratecat_id, g.the_geom gully_id, g.expl_id FROM gully g JOIN arc d using (arc_id) WHERE d.expl_id::text != g.expl_id::text)a';
+		UNION SELECT DISTINCT  gully_id, gratecat_id, g.the_geom gully_id, g.expl_id FROM '||v_edit||'gully g JOIN '||v_edit||'arc d using (arc_id) WHERE d.expl_id::text != g.expl_id::text)a';
 	END IF;
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -933,21 +935,24 @@ BEGIN
 
 	RAISE NOTICE '33 - Check builtdate before 1900  (fid 406)';
 	IF v_project_type = 'WS' THEN
-		SELECT count(*) INTO v_count FROM 
-			(SELECT arc_id, 'ARC'::text FROM arc WHERE builtdate < '1900/01/01'::date
-			UNION 
-			SELECT  node_id, 'NODE'::text FROM node WHERE builtdate < '1900/01/01'::date
-			UNION  
-			SELECT  node_id, 'CONNEC'::text FROM node WHERE builtdate < '1900/01/01'::date)a;
+		v_querytext='SELECT arc_id, ''ARC''::text FROM '||v_edit||'arc WHERE builtdate < ''1900/01/01''::date
+				UNION 
+				SELECT  node_id, ''NODE''::text FROM '||v_edit||'node WHERE builtdate < ''1900/01/01''::date
+				UNION  
+				SELECT  connec_id, ''CONNEC''::text FROM '||v_edit||'connec WHERE builtdate < ''1900/01/01''::date';
+				
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
 	ELSE
-		SELECT count(*) INTO v_count FROM 
-			(SELECT arc_id, 'ARC'::text FROM arc WHERE builtdate < '1900/01/01'::date
-			UNION 
-			SELECT  node_id, 'NODE'::text FROM node WHERE builtdate < '1900/01/01'::date
-			UNION  
-			SELECT  connec_id, 'CONNEC'::text FROM connec WHERE builtdate < '1900/01/01'::date
-			UNION  
-			SELECT  gully_id, 'GULLY'::text FROM gully WHERE builtdate < '1900/01/01'::date)a;
+		v_querytext='SELECT arc_id, ''ARC''::text FROM '||v_edit||'arc WHERE builtdate < ''1900/01/01''::date
+				UNION 
+				SELECT  node_id, ''NODE''::text FROM '||v_edit||'node WHERE builtdate < ''1900/01/01''::date
+				UNION  
+				SELECT  connec_id, ''CONNEC''::text FROM '||v_edit||'connec WHERE builtdate < ''1900/01/01''::date
+				UNION 
+				SELECT  gully_id, ''GULLY''::text FROM '||v_edit||'gully WHERE builtdate < ''1900/01/01''::date';
+				
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	END IF;
 
 	IF v_count > 0 THEN
@@ -964,20 +969,33 @@ BEGIN
 
 	-- connec_id (417)
 	DELETE FROM temp_arc;
-	INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', sector_id, link.state, link.the_geom 
-	FROM link JOIN connec ON feature_id = connec_id WHERE link.state = 1 and link.feature_type = 'CONNEC';
 
-	UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
-	SELECT link.link_id, connec.connec_id, (ST_Distance(connec.the_geom, ST_startpoint(link.the_geom))) as d FROM connec, link 
-	WHERE link.state = 1 and connec.state = 1 and ST_DWithin(ST_startpoint(link.the_geom), connec.the_geom, 0.05) group by 1,2 ORDER BY 1 DESC,3 DESC
-	)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
+	IF v_edit IS NULL THEN 
+		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', link.sector_id, link.state, link.the_geom 
+		FROM link l JOIN connec c ON feature_id = connec_id WHERE link.state = 1 and link.feature_type = 'CONNEC';
+
+		UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
+		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
+		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
+		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
+	ELSE
+		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
+		FROM v_edit_link l JOIN v_edit_connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
+
+		UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
+		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_connec c, v_edit_link l
+		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
+		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
+	END IF;
+		
+
 
 	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 1'
 	INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
 		SELECT 417, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with connec '',t.node_1), t.the_geom, a.expl_id 
-		FROM temp_arc t JOIN v_edit_connec a ON node_1 = connec_id WHERE t.state = 1';
+		FROM temp_arc t JOIN '||v_edit||'connec a ON node_1 = connec_id WHERE t.state = 1';
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 3, '417', concat('ERROR-417 (anl_arc): There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec'),v_count);
 	ELSE
@@ -988,20 +1006,31 @@ BEGIN
 	-- gullys (418)
 	IF v_project_type = 'UD' THEN
 		DELETE FROM temp_arc;
-		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', sector_id, link.state, link.the_geom 
-		FROM link JOIN gully ON feature_id = gully_id WHERE link.state = 1 and link.feature_type = 'GULLY' ;
 
-		UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
-		SELECT link.link_id, gully.gully_id, (ST_Distance(gully.the_geom, ST_startpoint(link.the_geom))) as d FROM gully, link 
-		WHERE link.state = 1 and gully.state = 1 and ST_DWithin(ST_startpoint(link.the_geom), gully.the_geom, 0.05) group by 1,2 ORDER BY 1 DESC,3 DESC
-		)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
+		IF v_edit IS NULL THEN
+			INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
+			FROM link l JOIN gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
+
+			UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
+			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM gully g, link l
+			WHERE l.state = 1 and g.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), g.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
+			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
+		ELSE
+			INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
+			FROM v_edit_link l JOIN v_edit_gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
+
+			UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
+			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_gully g, v_edit_link l
+			WHERE l.state = 1 and g.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), g.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
+			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
+		END IF;
 
 		EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 1'
 		INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
 			SELECT 418, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with gully '',t.node_1), t.the_geom, a.expl_id 
-			FROM temp_arc t JOIN v_edit_gully a ON node_1 = gully_id WHERE t.state = 1';
+			FROM temp_arc t JOIN '||v_edit||'gully a ON node_1 = gully_id WHERE t.state = 1';
 			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
 			VALUES (125, 3, '418', concat('ERROR-418 (anl_arc): There is/are ',v_count,' links related to gully with wrong topology, startpoint does not fit gully)'),v_count);
 		ELSE
@@ -1027,21 +1056,23 @@ BEGIN
 
 	RAISE NOTICE '36- Check category_type values which do not exists on man_type table (421)';
 	IF v_project_type = 'WS' THEN
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, category_type FROM '||v_edit||'arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
+		SELECT ''NODE'', node_id, category_type FROM '||v_edit||'node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL)a;
+		SELECT ''CONNEC'', connec_id, category_type FROM '||v_edit||'connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL';
+		
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	ELSE
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, category_type FROM '||v_edit||'arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, category_type FROM node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
+		SELECT ''NODE'', node_id, category_type FROM '||v_edit||'node WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, category_type FROM connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
+		SELECT ''CONNEC'', connec_id, category_type FROM '||v_edit||'connec WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, category_type FROM gully WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL)a;
+		SELECT ''GULLY'', gully_id, category_type FROM '||v_edit||'gully WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''GULLY'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL';
+
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	END IF;
 
 	IF v_count > 0 THEN
@@ -1054,21 +1085,23 @@ BEGIN
 
 	RAISE NOTICE '37- Check function_type values which do not exists on man_type table (422)';
 	IF v_project_type = 'WS' THEN
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, category_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, function_type FROM '||v_edit||'arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
+		SELECT ''NODE'', node_id, function_type FROM '||v_edit||'node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL)a;
+		SELECT ''CONNEC'', connec_id, function_type FROM '||v_edit||'connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL';
+		
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	ELSE
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, function_type FROM arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, function_type FROM '||v_edit||'arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, function_type FROM node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
+		SELECT ''NODE'', node_id, function_type FROM '||v_edit||'node WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, function_type FROM connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
+		SELECT ''CONNEC'', connec_id, function_type FROM '||v_edit||'connec WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, function_type FROM gully WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL)a;
+		SELECT ''GULLY'', gully_id, function_type FROM '||v_edit||'gully WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''GULLY'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL';
+
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	END IF;
 
 	IF v_count > 0 THEN
@@ -1082,21 +1115,23 @@ BEGIN
 
 	RAISE NOTICE '38- Check fluid_type values which do not exists on man_type table (423)';
 	IF v_project_type = 'WS' THEN
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, fluid_type FROM '||v_edit||'arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
+		SELECT ''NODE'', node_id, fluid_type FROM '||v_edit||'node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL)a;
+		SELECT ''CONNEC'', connec_id, fluid_type FROM '||v_edit||'connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL';
+		
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	ELSE
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, fluid_type FROM arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, fluid_type FROM '||v_edit||'arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, fluid_type FROM node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
+		SELECT ''NODE'', node_id, fluid_type FROM '||v_edit||'node WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, fluid_type FROM connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
+		SELECT ''CONNEC'', connec_id, fluid_type FROM '||v_edit||'connec WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, fluid_type FROM gully WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL)a;
+		SELECT ''GULLY'', gully_id, fluid_type FROM '||v_edit||'gully WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''GULLY'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL';
+
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	END IF;
 
 	IF v_count > 0 THEN
@@ -1109,21 +1144,23 @@ BEGIN
 
 	RAISE NOTICE '39- Check location_type values which do not exists on man_type table (424)';
 	IF v_project_type = 'WS' THEN
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, location_type FROM '||v_edit||'arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
+		SELECT ''NODE'', node_id, location_type FROM '||v_edit||'node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL)a;
+		SELECT ''CONNEC'', connec_id, location_type FROM '||v_edit||'connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL';
+		
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	ELSE
-		SELECT count(*) INTO v_count FROM (
-		SELECT 'ARC', arc_id, location_type FROM arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'ARC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
+		v_querytext='SELECT ''ARC'', arc_id, location_type FROM '||v_edit||'arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'NODE', node_id, location_type FROM node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'NODE' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
+		SELECT ''NODE'', node_id, location_type FROM '||v_edit||'node WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''NODE'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'CONNEC', connec_id, location_type FROM connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'CONNEC' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
+		SELECT ''CONNEC'', connec_id, location_type FROM '||v_edit||'connec WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''CONNEC'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
-		SELECT 'GULLY', gully_id, location_type FROM gully WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = 'GULLY' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL)a;
+		SELECT ''GULLY'', gully_id, location_type FROM '||v_edit||'gully WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''GULLY'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL';
+
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 	END IF;
 
 	IF v_count > 0 THEN

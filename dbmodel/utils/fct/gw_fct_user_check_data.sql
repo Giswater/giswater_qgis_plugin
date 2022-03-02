@@ -78,7 +78,7 @@ BEGIN
 
 	--if project check is executed look only for possible errors, if it's users check - look for info and errors
 	IF v_log_project = 'Project' THEN
-		v_target= '''ERROR''';
+		v_target= '''ERROR'',''DATA''';
 	ELSE
 		v_target = '''ERROR'',''INFO''';
 	END IF;
@@ -159,6 +159,9 @@ BEGIN
 				v_criticity = 3;
 				v_infotext = concat('ERROR-',rec.fid,':');
 			END IF;
+		ELSIF rec.target = 'DATA' THEN
+			v_criticity = 0;
+			v_infotext = concat('DATA-',rec.fid,':');
 		ELSE
 			v_criticity = 0;
 			v_infotext  = 'INFO: ';
@@ -212,7 +215,8 @@ BEGIN
 		FROM audit_check_data a
 		JOIN sys_fprocess f ON f.fid=result_id::integer 
 		WHERE a.fid=101 AND cur_user = current_user 
-		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')
+		AND ((criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%'))
+		OR (criticity IN (0) AND (error_message ILIKE 'DATA%')))
 		AND f.isaudit IS TRUE;
 
 		INSERT INTO audit.anl_arc (arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 

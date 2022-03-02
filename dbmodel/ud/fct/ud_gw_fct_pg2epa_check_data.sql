@@ -301,21 +301,21 @@ BEGIN
 
 
 	RAISE NOTICE '12 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION 
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom, n.expl_id FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION 
 			   SELECT node_2, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' )a 
-		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
+		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom, expl_id FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
 		       JOIN selector_sector USING (sector_id) 
 		       WHERE n.node_id IS NOT NULL AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
-		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 379, node_id, nodecat_id, 
+		''Topological node with epa_type UNDEFINED'', the_geom, expl_id FROM (', v_querytext,')a');
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
 	END IF;
 	
 
@@ -361,7 +361,10 @@ BEGIN
 
 	v_querytext = 'SELECT * FROM (
 		SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
-		FROM selector_sector s, v_edit_node AS t1 JOIN v_edit_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		FROM selector_sector s, node AS t1 
+		JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+		JOIN v_state_node v1 ON t2.node_id = v1.node_id
+		JOIN v_state_node v2 ON t1.node_id = v2.node_id
 		WHERE t1.node_id != t2.node_id 
 		AND s.sector_id = t1.sector_id AND cur_user = current_user 
 		ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
@@ -403,7 +406,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '429', concat('INFO: All timeseries checked have names without spaces.'),v_count);
 	END IF;
 
-	SELECT count(*) INTO v_count FROM inp_lid_control WHERE lidco_id like'% %';
+	SELECT count(*) INTO v_count FROM inp_lid WHERE lidco_id like'% %';
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '429',concat('ERROR-429: ',v_count,' lid(s) have name with spaces. Please fix it!'),v_count);

@@ -141,12 +141,12 @@ BEGIN
 			DELETE FROM config_param_user WHERE parameter ILIKE 'inp_options%' AND cur_user = current_user;
 			DELETE FROM config_param_user WHERE parameter ILIKE 'inp_report%' AND cur_user = current_user;
 
-			FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_edit' AND (id NOT LIKE 'v%' AND id NOT LIKE 'config%'))
+			FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_edit' AND (id NOT LIKE 'v%' AND id NOT LIKE 'config%')) 
 			LOOP
 				EXECUTE 'DELETE FROM '||quote_ident(v_id);
 			END LOOP;
 			
-			FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_epa' AND (id NOT LIKE 'v%' AND id NOT LIKE 'config%'))
+			FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_epa' AND (id NOT LIKE 'v%' AND id NOT LIKE 'config%')) 
 			LOOP
 				EXECUTE 'DELETE FROM '||quote_ident(v_id);
 			END LOOP;
@@ -344,6 +344,58 @@ BEGIN
 			INSERT INTO inp_conduit (arc_id, q0, qmax) SELECT csv1, csv8::numeric(12,3), csv9::numeric(12,3)
 			FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+			-- improve velocity for dwf using directly tables in spite of vi_dwf view
+			INSERT INTO inp_dwf(node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
+			SELECT csv1, csv3::numeric, csv4, csv5, csv6, csv7, 1
+			FROM temp_csv where source='[DWF]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 = 'FLOW';
+
+			INSERT INTO inp_dwf_pol_x_node (poll_id, node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
+			SELECT csv2, csv1, csv3::numeric, csv4, csv5, csv6, csv7, 1
+			FROM temp_csv where source='[DWF]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 != 'FLOW';
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv4
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv4 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv5
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv5 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv6
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv6 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv7
+			FROM temp_csv where source='[DWF]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv7 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			-- improve velocity for inflows using directly tables in spite of vi_inflows view
+			INSERT INTO inp_inflows(node_id, timser_id, sfactor, base, pattern_id) 
+			SELECT csv1, csv3, csv5::numeric, csv6::numeric,  csv7
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 = 'FLOW';
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv7
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 = 'FLOW' AND csv7 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
+			INSERT INTO inp_inflows_poll (node_id, timser_id, poll_id,form_type, mfactor, sfactor, base, pattern_id) 
+			SELECT csv1, csv3, csv2, csv4, csv5::numeric, csv6::numeric, csv7::numeric, csv8
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 != 'FLOW';
+
+			INSERT INTO inp_pattern (pattern_id)
+			SELECT csv8
+			FROM temp_csv where source='[INFLOWS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
+			AND csv2 != 'FLOW' AND csv8 IS NOT NULL ON CONFLICT (pattern_id) DO NOTHING;
+
 			-- delete those custom_length with same value of real_length
 			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
 
@@ -365,7 +417,7 @@ BEGIN
 					
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN 
-				('vi_conduits', 'vi_junction', 'vi_controls', 'vi_coordinates', 'vi_subcatchments', 'vi_subareas', 'vi_infiltration') order by orderby
+				('vi_conduits', 'vi_junction', 'vi_controls', 'vi_coordinates', 'vi_subcatchments', 'vi_subareas', 'vi_infiltration', 'vi_dwf', 'vi_inflows') order by orderby
 			LOOP
 				--identifing the humber of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
@@ -563,6 +615,8 @@ BEGIN
 			DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
 			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
 			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
+			DELETE FROM cat_feature_arc WHERE id NOT IN (SELECT arc_type FROM arc);
+			DELETE FROM cat_feature_node WHERE id NOT IN (SELECT node_type FROM node);
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT arc_type FROM arc) AND feature_type = 'ARC';
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT node_type FROM node) AND feature_type = 'NODE';
 
@@ -602,7 +656,7 @@ BEGIN
 		FROM temp_csv
 		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
 			and source in ('[OUTFALLS]','[JUNCTIONS]','[STORAGES]','[DIVIDERS]','[CONDUITS]','[PUMPS]','[ORIFICES]','[WEIRS]','[OUTLETS]','[SUBCATCHMENTS]', '[AQUIFERS]', 
-							'[RAINGAGE]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
+							'[RAINGAGES]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
 		GROUP BY source ORDER BY 1) a;
 	
 	--Control nulls

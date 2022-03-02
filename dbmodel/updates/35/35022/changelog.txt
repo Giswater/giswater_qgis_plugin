@@ -1,0 +1,17 @@
+3.5.022
+*************
+- Add modifcation_date column to om_mincut
+- Use value of inverted_slope on fct_anl_arc_inverted
+- Don't show PLANIFIED on selector_state but allow role_basic on selector_psector tab
+- New edit filtered view for timeseries and patterns in ud
+- Views related to curves, patterns and timeseries filtered by exploitation instead of sector
+- New field addparam on sys_table
+- Remove fields sys_sequence and sys_sequence_field from sys_table
+- Add default qml style to all layers available on Add Giswater Layer tool
+- Create 2 tables to define lid controls - inp_lid and inp_lid_values
+- Add new outlayer value for epa (depth) on ws projects
+- Configure new default raport - water consumption by period and dma
+- Create option of defining customized mapzone drawing definition
+- Add rules to control ids of 0 and -1 on mapzones
+- Define new shape of UD pipes - VERT_ELLIPSE
+- Add possibility of defining macrosector selector

@@ -21,8 +21,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'inp_curve' THEN
-			INSERT INTO inp_curve (id, curve_type, descript, sector_id) 
-			VALUES (NEW.id, NEW.curve_type, NEW.descript, NEW.sector_id);
+			INSERT INTO inp_curve (id, curve_type, descript, expl_id) 
+			VALUES (NEW.id, NEW.curve_type, NEW.descript, NEW.expl_id);
 		
 		ELSIF v_table = 'inp_curve_value' THEN
 
@@ -40,7 +40,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_table = 'inp_curve' THEN
-			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, sector_id=NEW.sector_id
+			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, expl_id=NEW.expl_id
 			WHERE id=OLD.id;
 
 		ELSIF v_table = 'inp_curve_value' THEN

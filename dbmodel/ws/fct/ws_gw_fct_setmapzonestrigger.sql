@@ -14,11 +14,11 @@ $BODY$
 
 	
 -- MAPZONES
-SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"node", "tableName":"ve_node_valvula", "id":"1295"},"data":{"fields":{"closed":"False"}}}$$)
 
+ SELECT ws_sample.gw_fct_setmapzonestrigger($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, 
+ "feature":{"id":"1088", "tableName":"ve_node_shutoff_valve", "featureType":"node" }, 
+ "data":{"filterFields":{}, "pageInfo":{}, "fields":{"closed": "true"}}}$$);
+ 
 */
 
 DECLARE
@@ -33,6 +33,7 @@ v_closedstatus boolean;
 v_automaticmapzonetrigger boolean;
 v_type text;
 v_mapzone text;
+v_mapzone_array json;
 v_count integer;
 v_count_2 integer;
 v_mapzone_id integer;
@@ -78,17 +79,10 @@ BEGIN
 			v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
 			
 			-- FOR v_mapzone
-			FOR v_mapzone IN 
-			SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'presszone', value::json->>'PRESSZONE' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dma', value::json->>'DMA' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
-			WHERE status::boolean is true
+			FOR v_mapzone IN SELECT json_array_elements_text(v_mapzone_array)
 			LOOP
 				-- getting current mapzone
 				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||quote_literal(v_id) INTO v_value;
@@ -114,6 +108,7 @@ BEGIN
 					IF v_mapzone_id IS NOT NULL THEN
 						EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
 						INTO v_nodeheader;
+						
 						RAISE NOTICE 'v_nodeheader %', v_nodeheader;
 
 						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":"true", 
@@ -142,31 +137,31 @@ BEGIN
 
 							PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
 										
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. This operation have been affected mapzones scenario. Take a look on map for check it"}';
+							v_message = '{"status": "Accepted", "level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. This operation have been affected mapzones scenario. Take a look on map for check it"}';
 						ELSE
 								
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
+							v_message = '{"status": "Accepted", "level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
 						END IF;		
 
 					ELSIF v_closedstatus IS FALSE THEN
 
 						IF v_count= 1 THEN
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Nothing happens because both sides of valve has same mapzone"}';
+							v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Nothing happens because both sides of valve has same mapzone"}';
 
 						ELSIF v_count =  2 THEN
 						
 							IF v_count_2 = 2 THEN			
-								v_message = concat('{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
+								v_message = concat('{"status": "Accepted", "level": 2, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
 							ELSIF  v_count_2 = 1 THEN
-								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
+								v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
 							END IF;
 						ELSE 
 							-- return message 
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
+							v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
 						END IF;
 					END IF;
 				ELSE
-					v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully updated but no mapzones have been modified"}';			
+					v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully updated but no mapzones have been modified"}';			
 				END IF;
 				
 			END LOOP;

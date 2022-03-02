@@ -57,17 +57,17 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, concat('ARC INVERTED ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'INFO: The analysis have been executed skipping arcs with ''VERIFIED'' on colum verified');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'If you are looking to remove results please set column verified with this value');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'INFO: The analysis have been executed skipping arcs with TRUE value on ''inverted_slope'' column');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, 'If some resultant arc is really an arc with inverted slope, please set this value to TRUE');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (110, null, 4, '');
 	
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN ('||v_array||') AND verified != ''VERIFIED'';';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN ('||v_array||') AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND verified != ''VERIFIED'';';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
 	END IF;
 
 	-- get results

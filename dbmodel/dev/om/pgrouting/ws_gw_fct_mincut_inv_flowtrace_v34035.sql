@@ -57,10 +57,10 @@ BEGIN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
 		FOR rec_tank IN 
-		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_mincut_inlet
-		JOIN v_edit_node ON v_edit_node.node_id=config_mincut_inlet.node_id
+		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graf_inlet
+		JOIN v_edit_node ON v_edit_node.node_id=config_graf_inlet.node_id
 		JOIN value_state_type ON state_type=value_state_type.id 
-		JOIN exploitation ON exploitation.expl_id=config_mincut_inlet.expl_id
+		JOIN exploitation ON exploitation.expl_id=config_graf_inlet.expl_id
 		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) 
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id=result_id_arg)
 		ORDER BY 1
@@ -100,12 +100,12 @@ BEGIN
 						
 							OR (node_2 IN (SELECT node_id FROM ws_fdw.om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
 							UNION
-							SELECT json_array_elements_text((parameters->>''''''''inletArc'''''''')::json) as arc_id, true as closed FROM ws_fdw.config_mincut_inlet
+							SELECT json_array_elements_text((parameters->>''''''''inletArc'''''''')::json) as arc_id, true as closed FROM ws_fdw.config_graf_inlet
 						)a 
 						ON a.arc_id=v_edit_arc.arc_id
 					WHERE node_1 is not null and node_2 is not null
 					)a	
-				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM ws_fdw.config_mincut_checkvalve)b USING (id)'''',
+				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM ws_fdw.config_graf_checkvalve)b USING (id)'''',
 
 				'||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)'') 
 				AS return(seq integer, path_seq integer, node bigint, edge bigint, cost double precision, agg_cost double precision)';

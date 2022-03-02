@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/12/22
- CREATE VIEW v_edit_cat_dscenario AS
+ CREATE OR REPLACE VIEW v_edit_cat_dscenario AS
  SELECT DISTINCT ON (dscenario_id)
   dscenario_id,
   c.name,
@@ -47,12 +47,13 @@ drop view if exists v_plan_current_psector_budget;
 drop view if exists v_edit_plan_psector_x_other;
 ALTER TABLE plan_psector_x_other RENAME COLUMN descript TO observ;
 
-CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
-AS SELECT plan_psector_x_other.id,
+
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other AS 
+ SELECT plan_psector_x_other.id,
     plan_psector_x_other.psector_id,
     v_price_compost.id AS price_id,
     v_price_compost.unit,
-    v_price_compost.descript AS price_descript,
+    rpad (v_price_compost.descript,125) AS price_descript,
     v_price_compost.price,
     plan_psector_x_other.measurement,
     (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
@@ -62,9 +63,10 @@ AS SELECT plan_psector_x_other.id,
      JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
   ORDER BY plan_psector_x_other.psector_id;
-  
-CREATE OR REPLACE VIEW v_plan_current_psector_budget
-AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+
+
+CREATE OR REPLACE VIEW v_plan_current_psector_budget AS 
+ SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     plan_psector_x_arc.psector_id,
     'arc'::text AS feature_type,
     v_plan_arc.arccat_id AS featurecat_id,
