@@ -4,21 +4,12 @@ qgisMinimumVersion=3.10
 qgisMaximumVersion=3.99
 description=Plugin to manage water networks (water supply, sewerage and urban drainage) using QGIS and PostGIS-PostgreSQL(from 9.5 to 11.x)
 about=Disclaimer: This plugin is released using the open source GNU-GPL3 license. Although a reasonable effort has been made to assure that the results obtained are correct,  some of the capabilities provided by Giswater are experimental, therefore the development team and the Giswater Association are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from the program, nor for any damages or litigation that result from the use of these programs for any purpose.
-
-version=3.5.022
+version=3.5.023
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 
-Changelog=Version 3.5.022
-    - Add new button, dscenario manager
-    - Project check now runs in a separate thread
-    - Manage draw polygon rubberband using new user variable "show_psector_ruberband_duration"
-    - Manage raster_layers and layers with more than one PK on add giswater layer button
-    - Update templates with new style for EPA result arcs and using QGIS 3.22 (WS)
-    - Add "Open/Close valve" quick access in right-click with Info
-    - Mincut hydrometer filters are now customizable with variable "om_mincut_hydrometer_filter"
-    - Add info box in psector manager
-    - Improve toolbox performance
+Changelog=Version 3.5.023
+
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
