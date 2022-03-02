@@ -68,3 +68,37 @@ ON vi_energy FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_energy');
 DROP TRIGGER IF EXISTS gw_trg_vi_reactions ON vi_reactions;
 CREATE TRIGGER gw_trg_vi_reactions INSTEAD OF INSERT OR UPDATE OR DELETE
 ON vi_reactions FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_reactions');
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_junction
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('junction');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_reservoir INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_reservoir
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('reservoir');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_tank INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_tank
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('tank');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pump INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_pump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pump');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pump_additional INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_pump_additional
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pump_additional');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_valve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('valve');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_shortpipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_shortpipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('shortpipe');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_inlet
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('inlet');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_connec INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_connec
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('connec');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_pipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pipe');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_virtualvalve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('virtualvalve');
