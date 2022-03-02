@@ -84,14 +84,14 @@ BEGIN
 	-- check controlmethod
 	IF (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_copyfrom) != (SELECT infiltration FROM cat_hydrology WHERE hydrology_id = v_target) THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Infiltration method for (',v_source_name,') and (', v_target_name,') are not the same.'));
 
 		
 	ELSIF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAVE BEEN FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
 	ELSE
