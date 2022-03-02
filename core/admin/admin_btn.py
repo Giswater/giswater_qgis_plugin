@@ -61,7 +61,7 @@ class GwAdminButton:
         self.form_enabled = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
                                             .replace('.', ''))
-        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir)
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', global_vars.plugin_dir)
                                             .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
