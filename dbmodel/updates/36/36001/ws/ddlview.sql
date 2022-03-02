@@ -530,6 +530,7 @@ JOIN SCHEMA_NAME.cat_dscenario d USING (dscenario_id)
 WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
+
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
  SELECT arc.arc_id,
@@ -556,7 +557,7 @@ JOIN inp_pipe USING (arc_id)
 WHERE arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
-  
+DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_dscenario_shortpipe AS 
 SELECT d.dscenario_id,
 p.node_id,
@@ -887,7 +888,6 @@ connec.the_geom
 FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
 WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;*/
-
 
 
 
