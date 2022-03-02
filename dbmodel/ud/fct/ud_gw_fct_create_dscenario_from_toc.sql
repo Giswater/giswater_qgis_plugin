@@ -64,7 +64,7 @@ BEGIN
 	-- get user parameters
 	v_lidco :=  (SELECT value FROM config_param_user WHERE parameter = 'epa_lidco_vdefault' AND cur_user = current_user);
 	IF v_lidco IS NULL THEN 
-		v_lidco := (SELECT DISTINCT lidco_id FROM inp_lid_control LIMIT 1);
+		v_lidco := (SELECT DISTINCT lidco_id FROM inp_lid LIMIT 1);
 	END IF;
 	
 	-- get input parameters
