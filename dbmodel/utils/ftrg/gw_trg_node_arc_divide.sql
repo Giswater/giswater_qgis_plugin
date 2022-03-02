@@ -42,14 +42,14 @@ BEGIN
 		edit_arc_division_dsbl_aux = TRUE;
 	END IF;
 	
-
 	--  Only enabled on insert
 	IF TG_OP = 'INSERT' AND edit_arc_division_dsbl_aux IS NOT TRUE THEN
 
 		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 
 		-- get if another node exists
-		SELECT node_id INTO node_id_aux FROM node JOIN v_edit_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity) AND NEW.node_id != node_id LIMIT 1;
+		SELECT node_id INTO node_id_aux FROM node JOIN v_edit_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity) 
+		AND NEW.node_id != node_id AND node.state=1 AND v_edit_node.state=1 LIMIT 1;
 		
 		IF node_id_aux IS NULL THEN
 
