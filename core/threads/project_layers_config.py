@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 from .task import GwTask
 from ..utils import tools_gw
@@ -155,150 +154,12 @@ class GwProjectLayersConfig(GwTask):
                 tools_log.log_info("Not 'data'")
                 continue
 
-            for field in self.json_result['body']['data']['fields']:
-                valuemap_values = {}
-
-                # Get column index
-                field_index = layer.fields().indexFromName(field['columnname'])
-
-                # Hide selected fields according table config_form_fields.hidden
-                if 'hidden' in field:
-                    self._set_column_visibility(layer, field['columnname'], field['hidden'])
-
-                # Set alias column
-                if field['label']:
-                    layer.setFieldAlias(field_index, field['label'])
-
-                # widgetcontrols
-                if 'widgetcontrols' in field:
-
-                    # Set field constraints
-                    if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
-                        if field['widgetcontrols']['setQgisConstraints'] is True:
-                            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                                     QgsFieldConstraints.ConstraintStrengthSoft)
-                            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
-                                                     QgsFieldConstraints.ConstraintStrengthHard)
-
-                if 'ismandatory' in field and not field['ismandatory']:
-                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                             QgsFieldConstraints.ConstraintStrengthSoft)
-
-                # Manage editability
-                self._set_read_only(layer, field, field_index)
-
-                # delete old values on ValueMap
-                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-
-                # Manage ValueRelation configuration
-                use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
-                         and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
-                if use_vr:
-                    value_relation = field['widgetcontrols']['valueRelation']
-                    if 'activated' in value_relation and value_relation['activated']:
-                        try:
-                            vr_layer = value_relation['layer']
-                            vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
-                            vr_key_column = value_relation['keyColumn']  # Get 'Key'
-                            vr_value_column = value_relation['valueColumn']  # Get 'Value'
-                            vr_allow_nullvalue = value_relation['nullValue']  # Get null values
-                            vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
-                            if vr_filter_expression is None:
-                                vr_filter_expression = ''
-
-                            # Create and apply ValueRelation config
-                            editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
-                                                                                         'Key': f'{vr_key_column}',
-                                                                                         'Value': f'{vr_value_column}',
-                                                                                         'AllowNull': f'{vr_allow_nullvalue}',
-                                                                                         'FilterExpression': f'{vr_filter_expression}'})
-                            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-							
-                        except Exception as e:
-                            self.exception = e
-                            self.vr_errors.add(layer_name)
-                            if 'layer' in value_relation:
-                                self.vr_missing.add(value_relation['layer'])
-                            self.message = f"ValueRelation for {self.vr_errors} switched to ValueMap because " \
-                                           f"layers {self.vr_missing} are not present on QGIS project"
-                            use_vr = False
-
-                if not use_vr:
-                    # Manage new values in ValueMap
-                    if field['widgettype'] == 'combo':
-                        if 'comboIds' in field:
-                            # Set values
-                            for i in range(0, len(field['comboIds'])):
-                                valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
-                        # Set values into valueMap
-                        editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                    elif field['widgettype'] == 'check':
-                        config = {'CheckedState': 'true', 'UncheckedState': 'false'}
-                        editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                    elif field['widgettype'] == 'datetime':
-                        config = {'allow_null': True,
-                                  'calendar_popup': True,
-                                  'display_format': 'yyyy-MM-dd',
-                                  'field_format': 'yyyy-MM-dd',
-                                  'field_iso_format': False}
-                        editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                    elif field['widgettype'] == 'textarea':
-                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                    else:
-                        editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-
-                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
-                if field['widgettype'] == 'text':
-                    self._set_column_multiline(layer, field, field_index)
+            tools_gw.config_layer_attributes(self.json_result, layer, layer_name, thread=self)
 
         if msg_failed != "":
             tools_qt.show_exception_message("Execute failed.", msg_failed)
 
         if msg_key != "":
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg_key)
-
-
-    def _set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable') """
-
-        # Get layer config
-        config = layer.editFormConfig()
-        try:
-            # Set field editability
-            config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError:
-            pass
-        finally:
-            # Set layer config
-            layer.setEditFormConfig(config)
-
-
-    def _set_column_visibility(self, layer, col_name, hidden):
-        """ Hide selected fields according table config_form_fields.hidden """
-
-        config = layer.attributeTableConfig()
-        columns = config.columns()
-        for column in columns:
-            if column.name == str(col_name):
-                column.hidden = hidden
-                break
-        config.setColumns(columns)
-        layer.setAttributeTableConfig(config)
-
-
-    def _set_column_multiline(self, layer, field, field_index):
-        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
-
-        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
-            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
-        else:
-            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
-        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     # endregion

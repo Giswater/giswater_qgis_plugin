@@ -1,4 +1,4 @@
-timser_id; date(M/D/Y)/time; hour/value; value; timser_type; times_type; description; sector_id (optional)
+timser_id; date(M/D/Y)/time; hour/value; value; timser_type; times_type; description;expl_id (optional)
 example_timser_1;01/30/2017;00:00;1.15;Rainfall;ABSOLUTE;Timeseries for sector 1;1
 example_timser_1;01/30/2017;00:10;1.25
 example_timser_1;01/30/2017;00:20;1.35

@@ -5,8 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+
+from qgis.core import QgsApplication
+
 from ..dialog import GwAction
-from ...load_project_check import GwLoadProjectCheck
+from ...threads.project_check import GwProjectCheckTask
 
 from ....lib import tools_qgis
 
@@ -31,7 +34,9 @@ class GwProjectCheckButton(GwAction):
         # Return layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 
-        check_project_result = GwLoadProjectCheck()
-        check_project_result.fill_check_project_table(layers, "false")
+        params = {"layers": layers, "init_project": "false"}
+        self.project_check_task = GwProjectCheckTask('check_project', params)
+        QgsApplication.taskManager().addTask(self.project_check_task)
+        QgsApplication.taskManager().triggerTask(self.project_check_task)
 
     # endregion

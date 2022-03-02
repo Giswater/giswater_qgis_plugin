@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
 import os
 from datetime import datetime
 from functools import partial
@@ -366,37 +367,37 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self._auto_mincut)
-        tools_gw.add_icon(action, "126")
+        tools_gw.add_icon(action, "126", sub_folder="24x24")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionRefreshMincut")
         action.triggered.connect(self._refresh_mincut)
-        tools_gw.add_icon(action, "125")
+        tools_gw.add_icon(action, "125", sub_folder="24x24")
         self.action_refresh_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self._custom_mincut, action))
-        tools_gw.add_icon(action, "123")
+        tools_gw.add_icon(action, "123", sub_folder="24x24")
         self.action_custom_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionChangeValveStatus")
         action.triggered.connect(partial(self._change_valve_status, action))
-        tools_gw.add_icon(action, "124")
+        tools_gw.add_icon(action, "124", sub_folder="24x24")
         self.action_change_valve_status = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self._add_connec)
-        tools_gw.add_icon(action, "121")
+        tools_gw.add_icon(action, "121", sub_folder="24x24")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self._add_hydrometer)
-        tools_gw.add_icon(action, "122")
+        tools_gw.add_icon(action, "122", sub_folder="24x24")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self._mincut_composer)
-        tools_gw.add_icon(action, "181")
+        tools_gw.add_icon(action, "181", sub_folder="24x24")
         self.action_mincut_composer = action
 
         # Set shortcut keys
@@ -1067,8 +1068,8 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
-        tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_connec.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_connec.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
@@ -1100,7 +1101,7 @@ class GwMincut:
         """ Set autocompleter for 'customer_code' """
 
         # Get list of 'customer_code'
-        sql = "SELECT DISTINCT(customer_code) FROM v_edit_connec"
+        sql = f"SELECT DISTINCT({self.col1}) FROM v_edit_connec"
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1202,6 +1203,19 @@ class GwMincut:
         self.list_ids['connec'] = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
+        # Get hydrometer filter columns
+        self.col1 = "customer_code"
+        self.col2 = "hydrometer_customer_code"
+        self.lbl1 = "Connec customer code:"
+        self.lbl2 = "Hydrometer customer code:"
+        row = tools_gw.get_config_value('om_mincut_hydrometer_filter', table='config_param_system')
+        if row:
+            values = json.loads(row[0])
+            self.col1 = values['field1']
+            self.col2 = values['field2']
+            self.lbl1 = values['label1']
+            self.lbl2 = values['label2']
+
         # Check if id exist in table 'om_mincut'
         sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
@@ -1227,8 +1241,12 @@ class GwMincut:
         # self.dlg_hydro.btn_snapping.setEnabled(False)
 
         # Set icons
-        tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
-        tools_gw.add_icon(self.dlg_hydro.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_hydro.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_hydro.btn_delete, "112", sub_folder="24x24")
+
+        # Set labels
+        self.dlg_hydro.lbl_ccc.setText(self.lbl1)
+        self.dlg_hydro.lbl_hcc.setText(self.lbl2)
 
         # Set signals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self._insert_hydro))
@@ -1246,7 +1264,7 @@ class GwMincut:
             # Read selection and reload table
             self._select_features_hydro()
 
-        tools_gw.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
+        tools_gw.open_dialog(self.dlg_hydro)
 
 
     def _auto_fill_hydro_id(self):
@@ -1263,13 +1281,14 @@ class GwMincut:
             return
 
         # Get 'hydrometers' related with this 'connec'
-        sql = (f"SELECT DISTINCT(hydrometer_customer_code)"
+        sql = (f"SELECT DISTINCT({self.col2})"
                f" FROM v_rtc_hydrometer"
                f" WHERE connec_id = '{connec_id}'")
         rows = tools_db.get_rows(sql)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer_hydro.setModel(model)
@@ -1295,7 +1314,7 @@ class GwMincut:
 
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
-               f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
+               f" WHERE {self.col2} = '{hydrometer_cc}'")
         row = tools_db.get_row(sql)
         if not row:
             message = "Selected hydrometer_id not found"
@@ -1495,7 +1514,7 @@ class GwMincut:
         """ Get 'connec_id' from @customer_code """
 
         sql = (f"SELECT connec_id FROM v_edit_connec"
-               f" WHERE customer_code = '{customer_code}'")
+               f" WHERE {self.col1} = '{customer_code}'")
         row = tools_db.get_row(sql)
         if not row:
             message = "Any connec_id found with this customer_code"
@@ -1543,7 +1562,7 @@ class GwMincut:
             id_feature = widget.model().record(row).value("connec_id")
             del_id.append(id_feature)
             # Id to ask
-            customer_code = widget.model().record(row).value("customer_code")
+            customer_code = widget.model().record(row).value(f"{self.col1}")
             inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
@@ -1592,7 +1611,7 @@ class GwMincut:
         inf_text = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value("hydrometer_customer_code")
+            id_feature = widget.model().record(row).value(f"{self.col2}")
             hydro_id = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
             del_id.append(hydro_id)
@@ -1774,6 +1793,9 @@ class GwMincut:
             snapped_point = self.snapper_manager.get_snapped_point(result)
             element_id = snapped_feat.attribute(f'{elem_type}_id')
             layer.select([feature_id])
+
+            # Ensure that Mincut layers are loaded
+            tools_gw.load_missing_layers('v_om_mincut%', "OM", "Mincut")
 
             # Create task to manage Mincut execution
             self.dlg_mincut.btn_cancel_task.show()

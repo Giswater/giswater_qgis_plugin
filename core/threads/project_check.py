@@ -5,25 +5,69 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+
 import platform
 from functools import partial
 import os
 
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 from qgis.core import Qgis
 
-from .utils import tools_gw
-from .ui.ui_manager import GwProjectCheckUi
-from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_qt, tools_os
+from .task import GwTask
+from ..utils import tools_gw
+from ..ui.ui_manager import GwProjectCheckUi
+from ... import global_vars
+from ...lib import tools_qgis, tools_log, tools_qt, tools_os
 
 
-class GwLoadProjectCheck:
+class GwProjectCheckTask(GwTask):
 
-    def __init__(self):
-        """ Class to control Composer button """
+    task_finished = pyqtSignal(list)
 
-        self.schema_name = global_vars.schema_name
+    def __init__(self, description='', params=None):
+
+        super().__init__(description)
+        self.params = params
+        self.result = None
+
+
+    def run(self):
+
+        super().run()
+
+        layers = self.params['layers']
+        init_project = self.params['init_project']
+        tools_log.log_info(f"Task 'Check project' execute function 'fill_check_project_table'")
+        status, self.result = self.fill_check_project_table(layers, init_project)
+        if not status:
+            tools_log.log_info("Function fill_check_project_table returned False")
+            return False
+
+        return True
+
+
+    def finished(self, result):
+
+        super().finished(result)
+
+        if self.isCanceled():
+            self.setProgress(100)
+            return
+
+        # Handle exception
+        if self.exception is not None:
+            msg = f"<b>Key: </b>{self.exception}<br>"
+            msg += f"<b>key container: </b>'body/data/ <br>"
+            msg += f"<b>Python file: </b>{__name__} <br>"
+            msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
+            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+            return
+
+        # Show dialog with audit check project result
+        self._show_check_project_result(self.result)
+
+        self.setProgress(100)
 
 
     def fill_check_project_table(self, layers, init_project):
@@ -41,7 +85,7 @@ class GwLoadProjectCheck:
             if layer_source['schema'] is None:
                 continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name:
+            if 'schema' not in layer_source or layer_source['schema'] != global_vars.schema_name:
                 continue
 
             schema_name = layer_source['schema']
@@ -62,15 +106,11 @@ class GwLoadProjectCheck:
         # Execute function 'gw_fct_setcheckproject'
         result = self._execute_check_project_function(init_project, fields)
 
-        # Manage 'current_selections' docker
-        open_docker = tools_gw.get_config_parser("dialogs_actions", "curselectors_open_loadproject", 'user', 'init')
-        open_docker = tools_os.set_boolean(open_docker, False)
-        tools_gw.manage_current_selections_docker(result, open=open_docker)
-
         return True, result
 
 
     # region private functions
+
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_setcheckproject' """
@@ -108,16 +148,13 @@ class GwLoadProjectCheck:
         extras += f', {fields_to_insert}'
 
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setcheckproject', body)
+        result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
         try:
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
         except KeyError as e:
             tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
             return result
-
-        # Show dialog with audit check project result
-        self._show_check_project_result(result)
 
         return result
 
@@ -136,51 +173,11 @@ class GwLoadProjectCheck:
                                               'gw_fct_setcheckproject_result', True, False, 0, True,
                                               call_set_tabs_enabled=False)
 
-        # TODO: Recover key 'missingLayers' to populate tab QGIS project log with Critical and Other layers
-        tools_qt.remove_tab(self.dlg_audit_project.mainTab, "tab_qgis_projlog")
-        # if 'missingLayers' in result['body']['data']:
-            # critical_level = self._get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
-
         tools_qt.hide_void_groupbox(self.dlg_audit_project)
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
             tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
-
-
-    # def _get_missing_layers(self, dialog, m_layers, critical_level):
-    #
-    #     lyt_critical = dialog.findChild(QGridLayout, "lyt_critical")
-    #     lyt_others = dialog.findChild(QGridLayout, "lyt_others")
-    #     for pos, item in enumerate(m_layers):
-    #         try:
-    #             if not item:
-    #                 continue
-    #             widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-    #             # If it is the case that a layer is necessary for two functions,
-    #             # and the widget has already been put in another iteration
-    #             if widget:
-    #                 continue
-    #             label = QLabel()
-    #             label.setObjectName(f"lbl_{item['layer']}")
-    #             label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
-    #
-    #             critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-    #             widget = QCheckBox()
-    #             widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-    #             widget.setObjectName(f"{item['layer']}")
-    #
-    #             if int(item['criticity']) == 3:
-    #                 lyt_critical.addWidget(label, pos, 0)
-    #                 lyt_critical.addWidget(widget, pos, 1)
-    #             else:
-    #                 lyt_others.addWidget(label, pos, 0)
-    #                 lyt_others.addWidget(widget, pos, 1)
-    #         except KeyError:
-    #             description = "Key on returned json from ddbb is missed"
-    #             tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)
-    #
-    #     return critical_level
 
 
     def _add_selected_layers(self, dialog, m_layers):

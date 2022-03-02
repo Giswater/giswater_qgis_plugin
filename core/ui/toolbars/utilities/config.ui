@@ -173,11 +173,11 @@
                   </sizepolicy>
                  </property>
                  <property name="title">
-                  <string>Edit</string>
+                  <string>Epa</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_11">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_edit"/>
+                   <layout class="QGridLayout" name="lyt_epa"/>
                   </item>
                   <item row="1" column="0">
                    <spacer name="verticalSpacer_19">

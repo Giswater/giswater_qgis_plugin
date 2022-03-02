@@ -1,0 +1,71 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
+
+from qgis.PyQt.QtCore import Qt, pyqtSignal
+
+from .task import GwTask
+from ..utils import tools_gw
+from ...lib import tools_qgis, tools_log, tools_qt
+
+
+class GwToggleValveTask(GwTask):
+
+    task_finished = pyqtSignal(list)
+
+    def __init__(self, description='', params=None):
+
+        super().__init__(description)
+        self.params = params
+        self.result = None
+        self.json_result = None
+
+
+    def run(self):
+
+        super().run()
+
+        body = self.params['body']
+        self.json_result = tools_gw.execute_procedure('gw_fct_setfields', body, is_thread=True, aux_conn=self.aux_conn)
+        if not self.json_result:
+            tools_log.log_info("Function gw_fct_setfields failed")
+            return False
+        tools_qgis.refresh_map_canvas()
+        if self.json_result and self.json_result['status'] != 'Failed':
+            self.json_result = tools_gw.execute_procedure('gw_fct_setmapzonestrigger', body, is_thread=True, aux_conn=self.aux_conn)
+            if not self.json_result:
+                tools_log.log_info("Function gw_fct_setmapzonestrigger failed")
+                return False
+            tools_log.log_info("Function gw_fct_setmapzonestrigger finished successfully")
+
+        return True
+
+
+    def finished(self, result):
+
+        super().finished(result)
+
+        if self.isCanceled():
+            self.setProgress(100)
+            return
+
+        # Handle exception
+        if self.exception is not None:
+            msg = f"<b>Key: </b>{self.exception}<br>"
+            msg += f"<b>key container: </b>'body/data/ <br>"
+            msg += f"<b>Python file: </b>{__name__} <br>"
+            msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
+            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+            return
+
+        if self.json_result:
+            if self.json_result['level'] in (1, 2):
+                tools_qt.show_info_box(self.json_result['text'])
+            if self.json_result['level'] == 0:
+                tools_qgis.show_info(self.json_result['text'])
+
+        self.setProgress(100)

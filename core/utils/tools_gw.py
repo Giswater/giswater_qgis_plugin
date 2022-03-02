@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
+import json
 import os
 import random
 import re
@@ -29,7 +30,7 @@ from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QCo
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, QgsProviderRegistry
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -505,7 +506,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -516,31 +517,55 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param style_id: Id of the style we want to load (integer or String)
     """
 
-    uri = tools_db.get_uri()
+    tablename_og = tablename
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
-
+    uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-    vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-    tools_qt.add_layer_to_toc(vlayer, group, sub_group)
-    # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-    # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-    # therefore, we define it with "-1"
-    if style_id not in (None, "-1"):
-        body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-        style = execute_procedure('gw_fct_getstyle', body)
-        if style is None or style['status'] == 'Failed':
-            return
-        if 'styles' in style['body']:
-            if 'style' in style['body']['styles']:
-                qml = style['body']['styles']['style']
-                tools_qgis.create_qml(vlayer, qml)
+    create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
+    create_groups = tools_os.set_boolean(create_groups, default=False)
 
-    # Set layer config
-    if tablename:
-        feature = '"tableName":"' + str(tablename) + '", "id":"", "isLayer":true'
-        extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
-        body = create_body(feature=feature, extras=extras)
-        execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
+    if the_geom == "rast":
+        connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
+                     f"user={global_vars.dao_db_credentials['user']} password={global_vars.dao_db_credentials['password']} " \
+                     f"port={global_vars.dao_db_credentials['port']} mode=2 schema={global_vars.dao_db_credentials['schema']} " \
+                     f"column={the_geom} table={tablename}"
+        if alias: tablename = alias
+        layer = QgsRasterLayer(connString, tablename)
+        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+
+    else:
+        if alias: tablename = alias
+        layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
+        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+
+        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
+        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
+        # therefore, we define it with "-1"
+        if style_id in (None, "-1"):
+            # Get style_id from tablename
+            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
+            row = tools_db.get_row(sql)
+            if row:
+                style_id = row[0]
+
+        # Apply style to layer if it has one configured
+        if style_id not in (None, "-1"):
+            body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+            style = execute_procedure('gw_fct_getstyle', body)
+            if style is None or style['status'] == 'Failed':
+                return
+            if 'styles' in style['body']:
+                if 'style' in style['body']['styles']:
+                    qml = style['body']['styles']['style']
+                    tools_qgis.create_qml(layer, qml)
+
+            # Set layer config
+            if tablename:
+                feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
+                extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+                body = create_body(feature=feature, extras=extras)
+                json_result = execute_procedure('gw_fct_getinfofromid', body)
+                config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -607,6 +632,145 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
+
+
+def config_layer_attributes(json_result, layer, layer_name, thread=None):
+
+    for field in json_result['body']['data']['fields']:
+        valuemap_values = {}
+
+        # Get column index
+        field_index = layer.fields().indexFromName(field['columnname'])
+
+        # Hide selected fields according table config_form_fields.hidden
+        if 'hidden' in field:
+            config = layer.attributeTableConfig()
+            columns = config.columns()
+            for column in columns:
+                if column.name == str(field['columnname']):
+                    column.hidden = field['hidden']
+                    break
+            config.setColumns(columns)
+            layer.setAttributeTableConfig(config)
+
+        # Set alias column
+        if field['label']:
+            layer.setFieldAlias(field_index, field['label'])
+
+        # widgetcontrols
+        if 'widgetcontrols' in field:
+
+            # Set field constraints
+            if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                if field['widgetcontrols']['setQgisConstraints'] is True:
+                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
+                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrengthHard)
+
+        if 'ismandatory' in field and not field['ismandatory']:
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrengthSoft)
+
+        # Manage editability
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError:
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
+
+        # delete old values on ValueMap
+        editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+        # Manage ValueRelation configuration
+        use_vr = 'widgetcontrols' in field and field['widgetcontrols'] \
+                 and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
+        if use_vr:
+            value_relation = field['widgetcontrols']['valueRelation']
+            if 'activated' in value_relation and value_relation['activated']:
+                try:
+                    vr_layer = value_relation['layer']
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
+                    vr_key_column = value_relation['keyColumn']  # Get 'Key'
+                    vr_value_column = value_relation['valueColumn']  # Get 'Value'
+                    vr_allow_nullvalue = value_relation['nullValue']  # Get null values
+                    vr_filter_expression = value_relation['filterExpression']  # Get 'FilterExpression'
+                    if vr_filter_expression is None:
+                        vr_filter_expression = ''
+
+                    # Create and apply ValueRelation config
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{vr_layer}',
+                                                                                 'Key': f'{vr_key_column}',
+                                                                                 'Value': f'{vr_value_column}',
+                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
+                                                                                 'FilterExpression': f'{vr_filter_expression}'})
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+                except Exception as e:
+                    if thread:
+                        thread.exception = e
+                        thread.vr_errors.add(layer_name)
+                        if 'layer' in value_relation:
+                            thread.vr_missing.add(value_relation['layer'])
+                        thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
+                                         f"layers {thread.vr_missing} are not present on QGIS project"
+                    use_vr = False
+
+        if not use_vr:
+            # Manage new values in ValueMap
+            if field['widgettype'] == 'combo':
+                if 'comboIds' in field:
+                    # Set values
+                    for i in range(0, len(field['comboIds'])):
+                        valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                # Set values into valueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'check':
+                config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'datetime':
+                config = {'allow_null': True,
+                          'calendar_popup': True,
+                          'display_format': 'yyyy-MM-dd',
+                          'field_format': 'yyyy-MM-dd',
+                          'field_iso_format': False}
+                editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'textarea':
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            else:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+        # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit',
+                                                           {'IsMultiline': field['widgetcontrols']['setMultiline']})
+            else:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
+            layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+
+
+def load_missing_layers(filter, group="GW Layers", sub_group=None):
+    """ Adds any missing Mincut layers to TOC """
+
+    sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filter}' AND alias IS NOT NULL"
+    rows = tools_db.get_rows(sql)
+    if rows:
+        for tablename, alias in rows:
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                add_layer_database(tablename, alias=alias, group=group, sub_group=sub_group)
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
@@ -1262,10 +1426,14 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
         value = tools_qt.get_calendar_date(dialog, widget)
 
+    key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
+    if key == '' or key is None:
+        return _json
+
     if str(value) == '' or value is None:
-        _json[str(widget.property('columnname'))] = None
+        _json[key] = None
     else:
-        _json[str(widget.property('columnname'))] = str(value)
+        _json[key] = str(value)
     return _json
 
 
@@ -2546,6 +2714,8 @@ def fill_tableview_rows(widget, field):
         for value in item.values():
             if value is None:
                 value = ""
+            if issubclass(type(value), dict):
+                value = json.dumps(value)
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
             model.appendRow(row)

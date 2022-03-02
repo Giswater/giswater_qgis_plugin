@@ -20,7 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
+from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
@@ -29,6 +29,7 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
+from ..threads.toggle_valve_state import GwToggleValveTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
@@ -591,16 +592,16 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_rotation, "107c", "24x24")
         tools_gw.add_icon(self.action_catalog, "195")
         tools_gw.add_icon(self.action_workcat, "193")
-        tools_gw.add_icon(self.action_mapzone, "213")
-        tools_gw.add_icon(self.action_set_to_arc, "212")
+        tools_gw.add_icon(self.action_mapzone, "213", sub_folder="24x24")
+        tools_gw.add_icon(self.action_set_to_arc, "212", sub_folder="24x24")
         tools_gw.add_icon(self.action_get_arc_id, "209")
         tools_gw.add_icon(self.action_get_parent_id, "210")
         tools_gw.add_icon(self.action_zoom_in, "103")
         tools_gw.add_icon(self.action_zoom_out, "107")
         tools_gw.add_icon(self.action_centered, "104")
-        tools_gw.add_icon(self.action_link, "173")
+        tools_gw.add_icon(self.action_link, "173", sub_folder="24x24")
         tools_gw.add_icon(self.action_section, "207")
-        tools_gw.add_icon(self.action_help, "73")
+        tools_gw.add_icon(self.action_help, "73", sub_folder="24x24")
         tools_gw.add_icon(self.action_interpolate, "194")
         # Set buttons icon
         # tab elements
@@ -711,13 +712,27 @@ class GwInfo(QObject):
         self.action_copy_paste.triggered.connect(
             partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
         self.action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, self.action_rotation))
-        self.action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
+        self.action_link.triggered.connect(partial(self.action_open_link))
         self.action_section.triggered.connect(partial(self._open_section_form))
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
         return dlg_cf, fid
+
+
+    def action_open_link(self):
+        """ Manage def open_file from action 'Open Link' """
+        
+        try:
+            widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
+            for widget in widget_list:
+                path = widget.text()
+                status, message = tools_os.open_file(path)
+                if status is False and message is not None:
+                    tools_qgis.show_warning(message, parameter=path)
+        except Exception:
+            pass
 
 
     def _get_feature_type(self, complet_result):
@@ -1858,6 +1873,15 @@ class GwInfo(QObject):
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
+        # Get utils_grafanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        thread = row[0] if row else None
+        if thread:
+            thread = json.loads(thread)
+            thread = tools_os.set_boolean(thread['status'], default=False)
+            if 'closed' not in _json:
+                thread = False
+
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
             QgsProject.instance().blockSignals(False)
@@ -1877,6 +1901,22 @@ class GwInfo(QObject):
                 msg_level = 1
             tools_qgis.show_message(msg_text, message_level=msg_level)
             self._reload_fields(dialog, json_result, p_widget)
+
+            if thread:
+                # If param is true show question and create thread
+                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                if global_vars.user_level['level'] in ('1', '2'):
+                    msg += " Would you like to continue?"
+                    answer = tools_qt.show_question(msg)
+                else:
+                    tools_qgis.show_info(msg)
+                    answer = True
+
+                if answer:
+                    params = {"body": body}
+                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                    QgsApplication.taskManager().addTask(self.valve_thread)
+                    QgsApplication.taskManager().triggerTask(self.valve_thread)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
             QgsProject.instance().blockSignals(False)
@@ -2409,7 +2449,7 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
 
         elem = GwElement()
-        elem.get_element(True, feature, self.feature_type)
+        elem.get_element(False, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
@@ -2675,18 +2715,19 @@ class GwInfo(QObject):
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
             self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=True, column_filter=feature_key, value_filter=self.feature_id))
-        self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
-        self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
-        btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+            self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+                visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
+            self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+                visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
-        # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
-        tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
-        tools_qt.fill_table(widget, table_name, filter_)
-        self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
-                               column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+            btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+
+            # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
+            tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
+            tools_qt.fill_table(widget, table_name, filter_)
+            self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                                   column_filter=feature_key, value_filter=self.feature_id, widget=widget)
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -3356,8 +3397,7 @@ class GwInfo(QObject):
 
         doc = GwDocument()
         doc.get_document(feature=feature, feature_type=self.feature_type)
-        doc.dlg_add_doc.accepted.connect(partial(self._manage_document_new, dialog, doc))
-        doc.dlg_add_doc.rejected.connect(partial(self._manage_document_new, dialog, doc))
+        doc.doc_added.connect(partial(self._manage_document_new, doc))
 
         # Set completer
         tools_gw.set_completer_object(dialog, self.table_object)
@@ -3368,13 +3408,13 @@ class GwInfo(QObject):
         # doc.open_dialog(doc.dlg_add_doc)
 
 
-    def _manage_document_new(self, dialog, doc):
+    def _manage_document_new(self, doc):
         """ Get inserted doc_id and add it to current feature """
 
-        if doc.doc_id is None:
+        if not doc.doc_id:
             return
 
-        tools_qt.set_widget_text(dialog, "doc_id", doc.doc_id)
+        tools_qt.set_widget_text(self.dlg_cf, "doc_id", doc.doc_id)
         self._add_object(self.tbl_document, "doc", "v_ui_doc")
 
 

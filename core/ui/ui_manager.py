@@ -178,8 +178,12 @@ FORM_CLASS = _get_ui_class('go2epa_options.ui', 'epa')
 class GwGo2EpaOptionsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('hydrology_selector.ui', 'epa')
-class GwHydrologySelectorUi(GwDialog, FORM_CLASS):
+FROM_CLASS = _get_ui_class('dscenario_manager.ui', 'epa')
+class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('dscenario.ui')
+class GwDscenarioUi(GwDialog, FROM_CLASS):
     pass
 # endregion
 
@@ -254,7 +258,7 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialog' + os.sep + '20x20' + os.sep + 'eye_open.png'
+        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialog' + os.sep + '24x24' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -270,12 +274,12 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(
-                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep + 'eye_open.png'
+                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
             icon_path = os.path.dirname(
-                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep + 'eye_close.png'
+                __file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -363,7 +367,7 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep + 'eye_open.png'
+        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -378,11 +382,11 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep + 'eye_open.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep + 'eye_close.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)

@@ -61,7 +61,7 @@ class GwAdminButton:
         self.form_enabled = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
                                             .replace('.', ''))
-        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir)
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', global_vars.plugin_dir)
                                             .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
@@ -174,7 +174,7 @@ class GwAdminButton:
                     tools_qt.show_info_box(msg, "Warning")
                     return
 
-        elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
+        elif self.rdb_sample.isChecked():
 
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
@@ -336,8 +336,9 @@ class GwAdminButton:
             schema_name = self._get_schema_name()
             sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
             tools_db.execute_sql(sql)
-            status = self.load_updates(project_type, update_changelog=True)
+            status = self.load_updates(project_type, update_changelog=True, schema_name=schema_name)
             if status:
+                # Set info project
                 self._set_info_project()
                 if 'body' in status:
                     tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
@@ -381,6 +382,8 @@ class GwAdminButton:
             status = self.update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
+            # Check if schema utils exists and execute update
+            self._update_utils(schema_name)
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 
@@ -409,7 +412,6 @@ class GwAdminButton:
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
         self.project_descript = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_descript')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
-        self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
@@ -430,9 +432,6 @@ class GwAdminButton:
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
-
-        if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
-            self.rdb_sample_dev.setVisible(False)
 
         # Manage SRID
         self._manage_srid()
@@ -632,6 +631,7 @@ class GwAdminButton:
 
     def load_sample_data(self, project_type):
 
+        global_vars.dao.commit()
         folder = os.path.join(self.folder_example, 'user', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
@@ -1195,7 +1195,7 @@ class GwAdminButton:
         new_name = self._bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
 
         msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info", force_action=True)
         if result:
             self._rename_project_data_schema(str(project_name), str(new_name))
             return True
@@ -2140,9 +2140,13 @@ class GwAdminButton:
 
     def _dlg_replace_accept(self):
 
-        dict_to_replace = {}
+        dict_to_replace_unordered = {}
         for widget in self.dlg_replace.findChildren(QLineEdit):
-            dict_to_replace[f'{widget.objectName()}'] = f'{widget.text()}'
+            dict_to_replace_unordered[f'{widget.objectName()}'] = f'{widget.text()}'
+
+        dict_to_replace = {}
+        for k in sorted(dict_to_replace_unordered, key=len, reverse=True):
+            dict_to_replace[k] = dict_to_replace_unordered[k]
 
         all_valid = True
         news = []
@@ -3152,13 +3156,16 @@ class GwAdminButton:
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
 
-    def _update_utils(self):
+    def _update_utils(self, schema_name=None):
 
-        self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        if schema_name is None:
+            self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+        else:
+            self.ws_project_name = schema_name
         sql = f"SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
         row = tools_db.get_row(sql)
         if row:
-            self._update_utils_schema(row)
+            self._update_utils_schema(row, schema_name)
 
 
     def _load_base_utils(self):
@@ -3183,7 +3190,7 @@ class GwAdminButton:
         return True
 
 
-    def _update_utils_schema(self, schema_version=None):
+    def _update_utils_schema(self, schema_version=None, schema_name=None):
 
         folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
 
@@ -3204,16 +3211,22 @@ class GwAdminButton:
                         status = self._load_sql(folder_update, utils_schema_name='utils')
                         if status is False:
                             return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
-                    if self._process_folder(folder_update):
-                        status = self._load_sql(folder_update, utils_schema_name=self.ws_project_name)
-                        if status is False:
-                            return False
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
-                    if self._process_folder(folder_update):
-                        status = self._load_sql(folder_update, utils_schema_name=self.ud_project_name)
-                        if status is False:
-                            return False
+                    if self.project_type_selected == 'ws':
+                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
+                        if self._process_folder(folder_update):
+                            if schema_name is None:
+                                schema_name = self.ws_project_name
+                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
+                            if status is False:
+                                return False
+                    if self.project_type_selected == 'ud':
+                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
+                        if self._process_folder(folder_update):
+                            if schema_name is None:
+                                schema_name = self.ud_project_name
+                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
+                            if status is False:
+                                return False
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
                     if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)

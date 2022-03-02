@@ -68,6 +68,8 @@ class GwAddChildLayerButton(GwAction):
                 if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
                     menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(f"{context['level_3']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+
+                alias = field['layerName'] if field['layerName'] is not None else field['tableName']
                 if 'level_3' in context:
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
                         action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
@@ -75,7 +77,7 @@ class GwAddChildLayerButton(GwAction):
                         group=context['level_1'], sub_group=context['level_2'], sub_sub_group=context['level_3']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all"] = True
-                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
+                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
                 else:
                     if f"{context['level_1']}_{context['level_2']}_load_all" not in dict_menu:
@@ -84,7 +86,7 @@ class GwAddChildLayerButton(GwAction):
                                                          group=context['level_1'], sub_group=context['level_2']))
                         dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_load_all"] = True
-                    action = QAction(field['layerName'], dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
+                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
                     dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
 
                 if f"{field['tableName']}" in layer_list:
@@ -95,13 +97,12 @@ class GwAddChildLayerButton(GwAction):
                     the_geom = None
                 else:
                     the_geom = field['geomField']
-                geom_field = field['tableId']
+                geom_field = field['tableId'].replace(" ", "")
                 style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
-
                 action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                 group, sub_group, style_id))
+                                                 group, sub_group, style_id, alias))
 
         main_menu.exec_(click_point)
 
@@ -118,17 +119,17 @@ class GwAddChildLayerButton(GwAction):
                         the_geom = None
                     else:
                         the_geom = field['geomField']
-                    geom_field = field['tableId']
+                    geom_field = field['tableId'].replace(" ", "")
                     style_id = field['style_id']
                     group = context['level_1']
                     sub_group = context['level_2']
 
                     layer = tools_qgis.get_layer_by_tablename(layer_name)
                     if layer is None:
-                        tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id)
+                        tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'])
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
-                                sub_group=None, style_id=None, is_checked=None):
+                                sub_group=None, style_id=None, alias=None, is_checked=None):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -141,7 +142,7 @@ class GwAddChildLayerButton(GwAction):
         if is_checked:
                 layer = tools_qgis.get_layer_by_tablename(tablename)
                 if layer is None:
-                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id)
+                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias)
         else:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:

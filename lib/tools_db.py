@@ -382,7 +382,7 @@ def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_em
     return rows
 
 
-def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None, is_thread=False):
+def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None, is_thread=False, show_exception=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     if log_sql:
@@ -392,7 +392,7 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None,
     if not result:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        if not is_thread:
+        if show_exception and not is_thread:
             tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, filepath=filepath)
         return False
 

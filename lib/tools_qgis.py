@@ -332,7 +332,9 @@ def get_layer_source_table_name(layer):
     total = len(uri)
     pos_end_schema = uri.rfind('.')
     pos_fi = uri.find('" ')
-    if pos_ini != -1 and pos_fi != -1:
+    if uri.find('pg:') != -1:
+        uri_table = uri[pos_ini + 6:total]
+    elif pos_ini != -1 and pos_fi != -1:
         uri_table = uri[pos_end_schema + 2:pos_fi]
     else:
         uri_table = uri[pos_end_schema + 2:total - 1]
@@ -1111,5 +1113,24 @@ def _get_multi_coordinates(feature):
     coordinates = coordinates[:-2] + ")"
     return coordinates
 
+
+def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None):
+    """
+    Draw 'polygon' over canvas following list of points
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    """
+
+    rubber_band.setIconSize(20)
+    polygon = QgsGeometry.fromPolygonXY([points])
+    rubber_band.setToGeometry(polygon, None)
+    rubber_band.setColor(border)
+    rubber_band.setFillColor(QColor(0, 0, 0, 0))
+    rubber_band.setWidth(width)
+    rubber_band.show()
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        # Qtimer singleShot works with ms, we manage transformation to seconds
+        QTimer.singleShot(int(duration_time)*1000, rubber_band.reset)
 
 # endregion

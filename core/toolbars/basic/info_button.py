@@ -7,19 +7,21 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import re
+import json
 from functools import partial
 
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
-from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.core import QgsApplication, QgsGeometry, QgsMapToPixel, QgsPointXY
 
 from ...shared import info
 from ...shared.info import GwInfo
 from ...toolbars.maptool import GwMaptool
+from ...threads.toggle_valve_state import GwToggleValveTask
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis
+from ....lib import tools_qgis, tools_os, tools_qt
 
 
 class GwInfoButton(GwMaptool):
@@ -113,6 +115,13 @@ class GwInfoButton(GwMaptool):
         info_action.trigger()
 
 
+    def _reset_rubber_bands(self):
+        for rb in self.rubberband_list:
+            tools_gw.reset_rubberband(rb)
+        if hasattr(self, "rubber_band"):
+            tools_qgis.reset_rubber_band(self.rubber_band)
+
+
     def _get_layers_from_coordinates(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
@@ -172,6 +181,18 @@ class GwInfoButton(GwMaptool):
         action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
+
+        # Open/close valve
+        if 'valve' in json_result['body']['data']:
+            valve_id = json_result['body']['data']['valve']['id']
+            valve_text = json_result['body']['data']['valve']['text']
+            valve_table = json_result['body']['data']['valve']['tableName']
+            valve_value = json_result['body']['data']['valve']['value']
+            action_valve = QAction(f"{valve_text}", None)
+            action_valve.triggered.connect(partial(self._toggle_valve_state, valve_id, valve_table, valve_value))
+            action_valve.hovered.connect(partial(self._reset_rubber_bands))
+            main_menu.addAction(action_valve)
+            main_menu.addSeparator()
         main_menu.exec_(click_point)
 
 
@@ -197,6 +218,46 @@ class GwInfoButton(GwMaptool):
                 rb.setWidth(5)
                 rb.show()
                 rb_list.append(rb)
+
+
+    def _toggle_valve_state(self, valve_id, table_name, value):
+        """ Open or closes a valve. If parameter 'utils_grafanalytics_automatic_trigger' is true,
+        also updates mapzones in a thread """
+
+        # Build function body
+        feature = f'"id":"{valve_id}", '
+        feature += f'"tableName":"{table_name}", '
+        feature += f' "featureType":"node" '
+        extras = f'"fields":{{"closed": "{value}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+
+        # Get utils_grafanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        thread = row[0] if row else None
+        if thread:
+            thread = json.loads(thread)
+            thread = tools_os.set_boolean(thread['status'], default=False)
+
+        # If param is false don't create thread
+        if not thread:
+            tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            tools_qgis.refresh_map_canvas()
+            return
+
+        # If param is true show question and create thread
+        msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+        if global_vars.user_level['level'] in ('1', '2'):
+            msg += " Would you like to continue?"
+            answer = tools_qt.show_question(msg)
+        else:
+            tools_qgis.show_info(msg)
+            answer = True
+
+        if answer:
+            params = {"body": body}
+            self.valve_thread = GwToggleValveTask("Update mapzones", params)
+            QgsApplication.taskManager().addTask(self.valve_thread)
+            QgsApplication.taskManager().triggerTask(self.valve_thread)
 
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):

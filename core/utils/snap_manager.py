@@ -392,7 +392,10 @@ class GwSnapManager(object):
     def _get_xy(self, vertex_marker, emit_point, point):
         """ Get coordinates of selected point """
 
-        # Setting x, y coordinates from point
+        event_point = self.get_event_point(point=point)
+        result = self.snap_to_project_config_layers(event_point)
+        point = self.get_snapped_point(result)
+        # Setting x, y coordinates from snapped point
         self.point_xy['x'] = point.x()
         self.point_xy['y'] = point.y()
 

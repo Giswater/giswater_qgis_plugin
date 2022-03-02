@@ -30,7 +30,8 @@ class GwToolBoxButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
+        if icon_path is not None:
+            super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
@@ -41,6 +42,53 @@ class GwToolBoxButton(GwAction):
 
         self._open_toolbox()
 
+
+    def open_function_by_id(self, func_id, connect_signal=None):
+
+        self.dlg_functions = GwToolboxManagerUi()
+        tools_gw.load_settings(self.dlg_functions)
+        self.dlg_functions.progressBar.setVisible(False)
+        self.dlg_functions.btn_cancel.hide()
+        self.dlg_functions.btn_close.show()
+
+        self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
+        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
+                                                                          self.dlg_functions.cmb_layers))
+        self.dlg_functions.rbt_previous.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_previous))
+        self.dlg_functions.rbt_layer.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_layer))
+        self.dlg_functions.rbt_layer.setChecked(True)
+
+        extras = f'"function":{func_id}'
+        extras += ', "isToolbox":false'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+        sql = f"SELECT alias FROM config_toolbox WHERE id = {func_id}"
+        self.function_selected = f"{tools_db.get_row(sql)[0]}"
+        status = self._populate_functions_dlg(self.dlg_functions, json_result['body']['data']['processes'])
+        if not status:
+            message = "Function not found"
+            tools_qgis.show_message(message, parameter=self.function_selected)
+            return
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_functions)
+
+        # Connect signals
+        self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
+        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
+                                                           self.dlg_functions, self.dlg_functions.cmb_layers,
+                                                           json_result['body']['data']['processes']))
+        self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        if connect_signal is not None:
+            self.dlg_functions.rejected.connect(connect_signal)
+
+        # Open form and set title
+        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
+        tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
     def remove_layers(self):
 
@@ -62,7 +110,7 @@ class GwToolBoxButton(GwAction):
             if len(parent_group.findLayers()) == 0:
                 root.removeChildNode(parent_group)
 
-        self.iface.mapCanvas().refresh()
+        global_vars.iface.mapCanvas().refresh()
 
 
     def set_selected_layer(self, dialog, combo):
@@ -72,7 +120,7 @@ class GwToolBoxButton(GwAction):
         if layer is None:
             tools_qgis.show_warning("Layer not found", parameter=layer_name)
             return None
-        self.iface.setActiveLayer(layer)
+        global_vars.iface.setActiveLayer(layer)
         return layer
 
 
@@ -219,6 +267,10 @@ class GwToolBoxButton(GwAction):
                     widget = tools_gw.add_calendar(self.dlg_reports, field)
                     widget.valueChanged.connect(partial(self._update_tbl_reports))
                 elif field['widgettype'] == 'list':
+                    if field['value'] is None:
+                        msg = "No results found. Please check values set on selector of state and exploitation"
+                        tools_qgis.show_warning(msg)
+                        return
                     numrows = len(field['value'])
                     numcols = len(field['value'][0])
 
@@ -501,15 +553,14 @@ class GwToolBoxButton(GwAction):
 
         list_items = []
         sql = (f"SELECT tablename, type FROM "
-               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
-               f"UNION SELECT child_layer, feature_type, 2 as c "
-               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
+               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c FROM cat_feature "
+               f"UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature "
                F" UNION "
-               f"SELECT concat('v_edit_',epa_table), feature_type as type, 9 as c FROM sys_feature_epa_type "
+               f"SELECT concat('v_edit_',epa_table), feature_type as type, 4 as c FROM sys_feature_epa_type "
                f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
-               f" AND feature_type = '{feature_type.upper()}') as t"
-               f" ORDER BY c, tablename")
+			   f"UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
+			   f"UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
+               f" WHERE type = '{feature_type.upper()}' ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -550,9 +601,8 @@ class GwToolBoxButton(GwAction):
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
 
-        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
+        icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep
         path_icon_blue = icon_folder + os.sep + '36.png'
-        path_icon_red = icon_folder + os.sep + '100.png'
 
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
@@ -566,21 +616,10 @@ class GwToolBoxButton(GwAction):
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                row = tools_db.check_function(function['functionname'])
-                if not row:
-                    if os.path.exists(path_icon_red):
-                        icon = QIcon(path_icon_red)
-                        label.setIcon(icon)
-                        label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']}" \
-                            f" configured on the table config_toolbox, but not found in the database"
-                        label.setToolTip(msg)
-                        self.no_clickable_items.append(str(function['alias']))
-                else:
-                    if os.path.exists(path_icon_blue):
-                        icon = QIcon(path_icon_blue)
-                        label.setIcon(icon)
-                        label.setToolTip(function['functionname'])
+                if os.path.exists(path_icon_blue):
+                    icon = QIcon(path_icon_blue)
+                    label.setIcon(icon)
+                    label.setToolTip(function['functionname'])
 
                 parent1.appendRow([label, func_name])
             section_processes.appendRow(parent1)
