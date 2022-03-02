@@ -883,9 +883,166 @@ inp_connec.custom_roughness,
 inp_connec.custom_length,
 inp_connec.custom_dint,
 --connec.epa_type
-
-
 connec.the_geom
 FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
 WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;*/
+
+
+
+
+CREATE OR REPLACE VIEW ve_epa_junction AS 
+SELECT inp_junction.*,
+max_demand, 
+min_demand, 
+max_head, 
+min_head, 
+max_pressure, 
+min_pressure, 
+max_quality, 
+min_quality
+FROM inp_junction JOIN v_rpt_node USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_tank AS 
+SELECT inp_tank.*, 
+max_demand, 
+min_demand, 
+max_head, 
+min_head, 
+max_pressure, 
+min_pressure, 
+max_quality, 
+min_quality
+FROM inp_tank JOIN v_rpt_node USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_reservoir AS 
+SELECT inp_reservoir.*, 
+max_demand, 
+min_demand, 
+max_head, 
+min_head, 
+max_pressure, 
+min_pressure, 
+max_quality, 
+min_quality
+FROM inp_reservoir JOIN v_rpt_node USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_inlet AS 
+SELECT inp_inlet.*, 
+max_demand, 
+min_demand, 
+max_head, 
+min_head, 
+max_pressure, 
+min_pressure, 
+max_quality, 
+min_quality
+FROM inp_inlet JOIN v_rpt_node USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_pipe AS 
+SELECT inp_pipe.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_pipe JOIN v_rpt_arc USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_pump AS 
+SELECT inp_pump.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_pump JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
+
+CREATE OR REPLACE VIEW ve_epa_valve AS 
+SELECT inp_valve.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_valve JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
+
+CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
+SELECT inp_shortpipe.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_shortpipe JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
+
+CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
+SELECT inp_virtualvalve.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_virtualvalve JOIN v_rpt_arc USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_pump_additional AS
+SELECT inp_pump_additional.*, 
+max_flow, 
+min_flow, 
+max_vel, 
+min_vel, 
+max_headloss, 
+min_headloss, 
+max_setting, 
+min_setting, 
+max_reaction, 
+min_reaction, 
+max_ffactor, 
+min_ffactor
+FROM inp_pump_additional JOIN v_rpt_arc ON concat(node_id,'_n2a',order_id) = arc_id;
+
+CREATE OR REPLACE VIEW ve_epa_connec AS
+SELECT inp_connec.*, 
+max_demand, 
+min_demand, 
+max_head, 
+min_head, 
+max_pressure, 
+min_pressure, 
+max_quality, 
+min_quality
+FROM inp_connec JOIN v_rpt_node ON connec_id = node_id;
