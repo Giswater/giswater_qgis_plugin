@@ -732,7 +732,7 @@ BEGIN
 						VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 
 					ELSE
-						UPDATE polygon SET the_geom = v_the_geom_pol WHERE gully_id =NEW.gully_id;
+						UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id =NEW.gully_id;
 					END IF;
 				END IF;
 		END IF;
