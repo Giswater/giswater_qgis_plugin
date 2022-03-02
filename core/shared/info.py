@@ -614,7 +614,8 @@ class GwInfo(QObject):
                     widget_offset = 0
                     prev_layout = layout.objectName()
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
+                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2',
+                                                                         'lyt_epa_data_1', 'lyt_epa_data_2'):
                     layout_list.append(layout)
 
                 # Manage widget and label positions

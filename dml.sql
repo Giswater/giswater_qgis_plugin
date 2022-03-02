@@ -33,8 +33,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'source_quality', 'lyt_epa_data_1', 6, 'string', 'text', 'Source quality:', 'Source quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'source_pattern', 'lyt_epa_data_1', 7, 'string', 'text', 'Source pattern:', 'Source pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_junction', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
@@ -43,8 +41,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 3, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 4, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_junction', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, false, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'tbl_inp_junction', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_junction');
@@ -72,8 +68,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energy_price', 'lyt_epa_data_1', 8, 'string', 'text', 'Energy price:', 'Energy price', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'price_pattern', 'lyt_epa_data_1', 9, 'string', 'text', 'Price pattern:', 'Price pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -97,8 +91,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'peak_kw', 'lyt_epa_data_2', 10, 'string', 'text', 'Peak KW:', 'Peak KW', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'cost_day', 'lyt_epa_data_2', 11, 'string', 'text', 'Cost day:', 'Cost day', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'tbl_inp_pump', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_pump');
@@ -116,8 +108,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'buk_coeff', 'lyt_epa_data_1', 3, 'string', 'text', 'Buk coefficient:', 'Buk coefficient', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'wall_coeff', 'lyt_epa_data_1', 4, 'string', 'text', 'Wall coefficient:', 'Wall coefficient', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -135,8 +125,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 7, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'status', 'lyt_epa_data_2', 8, 'string', 'text', 'Status:', 'Status', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'tbl_inp_pipe', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_pipe');
@@ -158,8 +146,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'buk_coeff', 'lyt_epa_data_1', 5, 'string', 'text', 'Buk coefficient:', 'Buk coefficient', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'wall_coeff', 'lyt_epa_data_1', 6, 'string', 'text', 'Wall coefficient:', 'Wall coefficient', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -177,8 +163,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 7, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'status', 'lyt_epa_data_2', 8, 'string', 'text', 'Status:', 'Status', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'tbl_inp_shortpipe', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_shortpipe');
@@ -214,8 +198,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'source_quality', 'lyt_epa_data_1', 12, 'string', 'text', 'Source quality:', 'Source quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'source_pattern', 'lyt_epa_data_1', 13, 'string', 'text', 'Source pattern:', 'Source pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_tank', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -227,8 +209,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 4, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 5, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_tank', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'tbl_inp_tank', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_tank');
@@ -250,8 +230,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'source_quality', 'lyt_epa_data_1', 5, 'string', 'text', 'Source quality:', 'Source quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'source_pattern', 'lyt_epa_data_1', 6, 'string', 'text', 'Source pattern:', 'Source pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -263,8 +241,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 4, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 5, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'tbl_inp_reservoir', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_reservoir');
@@ -298,8 +274,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'add_settings', 'lyt_epa_data_1', 11, 'string', 'text', 'Add settings:', 'Add settings', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'quality', 'lyt_epa_data_1', 12, 'string', 'text', 'Quality:', 'Quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_valve', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -311,8 +285,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 4, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 5, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_valve', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'tbl_inp_valve', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_valve');
@@ -344,8 +316,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'add_settings', 'lyt_epa_data_1', 10, 'string', 'text', 'Add settings:', 'Add settings', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'quality', 'lyt_epa_data_1', 11, 'string', 'text', 'Quality:', 'Quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -359,8 +329,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 5, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 6, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'tbl_inp_virtualvalve', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_virtualvalve');
@@ -400,8 +368,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'source_quality', 'lyt_epa_data_1', 14, 'string', 'text', 'Source quality:', 'Source quality', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'source_pattern', 'lyt_epa_data_1', 15, 'string', 'text', 'Source pattern:', 'Source pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'vspacer_lyt_epa_1', 'lyt_epa_data_1', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -413,8 +379,6 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'pressure', 'lyt_epa_data_2', 4, 'string', 'text', 'Pressure:', 'Pressure', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'quality', 'lyt_epa_data_2', 5, 'string', 'text', 'Quality:', 'Quality', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
-    VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'vspacer_lyt_epa_2', 'lyt_epa_data_2', 100, 'vspacer', false, false, true, false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'tbl_inp_tank', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_inlet');
