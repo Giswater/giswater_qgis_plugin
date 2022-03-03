@@ -52,7 +52,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfiel
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfields_parameter", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfields_parameter", "column":"iseditable", "dataType":"boolean"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"active", "dataType":"boolean", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"active", "dataType":"boolean"}}$$);
 
 -----------------------
 -- create sequences

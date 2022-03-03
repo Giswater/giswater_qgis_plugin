@@ -14,7 +14,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_rtc_hydrometer_x_connec","v_ui_hydrometer","vi_parent_hydrometer","v_rtc_hydrometer"], 
 "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_hydrometer", "column":"plot_code", "dataType":"varchar(30)", "type":"VARCHAR(30)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_hydrometer", "column":"plot_code", "dataType":"varchar(30)", "type":"VARCHAR(30)"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_rtc_hydrometer", "vi_parent_hydrometer", "v_rtc_hydrometer_x_connec","v_ui_hydrometer"], 

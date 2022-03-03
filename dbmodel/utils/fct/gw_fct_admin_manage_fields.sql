@@ -53,16 +53,6 @@ BEGIN
 	v_isutils = (p_data->>'data')::json->>'isUtils';
 	v_newname = (p_data->>'data')::json->>'newName';
 
-	-- manage utils schema
-	IF v_isutils THEN
-		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_utils_schema' OR parameter='admin_utils_schema');
-		IF v_schemautils THEN 		
-			SET search_path = 'utils', public;
-			v_schemaname := 'utils';
-			v_table := substring(v_table,5,999);
-			
-		END IF;
-	END IF;
 
 	-- check if column not exists
 	IF v_action='ADD' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NULL THEN
@@ -90,8 +80,6 @@ BEGIN
 		v_querytext = 'Process not executed. Table has already been modified.';
 	END IF;
 
-	-- recover search_path in case utils = true in order to reset value fixed before
-	SET search_path = "SCHEMA_NAME", public;
 
 	RETURN v_querytext;
 
