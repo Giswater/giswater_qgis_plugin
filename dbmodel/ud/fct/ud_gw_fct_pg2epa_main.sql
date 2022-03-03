@@ -74,18 +74,19 @@ BEGIN
 	
 	IF v_step=3 THEN
 
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Step-3: Create JSON of inp export done succesfully"}')::json;
+		'"message":{"level":1, "text":"Step-3: Creation of json for export done succesfully"}')::json;
 		RETURN v_return;
 		
 	ELSIF v_step=2 THEN
 	
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"message":{"level":1, "text":"Step-2: Analyze graf of inp export done succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-2: Gragf analytics done succesfully"}}'::json;
 		RETURN v_return;
 		
 	END IF;
@@ -160,22 +161,22 @@ BEGIN
 		PERFORM gw_fct_pg2epa_vdefault(v_input);
 	END IF;
 
-	RAISE NOTICE '9 - Check result network';
 	IF v_step = 0 THEN
-		PERFORM gw_fct_pg2epa_check_network(v_input);
-	END IF;
+	
+		RAISE NOTICE '9 - dscenario';
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
 		
-	RAISE NOTICE '10 - Advanced settings';
-	IF v_advancedsettings THEN
-		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
-	END IF;
+		RAISE NOTICE '10 - Advanced settings';
+		IF v_advancedsettings THEN
+			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+		END IF;
+		
+		RAISE NOTICE '11 - Check result network';
+		PERFORM gw_fct_pg2epa_check_network(v_input);
 
-	RAISE NOTICE '11 - dscenario';
-	PERFORM gw_fct_pg2epa_dscenario(v_result);
-
-	RAISE NOTICE '12 - check result previous exportation';
-	IF v_step=0 THEN
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+		RAISE NOTICE '12 - check result previous exportation';
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
+		
 	END IF;
 
 	RAISE NOTICE '13 - Move from temp tables to rpt_inp tables';
@@ -202,7 +203,7 @@ BEGIN
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN
 	
-		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary of inp export done succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary conditions of inp created succesfully"}}'::json;
 		RETURN v_return;	
 
 	ELSIF v_step=0 THEN
