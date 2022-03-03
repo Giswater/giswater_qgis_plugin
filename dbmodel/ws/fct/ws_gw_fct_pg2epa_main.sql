@@ -80,19 +80,19 @@ BEGIN
 	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	IF v_step=3 THEN
-
+	
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Step-3: Create JSON of inp export done succesfully"}')::json;
+		'"message":{"level":1, "text":"Step-3: Creation of json for export done succesfully"}')::json;
 		RETURN v_return;
 		
 	ELSIF v_step=2 THEN
-	
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"message":{"level":1, "text":"Step-2: Analyze graf of inp export done succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-2: Gragf analytics done succesfully"}}'::json;
 		RETURN v_return;
 	END IF;
 
@@ -201,33 +201,33 @@ BEGIN
 
 	RAISE NOTICE '14 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
-
-	RAISE NOTICE '15 - Setting dscenarios';
-	PERFORM gw_fct_pg2epa_dscenario(v_result);
-		
-	RAISE NOTICE '16 - Advanced settings';
-	IF v_advancedsettings THEN
-		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
-	END IF;
 	
-	RAISE NOTICE '17 - Check result network';
 	IF v_step = 0 THEN
-		PERFORM gw_fct_pg2epa_check_network(v_input);	
-	END IF;
+	
+		RAISE NOTICE '15 - Setting dscenarios';
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
+			
+		RAISE NOTICE '16 - Advanced settings';
+		IF v_advancedsettings THEN
+			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+		END IF;
+		
+		RAISE NOTICE '17 - Check result network';
+		PERFORM gw_fct_pg2epa_check_network(v_input);
+		
+		RAISE NOTICE '18- update values from inp_*_importinp tables';-- when delete network is enabled
 
-	-- when delete network is enabled (variable of inp_options_debug)
-	RAISE NOTICE '18- update values from inp_*_importinp tables';
-	UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
-	addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
-	FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
+		UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
+		addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
+		FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
 
-	UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
-	addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern":"',pattern,'", "energyparam":"',energyparam,'", "status":"',b.status,'", "energyvalue":"',b.energyvalue,'"}')
-	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
+		UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
+		addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern_id":"',pattern_id,'", "effic_curve_id":"',effic_curve_id,'", "status":"',b.status,'", "energy_price":"',b.energy_price,'", "energy_pattern_id":"',b.energy_pattern_id,'"}')
+		FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
-	RAISE NOTICE '19 - Check result previous exportation';
-	IF v_step=0 THEN
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+		RAISE NOTICE '19 - Check result previous exportation';
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
+		
 	END IF;
 
 	RAISE NOTICE '20 - Profilactic last control';
@@ -310,7 +310,7 @@ BEGIN
 	RAISE NOTICE '22 - Manage return';
 	IF v_step=1 THEN
 	
-		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary of inp export done succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary conditions of inp created succesfully"}}'::json;
 		RETURN v_return;	
 
 	ELSIF v_step=0 THEN
@@ -320,7 +320,8 @@ BEGIN
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}',
 		'"message":{"level":1, "text":"Full process of inp export done succesfully"}')::json;
-		RETURN v_return;	
+		RETURN v_return;
+		
 	END IF;
 
 	-- Exception handling
