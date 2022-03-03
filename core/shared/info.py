@@ -1788,6 +1788,8 @@ class GwInfo(QObject):
         after_insert = False
 
         if _json == '' or str(_json) == '{}':
+            if not close_dlg:
+                return None
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
