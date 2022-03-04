@@ -9,3 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/01/31
 UPDATE sys_table SET id = 'vi_subcatch2outlet' WHERE id = 'vi_subcatch2node';
+UPDATE sys_table SET sys_role='role_edit' WHERE id='inp_gully';
