@@ -1422,6 +1422,7 @@ def add_button(**kwargs):
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
     else:
+        return widget
         message = "Parameter widgetfunction.functionName is null for button"
         tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
