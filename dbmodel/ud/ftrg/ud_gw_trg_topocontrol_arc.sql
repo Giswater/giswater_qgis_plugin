@@ -286,20 +286,16 @@ BEGIN
 			ELSIF TG_OP = 'UPDATE' THEN
 
 				-- sys elev1
-				IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL)
-				OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
+				IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
 					sys_elev1_aux = NEW.custom_elev1;
-				ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)	OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) 
-				OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
+				ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)	OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
 					sys_elev1_aux = NEW.elev1;
 				END IF;
 
 				-- sys elev2
-				IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL)
-				OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
+				IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
 					sys_elev2_aux = NEW.custom_elev2;
-				ELSIF (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NOT NULL)
-				OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) THEN
+				ELSIF (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) THEN
 					sys_elev2_aux = NEW.elev2;
 				END IF;
 
