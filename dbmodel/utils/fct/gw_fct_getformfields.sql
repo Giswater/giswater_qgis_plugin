@@ -12,9 +12,8 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, cha
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(p_formname character varying, p_formtype character varying, p_tabname character varying, p_tablename character varying, p_idname character varying, p_id character varying, p_columntype character varying, p_tgop character varying, p_filterfield character varying, p_device integer, p_values_array json)
- RETURNS text[]
- LANGUAGE plpgsql
-AS $function$
+ RETURNS text[] AS
+$BODY$
 
 
 /*EXAMPLE
