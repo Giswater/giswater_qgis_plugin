@@ -39,7 +39,10 @@ class GwTask(QgsTask, QObject):
 
     def finished(self, result):
 
-        global_vars.session_vars['threads'].remove(self)
+        try:
+            global_vars.session_vars['threads'].remove(self)
+        except ValueError:
+            pass
         global_vars.dao.delete_aux_con(self.aux_conn)
         iface.actionOpenProject().setEnabled(True)
         iface.actionNewProject().setEnabled(True)
