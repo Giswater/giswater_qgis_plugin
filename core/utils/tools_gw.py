@@ -1418,16 +1418,21 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
 
-    if widget.isReadOnly() is True and not ignore_editability:
-        return _json
-
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and (widget.isReadOnly() is False or ignore_editability):
+        if widget.isReadOnly():
+            return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.is_checked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.get_calendar_date(dialog, widget)
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
