@@ -83,9 +83,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 --outfall
 
-outfall_type, stage, curve_id, timser_id, gate, flow_freq, 
-       avg_flow, max_flow, total_vol
-
 INSERT INTO config_form_list(listname, query_text, device)
     VALUES ('tbl_inp_outfall', 'SELECT dscenario_id, elev, ymax, outfall_type, stage, curve_id, timser_id, gate FROM v_edit_inp_dscenario_outfall WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
 
