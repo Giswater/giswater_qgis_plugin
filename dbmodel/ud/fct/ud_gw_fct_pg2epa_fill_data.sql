@@ -223,14 +223,18 @@ BEGIN
 	FROM v_edit_inp_flwreg_pump;
 
 	-- weir
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
-	SELECT arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
+	road_surf, coef_curve, surcharge)
+	SELECT arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, 
+	road_surf, coef_curve, surcharge
 	FROM v_edit_inp_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 	
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve)
-	SELECT nodarc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, road_surf, coef_curve
+	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
+	road_surf, coef_curve, surcharge)
+	SELECT nodarc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, 
+	road_surf, coef_curve, surcharge
 	FROM v_edit_inp_flwreg_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_flwreg_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
