@@ -24,3 +24,21 @@ SELECT
    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LINESTRING,SRID_VALUE) AS the_geom
    FROM v_edit_inp_subcatchment s1
    JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id = s2.subc_id
+
+--2022/03/07
+CREATE OR REPLACE VIEW vi_vertices AS
+ SELECT DISTINCT ON (the_geom, path) arc.arc_id,
+    NULL::numeric(16,3) AS xcoord,
+    NULL::numeric(16,3) AS ycoord,
+    arc.point AS the_geom
+   FROM ( SELECT (st_dumppoints(rpt_inp_arc.the_geom)).geom AS point,
+     (st_dumppoints(rpt_inp_arc.the_geom)).path AS path,
+            st_startpoint(rpt_inp_arc.the_geom) AS startpoint,
+            st_endpoint(rpt_inp_arc.the_geom) AS endpoint,
+            rpt_inp_arc.sector_id,
+            rpt_inp_arc.arc_id
+           FROM selector_inp_result,
+            rpt_inp_arc
+          WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text) arc
+  WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
+  ORDER BY path;
