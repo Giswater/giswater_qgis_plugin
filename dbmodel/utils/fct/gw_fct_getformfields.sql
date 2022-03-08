@@ -11,7 +11,8 @@ character varying, character varying, character varying, character varying, char
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(p_formname character varying, p_formtype character varying, p_tabname character varying, p_tablename character varying, p_idname character varying, p_id character varying, p_columntype character varying, p_tgop character varying, p_filterfield character varying, p_device integer, p_values_array json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(p_formname character varying, p_formtype character varying, p_tabname character varying, 
+p_tablename character varying, p_idname character varying, p_id character varying, p_columntype character varying, p_tgop character varying, p_filterfield character varying, p_device integer, p_values_array json)
  RETURNS text[] AS
 $BODY$
 
@@ -61,9 +62,10 @@ v_querystring text;
 v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
-       
+v_epa_table text;
+v_featuretype text;
 BEGIN
-	
+
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
@@ -116,6 +118,17 @@ BEGIN
 
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
+		IF p_tgop = 'INSERT' THEN
+			v_featuretype = lower(replace(p_idname,'_id',''));
+			EXECUTE 'SELECT concat(''ve_epa_'',lower(epa_default)) 
+			FROM cat_feature cf
+			JOIN cat_feature_'||v_featuretype||' f ON cf.id = f.id
+			WHERE child_layer = '||quote_literal(p_formname)||''
+			INTO v_epa_table;
+		ELSIF p_tgop='UPDATE' THEN
+			v_epa_table=concat('ve_epa_',lower(json_extract_path_text(p_values_array,'epa_type')));
+		END IF;	
+		
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
@@ -129,10 +142,11 @@ BEGIN
 			LEFT JOIN typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
 			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			
-			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''' OR formname = ''ve_epa_junction'') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ORDER BY orderby) a');
+			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''' OR formname = ''',v_epa_table,''') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ORDER BY orderby) a');
 		v_debug_vars := json_build_object('v_label', v_label, 'p_tabname', p_tabname, 'v_device', v_device, 'p_formname', p_formname, 'p_formtype', p_formtype, 'v_clause', v_clause);
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+		RAISE NOTICE 'v_querystring111,%',v_querystring;
 		EXECUTE v_querystring INTO fields_array;
 
 	ELSE
