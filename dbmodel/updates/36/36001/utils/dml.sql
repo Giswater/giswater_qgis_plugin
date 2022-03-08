@@ -27,8 +27,8 @@ INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_element_3', 'l
 
 
 --ELEMENT ARC
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_element_x_arc', 'SELECT id as sys_id, * FROM v_ui_element_x_arc WHERE id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_element_x_arc', 'SELECT id as sys_id, * FROM v_ui_element_x_arc WHERE id IS NOT NULL', 4, 'tab', 'list');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('arc', 'form_feature', 'element', 'tbl_elements', 'lyt_element_2', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_element", "module": "info", "parameters":{"columnfind":"element_id"}}', 'tbl_element_x_arc');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
@@ -46,8 +46,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layout
 VALUES ('arc', 'form_feature', 'element', 'open_element', 'lyt_element_1', 11, 'button', 'Open element', false, false, true, false,  '{"icon":"134b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "open_selected_element", "module": "info", "parameters":{"columnfind":"element_id", "targetwidget":"element_tbl_elements", "sourceview":"element"}}', false, 'tbl_element_x_arc');
 
 --ELEMENT NODE
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_element_x_node', 'SELECT id as sys_id, * FROM v_ui_element_x_node WHERE id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_element_x_node', 'SELECT id as sys_id, * FROM v_ui_element_x_node WHERE id IS NOT NULL', 4, 'tab', 'list');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('node', 'form_feature', 'element', 'tbl_elements', 'lyt_element_2', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_element", "module": "info", "parameters":{"columnfind":"element_id"}}', 'tbl_element_x_node');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
@@ -68,8 +68,8 @@ VALUES ('node', 'form_feature', 'element', 'open_element', 'lyt_element_1', 11, 
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_relation_1', 'lyt_relation_1','lytRelations1');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_relation_2', 'lyt_relation_2','lytRelations2');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_relation_3', 'lyt_relation_3','lytRelations3');
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations WHERE rid IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations WHERE rid IS NOT NULL', 4, 'tab', 'list');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
 VALUES ('arc', 'form_feature', 'relation', 'tbl_relations', 'lyt_relation_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}','{"functionName": "open_selected_feature", "module": "info", "parameters":{"columnfind":"feature_id", "tablefind":"sys_table_id"}}', false, 'tbl_relations');
 
@@ -100,8 +100,8 @@ INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_event_1', 'lyt
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_event_2', 'lyt_event_2','lytEvents2');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_event_3', 'lyt_event_3','lytEvents3');
 
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_visit_x_arc', 'SELECT * FROM v_ui_event_x_arc WHERE event_id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_visit_x_arc', 'SELECT * FROM v_ui_event_x_arc WHERE event_id IS NOT NULL', 4, 'tab', 'list');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('arc', 'form_feature', 'event', 'date_event_from', 'lyt_event_1', 1, 'date', 'datetime',  'From:', false, false, true, false, true, '{"labelPosition": "top"}', '{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}', 'tbl_visit_x_arc');
@@ -129,8 +129,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES ('arc', 'form_feature', 'event', 'tbl_event_cf', 'lyt_event_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_visit_event", "module": "info", "parameters":{"columnfind":["visit_id", "event_id"]}}', 'tbl_visit_x_arc');
 
 -- TAB EVENT NODE
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_visit_x_node', 'SELECT * FROM v_ui_event_x_node WHERE event_id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_visit_x_node', 'SELECT * FROM v_ui_event_x_node WHERE event_id IS NOT NULL', 4, 'tab', 'list');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('node', 'form_feature', 'event', 'date_event_from', 'lyt_event_1', 1, 'date', 'datetime',  'From:', false, false, true, false, true, '{"labelPosition": "top"}', '{"functionName": "filter_table", "parameters":{"columnfind": "visit_start"}}', 'tbl_visit_x_node');
@@ -162,8 +162,8 @@ VALUES ('node', 'form_feature', 'event', 'tbl_event_cf', 'lyt_event_3', 1, 'tabl
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_document_1', 'lyt_document_1','lytDocuments1');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_document_2', 'lyt_document_2','lytDocuments2');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_document_3', 'lyt_document_3','lytDocuments3');
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_doc_x_arc', 'SELECT id as sys_id, * FROM v_ui_doc_x_arc WHERE id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_doc_x_arc', 'SELECT id as sys_id, * FROM v_ui_doc_x_arc WHERE id IS NOT NULL', 4, 'tab', 'list');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('arc', 'form_feature', 'document', 'tbl_documents', 'lyt_document_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_path", "parameters":{"targetwidget": "document_tbl_documents", "columnfind":"path"}}', 'tbl_doc_x_arc');
 
@@ -188,8 +188,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES ('arc', 'form_feature', 'document', 'doc_type', 'lyt_document_1', 3, 'string', 'combo',  'Doc type:', false, false, true, false, true, '{"labelPosition": "top"}', 'SELECT id as id, id as idval FROM doc_type WHERE id IS NOT NULL ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_doc_x_arc');
 
 -- TAB DOCUMENTS NODE
-INSERT INTO config_form_list(listname, query_text, device)
-VALUES ('tbl_doc_x_node', 'SELECT id as sys_id, * FROM v_ui_doc_x_node WHERE id IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+VALUES ('tbl_doc_x_node', 'SELECT id as sys_id, * FROM v_ui_doc_x_node WHERE id IS NOT NULL', 4, 'tab', 'list');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
 VALUES ('node', 'form_feature', 'document', 'tbl_documents', 'lyt_document_3', 1, 'tableview', false, false, false, false, false, '{"saveValue": false}', '{"functionName": "open_selected_path", "parameters":{"targetwidget": "document_tbl_documents", "columnfind":"path"}}', 'tbl_doc_x_node');
 

@@ -132,7 +132,7 @@ v_the_geom text;
 v_canvasextend json;
 v_canvascheck boolean;
 v_srid integer;
-v_i integer = 1;
+v_i integer;
 v_buttonname text;
 v_featuretype text;
 v_pageinfo json;
@@ -454,6 +454,10 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- adding the widget of list
 	v_i = cardinality(v_filter_fields) ;
 
+	IF v_i IS NULL THEN
+		v_i = 1;
+	END IF;
+	
 	EXECUTE 'SELECT listclass FROM config_form_list WHERE listname = $1 LIMIT 1'
 		INTO v_listclass
 		USING v_tablename;
