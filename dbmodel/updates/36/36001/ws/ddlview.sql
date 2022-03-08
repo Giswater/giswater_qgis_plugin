@@ -957,6 +957,7 @@ FROM inp_pipe JOIN v_rpt_arc USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_pump AS 
 SELECT inp_pump.*, 
+concat(node_id,'_n2a') as nodarc_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -973,6 +974,7 @@ FROM inp_pump JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_valve AS 
 SELECT inp_valve.*, 
+concat(node_id,'_n2a') as nodarc_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -989,6 +991,7 @@ FROM inp_valve JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
 SELECT inp_shortpipe.*, 
+concat(node_id,'_n2a') as nodarc_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -1021,6 +1024,7 @@ FROM inp_virtualvalve JOIN v_rpt_arc USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_pump_additional AS
 SELECT inp_pump_additional.*, 
+concat(node_id,'_n2a') as nodarc_id,
 max_flow, 
 min_flow, 
 max_vel, 
