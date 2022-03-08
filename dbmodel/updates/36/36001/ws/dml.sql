@@ -294,7 +294,7 @@ VALUES ('inp_typevalue', 'inp_value_mixing', 'inp_dscenario_inlet', 'mixing_mode
 
 -- JUNCTION
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_junction', 'SELECT dscenario_id, demand, pattern_id FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
+    VALUES ('tbl_inp_junction', 'SELECT dscenario_id, demand, pattern_id, emitter_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL', 4); 
 
 INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', NULL, false, '');
@@ -330,7 +330,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- PUMP
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_pump', 'SELECT dscenario_id, power, curve_id, speed, pattern, status, pump_type, energy_price, price_pattern FROM ve_inp_dscenario_pump WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_pump', 'SELECT dscenario_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id FROM v_edit_inp_dscenario_pump WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'power', 'lyt_epa_data_1', 1, 'string', 'text', 'Power:', 'Power', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -378,7 +378,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- PIPE
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_pipe', 'SELECT dscenario_id, minorloss, status, buk_coeff, wall_coeff FROM ve_inp_dscenario_pipe WHERE arc_id IS NOT NULL', 4); -- 
+    VALUES ('tbl_inp_pipe', 'SELECT dscenario_id, minorloss, status, roughness, dint, bulk_coeff, wall_coeff FROM v_edit_inp_dscenario_pipe WHERE arc_id IS NOT NULL', 4); -- 
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pipe', 'form_feature', 'epa', 'minorloss', 'lyt_epa_data_1', 1, 'string', 'text', 'Minorloss:', 'Minorloss', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -430,7 +430,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- SHORTPIPE
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_shortpipe', 'SELECT dscenario_id, minorloss, to_arc, status, buk_coeff, wall_coeff FROM ve_inp_dscenario_shortpipe WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_shortpipe', 'SELECT dscenario_id, minorloss, status, bulk_coeff, wall_coeff FROM v_edit_inp_dscenario_shortpipe WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'nodarc_id', 'lyt_epa_data_1', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -478,7 +478,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- TANK
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_tank', 'SELECT dscenario_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, mixing_model, bulk_coeff, wall_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_tank WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_tank', 'SELECT dscenario_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_dscenario_tank WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_tank', 'form_feature', 'epa', 'initlevel', 'lyt_epa_data_1', 1, 'string', 'text', 'Init level:', 'Initial level', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -532,7 +532,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- RESERVOIR
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_reservoir', 'SELECT dscenario_id, head, pattern, initial_quality, source_type, source_quality_source_pattern FROM ve_inp_dscenario_reservoir WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_reservoir', 'SELECT dscenario_id, pattern_id, head, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_dscenario_reservoir WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_reservoir', 'form_feature', 'epa', 'pattern_id', 'lyt_epa_data_1', 1, 'string', 'text', 'Pattern:', 'Pattern', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -572,7 +572,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- VALVE
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_valve', 'SELECT dscenario_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, to_arc, status, custom_dint, add_settings, quality FROM ve_inp_dscenario_valve WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_valve', 'SELECT dscenario_id, nodarc_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality FROM v_edit_inp_dscenario_valve WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_valve', 'form_feature', 'epa', 'nodarc_id', 'lyt_epa_data_1', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -632,7 +632,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- VIRTUALVALVE
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_virtualvalve', 'SELECT dscenario_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, to_arc, status, custom_dint, add_settings, quality, status FROM ve_inp_dscenario_virtualvalve WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_virtualvalve', 'SELECT dscenario_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality FROM v_edit_inp_dscenario_virtualvalve WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualvalve', 'form_feature', 'epa', 'nodarc_id', 'lyt_epa_data_1', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false, false, false, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
@@ -691,7 +691,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- INLET
 INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_inlet', 'SELECT dscenario_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, pattern_id, head, mixing_model, bulk_coeff, wall_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_inlet WHERE node_id IS NOT NULL', 4);
+    VALUES ('tbl_inp_inlet', 'SELECT dscenario_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, head, pattern_id, mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_dscenario_inlet WHERE node_id IS NOT NULL', 4);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_inlet', 'form_feature', 'epa', 'initlevel', 'lyt_epa_data_1', 1, 'string', 'text', 'Init level:', 'Initial level', false, false, true, false, NULL,'{"saveValue": false, "filterSign":"ILIKE"}', NULL, false);
