@@ -460,7 +460,7 @@ BEGIN
 
 			-- refactor of linksoffsets
 			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
-			IF v_linkoffsets != 'ELEVATION' THEN
+			IF v_linkoffsets != 'ELEVATION' OR v_linkoffsets IS NULL THEN
 				UPDATE arc SET elev1 = b.a1,  elev2 = b.a2 FROM 
 				(SELECT a.arc_id, n1.sys_elev + elev1 AS a1, n2.sys_elev + elev2 AS a2 FROM arc a 
 				JOIN v_edit_node n1 ON n1.node_id = node_1 
