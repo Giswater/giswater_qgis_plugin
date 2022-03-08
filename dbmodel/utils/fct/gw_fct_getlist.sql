@@ -132,7 +132,7 @@ v_the_geom text;
 v_canvasextend json;
 v_canvascheck boolean;
 v_srid integer;
-v_i integer;
+v_i integer = 1;
 v_buttonname text;
 v_featuretype text;
 v_pageinfo json;

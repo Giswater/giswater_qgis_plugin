@@ -15,10 +15,10 @@ INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_1',
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_2', 'lyt_connection_2','lytConnection2');
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_connection_3', 'lyt_connection_3','lytConnection3');
 
-INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_connection_upstream', 'SELECT * FROM v_ui_node_x_connection_upstream WHERE rid IS NOT NULL', 4);
-INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_connection_downstream', 'SELECT * FROM v_ui_node_x_connection_downstream WHERE rid IS NOT NULL', 4);
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+    VALUES ('tbl_connection_upstream', 'SELECT * FROM v_ui_node_x_connection_upstream WHERE rid IS NOT NULL', 4, 'tab', 'list');
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+    VALUES ('tbl_connection_downstream', 'SELECT * FROM v_ui_node_x_connection_downstream WHERE rid IS NOT NULL', 4, 'tab', 'list');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject)
     VALUES ('node', 'form_feature', 'connection', 'tbl_upstream', 'lyt_connection_2', 1, 'tableview', 'Upstream features:', false, false, false, false, false, '{"saveValue": false, "labelPosition": "top"}', '{"functionName": "open_selected_feature", "module": "info", "parameters":{"columnfind":"feature_id", "tablefind":"sys_table_id"}}', 'tbl_connection_upstream');
@@ -36,8 +36,8 @@ INSERT INTO config_form_tabs VALUES ('v_edit_gully','tab_epa','EPA results',NULL
 {"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]',4, 1) ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 --junction
-INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_junction', 'SELECT dscenario_id, y0, ysur, apond, outfallparam, elev, ymax FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+    VALUES ('tbl_inp_junction', 'SELECT dscenario_id, y0, ysur, apond, outfallparam, elev, ymax FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL', 4, 'tab', 'list');
 
 /*INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', NULL, false, '');
@@ -83,8 +83,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 --outfall
 
-INSERT INTO config_form_list(listname, query_text, device)
-    VALUES ('tbl_inp_outfall', 'SELECT dscenario_id, elev, ymax, outfall_type, stage, curve_id, timser_id, gate FROM v_edit_inp_dscenario_outfall WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
+    VALUES ('tbl_inp_outfall', 'SELECT dscenario_id, elev, ymax, outfall_type, stage, curve_id, timser_id, gate FROM v_edit_inp_dscenario_outfall WHERE node_id IS NOT NULL', 4, 'tab', 'list'); 
 
 /*INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_outfall', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', NULL, false, '');
@@ -114,9 +114,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     VALUES ('ve_epa_outfall', 'form_feature', 'epa', 'tbl_inp_outfall', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_outfall');
 
 --storage
-INSERT INTO config_form_list(listname, query_text, device)
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
     VALUES ('tbl_inp_storage', 'SELECT dscenario_id, elev, ymax, storage_type, curve_id, a1, 
-       a2, a0, fevap, sh, hc, imd, y0, ysur, apond FROM v_edit_inp_dscenario_storage WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
+       a2, a0, fevap, sh, hc, imd, y0, ysur, apond FROM v_edit_inp_dscenario_storage WHERE node_id IS NOT NULL', 4, 'tab', 'list'); 
 
 /*INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_storage', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', NULL, false, '');
@@ -170,10 +170,10 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 
 --conduit
-INSERT INTO config_form_list(listname, query_text, device)
+INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
     VALUES ('tbl_inp_conduit', 'SELECT dscenario_id, elev, ymax, conduit_type, curve_id, a1, 
-       a2, a0, fevap, sh, hc, imd, y0, ysur, apond FROM v_edit_inp_dscenario_conduit WHERE node_id IS NOT NULL', 4); -- SELECT dscenario_id, demand, pattern_id, emitter_coeff, initial_quality, source_type, source_quality, source_pattern FROM ve_inp_dscenario_junction WHERE node_id IS NOT NULL
-
+       a2, a0, fevap, sh, hc, imd, y0, ysur, apond FROM v_edit_inp_dscenario_conduit WHERE node_id IS NOT NULL', 4, 'tab', 'list');
+    
 /*INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"icon":"111b", "size":"24x24"}', '{"saveValue":false, "filterSign":"="}', NULL, false, '');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
