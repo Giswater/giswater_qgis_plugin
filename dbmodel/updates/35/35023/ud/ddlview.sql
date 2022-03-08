@@ -23,7 +23,7 @@ SELECT
    s1.hydrology_id,
    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LINESTRING,SRID_VALUE) AS the_geom
    FROM v_edit_inp_subcatchment s1
-   JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id = s2.subc_id
+   JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id = s2.subc_id;
 
 --2022/03/07
 CREATE OR REPLACE VIEW vi_vertices AS
