@@ -486,12 +486,29 @@ BEGIN
 			UPDATE inp_valve_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
 			UPDATE inp_pump_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
 
+			--set options configuration
+			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_options%';
+
+			UPDATE config_param_user set value=csv2 FROM temp_csv
+			WHERE source ='[OPTIONS]' AND replace(parameter,'inp_options_','')=lower(csv1);
+
+			--set raport configuration
+			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_report%';
+
+			UPDATE config_param_user set value=csv2 FROM temp_csv
+			WHERE source ='[REPORT]' AND replace(parameter,'inp_report_','')=lower(csv1);
+
+			--set raport configuration
+			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_times';
+
+			UPDATE config_param_user set value=csv2 FROM temp_csv
+			WHERE source ='[TIMES]' AND replace(parameter,'inp_times_','')=lower(csv1);
 
 			-- disable temporary the constraint in order to use ON CONFLICT on insert
 			ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 			RAISE NOTICE 'step 4/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are not updated. Default values of Giswater are keeped');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Values of options /times / report have been set.');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If controls exists, it would have been related to the whole sector');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: If rules exits, it would have been related to the whole sector');
