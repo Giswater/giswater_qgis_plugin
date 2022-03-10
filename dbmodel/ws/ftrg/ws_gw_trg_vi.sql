@@ -77,7 +77,7 @@ BEGIN
 	      END IF;         
 	    
 	  ELSIF v_view='vi_tags' THEN 
-		INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
+		INSERT INTO inp_tags(feature_type, feature_id, tag) VALUES (NEW.feature_type, NEW.feature_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
 		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
