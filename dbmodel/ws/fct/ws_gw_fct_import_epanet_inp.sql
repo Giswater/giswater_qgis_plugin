@@ -260,19 +260,6 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,'INFO: Creating map zones and catalogs -> Done');
 
 			-- MAPZONES
-			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(0,'undefined') ON CONFLICT (macroexpl_id) DO NOTHING;
-			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(0,'undefined',0) ON CONFLICT (expl_id) DO NOTHING;
-			
-			INSERT INTO sector(sector_id,name) VALUES(0,'undefined') ON CONFLICT (sector_id) DO NOTHING;
-			INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dma_id) DO NOTHING;
-			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
-			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (presszone_id) DO NOTHING;
-
-			INSERT INTO sector(sector_id,name) VALUES(-1,'Conflict') ON CONFLICT (sector_id) DO NOTHING;
-			INSERT INTO dma(dma_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (dma_id) DO NOTHING;
-			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (dqa_id) DO NOTHING;
-			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(-1,'Conflict',0) ON CONFLICT (presszone_id) DO NOTHING;
-
 			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
 			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1) ON CONFLICT (expl_id) DO NOTHING;
 			INSERT INTO sector(sector_id,name) VALUES(1,'sector1') ON CONFLICT (sector_id) DO NOTHING;
@@ -736,17 +723,6 @@ BEGIN
 			UPDATE arc SET code = arc_id;
 			UPDATE node SET code = node_id;
 
-			-- check for integer or varchar id's
-			v_count_total := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a);
-			v_count := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a WHERE fid ~ '^\d+$');
-
-			IF v_count =v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
-			ELSIF v_count < v_count_total THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
-				v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
-			END IF;
-
 			-- delete from arc
 			DELETE FROM arc WHERE state = 0;
 
@@ -795,11 +771,25 @@ BEGIN
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
-		
+	
+	--set urn id
+	PERFORM gw_fct_import_inp_urn();
+
+	-- check for integer or varchar id's
+	v_count_total := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a);
+	v_count := (SELECT count(*) FROM (SELECT arc_id fid FROM arc UNION SELECT node_id FROM node)a WHERE fid ~ '^\d+$');
+
+	IF v_count =v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All arc & node id''s are integer');
+	ELSIF v_count < v_count_total THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, concat('WARNING-239: There is/are ',
+		v_count_total - v_count,' element(s) with id''s not integer(s). It creates a limitation to use some functionalities of Giswater'));
+	END IF;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND (fid=239 OR fid=439) order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
