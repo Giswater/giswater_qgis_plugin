@@ -642,17 +642,20 @@ BEGIN
 
 	-- check project (to initialize config_param_user among others)
 	PERFORM gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"filterFields":{}, "fid":101}}$$);
-
+		
 	-- insert spacers on log
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
 
+	--set urn id
+	PERFORM gw_fct_import_inp_urn();
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=239  order by criticity DESC, id) row;
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND (fid=239 OR fid=439) order by criticity DESC, id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
