@@ -60,6 +60,7 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_value text;
+v_reports json;
 v_reports_basic json;
 v_reports_edit json;
 v_reports_epa json;
@@ -242,6 +243,12 @@ BEGIN
 		EXECUTE v_querystring INTO v_reports_admin;
 	END IF;
 
+	SELECT json_strip_nulls(json_build_object('basic', v_reports_basic, 
+	'edit', v_reports_edit,
+	'epa', v_reports_epa,
+	'master', v_reports_master,
+	'admin', v_reports_admin)) INTO v_reports;
+
 	-- refactor dvquerytext			
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
 	FROM sys_function JOIN config_toolbox USING (id) 
@@ -354,11 +361,7 @@ BEGIN
 	v_epa_fields := COALESCE(v_epa_fields, '[]');
 	v_master_fields := COALESCE(v_master_fields, '[]');
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
-	v_reports_basic := COALESCE(v_reports_basic, '[]');
-	v_reports_edit := COALESCE(v_reports_edit, '[]');
-	v_reports_epa := COALESCE(v_reports_epa, '[]');
-	v_reports_master := COALESCE(v_reports_master, '[]');
-	v_reports_admin := COALESCE(v_reports_admin, '[]');
+	v_reports := COALESCE(v_reports, '[]');
 
 	-- make return
 	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
@@ -368,7 +371,7 @@ BEGIN
 						 ' , "epa":' || v_epa_fields ||
 						 ' , "master":' || v_master_fields ||
 						 ' , "admin":' || v_admin_fields ||'}}'||
-				', "reports":{"fields":{"basic":'||v_reports_basic||',"edit":'||v_reports_edit||',"epa":'||v_reports_epa||',"master":'||v_reports_master||',"admin":'||v_reports_admin||'}}}}}';
+				', "reports":{"fields":'||v_reports||'}}}}';
 
 	
 	RETURN v_return;
