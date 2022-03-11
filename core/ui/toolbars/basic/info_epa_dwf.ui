@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>info_epa_dwf</class>
+ <widget class="QDialog" name="info_epa_dwf">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -143,8 +143,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>388</height>
+        <width>98</width>
+        <height>91</height>
        </rect>
       </property>
       <attribute name="label">
@@ -179,7 +179,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_dwf</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -195,7 +195,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_dwf</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>info_epa_demand</class>
+ <widget class="QDialog" name="info_epa_demand">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,35 +19,13 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>947</width>
-        <height>388</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Base</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="lyt_base">
-         <item row="0" column="0">
-          <widget class="QTableView" name="tbl_demand"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="page_2">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>947</width>
-        <height>388</height>
+        <height>415</height>
        </rect>
       </property>
       <attribute name="label">
@@ -82,7 +60,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_demand</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -98,7 +76,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_demand</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

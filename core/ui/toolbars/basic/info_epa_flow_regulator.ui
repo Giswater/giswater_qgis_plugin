@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>info_epa_flow_regulator</class>
+ <widget class="QDialog" name="info_epa_flow_regulator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -91,8 +91,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>637</height>
+        <width>111</width>
+        <height>454</height>
        </rect>
       </property>
       <attribute name="label">
@@ -172,7 +172,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_flow_regulator</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -188,7 +188,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>info_epa_flow_regulator</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
