@@ -3,3 +3,4 @@
 - Rename and update vi_subcatch2outlet view for ud
 - New function gw_fct_import_inp_urn
 - New field sys_role on config_report
+- New function trigger gw_trg_sysaddfields 

@@ -15,3 +15,6 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (439, 'Set integer id on import inp', 'utils', NULL, 'core', false, 'Function process');
 
 update sys_fprocess set fprocess_type='Function process' where fid in (438, 432);
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3138, 'gw_trg_sysaddfields', 'utils', 'function trigger', NULL, NULL, 'Trigger that controls setting addfileds as unactive', 'role_admin', NULL, 'core');
