@@ -34,8 +34,9 @@ from ..utils import tools_gw, tools_backend_calls
 from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
-    GwInterpolate
+from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
+    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaDwfUi, GwInfoEpaFlowRegulatorUi, GwInfoEpaInflowsUi, \
+    GwInfoEpaInflowsPollUi, GwInfoEpaPumpadditionalUi, GwInfoEpaTreatmentUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
@@ -1523,7 +1524,8 @@ class GwInfo(QObject):
             return label, widget
 
         try:
-            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
+            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+                      "info": self}
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         except Exception as e:
             msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
@@ -1816,6 +1818,8 @@ class GwInfo(QObject):
             return None
 
         p_table_id = complet_result['body']['feature']['tableName']
+        if self.tab_main.currentWidget().objectName() == 'tab_epa':
+            p_table_id = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
         id_name = complet_result['body']['feature']['idName']
         newfeature_id = complet_result['body']['feature']['id']
         parent_fields = complet_result['body']['data']['parentFields']
@@ -2810,6 +2814,77 @@ class GwInfo(QObject):
 
     # endregion
 # region Static functions used by the widgets in the custom form
+
+
+def get_list(table_name, id_name=None, filter=None):
+    """ Mount and execute the query for gw_fct_getlist """
+
+    feature = f'"tableName":"{table_name}"'
+    filter_fields = f'"limit": -1'
+    if id_name and filter:
+        filter_fields += f', "{id_name}": {{"filterSign":"=", "value":"{filter}"}}'
+    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
+
+def fill_tbl(complet_list, tbl):
+    if complet_list is False:
+        return False, False
+    for field in complet_list['body']['data']['fields']:
+        if 'hidden' in field and field['hidden']: continue
+        model = tbl.model()
+        if model is None:
+            model = QStandardItemModel()
+            tbl.setModel(model)
+        model.removeRows(0, model.rowCount())
+
+        if field['value']:
+            tbl = tools_gw.add_tableview_header(tbl, field)
+            tbl = tools_gw.fill_tableview_rows(tbl, field)
+        tools_qt.set_tableview_config(tbl)
+
+# region Tab epa
+
+
+def open_epa_dlg(**kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['info']
+    func_params = kwargs['func_params']
+    ui = func_params['ui']
+    ui_name = func_params['uiName']
+    tableviews = func_params['tableviews']
+
+    feature_id = complet_result['body']['feature']['id']
+    id_name = complet_result['body']['feature']['idName']
+
+    # Build dlg
+    info.dlg = globals()[ui]()
+    tools_gw.load_settings(info.dlg)
+
+    # Fill tableviews
+    for tableview in tableviews:
+        tbl = tableview['tbl']
+        tbl = info.dlg.findChild(QTableView, tbl)
+        if not tbl:
+            continue
+        view = tableview['view']
+
+        complet_list = get_list(view, id_name, feature_id)
+        fill_tbl(complet_list, tbl)
+
+    info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
+    # Open dlg
+    tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+# endregion
 
 # region Tab element
 

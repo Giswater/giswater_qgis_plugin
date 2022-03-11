@@ -41,6 +41,34 @@ FORM_CLASS = _get_ui_class('info_feature.ui', 'basic')
 class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
     pass
 
+FORM_CLASS = _get_ui_class('info_epa_demand.ui', 'basic')
+class GwInfoEpaDemandUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_dwf.ui', 'basic')
+class GwInfoEpaDwfUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_flow_regulator.ui', 'basic')
+class GwInfoEpaFlowRegulatorUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_inflows.ui', 'basic')
+class GwInfoEpaInflowsUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_inflows_poll.ui', 'basic')
+class GwInfoEpaInflowsPollUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_pumpadditional.ui', 'basic')
+class GwInfoEpaPumpadditionalUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('info_epa_treatment.ui', 'basic')
+class GwInfoEpaTreatmentUi(GwDialog, FORM_CLASS):
+    pass
+
 FORM_CLASS = _get_ui_class('search.ui', 'basic')
 class GwSearchUi(GwDocker, FORM_CLASS):
     pass
