@@ -21,7 +21,7 @@ from ...threads.epa_file_manager import GwEpaFileManager
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....lib import tools_qgis, tools_qt, tools_db, tools_os
 from ..dialog import GwAction
 
 
@@ -404,6 +404,13 @@ class GwGo2EpaButton(GwAction):
             if row is None:
                 msg = "You need to select some sector"
                 tools_qt.show_info_box(msg)
+                return
+
+        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
+        if tools_os.set_boolean(replace, default=False) and self.import_result:
+            msg = "You have activated the option to force the import even if there are velocities >50. They will be " \
+                  "set to 50.\nDo you want to continue?"
+            if not tools_qt.show_question(msg):
                 return
 
         self.dlg_go2epa.btn_accept.setEnabled(False)

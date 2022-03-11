@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt, tools_db, tools_qgis
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis, tools_os
 from .task import GwTask
 
 
@@ -420,6 +420,26 @@ class GwEpaFileManager(GwTask):
 
 
     def _read_rpt_file(self, file_path=None):
+
+        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
+        if tools_os.set_boolean(replace, default=False):
+            # Replace the velocities
+            try:
+                # Read the contents of the file
+                with open(file_path, "r+") as file:
+                    contents = file.read()
+                # Save a backup of the file
+                with open(f"{file_path}.old", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+                # Replace the words
+                contents = tools_os.ireplace('>50', '50', contents)
+                # Write the file with new contents
+                with open(file_path, "r+") as file:
+                    file.write(contents)
+                with open(f"{file_path}", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+            except Exception as e:
+                tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
 
         self.file_rpt = open(file_path, "r+")
         full_file = self.file_rpt.readlines()
