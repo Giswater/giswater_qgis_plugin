@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/03/11
-ALTER TABLE config_report vADD CONSTRAINT config_report_sys_role_id_fkey FOREIGN KEY (sys_role)
+ALTER TABLE config_report ADD CONSTRAINT config_report_sys_role_id_fkey FOREIGN KEY (sys_role)
 REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
