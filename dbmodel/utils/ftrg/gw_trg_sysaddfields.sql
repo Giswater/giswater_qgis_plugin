@@ -18,13 +18,13 @@ BEGIN
         EXECUTE 'SELECT gw_fct_admin_manage_addfields($${
         "client":{"lang":"ES"}, 
         "feature":{"catFeature":"HYDRANT"},
-        "data":{"action":"DEACTIVATE", "multiCreate":"true", "parameters":{"columnname":"'||NEW.param_name||'"}}}$$)';
+        "data":{"action":"DEACTIVATE", "multiCreate":"true", "parameters":{"columnname":"'||NEW.param_name||'", "istrg":"true"}}}$$)';
 
         ELSE
         EXECUTE 'SELECT gw_fct_admin_manage_addfields($${
         "client":{"lang":"ES"}, 
         "feature":{"catFeature":"'||NEW.cat_feature_id||'"},
-        "data":{"action":"DEACTIVATE", "multiCreate":"false", "parameters":{"columnname":"'||NEW.param_name||'"}}}$$)';
+        "data":{"action":"DEACTIVATE", "multiCreate":"false", "parameters":{"columnname":"'||NEW.param_name||'", "istrg":"true"}}}$$)';
         END IF;
     END IF;
     RETURN NEW;
