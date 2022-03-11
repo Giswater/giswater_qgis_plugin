@@ -143,8 +143,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>91</height>
+        <width>947</width>
+        <height>388</height>
        </rect>
       </property>
       <attribute name="label">
@@ -154,7 +154,7 @@
        <item row="0" column="0">
         <layout class="QGridLayout" name="lyt_dscenario">
          <item row="0" column="0">
-          <widget class="QTableView" name="tbl_dscenario_dwf"/>
+          <widget class="QTableView" name="tbl_dscenario_inflows"/>
          </item>
         </layout>
        </item>

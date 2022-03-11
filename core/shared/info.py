@@ -2861,6 +2861,8 @@ def open_epa_dlg(**kwargs):
     ui = func_params['ui']
     ui_name = func_params['uiName']
     tableviews = func_params['tableviews']
+    widgets = func_params.get('widgets')
+    widgets_tablename = func_params.get('widgetsTablename')
 
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
@@ -2869,6 +2871,17 @@ def open_epa_dlg(**kwargs):
     info.dlg = globals()[ui]()
     tools_gw.load_settings(info.dlg)
 
+    # Fill widgets
+    if widgets and widgets_tablename:
+        fields = str(widgets).replace('[', '').replace(']', '').replace('\'', '')
+        sql = f"SELECT {fields} FROM {widgets_tablename} WHERE {id_name} = '{feature_id}'"
+        row = tools_db.get_row(sql)
+        if row:
+            for i, widget in enumerate(widgets):
+                w = info.dlg.findChild(QLineEdit, widget)
+                if not w:
+                    continue
+                tools_qt.set_widget_text(info.dlg, w, row[i])
     # Fill tableviews
     for tableview in tableviews:
         tbl = tableview['tbl']
