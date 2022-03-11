@@ -44,6 +44,11 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "feature":{"catFeature":"PUMP"},
 "data":{"action":"DELETE", "multiCreate":"true", "parameters":{"columnname":"pump_test"}}}$$)
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
+"client":{"lang":"ES"}, 
+"feature":{"catFeature":"PUMP"},
+"data":{"action":"DEACTIVATE", "multiCreate":"true", "parameters":{"columnname":"pump_test"}}}$$)
+
 -- fid: 218
 
 */
@@ -395,7 +400,7 @@ BEGIN
 			END IF;
 			
 			--get new values of addfields
-			IF v_action='DELETE' THEN
+			IF v_action='DELETE' or v_action = 'DEACTIVATE' THEN
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
@@ -506,6 +511,7 @@ BEGIN
 				v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
 
 				--replace the existing view
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 				
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -541,6 +547,14 @@ BEGIN
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Update values of sys_addfields related to parameter.');
+			
+		ELSIF v_action='DEACTIVATE'THEN
+
+			UPDATE sys_addfields SET active=FALSE  
+			WHERE param_name=v_param_name and cat_feature_id IS NULL;
+
+			UPDATE config_form_fields SET hidden=TRUE WHERE columnname=v_param_name AND 
+			formname IN (SELECT child_layer FROM cat_feature);
 		END IF;
 
 	--SIMPLE ADDFIELDS
@@ -691,6 +705,14 @@ BEGIN
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
+
+		ELSIF v_action='DEACTIVATE' THEN
+			RAISE NOTICE 'DEACTIVATE2';
+			UPDATE sys_addfields SET active=FALSE
+			WHERE param_name=v_param_name and cat_feature_id=v_cat_feature;
+
+			UPDATE config_form_fields SET hidden=TRUE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
+			AND	formname = child_layer;
 
 		END IF;
 
