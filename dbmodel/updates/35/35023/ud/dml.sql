@@ -14,3 +14,6 @@ UPDATE sys_table SET sys_role='role_edit' WHERE id='inp_gully';
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT lidco_id AS id, lidco_id as idval FROM inp_lid WHERE lidco_id IS NOT NULL',
 widgetcontrols='{"setMultiline":false,"valueRelation":{"nullValue":true, "layer": "inp_lid", "activated": true, "keyColumn": "lidco_id", "valueColumn": "lidco_id", "filterExpression":""}}'::json
 WHERE columnname='lidco_id' AND formname='inp_lid_value';
+
+--2022/03/14
+update sys_table set addparam='{"pkey":"dwfscenario_id, node_id"}' where id='v_edit_inp_dwf';
