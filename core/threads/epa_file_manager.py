@@ -125,7 +125,7 @@ class GwEpaFileManager(GwTask):
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
                                 tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                    f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
+                                    f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
                                                    f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
 
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
