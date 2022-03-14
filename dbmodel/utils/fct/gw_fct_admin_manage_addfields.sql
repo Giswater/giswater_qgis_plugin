@@ -408,6 +408,13 @@ BEGIN
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_new_parameters
 				FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+			ELSIF v_action = 'ACTIVATE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);	
 			ELSE
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
@@ -557,6 +564,15 @@ BEGIN
 
 			UPDATE config_form_fields SET hidden=TRUE WHERE columnname=v_param_name AND 
 			formname IN (SELECT child_layer FROM cat_feature);
+		ELSIF v_action='ACTIVATE'THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN	
+				UPDATE sys_addfields SET active=TRUE  
+				WHERE param_name=v_param_name and cat_feature_id IS NULL;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=FALSE WHERE columnname=v_param_name AND 
+			formname IN (SELECT child_layer FROM cat_feature);
+		
 		END IF;
 
 	--SIMPLE ADDFIELDS
@@ -716,6 +732,14 @@ BEGIN
 
 			UPDATE config_form_fields SET hidden=TRUE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
 			AND	formname = child_layer;
+		ELSIF v_action='ACTIVATE' THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN 
+				UPDATE sys_addfields SET active=TRUE
+				WHERE param_name=v_param_name and cat_feature_id=v_cat_feature;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=FALSE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
+			AND	formname = child_layer;
 
 		END IF;
 
@@ -727,6 +751,13 @@ BEGIN
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_new_parameters
 				FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+			ELSIF v_action = 'ACTIVATE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);
 			ELSE
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
