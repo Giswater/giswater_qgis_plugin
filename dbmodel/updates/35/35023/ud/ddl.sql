@@ -28,3 +28,30 @@ r.envelope
 FROM v_edit_exploitation a, ext_raster_dem r
 JOIN ext_cat_raster c ON c.id::text = r.rastercat_id::text
 WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+
+
+CREATE TABLE IF NOT EXISTS rpt_arcpollutant_sum (
+  id serial,
+  result_id character varying(30),
+  poll_id character varying(16),
+  arc_id character varying(50),
+  value numeric(12,4),
+  CONSTRAINT rpt_arcpollutant_sum_pkey PRIMARY KEY (id),
+CONSTRAINT rpt_arcpollutant_sum_result_id_fkey FOREIGN KEY (result_id)
+      REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE );
+
+ALTER TABLE inp_dscenario_inflows DROP CONSTRAINT inp_dscenario_inflows_node_id_fkey;
+ALTER TABLE inp_dscenario_inflows
+  ADD CONSTRAINT inp_dscenario_inflows_node_id_fkey FOREIGN KEY (node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE inp_dscenario_inflows_poll DROP CONSTRAINT inp_dscenario_inflows_pol_node_id_fkey;
+ALTER TABLE inp_dscenario_inflows_poll
+  ADD CONSTRAINT inp_dscenario_inflows_node_id_fkey FOREIGN KEY (node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE temp_node_other ADD CONSTRAINT temp_node_other_unique UNIQUE (node_id, type);
+

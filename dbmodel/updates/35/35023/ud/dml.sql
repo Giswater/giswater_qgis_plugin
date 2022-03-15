@@ -22,3 +22,6 @@ update sys_table set context='{"level_1":"EPA","level_2":"RESULTS"}', orderby=15
 update sys_table set context='{"level_1":"EPA","level_2":"COMPARE"}', orderby=15, alias='LID Performance Compare' where id='v_rpt_comp_lidperfomance_sum';
 update sys_table set context='{"level_1":"EPA","level_2":"HYDROLOGY"}', orderby=3, alias='Subcatchment outlet' where id='vi_subcatch2outlet';
 
+INSERT INTO config_fprocess VALUES (140,'rpt_arcpollutant_sum','Link Pollutant Load Summary', null, 99);
+
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('rpt_arcpollutant_sum','Table to store arcpollutant values', 'role_epa','core');

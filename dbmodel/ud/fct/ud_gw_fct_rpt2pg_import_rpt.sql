@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2530
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(text, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(text, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_rpt(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"test1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"test_xavi"}}$$)
 
 --fid:140
 
@@ -47,7 +47,6 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-
 
 	-- get system parameters
 	SELECT giswater  INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -108,6 +107,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Max.' and csv2='Height';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='No' and csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
@@ -115,6 +115,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Hours' and csv2='Rate';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='No' and csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
@@ -144,6 +145,12 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
+	DELETE FROM temp_csv WHERE id >= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='Pollutant'and csv3='Load')
+				AND id <= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');	
+
+	DELETE FROM temp_csv WHERE id >= (SELECT id FROM temp_csv WHERE source ='rpt_arcpollutant_sum' and csv2='Pollutant'and csv3='Load')
+				AND id <= (SELECT id FROM temp_csv WHERE source ='rpt_arcpollutant_sum' and csv1='Link'and csv2='kg');
 
 	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Pumping' and csv2='Summary';
 	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Min' and csv2='Avg';
@@ -311,6 +318,44 @@ BEGIN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
 				END IF;
 			END LOOP;	
+			
+		ELSIF type_aux='rpt_arcpollutant_sum' then
+
+			i = 0;
+	
+			LOOP		
+				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
+				i = i+1;
+
+				EXIT WHEN v_poll IS NULL;
+
+				IF i = 1 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv2::numeric;
+				ELSIF i = 2 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
+				ELSIF i = 3 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
+				ELSIF i = 4 THEN	
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
+				ELSIF i = 5 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
+				ELSIF i = 6 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
+				ELSIF i = 7 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
+				ELSIF i = 8 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
+				ELSIF i = 9 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
+				ELSIF i = 10 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv11::numeric;
+				ELSIF i = 11 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv12::numeric;
+				ELSIF i = 12 THEN
+					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
+				END IF;
+			END LOOP;	
+
 
 		ELSIF type_aux='rpt_nodedepth_sum' then
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
@@ -328,7 +373,6 @@ BEGIN
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
 
 		ELSIF type_aux='rpt_nodeflooding_sum' then
-			raise notice 'ghashash';
 			INSERT INTO rpt_nodeflooding_sum(result_id, node_id, hour_flood, max_rate, time_days, time_hour, tot_flood, max_ponded)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4,rpt_rec.csv5,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric);
