@@ -195,7 +195,7 @@ BEGIN
 
 	IF v_action = 'DELETE' THEN
 		--check if someone uses a workspace at the moment, if not, remove it 
-		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault') = v_workspace_id::text THEN
+		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3186", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
 		ELSE
