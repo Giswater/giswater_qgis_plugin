@@ -18,3 +18,10 @@ update sys_fprocess set fprocess_type='Function process' where fid in (438, 432)
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3138, 'gw_trg_sysaddfields', 'utils', 'function trigger', NULL, NULL, 'Trigger that controls setting addfileds as unactive', 'role_admin', NULL, 'core');
+
+--2022/03/15
+update sys_table set context='{"level_1":"MASTERPLAN","level_2":"PSECTOR"}' where context='{"level_1":"PLAN","level_2":"PSECTOR"}';
+update sys_table set context='{"level_1":"MASTERPLAN","level_2":"PRICES"}' where context='{"level_1":"PLAN","level_2":"PRICES"}';
+
+update config_typevalue set id='{"level_1":"MASTERPLAN","level_2":"PRICES"}' where id='{"level_1":"PLAN","level_2":"PRICES"}';
+update config_typevalue set id='{"level_1":"MASTERPLAN","level_2":"PSECTOR"}' where id='{"level_1":"PLAN","level_2":"PSECTOR"}';
