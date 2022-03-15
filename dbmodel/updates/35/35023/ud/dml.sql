@@ -17,3 +17,7 @@ WHERE columnname='lidco_id' AND formname='inp_lid_value';
 
 --2022/03/14
 update sys_table set addparam='{"pkey":"dwfscenario_id, node_id"}' where id='v_edit_inp_dwf';
+
+update sys_table set context='{"level_1":"EPA","level_2":"RESULTS"}', orderby=15, alias='LID Performance' where id='v_rpt_lidperfomance_sum';
+update sys_table set context='{"level_1":"EPA","level_2":"COMPARE"}', orderby=15, alias='LID Performance Compare' where id='v_rpt_comp_lidperfomance_sum';
+
