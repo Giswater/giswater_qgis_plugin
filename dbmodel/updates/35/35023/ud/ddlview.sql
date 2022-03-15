@@ -42,3 +42,32 @@ CREATE OR REPLACE VIEW vi_vertices AS
           WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text) arc
   WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
   ORDER BY path;
+
+--2022/03/15
+
+CREATE OR REPLACE VIEW vi_inflows AS 
+ SELECT temp_node_other.node_id,
+    temp_node_other.type,
+    temp_node_other.timser_id,
+    'FLOW'::text AS format,
+    1::numeric(12,4) AS mfactor,
+    temp_node_other.sfactor,
+    temp_node_other.base,
+    temp_node_other.pattern_id
+   FROM temp_node_other
+  WHERE temp_node_other.type::text = 'FLOW'::text
+UNION
+ SELECT temp_node_other.node_id,
+    temp_node_other.poll_id AS type,
+    temp_node_other.timser_id,
+    temp_node_other.other AS format,
+    temp_node_other.mfactor,
+    temp_node_other.sfactor,
+    temp_node_other.base,
+    temp_node_other.pattern_id
+   FROM temp_node_other
+  WHERE temp_node_other.type::text = 'POLLUTANT'::text
+  order by node_id;
+
+
+  
