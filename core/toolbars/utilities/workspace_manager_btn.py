@@ -163,6 +163,7 @@ class GwWorkspaceManagerButton(GwAction):
             descript = 'null'
         else:
             descript = f'"{descript}"'
+            descript = descript.replace("\n", "\\n")
         if len(name) == 0:
             tools_qt.set_stylesheet(self.new_workspace_name)
             return
