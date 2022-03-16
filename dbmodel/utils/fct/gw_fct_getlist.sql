@@ -150,6 +150,7 @@ v_level integer;
 v_message text;
 v_value_type text;
 v_widgetname text;
+v_pkey json;
 BEGIN
 
 	-- Set search path to local schema
@@ -472,6 +473,9 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 
+	-- get primary key
+	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_pkey USING v_tablename;
+
 	-- Control NULL's
 	v_version := COALESCE(v_version, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
@@ -479,6 +483,7 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	v_idname := COALESCE(v_idname, '');
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
+	v_pkey := COALESCE(v_pkey, '{}');
 
 
 	IF v_audit_result is null THEN
@@ -496,7 +501,7 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||
              ',"body":{"form":{}'||
-		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
+		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","addparams":'|| v_pkey ||'}'||
 		     ',"data":{"fields":' || v_fields_json ||
 			     ',"pageInfo":' || v_pageinfo ||
 			     '}'||
