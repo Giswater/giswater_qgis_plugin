@@ -217,7 +217,8 @@ class GwGo2EpaManagerButton(GwAction):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = widget.model().record(row).value(str(column_id))
+            col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
+            id_ = widget.model().index(row, col).data()
             inf_text += f"{id_}, "
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
