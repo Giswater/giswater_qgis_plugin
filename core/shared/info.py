@@ -2834,9 +2834,10 @@ def get_list(table_name, id_name=None, filter=None):
     return complet_list
 
 
-def fill_tbl(complet_list, tbl):
+def fill_tbl(complet_list, tbl, info, view):
     if complet_list is False:
         return False, False
+    setattr(info, f"my_json_{view}", {})
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']: continue
         model = tbl.model()
@@ -2848,7 +2849,8 @@ def fill_tbl(complet_list, tbl):
         if field['value']:
             tbl = tools_gw.add_tableview_header(tbl, field)
             tbl = tools_gw.fill_tableview_rows(tbl, field)
-        tools_qt.set_tableview_config(tbl)
+        tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
+        model.dataChanged.connect(partial(tbl_data_changed, info, view, model))
 
 # region Tab epa
 
@@ -2891,11 +2893,41 @@ def open_epa_dlg(**kwargs):
         view = tableview['view']
 
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl)
+        fill_tbl(complet_list, tbl, info, view)
+        info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
 
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+
+def tbl_data_changed(info, view, model, index):
+
+    fieldname = model.headerData(index.column(), Qt.Horizontal)
+    field = index.data()
+
+
+    if str(field) == '' or field is None:
+        getattr(info, f"my_json_{view}")[fieldname] = None
+    else:
+        getattr(info, f"my_json_{view}")[fieldname] = str(field)
+
+
+def save_tbl_changes(complet_list, info):
+    addparams = complet_list['body']['feature'].get('addparams')
+    view = complet_list['body']['feature']['tableName']
+    my_json = getattr(info, f"my_json_{view}")
+    if not my_json:
+        return
+    my_json = json.dumps(my_json)
+
+    feature = f'"id":"{info.feature_id}", '
+    feature += f'"tableName":"{view}"'
+    extras = f'"fields":{my_json}'
+    body = tools_gw.create_body(feature=feature, extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+    print(f"{json_result}")
+
 
 # endregion
 
