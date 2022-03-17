@@ -25,3 +25,5 @@ update sys_table set context='{"level_1":"EPA","level_2":"HYDROLOGY"}', orderby=
 INSERT INTO config_fprocess VALUES (140,'rpt_arcpollutant_sum','Link Pollutant Load Summary', null, 99);
 
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('rpt_arcpollutant_sum','Table to store arcpollutant values', 'role_epa','core');
+
+update sys_param_user set isenabled=true, layoutname='lyt_other', layoutorder=24, formname='config' where id='edit_node_interpolate';
