@@ -26,21 +26,36 @@ class GwGo2EpaSelectorButton(GwAction):
     def clicked_event(self):
         """ Button 29: Epa result selector """
 
-        tools_qgis.set_cursor_wait()
-        try:
-            self._load_missing_layers()
-        except Exception:
-            pass
-        tools_qgis.restore_cursor()
         self._open_go2epa_selector()
 
 
     # region private functions
 
-    def _load_missing_layers(self):
+    def _load_result_layers(self):
         """ Adds any missing Compare layers to TOC """
 
-        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE 'v_rpt_comp_%' AND alias IS NOT NULL"
+        filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
+        if global_vars.project_type == 'ud':
+            filtre = "id LIKE 'v_rpt_%_sum'"
+        sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            for tablename, alias in rows:
+                lyr = tools_qgis.get_layer_by_tablename(tablename)
+                if not lyr:
+                    pk = "id"
+                    if global_vars.project_type == 'ws' and (tablename == 'v_rpt_node' or tablename == 'v_rpt_arc'):
+                        pk = f"{tablename.split('_')[-1]}_id"
+                    tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
+
+
+    def _load_compare_layers(self):
+        """ Adds any missing Compare layers to TOC """
+
+        filtre = 'v_rpt_comp_%'
+        if global_vars.project_type == 'ud':
+            filtre = 'v_rpt_comp_%_sum'
+        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             for tablename, alias in rows:
@@ -195,6 +210,12 @@ class GwGo2EpaSelectorButton(GwAction):
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
 
         if rpt_selector_result_id not in (None, -1, ''):
+            tools_qgis.set_cursor_wait()
+            try:
+                self._load_result_layers()
+            except Exception:
+                pass
+            tools_qgis.restore_cursor()
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
             tools_db.execute_sql(sql)
@@ -202,6 +223,12 @@ class GwGo2EpaSelectorButton(GwAction):
             tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{rpt_selector_result_id}')
 
         if rpt_selector_compare_id not in (None, -1, ''):
+            tools_qgis.set_cursor_wait()
+            try:
+                self._load_compare_layers()
+            except Exception:
+                pass
+            tools_qgis.restore_cursor()
             sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
             tools_db.execute_sql(sql)
