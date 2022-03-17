@@ -3158,6 +3158,13 @@ class GwAdminButton:
 
     def _update_utils(self, schema_name=None):
 
+        # Check if utils schema exists
+        sql = (f"SELECT schema_name FROM information_schema.schemata "
+               f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
+        row = tools_db.get_row(sql, commit=False)
+        if not row:
+            return
+
         if schema_name is None:
             self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
         else:
