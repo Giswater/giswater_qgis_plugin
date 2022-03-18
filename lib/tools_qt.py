@@ -14,6 +14,7 @@ import traceback
 import webbrowser
 from functools import partial
 from encodings.aliases import aliases
+from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
     QPersistentModelIndex, QCoreApplication, QTranslator
@@ -59,6 +60,8 @@ class GwHyperLinkLabel(QLabel):
 
 
 def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
+
+    warn('This method is deprecated, use fill_combo_values instead.', DeprecationWarning, stacklevel=2)
 
     if rows is None:
         return

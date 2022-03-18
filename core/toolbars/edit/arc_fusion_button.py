@@ -135,9 +135,9 @@ class GwArcFusionButton(GwMaptool):
                 tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
 
             # Fill ComboBox workcat_id_end
-            sql = "SELECT id FROM cat_work ORDER BY id"
+            sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
             rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, True)
+            tools_qt.fill_combo_values(self.dlg_fusion.workcat_id_end, rows)
 
             # Fill ComboBox cmb_statetype
             sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"

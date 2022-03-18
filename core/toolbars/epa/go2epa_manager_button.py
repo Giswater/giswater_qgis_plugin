@@ -179,7 +179,7 @@ class GwGo2EpaManagerButton(GwAction):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
+        tools_qt.fill_combo_values(self.dlg_manager.txt_result_id, rows)
 
 
     def _filter_by_result_id(self):

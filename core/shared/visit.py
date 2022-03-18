@@ -1180,7 +1180,7 @@ class GwVisit(QObject):
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_add_visit, "feature_type", rows, False)
+        tools_qt.fill_combo_values(self.dlg_add_visit.feature_type, rows)
 
         # Event tab
         # Fill ComboBox parameter_type_id
