@@ -382,8 +382,6 @@ class GwAdminButton:
             status = self.update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
-            # Check if schema utils exists and execute update
-            self._update_utils(schema_name)
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 
@@ -3157,13 +3155,6 @@ class GwAdminButton:
 
 
     def _update_utils(self, schema_name=None):
-
-        # Check if utils schema exists
-        sql = (f"SELECT schema_name FROM information_schema.schemata "
-               f"WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
-        row = tools_db.get_row(sql, commit=False)
-        if not row:
-            return
 
         if schema_name is None:
             self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
