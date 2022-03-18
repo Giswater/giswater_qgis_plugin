@@ -101,8 +101,9 @@ class GwAddChildLayerButton(GwAction):
                 style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
+                sub_sub_group = context.get('level_3')
                 action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                 group, sub_group, style_id, alias))
+                                                 group, sub_group, sub_sub_group, style_id, alias))
 
         main_menu.exec_(click_point)
 
@@ -126,10 +127,10 @@ class GwAddChildLayerButton(GwAction):
 
                     layer = tools_qgis.get_layer_by_tablename(layer_name)
                     if layer is None:
-                        tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'])
+                        tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'], sub_sub_group=sub_sub_group)
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
-                                sub_group=None, style_id=None, alias=None, is_checked=None):
+                                sub_group=None, sub_sub_group=None, style_id=None, alias=None, is_checked=None):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -142,7 +143,7 @@ class GwAddChildLayerButton(GwAction):
         if is_checked:
                 layer = tools_qgis.get_layer_by_tablename(tablename)
                 if layer is None:
-                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias)
+                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias, sub_sub_group=sub_sub_group)
         else:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
