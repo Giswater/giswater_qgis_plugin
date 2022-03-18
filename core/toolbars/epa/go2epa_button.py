@@ -406,13 +406,6 @@ class GwGo2EpaButton(GwAction):
                 tools_qt.show_info_box(msg)
                 return
 
-        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
-        if tools_os.set_boolean(replace, default=False) and self.import_result:
-            msg = "You have activated the option to force the import even if there are velocities >50. They will be " \
-                  "set to 50.\nDo you want to continue?"
-            if not tools_qt.show_question(msg):
-                return
-
         self.dlg_go2epa.btn_accept.setEnabled(False)
         self.dlg_go2epa.btn_cancel.setEnabled(True)
 

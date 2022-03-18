@@ -43,6 +43,7 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        self.replaced_velocities = False
 
 
     def set_variables_from_go2epa(self):
@@ -138,6 +139,13 @@ class GwEpaFileManager(GwTask):
             sql += f");"
             tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
             tools_gw.manage_json_response(self.complet_result, sql, None)
+
+            replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
+                                                 prefix=False)
+            if tools_os.set_boolean(replace, default=False) and self.replaced_velocities:
+                msg = "There were velocities >50 in the rpt file. You have activated the option to force the import " \
+                      "so they have been set to 50."
+                tools_qt.show_info_box(msg)
 
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
@@ -422,7 +430,7 @@ class GwEpaFileManager(GwTask):
     def _read_rpt_file(self, file_path=None):
 
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
-        if tools_os.set_boolean(replace, default=False):
+        if tools_os.set_boolean(replace, default=False) and global_vars.project_type == 'ud':
             # Replace the velocities
             try:
                 # Read the contents of the file
@@ -432,7 +440,10 @@ class GwEpaFileManager(GwTask):
                 with open(f"{file_path}.old", 'w', encoding='utf-8') as file:
                     file.write(contents)
                 # Replace the words
+                old_contents = contents
                 contents = tools_os.ireplace('>50', '50', contents)
+                if contents != old_contents:
+                    self.replaced_velocities = True
                 # Write the file with new contents
                 with open(file_path, "r+") as file:
                     file.write(contents)
