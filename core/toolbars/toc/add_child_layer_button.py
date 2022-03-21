@@ -97,7 +97,11 @@ class GwAddChildLayerButton(GwAction):
                     the_geom = None
                 else:
                     the_geom = field['geomField']
-                geom_field = field['tableId'].replace(" ", "")
+                geom_field = field['tableId']
+                # If layer is configured but it doesn't exist in schema, ignore it
+                if not geom_field:
+                    continue
+                geom_field = geom_field.replace(" ", "")
                 style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
@@ -120,7 +124,11 @@ class GwAddChildLayerButton(GwAction):
                         the_geom = None
                     else:
                         the_geom = field['geomField']
-                    geom_field = field['tableId'].replace(" ", "")
+                    geom_field = field['tableId']
+                    # If layer is configured but it doesn't exist in schema, ignore it
+                    if not geom_field:
+                        continue
+                    geom_field = geom_field.replace(" ", "")
                     style_id = field['style_id']
                     group = context['level_1']
                     sub_group = context['level_2']
