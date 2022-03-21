@@ -25,3 +25,9 @@ update config_typevalue set id='{"level_1":"MASTERPLAN","level_2":"PSECTOR"}' wh
 
 update sys_table set context='{"level_1":"MASTERPLAN","level_2":"PSECTOR"}' where context='{"level_1":"PLAN","level_2":"PSECTOR"}';
 update sys_table set context='{"level_1":"MASTERPLAN","level_2":"PRICES"}' where context='{"level_1":"PLAN","level_2":"PRICES"}';
+
+--2022/03/21
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
+  {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE VALUES & COPY FROM", "KEEP VALUES & COPY FROM", "DELETE SCENARIO"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
+  {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":""}
+  ]' WHERE id = 3042;
