@@ -71,6 +71,8 @@ BEGIN
 				 	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 				 	USING NEW.the_geom
 					INTO v_ws_expl_id;
+				ELSE 
+					v_ws_expl_id=NEW.expl_id;
 				END IF;
 
 				--get expl_id value of the oposite schema
@@ -87,6 +89,8 @@ BEGIN
 				 	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 				 	USING NEW.the_geom
 					INTO v_ud_expl_id;
+				ELSE 
+					v_ud_expl_id=NEW.expl_id;
 				END IF;
 
 				--get expl_id value of the oposite schema
