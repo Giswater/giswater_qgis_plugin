@@ -655,7 +655,7 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub
             first_group = root.insertGroup(0, group)
         if not first_group.findGroup(sub_group):
             second_group = first_group.insertGroup(0, sub_group)
-            if not second_group.findGroup(sub_sub_group):
+            if sub_sub_group and not second_group.findGroup(sub_sub_group):
                 second_group.insertGroup(0, sub_sub_group)
 
     if first_group and sub_group:
