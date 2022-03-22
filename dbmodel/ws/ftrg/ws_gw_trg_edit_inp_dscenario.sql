@@ -49,9 +49,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.minlevel IS NULL THEN NEW.minlevel = (SELECT minlevel FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.maxlevel IS NULL THEN NEW.maxlevel = (SELECT maxlevel FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.diameter IS NULL THEN NEW.diameter = (SELECT diameter FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.minvol IS NULL OR NEW.minvol='' THEN NEW.minvol = (SELECT minvol FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.minvol IS NULL THEN NEW.minvol = (SELECT minvol FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.overflow IS NULL THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.overflow IS NULL OR NEW.overflow='' THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow);
@@ -126,7 +126,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.diameter IS NULL THEN NEW.diameter = (SELECT diameter FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.minvol IS NULL THEN NEW.minvol = (SELECT minvol FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.overflow IS NULL THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.overflow IS NULL OR NEW.overflow='' THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 
