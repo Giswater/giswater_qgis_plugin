@@ -18,6 +18,8 @@ DECLARE
     visit_table text;
     v_visit_type integer;
     v_pluginlot boolean;
+    v_unit_id integer;
+    v_num_elem_visit text;
     
 BEGIN
 
@@ -75,6 +77,21 @@ BEGIN
                 EXECUTE 'SELECT $1.' || v_parameters.id
                     USING NEW
                     INTO v_new_value_param;
+                    --exception to manage parameter 'num_elem_visit' to set who many elements are visited with this unit_id
+                    IF v_parameters.id='num_elem_visit' THEN
+                        IF visit_table = 'arc' THEN
+                            SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_arc WHERE arc_id=NEW.arc_id AND lot_id=NEW.lot_id;
+                        ELSIF visit_table = 'node' THEN
+                            SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_node WHERE node_id=NEW.node_id AND lot_id=NEW.lot_id;
+                        END IF;
+
+                        SELECT string_agg (concat, ' ') INTO v_num_elem_visit FROM (
+                        SELECT concat('trams:', array_agg(arc_id)) FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id
+                        UNION 
+                        SELECT concat('nodes:', array_agg(node_id)) FROM om_visit_lot_x_node WHERE unit_id=v_unit_id)b;
+
+                        v_new_value_param=v_num_elem_visit;
+                   	END IF;
                      
                     EXECUTE 'INSERT INTO om_visit_event (visit_id, parameter_id, value) VALUES ($1, $2, $3)'
                     USING NEW.visit_id, v_parameters.id, v_new_value_param;
