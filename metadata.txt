@@ -9,6 +9,10 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.5.023
+ - Improve reliability of button Add Child Layers
+ - Add option to import SWMM rpt file with >50 velocities
+ - Make 'Update project schema' a thread
+ - Bug fix autoupdate widgets in info
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
