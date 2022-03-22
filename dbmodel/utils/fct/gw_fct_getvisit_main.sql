@@ -167,6 +167,8 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_new_visit boolean = FALSE;
+v_new_featureid varchar;
+v_new_visitclass integer;
 
 BEGIN
 	
@@ -180,6 +182,10 @@ BEGIN
 
 	--check plugin lotes
 	select upper(value::json->>'lotManage'::text) INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
+
+	IF v_pluginlot = 'TRUE' THEN
+		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id='test');
+	END IF;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -218,7 +224,29 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_userrole;
 
-        -- get v_featuretype if is null or 'visit'(when open it from visit_manager)
+	 -- LOTS MANAGE UNITS (um visitclass)
+	 -- if feature_type is unit, we change to arc/node and select one of the elements that are in this unit
+	IF v_featuretype = 'unit' THEN
+		v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
+	
+		v_featuretype='arc';
+		v_featuretablename='v_edit_arc';
+		v_new_featureid=(SELECT arc_id FROM om_visit_lot_x_arc WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+		v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='ARC');
+	
+		IF v_new_featureid IS NULL THEN
+			v_featuretype='node';
+			v_featuretablename='v_edit_node';
+			v_new_featureid=(SELECT node_id FROM om_visit_lot_x_node WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='NODE');
+		END IF;
+	
+		v_featureid=v_new_featureid;
+		v_visitclass=v_new_visitclass;
+	
+	END IF;
+
+    -- get v_featuretype if is null or 'visit'(when open it from visit_manager)
 	IF v_featuretype IS NULL OR v_featuretype='visit' THEN
 		IF v_projecttype='WS' THEN
 			SELECT feature_type, feature_id INTO v_featuretype, v_featureid FROM 
@@ -261,11 +289,8 @@ BEGIN
 		ELSE
 			IF v_pluginlot = 'TRUE' THEN
 				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-					-- Compare current lot_id with old visits for only show existing visits for current lot
-					v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
-
 					-- getting visit class in function: 1st v_lot, 2nd feature_type
-					IF v_lot IS NOT NULL AND p_visittype = 1 THEN
+					IF v_lot IS NOT NULL AND p_visittype = 1 AND v_visitclass IS NULL THEN
 						v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
 					END IF;
 					

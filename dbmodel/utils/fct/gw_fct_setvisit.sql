@@ -76,6 +76,17 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+v_lot integer;
+v_unit_id integer;
+v_arc_id integer;
+rec_node record;
+rec_arc record;
+id_last integer;
+v_parent_id integer;
+v_visitclass_arc integer;
+v_visitclass_node integer;
+v_feature_id integer;
+
 
 BEGIN
 
@@ -105,6 +116,8 @@ BEGIN
 	v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
 	v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
 	v_addphotos = (p_data ->>'data')::json->>'photos';
+	v_lot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id';
+	v_arc_id = ((p_data ->>'data')::json->>'fields')::json->>'arc_id';
 
 	-- setting sequences of related visit tables
 	PERFORM setval('"SCHEMA_NAME".om_visit_event_id_seq', (SELECT max(id) FROM om_visit_event), true);
@@ -298,7 +311,50 @@ BEGIN
 				  tstamp=now() 
 				  WHERE visit_id=v_id;
 
+
+	-- LOTS MANAGE UNITS (um_visitclass)
+	-- only for visitclass which has parent_id
+	SELECT parent_id INTO v_parent_id FROM config_visit_class WHERE id=v_class;
+	IF v_parent_id IS NOT NULL THEN
+		-- select unit_id from the om_visit_lot_x_* table 
+		IF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'arc' THEN
+			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_arc WHERE arc_id=v_arc_id::text AND lot_id=v_lot;
+		ELSIF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'node' THEN
+			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_node WHERE node_id=v_node_id::text AND lot_id=v_lot;
+		END IF;
+		
+		UPDATE om_visit_lot_x_unit SET status=0 WHERE unit_id=v_unit_id;
 	
+		-- set visit to every feature of the related unit
+		-- get generic v_feature_id whenever is arc or node
+		IF v_arc_id IS NOT NULL THEN
+			v_feature_id=v_arc_id;
+		ELSE
+			v_feature_id=v_node_id;
+		END IF;
+		
+		-- select visitclass for arc and loop for every arc on om_visit_lot_x_arc. Then insert visit and events with same values of the one triggered by this setvisit
+		SELECT id INTO v_visitclass_arc FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='arc';
+		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND arc_id::integer <> v_feature_id::integer
+		LOOP
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last, rec_arc.arc_id);
+	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
+		END LOOP;
+		
+		-- select visitclass for node and loop for every node on om_visit_lot_x_node. Then insert visit and events with same values of the one triggered by this setvisit
+		SELECT id INTO v_visitclass_node FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='node';
+		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND node_id::integer <> v_feature_id::integer
+		LOOP
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
+	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
+		END LOOP;
+	
+	END IF;
+
 	
 	-- getting geometry
 	IF v_id IS NOT NULL THEN
