@@ -107,7 +107,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Max.' and csv2='Height';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='No' and csv2='nodes';
+	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum'  and csv1='nodes' or csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
@@ -115,7 +115,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Hours' and csv2='Rate';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='No' and csv2='nodes';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='nodes' or csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
