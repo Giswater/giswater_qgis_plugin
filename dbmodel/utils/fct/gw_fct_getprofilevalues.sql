@@ -54,7 +54,12 @@ Is mandatory start-end nodes must have data, and must be profile_surface = true
 DECLARE
 
 v_init  text;
+v_init_aux text;
+v_mid text;
 v_end text;
+v_end_aux text;
+v_query_dijkstra text;
+v_i json;
 v_hs float;
 v_vs float;
 v_arc json;
@@ -140,6 +145,7 @@ BEGIN
 
 	--  Get input data
 	v_init = (p_data->>'data')::json->>'initNode';
+	v_mid = (p_data->>'data')::json->>'midNodes';
 	v_end = (p_data->>'data')::json->>'endNode';
 	v_hs = ((p_data->>'data')::json->>'scale')::json->>'eh';
 	v_vs = ((p_data->>'data')::json->>'scale')::json->>'ev';
@@ -257,20 +263,56 @@ BEGIN
 		DELETE FROM anl_arc WHERE fid=222 AND cur_user = current_user;
 		DELETE FROM anl_node WHERE fid=222 AND cur_user = current_user;
 
+		v_query_dijkstra := 'SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||')';
+
+		IF v_mid IS NOT NULL THEN
+			v_query_dijkstra = '';
+			v_init_aux = v_init;
+			FOR v_i IN SELECT * FROM json_array_elements(v_mid::json)
+			LOOP
+				-- Get starting point
+				v_end_aux = v_i;
+
+				-- DIJKSTRA v_init_aux -> v_end_aux
+				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
+				
+				-- We need to insert values each dijkstra for the total_length to keep accumulating
+				-- insert edge values on anl_arc table
+				EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
+					SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+					||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
+					('|| v_query_dijkstra ||')a
+					USING (arc_id)
+					WHERE b.state > 0';
+		
+				-- insert node values on anl_node table
+				EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
+					SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
+					('|| v_query_dijkstra ||')a
+					USING (node_id)';
+
+				-- Get end point
+				v_init_aux = v_end_aux;
+			END LOOP;
+			-- Last DIJKSTRA
+			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
+		END IF;
+
 		-- insert edge values on anl_arc table
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
-			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-			gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||'))a
+			('|| v_query_dijkstra ||')a
 			USING (arc_id)
 			WHERE b.state > 0';
 
 		-- insert node values on anl_node table
 		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
 			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
-			(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-			gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||'))a
+			('|| v_query_dijkstra ||')a
 			USING (node_id)';
 
 		-- looking for null values (in case of exists links graf will be disabled as below)
@@ -530,8 +572,8 @@ BEGIN
 		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
 
 
-		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, '||
-				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, '||
+				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
 				/*      
 				SELECT node_id, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
