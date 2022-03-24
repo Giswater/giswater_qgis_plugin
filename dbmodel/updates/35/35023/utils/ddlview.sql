@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/03/24
-DROP VIEW v_ui_workspace;
+DROP VIEW IF EXISTS v_ui_workspace;
 CREATE VIEW v_ui_workspace
 AS SELECT id, name, descript, config, private 
 		FROM cat_workspace 
