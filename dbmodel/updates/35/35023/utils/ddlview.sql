@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2022/03/11
-ALTER TABLE config_report ADD CONSTRAINT config_report_sys_role_id_fkey FOREIGN KEY (sys_role)
-REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
 --2022/03/24
-ALTER TABLE cat_workspace ADD COLUMN private BOOLEAN DEFAULT false;
+DROP VIEW v_ui_workspace;
+CREATE VIEW v_ui_workspace
+AS SELECT id, name, descript, config, private 
+		FROM cat_workspace 
+		WHERE private IS FALSE OR (private IS TRUE AND cur_user = current_user)

@@ -233,6 +233,10 @@ BEGIN
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 
+	ELSIF v_action = 'TOGGLE' THEN
+
+		UPDATE cat_workspace SET private = (NOT private) WHERE id=v_workspace_id;
+
 	ELSIF v_action = 'CHECK' THEN 
 
 		-- code to check if user selection fits on some current workspace
