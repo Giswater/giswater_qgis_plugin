@@ -60,6 +60,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
+        self.dlg_workspace_manager.btn_toggle_visibility.clicked.connect(partial(self._toggle_visibility_workspace))
         # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
         # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
         selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
@@ -204,6 +205,33 @@ class GwWorkspaceManagerButton(GwAction):
             tools_qgis.refresh_map_canvas()  # First refresh all the layers
             global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
             tools_gw.refresh_selectors()
+
+
+    def _toggle_visibility_workspace(self):
+        """ Set the selected workspace as public/private """
+
+        action = "TOGGLE"
+
+        # Get selected row
+        selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected workspace id
+        index = self.tbl_wrkspcm.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        extras = f'"action":"{action}", "id": "{value}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+
+        if result and result['status'] == "Accepted":
+            if 'message' in result and result['message']:
+                message = result['message']
+                tools_qgis.show_message(message['text'], message['level'])
+            self._fill_tbl(self.filter_name.text())
 
 
     def _reset_workspace(self):

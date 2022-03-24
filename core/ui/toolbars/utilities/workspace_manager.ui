@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>872</width>
+    <width>841</width>
     <height>786</height>
    </rect>
   </property>
@@ -16,12 +16,24 @@
   <layout class="QGridLayout" name="verticalLayout_4">
    <item row="0" column="1">
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="0">
        <widget class="QTextEdit" name="txt_infolog">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -39,11 +51,37 @@
    </item>
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="7" column="0" colspan="6">
+      <item row="5" column="8">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_workspace_name">
+        <property name="text">
+         <string>Filter by: Workspace name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="7">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -69,15 +107,15 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_workspace_name">
-        <property name="text">
-         <string>Filter by: Workspace name</string>
+      <item row="6" column="0" colspan="9">
+       <widget class="QTableView" name="tbl_wrkspcm">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
        </widget>
       </item>
-      <item row="5" column="7">
-       <widget class="QPushButton" name="btn_delete">
+      <item row="5" column="6">
+       <widget class="QPushButton" name="btn_current">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -85,25 +123,24 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Delete</string>
+         <string>Current workspace</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="8">
-       <widget class="QTableView" name="tbl_wrkspcm">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+      <item row="5" column="1" colspan="3">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item row="7" column="7">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
-      <item row="5" column="6">
+      <item row="5" column="7">
        <widget class="QPushButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -116,16 +153,10 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_current">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="7" column="8">
+       <widget class="QPushButton" name="btn_cancel">
         <property name="text">
-         <string>Current workspace</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -142,18 +173,18 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1" colspan="3">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="5" column="5">
+       <widget class="QPushButton" name="btn_toggle_visibility">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>80</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>Toggle visibility</string>
         </property>
-       </spacer>
+       </widget>
       </item>
      </layout>
     </widget>
