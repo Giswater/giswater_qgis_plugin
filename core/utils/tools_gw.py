@@ -1384,6 +1384,8 @@ def add_button(**kwargs):
         widget.setProperty('value', field['value'])
     if 'tooltip' in field:
         widget.setToolTip(field['tooltip'])
+    if 'placeholder' in field:
+        widget.setText(field['placeholder'])
 
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
