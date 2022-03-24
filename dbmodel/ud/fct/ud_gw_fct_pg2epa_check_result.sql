@@ -81,8 +81,8 @@ v_networkmode integer;
 
 object_rec record;
 
-v_graphiclog boolean;
-
+v_graphiclog boolean;+
+v_workspace text;
 
 BEGIN
 
@@ -139,7 +139,8 @@ BEGIN
 	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
 	v_exportmodeval = (SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode');
-	
+	SELECT name INTO v_workspace FROM config_param_user JOIN cat_workspace ON value = id WHERE parameter = 'utils_workspace_vdefault' AND cur_user=current_user;
+
 	
 	-- Header
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-10, v_fid, v_result_id, 4,
@@ -166,7 +167,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Hidrology scenario: ', v_hydroscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DWF scenario: ',v_dwfscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));
-
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Workspace: ', v_workspace));
 
 	UPDATE rpt_cat_result SET 
 	export_options = concat('{"Hydrology scenario": "', v_hydroscenarioval,'", "DWF scenario":"',v_dwfscenarioval,'"}')::json
