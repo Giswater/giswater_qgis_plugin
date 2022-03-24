@@ -10,13 +10,13 @@ import json
 from functools import partial
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QPoint, Qt
-from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtCore import QPoint, Qt, QEvent, QObject
+from qgis.PyQt.QtWidgets import QAction, QMenu, QCheckBox, QWidgetAction
 from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_db
+from ....lib import tools_qgis
 
 
 class GwAddChildLayerButton(GwAction):
@@ -71,26 +71,49 @@ class GwAddChildLayerButton(GwAction):
 
                 alias = field['layerName'] if field['layerName'] is not None else field['tableName']
                 if 'level_3' in context:
+                    menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
-                        action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
-                        action.triggered.connect(partial(self._manage_load_all, fields=json_result['body']['data']['fields'],
-                        group=context['level_1'], sub_group=context['level_2'], sub_sub_group=context['level_3']))
-                        dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
+                        # LEVEL 3 - LOAD ALL
+                        widget = QCheckBox()
+                        widget.setText("Load all")
+                        widget.setStyleSheet("margin: 5px 5px 5px 8px;")
+                        widgetAction = QWidgetAction(menu)
+                        widgetAction.setDefaultWidget(widget)
+                        widgetAction.defaultWidget().stateChanged.connect(
+                            partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'],
+                                    context['level_2'], context['level_3'], menu))
+                        menu.addAction(widgetAction)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all"] = True
-                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"],checkable=True)
-                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"].addAction(action)
+                    # LEVEL 3 - LAYER
+                    widget = QCheckBox()
+                    widget.setText(alias)
+                    widgetAction = QWidgetAction(menu)
+                    widgetAction.setDefaultWidget(widget)
+                    menu.addAction(widgetAction)
                 else:
+                    menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
                     if f"{context['level_1']}_{context['level_2']}_load_all" not in dict_menu:
-                        action = QAction("Load all", dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
-                        action.triggered.connect(partial(self._manage_load_all, fields=json_result['body']['data']['fields'],
-                                                         group=context['level_1'], sub_group=context['level_2']))
-                        dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
+                        # LEVEL 2 - LOAD ALL
+                        widget = QCheckBox()
+                        widget.setText("Load all")
+                        widget.setStyleSheet("margin: 5px 5px 5px 8px;")
+                        widgetAction = QWidgetAction(menu)
+                        widgetAction.setDefaultWidget(widget)
+                        widgetAction.defaultWidget().stateChanged.connect(
+                            partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'],
+                                    context['level_2'], None, menu))
+                        menu.addAction(widgetAction)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_load_all"] = True
-                    action = QAction(alias, dict_menu[f"{context['level_1']}_{context['level_2']}"],checkable=True)
-                    dict_menu[f"{context['level_1']}_{context['level_2']}"].addAction(action)
+                    # LEVEL 2 - LAYER
+                    widget = QCheckBox()
+                    widget.setText(alias)
+                    widgetAction = QWidgetAction(menu)
+                    widgetAction.setDefaultWidget(widget)
+                    menu.addAction(widgetAction)
 
                 if f"{field['tableName']}" in layer_list:
-                    action.setChecked(True)
+                    widget.setChecked(True)
+                widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
                 layer_name = field['tableName']
                 if field['geomField'] == "None":
@@ -106,39 +129,45 @@ class GwAddChildLayerButton(GwAction):
                 group = context['level_1']
                 sub_group = context['level_2']
                 sub_sub_group = context.get('level_3')
-                action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
-                                                 group, sub_group, sub_sub_group, style_id, alias))
+                widgetAction.defaultWidget().stateChanged.connect(
+                    partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
+                            sub_sub_group, style_id, alias))
 
         main_menu.exec_(click_point)
 
 
-    def _manage_load_all(self, fields, group, sub_group, sub_sub_group=None):
+    def _manage_load_all(self, fields, group, sub_group, sub_sub_group, menu, state=None):
 
-        for field in fields:
-            if field['context'] is not None:
-                context = json.loads(field['context'])
-                if ('level_3' in context and context['level_3'] == sub_sub_group) or \
-                   (sub_sub_group is None and context['level_1'] == group and context['level_2'] == sub_group):
-                    layer_name = field['tableName']
-                    if field['geomField'] == "None":
-                        the_geom = None
-                    else:
-                        the_geom = field['geomField']
-                    geom_field = field['tableId']
-                    # If layer is configured but it doesn't exist in schema, ignore it
-                    if not geom_field:
-                        continue
-                    geom_field = geom_field.replace(" ", "")
-                    style_id = field['style_id']
-                    group = context['level_1']
-                    sub_group = context['level_2']
+        if state == 2:
+            for field in fields:
+                if field['context'] is not None:
+                    context = json.loads(field['context'])
+                    if ('level_3' in context and context['level_3'] == sub_sub_group) or \
+                       (sub_sub_group is None and context['level_1'] == group and context['level_2'] == sub_group):
+                        layer_name = field['tableName']
+                        if field['geomField'] == "None":
+                            the_geom = None
+                        else:
+                            the_geom = field['geomField']
+                        geom_field = field['tableId']
+                        # If layer is configured but it doesn't exist in schema, ignore it
+                        if not geom_field:
+                            continue
+                        geom_field = geom_field.replace(" ", "")
+                        style_id = field['style_id']
+                        group = context['level_1']
+                        sub_group = context['level_2']
 
-                    layer = tools_qgis.get_layer_by_tablename(layer_name)
-                    if layer is None:
-                        tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'], sub_sub_group=sub_sub_group)
+                        layer = tools_qgis.get_layer_by_tablename(layer_name)
+                        if layer is None:
+                            tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'], sub_sub_group=sub_sub_group)
+            for child in menu.actions():
+                if not child.isChecked():
+                    child.defaultWidget().setChecked(True)
+
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
-                                sub_group=None, sub_sub_group=None, style_id=None, alias=None, is_checked=None):
+                                sub_group=None, sub_sub_group=None, style_id=None, alias=None, state=None):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -148,13 +177,13 @@ class GwAddChildLayerButton(GwAction):
         :param style_id: Id of the style we want to load (integer or String)
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
-        if is_checked:
-                layer = tools_qgis.get_layer_by_tablename(tablename)
-                if layer is None:
-                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias, sub_sub_group=sub_sub_group)
-        else:
+        if state == 2:
+            layer = tools_qgis.get_layer_by_tablename(tablename)
+            if layer is None:
+                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias, sub_sub_group=sub_sub_group)
+        elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
-                tools_qgis.remove_layer_from_toc(tablename, group, sub_group)
+                tools_qgis.remove_layer_from_toc(alias, group, sub_group)
 
     # endregion
