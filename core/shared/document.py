@@ -110,7 +110,7 @@ class GwDocument(QObject):
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
+                                "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))

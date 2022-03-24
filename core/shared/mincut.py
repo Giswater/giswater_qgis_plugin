@@ -49,6 +49,7 @@ class GwMincut:
         self.deleted_list = []
         self.ids = []
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+        self.excluded_layers = []
 
         # Serialize data of mincut states
         self.states = {}

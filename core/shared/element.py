@@ -112,6 +112,7 @@ class GwElement:
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_element.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_element.btn_accept.clicked.connect(partial(self._manage_element_accept, table_object))

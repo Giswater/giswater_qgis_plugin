@@ -222,6 +222,7 @@ class GwVisit(QObject):
         # Force _visit_tab_feature_changed
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
         # Manage relation locking
@@ -903,6 +904,7 @@ class GwVisit(QObject):
 
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
+        self.excluded_layers = excluded_layers
         if self.feature_type is None:
             return
 
