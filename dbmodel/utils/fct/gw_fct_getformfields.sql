@@ -11,11 +11,23 @@ character varying, character varying, character varying, character varying, char
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(p_formname character varying, p_formtype character varying, p_tabname character varying, 
-p_tablename character varying, p_idname character varying, p_id character varying, p_columntype character varying, p_tgop character varying, p_filterfield character varying, p_device integer, p_values_array json)
- RETURNS text[] AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
+	p_formname character varying,
+	p_formtype character varying,
+	p_tabname character varying,
+	p_tablename character varying,
+	p_idname character varying,
+	p_id character varying,
+	p_columntype character varying,
+	p_tgop character varying,
+	p_filterfield character varying,
+	p_device integer,
+	p_values_array json)
+    RETURNS text[]
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getformfields( 've_arc_pipe','form_feature','data','ve_arc_pipe','arc_id',	'2088','character varying(16)',	'UPDATE',	1,	'4',	'{}' )
@@ -64,6 +76,9 @@ v_debug_sql json;
 v_msgerr json;
 v_epa_table text;
 v_featuretype text;
+v_currency text;
+v_filter_widgets text = '';
+       
 BEGIN
 
 	-- Set search path to local schema
@@ -108,6 +123,10 @@ BEGIN
 	ELSE 
 		v_device = '';
 	END IF;
+		
+	IF p_filterfield IS NOT NULL THEN
+		v_filter_widgets = ' AND columnname NOT IN('||p_filterfield||') ';
+	END IF;
 
 	-- get user variable to show label as column id or not
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_formlabel_show_columname' AND cur_user =  current_user) THEN
@@ -141,8 +160,8 @@ BEGIN
 			FROM config_form_fields 
 			LEFT JOIN typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
 			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
-			
-			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''' OR formname = ''',v_epa_table,''') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ORDER BY orderby) a');
+			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''' OR formname = ''',v_epa_table,''') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+
 		v_debug_vars := json_build_object('v_label', v_label, 'p_tabname', p_tabname, 'v_device', v_device, 'p_formname', p_formname, 'p_formtype', p_formtype, 'v_clause', v_clause);
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
@@ -183,7 +202,6 @@ BEGIN
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
       		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
-
 
 	-- combo no childs	
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo'  AND  a->>'parentId' IS NULL
@@ -350,7 +368,6 @@ BEGIN
 		END IF;
 		
 	END LOOP;
-
 
 	-- for the rest of widgets removing not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
