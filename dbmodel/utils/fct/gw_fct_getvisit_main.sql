@@ -8,10 +8,14 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(text, p_data json);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main( p_visittype integer, p_data json)
-  RETURNS json AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main(
+	p_visittype integer,
+	p_data json)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 /*EXAMPLE:
 
 -- GET FORMS FOR WORK OFFLINE
@@ -169,6 +173,11 @@ v_msgerr json;
 v_new_visit boolean = FALSE;
 v_new_featureid varchar;
 v_new_visitclass integer;
+v_tram_exec_visit integer;
+v_tram_exec_visit_wc json;
+rec record;
+v_filter text;
+v_filter_aux text;
 
 BEGIN
 	
@@ -211,6 +220,7 @@ BEGIN
 	v_featuretablename = (((p_data ->>'data')::json->>'relatedFeature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
+	v_tram_exec_visit = ((p_data ->>'data')::json->>'fields')::json->>'tram_exec_visit';
 	
 	--   Get editability of layer
 	v_querystring = concat('SELECT r1.rolname as "role"
@@ -610,17 +620,37 @@ BEGIN
 		IF v_activedatatab IS NULL AND v_activefilestab IS NULL THEN
 			v_activedatatab = True;
 		END IF;
+		
+		
+		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit''' INTO v_tram_exec_visit_wc;
+		if v_tram_exec_visit IS NOT NULL THEN
+		
+			v_filter = ((v_tram_exec_visit_wc->>'hideWidgets')::JSON->>'tram_exec_visit')::json->>v_tram_exec_visit::text;
+			v_filter = replace(v_filter, '"', '''');
+			v_filter = replace(v_filter, '[', '');
+			v_filter = replace(v_filter, ']', '');
+		
+		ELSE
+		
+			FOR rec IN SELECT * FROM json_each_text(((v_tram_exec_visit_wc->>'hideWidgets')::JSON->>'tram_exec_visit')::json)
+			LOOP
+				v_filter_aux = rec.value;
+				v_filter_aux = replace(v_filter_aux, '"', '''');
+				v_filter_aux = replace(v_filter_aux, '[', '');
+				v_filter_aux = replace(v_filter_aux, ']', '');
+				
+				v_filter = concat(v_filter_aux, ', ', v_filter);
+			END LOOP;		
+			v_filter = left(v_filter, -2);
+		END IF;
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
-
 			IF v_new_visit THEN
-
 				IF v_formname IS NULL THEN
 					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
 				END IF;
-				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
-				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
-			
+				
+				SELECT gw_fct_getformfields(v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP		
 				raise notice 'aux_json,%',aux_json;
@@ -682,7 +712,12 @@ BEGIN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '4'::text);	
 						RAISE NOTICE ' --- SETTING status VALUE % ---', v_status;
 					END IF;
-
+					
+					IF (aux_json->>'columnname') = 'tram_exec_visit' AND v_tram_exec_visit IS NOT NULL THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
+						RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
+					END IF;
+					
 					-- setting parameter in case of singleparameter visit
 					IF v_ismultievent IS FALSE THEN
 						IF (aux_json->>'columnname') = 'parameter_id' THEN
@@ -695,7 +730,6 @@ BEGIN
 							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
 						END IF;
 
-						
 					END IF;
 					
 					-- disable visit type if project is offline
@@ -705,7 +739,7 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
@@ -832,7 +866,7 @@ BEGIN
 			
 				RAISE NOTICE '--- CALLING gw_fct_getlist USING p_data: % ---', p_data;
 				SELECT gw_fct_getlist (p_data) INTO v_fields_json;
-				RAISE NOTICE '0 -> %',v_fields_json;
+
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
 				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
@@ -857,7 +891,6 @@ BEGIN
 
 			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
-
 
 			RAISE NOTICE ' --- BUILDING tabFiles with v_tabaux  ---';
 
