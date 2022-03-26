@@ -71,6 +71,7 @@ BEGIN
 
 	IF v_action = 'updateArc' THEN
 
+		-- mapzones
 		FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] 
 		LOOP
 
@@ -85,9 +86,18 @@ BEGIN
 			EXECUTE v_querytext;
 			
 		END LOOP;
+		
+		-- epanet (to_arcs)
+		UPDATE inp_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		UPDATE inp_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		UPDATE inp_shortpipe SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		
+		-- graf
+		UPDATE config_graf_checkvalve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 
 	ELSIF v_action = 'updateNode' THEN
 
+		-- mapzones
 		FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] LOOP
 
 			--update toArc value with newly created arc id
@@ -97,6 +107,10 @@ BEGIN
 			cross join json_array_elements((grafconfig->>''use'')::json) elem
 			where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
 		END LOOP;
+		
+		-- graf
+		UPDATE config_graf_checkvalve SET node_id = v_node_id_new WHERE node_id = v_node_id_old;
+		
 	END IF;
 
 	IF v_audit_result is null THEN
