@@ -269,7 +269,8 @@ BEGIN
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
 
 					IF v_project_type = 'WS' THEN
-					--check if final nodes maybe graf delimiters
+
+						--check if final nodes maybe graf delimiters
 						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
 						JOIN v_edit_node n1 ON n1.node_id=node_1
 						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
@@ -550,6 +551,7 @@ BEGIN
 						END LOOP;
 						
 						IF v_project_type = 'WS' THEN
+						
 							--reconfigure mapzones
 							IF v_new_node_graf IS NOT NULL THEN
 								INSERT INTO audit_check_data (fid, criticity, error_message)
@@ -564,12 +566,12 @@ BEGIN
 								END IF;
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"},
-								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneOld":"'||v_node1_graf||'", 
-								"arcIdOld":"'||v_arc_id||'","arcIdNew":"'||v_graf_arc_id||'","action":"arcDivide"}}}$$);';
+								"data":{"parameters":{"nodeIdOld":"'||v_node_1||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graf_arc_id||'", "action":"updateArc"}}}$$);';
 
+								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
+								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
 								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (212, 1, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+								VALUES (212, 0, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
 							
 							IF v_node2_graf IS NOT NULL THEN
@@ -580,13 +582,14 @@ BEGIN
 								END IF;
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"},
-								"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneOld":"'||v_node2_graf||'", 
-								"arcIdOld":"'||v_arc_id||'","arcIdNew":"'||v_graf_arc_id||'","action":"arcDivide"}}}$$);';
+								"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graf_arc_id||'", "action":"updateArc"}}}$$);';
 
+								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
+								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
 								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (212, 1, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
+								VALUES (212, 0, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
+
 						END IF;
 	
 					ELSIF v_state_node = 2 THEN --is psector
