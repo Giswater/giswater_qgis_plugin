@@ -10,5 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2022/03/09
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_report", "column":"sys_role", "dataType":"text", "isUtils":"False"}}$$);
 
---2022/03/24
-ALTER TABLE cat_workspace ADD COLUMN private BOOLEAN DEFAULT false;
+--2022/03/26
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_workspace", "column":"private", "dataType":"BOOLEAN"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"isheader", "dataType":"BOOLEAN"}}$$);
+
