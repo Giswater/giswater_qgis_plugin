@@ -21,4 +21,6 @@ VALUES ('om_profile_vdefault','{"arc":{"cat_geom1":"0.40"}, "node":{"cat_geom1":
 
 UPDATE cat_feature_node SET isprofilesurface = false;
 
-SELECT (((elevation2-coalesce(depth2,0)- elevation1-coalesce(depth1,0))/gis_length)*100)::numeric(12,2) from v_edit_arc limit 1
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES ('v_anl_grafanalytics_mapzones', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
+ON CONFLICT (id) DO NOTHING;

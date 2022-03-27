@@ -553,10 +553,8 @@ BEGIN
 				-- inundation process
 				LOOP						
 					v_count = v_count+1;
-					
-					UPDATE temp_anlgraf n SET water=1, trace = v_featureid FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;					
+					UPDATE temp_anlgraf n SET water=1, trace = v_featureid FROM v_anl_grafanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
 					GET DIAGNOSTICS v_affectrow = row_count;
-					
 					EXIT WHEN v_affectrow = 0;
 					EXIT WHEN v_count = 2000;
 				END LOOP;
