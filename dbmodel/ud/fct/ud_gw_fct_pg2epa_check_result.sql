@@ -139,7 +139,7 @@ BEGIN
 	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
 	v_exportmodeval = (SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode');
-	SELECT name INTO v_workspace FROM config_param_user JOIN cat_workspace ON value = id WHERE parameter = 'utils_workspace_vdefault' AND cur_user=current_user;
+	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
 
 	
 	-- Header
