@@ -34,7 +34,7 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"target", "label":"Targe
 
 UPDATE polygon SET state = 1;
 
-INSERT INTO config_info_layer VALUES ('v_polygon', false, null, false, 'info_feature', null, 21)
+INSERT INTO config_info_layer VALUES ('v_polygon', false, null, false, 'info_feature', null, 21);
 
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_polygon', 'Table to enable the info for polygons. Table need to be load on qgis project', 'role_basic', 'giswater') 
