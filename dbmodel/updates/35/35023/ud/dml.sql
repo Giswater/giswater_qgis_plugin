@@ -27,3 +27,6 @@ INSERT INTO config_fprocess VALUES (140,'rpt_arcpollutant_sum','Link Pollutant L
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('rpt_arcpollutant_sum','Table to store arcpollutant values', 'role_epa','core');
 
 update sys_param_user set isenabled=true, layoutname='lyt_other', layoutorder=24, formname='config' where id='edit_node_interpolate';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT snow_id as id, snow_id as idval FROM inp_snowpack WHERE snow_id IS NOT NULL' 
+WHERE formname = 'v_edit_inp_subcatchment' AND columnname = 'snow_id';
