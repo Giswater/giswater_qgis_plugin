@@ -423,8 +423,8 @@ BEGIN
 	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
-		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall", "inflows_poll", "treatment", "lid_usage" ]'::json) as tabname, 
-					 json_array_elements_text('["node_id" ,"arc_id", "rg_id", "nodarc_id", "nodarc_id", "nodarc_id", "nodarc_id", "node_id", "node_id", "node_id", "node_id", "subc_id, lidco_id"]'::json) as colname,
+		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall", "treatment", "lid_usage" ]'::json) as tabname, 
+					 json_array_elements_text('["node_id" ,"arc_id", "rg_id", "nodarc_id", "nodarc_id", "nodarc_id", "nodarc_id", "node_id", "node_id", "node_id", "node_id, lidco_id"]'::json) as colname,
  					 json_array_elements_text('["anl_node" ,"anl_arc", "", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_node", "anl_node", "", "anl_node", "anl_polygon"]'::json) as tablename
 		LOOP
 
