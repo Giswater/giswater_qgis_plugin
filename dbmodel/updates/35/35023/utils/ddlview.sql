@@ -12,4 +12,15 @@ DROP VIEW IF EXISTS v_ui_workspace;
 CREATE VIEW v_ui_workspace
 AS SELECT id, name, descript, config, private 
 		FROM cat_workspace 
-		WHERE private IS FALSE OR (private IS TRUE AND cur_user = current_user)
+		WHERE private IS FALSE OR (private IS TRUE AND cur_user = current_user);
+
+CREATE OR REPLACE VIEW v_polygon AS
+SELECT 
+pol_id,
+state,
+feature_id,
+sys_type,
+featurecat_id,
+the_geom
+FROM selector_state s, polygon p
+WHERE s.state_id = p.state and s.cur_user = current_user;

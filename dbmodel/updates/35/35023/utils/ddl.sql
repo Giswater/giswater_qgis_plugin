@@ -13,4 +13,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_repo
 --2022/03/26
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_workspace", "column":"private", "dataType":"BOOLEAN"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"isheader", "dataType":"BOOLEAN"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"state", "dataType":"int2"}}$$);
+ALTER TABLE polygon ALTER COLUMN state SET DEFAULT 1;
+
 

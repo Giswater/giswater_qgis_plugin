@@ -31,3 +31,7 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"target", "label":"Targe
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE VALUES & COPY FROM", "KEEP VALUES & COPY FROM", "DELETE SCENARIO"], "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT dscenario_id as id, name as idval FROM cat_dscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":""}
   ]' WHERE id = 3042;
+
+UPDATE polygon SET state = 1;
+
+INSERT INTO config_info_layer VALUES ('v_polygon', false, null, false, 'info_feature', null, 21)
