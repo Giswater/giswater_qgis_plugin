@@ -55,3 +55,5 @@ ALTER TABLE inp_dscenario_inflows_poll
 
 ALTER TABLE temp_node_other ADD CONSTRAINT temp_node_other_unique UNIQUE (node_id, type);
 
+ALTER TABLE raingage ADD CONSTRAINT raingage_timser_id_fkey FOREIGN KEY (timser_id)
+REFERENCES inp_timeseries (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
