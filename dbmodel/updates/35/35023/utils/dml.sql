@@ -39,3 +39,7 @@ INSERT INTO config_info_layer VALUES ('v_polygon', false, null, false, 'info_fea
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_polygon', 'Table to enable the info for polygons. Table need to be load on qgis project', 'role_basic', 'giswater') 
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES ('v_ui_cat_dscenario', 'Table to show dscenario un qgis ui', 'role_epa', 'giswater') 
+ON CONFLICT (id) DO NOTHING;

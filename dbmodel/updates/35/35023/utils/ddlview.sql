@@ -24,3 +24,16 @@ featurecat_id,
 the_geom
 FROM selector_state s, polygon p
 WHERE s.state_id = p.state and s.cur_user = current_user;
+
+
+CREATE OR REPLACE VIEW v_ui_cat_dscenario AS 
+ SELECT DISTINCT ON (c.dscenario_id) c.dscenario_id,
+    c.name,
+    c.descript,
+    c.dscenario_type,
+    c.parent_id,
+    c.expl_id,
+    c.active,
+    c.log
+   FROM cat_dscenario c, selector_expl s
+  WHERE active is true AND ((s.expl_id = c.expl_id AND s.cur_user = CURRENT_USER::text) OR c.expl_id IS NULL);
