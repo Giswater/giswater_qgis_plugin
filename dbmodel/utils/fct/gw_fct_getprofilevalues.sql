@@ -177,27 +177,19 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
 		WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
-	ELSIF v_project_type = 'WS' THEN
-		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
-		WHERE elevation IS NOT NULL AND depth IS NOT NULL AND node_id = v_init;
-	END IF;
 
-	IF v_nodevalid THEN
-		IF v_project_type = 'UD' THEN
-			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
-		ELSIF v_project_type = 'WS' THEN
+		IF v_nodevalid THEN
 			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
 			WHERE elevation IS NOT NULL AND depth IS NOT NULL AND node_id = v_end;
-		END IF;
-
-		IF v_nodevalid IS NOT TRUE THEN	
+			
+			IF v_nodevalid IS NOT TRUE THEN	
+				v_level = 2;
+				v_message = v_nodemessage;
+			END IF;
+		ELSE
 			v_level = 2;
 			v_message = v_nodemessage;
 		END IF;
-	ELSE
-		v_level = 2;
-		v_message = v_nodemessage;
 	END IF;	
 
 	-- Check not integer id''s 
@@ -237,7 +229,6 @@ BEGIN
 				WHERE fid=222 AND cur_user = current_user
 				AND anl_arc.node_1 = v_arc_x_vnode.node_2';
 
-				
 			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
 			v_z1 = 'case when node_1=node_id then b.z1 else b.z2 end';
@@ -246,7 +237,8 @@ BEGIN
 			v_y2 = 'case when node_1=node_id then sys_y2 else sys_y1 end';
 
 		ELSIF v_project_type = 'WS' THEN
-			v_fcatgeom = 'cat_dnom::float*0.01'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
+		
+			v_fcatgeom = 'cat_dnom::float*0.001'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
 			v_fsyselev = 'elevation - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax; 
 			v_querytext = '';
 			v_querytext1 = '';
@@ -275,13 +267,15 @@ BEGIN
 				v_end_aux = v_i;
 
 				-- DIJKSTRA v_init_aux -> v_end_aux
-				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length 
+				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
 					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
 				
 				-- We need to insert values each dijkstra for the total_length to keep accumulating
 				-- insert edge values on anl_arc table
 				EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
-					SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+					SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', 
+					gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 					||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 					('|| v_query_dijkstra ||')a
 					USING (arc_id)
@@ -297,13 +291,15 @@ BEGIN
 				v_init_aux = v_end_aux;
 			END LOOP;
 			-- Last DIJKSTRA
-			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
+			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node) + agg_cost as total_length 
+			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+			gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
 		END IF;
 
 		-- insert edge values on anl_arc table
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
-			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
+			'||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 			('|| v_query_dijkstra ||')a
 			USING (arc_id)
