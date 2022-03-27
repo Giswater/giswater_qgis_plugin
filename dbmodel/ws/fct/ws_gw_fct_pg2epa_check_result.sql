@@ -206,14 +206,14 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
 
-		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
+		RAISE NOTICE '1 - Check pumps with 3-point curves';
 		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM v_edit_inp_pump)a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Check this 3-points has thresholds defined (133%).'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
+			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found.');
 		END IF;
 
 		
