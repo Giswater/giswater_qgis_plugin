@@ -81,7 +81,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.set_config_parser('dscenario_manager', 'cmb_action', action)
 
 
-    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
+    def _get_list(self, table_name='v_ui_cat_dscenario', filter_name="", filter_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
@@ -100,9 +100,9 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _fill_manager_table(self, filter_name=""):
-        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+        """ Fill dscenario manager table with data from v_ui_cat_dscenario """
 
-        complet_list = self._get_list("v_edit_cat_dscenario", filter_name)
+        complet_list = self._get_list("v_ui_cat_dscenario", filter_name)
 
         if complet_list is False:
             return False, False
