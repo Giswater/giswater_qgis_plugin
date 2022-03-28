@@ -180,7 +180,7 @@ BEGIN
 
 		IF v_nodevalid THEN
 			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
-			WHERE elevation IS NOT NULL AND depth IS NOT NULL AND node_id = v_end;
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
 			
 			IF v_nodevalid IS NOT TRUE THEN	
 				v_level = 2;
