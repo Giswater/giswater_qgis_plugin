@@ -43,3 +43,5 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_ui_cat_dscenario', 'Table to show dscenario un qgis ui', 'role_epa', 'giswater') 
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_report SET sys_role='role_basic' WHERE sys_role IS NULL;
