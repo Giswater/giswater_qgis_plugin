@@ -607,8 +607,8 @@ class GwToolBoxButton(GwAction):
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
         for group, functions in result['processes']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['functionname']))
@@ -627,8 +627,8 @@ class GwToolBoxButton(GwAction):
         # Section Reports
         reports_processes = QStandardItem('{}'.format('Reports'))
         for group, functions in result['reports']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Reports functions]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Reports functions]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))
