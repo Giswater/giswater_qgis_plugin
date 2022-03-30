@@ -295,7 +295,7 @@ BEGIN
 		ELSIF v_view='vi_timeseries' THEN 
 			IF NEW.other1 ilike 'FILE' THEN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
-					INSERT INTO inp_timeseries(id,times_type,fname) VALUES (NEW.timser_id,'FILE',NEW.other2) ;
+					INSERT INTO inp_timeseries(id, idval, times_type,fname) VALUES (NEW.timser_id, NEW.timser_id,'FILE',NEW.other2) ;
 				END IF;
 				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
@@ -306,7 +306,7 @@ BEGIN
 				END IF;
 				
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
-					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'RELATIVE');
+					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'RELATIVE');
 				END IF;
 				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
 					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1::time, NEW.other2::numeric);				
@@ -315,7 +315,7 @@ BEGIN
 				END IF;				
 			ELSE	
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
-					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'ABSOLUTE');
+					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'ABSOLUTE');
 				END IF;
 				IF NEW.other2 ~ '^\d+$' then
 					NEW.other2 = concat(NEW.other2,':00');
