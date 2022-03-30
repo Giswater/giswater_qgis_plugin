@@ -1096,7 +1096,13 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
     description = ""
     if exception:
         description = str(exception)
-        if 'unknown error' in description:
+        dont_show_list = ['unknown error', 'server closed the connection unexpectedly',
+                          'message contents do not agree with length in message']
+        for dont_show in dont_show_list:
+            if dont_show in description:
+                show_exception_msg = False
+                break
+        if 'server sent data' in description and 'without prior row description' in description:
             show_exception_msg = False
 
     try:
