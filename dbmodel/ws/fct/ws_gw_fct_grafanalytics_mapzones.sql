@@ -50,6 +50,8 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZ
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15, "usePlanPsector":false}}}');
 
 
+ SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones_advanced($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"grafClass":"PRESSZONE", "exploitation":"1", "floodOnlyMapzone":null, "floodFromNode":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "valueForDisconnected":"0", "updateMapZone":"5", "geomParamUpdate":"100"}}}$$);
+
 hieracy
 -------
 if floodfromnode not exits 
@@ -65,7 +67,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafCl
 DELETE FROM anl_arc
 SELECT arc_id, descript, the_geom FROM anl_arc WHERE fid = 145
 ----------------
-
+UPDATE SCHEMA_NAME.presszone set the_geom = null where expl_id  =1
 
 SELECT dma_id from SCHEMA_NAME.arc
 
@@ -134,7 +136,6 @@ v_expl json;
 v_macroexpl json;
 v_data json;
 v_fid integer;
-v_floodfromnode text;
 v_featureid integer;
 v_text text;
 v_querytext text;
@@ -190,10 +191,8 @@ BEGIN
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	
-	v_floodfromnode = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodFromNode');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
-
 
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
@@ -204,8 +203,9 @@ BEGIN
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 
-	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
+
+	v_floodonlymapzone = REPLACE(REPLACE (v_floodonlymapzone,'[','') ,']','');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -348,12 +348,6 @@ BEGIN
 			DELETE FROM selector_psector WHERE cur_user=current_user;
 		END IF;
 
-		-- managing floodonlymapzne <-> floodfromnode
-		IF v_floodonlymapzone IS NOT NULL THEN
-			EXECUTE 'SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' FROM '||v_table||' WHERE '||v_field||'::text = '||v_floodonlymapzone||'::text LIMIT 1'
-			INTO v_floodfromnode;
-		END IF;	
-
 		-- start build log message
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 		IF upper(v_class) ='PRESSZONE' THEN
@@ -366,8 +360,8 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatefeature::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 		
-		IF v_floodfromnode IS NOT NULL THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('''Flood only mapzone'' have been ACTIVATED. Graphic log have been disabled. Used node:',v_floodfromnode,'.'));
+		IF v_floodonlymapzone IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('''Flood only mapzone'' have been ACTIVATED. Graphic log have been disabled. Used mapzones:',v_floodonlymapzone,'.'));
 		END IF;	
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 
@@ -391,32 +385,26 @@ BEGIN
 
 			IF v_updatefeature THEN 
 				-- reset mapzones (update to 0)
-				IF v_floodfromnode IS NULL THEN
+				IF v_floodonlymapzone IS NULL THEN
 					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 FROM v_edit_arc v WHERE v.arc_id = arc.arc_id ';
 					EXECUTE v_querytext;
 					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 FROM v_edit_node v WHERE v.node_id = node.node_id ';
 					EXECUTE v_querytext;
 					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 FROM v_edit_connec v WHERE v.connec_id = connec.connec_id ';
 					EXECUTE v_querytext;
-				ELSE
-					EXECUTE 'SELECT '||quote_ident(v_field)||' FROM node WHERE node_id = '||quote_literal(v_floodfromnode) INTO v_nodemapzone;
-					IF v_nodemapzone IS NOT NULL THEN
-						v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-						EXECUTE v_querytext;
-						v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-						EXECUTE v_querytext;
-						v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-						EXECUTE v_querytext;
-					END IF;
-				END IF;
 
-				-- reset mapzone geometry
-				IF v_floodfromnode IS NULL AND lower(v_table) != 'sector' AND v_updatefeature AND v_updatemapzgeom > 0 THEN
-					v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
-					WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
+					IF v_table !='sector' THEN
+						v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
+						EXECUTE v_querytext;
+					END IF;					
+				ELSE
+					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
+					EXECUTE v_querytext;
+					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
+					EXECUTE v_querytext;
+					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
 					EXECUTE v_querytext;
 				END IF;
-
 			END IF;
 
 			-- fill the graf table
@@ -528,37 +516,27 @@ BEGIN
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 
-	
-			-- starting process
-			LOOP	
-				EXIT WHEN v_cont1 = -1;
-				v_cont1 = v_cont1+1;
-
-				IF v_floodfromnode IS NULL THEN
-					v_featureid = (SELECT node_1 FROM temp_anlgraf WHERE isheader = true AND water = 0 LIMIT 1);
-					raise notice '---------------- Feature_id % v_cont1 %', v_featureid, v_cont1;
-					EXIT WHEN v_featureid IS NULL;
-					
-				ELSIF v_floodfromnode IS NOT NULL THEN
-					v_featureid = v_floodfromnode::integer;
-					raise notice '---------------- Feature_id % ', v_featureid;
-					v_cont1 = -1;
-				END IF;
-	
-				-- set the starting element (water)
-				v_querytext = 'UPDATE temp_anlgraf SET water=1, trace = node_1::integer  WHERE node_1='||quote_literal(v_featureid)||'AND flag=0'; 
+			-- set the starting element (water)
+			IF v_floodonlymapzone IS NULL THEN
+				v_querytext = 'UPDATE temp_anlgraf SET water=1, trace = '||v_fieldmp||'::integer 
+				FROM '||v_table||' WHERE grafconfig is not null and active is true AND flag=0 
+				AND node_1 IN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
 				EXECUTE v_querytext;
-				v_count = 0;
+			ELSE
+				v_querytext = 'UPDATE temp_anlgraf SET water=1, trace = '||v_fieldmp||'::integer 
+				FROM '||v_table||' WHERE grafconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||') AND flag=0 
+				AND node_1 IN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+				EXECUTE v_querytext;
+			END IF;
 
-				-- inundation process
-				LOOP						
-					v_count = v_count+1;
-					UPDATE temp_anlgraf n SET water=1, trace = v_featureid FROM v_anl_grafanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
-					GET DIAGNOSTICS v_affectrow = row_count;
-					EXIT WHEN v_affectrow = 0;
-					EXIT WHEN v_count = 2000;
-				END LOOP;
-
+			-- inundation process
+			LOOP						
+				v_count = v_count+1;
+				UPDATE temp_anlgraf n SET water=1, trace = a.trace FROM v_anl_grafanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+				GET DIAGNOSTICS v_affectrow = row_count;
+				raise notice 'v_count --> %' , v_count;
+				EXIT WHEN v_affectrow = 0;
+				EXIT WHEN v_count = 2000;
 			END LOOP;
 
 			RAISE NOTICE 'Finish engine....';
@@ -569,46 +547,44 @@ BEGIN
 				RAISE NOTICE ' Update arcs';
 
 				-- update arc table
-				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM temp_anlgraf a JOIN 
-						(SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||
-						quote_ident(v_table)||' WHERE active IS TRUE) b 
-						 ON  nodeparent::integer = trace WHERE a.arc_id=arc.arc_id';
+				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = trace FROM temp_anlgraf t WHERE arc.arc_id = t.arc_id AND water = 1';
 				EXECUTE v_querytext;
 
 				RAISE NOTICE ' Update nodes';
 
+				/*
 				-- update node table
 				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM temp_anlgraf a JOIN 
 						(SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||
 						quote_ident(v_table)||' WHERE active IS TRUE) b 
-						 ON  nodeparent::integer = trace WHERE a.node_1=node.node_id';
+						 ON  nodeparent::integer = trace WHERE a.node_1=node.node_id AND water = 1';
 				EXECUTE v_querytext;
+				*/
 
 				-- update disconnected nodes from parent arcs
 				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=node.arc_id';
 				EXECUTE v_querytext;
 
 				-- update whole nodes
-				EXECUTE 'UPDATE node SET '||quote_ident(v_field)||' =  b.'||quote_ident(v_fieldmp)||' FROM (
+				EXECUTE 'UPDATE node SET '||quote_ident(v_field)||' = trace FROM (
 				SELECT distinct on(node) node, trace FROM(
-				select node, count(*) c, case when trace is not null then trace else 0 end trace FROM(
+
+				select node, count(*) c, trace FROM(
 				select id, node, arc_id, trace, flag from(
-				select id, node_1 node, arc_id, trace, flag from temp_anlgraf
+				select id, node_1 node, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0
 				union all
-				select id, node_2, arc_id, trace, flag from temp_anlgraf)a
-				order by node)b
-				group by node, trace order by 1, 2 desc)c order by node, c desc) a
-				JOIN (SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||
-						quote_ident(v_table)||' WHERE active IS TRUE) b  ON  nodeparent::integer = trace
+				select id, node_2, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0)a
+				order by node
+				)b group by node, trace order by 1, 2 desc
+				
+				)c order by node, c desc)a
 				WHERE node = node_id';
 				
 				RAISE NOTICE ' Update connecs';
 				-- used connec using v_edit_arc because the exploitation filter (same before)
 				v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
 				EXECUTE v_querytext;
-
-				
-			
+		
 				-- recalculate staticpressure (fid=147)
 				IF v_fid=146 THEN
 
@@ -641,8 +617,14 @@ BEGIN
 						JOIN presszone USING (presszone_id)) a
 						WHERE connec.connec_id=a.connec_id;
 				END IF;
+	
+				IF v_updatemapzgeom > 0 THEN		
+					-- message
+					INSERT INTO audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 1, concat('INFO: Geometry of mapzone ',v_class ,' have been modified by this process'));
+				END IF;
 
-				IF v_floodfromnode IS NULL THEN
+				IF v_floodonlymapzone IS NULL THEN
 
 					RAISE NOTICE 'Disconnecteds';
 
@@ -668,18 +650,22 @@ BEGIN
 
 					RAISE NOTICE 'Manage conflicts';
 
+					
+
 					-- manage conflicts
 					FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
 					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz WHERE active is true)a
 					USING (node_id))a
 					WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
+					
 					/*
 					SELECT concat(quote_literal(m1),',',quote_literal(m2)) as mapzone, node_id 
 					FROM (select n.node_id, n.presszone_id::text as m1, a.presszone_id::text as m2 from v_edit_node n 
-					JOIN (SELECT json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id, presszone_id, name FROM presszone mpz WHERE active is true)a	USING (node_id))a
+					      JOIN (SELECT json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id, presszone_id, name FROM presszone mpz WHERE active is true)a	USING (node_id))a
 					WHERE m1::text != m2::text AND m1::text !='0' AND m2::text !='0'
 					*/
-				
+
+	
 					LOOP
 						RAISE NOTICE 'Manage conflicts -> %', rec_conflict;
 				
@@ -712,17 +698,17 @@ BEGIN
 					-- create log
 					v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc GROUP BY '||(v_field)||')a
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN '||(v_table)||' p ON a.'||(v_field)||' = p.'||(v_field);
 					EXECUTE v_querytext;
 				ELSE
 					v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc GROUP BY '||(v_field)||')a
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN '||(v_table)||' p ON a.'||(v_field)||' = p.'||(v_field)||'
 					WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 					EXECUTE v_querytext;
@@ -748,7 +734,9 @@ BEGIN
 			
 				-- concave polygon
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
-						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM v_edit_arc WHERE state >0 group by '||quote_ident(v_field)||') 
+						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM v_edit_arc 
+						JOIN temp_anlgraf USING (arc_id) 
+						WHERE state > 0  AND water = 1 group by '||quote_ident(v_field)||') 
 						SELECT '||quote_ident(v_field)||
 						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 						v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
@@ -764,7 +752,8 @@ BEGIN
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc arc 
-						where arc.state > 0 AND '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||')a 
+						JOIN temp_anlgraf USING (arc_id) 
+						where arc.state > 0 AND water = 1 AND '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||')a 
 						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
 						/*
@@ -781,10 +770,13 @@ BEGIN
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc
-							where arc.state > 0 AND  '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||'
+							JOIN temp_anlgraf USING (arc_id) 
+							where arc.state > 0 AND water = 1 AND  '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||'
 							UNION
-							SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
-							WHERE v_edit_connec.state > 0 AND '||quote_ident(v_field)||'::integer > 0
+							SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM  ext_plot, v_edit_connec
+							JOIN temp_anlgraf USING (arc_id) 
+							WHERE v_edit_connec.state > 0 
+							AND '||quote_ident(v_field)||'::integer > 0  AND water = 1
 							AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 							group by '||quote_ident(v_field)||'	
 							)a group by '||quote_ident(v_field)||')b 
@@ -794,6 +786,7 @@ BEGIN
 						UPDATE arc set the_geom = geom FROM(
 							SELECT dma_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT dma_id, st_buffer(st_collect(the_geom), 10) as geom from v_edit_arc 
+							JOIN temp_anlgraf USING (arc_id) 
 							where dma_id::integer > 0 group by dma_id
 							UNION
 							SELECT dma_id, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
@@ -814,12 +807,13 @@ BEGIN
 				-- use link and pipe buffer
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-						(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc 
-						where arc.state > 0 AND '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||'
+						(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc JOIN temp_anlgraf USING (arc_id) 
+						where arc.state > 0  AND water = 1 AND '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||'
 						UNION
 						SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
-						as geom FROM connec c, v_edit_link link
-						WHERE c.'||quote_ident(v_field)||'::integer > 0 
+						as geom FROM v_edit_link link, connec c
+						JOIN temp_anlgraf USING (arc_id) 
+						WHERE c.'||quote_ident(v_field)||'::integer > 0  AND water = 1
 						AND c.state > 0	AND link.feature_id = connec_id and link.feature_type = ''CONNEC''
 						group by c.'||quote_ident(v_field)||'	
 						)a group by '||quote_ident(v_field)||')b 
@@ -848,6 +842,23 @@ BEGIN
 
 				v_geomparamupdate_divide = v_geomparamupdate/2;
 
+				/* example of querytext that could be implemented on config_param_system
+				UPDATE v_table set the_geom = geom FROM
+				(SELECT v_field, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+				(SELECT v_field, st_buffer(st_collect(the_geom), v_geomparamupdate) as geom 
+				FROM v_edit_arc arc
+				JOIN temp_anlgraf USING (arc_id) 
+				where arc.state > 0 AND water = 1 AND v_field::INTEGER> 0 group by v_field
+				UNION
+				SELECT v_field, st_collect(z.geom) as geom FROM v_crm_zone z
+				join v_edit_node using (node_id)
+				JOIN temp_anlgraf ON  node_id = node_1
+				WHERE v_edit_node.state > 0 AND water = 1 AND v_field::INTEGER> 0
+				group by v_field
+				)a group by v_field)b 
+				WHERE b.v_field=v_table.v_fieldmp
+				*/
+
 				SELECT value into v_querytext FROM config_param_system WHERE parameter='utils_grafanalytics_custom_geometry_constructor';
 				EXECUTE 'SELECT replace(replace(replace(replace(replace('||quote_literal(v_querytext)||',''v_table'', '||quote_literal(v_table)||'),
 				''v_fieldmp'', '||quote_literal(v_fieldmp)||'), ''v_field'', '||quote_literal(v_field)||'), ''v_fid'', '||quote_literal(v_fid)||'),
@@ -856,12 +867,6 @@ BEGIN
 
 				EXECUTE v_querytext;
 
-			END IF;
-				
-			IF v_updatemapzgeom > 0 THEN		
-				-- message
-				INSERT INTO audit_check_data (fid, criticity, error_message)
-				VALUES (v_fid, 1, concat('INFO: Geometry of mapzone ',v_class ,' have been modified by this process'));
 			END IF;
 
 			-- insert spacer for warning and info
@@ -880,7 +885,7 @@ BEGIN
 
 	IF v_updatefeature THEN -- only disconnected features to make a simple log
 
-		IF v_floodfromnode IS NULL THEN
+		IF v_floodonlymapzone IS NULL THEN
 			v_result = null;
 
 			-- disconnected arcs
@@ -951,8 +956,6 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 		
 	END IF;
-
-	RAISE NOTICE 'Finishing....';
 
 	-- value4disconnecteds
 	IF v_valuefordisconnected IS NOT NULL OR v_valuefordisconnected <> 0 THEN
