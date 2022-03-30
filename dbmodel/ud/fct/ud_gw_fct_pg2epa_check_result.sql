@@ -81,7 +81,7 @@ v_networkmode integer;
 
 object_rec record;
 
-v_graphiclog boolean;+
+v_graphiclog boolean;
 v_workspace text;
 
 BEGIN
