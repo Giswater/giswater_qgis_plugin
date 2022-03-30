@@ -208,7 +208,7 @@ class GwToolBoxButton(GwAction):
         if self.function_selected in self.no_clickable_items:
             return
 
-        if 'reports' in index.parent().data().lower():
+        if 'reports' in index.parent().parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
@@ -301,7 +301,7 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
 
-        elif 'giswater' in index.parent().data().lower():
+        elif 'processes' in index.parent().parent().data().lower():
 
             self.dlg_functions = GwToolboxManagerUi()
             tools_gw.load_settings(self.dlg_functions)
