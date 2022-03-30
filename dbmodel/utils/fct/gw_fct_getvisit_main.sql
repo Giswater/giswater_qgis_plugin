@@ -620,7 +620,8 @@ BEGIN
 		END IF;
 		
 		
-		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit''' INTO v_tram_exec_visit_wc;
+		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit'' and formname = '''||v_formname||'''' INTO v_tram_exec_visit_wc;
+
 		if v_tram_exec_visit IS NOT NULL THEN
 		
 			v_filter = ((v_tram_exec_visit_wc->>'hideWidgets')::JSON->>'tram_exec_visit')::json->>v_tram_exec_visit::text;
