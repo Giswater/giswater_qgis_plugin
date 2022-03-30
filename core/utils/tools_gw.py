@@ -1519,13 +1519,13 @@ def add_hyperlink(field):
                     tools_qgis.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter widgetfunction is null for widget"
+                message = "Parameter widgetfunction is null for widget hyperlink"
                 tools_qgis.show_message(message, 2, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
-        message = "Parameter not found"
-        tools_qgis.show_message(message, 2, parameter='widgetfunction')
+        message = "Parameter widgetfunction not found for widget type hyperlink"
+        tools_qgis.show_message(message, 2)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
