@@ -323,7 +323,7 @@ BEGIN
 			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_node WHERE node_id=v_node_id::text AND lot_id=v_lot;
 		END IF;
 		
-		UPDATE om_visit_lot_x_unit SET status=0 WHERE unit_id=v_unit_id;
+		UPDATE om_visit_lot_x_unit SET status=v_status WHERE unit_id=v_unit_id;
 	
 		-- set visit to every feature of the related unit
 		-- get generic v_feature_id whenever is arc or node
