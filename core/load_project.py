@@ -60,6 +60,10 @@ class GwLoadProject(QObject):
         # Get variables from qgis project
         self._get_project_variables()
 
+        # Manage variables not configured
+        if 'project_role' not in global_vars.project_vars or ('project_role' in global_vars.project_vars and global_vars.project_vars['project_role'] in (None, '')):
+            global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
+
         # Get water software from table 'sys_version'
         global_vars.project_type = tools_gw.get_project_type()
         if global_vars.project_type is None:
@@ -412,30 +416,25 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        if 'project_role' in global_vars.project_vars:
-            restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
-        else:
-            restriction = tools_gw.get_role_permissions(None)
-
-        if restriction == 'role_basic':
+        if global_vars.project_vars['project_role'] == 'role_basic':
             return
 
-        elif restriction == 'role_om':
+        elif global_vars.project_vars['project_role'] == 'role_om':
             self._enable_toolbar("om")
             return
 
-        elif restriction == 'role_edit':
+        elif global_vars.project_vars['project_role'] == 'role_edit':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
 
-        elif restriction == 'role_epa':
+        elif global_vars.project_vars['project_role'] == 'role_epa':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
 
-        elif restriction == 'role_master' or restriction == 'role_admin':
+        elif global_vars.project_vars['project_role'] == 'role_master' or global_vars.project_vars['project_role'] == 'role_admin':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
