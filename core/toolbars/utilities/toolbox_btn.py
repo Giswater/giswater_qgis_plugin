@@ -9,8 +9,10 @@ import csv
 import os
 from functools import partial
 import json
+from time import time
+from datetime import timedelta
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
     QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
@@ -472,10 +474,25 @@ class GwToolBoxButton(GwAction):
                                          "background-color: #E0E0E0;}"
                                          "QProgressBar::chunk {background-color:#0bd82c; width: 10 px; margin: 0.5px;}")
 
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._calculate_elapsed_time)
+        self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
-        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
+        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
+
+
+    def _calculate_elapsed_time(self):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"{timedelta(seconds=round(td))}")
+
+    def _update_time_elapsed(self, text):
+        lbl_time = self.dlg_functions.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
 
     def _manage_btn_run(self, index):

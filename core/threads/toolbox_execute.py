@@ -20,7 +20,7 @@ class GwToolBoxTask(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, toolbox, description, dialog, combo, result):
+    def __init__(self, toolbox, description, dialog, combo, result, timer=None):
 
         super().__init__(description)
         self.toolbox = toolbox
@@ -30,6 +30,7 @@ class GwToolBoxTask(GwTask):
         self.json_result = None
         self.exception = None
         self.function_name = None
+        self.timer = timer
 
 
     def run(self):
@@ -171,6 +172,8 @@ class GwToolBoxTask(GwTask):
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             return
 
