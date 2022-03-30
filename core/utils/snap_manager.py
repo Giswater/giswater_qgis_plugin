@@ -394,8 +394,11 @@ class GwSnapManager(object):
 
         event_point = self.get_event_point(point=point)
         result = self.snap_to_project_config_layers(event_point)
-        point = self.get_snapped_point(result)
-        # Setting x, y coordinates from snapped point
+        # Get snapped point only if snapping is valid
+        if result.isValid():
+            point = self.get_snapped_point(result)
+
+        # Setting x, y coordinates from point
         self.point_xy['x'] = point.x()
         self.point_xy['y'] = point.y()
 

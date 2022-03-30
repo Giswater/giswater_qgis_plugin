@@ -14,6 +14,7 @@ import traceback
 import webbrowser
 from functools import partial
 from encodings.aliases import aliases
+from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
     QPersistentModelIndex, QCoreApplication, QTranslator
@@ -59,6 +60,8 @@ class GwHyperLinkLabel(QLabel):
 
 
 def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
+
+    warn('This method is deprecated, use fill_combo_values instead.', DeprecationWarning, stacklevel=2)
 
     if rows is None:
         return
@@ -634,7 +637,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     qtable.setModel(model)
 
 
-def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False):
+def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub_sub_group=None):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
     :param group: Name of the group that will be created in the toc (string)
@@ -651,15 +654,21 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False):
         if not first_group:
             first_group = root.insertGroup(0, group)
         if not first_group.findGroup(sub_group):
-            first_group.insertGroup(0, sub_group)
+            second_group = first_group.insertGroup(0, sub_group)
+            if sub_sub_group and not second_group.findGroup(sub_sub_group):
+                second_group.insertGroup(0, sub_sub_group)
 
     if first_group and sub_group:
-        for child in first_group.children():
-            second_group = first_group.findGroup(child.name())
-            if second_group and sub_group.lower() == child.name().lower():
-                second_group.insertLayer(0, layer)
+        second_group = first_group.findGroup(sub_group)
+        if second_group:
+            third_group = second_group.findGroup(sub_sub_group)
+            if third_group:
+                third_group.insertLayer(0, layer)
                 global_vars.iface.setActiveLayer(layer)
                 return
+            second_group.insertLayer(0, layer)
+            global_vars.iface.setActiveLayer(layer)
+            return
         first_group.insertLayer(0, layer)
         global_vars.iface.setActiveLayer(layer)
         return
@@ -1087,7 +1096,13 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
     description = ""
     if exception:
         description = str(exception)
-        if 'unknown error' in description:
+        dont_show_list = ['unknown error', 'server closed the connection unexpectedly',
+                          'message contents do not agree with length in message']
+        for dont_show in dont_show_list:
+            if dont_show in description:
+                show_exception_msg = False
+                break
+        if 'server sent data' in description and 'without prior row description' in description:
             show_exception_msg = False
 
     try:

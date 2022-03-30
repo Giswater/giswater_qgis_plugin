@@ -21,7 +21,7 @@ from ...threads.epa_file_manager import GwEpaFileManager
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....lib import tools_qgis, tools_qt, tools_db, tools_os
 from ..dialog import GwAction
 
 

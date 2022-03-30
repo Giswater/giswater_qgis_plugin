@@ -506,7 +506,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -536,7 +536,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     else:
         if alias: tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
         # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
         # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
@@ -561,7 +561,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
             # Set layer config
             if tablename:
-                feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
+                feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
                 extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
                 body = create_body(feature=feature, extras=extras)
                 json_result = execute_procedure('gw_fct_getinfofromid', body)
@@ -1417,13 +1417,22 @@ def add_spinbox(field):
 def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
+
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and (widget.isReadOnly() is False or ignore_editability):
+        if widget.isReadOnly():
+            return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.is_checked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
+        if not widget.isEnabled():
+            return _json
         value = tools_qt.get_calendar_date(dialog, widget)
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
@@ -1510,13 +1519,13 @@ def add_hyperlink(field):
                     tools_qgis.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter widgetfunction is null for widget"
+                message = "Parameter widgetfunction is null for widget hyperlink"
                 tools_qgis.show_message(message, 2, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
-        message = "Parameter not found"
-        tools_qgis.show_message(message, 2, parameter='widgetfunction')
+        message = "Parameter widgetfunction not found for widget type hyperlink"
+        tools_qgis.show_message(message, 2)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)

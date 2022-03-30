@@ -172,9 +172,9 @@ class GwFeatureEndButton(GwAction):
             enddate = QDate.currentDate()
         tools_qt.set_calendar(self.dlg_work_end, "enddate", enddate)
 
-        sql = "SELECT id FROM cat_work"
+        sql = "SELECT id, id as idval FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, True)
+        tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
@@ -544,10 +544,10 @@ class GwFeatureEndButton(GwAction):
             if row is None:
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 tools_db.execute_sql(sql)
-                sql = "SELECT id FROM cat_work ORDER BY id"
+                sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 if rows:
-                    tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
+                    tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 

@@ -207,10 +207,10 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "193")
         tools_gw.add_icon(self.dlg_replace.btn_catalog, "195")
 
-        sql = "SELECT id FROM cat_work ORDER BY id"
+        sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+            tools_qt.fill_combo_values(self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         row = tools_gw.get_config_value('edit_workcat_vdefault')
@@ -255,7 +255,7 @@ class GwFeatureReplaceButton(GwMaptool):
                            f"ORDER BY id")
                 if sql:
                     rows = tools_db.get_rows(sql)
-                    tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                    tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
 
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
@@ -384,10 +384,10 @@ class GwFeatureReplaceButton(GwMaptool):
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     tools_db.execute_sql(sql)
 
-                    sql = "SELECT id FROM cat_work ORDER BY id"
+                    sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
                     rows = tools_db.get_rows(sql)
                     if rows:
-                        tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+                        tools_qt.fill_combo_values(self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
@@ -489,6 +489,6 @@ class GwFeatureReplaceButton(GwMaptool):
                    f"ORDER BY id")
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+        tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
 
     # endregion

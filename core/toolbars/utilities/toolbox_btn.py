@@ -208,7 +208,7 @@ class GwToolBoxButton(GwAction):
         if self.function_selected in self.no_clickable_items:
             return
 
-        if 'reports' in index.parent().data().lower():
+        if 'reports' in index.parent().parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
@@ -301,7 +301,7 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
 
-        elif 'giswater' in index.parent().data().lower():
+        elif 'processes' in index.parent().parent().data().lower():
 
             self.dlg_functions = GwToolboxManagerUi()
             tools_gw.load_settings(self.dlg_functions)
@@ -607,8 +607,8 @@ class GwToolBoxButton(GwAction):
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
         for group, functions in result['processes']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['functionname']))
@@ -627,8 +627,8 @@ class GwToolBoxButton(GwAction):
         # Section Reports
         reports_processes = QStandardItem('{}'.format('Reports'))
         for group, functions in result['reports']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Reports functions]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Reports functions]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))

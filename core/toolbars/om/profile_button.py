@@ -71,6 +71,8 @@ class GwProfileButton(GwAction):
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
         self.none_values = []
+        self.add_points = False
+        self.add_points_list = []
 
 
     def clicked_event(self):
@@ -94,8 +96,16 @@ class GwProfileButton(GwAction):
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
         tools_gw.add_icon(action, "131", sub_folder="24x24")
+        action.triggered.connect(partial(self._activate_add_points, False))
         action.triggered.connect(partial(self._activate_snapping_node))
         self.action_profile = action
+
+        action = self.dlg_draw_profile.findChild(QAction, "actionAddPoint")
+        tools_gw.add_icon(action, "111", sub_folder="24x24")
+        action.triggered.connect(partial(self._activate_add_points, True))
+        action.triggered.connect(partial(self._activate_snapping_node))
+        self.action_add_point = action
+        self.action_add_point.setDisabled(True)
 
         # Set validators
         self.dlg_draw_profile.txt_min_distance.setValidator(QDoubleValidator())
@@ -137,6 +147,12 @@ class GwProfileButton(GwAction):
         self.initNode = None
         self.endNode = None
         self.first_node = True
+        self.add_points = False
+        self.add_points_list = []
+
+
+    def _activate_add_points(self, activate=True):
+        self.add_points = activate
 
 
     def _get_profile(self):
@@ -156,6 +172,9 @@ class GwProfileButton(GwAction):
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
                  f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
+        if self.add_points_list:
+            l = str(self.add_points_list).replace("'", "")
+            extras += f', "midNodes":{l}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -313,7 +332,7 @@ class GwProfileButton(GwAction):
         self.endNode = None if not hasattr(self, "endNode") else self.endNode
         self.first_node = True if not hasattr(self, "first_node") else self.first_node
 
-        if self.first_node is False:
+        if self.first_node is False and not self.add_points:
             message = f"First node already selected with id: {self.initNode}. Select second one."
             tools_qgis.show_info(message)
 
@@ -368,13 +387,16 @@ class GwProfileButton(GwAction):
                 element_id = snapped_feat.attribute('node_id')
                 self.element_id = str(element_id)
 
-                if self.first_node:
+                if self.first_node and not self.add_points:
                     self.initNode = element_id
                     self.first_node = False
                     message = f"Node 1 selected"
                     tools_qgis.show_info(message, parameter=element_id)
                 else:
-                    self.endNode = element_id
+                    if self.add_points:
+                        self.add_points_list.append(element_id)
+                    else:
+                        self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                     tools_gw.disconnect_signal('profile')
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
@@ -385,6 +407,9 @@ class GwProfileButton(GwAction):
 
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
+                    if self.add_points and self.add_points_list:
+                        l = str(self.add_points_list).replace("'", "")
+                        extras += f', "midNodes":{l}'
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                     if result is None or result['status'] == 'Failed':
@@ -418,6 +443,9 @@ class GwProfileButton(GwAction):
 
                     # Next profile will be done from scratch
                     self.first_node = True
+                    if self.add_points:
+                        self.add_points = False
+                    self.action_add_point.setDisabled(False)
 
 
     def _action_pan(self):
@@ -1335,6 +1363,7 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.tbl_list_arc.clear()
         self.dlg_draw_profile.txt_profile_id.clear()
         self.action_profile.setDisabled(False)
+        self.action_add_point.setDisabled(True)
         self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
         self.dlg_draw_profile.btn_save_profile.setEnabled(False)
 

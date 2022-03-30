@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt, tools_db, tools_qgis
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis, tools_os
 from .task import GwTask
 
 
@@ -43,6 +43,7 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        self.replaced_velocities = False
 
 
     def set_variables_from_go2epa(self):
@@ -125,7 +126,7 @@ class GwEpaFileManager(GwTask):
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
                                 tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                    f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
+                                    f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
                                                    f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
 
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
@@ -138,6 +139,13 @@ class GwEpaFileManager(GwTask):
             sql += f");"
             tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
             tools_gw.manage_json_response(self.complet_result, sql, None)
+
+            replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
+                                                 prefix=False)
+            if tools_os.set_boolean(replace, default=False) and self.replaced_velocities:
+                msg = "There were velocities >50 in the rpt file. You have activated the option to force the import " \
+                      "so they have been set to 50."
+                tools_qt.show_info_box(msg)
 
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
@@ -420,6 +428,29 @@ class GwEpaFileManager(GwTask):
 
 
     def _read_rpt_file(self, file_path=None):
+
+        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
+        if tools_os.set_boolean(replace, default=False) and global_vars.project_type == 'ud':
+            # Replace the velocities
+            try:
+                # Read the contents of the file
+                with open(file_path, "r+") as file:
+                    contents = file.read()
+                # Save a backup of the file
+                with open(f"{file_path}.old", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+                # Replace the words
+                old_contents = contents
+                contents = tools_os.ireplace('>50', '50', contents)
+                if contents != old_contents:
+                    self.replaced_velocities = True
+                # Write the file with new contents
+                with open(file_path, "r+") as file:
+                    file.write(contents)
+                with open(f"{file_path}", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+            except Exception as e:
+                tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
 
         self.file_rpt = open(file_path, "r+")
         full_file = self.file_rpt.readlines()

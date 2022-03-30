@@ -49,6 +49,9 @@ class GwDscenarioManagerButton(GwAction):
 
         # Manage active buttons depending on project type
         self._manage_active_functions()
+        action = tools_gw.get_config_parser('dscenario_manager', 'cmb_action', "user", "session")
+        if action:
+            tools_qt.set_combo_value(self.dlg_dscenario_manager.cmb_actions, action, 0)
 
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
@@ -67,12 +70,18 @@ class GwDscenarioManagerButton(GwAction):
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
+        self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
 
-    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
+    def save_user_values(self):
+        action = tools_qt.get_combo_value(self.dlg_dscenario_manager, self.dlg_dscenario_manager.cmb_actions)
+        tools_gw.set_config_parser('dscenario_manager', 'cmb_action', action)
+
+
+    def _get_list(self, table_name='v_ui_cat_dscenario', filter_name="", filter_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
@@ -91,9 +100,9 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _fill_manager_table(self, filter_name=""):
-        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+        """ Fill dscenario manager table with data from v_ui_cat_dscenario """
 
-        complet_list = self._get_list("v_edit_cat_dscenario", filter_name)
+        complet_list = self._get_list("v_ui_cat_dscenario", filter_name)
 
         if complet_list is False:
             return False, False

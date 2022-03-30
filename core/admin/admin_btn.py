@@ -38,6 +38,7 @@ from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
+from ..threads.project_schema_update import GwUpdateSchemaTask
 
 
 class GwAdminButton:
@@ -328,38 +329,11 @@ class GwAdminButton:
             message_log.setVisible(True)
             QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
 
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(50)
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            schema_name = self._get_schema_name()
-            sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
-            tools_db.execute_sql(sql)
-            status = self.load_updates(project_type, update_changelog=True, schema_name=schema_name)
-            if status:
-                # Set info project
-                self._set_info_project()
-                if 'body' in status:
-                    tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
-                else:
-                    tools_log.log_warning(f"Key not found: 'body'")
-
-            self.task1.setProgress(100)
-        else:
-            return
-
-        status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Update project")
-
-        if status:
-            global_vars.dao.commit()
-            self.dlg_readsql_show_info.btn_update.hide()
-        else:
-            global_vars.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
+            description = f"Update schema"
+            params = {'project_type': project_type}
+            self.task_update_schema = GwUpdateSchemaTask(self, description, params)
+            QgsApplication.taskManager().addTask(self.task_update_schema)
+            QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
     def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
@@ -382,8 +356,6 @@ class GwAdminButton:
             status = self.update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
-            # Check if schema utils exists and execute update
-            self._update_utils(schema_name)
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 

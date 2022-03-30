@@ -49,6 +49,7 @@ class GwMincut:
         self.deleted_list = []
         self.ids = []
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+        self.excluded_layers = []
 
         # Serialize data of mincut states
         self.states = {}
@@ -704,11 +705,11 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
-        sql = ("SELECT name "
+        sql = ("SELECT name as id, name as idval "
                "FROM cat_users "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_fin, "exec_user", rows, False)
+        tools_qt.fill_combo_values(self.dlg_fin.exec_user, rows)
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
         tools_qt.set_widget_text(self.dlg_fin, "exec_user", str(assigned_to))
 
