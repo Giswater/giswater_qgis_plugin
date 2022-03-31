@@ -197,4 +197,8 @@ class GwToolBoxTask(GwTask):
     def cancel(self):
 
         self.toolbox.remove_layers()
+
+        if self.timer:
+            self.timer.stop()
+
         super().cancel()
