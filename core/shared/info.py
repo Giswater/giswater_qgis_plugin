@@ -2714,7 +2714,6 @@ class GwInfo(QObject):
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
         if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
             filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
-            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
             self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=True, column_filter=feature_key, value_filter=self.feature_id))
 
@@ -2724,6 +2723,8 @@ class GwInfo(QObject):
                 visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
             btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
             # Set model of selected widgetf.dlg_cf, self.cmb_visit_class, 0)])
             tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
@@ -2739,6 +2740,7 @@ class GwInfo(QObject):
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
 
+        table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
         if date_from > date_to:
             message = "Selected date interval is not valid"
             tools_qgis.show_warning(message)
