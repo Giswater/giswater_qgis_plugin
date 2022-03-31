@@ -488,7 +488,7 @@ class GwToolBoxButton(GwAction):
 
         tf = time()  # Final time
         td = tf - self.t0  # Delta time
-        self._update_time_elapsed(f"{timedelta(seconds=round(td))}")
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}")
 
     def _update_time_elapsed(self, text):
         lbl_time = self.dlg_functions.findChild(QLabel, 'lbl_time')
