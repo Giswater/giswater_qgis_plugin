@@ -9,6 +9,7 @@ import csv
 import os
 from functools import partial
 import json
+from sip import isdeleted
 from time import time
 from datetime import timedelta
 
@@ -491,6 +492,11 @@ class GwToolBoxButton(GwAction):
         self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}")
 
     def _update_time_elapsed(self, text):
+
+        if isdeleted(self.dlg_functions):
+            self.timer.stop()
+            return
+
         lbl_time = self.dlg_functions.findChild(QLabel, 'lbl_time')
         lbl_time.setText(text)
 
