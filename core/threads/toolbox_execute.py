@@ -105,7 +105,7 @@ class GwToolBoxTask(GwTask):
         extras += '"parameters":{'
         for group, function in list(self.result['fields'].items()):
             if len(function) != 0:
-                if function[0]['return_type'] not in (None, ''):
+                if function[0].get('return_type') not in (None, ''):
                     for field in function[0]['return_type']:
                         widget = self.dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
