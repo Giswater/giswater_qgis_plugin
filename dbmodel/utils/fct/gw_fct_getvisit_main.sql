@@ -172,7 +172,8 @@ v_new_visit boolean = FALSE;
 v_new_featureid varchar;
 v_new_visitclass integer;
 v_tram_exec_visit integer;
-v_tram_exec_visit_wc json;
+v_tram_exec_visit_txt text;
+v_tram_exec_visit_widget_control json;
 rec record;
 v_filter text;
 v_filter_aux text;
@@ -278,7 +279,7 @@ BEGIN
 	
 
 	--  get visitclass
-	IF v_visitclass IS NULL THEN
+	--IF v_visitclass IS NULL THEN
 
 		IF v_featureid IS NULL THEN
 			v_featureid = v_id;
@@ -327,19 +328,22 @@ BEGIN
 					
 				END IF;
 			ELSIF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-				v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type= upper(v_featuretype) order by id asc limit 1);
-					-- get if visit already exists
-					v_querystring = concat('SELECT visit_id FROM om_visit_x_',(v_featuretype) ,' 
-						JOIN om_visit ON om_visit.id = om_visit_x_',(v_featuretype) ,'.visit_id 
-						WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text  AND om_visit.class_id = ', v_visitclass ,'
-						ORDER BY om_visit_x_', (v_featuretype) ,'.id desc LIMIT 1');
-					v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid, 'v_visitclass', v_visitclass);
-					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 40);
-					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-					EXECUTE v_querystring INTO v_visit_id;
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type= upper(v_featuretype) order by id asc limit 1);
+				END IF;
+				-- get if visit already exists
+				v_querystring = concat('SELECT visit_id FROM om_visit_x_',(v_featuretype) ,' 
+					JOIN om_visit ON om_visit.id = om_visit_x_',(v_featuretype) ,'.visit_id 
+					WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text  AND om_visit.class_id = ', v_visitclass ,'
+					ORDER BY om_visit_x_', (v_featuretype) ,'.id desc LIMIT 1');
+				v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid, 'v_visitclass', v_visitclass);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 40);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_visit_id;
 			END IF;
 			-- if visit exists, get v_id and control if we have to load its form according to days interval
 			IF v_visit_id IS NOT NULL THEN
+			
 				v_querystring = concat('SELECT true FROM om_visit WHERE startdate > now() - ''7 days''::interval AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
 				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 50);
@@ -347,16 +351,16 @@ BEGIN
 				EXECUTE v_querystring INTO v_load_visit;
 			END IF;
             
-            IF v_load_visit IS NOT TRUE AND v_id IS NULL THEN
-				v_new_visit=TRUE;
-			END IF;
-            
             IF v_visit_id IS NOT NULL AND v_id IS NULL THEN
             	v_id = v_visit_id;
             END IF;
+			
+			IF v_load_visit IS NOT TRUE AND v_id IS NULL THEN
+				v_new_visit=TRUE;
+			ELSE 
+				v_tram_exec_visit=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'tram_exec_visit');
+			END IF;
             
-            RAISE NOTICE 'v_new_visit -> %', v_new_visit;
-
 		END IF;
 		
 		--new visit
@@ -372,7 +376,7 @@ BEGIN
 			ELSE
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
 				IF p_visittype=1 THEN
-					IF v_lot IS NOT NULL THEN
+					IF v_lot IS NOT NULL AND v_visitclass IS NULL THEN
 						v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot)::integer;
 					ELSIF v_visitclass IS NULL THEN
 						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_planned_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
@@ -407,11 +411,7 @@ BEGIN
 		ELSE 
 			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);			
 		END IF;
-	END IF;
-
-	IF v_visitclass IS NULL THEN
-		v_visitclass := 0;
-	END IF;
+	--END IF;
 
 	--  get formname and tablename
 	v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
@@ -442,7 +442,6 @@ BEGIN
 		v_queryinfra = (SELECT feature_id FROM (SELECT arc_id as feature_id, visit_id FROM om_visit_x_arc UNION SELECT node_id, visit_id FROM om_visit_x_node 
 				UNION SELECT connec_id, visit_id FROM om_visit_x_connec UNION SELECT gully_id, visit_id FROM om_visit_x_gully LIMIT 1) a WHERE visit_id=v_id::int8);
 	END IF;
-
 
 	IF v_new_visit IS FALSE THEN
 
@@ -620,28 +619,28 @@ BEGIN
 		END IF;
 		
 		
-		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit'' and formname = '''||v_formname||'''' INTO v_tram_exec_visit_wc;
-
+		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit'' and formname = '''||v_formname||'''' INTO v_tram_exec_visit_widget_control;
+		
 		if v_tram_exec_visit IS NOT NULL THEN
 		
-			v_filter = ((v_tram_exec_visit_wc->>'hideWidgets')::JSON->>'tram_exec_visit')::json->>v_tram_exec_visit::text;
+			v_filter = ((v_tram_exec_visit_widget_control->>'hideWidgets')::JSON->>'tram_exec_visit')::json->>v_tram_exec_visit::text;
+			v_filter = left(v_filter, -1);
+			v_filter = right(v_filter, -1);
 			v_filter = replace(v_filter, '"', '''');
-			v_filter = replace(v_filter, '[', '');
-			v_filter = replace(v_filter, ']', '');
-		
 		ELSE
 		
-			FOR rec IN SELECT * FROM json_each_text(((v_tram_exec_visit_wc->>'hideWidgets')::JSON->>'tram_exec_visit')::json)
+			FOR rec IN SELECT * FROM json_each_text(((v_tram_exec_visit_widget_control->>'hideWidgets')::JSON->>'tram_exec_visit')::json)
 			LOOP
 				v_filter_aux = rec.value;
+				v_filter_aux = left(v_filter_aux, -1);
+				v_filter_aux = right(v_filter_aux, -1);
 				v_filter_aux = replace(v_filter_aux, '"', '''');
-				v_filter_aux = replace(v_filter_aux, '[', '');
-				v_filter_aux = replace(v_filter_aux, ']', '');
-				
+
 				v_filter = concat(v_filter_aux, ', ', v_filter);
 			END LOOP;		
 			v_filter = left(v_filter, -2);
 		END IF;
+
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
 			IF v_new_visit THEN
 				IF v_formname IS NULL THEN
@@ -712,21 +711,25 @@ BEGIN
 						RAISE NOTICE ' --- SETTING status VALUE % ---', v_status;
 					END IF;
 					
-					IF (aux_json->>'columnname') = 'tram_exec_visit' AND v_tram_exec_visit IS NOT NULL THEN
-						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
-						RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
+					IF (aux_json->>'columnname') = 'tram_exec_visit' THEN
+						IF v_tram_exec_visit IS NULL THEN
+							v_tram_exec_visit_txt = COALESCE(v_tram_exec_visit::text, '');
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit_txt::text);
+						ELSE
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
+						END IF;
 					END IF;
 					
 					-- setting parameter in case of singleparameter visit
 					IF v_ismultievent IS FALSE THEN
 						IF (aux_json->>'columnname') = 'parameter_id' THEN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
-							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_parameter ;
+							RAISE NOTICE ' --- SETTING parameter_id VALUE % ---',v_parameter ;
 						END IF;
 
 						IF (aux_json->>'columnname') = 'value' THEN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_value);
-							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
+							RAISE NOTICE ' --- SETTING value VALUE % ---',v_value ;
 						END IF;
 
 					END IF;
@@ -799,6 +802,15 @@ BEGIN
 					-- disable visit type if project is offline
 					IF (aux_json->>'columnname') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
+					
+					IF (aux_json->>'columnname') = 'tram_exec_visit' THEN
+						IF v_tram_exec_visit IS NULL THEN
+							v_tram_exec_visit_txt = COALESCE(v_tram_exec_visit::text, '');
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit_txt::text);
+						ELSE
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
+						END IF;
 					END IF;
 									
 				END LOOP;			
