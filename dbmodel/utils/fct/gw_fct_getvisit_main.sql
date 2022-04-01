@@ -177,6 +177,7 @@ v_tram_exec_visit_widget_control json;
 rec record;
 v_filter text;
 v_filter_aux text;
+v_unit integer;
 
 BEGIN
 	
@@ -237,6 +238,7 @@ BEGIN
 	 -- if feature_type is unit, we change to arc/node and select one of the elements that are in this unit
 	IF v_featuretype = 'unit' THEN
 		v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
+		v_unit = v_featureid;
 	
 		v_featuretype='arc';
 		v_featuretablename='v_edit_arc';
@@ -697,6 +699,12 @@ BEGIN
 					IF (aux_json->>'columnname') = 'lot_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_lot::text);
 						RAISE NOTICE ' --- SETTING v_lot VALUE % ---',v_lot ;
+					END IF;
+				
+					-- setting unit_id
+					IF (aux_json->>'columnname') = 'unit_id' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_unit::text);
+						RAISE NOTICE ' --- SETTING v_unit VALUE % ---',v_unit ;
 					END IF;
 									
 					-- setting startdate
