@@ -359,7 +359,7 @@ BEGIN
 			
 			IF v_load_visit IS NOT TRUE AND v_id IS NULL THEN
 				v_new_visit=TRUE;
-			ELSE 
+			ELSIF v_tram_exec_visit IS NULL THEN
 				v_tram_exec_visit=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'tram_exec_visit');
 			END IF;
             
