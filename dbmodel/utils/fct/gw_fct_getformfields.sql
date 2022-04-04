@@ -24,9 +24,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
 	p_device integer,
 	p_values_array json)
     RETURNS text[]
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 
 /*EXAMPLE

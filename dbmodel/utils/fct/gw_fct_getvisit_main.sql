@@ -12,9 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main(
 	p_visittype integer,
 	p_data json)
     RETURNS json
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 /*EXAMPLE:
 
