@@ -2837,6 +2837,14 @@ def get_list(table_name, id_name=None, filter=None):
 def fill_tbl(complet_list, tbl, info, view):
     if complet_list is False:
         return False, False
+
+    # get view addparam
+    addparam = None
+    sql = f"SELECT addparam FROM sys_table WHERE id = '{view}'"
+    row = tools_db.get_row(sql)
+    if row:
+        addparam = row[0].get('pkey')
+
     setattr(info, f"my_json_{view}", {})
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']: continue
@@ -2850,7 +2858,7 @@ def fill_tbl(complet_list, tbl, info, view):
             tbl = tools_gw.add_tableview_header(tbl, field)
             tbl = tools_gw.fill_tableview_rows(tbl, field)
         tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
-        model.dataChanged.connect(partial(tbl_data_changed, info, view, model))
+        model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
 
 # region Tab epa
 
@@ -2901,32 +2909,50 @@ def open_epa_dlg(**kwargs):
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def tbl_data_changed(info, view, model, index):
+def tbl_data_changed(info, view, tbl, model, addparam, index):
 
+    # Get view pk
+    ids = f''
+    if addparam:
+        for pk in addparam.split(','):
+            col = tools_qt.get_col_index_by_col_name(tbl, pk.strip())
+            if col is not False:
+                ids += f"{model.index(index.row(), col).data()}, "
+    ids = ids.strip(', ')
+
+    if ids not in getattr(info, f"my_json_{view}"):
+        getattr(info, f"my_json_{view}")[ids] = {}
+
+    # Get edited cell
     fieldname = model.headerData(index.column(), Qt.Horizontal)
     field = index.data()
 
-
+    # Fill my_json
     if str(field) == '' or field is None:
-        getattr(info, f"my_json_{view}")[fieldname] = None
+        getattr(info, f"my_json_{view}")[ids][fieldname] = None
     else:
-        getattr(info, f"my_json_{view}")[fieldname] = str(field)
+        getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
 
 
 def save_tbl_changes(complet_list, info):
-    addparams = complet_list['body']['feature'].get('addparams')
+
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
     if not my_json:
         return
-    my_json = json.dumps(my_json)
 
-    feature = f'"id":"{info.feature_id}", '
-    feature += f'"tableName":"{view}"'
-    extras = f'"fields":{my_json}'
-    body = tools_gw.create_body(feature=feature, extras=extras)
-    json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
-    print(f"{json_result}")
+    # For each edited row
+    for k, v in my_json.items():
+        fields = json.dumps(v)
+        if not fields:
+            continue
+
+        feature = f'"id":"{k}", '
+        feature += f'"tableName":"{view}"'
+        extras = f'"fields":{fields}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+        print(f"{json_result}")
 
 
 # endregion
