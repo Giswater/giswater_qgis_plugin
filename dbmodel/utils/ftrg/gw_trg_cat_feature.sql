@@ -49,11 +49,10 @@ BEGIN
 
 		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_config') IS TRUE THEN
 
-			IF (NEW.graf_delimiter != 'NONE' AND NEW.graf_delimiter IS NOT NULL) THEN
+			IF (NEW.graf_delimiter = 'MINSECTOR') THEN
 				INSERT INTO config_graf_valve VALUES (NEW.id) ON CONFLICT (id) DO NOTHING; 
-			ELSIF (NEW.graf_delimiter = 'NONE') THEN
-				DELETE FROM config_graf_valve WHERE id = NEW.id;
 			END IF;
+			
 		END IF;
 		
 		RETURN NEW;
