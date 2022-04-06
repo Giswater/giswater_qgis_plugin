@@ -394,7 +394,8 @@ BEGIN
 					EXECUTE v_querytext;
 
 					IF v_table !='sector' THEN
-						v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
+						v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null WHERE expl_id IN 
+						(SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
 						EXECUTE v_querytext;
 					END IF;					
 				ELSE
@@ -425,10 +426,9 @@ BEGIN
 			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
 			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
 
-			-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
+			-- close boundary conditions acording config_graf_valve (flag=1)
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
-					node_1::integer IN ('||v_text||' 
-					UNION
+					node_1::integer IN (
 					SELECT a.node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
@@ -438,8 +438,7 @@ BEGIN
 			EXECUTE v_querytext;
 
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
-					node_2::integer IN ('||v_text||' 
-					UNION
+					node_2::integer IN (
 					SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
@@ -455,9 +454,6 @@ BEGIN
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
 			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 
-
-			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
-
 			-- close checkvalves on the opposite sense where they are working
 			UPDATE temp_anlgraf SET flag=1 WHERE id IN (
 					SELECT id FROM temp_anlgraf JOIN (
@@ -465,8 +461,23 @@ BEGIN
 					) a 
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_2::integer);
 
-			-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)			
-			-- in function of graf class
+			-- close custom nodes acording init parameters
+			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+			
+			-- open custom nodes acording init parameters
+			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+			UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+			
+			-- Close mapzone headers
+			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE node_1::integer IN ('||v_text||')';
+			EXECUTE v_querytext;
+			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE node_2::integer IN ('||v_text||')';
+			EXECUTE v_querytext;
+
+			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
+
+			-- Open mapzone headers BUT ONLY ENABLING the right sense (to_arc)			
 			IF v_class = 'SECTOR' THEN
 				-- sector (sector.grafconfig)
 				UPDATE temp_anlgraf SET flag=0, isheader = true WHERE id IN (
@@ -507,15 +518,7 @@ BEGIN
 					where grafconfig is not null and active is true order by 1,2) a
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);		
 			END IF;
-
-			-- close custom nodes acording init parameters
-			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
-			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 			
-			-- open custom nodes acording init parameters
-			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
-			UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
-
 			-- set the starting element (water)
 			IF v_floodonlymapzone IS NULL THEN
 				v_querytext = 'UPDATE temp_anlgraf SET water=1, trace = '||v_fieldmp||'::integer 
@@ -536,7 +539,7 @@ BEGIN
 				GET DIAGNOSTICS v_affectrow = row_count;
 				raise notice 'v_count --> %' , v_count;
 				EXIT WHEN v_affectrow = 0;
-				EXIT WHEN v_count = 2000;
+				EXIT WHEN v_count = 5000;
 			END LOOP;
 
 			RAISE NOTICE 'Finish engine....';
@@ -918,6 +921,8 @@ BEGIN
 			FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = 0
 			UNION
 			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = -1
+			UNION			
+			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
