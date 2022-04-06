@@ -168,10 +168,10 @@ BEGIN
 			DELETE FROM inp_curve_value;
 			DELETE FROM inp_controls;
 			DELETE FROM inp_rules;
-			DELETE FROM inp_emitter;
-			DELETE FROM inp_quality;
-			DELETE FROM inp_source;
-			DELETE FROM inp_mixing;
+			--DELETE FROM inp_emitter;
+			--DELETE FROM inp_quality;
+			--DELETE FROM inp_source;
+			--DELETE FROM inp_mixing;
 			DELETE FROM config_param_user;
 			DELETE FROM inp_label;
 			DELETE FROM inp_backdrop;
@@ -395,7 +395,7 @@ BEGIN
 
 			-- insert other catalog tables
 			INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
-
+			INSERT INTO cat_dscenario(dscenario_id, name, active, expl_id) VALUES (1, 'IMPORTINP', TRUE, 1);
 
 			--create child views 
 			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
@@ -418,6 +418,19 @@ BEGIN
 			INSERT INTO inp_pipe (arc_id, minorloss, status) 
 			SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
+			-- improve velocity for demands using directy tables in spite of vi_pipes view
+			INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source) 
+			SELECT 1, csv1, csv2::numeric(12,6), csv3, csv4, 'IMPORTINP' 
+			FROM temp_csv where source='[DEMANDS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
+
+			-- improve velocity for demands using directy tables in spite of vi_pipes view
+			UPDATE inp_junction SET emitter_coeff = csv2::numeric(12,6)
+			FROM temp_csv where source='[EMITTERS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user AND node_id = csv1;
+
+			-- improve velocity for demands using directy tables in spite of vi_pipes view
+			UPDATE inp_junction SET init_quality = csv2::numeric(12,6)
+			FROM temp_csv where source='[QUALITY]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user AND node_id = csv1;
+
 			-- delete those custom_length with same value of real_length
 			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
 			
@@ -433,7 +446,8 @@ BEGIN
 
 
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
+			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid 
+			AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates', 'vi_emitters', 'vi_quality','vi_demands') order by orderby
 			LOOP
 				--identifing the number of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
@@ -453,7 +467,7 @@ BEGIN
 
 				--inserting values on editable view
 				v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source='||quote_literal(v_rec_table.target)||'
-				AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
+				AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id;';
 
 				raise notice 'v_sql %', v_sql;
 				EXECUTE v_sql;
@@ -580,8 +594,8 @@ BEGIN
 					EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 					IF v_epatablename = 'inp_pump' THEN
-						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, pump_type)
-						SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id,to_arc, pump_type)
+						SELECT v_node_id, power, curve_id, speed, pattern_id, status, effic_curve_id,  energy_price, energy_pattern_id, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
@@ -623,11 +637,11 @@ BEGIN
 				WHERE  b.arc_id = concat(inp_shortpipe.node_id,'_n2a');
 
 				-- transform pump additional from node to inp_pump_additional table		
-				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status, energyparam, energyvalue)
+				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
 				select 
 				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
 				(substring(reverse(arc_id),0,2))::integer,
-				power, curve_id, speed, pattern, status, energyparam, energyvalue
+				power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id
 				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
 				-- update state=0 pump additionals 
@@ -827,7 +841,7 @@ BEGIN
 	    '}}')::json, 2522, null, null, null);
 	
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
+/*	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
 		{"message":"-----------------------------"},
@@ -838,7 +852,7 @@ BEGIN
 		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
-	
+	*/
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

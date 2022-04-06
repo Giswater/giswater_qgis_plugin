@@ -52,77 +52,110 @@ BEGIN
 	  ELSIF v_view='vi_pumps' THEN 
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'ARCPUMP','PUMP-IMPORTINP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
+	    
 	    IF NEW.power ='POWER' THEN
-			NEW.power=NEW.head;
+				NEW.power=NEW.head;
 	    ELSIF NEW.power ='HEAD' THEN
-			NEW.power=NULL;	   
+				NEW.power=NULL;	   
 	    END IF;
 	    
-	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern)
-	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern);
+	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern_id)
+	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern_id);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
 	  ELSIF v_view='vi_valves' THEN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, concat('ARC',NEW.valv_type),'VALVE-IMPORTINP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_valve_importinp (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
-	      IF NEW.valv_type IN ('PRV','PSV','PBV') THEN
-		UPDATE inp_valve_importinp SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
-	      ELSIF NEW.valv_type='FCV' THEN 
-		UPDATE inp_valve_importinp SET flow=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
-	      ELSIF NEW.valv_type='TCV' THEN
-		UPDATE inp_valve_importinp SET coef_loss=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
-	      ELSIF NEW.valv_type='GPV' THEN
-		UPDATE inp_valve_importinp SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
-	      END IF;         
+	   	IF NEW.valv_type IN ('PRV','PSV','PBV') THEN
+				UPDATE inp_valve_importinp SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+	    ELSIF NEW.valv_type='FCV' THEN 
+				UPDATE inp_valve_importinp SET flow=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+	    ELSIF NEW.valv_type='TCV' THEN
+				UPDATE inp_valve_importinp SET coef_loss=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+	    ELSIF NEW.valv_type='GPV' THEN
+				UPDATE inp_valve_importinp SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
+	    END IF;         
 	    
 	  ELSIF v_view='vi_tags' THEN 
-		INSERT INTO inp_tags(feature_type, feature_id, tag) VALUES (NEW.feature_type, NEW.feature_id, NEW.tag);
+			INSERT INTO inp_tags(feature_type, feature_id, tag) VALUES (NEW.feature_type, NEW.feature_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
-		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
-      	    
+			INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
+    	  	    
 	  ELSIF v_view='vi_patterns' THEN 
-		INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
-					   factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) VALUES 
-					   (NEW.pattern_id, NEW.factor_1,NEW.factor_2,NEW.factor_3,NEW.factor_4,NEW.factor_5,NEW.factor_6,NEW.factor_7,NEW.factor_8, NEW.factor_9,
-					   NEW.factor_10,NEW.factor_11,NEW.factor_12,NEW.factor_13,NEW.factor_14, NEW.factor_15, NEW.factor_16,NEW.factor_17, NEW.factor_18);
+			INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
+			factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) 
+			VALUES (NEW.pattern_id, NEW.factor_1,NEW.factor_2,NEW.factor_3,NEW.factor_4,NEW.factor_5,NEW.factor_6,NEW.factor_7,NEW.factor_8, NEW.factor_9,
+			NEW.factor_10,NEW.factor_11,NEW.factor_12,NEW.factor_13,NEW.factor_14, NEW.factor_15, NEW.factor_16,NEW.factor_17, NEW.factor_18);
 	  
 	  ELSIF v_view='vi_curves' THEN
 
-		IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
-			INSERT INTO inp_curve (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
-		END IF;
+			IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
+				INSERT INTO inp_curve (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
+			END IF;
 
-		INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
+			INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
 	    
 	  ELSIF v_view='vi_emitters' THEN
-		INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
+			UPDATE inp_junction SET emitter_coeff=NEW.emitter_coeff WHERE node_id=NEW.node_id;
 	    
 	  ELSIF v_view='vi_quality' THEN
-		INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
-	    
+	  	UPDATE inp_junction SET initqual=NEW.initqual WHERE node_id=NEW.node_id;
+	  	UPDATE inp_tank SET initqual=NEW.initqual WHERE node_id=NEW.node_id;
+	  	UPDATE inp_reservoir SET initqual=NEW.initqual WHERE node_id=NEW.node_id;
+	  	UPDATE inp_valve_importinp SET initqual=NEW.initqual WHERE node_id=NEW.node_id; --vrtualvalve
+	  	UPDATE inp_inlet SET initqual=NEW.initqual WHERE arc_id=NEW.node_id;
+
 	  ELSIF v_view='vi_sources' THEN
-		INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
+			INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
 	    
 	  ELSIF v_view='vi_reactions' THEN
 
 	  	IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
-	  		UPDATE inp_pipe SET reactionparam = NEW.idval, reactionvalue = NEW.reactionvalue WHERE arc_id=NEW.arc_id;
-	  	ELSE 
-	  		INSERT INTO inp_reactions (descript) VALUES (concat(NEW.idval,' ', NEW.arc_id,' ',NEW.reactionvalue));
+	  		IF NEW.param = 'BULK' THEN 
+	  			UPDATE inp_pipe SET bulk_coeff = NEW.coeff WHERE arc_id=NEW.arc_id;
+	  		ELSIF NEW.param = 'WALL' THEN 
+	  			UPDATE inp_pipe SET wall_coeff = NEW.coeff WHERE arc_id=NEW.arc_id;
+	  		END IF;
+	  	ELSIF NEW.arc_id ilike 'ORDER BUL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ORDER BULK','')) WHERE parameter = 'inp_reactions_global_order';
+	  	ELSIF NEW.pump_id ilike 'ORDER WALL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ORDER WALL','')) WHERE parameter = 'inp_reactions_global_order';
+	  	ELSIF NEW.arc_id ilike 'GLOBAL BUL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'GLOBAL BULK','')) WHERE parameter = 'inp_reactions_global_bulk';
+	  	ELSIF NEW.pump_id ilike 'GLOBAL WALL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'GLOBAL WALL','')) WHERE parameter = 'inp_reactions_global_wall'; 
+	  	ELSIF NEW.pump_id ilike 'ROUGHNESS CORRELATION%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ROUGHNESS CORRELATION','')) WHERE parameter = 'inp_reactions_wall_coeff_correlation'; 
+	  	ELSIF NEW.pump_id ilike 'LIMITING POTENTIAL%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.arc_id, 'ROUGHNESS CORRELATION','')) WHERE parameter = '	inp_reactions_limit_concentration';	
 	  	END IF;
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		UPDATE inp_pump_importinp SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
-	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
-	  	ELSE
-	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 
+	  		IF NEW.idval ILIKE '%PRICE%' THEN
+	  			UPDATE inp_pump_importinp SET energy_price = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		ELSIF NEW.idval ILIKE '%EFFIC%' THEN
+	  			UPDATE inp_pump_importinp SET effic_curve_id = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		ELSIF  NEW.idval ILIKE '%PATTERN%' THEN
+	  			UPDATE inp_pump_importinp SET energy_pattern_id = NEW.energyvalue 
+	  			WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  		END IF;
+	  	ELSIF NEW.pump_id ilike 'GLOBAL EFFIC%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL EFFIC','')) WHERE parameter = 'inp_energy_pump_effic';
+	  	ELSIF NEW.pump_id ilike 'GLOBAL PATTERN%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL PATTERN','')) WHERE parameter = 'inp_energy_price_pattern'; 
+	  	ELSIF NEW.pump_id ilike 'GLOBAL PRICE%' THEN
+	  		UPDATE config_param_user SET value = trim(replace(NEW.pump_id, 'GLOBAL PRICE','')) WHERE parameter = 'inp_energy_price'; 
 	  	END IF;
 
 	  ELSIF v_view='vi_mixing' THEN
-	    INSERT INTO inp_mixing(node_id, mix_type, value) VALUES (NEW.node_id, NEW.mix_type, NEW.value);
+	    UPDATE inp_tank SET mixing_model=NEW.mixing_model, mixing_fraction=NEW.mixing_fraction WHERE node_id=NEW.node_id;
+	    UPDATE inp_inlet SET mixing_model=NEW.mixing_model, mixing_fraction=NEW.mixing_fraction WHERE node_id=NEW.node_id;
+
 	    
 	  ELSIF v_view='vi_times' THEN 
 	    IF NEW.value IS NULL THEN

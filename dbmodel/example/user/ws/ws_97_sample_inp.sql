@@ -581,8 +581,10 @@ INSERT INTO inp_pipe VALUES ('113907', NULL, 'OPEN', NULL, NULL);
 INSERT INTO inp_pipe VALUES ('113905', NULL, 'OPEN', NULL, NULL);
 INSERT INTO inp_pipe VALUES ('113906', NULL, 'OPEN', NULL, NULL);
 
-INSERT INTO inp_pump VALUES ('1105', NULL, 'PUMP_02', NULL, NULL, 'OPEN', 113881, null, null, 'PRESSPUMP');
-INSERT INTO inp_pump VALUES ('113951', NULL, 'PUMP_01', NULL, NULL, 'OPEN', 114026, null, null, 'FLOWPUMP');
+INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, to_arc, pump_type) 
+VALUES ('1105', NULL, 'PUMP_02', NULL, NULL, 'OPEN', 113881, 'PRESSPUMP');
+INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, to_arc, pump_type) 
+VALUES ('113951', NULL, 'PUMP_01', NULL, NULL, 'OPEN', 114026, 'FLOWPUMP');
 
 INSERT INTO inp_pump_additional VALUES (1,'1105',1, NULL, 'PUMP_02', NULL, NULL, 'CLOSED');
 

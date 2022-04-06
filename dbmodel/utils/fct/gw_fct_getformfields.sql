@@ -24,8 +24,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
 	p_device integer,
 	p_values_array json)
     RETURNS text[]
-
 AS $BODY$
+
+
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getformfields( 've_arc_pipe','form_feature','data','ve_arc_pipe','arc_id',	'2088','character varying(16)',	'UPDATE',	1,	'4',	'{}' )
 SELECT SCHEMA_NAME.gw_fct_getformfields('visit_arc_insp', 'form_visit', 'data', NULL,	 NULL, 		NULL, 	NULL, 			'INSERT', 	null, 	3,	null)
@@ -71,11 +72,13 @@ v_querystring text;
 v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
+v_epa_table text;
+v_featuretype text;
 v_currency text;
 v_filter_widgets text = '';
        
 BEGIN
-	
+
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
@@ -83,17 +86,17 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row' INTO v_version;
-	v_currency :=(SELECT value::json->>'symbol' FROM config_param_system WHERE parameter='admin_currency');
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	INTO v_version;
 
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
-
+	
 	IF v_debug = TRUE THEN
 		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
 		'id',p_id, 'columntype', p_columntype, 'tgop', p_tgop, 'filterfield', p_filterfield, 'device', p_device, 'values_array', p_values_array	));
-
+		
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":',v_debug_var,'}}')::json);
 	END IF;
 
@@ -132,41 +135,49 @@ BEGIN
 
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
+		IF p_tgop = 'INSERT' THEN
+			v_featuretype = lower(replace(p_idname,'_id',''));
+			EXECUTE 'SELECT concat(''ve_epa_'',lower(epa_default)) 
+			FROM cat_feature cf
+			JOIN cat_feature_'||v_featuretype||' f ON cf.id = f.id
+			WHERE child_layer = '||quote_literal(p_formname)||''
+			INTO v_epa_table;
+		ELSIF p_tgop='UPDATE' THEN
+			v_epa_table=concat('ve_epa_',lower(json_extract_path_text(p_values_array,'epa_type')));
+		END IF;	
 		
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
 		
-			SELECT ',v_label,', columnname, columnname as column_id, concat(',quote_literal(p_tabname),',''_'',columnname) AS widgetname, widgettype,
-			widgetfunction,', v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
+			SELECT ',v_label,', columnname, columnname as column_id, concat(tabname,''_'',columnname) AS widgetname, widgettype,
+			widgetfunction, widgetfunction as  widgetAction, widgetfunction as updateAction, widgetfunction as changeAction,
+			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
-			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
+			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, isfilter
 			FROM config_form_fields 
 			LEFT JOIN typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
 			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
-			
-			WHERE formname = ',quote_nullable(p_formname),' AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''' OR formname = ''',v_epa_table,''') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+
 
 		v_debug_vars := json_build_object('v_label', v_label, 'p_tabname', p_tabname, 'v_device', v_device, 'p_formname', p_formname, 'p_formtype', p_formtype, 'v_clause', v_clause);
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+		RAISE NOTICE 'v_querystring111,%',v_querystring;
 		EXECUTE v_querystring INTO fields_array;
 
 	ELSE
 		v_querystring = concat('SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
-				(SELECT 
-				concat(unit, ''. '', descript) AS label , 				
-				identif AS columnname, ''label'' AS widgettype,
+				(SELECT concat(unit, ''. '', descript) AS label, identif AS columnname, ''label'' AS widgettype,
 				concat (',quote_literal(p_tabname),',''_'',identif) AS widgetname, ''string'' AS datatype, 
 				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
-				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, 
-				CASE WHEN lower(unit)!=''pp'' THEN concat (measurement,'' '',unit,'' x '', cost , '' ',v_currency,'/'',unit,'' = '', total_cost::numeric(12,2), '' ',v_currency,''')   
-				     WHEN lower(unit) =''pp'' THEN concat (''('',measurement,'' ut. x '', cost , '' ',v_currency,''', '' ) / '', length ,'' ml = '', total_cost,'' ',v_currency,''') END as value, 
-				null as stylesheet,
+				NULL AS dv_querytext_filterc, NULL AS linkedobject, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , 
+				'' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
 				null as widgetcontrols, null as hidden
-				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),' AND total_cost IS NOT NULL
+				FROM ' ,p_tablename, ' WHERE ' ,p_idname, ' = ',quote_nullable(p_id),'
 			UNION
 				SELECT label, columnname, widgettype,
 				concat (',quote_literal(p_tabname),',''_'',columnname) AS widgetname, datatype,
@@ -364,19 +375,37 @@ BEGIN
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
+	-- Remove widgetaction when is null
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgetaction' is null
+	LOOP
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'widgetaction');
+	END LOOP;
+
+	-- Remove updateaction when is null
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'updateaction' is null
+	LOOP
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'updateaction');
+	END LOOP;
+
+	-- Remove changeaction when is null
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'changeaction' is null
+	LOOP
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'changeaction');
+	END LOOP;
+	
 	-- Remove widgetfunction when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgetfunction' is null
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'widgetfunction');
 	END LOOP;
 
-	
+	/*
 	-- Remove stylesheet when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'stylesheet' is null
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'stylesheet');
 	END LOOP;
-	
+	*/
 
 	-- Remove tooltip when is null
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'tooltip' is null
