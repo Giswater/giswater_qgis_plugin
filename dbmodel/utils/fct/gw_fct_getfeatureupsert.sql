@@ -200,6 +200,7 @@ BEGIN
 
 	EXECUTE v_active_feature INTO v_catfeature;
 
+
 	--  Starting control process
 	----------------------------
 	IF p_tg_op = 'INSERT' THEN 
@@ -404,26 +405,16 @@ BEGIN
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
 		-- getting values from feature
-		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' AND table_name = concat('ve_epa_',lower(v_catfeature.system_id)))) IS TRUE THEN
-			v_querystring = concat('SELECT (row_to_json(a)) FROM 
-				(SELECT * FROM ',p_table_id,' a JOIN ve_epa_',lower(v_catfeature.system_id),' b ON a.',quote_ident(p_idname),'=b.',quote_ident(p_idname),' WHERE a.',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
-			v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_values_array;
-		ELSE
-			v_querystring = concat('SELECT (row_to_json(a)) FROM 
+		v_querystring = concat('SELECT (row_to_json(a)) FROM 
 			(SELECT * FROM ',p_table_id,' WHERE ',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
-			v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 25);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_values_array;
-		END IF;
-		
+		v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_values_array;
+
 		-- getting node values in case of arcs (update)
 		v_node1 := (v_values_array->>'node_1');
 		v_node2 := (v_values_array->>'node_2');	
-		
 	END IF;
 
 	-- building the form widgets
@@ -712,10 +703,10 @@ BEGIN
 				END IF;
 
 				
-			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
+			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN 
 				field_value := (v_values_array->>(aux_json->>'columnname'));
 			END IF;
-
+		
 			-- setting values
 			IF (aux_json->>'widgettype')='combo' THEN 
 				--check if selected id is on combo list

@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main(
 	p_visittype integer,
 	p_data json)
     RETURNS json
+    
 AS $BODY$
 /*EXAMPLE:
 
@@ -177,7 +178,6 @@ rec record;
 v_filter text;
 v_filter_aux text;
 v_unit integer;
-
 
 BEGIN
 	
@@ -638,7 +638,6 @@ BEGIN
 				v_filter_aux = right(v_filter_aux, -1);
 				v_filter_aux = replace(v_filter_aux, '"', '''');
 
-
 				v_filter = concat(v_filter_aux, ', ', v_filter);
 			END LOOP;		
 			v_filter = left(v_filter, -2);
@@ -727,7 +726,6 @@ BEGIN
 						ELSE
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
 						END IF;
-
 					END IF;
 					
 					-- setting parameter in case of singleparameter visit

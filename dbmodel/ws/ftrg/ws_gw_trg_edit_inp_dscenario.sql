@@ -79,11 +79,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pattern IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern IS NULL OR NEW.pattern='' THEN NEW.pattern = (SELECT pattern FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 	
-			INSERT INTO inp_dscenario_pump(dscenario_id, node_id, power, curve_id, speed, pattern_id, status)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status);
+			INSERT INTO inp_dscenario_pump(dscenario_id, node_id, power, curve_id, speed, pattern, status)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 
 		ELSIF v_dscenario_type = 'PIPE' THEN
 
