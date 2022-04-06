@@ -457,7 +457,7 @@ BEGIN
 			WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
 		-- update node catalog
-		UPDATE anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user AND nodecat_id !='VNODE';
+		UPDATE anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.type = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user AND nodecat_id !='VNODE';
 		UPDATE anl_node SET nodecat_id = 'TOP' WHERE nodecat_id NOT IN ('BOTTOM', 'VNODE') AND fid=222 AND cur_user = current_user;
 
 		-- update node type
@@ -572,7 +572,7 @@ BEGIN
 				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
 				/*      
-				SELECT node_id, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
+				SELECT node_id, nodecat_id as surface_type, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
 				select * from anl_arc WHERE fid=222 AND cur_user = current_user order by total_length
 				select * from anl_node WHERE fid=222 AND cur_user = current_user ORDER BY total_distance 
 				*/
