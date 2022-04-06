@@ -580,6 +580,7 @@ BEGIN
 			update sector SET the_geom=v_extend_val;
 			update dma SET the_geom=v_extend_val;
 			update ext_municipality SET the_geom=v_extend_val;
+			UPDATE raingage SET the_geom=ST_Centroid(sector.the_geom) FROM sector WHERE raingage.the_geom IS NULL;
 
 			-- Create cat_mat_arc on import inp function
 			INSERT INTO cat_mat_arc	SELECT DISTINCT matcat_id, matcat_id FROM arc WHERE matcat_id IS NOT NULL;
