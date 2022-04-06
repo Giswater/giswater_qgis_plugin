@@ -2843,7 +2843,9 @@ def fill_tbl(complet_list, tbl, info, view):
     sql = f"SELECT addparam FROM sys_table WHERE id = '{view}'"
     row = tools_db.get_row(sql)
     if row:
-        addparam = row[0].get('pkey')
+        addparam = row[0]
+        if addparam:
+            addparam = addparam.get('pkey')
 
     setattr(info, f"my_json_{view}", {})
     for field in complet_list['body']['data']['fields']:
@@ -2918,7 +2920,9 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
             col = tools_qt.get_col_index_by_col_name(tbl, pk.strip())
             if col is not False:
                 ids += f"{model.index(index.row(), col).data()}, "
-    ids = ids.strip(', ')
+        ids = ids.strip(', ')
+    else:
+        ids = f"{model.index(index.row(), 0).data()}"
 
     if ids not in getattr(info, f"my_json_{view}"):
         getattr(info, f"my_json_{view}")[ids] = {}
