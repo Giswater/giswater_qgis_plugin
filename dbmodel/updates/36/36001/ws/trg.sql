@@ -22,6 +22,9 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
 CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pump
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump');
 
+CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pump_additional
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump_additional');
+
 CREATE TRIGGER gw_trg_edit_inp_node_reservoir INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_reservoir
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_reservoir');
 
