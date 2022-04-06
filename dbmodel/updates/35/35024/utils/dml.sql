@@ -11,3 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
 VALUES ('440', 'Check outlet_id assigned to subcatchments','ud',null, 'core', true, 'Check epa-config')
 ON CONFLICT (fid) DO NOTHING;
+
+UPDATE config_param_system SET parameter='admin_debug' WHERE parameter = 'om_mincut_debug';
