@@ -64,6 +64,11 @@ v_projecttype text;
 v_closedstatus boolean;
 v_message json;
 v_afterinsert boolean;
+v_addparam json;
+v_idname_array text[];
+v_id_array text[];
+column_type_id_array text[];
+idname text;
 
 BEGIN
 
@@ -100,7 +105,30 @@ BEGIN
 	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
         INTO v_idname
         USING v_tablename;
-        
+	-- Get if view has composite primary key
+	IF v_idname ISNULL THEN
+		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+		v_idname = v_addparam ->> 'pkey';
+		v_idname_array := string_to_array(v_idname, ', ');
+
+		IF v_idname IS NOT NULL THEN
+			FOREACH idname IN ARRAY v_idname_array LOOP
+				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+				    JOIN pg_class t on a.attrelid = t.oid
+				    JOIN pg_namespace s on t.relnamespace = s.oid
+				    WHERE a.attnum > 0 
+				    AND NOT a.attisdropped
+				    AND a.attname = $3
+				    AND t.relname = $2 
+				    AND s.nspname = $1
+				    ORDER BY a.attnum'
+			    USING v_schemaname, v_tablename, idname
+			    INTO column_type_id;
+				column_type_id_array[i] := column_type_id;
+				i=i+1;
+			END LOOP;
+		END IF;
+	END IF;
 	-- For views it suposse pk is the first column
 	IF v_idname ISNULL THEN
 		EXECUTE '
@@ -126,6 +154,7 @@ BEGIN
             INTO column_type_id;
 
 	IF v_text is not NULL THEN
+		i = 1;
 		-- query text, step1
 		v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
 	
@@ -178,7 +207,19 @@ BEGIN
 		END LOOP;
 
 		-- query text, final step
-		v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
+		v_idname_array := string_to_array(v_idname, ', ');
+		v_id_array := string_to_array(v_id, ', ');
+		IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 THEN
+			i = 1;
+			v_querytext := v_querytext || ' WHERE ';
+			FOREACH idname IN ARRAY v_idname_array LOOP
+				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
+				i=i+1;
+			END LOOP;
+			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+		ELSE
+			v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
+		END IF;
 
 		raise notice 'v_querytext %', v_querytext;
 
