@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QTableView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi
@@ -80,6 +80,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_create_workspace = GwCreateWorkspaceUi()
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
+        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
 
         # Connect create workspace dialog signals
         self.new_workspace_name.textChanged.connect(partial(self._check_exists))
@@ -168,9 +169,10 @@ class GwWorkspaceManagerButton(GwAction):
         if len(name) == 0:
             tools_qt.set_stylesheet(self.new_workspace_name)
             return
+        private = self.new_workspace_chk.isChecked()
         action = "CREATE"
 
-        extras = f'"action":"{action}", "name":"{name}", "descript":{descript}'
+        extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
