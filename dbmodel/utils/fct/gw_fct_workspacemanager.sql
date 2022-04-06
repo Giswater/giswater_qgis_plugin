@@ -54,6 +54,7 @@ rec_selectorcolumn record;
 v_datatype text;
 v_fid integer=398;
 v_check_config json;
+v_workspace_private boolean=false;
 
 v_return_level integer;
 v_return_status text;
@@ -85,6 +86,7 @@ BEGIN
 	v_workspace_id = json_extract_path_text(p_data,'data','id');
 	v_workspace_name = json_extract_path_text(p_data,'data','name');
 	v_workspace_descript = json_extract_path_text(p_data,'data','descript');
+	v_workspace_private = json_extract_path_text(p_data,'data', 'private');
 
 	IF v_workspace_name IS NULL THEN
 		SELECT name into v_workspace_name FROM cat_workspace WHERE id = v_workspace_id;
@@ -206,8 +208,8 @@ BEGIN
 		
 	ELSIF v_action = 'CREATE' AND v_audit_result is null THEN
 		--insert new workspace into catalog and set it as vdefault
-		INSERT INTO cat_workspace (name, descript, config)
-		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config) RETURNING id INTO v_workspace_id;
+		INSERT INTO cat_workspace (name, descript, config, private)
+		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config, v_workspace_private) RETURNING id INTO v_workspace_id;
 
 		INSERT INTO config_param_user (parameter,value, cur_user)
 		VALUES ('utils_workspace_vdefault',v_workspace_id, current_user)
