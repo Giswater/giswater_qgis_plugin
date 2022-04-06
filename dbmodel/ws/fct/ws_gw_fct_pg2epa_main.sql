@@ -223,6 +223,7 @@ BEGIN
 
 		UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
 		addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern_id":"',pattern_id,'", "effic_curve_id":"',effic_curve_id,'", "status":"',b.status,'", "energy_price":"',b.energy_price,'", "energy_pattern_id":"',b.energy_pattern_id,'"}')
+
 		FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
 		RAISE NOTICE '19 - Check result previous exportation';

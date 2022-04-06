@@ -61,6 +61,8 @@ BEGIN
 						ELSE
 							v_field=rec.target_field;
 						END IF;
+
+						v_new_field = REPLACE(v_new_field, '"', '\"');
 						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3022", "function":"2744","debug_msg":

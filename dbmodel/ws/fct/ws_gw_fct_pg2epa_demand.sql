@@ -73,10 +73,10 @@ BEGIN
 	ELSIF v_networkmode = 3 THEN
 
 		-- demand on vnodes from associated connecs
-		UPDATE temp_node SET demand=sum::numeric(12,8) FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id ;
+		UPDATE temp_node SET demand=sum::float FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id ;
 		
 		-- demand on connecs over arc
-		UPDATE temp_node SET demand=a.demand::numeric(12,8) FROM v_edit_inp_connec a WHERE concat('VC', connec_id) = node_id;
+		UPDATE temp_node SET demand=a.demand::float FROM v_edit_inp_connec a WHERE concat('VC', connec_id) = node_id;
 
 		-- pattern	
 		IF v_patternmethod  = 12 THEN -- SECTOR PATTERN (PJOINT)

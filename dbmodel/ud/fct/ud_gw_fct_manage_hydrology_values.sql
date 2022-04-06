@@ -100,11 +100,10 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: Target and source have same infiltration method.'));
 		END IF;
 
-		FOR object_rec IN SELECT json_array_elements_text('["subcatchment", "lid_usage", "loadings_pol_x_subc", "groundwater", "coverage_land_x_subc"]'::json) as table,
-		json_array_elements_text('["subc_id", "subc_id, lidco_id", "subc_id, poll_id", "subc_id", "subc_id, landus_id"]'::json) as pk,
+		FOR object_rec IN SELECT json_array_elements_text('["subcatchment", "loadings", "groundwater", "coverage"]'::json) as table,
+		json_array_elements_text('["subc_id", "subc_id, poll_id", "subc_id", "subc_id, landus_id"]'::json) as pk,
 		json_array_elements_text('[
 		"subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id", 
-		"subc_id, lidco_id, number, t.area, t.width, initsat, fromimp, toperv, rptfile, t.descript",
 		"poll_id, subc_id, ibuildup", 
 		"subc_id,  aquif_id, node_id, surfel, a1, b1, a2, b2, a3, tw, h, fl_eq_lat, fl_eq_deep",
 		"subc_id, landus_id, t.percent"]'::json) as column

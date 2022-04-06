@@ -306,6 +306,7 @@ BEGIN
 					END IF;
 
 					IF v_project_type = 'WS' THEN
+					
 						--check if final nodes maybe graf delimiters
 						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
 						JOIN v_edit_node n1 ON n1.node_id=node_1
@@ -319,52 +320,32 @@ BEGIN
 						WHERE a.arc_id='''||v_new_record.arc_id||''';'
 						INTO v_node2_graf, v_node_2;
 						
-						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf FROM v_edit_node
-						JOIN cat_feature_node cf2 ON node_type = cf2.id 
-						WHERE node_id='''||v_exists_node_id||''';'
-						INTO v_old_node_graf;
-
-						IF v_old_node_graf IS NOT NULL OR v_node1_graf IS NOT NULL OR v_node2_graf IS NOT NULL THEN
-							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
-						END IF;
-
-						IF v_old_node_graf IS NOT NULL THEN 
-							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-							"client":{"device":4, "infoType":1,"lang":"ES"},
-							"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_exists_node_id||'","mapzoneOld":"'||v_old_node_graf||'", 
-							"action":"arcFusion"}}}$$);';
-
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (214, 1, concat('Selected node is a mapzone delimiter. Configuration for node will be removed.'));
-						END IF;
-
 						IF v_node1_graf IS NOT NULL THEN 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-							"client":{"device":4, "infoType":1,"lang":"ES"},
-							"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
-							"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+							"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+							"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-							"client":{"device":4, "infoType":1,"lang":"ES"},
-							"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'","mapzoneNew":"'||v_node1_graf||'", 
-							"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
-
+							"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+							"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
+							
+							INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat(''));
+							INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
 							INSERT INTO audit_check_data (fid, criticity, error_message)
 							VALUES (214, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
 						END IF;
 
 						IF v_node2_graf IS NOT NULL THEN 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-							"client":{"device":4, "infoType":1,"lang":"ES"},
-							"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
-							"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+							"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
+							"arcIdOld":'||v_my_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-							"client":{"device":4, "infoType":1,"lang":"ES"},
-							"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'","mapzoneNew":"'||v_node2_graf||'", 
-							"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"arcFusion"}}}$$);';
+							"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
+							"arcIdOld":'||v_my_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
 
+							INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat(''));
+							INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
 							INSERT INTO audit_check_data (fid, criticity, error_message)
 							VALUES (214, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
 						END IF;
@@ -469,11 +450,7 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
- 
 END;
 $BODY$
 	LANGUAGE plpgsql VOLATILE
 	COST 100;
-
-

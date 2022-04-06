@@ -78,6 +78,7 @@ v_graphiclog boolean;
 v_outlayer_elevation json;
 v_outlayer_depth json;
 v_minlength float;
+v_workspace text;
 
 
 BEGIN
@@ -133,6 +134,7 @@ BEGIN
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
+	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
 	
 	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
@@ -180,6 +182,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of Presspump (Double-n2a): ', v_doublen2a));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Workspace: ', v_workspace));
 
 	UPDATE rpt_cat_result SET 
 	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Pattern method": "', v_patternmethodval, '"}')::json
@@ -203,14 +206,14 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
 
-		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
+		RAISE NOTICE '1 - Check pumps with 3-point curves';
 		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM v_edit_inp_pump)a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Check this 3-points has thresholds defined (133%).'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
+			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found.');
 		END IF;
 
 		

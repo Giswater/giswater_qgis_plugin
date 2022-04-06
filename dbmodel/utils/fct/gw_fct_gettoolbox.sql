@@ -60,11 +60,17 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_value text;
-v_reports_fields json;
+v_reports json;
+v_reports_basic json;
+v_reports_edit json;
+v_reports_epa json;
+v_reports_master json;
+v_reports_admin json;
 v_inp_hydrology text;
 v_inp_dwf text;
 v_inp_dscenario text;
 v_sector text;
+v_process json;
 
 BEGIN
 
@@ -144,6 +150,7 @@ BEGIN
 			 FROM sys_function 
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
+			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
@@ -156,6 +163,7 @@ BEGIN
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_edit'' AND config_toolbox.active IS TRUE
+			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND ( project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 20);
@@ -168,6 +176,7 @@ BEGIN
 			FROM sys_function
 			JOIN config_toolbox USING (id)
 			WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_epa'' AND config_toolbox.active IS TRUE
+			AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			AND ( project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 30);
@@ -180,6 +189,7 @@ BEGIN
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_master'' AND config_toolbox.active IS TRUE
+			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' OR project_type=''utils'')) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 40);
@@ -193,6 +203,7 @@ BEGIN
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
+			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')) a');
 			 
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
@@ -205,10 +216,54 @@ BEGIN
 		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 				 SELECT id as listname, alias
 				 FROM config_report
-				 WHERE alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 WHERE sys_role = ''role_basic'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
 				
-		EXECUTE v_querystring INTO v_reports_fields;
+		EXECUTE v_querystring INTO v_reports_basic;
+
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT id as listname, alias
+				 FROM config_report
+				 WHERE sys_role = ''role_edit'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				
+		EXECUTE v_querystring INTO v_reports_edit;
+
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT id as listname, alias
+				 FROM config_report
+				 WHERE sys_role = ''role_epa'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				
+		EXECUTE v_querystring INTO v_reports_epa;
+
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT id as listname, alias
+				 FROM config_report
+				 WHERE sys_role = ''role_master'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				
+		EXECUTE v_querystring INTO v_reports_master;
+
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT id as listname, alias
+				 FROM config_report
+				 WHERE sys_role = ''role_admin'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				
+		EXECUTE v_querystring INTO v_reports_admin;
 	END IF;
+
+	SELECT json_strip_nulls(json_build_object('basic', v_reports_basic, 
+	'edit', v_reports_edit,
+	'epa', v_reports_epa,
+	'master', v_reports_master,
+	'admin', v_reports_admin)) INTO v_reports;
 
 	-- refactor dvquerytext			
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
@@ -316,31 +371,28 @@ BEGIN
 
 	END LOOP;
 
-	--    Control NULL's
-	v_om_fields := COALESCE(v_om_fields, '[]');
-	v_edit_fields := COALESCE(v_edit_fields, '[]');
-	v_epa_fields := COALESCE(v_epa_fields, '[]');
-	v_master_fields := COALESCE(v_master_fields, '[]');
-	v_admin_fields := COALESCE(v_admin_fields, '[]');
-	v_reports_fields := COALESCE(v_reports_fields, '[]');
+--    Control NULL's
+	SELECT json_strip_nulls(json_build_object('om', v_om_fields, 
+	'edit', v_edit_fields,
+	'epa', v_epa_fields,
+	'master', v_master_fields,
+	'admin', v_admin_fields)) INTO v_process;
+
+	v_process := COALESCE(v_process, '[]');
+	v_reports := COALESCE(v_reports, '[]');
 
 	-- make return
 	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
-		     ',"data":{"processes":{"fields":{ "om":' || v_om_fields ||
-						 ' , "edit":' || v_edit_fields ||
-						 ' , "epa":' || v_epa_fields ||
-						 ' , "master":' || v_master_fields ||
-						 ' , "admin":' || v_admin_fields ||'}}'||
-				', "reports":{"fields":{"edit":'||v_reports_fields||'}}}}}';
+		     ',"data":{"processes":{"fields": '|| v_process ||'}'||
+				', "reports":{"fields":'||v_reports||'}}}}';
 
-	
 	RETURN v_return;
        
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	--RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

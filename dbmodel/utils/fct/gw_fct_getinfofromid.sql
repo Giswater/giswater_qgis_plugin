@@ -158,8 +158,16 @@ BEGIN
 		v_addschema = null;
 	END IF;
 
+	-- special case of polygon
+	IF v_tablename = 'v_polygon' THEN
+
+		SELECT feature_id, featurecat_id INTO v_id, v_tablename FROM v_polygon WHERE pol_id = v_id;
+		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE system_id = v_tablename LIMIT 1);
+		IF v_tablename IS NULL THEN v_tablename = 'v_edit_element'; END IF;
+		v_editable = true;
+	END IF;
+
 	-- Check if feature exist
-	
 	IF v_id NOT IN ('', NULL) THEN
 
 		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
@@ -524,7 +532,7 @@ BEGIN
 			EXECUTE v_querystring INTO form_tabs;
 		END IF;
 	END IF;
-	
+
 	-- Check if it is parent table 
 	IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_id IS NOT NULL THEN
 
@@ -552,6 +560,7 @@ BEGIN
 		EXECUTE v_querystring INTO v_tablename;
 		
 	ELSE
+	
 		-- get child type
 		v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ',quote_nullable(v_tablename),' LIMIT 1');
 		v_debug_vars := json_build_object('v_tablename', v_tablename);
@@ -776,9 +785,9 @@ BEGIN
 
 
 	-- Exception handling
-	 EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-	 RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+	-- EXCEPTION WHEN OTHERS THEN
+	-- GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

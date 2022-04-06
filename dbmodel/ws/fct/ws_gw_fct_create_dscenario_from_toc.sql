@@ -143,9 +143,12 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 			
 			-- inserting values on tables
+			v_count = 0;
 			IF v_selectionmode = 'wholeSelection' THEN
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename);
-			ELSIF  v_selectionmode = 'previousSelection' THEN
+				EXECUTE v_querytext;
+				GET DIAGNOSTICS v_count = row_count;
+			ELSIF  v_selectionmode = 'previousSelection' AND v_id NOT IN ('', '()', '[]') THEN
 				v_where = ' WHERE ';
 				FOR _key, _value IN
 			       SELECT * FROM jsonb_each(v_id)
@@ -155,10 +158,9 @@ BEGIN
 				END LOOP;
 				v_where = substr(v_where, 1, length(v_where) - 5);
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)|| v_where;
+				EXECUTE v_querytext;
+				GET DIAGNOSTICS v_count = row_count;
 			END IF;
-
-			EXECUTE v_querytext;	
-			GET DIAGNOSTICS v_count = row_count;
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 			VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' features have been inserted on table ', v_table,'.'));

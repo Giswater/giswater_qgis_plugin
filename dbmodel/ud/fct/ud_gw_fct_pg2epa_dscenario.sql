@@ -11,7 +11,7 @@ RETURNS integer AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_dscenario('prognosi')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_dscenario('bgeo_residuals')
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
 
 SELECT * FROM SCHEMA_NAME.temp_node WHERE node_id = 'VN257816';
@@ -106,7 +106,7 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
 
 		-- insert lid-usage
-		INSERT INTO temp_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript 
+		INSERT INTO temp_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
 		FROM v_edit_inp_dscenario_lid_usage
 		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
@@ -228,38 +228,29 @@ BEGIN
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.road_surf IS NOT NULL;
 		UPDATE temp_arc_flowregulator t SET coef_curve = d.coef_curve FROM v_edit_inp_dscenario_flwreg_weir d 
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.coef_curve IS NOT NULL;
-		
-		-- update inflows
-		UPDATE temp_node_other t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
-		UPDATE temp_node_other t SET sfactor = d.sfactor FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.sfactor IS NOT NULL;
-		UPDATE temp_node_other t SET base = d.base FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.base IS NOT NULL;
-		UPDATE temp_node_other t SET pattern_id = d.pattern_id FROM v_edit_inp_dscenario_inflows d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;	
 
-		-- update inflows poll
-		UPDATE temp_node_other t SET poll_id = d.poll_id FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.poll_id IS NOT NULL;
-		UPDATE temp_node_other t SET timser_id = d.timser_id FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.timser_id IS NOT NULL;
-		UPDATE temp_node_other t SET other = d.form_type FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.form_type IS NOT NULL;
-		UPDATE temp_node_other t SET mfactor = d.mfactor FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.mfactor IS NOT NULL;
-		UPDATE temp_node_other t SET sfactor = d.sfactor FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.sfactor IS NOT NULL;
-		UPDATE temp_node_other t SET base = d.base FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.base IS NOT NULL;
-		UPDATE temp_node_other t SET pattern_id = d.pattern_id FROM v_edit_inp_dscenario_inflows_poll d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;		
+		-- insert lid-usage
+		INSERT INTO temp_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
+		FROM v_edit_inp_dscenario_lid_usage
+		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
-		-- update treatment
-		UPDATE temp_node_other t SET poll_id = d.poll_id FROM v_edit_inp_dscenario_treatment d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.poll_id IS NOT NULL;
-		UPDATE temp_node_other t SET other = d.function FROM v_edit_inp_dscenario_treatment d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.function IS NOT NULL;	
+		-- insertar inflows
+		INSERT INTO temp_node_other (node_id, type, timser_id, other, sfactor, base, pattern_id)
+		SELECT node_id, 'FLOW', timser_id, 'FLOW', sfactor, base, pattern_id FROM v_edit_inp_dscenario_inflows d 
+		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+		ON CONFLICT (node_id, type) DO NOTHING;
+
+		-- insertar inflows poll
+		INSERT INTO temp_node_other (node_id, type, poll_id, timser_id, other,  mfactor, sfactor, base, pattern_id)
+		SELECT node_id, 'POLLUTANT', poll_id, timser_id, form_type, mfactor, sfactor, base, pattern_id FROM v_edit_inp_dscenario_inflows_poll d 
+		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+		ON CONFLICT (node_id, type) DO NOTHING;
+	
+		-- insertar treatment
+		INSERT INTO temp_node_other (node_id, poll_id, other)
+		SELECT node_id, poll_id, function FROM v_edit_inp_dscenario_treatment d 
+		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+		ON CONFLICT (node_id, type) DO NOTHING;
 	END IF;
 
 	RETURN 1;

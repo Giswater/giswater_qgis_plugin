@@ -650,11 +650,26 @@ BEGIN
 		    ELSIF (OLD.epa_type = 'INLET') THEN
 			v_inp_table:= 'inp_inlet';
 		    END IF;
+
+		    -- specific case to move data between inlet <-> tank
+		    IF (OLD.epa_type = 'TANK') and (NEW.epa_type = 'INLET') THEN
+		        DELETE FROM inp_inlet WHERE node_id = OLD.node_id;
+			INSERT INTO inp_inlet (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow)
+			SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow 
+			FROM inp_tank WHERE node_id = OLD.node_id;
+
+		    ELSIF (OLD.epa_type = 'INLET') and (NEW.epa_type = 'TANK') THEN
+			DELETE FROM inp_tank WHERE node_id = OLD.node_id;
+			INSERT INTO inp_tank 
+			SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow  
+			FROM inp_inlet WHERE node_id = OLD.node_id;
+		    END IF;
+		
 		    IF v_inp_table IS NOT NULL THEN
 			v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
 			EXECUTE v_sql;
 		    END IF;
-				v_inp_table := NULL;
+		    v_inp_table := NULL;
 
 		    IF (NEW.epa_type = 'JUNCTION') THEN
 			v_inp_table:= 'inp_junction';   
@@ -955,9 +970,7 @@ BEGIN
 		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.node_type);
 
 		RETURN NULL;
-   
     END IF;
-    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

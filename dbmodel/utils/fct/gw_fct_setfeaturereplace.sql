@@ -92,6 +92,10 @@ v_category text;
 v_function text;
 v_fluid text;
 v_location text;
+v_node1_graf text;
+v_node_1 text;
+v_node2_graf  text; 
+v_node_2 text;
 
 BEGIN
 
@@ -564,55 +568,86 @@ BEGIN
 		END IF;
 		
 		--reset mapzone configuration
-		IF v_feature_type = 'node' AND v_project_type='WS' THEN
+		IF v_project_type='WS' THEN
 
-			EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
-			FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
-			INTO v_mapzone_old;
+			IF v_feature_type = 'node' THEN
 
-			EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
-			FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
-			INTO v_mapzone_new;
+				-- check if old / new nodes they are grafdelimiters
+				EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
+				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
+				INTO v_mapzone_old;
 
-			IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
-			END IF;
+				EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
+				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
+				INTO v_mapzone_new;
 
-			IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
-				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-				"client":{"device":4, "infoType":1,"lang":"ES"},
-				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
+				IF v_mapzone_old IS NOT NULL OR v_mapzone_new IS NOT NULL THEN
+					INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
+					INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
 
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
-			
-			ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
-				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-				"client":{"device":4, "infoType":1,"lang":"ES"},
-				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":null, "action":"replaceNode"}}}$$);';
+					IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'",
+						"nodeIdNew":"'||v_id||'", "action":"updateNode"}}}$$);';
+
+						INSERT INTO audit_check_data (fid, result_id, error_message)
+						VALUES (v_fid, v_result_id, concat('New node and old node are delimiters of the same mapzone. Configuration will be updated.'));
+					
+					ELSIF  v_mapzone_old is not null AND  v_mapzone_new is nulL THEN
+												
+						INSERT INTO audit_check_data (fid, result_id, error_message)
+						VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node need to be removed.'));
+
+					ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
+						INSERT INTO audit_check_data (fid, result_id, error_message)
+						VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
+					
+					ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
+											
+						INSERT INTO audit_check_data (fid, result_id, error_message)
+						VALUES (v_fid, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.'));
+					END IF;
+				END IF;
 				
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('New node is not a delimiter of a mapzone. Configuration for old node will be removed.'));
+			ELSIF v_feature_type = 'arc' THEN
 
-			ELSIF  v_mapzone_old is null AND v_mapzone_new is not null THEN
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('New node is a delimiter of a mapzone that needs to be configured.'));
-			
-			
-			ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
-				EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-				"client":{"device":4, "infoType":1,"lang":"ES"},
-				"feature":{"id":["1004"]},"data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'","nodeIdNew":"'||v_id||'",
-				"mapzoneOld":"'||v_mapzone_old||'","mapzoneNew":"'||v_mapzone_new||'","action":"replaceNode"}}}$$);';
-				
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter needs to be configured.'));
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Configuration for old node will be removed.'));
+					--check if final nodes of arc are graf delimiters
+					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
+					JOIN v_edit_node n1 ON n1.node_id=node_1
+					JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
+					WHERE a.arc_id='''||v_id||''';'
+					INTO v_node1_graf, v_node_1;
+
+					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf,node_2 FROM v_edit_arc a 
+					JOIN v_edit_node n2 ON n2.node_id=node_2
+					JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
+					WHERE a.arc_id='''||v_id||''';'
+					INTO v_node2_graf, v_node_2;
+										
+					IF v_node1_graf IS NOT NULL THEN 
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+						"arcIdOld":'||v_old_feature_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
+
+						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
+						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+					END IF;
+
+					IF v_node2_graf IS NOT NULL THEN 
+						
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
+						"arcIdOld":'||v_old_feature_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
+						
+						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
+						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
+					END IF;
 			END IF;
+			
 		END IF;
 
 		-- get log (fid: 143)

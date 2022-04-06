@@ -44,6 +44,11 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "feature":{"catFeature":"PUMP"},
 "data":{"action":"DELETE", "multiCreate":"true", "parameters":{"columnname":"pump_test"}}}$$)
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
+"client":{"lang":"ES"}, 
+"feature":{"catFeature":"PUMP"},
+"data":{"action":"DEACTIVATE", "multiCreate":"true", "parameters":{"columnname":"pump_test", "istrg":"false"}}}$$);
+
 -- fid: 218
 
 */
@@ -115,7 +120,7 @@ v_status text;
 v_message text;
 v_version text;	
 v_idaddparam integer;
-
+v_istrg boolean;
 BEGIN
 	
 	-- search path
@@ -142,6 +147,7 @@ BEGIN
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
 	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
+	v_istrg = (((p_data ->>'data')::json->>'parameters')::json ->>'istrg')::boolean;
 
 	--set new addfield as active if it wasnt defined
 	IF v_active IS NULL THEN
@@ -395,13 +401,20 @@ BEGIN
 			END IF;
 			
 			--get new values of addfields
-			IF v_action='DELETE' THEN
+			IF v_action='DELETE' or v_action = 'DEACTIVATE' THEN
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_new_parameters
 				FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+			ELSIF v_action = 'ACTIVATE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);	
 			ELSE
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
@@ -506,6 +519,7 @@ BEGIN
 				v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
 
 				--replace the existing view
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 				
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -541,6 +555,24 @@ BEGIN
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Update values of sys_addfields related to parameter.');
+			
+		ELSIF v_action='DEACTIVATE'THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN	
+				UPDATE sys_addfields SET active=FALSE  
+				WHERE param_name=v_param_name and cat_feature_id IS NULL;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=TRUE WHERE columnname=v_param_name AND 
+			formname IN (SELECT child_layer FROM cat_feature);
+		ELSIF v_action='ACTIVATE'THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN	
+				UPDATE sys_addfields SET active=TRUE  
+				WHERE param_name=v_param_name and cat_feature_id IS NULL;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=FALSE WHERE columnname=v_param_name AND 
+			formname IN (SELECT child_layer FROM cat_feature);
+		
 		END IF;
 
 	--SIMPLE ADDFIELDS
@@ -692,15 +724,49 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
 
+		ELSIF v_action='DEACTIVATE' THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN 
+				UPDATE sys_addfields SET active=FALSE
+				WHERE param_name=v_param_name and cat_feature_id=v_cat_feature;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=TRUE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
+			AND	formname = child_layer;
+		ELSIF v_action='ACTIVATE' THEN
+			IF v_istrg IS FALSE OR v_istrg IS NULL THEN 
+				UPDATE sys_addfields SET active=TRUE
+				WHERE param_name=v_param_name and cat_feature_id=v_cat_feature;
+			END IF;
+
+			UPDATE config_form_fields SET hidden=FALSE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
+			AND	formname = child_layer;
+
 		END IF;
 
 			--get new values of addfields
-			SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
-			lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-			lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-			lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-			INTO v_new_parameters
-			FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
+			IF v_action='DELETE' or v_action = 'DEACTIVATE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+			ELSIF v_action = 'ACTIVATE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);
+			ELSE
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
+				
+			END IF;
 			
 			--select columns from man_* table without repeating the identifier
 			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')

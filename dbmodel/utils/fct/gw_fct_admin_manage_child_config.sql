@@ -63,7 +63,10 @@ BEGIN
 	  ON CONFLICT (id) DO NOTHING;
 	  IF (SELECT giswater from sys_version) >'3.5.020' THEN
 			UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), criticity=0, alias = initcap(cf.id)
-	  	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
+	  	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id AND cf.id!=feature_type;
+
+			UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), criticity=0, alias =  concat(initcap(cf.id),' child')
+	  	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id AND cf.id=feature_type;
 	  END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();

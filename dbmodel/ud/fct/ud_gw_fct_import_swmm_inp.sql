@@ -328,7 +328,7 @@ BEGIN
 			FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 			INSERT INTO inp_junction (node_id, y0, ysur, apond) 
 			SELECT csv1, csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3) FROM temp_csv where source='[JUNCTIONS]' AND fid =239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
-			INSERT INTO man_manhole 
+			INSERT INTO man_junction
 			SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 
@@ -460,7 +460,7 @@ BEGIN
 
 			-- refactor of linksoffsets
 			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
-			IF v_linkoffsets != 'ELEVATION' THEN
+			IF v_linkoffsets != 'ELEVATION' OR v_linkoffsets IS NULL THEN
 				UPDATE arc SET elev1 = b.a1,  elev2 = b.a2 FROM 
 				(SELECT a.arc_id, n1.sys_elev + elev1 AS a1, n2.sys_elev + elev2 AS a2 FROM arc a 
 				JOIN v_edit_node n1 ON n1.node_id = node_1 
@@ -477,11 +477,23 @@ BEGIN
 			FROM temp_csv where source='[COORDINATES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user 
 			AND csv1 = node_id;
 			
+			--set options
+			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_options%';
+
+			UPDATE config_param_user set value=csv2 FROM temp_csv
+			WHERE source ='[OPTIONS]' AND replace(parameter,'inp_options_','')=lower(csv1);
+
+			--set raport
+			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_report%';
+
+			UPDATE config_param_user set value=csv2 FROM temp_csv
+			WHERE source ='[REPORT]' AND replace(parameter,'inp_report_','')=lower(csv1);
+
 			-- enable temporary the constraint in order to use ON CONFLICT on insert
 			ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 			RAISE NOTICE 'step 4/7';
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Values of options /times / report have been set.');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Inserting data into tables using vi_* views -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, 'WARNING-239: Controls and rules have been stored on inp_controls');
 

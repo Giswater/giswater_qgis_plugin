@@ -509,7 +509,8 @@ BEGIN
 	END IF;	
 
 	RAISE NOTICE '20 - Check matcat not null on arc (430)';
-	SELECT count(*) INTO v_count FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user AND matcat_id IS NULL;
+	SELECT count(*) INTO v_count FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user 
+	AND matcat_id IS NULL AND sys_type !='VARC';
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
