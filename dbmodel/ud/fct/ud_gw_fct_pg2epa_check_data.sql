@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430, 440
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -520,6 +520,26 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
+	END IF;	
+
+	RAISE NOTICE '21 - Check outlet_id assigned to subcatchments (440)';
+
+	SELECT count(DISTINCT outlet_id) INTO v_count  FROM (
+	SELECT outlet_id from v_edit_inp_subcatchment where "left"(outlet_id::text, 1) != '{'::text UNION
+	SELECT unnest(outlet_id::text[]) AS outlet_id from v_edit_inp_subcatchment where "left"(outlet_id::text, 1) = '{'::text)a
+	WHERE outlet_id not in 
+	(select node_id FROM v_edit_inp_junction UNION select node_id FROM v_edit_inp_outfall UNION
+	select node_id FROM v_edit_inp_storage UNION select node_id FROM v_edit_inp_divider UNION
+	select subc_id FROM v_edit_inp_subcatchment);
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-440: There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlets set on subcatchments are correctly defined.',v_count);
 	END IF;	
 
 	IF v_result_id IS NULL THEN
