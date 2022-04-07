@@ -13,3 +13,6 @@ VALUES ('440', 'Check outlet_id assigned to subcatchments','ud',null, 'core', tr
 ON CONFLICT (fid) DO NOTHING;
 
 UPDATE config_param_system SET parameter='admin_debug' WHERE parameter = 'om_mincut_debug';
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3140, 'gw_trg_edit_inp_coverage', 'ud', 'trigger function', NULL, 'json', 'Trigger to make editable v_edit_inp_coverage', 'role_epa', NULL, 'core');

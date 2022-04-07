@@ -1,3 +1,4 @@
 3.5.024
 *************
 - Rename om_mincut_debug variable to admin_debug on config_param_system
+- Editable view v_edit_inp_coverages
