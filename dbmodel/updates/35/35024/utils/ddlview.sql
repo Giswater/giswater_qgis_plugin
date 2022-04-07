@@ -20,3 +20,13 @@ JOIN inp_curve_value cv ON c.id::text = cv.curve_id::text
 WHERE c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
 ORDER BY cv.id;
 
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_controls AS 
+SELECT id,
+d.dscenario_id,
+i.sector_id,
+i.text,
+i.active
+FROM selector_inp_dscenario, inp_dscenario_controls i 
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;

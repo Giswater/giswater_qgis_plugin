@@ -1,0 +1,23 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+--2022/04/06
+CREATE TABLE inp_dscenario_rules
+(id serial PRIMARY KEY,
+dscenario_id integer NOT NULL,
+sector_id integer NOT NULL,
+text text NOT NULL,
+active boolean);
+
+ALTER TABLE inp_dscenario_rules ADD CONSTRAINT inp_dscenario_rules_sector_id_fkey FOREIGN KEY (sector_id)
+REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE inp_dscenario_rules ADD CONSTRAINT inp_dscenario_rules_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+

@@ -157,6 +157,14 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			INSERT INTO inp_dscenario_pump_additional(dscenario_id, node_id, order_id, power, curve_id, speed, pattern, status)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
+		
+		ELSIF v_dscenario_type = 'RULES' THEN
+			INSERT INTO inp_rules(dscenario_id, sector_id, text, active)
+			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+			INSERT INTO inp_controls(dscenario_id, sector_id, text, active)
+			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
 		END IF;
 		
 		RETURN NEW;
@@ -213,7 +221,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
 			UPDATE inp_dscenario_pump_additional SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, order_id=NEW.order_id, power=NEW.power, curve_id=NEW.curve_id,
 			speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
-	
+		
+		ELSIF v_dscenario_type = 'RULES' THEN
+			INSERT INTO inp_rules SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text active=NEW.active 
+			WHERE id=OLD.id;
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+			INSERT INTO inp_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text active=NEW.active 
+			WHERE id=OLD.id;
+		END IF;
+
 		END IF;
 		
 		RETURN NEW;
@@ -251,6 +268,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
 			DELETE FROM inp_dscenario_pump_additional WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
+
+		ELSIF v_dscenario_type = 'RULES' THEN
+			DELETE FROM inp_rules WHERE id=OLD.id;
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+			DELETE FROM inp_controls WHERE id=OLD.id;
 
 		END IF;
 

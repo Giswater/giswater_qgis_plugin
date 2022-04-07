@@ -8,9 +8,12 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/04/06
-CREATE TRIGGER gw_trg_edit_inp_curve INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_curve_value FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_curve('inp_curve_value');
-
-
-CREATE TRIGGER gw_trg_edit_inp_dscenario_controls INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_dscenario_controls FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONTROLS');
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_rules AS 
+SELECT id,
+d.dscenario_id,
+i.sector_id,
+i.text,
+i.active
+FROM selector_inp_dscenario, inp_dscenario_rules i 
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
