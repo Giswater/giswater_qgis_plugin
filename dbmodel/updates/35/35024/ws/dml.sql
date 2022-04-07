@@ -30,3 +30,6 @@ VALUES ('inp_dscenario_rules', '"Table to manage scenario for rules"', 'role_epa
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('v_edit_inp_dscenario_rules', '"Editable view to manage scenario for rules"', 'role_epa',  '{"level_1":"EPA","level_2":"DSCENARIO"}',16, 'Rules Dscenario', 
 'core');
+
+INSERT INTO inp_typevalue (typevalue, id, idval)
+VALUES ('inp_value_demandtype',3,'HYDRANT');
