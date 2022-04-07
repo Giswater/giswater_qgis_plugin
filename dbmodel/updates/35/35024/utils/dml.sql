@@ -37,5 +37,5 @@ INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('inp_dscenario_controls', '"Table to manage scenario for controls"', 'role_epa', null,null,NULL, 'core');
 
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
-VALUES ('v_edit_inp_dscenario_controls', '"Editable view to manage scenario for controls"', 'role_epa',  '{"level_1":"EPA","level_2":"DSCENARIO"}',15, 'Inp coverage', 
+VALUES ('v_edit_inp_dscenario_controls', '"Editable view to manage scenario for controls"', 'role_epa',  '{"level_1":"EPA","level_2":"DSCENARIO"}',15, 'Controls Dscenario', 
 'core');
