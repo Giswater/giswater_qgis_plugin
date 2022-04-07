@@ -169,6 +169,6 @@ BEGIN
             '}')::json;
 
 END;
-$BODY$;
+$BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;

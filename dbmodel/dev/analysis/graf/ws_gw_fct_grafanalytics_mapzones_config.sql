@@ -264,7 +264,7 @@ BEGIN
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
-$BODY$;
+$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
