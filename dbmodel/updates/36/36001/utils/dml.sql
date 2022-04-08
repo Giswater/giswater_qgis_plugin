@@ -219,6 +219,11 @@ UPDATE config_form_fields
 SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
 WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
 
+-- SET epa_type WIDGET AS AUTOUPDATE
+UPDATE config_form_fields 
+SET isautoupdate = true 
+WHERE columnname = 'epa_type' and formname like 've_%';
+
 
 -- TAB EPA
 INSERT INTO config_form_tabs VALUES ('v_edit_arc','tab_epa','EPA results',NULL,'role_basic',NULL,'[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
