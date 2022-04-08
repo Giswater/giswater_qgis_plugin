@@ -353,6 +353,8 @@ class GwInfo(QObject):
                 continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none':
                 continue
+            if field.get('tabname') != 'data':
+                continue
             if 'spacer' in field['widgettype']:
                 continue
 
