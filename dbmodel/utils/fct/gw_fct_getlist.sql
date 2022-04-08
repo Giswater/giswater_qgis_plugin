@@ -38,7 +38,6 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 "data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
 
-
 -- Visit -> events
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -69,7 +68,6 @@ SELECT SCHEMA_NAME.gw_fct_getlist($$
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
 	"filterFields":{"filetype":"doc","limit":10,"visit_id":"10002"}}}$$)
 
-
 FEATURE FORMS
 -------------
 -- Arc -> elements
@@ -78,7 +76,6 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
-
 
 MANAGER FORMS
 -------------
@@ -89,7 +86,6 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 "data":{"filterFields":{"limit":10},
 	"pageInfo":{"currentPage":null}}}$$)
 */
-
 
 DECLARE
 
@@ -197,7 +193,6 @@ BEGIN
 
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
 
-
 	-- setting value default for filter fields
 	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
 	
@@ -298,15 +293,22 @@ BEGIN
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 	
 	IF v_text IS NOT NULL THEN
+	
 		FOREACH text IN ARRAY v_text
 		LOOP
+		
 			-- Get field and value from json
 			SELECT v_text [i] into v_json_field;
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
+						
+			IF v_value is not null THEN
+				EXECUTE 'SELECT pg_typeof(' || v_value || ')'
+				INTO v_value_type;
+			END IF;
 
 			-- Getting the sign of the filter
-			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL THEN
+			IF (v_value_type = 'json') AND v_value->>'filterSign' IS NOT NULL THEN
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
@@ -333,9 +335,10 @@ BEGIN
 				v_query_result := v_query_result;
 				v_limit := v_value;
 			END IF;
+			
 		END LOOP;
 	END IF;
-	raise notice '00 -> %',v_query_result;
+	
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
 	IF v_text IS NOT NULL THEN
@@ -372,7 +375,6 @@ BEGIN
 		v_ordertype = v_default->>'orderType';
 	END IF;
 
-
 	IF v_orderby IS NOT NULL THEN
 		v_query_result := v_query_result || ' ORDER BY '||v_orderby;
 	END IF;
@@ -390,9 +392,7 @@ BEGIN
 		INTO v_lastpage;
 	
 	-- add limit
-	IF v_limit != -1 THEN
-		v_query_result := v_query_result || ' LIMIT '|| v_limit;
-	END IF;
+	v_query_result := v_query_result || ' LIMIT '|| v_limit;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
@@ -475,7 +475,6 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
-
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
@@ -487,7 +486,7 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
     END IF;
-
+	
 	-- Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||
              ',"body":{"form":{}'||
