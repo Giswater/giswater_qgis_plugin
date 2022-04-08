@@ -1376,16 +1376,15 @@ def add_button(**kwargs):
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
-    if 'widgetcontrols' in field and field['widgetcontrols']:
-        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'value' in field:
         widget.setText(field['value'])
         # TODO: Check this
         widget.setProperty('value', field['value'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+        widget.setText(field['widgetcontrols'].get('text'))
     if 'tooltip' in field:
         widget.setToolTip(field['tooltip'])
-    if 'placeholder' in field:
-        widget.setText(field['placeholder'])
 
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
