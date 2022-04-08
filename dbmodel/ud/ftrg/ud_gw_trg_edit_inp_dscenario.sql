@@ -222,7 +222,7 @@ BEGIN
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 		
-			INSERT INTO inp_controls(dscenario_id, sector_id, text, active)
+			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
 		
 		END IF;
@@ -299,7 +299,7 @@ BEGIN
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND poll_id = OLD.poll_id;
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
-			INSERT INTO inp_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text active=NEW.active 
+			UPDATE inp_dscenario_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active 
 			WHERE id=OLD.id;
 		END IF;
 
@@ -348,7 +348,7 @@ BEGIN
 			DELETE FROM inp_dscenario_treatment WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND poll_id = OLD.poll_id;
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
-			DELETE FROM inp_controls WHERE id=OLD.id;
+			DELETE FROM inp_dscenario_controls WHERE id=OLD.id;
 			
 		END IF;
 

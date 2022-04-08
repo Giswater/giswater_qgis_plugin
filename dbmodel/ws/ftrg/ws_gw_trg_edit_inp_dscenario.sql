@@ -159,11 +159,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 		
 		ELSIF v_dscenario_type = 'RULES' THEN
-			INSERT INTO inp_rules(dscenario_id, sector_id, text, active)
+			INSERT INTO inp_dscenario_rules(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
-			INSERT INTO inp_controls(dscenario_id, sector_id, text, active)
+			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
 		END IF;
 		
@@ -223,14 +223,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 		
 		ELSIF v_dscenario_type = 'RULES' THEN
-			INSERT INTO inp_rules SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text active=NEW.active 
+			UPDATE inp_dscenario_rules SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active 
 			WHERE id=OLD.id;
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
-			INSERT INTO inp_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text active=NEW.active 
+			UPDATE inp_dscenario_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active 
 			WHERE id=OLD.id;
-		END IF;
-
 		END IF;
 		
 		RETURN NEW;
@@ -270,10 +268,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			DELETE FROM inp_dscenario_pump_additional WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 		ELSIF v_dscenario_type = 'RULES' THEN
-			DELETE FROM inp_rules WHERE id=OLD.id;
+			DELETE FROM inp_dscenario_rules WHERE id=OLD.id;
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
-			DELETE FROM inp_controls WHERE id=OLD.id;
+			DELETE FROM inp_dscenario_controls WHERE id=OLD.id;
 
 		END IF;
 
