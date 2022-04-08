@@ -597,7 +597,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_interpolate, "194")
 
 
-    def _manage_dlg_widgets(self, complet_result, result, new_feature):
+    def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False):
         """ Creates and populates all the widgets """
 
         layout_list = []
@@ -605,6 +605,8 @@ class GwInfo(QObject):
         prev_layout = ""
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
+                continue
+            if reload_epa and 'lyt_epa' not in field['layoutname']:
                 continue
             label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
             if widget is None:
@@ -668,6 +670,8 @@ class GwInfo(QObject):
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
+        if reload_epa:
+            return
         # Manage combo parents and children:
         for field in result['fields']:
             if field['isparent']:
@@ -1904,6 +1908,9 @@ class GwInfo(QObject):
             thread = tools_os.set_boolean(thread['status'], default=False)
             if 'closed' not in _json:
                 thread = False
+        epa_type_changed = False
+        if 'epa_type' in _json:
+            epa_type_changed = True
 
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
         if not json_result:
@@ -1924,6 +1931,8 @@ class GwInfo(QObject):
                 msg_level = 1
             tools_qgis.show_message(msg_text, message_level=msg_level)
             self._reload_fields(dialog, json_result, p_widget)
+            if epa_type_changed:
+                self._reload_epa_tab(dialog)
 
             if thread:
                 # If param is true show question and create thread
@@ -2184,6 +2193,25 @@ class GwInfo(QObject):
 
     def _enabled_accept(self, dialog):
         dialog.btn_accept.setEnabled(True)
+
+
+    def _reload_epa_tab(self, dialog):
+        # call getinfofromid
+        tablename = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
+        body = tools_gw.create_body(feature=feature)
+        function_name = 'gw_fct_getinfofromid'
+        complet_result = tools_gw.execute_procedure(function_name, body, log_sql=True)
+        if complet_result:
+            for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
+                i = 0
+                while i < lyt.count():
+                    widget = lyt.itemAt(i).widget()
+                    if widget:
+                        widget.deleteLater()
+                    i += 1
+            self._manage_dlg_widgets(complet_result, {}, False, reload_epa=True)
+            dialog.show()
 
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
