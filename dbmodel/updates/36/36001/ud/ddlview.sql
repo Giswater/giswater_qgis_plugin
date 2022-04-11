@@ -22,9 +22,9 @@ f.time_hour as time_hour,
 tot_flood as flood_total, 
 max_ponded as flood_max_ponded
 FROM inp_junction 
-JOIN v_rpt_nodedepth_sum d USING (node_id)
-JOIN v_rpt_nodesurcharge_sum s USING (node_id)
-JOIN v_rpt_nodeflooding_sum f USING (node_id);
+LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
+LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
+LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_storage AS
 SELECT inp_storage.*, 
@@ -37,7 +37,7 @@ time_days,
 time_hour, 
 max_out
 FROM inp_storage 
-JOIN v_rpt_storagevol_sum USING (node_id);
+LEFT JOIN v_rpt_storagevol_sum USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_outfall AS
 SELECT inp_outfall.*, 
@@ -46,7 +46,7 @@ avg_flow,
 max_flow, 
 total_vol
 FROM inp_outfall
-JOIN v_rpt_outfallflow_sum USING (node_id);
+LEFT JOIN v_rpt_outfallflow_sum USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_conduit AS
 SELECT inp_conduit.*, 
@@ -64,4 +64,4 @@ time_max,
 min_shear, 
 day_min, 
 time_min
-FROM inp_conduit JOIN v_rpt_arcflow_sum USING (arc_id);
+FROM inp_conduit LEFT JOIN v_rpt_arcflow_sum USING (arc_id);
