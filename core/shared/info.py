@@ -103,6 +103,7 @@ class GwInfo(QObject):
             self.layer = None
             self.feature = None
             self.my_json = {}
+            self.my_json_epa = {}
             self.tab_type = tab_type
 
             # Get project variables
@@ -503,7 +504,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
             dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
-            dlg_cf.dlg_closed.connect(self._reset_my_json)
+            dlg_cf.dlg_closed.connect(self._reset_my_json, True)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(
@@ -1815,146 +1816,160 @@ class GwInfo(QObject):
 
         after_insert = False
 
-        if _json == '' or str(_json) == '{}':
-            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
-                tools_gw.close_docker()
-                return None
-            tools_gw.close_dialog(dialog)
-            return None
+        # if _json == '' or str(_json) == '{}':
+        #     if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+        #         global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
+        #         tools_gw.close_docker()
+        #         return None
+        #     tools_gw.close_dialog(dialog)
+        #     return None
 
-        p_table_id = complet_result['body']['feature']['tableName']
-        if self.tab_main.currentWidget().objectName() == 'tab_epa':
-            p_table_id = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
-        id_name = complet_result['body']['feature']['idName']
-        newfeature_id = complet_result['body']['feature']['id']
-        parent_fields = complet_result['body']['data']['parentFields']
-        fields_reload = ""
-        list_mandatory = []
-        for field in complet_result['body']['data']['fields']:
-            if p_widget and (field['widgetname'] == p_widget.objectName()):
-                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+        if _json != '' and str(_json) != '{}':
+            p_table_id = complet_result['body']['feature']['tableName']
+            id_name = complet_result['body']['feature']['idName']
+            newfeature_id = complet_result['body']['feature']['id']
+            parent_fields = complet_result['body']['data']['parentFields']
+            fields_reload = ""
+            list_mandatory = []
+            for field in complet_result['body']['data']['fields']:
+                if p_widget and (field['widgetname'] == p_widget.objectName()):
+                    if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                        fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
-            if field['ismandatory']:
-                widget = dialog.findChild(QWidget, field['widgetname'])
-                widget.setStyleSheet(None)
-                value = tools_qt.get_text(dialog, widget)
-                if value in ('null', None, ''):
-                    widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(field['widgetname'])
+                if field['ismandatory']:
+                    widget = dialog.findChild(QWidget, field['widgetname'])
+                    widget.setStyleSheet(None)
+                    value = tools_qt.get_text(dialog, widget)
+                    if value in ('null', None, ''):
+                        widget.setStyleSheet("border: 1px solid red")
+                        list_mandatory.append(field['widgetname'])
 
-        if list_mandatory:
-            msg = "Some mandatory values are missing. Please check the widgets marked in red."
-            tools_qgis.show_warning(msg)
-            tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
-            return False
-
-        # If we create a new feature
-        if self.new_feature_id is not None:
-            new_feature.setAttribute(id_name, newfeature_id)
-            after_insert = True
-            for k, v in list(_json.items()):
-                if k in parent_fields:
-                    new_feature.setAttribute(k, v)
-                    _json.pop(k, None)
-
-            if not self.layer_new_feature.isEditable():
-                self.layer_new_feature.startEditing()
-            self.layer_new_feature.updateFeature(new_feature)
-
-            status = self.layer_new_feature.commitChanges()
-            if status is False:
-                error = self.layer_new_feature.commitErrors()
-                tools_log.log_warning(f"{error}")
+            if list_mandatory:
+                msg = "Some mandatory values are missing. Please check the widgets marked in red."
+                tools_qgis.show_warning(msg)
+                tools_qt.set_action_checked("actionEdit", True, dialog)
                 QgsProject.instance().blockSignals(False)
                 return False
 
-            self.new_feature_id = None
-            self._enable_action(dialog, "actionZoom", True)
-            self._enable_action(dialog, "actionZoomOut", True)
-            self._enable_action(dialog, "actionCentered", True)
-            self._enable_action(dialog, "actionSetToArc", True)
-            global is_inserting
-            is_inserting = False
-            my_json = json.dumps(_json)
-            if my_json == '' or str(my_json) == '{}':
-                if close_dlg:
-                    if global_vars.session_vars['dialog_docker']:
-                        tools_gw.close_docker()
-                        return True
-                    tools_gw.close_dialog(dialog)
-                return True
+            # If we create a new feature
+            if self.new_feature_id is not None:
+                new_feature.setAttribute(id_name, newfeature_id)
+                after_insert = True
+                for k, v in list(_json.items()):
+                    if k in parent_fields:
+                        new_feature.setAttribute(k, v)
+                        _json.pop(k, None)
 
-            if self.new_feature.attribute(id_name) is not None:
-                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+                if not self.layer_new_feature.isEditable():
+                    self.layer_new_feature.startEditing()
+                self.layer_new_feature.updateFeature(new_feature)
+
+                status = self.layer_new_feature.commitChanges()
+                if status is False:
+                    error = self.layer_new_feature.commitErrors()
+                    tools_log.log_warning(f"{error}")
+                    QgsProject.instance().blockSignals(False)
+                    return False
+
+                self.new_feature_id = None
+                self._enable_action(dialog, "actionZoom", True)
+                self._enable_action(dialog, "actionZoomOut", True)
+                self._enable_action(dialog, "actionCentered", True)
+                self._enable_action(dialog, "actionSetToArc", True)
+                global is_inserting
+                is_inserting = False
+                my_json = json.dumps(_json)
+                if my_json == '' or str(my_json) == '{}':
+                    if close_dlg:
+                        if global_vars.session_vars['dialog_docker']:
+                            tools_gw.close_docker()
+                            return True
+                        tools_gw.close_dialog(dialog)
+                    return True
+
+                if self.new_feature.attribute(id_name) is not None:
+                    feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+                else:
+                    feature = f'"id":"{self.feature_id}", '
+
+            # If we make an info
             else:
+                my_json = json.dumps(_json)
                 feature = f'"id":"{self.feature_id}", '
 
-        # If we make an info
-        else:
-            my_json = json.dumps(_json)
-            feature = f'"id":"{self.feature_id}", '
+            feature += f'"tableName":"{p_table_id}", '
+            feature += f' "featureType":"{self.feature_type}" '
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
+            body = tools_gw.create_body(feature=feature, extras=extras)
 
-        feature += f'"tableName":"{p_table_id}", '
-        feature += f' "featureType":"{self.feature_type}" '
-        extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-
-        # Get utils_grafanalytics_automatic_trigger param
-        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
-        thread = row[0] if row else None
-        if thread:
-            thread = json.loads(thread)
-            thread = tools_os.set_boolean(thread['status'], default=False)
-            if 'closed' not in _json:
-                thread = False
-        epa_type_changed = False
-        if 'epa_type' in _json:
-            epa_type_changed = True
-
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
-        if not json_result:
-            QgsProject.instance().blockSignals(False)
-            return False
-
-        if clear_json:
-            _json = {}
-
-        self._reset_my_json()
-
-        if "Accepted" in json_result['status']:
-            msg_text = json_result['message']['text']
-            if msg_text is None:
-                msg_text = 'Feature upserted'
-            msg_level = json_result['message']['level']
-            if msg_level is None:
-                msg_level = 1
-            tools_qgis.show_message(msg_text, message_level=msg_level)
-            self._reload_fields(dialog, json_result, p_widget)
-            if epa_type_changed:
-                self._reload_epa_tab(dialog)
-
+            # Get utils_grafanalytics_automatic_trigger param
+            row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+            thread = row[0] if row else None
             if thread:
-                # If param is true show question and create thread
-                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-                if global_vars.user_level['level'] in ('1', '2'):
-                    msg += "\nWould you like to continue?"
-                    answer = tools_qt.show_question(msg)
-                else:
-                    tools_qgis.show_info(msg)
-                    answer = True
+                thread = json.loads(thread)
+                thread = tools_os.set_boolean(thread['status'], default=False)
+                if 'closed' not in _json:
+                    thread = False
+            epa_type_changed = False
+            if 'epa_type' in _json:
+                epa_type_changed = True
 
-                if answer:
-                    params = {"body": body}
-                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
-                    QgsApplication.taskManager().addTask(self.valve_thread)
-                    QgsApplication.taskManager().triggerTask(self.valve_thread)
-        elif "Failed" in json_result['status']:
-            # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-            QgsProject.instance().blockSignals(False)
-            return False
+            json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            if not json_result:
+                QgsProject.instance().blockSignals(False)
+                return False
+
+            if clear_json:
+                _json = {}
+
+            self._reset_my_json(False)
+
+            if "Accepted" in json_result['status']:
+                msg_text = json_result['message']['text']
+                if msg_text is None:
+                    msg_text = 'Feature upserted'
+                msg_level = json_result['message']['level']
+                if msg_level is None:
+                    msg_level = 1
+                tools_qgis.show_message(msg_text, message_level=msg_level)
+                self._reload_fields(dialog, json_result, p_widget)
+                if epa_type_changed:
+                    self._reload_epa_tab(dialog)
+
+                if thread:
+                    # If param is true show question and create thread
+                    msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                    if global_vars.user_level['level'] in ('1', '2'):
+                        msg += "\nWould you like to continue?"
+                        answer = tools_qt.show_question(msg)
+                    else:
+                        tools_qgis.show_info(msg)
+                        answer = True
+
+                    if answer:
+                        params = {"body": body}
+                        self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                        QgsApplication.taskManager().addTask(self.valve_thread)
+                        QgsApplication.taskManager().triggerTask(self.valve_thread)
+            elif "Failed" in json_result['status']:
+                # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
+                QgsProject.instance().blockSignals(False)
+                return False
+
+        # Tab EPA
+        if self.my_json_epa != '' and str(self.my_json_epa) != '{}':
+            feature = f'"id":"{self.feature_id}", '
+            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+            my_json = json.dumps(self.my_json_epa)
+            feature += f'"tableName":"{epa_table_id}", '
+            feature += f' "featureType":"{self.feature_type}" '
+            extras = f'"fields":{my_json}, "afterInsert":"{after_insert}"'
+            body = tools_gw.create_body(feature=feature, extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            self._reset_my_json_epa()
+            if not json_result:
+                QgsProject.instance().blockSignals(False)
+                return False
 
         if close_dlg:
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
@@ -2068,17 +2083,12 @@ class GwInfo(QObject):
             btn_accept.setEnabled(False)
 
 
-    def _check_tab_data(self, dialog):
+    def _check_tab_data(self, field):
         """ Check if current tab name is tab_data """
 
-        tab_main = dialog.findChild(QTabWidget, "tab_main")
-        if not tab_main:
-            return
-        index_tab = tab_main.currentIndex()
-        tab_name = tab_main.widget(index_tab).objectName()
-        if tab_name == 'tab_data':
-            return True
-        return False
+        if field.get('tabname') != 'data':
+            return False
+        return True
 
 
     def _clean_my_json(self, widget):
@@ -2090,10 +2100,17 @@ class GwInfo(QObject):
             pass
 
 
-    def _reset_my_json(self):
+    def _reset_my_json(self, reset_epa=True):
         """ Delete keys if exist, when widget is autoupdate """
 
         self.my_json = {}
+        if reset_epa:
+            self._reset_my_json_epa()
+
+
+    def _reset_my_json_epa(self):
+        """ Delete keys if exist, when widget is autoupdate """
+        self.my_json_epa = {}
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -2104,7 +2121,7 @@ class GwInfo(QObject):
             if widget.property('widgetcontrols')['saveValue'] is False:
                 return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
@@ -2115,10 +2132,12 @@ class GwInfo(QObject):
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-
-            widget.textChanged.connect(partial(self._enabled_accept, dialog))
-            widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
-            widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        else:  # Other tabs
+            widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
+        widget.textChanged.connect(partial(self._enabled_accept, dialog))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
 
@@ -2129,7 +2148,7 @@ class GwInfo(QObject):
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
@@ -2140,10 +2159,12 @@ class GwInfo(QObject):
                     partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-
-            widget.textChanged.connect(partial(self._enabled_accept, dialog))
-            widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
-            widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        else:  # Other tabs
+            widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
+        widget.textChanged.connect(partial(self._enabled_accept, dialog))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
 
@@ -2199,6 +2220,9 @@ class GwInfo(QObject):
 
     def _reload_epa_tab(self, dialog):
         # call getinfofromid
+        if tools_qt.get_text(dialog, 'data_epa_type').lower() == 'undefined':
+            tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
+            return
         tablename = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
         feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature=feature)
@@ -2213,6 +2237,8 @@ class GwInfo(QObject):
                         widget.deleteLater()
                     i += 1
             self._manage_dlg_widgets(complet_result, {}, False, reload_epa=True)
+            tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', True)
+            self._reset_my_json_epa()
             dialog.show()
 
 
@@ -2222,7 +2248,7 @@ class GwInfo(QObject):
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
@@ -2231,6 +2257,9 @@ class GwInfo(QObject):
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
 
         return widget
 
@@ -2241,7 +2270,7 @@ class GwInfo(QObject):
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self._clean_my_json, widget))
@@ -2250,6 +2279,9 @@ class GwInfo(QObject):
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
 
         return widget
 
@@ -2261,7 +2293,7 @@ class GwInfo(QObject):
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self._clean_my_json, widget))
@@ -2270,6 +2302,9 @@ class GwInfo(QObject):
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
 
         return widget
 
@@ -2280,7 +2315,7 @@ class GwInfo(QObject):
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
-        if self._check_tab_data(dialog):
+        if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self._clean_my_json, widget))
@@ -2289,6 +2324,9 @@ class GwInfo(QObject):
                     self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+        else:  # Other tabs
+            widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
+            # TODO: Make autoupdate widgets work
         return widget
 
 
