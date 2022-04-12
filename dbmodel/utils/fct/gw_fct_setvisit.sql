@@ -337,8 +337,8 @@ BEGIN
 		SELECT id INTO v_visitclass_arc FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='arc';
 		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND arc_id::integer <> v_feature_id::integer
 		LOOP
-			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
-			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last, rec_arc.arc_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
 		END LOOP;
@@ -347,8 +347,8 @@ BEGIN
 		SELECT id INTO v_visitclass_node FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='node';
 		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND node_id::integer <> v_feature_id::integer
 		LOOP
-			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
-			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
 		END LOOP;
