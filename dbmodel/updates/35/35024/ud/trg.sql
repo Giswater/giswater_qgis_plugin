@@ -10,3 +10,19 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2022/04/07
 CREATE TRIGGER gw_trg_edit_inp_coverage INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_coverage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_coverage();
+
+
+--2022/04/12
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_flwreg_orifice
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-ORIFICE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_flwreg_outlet
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-OUTLET');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_flwreg_pump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-PUMP');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_flwreg_weir
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('FLWREG-WEIR');
+
+

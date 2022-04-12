@@ -175,3 +175,86 @@ CREATE OR REPLACE VIEW vu_arc AS
      JOIN dma ON arc.dma_id = dma.dma_id
      LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text;
+
+
+DROP VIEW v_edit_inp_dscenario_flwreg_orifice;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice AS 
+ SELECT s.dscenario_id,
+    f.nodarc_id,
+    n.node_id,
+    f.ori_type,
+    f.offsetval,
+    f.cd,
+    f.orate,
+    f.flap,
+    f.shape,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    f.close_time,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_flwreg_orifice f
+     JOIN v_edit_inp_flwreg_orifice n USING (nodarc_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+
+DROP VIEW v_edit_inp_dscenario_flwreg_outlet;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet AS 
+ SELECT s.dscenario_id,
+    f.nodarc_id,
+    n.node_id,
+    f.outlet_type,
+    f.offsetval,
+    f.curve_id,
+    f.cd1,
+    f.cd2,
+    f.flap,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_flwreg_outlet f
+     JOIN v_edit_inp_flwreg_outlet n USING (nodarc_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+
+DROP VIEW v_edit_inp_dscenario_flwreg_pump;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump AS 
+ SELECT s.dscenario_id,
+    f.nodarc_id,
+    n.node_id,
+    f.curve_id,
+    f.status,
+    f.startup,
+    f.shutoff,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_flwreg_pump f
+     JOIN v_edit_inp_flwreg_pump n USING (nodarc_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+
+
+DROP VIEW v_edit_inp_dscenario_flwreg_weir;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir AS 
+ SELECT s.dscenario_id,
+    f.nodarc_id,
+    n.node_id,
+    f.weir_type,
+    f.offsetval,
+    f.cd,
+    f.ec,
+    f.cd2,
+    f.flap,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    f.surcharge,
+    f.road_width,
+    f.road_surf,
+    f.coef_curve,
+    n.the_geom
+   FROM selector_inp_dscenario s,
+    inp_dscenario_flwreg_weir f
+     JOIN v_edit_inp_flwreg_weir n USING (nodarc_id)
+  WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
