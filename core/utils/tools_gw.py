@@ -1382,7 +1382,9 @@ def add_button(**kwargs):
         widget.setProperty('value', field['value'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
-        widget.setText(field['widgetcontrols'].get('text'))
+        txt = field['widgetcontrols'].get('text')
+        if txt:
+            widget.setText(txt)
     if 'tooltip' in field:
         widget.setToolTip(field['tooltip'])
 
