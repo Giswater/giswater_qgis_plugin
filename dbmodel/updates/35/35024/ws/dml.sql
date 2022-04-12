@@ -33,3 +33,6 @@ VALUES ('v_edit_inp_dscenario_rules', '"Editable view to manage scenario for rul
 
 INSERT INTO inp_typevalue (typevalue, id, idval)
 VALUES ('inp_value_demandtype',3,'HYDRANT');
+
+INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
+VALUES ('crm_zone', 'Table with polygonal geometry to relate connecs to a map zone about crm', 'role_basic', null,null,NULL, 'core');

@@ -21,3 +21,10 @@ REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE inp_dscenario_rules ADD CONSTRAINT inp_dscenario_rules_dscenario_id_fkey FOREIGN KEY (dscenario_id)
 REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
+CREATE TABLE crm_zone
+(id INTEGER PRIMARY KEY,
+name TEXT,
+descript TEXT,
+the_geom geometry(multipolygon, SRID_VALUE)
+);
+
