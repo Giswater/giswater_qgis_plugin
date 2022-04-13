@@ -408,7 +408,7 @@ BEGIN
 		IF p_idname = 'connec_id' THEN
 			v_epa = 'connec';
 		ELSE
-			EXECUTE ('SELECT epa_type FROM ' || p_table_id || ' WHERE ' || p_idname || ' = ''' || p_id || '''') INTO v_epa;
+			EXECUTE ('SELECT epa_type FROM ' || substring(p_idname, 0, length(p_idname)-2) || ' WHERE ' || p_idname || ' = ''' || p_id || '''') INTO v_epa;
 		END IF;
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' AND table_name = concat('ve_epa_',lower(v_epa)))) IS TRUE THEN
 			v_querystring = concat('SELECT (row_to_json(a)) FROM 
