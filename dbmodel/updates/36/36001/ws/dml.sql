@@ -297,7 +297,7 @@ INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
     VALUES ('tbl_inp_junction', 'SELECT dscenario_id, demand, pattern_id, emitter_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL', 4, 'tab', 'list'); 
 
 INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_epa_junction', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"saveValue":false, "filterSign":"=", "text":"DMND"}', '{"functionName": "open_epa_dlg", "module": "info", "parameters":{"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand", "tableviews": [{"tbl": "tbl_dscenario_demand", "view": "v_edit_inp_dscenario_demand"}]}}', false, '');
+    VALUES ('ve_epa_junction', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"saveValue":false, "filterSign":"=", "text":"DMND"}', '{"functionName": "open_epa_dlg", "module": "info", "parameters":{"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand", "tableviews": [{"tbl": "tbl_dscenario_demand", "view": "v_edit_inp_dscenario_demand", "pk": "feature_id"}]}}', false, '');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('ve_epa_junction', 'form_feature', 'epa', 'hspacer_lyt_epa', 'lyt_epa_1', 10, 'hspacer', false, false, true, false);
 
@@ -763,7 +763,7 @@ INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
     VALUES ('tbl_inp_connec', 'SELECT dscenario_id, pjoint_type, pjoint_id, demand, pattern_id, peak_factor, status, minorloss, custom_roughness, custom_length, custom_dint FROM v_edit_inp_dscenario_connec WHERE connec_id IS NOT NULL', 4, 'tab', 'list'); 
 
 INSERT INTO config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
-    VALUES ('ve_epa_connec', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"saveValue":false, "filterSign":"=", "text":"DMND"}', '{"functionName": "open_epa_dlg", "module": "info", "parameters":{"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand", "tableviews": [{"tbl": "tbl_dscenario_demand", "view": "v_edit_inp_dscenario_demand"}]}}', false, '');
+    VALUES ('ve_epa_connec', 'form_feature', 'epa', 'manage_demands', 'lyt_epa_1', 1, 'button', 'Manage demands', false, false, true, false, '{"saveValue":false, "filterSign":"=", "text":"DMND"}', '{"functionName": "open_epa_dlg", "module": "info", "parameters":{"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand", "tableviews": [{"tbl": "tbl_dscenario_demand", "view": "v_edit_inp_dscenario_demand", "pk": "feature_id"}]}}', false, '');
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('ve_epa_connec', 'form_feature', 'epa', 'hspacer_lyt_epa', 'lyt_epa_1', 10, 'hspacer', false, false, true, false);
 
