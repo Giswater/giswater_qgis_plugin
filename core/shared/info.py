@@ -1816,14 +1816,6 @@ class GwInfo(QObject):
 
         after_insert = False
 
-        # if _json == '' or str(_json) == '{}':
-        #     if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-        #         global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
-        #         tools_gw.close_docker()
-        #         return None
-        #     tools_gw.close_dialog(dialog)
-        #     return None
-
         if _json != '' and str(_json) != '{}':
             p_table_id = complet_result['body']['feature']['tableName']
             id_name = complet_result['body']['feature']['idName']
@@ -1967,7 +1959,7 @@ class GwInfo(QObject):
             body = tools_gw.create_body(feature=feature, extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
             self._reset_my_json_epa()
-            if not json_result:
+            if not json_result or "Failed" in json_result['status']:
                 QgsProject.instance().blockSignals(False)
                 return False
 
