@@ -293,22 +293,15 @@ BEGIN
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 	
 	IF v_text IS NOT NULL THEN
-	
 		FOREACH text IN ARRAY v_text
 		LOOP
-		
 			-- Get field and value from json
 			SELECT v_text [i] into v_json_field;
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
-						
-			IF v_value is not null THEN
-				EXECUTE 'SELECT pg_typeof(' || v_value || ')'
-				INTO v_value_type;
-			END IF;
 
 			-- Getting the sign of the filter
-			IF (v_value_type = 'json') AND v_value->>'filterSign' IS NOT NULL THEN
+			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL THEN
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
@@ -392,7 +385,9 @@ BEGIN
 		INTO v_lastpage;
 	
 	-- add limit
-	v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	IF v_limit != -1 THEN
+		v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	END IF;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
