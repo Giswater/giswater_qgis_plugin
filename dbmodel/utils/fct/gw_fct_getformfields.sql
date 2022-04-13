@@ -143,7 +143,11 @@ BEGIN
 			WHERE child_layer = '||quote_literal(p_formname)||''
 			INTO v_epa_table;
 		ELSIF p_tgop='UPDATE' THEN
-			v_epa_table=concat('ve_epa_',lower(json_extract_path_text(p_values_array,'epa_type')));
+			IF p_idname = 'connec_id' THEN
+				v_epa_table='ve_epa_connec';
+			ELSE
+				v_epa_table=concat('ve_epa_',lower(json_extract_path_text(p_values_array,'epa_type')));
+			END IF;
 		END IF;	
 		
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
