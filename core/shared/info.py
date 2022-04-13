@@ -2961,8 +2961,11 @@ def open_epa_dlg(**kwargs):
         if not tbl:
             continue
         view = tableview['view']
+        pk = tableview.get('pk')
+        if not pk:
+            pk = id_name
 
-        complet_list = get_list(view, id_name, feature_id)
+        complet_list = get_list(view, pk, feature_id)
         fill_tbl(complet_list, tbl, info, view)
         info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
 
