@@ -478,6 +478,9 @@ class GwInfo(QObject):
         result = self._get_feature_type(complet_result)
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
+        # Disable tab EPA if epa_type is undefined
+        if tools_qt.get_text(self.dlg_cf, 'data_epa_type').lower() == 'undefined':
+            tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
