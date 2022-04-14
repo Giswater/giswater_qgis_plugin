@@ -322,31 +322,28 @@ class GwPsector:
                 row = tools_db.get_row(sql)
                 if row[0]:
                     list_coord = re.search('\(\((.*)\)\)', str(row[0]))
-                else:
-                    msg = "Empty coordinate list"
-                    tools_qgis.show_warning(msg)
-                    return
 
-            # Get canvas extend in order to create a QgsRectangle
-            ext = self.canvas.extent()
-            start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-            end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-            canvas_rec = QgsRectangle(start_point, end_point)
-            canvas_width = ext.xMaximum() - ext.xMinimum()
-            canvas_height = ext.yMaximum() - ext.yMinimum()
+            if list_coord:
+                # Get canvas extend in order to create a QgsRectangle
+                ext = self.canvas.extent()
+                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
+                canvas_rec = QgsRectangle(start_point, end_point)
+                canvas_width = ext.xMaximum() - ext.xMinimum()
+                canvas_height = ext.yMaximum() - ext.yMinimum()
 
-            points = tools_qgis.get_geometry_vertex(list_coord)
-            polygon = QgsGeometry.fromPolygonXY([points])
-            psector_rec = polygon.boundingBox()
-            tools_gw.reset_rubberband(self.rubber_band)
-            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
-            if rb_duration == "0": rb_duration = None
-            tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
+                points = tools_qgis.get_geometry_vertex(list_coord)
+                polygon = QgsGeometry.fromPolygonXY([points])
+                psector_rec = polygon.boundingBox()
+                tools_gw.reset_rubberband(self.rubber_band)
+                rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
+                if rb_duration == "0": rb_duration = None
+                tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
 
-            # Manage Zoom to rectangle
-            if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
-                max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-                tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+                # Manage Zoom to rectangle
+                if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
+                    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+                    tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
