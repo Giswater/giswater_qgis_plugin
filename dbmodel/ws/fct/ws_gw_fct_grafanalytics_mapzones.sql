@@ -3,7 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
--- The code of this inundation function have been provided by Enric Amat (FISERSA)
+-- The code of this have been received helpfull assistance from Enric Amat (FISERSA) and Claudia Dragoste (AIGSA)
 
 --FUNCTION CODE: 2710
 
@@ -309,6 +309,12 @@ BEGIN
 		TRUNCATE temp_anlgraf;
 
 		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
+
+		-- reset rtc_scada_x_dma or rtc_scada_x_dma
+		IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
+			v_querytext = 'DELETE FROM rtc_scada_x_'||quote_ident(v_table);
+			EXECUTE v_querytext;
+		END IF;
 			
 		-- save state selector 
 		DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
@@ -454,6 +460,7 @@ BEGIN
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((grafconfig->>''forceOpen'')::json) FROM '
 			||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE)';
 
+
 			-- close checkvalves on the opposite sense where they are working
 			UPDATE temp_anlgraf SET flag=1 WHERE id IN (
 					SELECT id FROM temp_anlgraf JOIN (
@@ -475,6 +482,7 @@ BEGIN
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE node_2::integer IN ('||v_text||')';
 			EXECUTE v_querytext;
 
+			--moved after Close mapzone headers
 			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
 
 			-- Open mapzone headers BUT ONLY ENABLING the right sense (to_arc)			
@@ -728,6 +736,30 @@ BEGIN
 				VALUES (v_fid, 1, concat('NOTE: This query may load more than once same arc. This will be usefull to check mapzone conflicts because it will show where could be problem'));
 			END IF;
 			
+			-- fill table rtc_scada_x_dma or rtc_scada_x_sector; 
+			IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
+				v_querytext = 'INSERT INTO rtc_scada_x_'||quote_ident(v_table)||' (node_id, '||quote_ident(v_field)||', flow_sign)
+				(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
+				CASE 
+				WHEN n.'||quote_ident(v_field)||' =a.'||quote_ident(v_field)||' then 1
+				ELSE -1
+				END AS flow_sign
+				FROM node n
+				JOIN value_state_type sn ON sn.state =n.state AND sn.id=n.state_type
+				JOIN arc a  ON a.node_1 =n.node_id or a.node_2 =n.node_id 
+				JOIN value_state_type sa ON sa.state =a.state AND sa.id=a.state_type
+				WHERE sn.is_operative =true AND sa.is_operative =true AND 
+				n.node_id IN
+				(SELECT json_array_elements(grafconfig->''use'')->>''nodeParent'' as nodeparent
+				FROM '||quote_ident(v_table)||' WHERE active=true)
+				AND a.'||quote_ident(v_field)||' IN
+				(SELECT '||quote_ident(v_field)||'
+				FROM '||quote_ident(v_table)||' WHERE active=true
+				)
+				)';
+				EXECUTE v_querytext;
+			END IF;
+
 			RAISE NOTICE 'Generate geometries';		
 
 			-- update geometry of mapzones

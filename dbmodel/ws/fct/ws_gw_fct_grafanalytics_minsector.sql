@@ -134,7 +134,7 @@ BEGIN
 	END IF;
  
 	-- reset graf & audit_log tables
-	TRUNCATE temp_anlgraf;
+	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid=134 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid=134 AND cur_user=current_user;

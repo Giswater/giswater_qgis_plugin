@@ -28,3 +28,45 @@ descript TEXT,
 the_geom geometry(multipolygon, SRID_VALUE)
 );
 
+ALTER TABLE IF EXISTS rtc_scada_node RENAME TO _rtc_scada_node_;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rtc_scada_x_dma", "column":"scada_id", "newName":"node_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rtc_scada_x_sector", "column":"scada_id", "newName":"node_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_x_sector", "column":"id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_x_dma", "column":"id"}}$$);
+
+
+
+CREATE TABLE IF NOT EXISTS rtc_scada (
+node_id varchar(16),
+scada_id varchar(30),
+code varchar(50),
+type varchar(50),
+descript text,
+CONSTRAINT rtc_scada_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS rtc_scada_x_data (
+node_id varchar(16),
+cat_period_id varchar(16),
+value double precision,
+custom_value double precision,
+value_type integer,
+value_status integer,
+value_state integer,
+CONSTRAINT rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS rtc_nrw (
+dma_id integer,
+cat_period_id varchar(16),
+scada_value double precision,
+crm_value double precision,
+nrw_value double precision,
+nrw_custom_value double precision,
+type varchar(50),
+descript text,
+CONSTRAINT rtc_nrw_pkey PRIMARY KEY (dma_id,cat_period_id)
+);

@@ -1,0 +1,46 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+/*
+delete from rtc_scada;
+delete from rtc_scada_x_data;
+*/
+
+INSERT INTO rtc_scada VALUES ('113873', 'SCD-0001', 'SCD-0001','FLOWMETER');
+INSERT INTO rtc_scada VALUES ('1080', 'SCD-0002', 'SCD-0002','FLOWMETER');
+INSERT INTO rtc_scada VALUES ('113952', 'SCD-0003', 'SCD-0003','FLOWMETER');
+INSERT INTO rtc_scada VALUES ('1101', 'SCD-0004', 'SCD-0004','FLOWMETER');
+INSERT INTO rtc_scada VALUES ('111111', 'SCD-0005', 'SCD-0005','FLOWMETER');
+INSERT INTO rtc_scada VALUES ('1097', 'SCD-0006', 'SCD-0006','FLOWMETER');
+
+-- dma1
+INSERT INTO rtc_scada_x_data VALUES ('113873', '5', 10120.5, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('113873', '6', 10112.2, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('113873', '7', 9734.9, null, 1,1,1);
+
+-- dma2
+INSERT INTO rtc_scada_x_data VALUES ('1080', '5', 9999.5, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('1080', '6', 9945.4, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('1080', '7', 9215.3, null, 1,1,1);
+
+-- dma3
+INSERT INTO rtc_scada_x_data VALUES ('113952', '5', 9315.2, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('113952', '6', 9454.4, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('113952', '7', 9321.3, null, 1,1,1);
+
+-- dm4
+INSERT INTO rtc_scada_x_data VALUES ('1101', '5', 10120.5, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('1101', '6', 10112.2, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('1101', '7', 9734.9, null, 1,1,1);
+
+-- dma5
+INSERT INTO rtc_scada_x_data VALUES ('111111', '5', 9315.2, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('111111', '6', 9454.4, null, 1,1,1);
+INSERT INTO rtc_scada_x_data VALUES ('111111', '7', 9321.3, null, 1,1,1);
+

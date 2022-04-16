@@ -548,10 +548,6 @@ INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.02,'2020-01-
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.03,'2020-01-01 03:10:00');
 
 
---2021/08/19
-INSERT INTO dma VALUES (6, 'Source-3', 1, null, null, null, null, null, null, null, null, null, '{"use":[{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
-
-
 -- 2020/12/07
 UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},
 "tank":{"distVirtualReservoir":0.01}, 
