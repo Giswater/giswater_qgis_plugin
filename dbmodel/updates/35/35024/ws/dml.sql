@@ -76,7 +76,7 @@ VALUES (101, 'Connecs by Exploitation',
 DELETE FROM config_report WHERE id = 102;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
 VALUES (102, 'Water by Expl., Period and DMA (Hydro)', 
-'SELECT e.name as "Exploitation", p.code as "Period", dma.name as "Dma", round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
+'SELECT e.name as "Exploitation", p.code as "Period", dma.name as "Dma", round(SUM(sum)::numeric,2) as "Volume" FROM ext_rtc_hydrometer_x_data
 JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
 JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e ON c.expl_id=e.expl_id GROUP BY p.code, dma.name, e.name',
 '{"orderBy":"1", "orderType": "DESC"}',
@@ -91,7 +91,7 @@ JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e ON c.
 DELETE FROM config_report WHERE id = 103;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
 VALUES (103, 'Water by Expl., Period and DMA (Meters)', 
-'SELECT expl as "Exploitation", code as "Period", dma as "Dma", (sum(flow_sign*value))::numeric(12,2) as Volume 
+'SELECT expl as "Exploitation", code as "Period", dma as "Dma", (sum(flow_sign*value))::numeric(12,2) as "Volume"
 FROM (SELECT node_id, exploitation, exploitation.name as expl, dma.name as dma , code , flow_sign, (CASE WHEN custom_value is null then value else custom_value end) as value 
 FROM rtc_scada_x_data JOIN rtc_scada_x_dma USING (node_id) JOIN dma USING (dma_id) JOIN exploitation USING (expl_id) JOIN ext_cat_period p ON p.id = cat_period_id )a
 group by expl, code, dma',
@@ -108,15 +108,25 @@ group by expl, code, dma',
 DELETE FROM config_report WHERE id = 104;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
 VALUES (104, 'NRW by Exploitation, Period and DMA', 
-'SELECT name as "Dma", code as "Period", scada_value as "Meter volume", crm_value as "Hydrometer volume", nrw as "NRW", ((crm_value-scada_value)/scada_value)::numeric(12,2) as "Efficiency"
-FROM (SELECT dma_id, scada_value, crm_value, cat_period_id, (case when nrw_custom_value is null then nrw_value else nrw_custom_value END) as nrw FROM rtc_nrw) a
-JOIN dma USING (dma_id) JOIN ext_cat_period ON id = cat_period_id',
+'SELECT e.name as "Exploitation", code as "Period", d.name as "Dma", scada_value as "Meter Vol.", crm_value as "Hydro Vol.", nrw_value as "NRW", efficiency as "Efficiency"
+FROM (SELECT dma_id, scada_value, crm_value, cat_period_id, nrw_value, efficiency FROM rtc_nrw) a
+JOIN dma d USING (dma_id) JOIN ext_cat_period ON id = cat_period_id JOIN exploitation e ON d.expl_id = e.expl_id',
 '{"orderBy":"1", "orderType": "DESC"}',
-'[{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
 {"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
 'role_om');
 
+--2022/04/06
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
+VALUES (441, 'NRW calculation','ws',null, 'core', false, 'Function process')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3142, 'gw_fct_set_nrw', 'ws', 'function', NULL, 'json', 'Function to calculate NRW', 'role_admin', NULL, 'core');
+ON CONFLICT (fid) DO NOTHING;
 
  

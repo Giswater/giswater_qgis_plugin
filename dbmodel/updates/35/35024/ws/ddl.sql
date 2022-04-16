@@ -35,7 +35,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rtc_scad
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_x_sector", "column":"id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_x_dma", "column":"id"}}$$);
 
-
+ALTER TABLE rtc_scada_x_dma ADD CONSTRAINT rtc_scada_x_dma_pkey PRIMARY KEY(node_id, dma_id);
+ALTER TABLE rtc_scada_x_sector ADD CONSTRAINT rtc_scada_x_sector_pkey PRIMARY KEY(node_id, sector_id);
 
 CREATE TABLE IF NOT EXISTS rtc_scada (
 node_id varchar(16),
@@ -58,15 +59,16 @@ value_state integer,
 CONSTRAINT rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
 );
 
-
+drop table if exists rtc_nrw;
 CREATE TABLE IF NOT EXISTS rtc_nrw (
+expl_id integer,
 dma_id integer,
 cat_period_id varchar(16),
 scada_value double precision,
 crm_value double precision,
 nrw_value double precision,
-nrw_custom_value double precision,
+efficiency double precision,
 type varchar(50),
 descript text,
-CONSTRAINT rtc_nrw_pkey PRIMARY KEY (dma_id,cat_period_id)
+CONSTRAINT rtc_nrw_pkey PRIMARY KEY (dma_id, cat_period_id)
 );
