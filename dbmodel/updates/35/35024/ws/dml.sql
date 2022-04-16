@@ -36,3 +36,87 @@ VALUES ('inp_value_demandtype',3,'HYDRANT');
 
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('crm_zone', 'Table with polygonal geometry to relate connecs to a map zone about crm', 'role_basic', null,null,NULL, 'core');
+
+DELETE FROM sys_table WHERE id = 'rtc_scada_node';
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, source)
+VALUES ('rtc_scada', 'Table to manage scada assets', 'role_basic', 0, 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, source)
+VALUES ('rtc_scada_x_data', 'Table to manage scada values (aggregated by period', 'role_basic', 0, 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, source)
+VALUES ('rtc_nrw', 'Table to manage nrw values aggregated by period', 'role_basic', 0, 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_report SET id = 102 WHERE alias  = 'Water consumption by period and dma';
+
+DELETE FROM config_report WHERE id = 100;
+INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
+VALUES (100, 'Pipe length by Exploitation and Catalog', 
+'SELECT name as "Exploitation", arccat_id as "Arc Catalog", sum(gis_length) as "Length" FROM v_edit_arc JOIN exploitation USING (expl_id) GROUP BY arccat_id, name',
+'{"orderBy":"1", "orderType": "DESC"}',
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"},
+{"columnname":"Arc Catalog", "label":"Arc catalog:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id","isNullValue":"true"}]',
+'role_basic');
+
+DELETE FROM config_report WHERE id = 101;
+INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
+VALUES (101, 'Connecs by Exploitation', 
+'SELECT name as "Exploitation", connec_id, code, customer_code FROM v_edit_connec JOIN exploitation USING (expl_id) ',
+'{"orderBy":"1", "orderType": "DESC"}',
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL","isNullValue":"true"}]',
+'role_basic');
+
+DELETE FROM config_report WHERE id = 102;
+INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
+VALUES (102, 'Water by Expl., Period and DMA (Hydro)', 
+'SELECT e.name as "Exploitation", p.code as "Period", dma.name as "Dma", round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
+JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
+JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e ON c.expl_id=e.expl_id GROUP BY p.code, dma.name, e.name',
+'{"orderBy":"1", "orderType": "DESC"}',
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":3,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
+'role_om');
+
+DELETE FROM config_report WHERE id = 103;
+INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
+VALUES (103, 'Water by Expl., Period and DMA (Meters)', 
+'SELECT expl as "Exploitation", code as "Period", dma as "Dma", (sum(flow_sign*value))::numeric(12,2) as Volume 
+FROM (SELECT node_id, exploitation, exploitation.name as expl, dma.name as dma , code , flow_sign, (CASE WHEN custom_value is null then value else custom_value end) as value 
+FROM rtc_scada_x_data JOIN rtc_scada_x_dma USING (node_id) JOIN dma USING (dma_id) JOIN exploitation USING (expl_id) JOIN ext_cat_period p ON p.id = cat_period_id )a
+group by expl, code, dma',
+'{"orderBy":"1", "orderType": "DESC"}',
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":3,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
+'role_om');
+
+
+DELETE FROM config_report WHERE id = 104;
+INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
+VALUES (104, 'NRW by Exploitation, Period and DMA', 
+'SELECT name as "Dma", code as "Period", scada_value as "Meter volume", crm_value as "Hydrometer volume", nrw as "NRW", ((crm_value-scada_value)/scada_value)::numeric(12,2) as "Efficiency"
+FROM (SELECT dma_id, scada_value, crm_value, cat_period_id, (case when nrw_custom_value is null then nrw_value else nrw_custom_value END) as nrw FROM rtc_nrw) a
+JOIN dma USING (dma_id) JOIN ext_cat_period ON id = cat_period_id',
+'{"orderBy":"1", "orderType": "DESC"}',
+'[{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
+'role_om');
+
+
+ 
