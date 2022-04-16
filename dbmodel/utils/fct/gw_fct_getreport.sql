@@ -16,13 +16,16 @@ SELECT SCHEMA_NAME.gw_fct_getreport($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"filterText":null, "listId":"1"}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "cat_period_id", "filterValue": "6"}, {"filterName": "dma_id", "filterValue": "3"}], "listId":"103"}}$$);
+
+ SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "code", "filterValue": "6"}, {"filterName": "dma_id", "filterValue": "5"}], "listId":"102"}}$$);
+
 */
 
 DECLARE
 
 v_list_id integer;
 v_fields json;
-i integer;
 v_filterparam json;
 v_filterdvquery json;
 v_comboid json;
@@ -52,7 +55,7 @@ BEGIN
 	v_list_id := json_extract_path_text(p_data,'data','listId');
 	v_filter := json_extract_path_text(p_data,'data','filter');
 
-	SELECT array_agg(a) AS list FROM   json_array_elements_text(v_filter) a
+	SELECT array_agg(a) AS list FROM json_array_elements_text(v_filter) a
 	INTO v_filterinput;
 
 	--filter widgets
@@ -81,34 +84,23 @@ BEGIN
 	ELSE  query_text END AS query INTO v_querytext FROM config_report WHERE id = v_list_id;
 
 	IF v_filterinput IS NOT NULL THEN
-		i=1;
+
+	RAISE NOTICE ' v_filterinput %', v_filterinput;
+
 		FOREACH rec_filter IN ARRAY v_filterinput LOOP
-			v_filtername = json_extract_path_text(rec_filter::json,'filterName');
+		
+			v_filtername = concat('"',json_extract_path_text(rec_filter::json,'filterName'),'"');
 			v_filtervalue = json_extract_path_text(rec_filter::json,'filterValue');
 			v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
 
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
 			END IF;
+			
 			IF v_filtername != '' AND v_filtervalue != '' THEN
-				IF v_querytext ILIKE '%WHERE%' THEN
-					IF v_querytext ILIKE '%GROUP BY%' THEN
-						v_querytext = replace(v_querytext, 'GROUP BY',concat(' AND ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
-					ELSE 
-						v_querytext = replace(v_querytext, 'WHERE ',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' AND '));
-		
-					END IF;
-				ELSE
-					IF v_querytext ILIKE '%GROUP BY%' THEN
-						v_querytext = replace(v_querytext, 'GROUP BY',concat(' WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue),' GROUP BY'));
-					ELSIF v_querytext ILIKE '%ORDER BY%' THEN
-						v_querytext = replace(v_querytext, 'ORDER BY', concat(' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue), 'ORDER BY '));
-					ELSE 
-						v_querytext = concat(v_querytext, ' WHERE ',  v_filtername,v_filtersign,quote_literal(v_filtervalue));
-					END IF;
-				END IF; 
+				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue));
 			END IF;
-			i=i+1;
+			
 		END LOOP;
 	END IF;
 	
@@ -118,7 +110,7 @@ BEGIN
 
 	v_fields = json_build_object('widgettype', 'list', 'value',v_fields); 
 	
-  v_fields=json_build_object('fields',v_fields||v_filterlist);
+	v_fields=json_build_object('fields',v_fields||v_filterlist);
 	
 	v_fields := COALESCE(v_fields, '{}'); 
 	    	
