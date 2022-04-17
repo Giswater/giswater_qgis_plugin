@@ -145,12 +145,24 @@ VALUES (105, 'Losses by expl,dma and period',
 "dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"}]',
 'role_om');
 
+DELETE FROM config_param_system where parameter  = 'utils_grafanalytics_vdefault';
+INSERT INTO config_param_system VALUES('utils_grafanalytics_vdefault', '{"DMA":{"updateMapZone":2, "geomParamUpdate":30}, "SECTOR":{"updateMapZone":2, "geomParamUpdate":30}, 
+"PRESSZONE":{"updateMapZone":2, "geomParamUpdate":30}, "MINSECTOR":{"updateMapZone":2, "geomParamUpdate":30}, "DQA":{"updateMapZone":2, "geomParamUpdate":30}}'::json, 
+'Automatic values for geometry trigger mapzone algorithm');
 
---2022/04/06
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type)
 VALUES (441, 'Water balance calculation','ws',null, 'core', false, 'Function process')
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3142, 'gw_fct_waterbalance', 'ws', 'function', NULL, 'json', 'Function to calculate water balance according stardards of IWA.', 'role_om', NULL, 'core')
+VALUES (3142, 'gw_fct_waterbalance', 'ws', 'function', NULL, 'json', 'Function to calculate water balance according stardards of IWA.', 'role_master', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM config_toolbox WHERE id=3142;
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3142, 'Water balance by expl and period', '{"featureType":[]}', '[
+{"widgetname":"executeGrafDma", "label":"Execute Graf for DMA:", "widgettype":"check","datatype":"boolean","tooltip":"If true, grafaanalytics mapzones will be triggered for DMA and expl selected" , "layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "layoutname":"grl_option_parameters","layoutorder":3, "value":""}
+]', NULL, true) 
 ON CONFLICT (id) DO NOTHING;

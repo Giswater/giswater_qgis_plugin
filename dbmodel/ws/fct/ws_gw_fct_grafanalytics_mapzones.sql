@@ -312,7 +312,7 @@ BEGIN
 
 		-- reset rtc_scada_x_dma or rtc_scada_x_dma
 		IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
-			v_querytext = 'DELETE FROM rtc_scada_x_'||quote_ident(v_table);
+			v_querytext = 'DELETE FROM ext_rtc_scada_x_'||quote_ident(v_table);
 			EXECUTE v_querytext;
 		END IF;
 			
@@ -738,7 +738,7 @@ BEGIN
 			
 			-- fill table rtc_scada_x_dma or rtc_scada_x_sector; 
 			IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
-				v_querytext = 'INSERT INTO rtc_scada_x_'||quote_ident(v_table)||' (node_id, '||quote_ident(v_field)||', flow_sign)
+				v_querytext = 'INSERT INTO ext_rtc_scada_x_'||quote_ident(v_table)||' (node_id, '||quote_ident(v_field)||', flow_sign)
 				(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
 				CASE 
 				WHEN n.'||quote_ident(v_field)||' =a.'||quote_ident(v_field)||' then 1
