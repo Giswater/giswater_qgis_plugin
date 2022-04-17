@@ -61,10 +61,9 @@ BEGIN
 		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_grafanalytics_vdefault');
 			
 		v_data =  concat ('{"data":{"parameters":{"grafClass":"DMA", "exploitation": [',v_expl,'], "updateFeature":"TRUE", "updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate,'}}}');
-
-		raise notice 'v_data %', v_data;
 		
 		PERFORM gw_fct_grafanalytics_mapzones(v_data);
+		
 	END IF;
 
 	-- Reset values
@@ -80,7 +79,7 @@ BEGIN
 	ON CONFLICT (cat_period_id, dma_id) do nothing;
 
 	UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-					FROM ext_rtc_scada_x_data JOIN ext_rtc_scada_x_dma s USING (node_id) GROUP BY cat_period_id, dma_id)a
+					FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graf USING (node_id) GROUP BY cat_period_id, dma_id)a
 					WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
 	GET DIAGNOSTICS v_count = row_count;
@@ -97,9 +96,9 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'Process done succesfully');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi, ' CMP'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc, ' CMP'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw, ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
 
 	IF v_executegrafdma THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
@@ -122,50 +121,53 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	-- disconnected arcs
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM 
-	(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = 0
-	UNION
-	SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = -1
-	) row) features;
+	IF v_executegrafdma THEN
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+		-- disconnected arcs
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM 
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = -1
+		) row) features;
 
-	-- disconnected connecs
-	v_result = null;
-	
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = 0
-	UNION
-	SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = -1
-	UNION			
-	SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
-	) row) features;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+		-- disconnected connecs
+		v_result = null;
+
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = -1
+		UNION			
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+		
+	END IF;
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	RAISE NOTICE 'v_result_line %', v_result_line;
-	
+		
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
@@ -181,4 +183,3 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

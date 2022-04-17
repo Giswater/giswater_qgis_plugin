@@ -3,7 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
--- The code of this have been received helpfull assistance from Enric Amat (FISERSA) and Claudia Dragoste (AIGSA)
+-- The code of this have been received helpfull assistance from Enric Amat (FISERSA) and Claudia Dragoste (Aigües de Girona SA)
 
 --FUNCTION CODE: 2710
 
@@ -311,9 +311,8 @@ BEGIN
 		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
 		-- reset rtc_scada_x_dma or rtc_scada_x_dma
-		IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
-			v_querytext = 'DELETE FROM ext_rtc_scada_x_'||quote_ident(v_table);
-			EXECUTE v_querytext;
+		IF v_class = 'DMA' THEN
+			DELETE FROM om_waterbalance_dma_graf;
 		END IF;
 			
 		-- save state selector 
@@ -736,9 +735,9 @@ BEGIN
 				VALUES (v_fid, 1, concat('NOTE: This query may load more than once same arc. This will be usefull to check mapzone conflicts because it will show where could be problem'));
 			END IF;
 			
-			-- fill table rtc_scada_x_dma or rtc_scada_x_sector; 
-			IF v_class = 'SECTOR' OR v_class = 'DMA' THEN
-				v_querytext = 'INSERT INTO ext_rtc_scada_x_'||quote_ident(v_table)||' (node_id, '||quote_ident(v_field)||', flow_sign)
+			-- fill config table for dma
+			IF v_class = 'DMA' THEN
+				v_querytext = 'INSERT INTO om_waterbalance_dma_graf (node_id, '||quote_ident(v_field)||', flow_sign)
 				(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
 				CASE 
 				WHEN n.'||quote_ident(v_field)||' =a.'||quote_ident(v_field)||' then 1

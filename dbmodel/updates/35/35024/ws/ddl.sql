@@ -40,9 +40,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_
 ALTER TABLE rtc_scada_x_dma ADD CONSTRAINT rtc_scada_x_dma_pkey PRIMARY KEY(node_id, dma_id);
 ALTER TABLE rtc_scada_x_sector ADD CONSTRAINT rtc_scada_x_sector_pkey PRIMARY KEY(node_id, sector_id);
 
-ALTER TABLE rtc_scada_x_sector RENAME TO ext_rtc_scada_x_sector;
-ALTER TABLE rtc_scada_x_dma RENAME TO ext_rtc_scada_x_dma;
+ALTER TABLE rtc_scada_x_sector RENAME TO _ext_rtc_scada_x_sector_;
 
+ALTER TABLE rtc_scada_x_dma RENAME TO om_waterbalance_dma_graf;
 
 DROP TABLE IF EXISTS _ext_rtc_scada_x_data_;
 DROP TABLE IF EXISTS _ext_rtc_scada_;
@@ -56,12 +56,10 @@ descript text,
 CONSTRAINT ext_rtc_scada_pkey PRIMARY KEY (node_id)
 );
 
-
 CREATE TABLE IF NOT EXISTS ext_rtc_scada_x_data (
 node_id varchar(16),
 cat_period_id varchar(16),
 value double precision,
-custom_value double precision,
 value_type integer,
 value_status integer,
 value_state integer,
@@ -89,3 +87,9 @@ type varchar(50),
 descript text,
 CONSTRAINT om_waterbalance_pkey PRIMARY KEY (dma_id, cat_period_id)
 );
+
+ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_dma_id_fkey FOREIGN KEY (dma_id)
+REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
