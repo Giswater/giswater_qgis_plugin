@@ -88,10 +88,8 @@ VALUES (101, 'Connecs by Exploitation',
 
 DELETE FROM config_report WHERE id = 102;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
-VALUES (102, 'Water consumption by expl,dma and period', 
-'SELECT e.name as "Exploitation", p.code as "Period", dma.name as "Dma", round(SUM(sum)::numeric,2) as "Volume" FROM ext_rtc_hydrometer_x_data
-JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
-JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e ON c.expl_id=e.expl_id GROUP BY p.code, dma.name, e.name',
+VALUES (102, 'Input Water by Exploitation, Dma & period', 
+'SELECT exploitation as "Exploitation", period "Period", dma as "Dma", total as "Input Water" FROM v_om_waterbalance',
 '{"orderBy":"1", "orderType": "DESC"}',
 '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
@@ -101,47 +99,31 @@ JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e ON c.
 "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
 'role_om');
 
+
 DELETE FROM config_report WHERE id = 103;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
-VALUES (103, 'Water input by expl,dma and period', 
-'SELECT expl as "Exploitation", code as "Period", dma as "Dma", (sum(flow_sign*value))::numeric(12,2) as "Volume"
-FROM (SELECT node_id, exploitation, exploitation.name as expl, dma.name as dma , code , flow_sign, (CASE WHEN custom_value is null then value else custom_value end) as value 
-FROM rtc_scada_x_data JOIN rtc_scada_x_dma USING (node_id) JOIN dma USING (dma_id) JOIN exploitation USING (expl_id) JOIN ext_cat_period p ON p.id = cat_period_id )a
-group by expl, code, dma',
+VALUES (103, 'NRW by Exploitation, Dma & Period', 
+'SELECT exploitation as "Exploitation", dma as "Dma", period as "Period", rw as "Revenue Water", nrw as "NRW", eff as "Efficiency" FROM v_om_waterbalance_nrw',
 '{"orderBy":"1", "orderType": "DESC"}',
 '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
-{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":2,
-"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"},
-{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":3,
-"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"}]',
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"}]',
 'role_om');
 
 
 DELETE FROM config_report WHERE id = 104;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
-VALUES (104, 'NRW by expl,dma and period', 
-'SELECT * FROM v_om_waterbalance_nrw',
+VALUES (104, 'Losses by Exploitation, Dma and Period', 
+'SELECT exploitation as "Exploitation", dma as "Dma", period as "Period", auth as "Auth. Consumption", loss as "Water Losses", eff as "Efficiency" FROM v_om_waterbalance_loss',
 '{"orderBy":"1", "orderType": "DESC"}',
-'[{"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+'[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
-{"columnname":"dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"},
-{"columnname":"period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
-"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"}]',
-'role_om');
-
-
-DELETE FROM config_report WHERE id = 105;
-INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
-VALUES (105, 'Losses by expl,dma and period', 
-'SELECT * FROM v_om_waterbalance_loss',
-'{"orderBy":"1", "orderType": "DESC"}',
-'[{"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
-"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0","isNullValue":"true"},
-{"columnname":"dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
-"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0","isNullValue":"true"},
-{"columnname":"period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL","isNullValue":"true"}]',
 'role_om');
 
@@ -160,7 +142,7 @@ ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id=3142;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3142, 'Water balance by expl and period', '{"featureType":[]}', '[
+VALUES (3142, 'Water balance by Exploitation and Period', '{"featureType":[]}', '[
 {"widgetname":"executeGrafDma", "label":"Execute Graf for DMA:", "widgettype":"check","datatype":"boolean","tooltip":"If true, grafaanalytics mapzones will be triggered for DMA and expl selected" , "layoutname":"grl_option_parameters","layoutorder":1,"value":""},
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
 {"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "layoutname":"grl_option_parameters","layoutorder":3, "value":""}

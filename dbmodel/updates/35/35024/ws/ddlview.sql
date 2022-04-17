@@ -66,7 +66,7 @@ p.code as period,
 coalesce(total_sys_input,0) as total
 FROM om_waterbalance
 JOIN exploitation e USING (expl_id)
-JOIN dma d USING (expl_id)
+JOIN dma d USING (dma_id)
 JOIN ext_cat_period p ON id = cat_period_id;
 
 
