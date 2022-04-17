@@ -28,6 +28,8 @@ descript TEXT,
 the_geom geometry(multipolygon, SRID_VALUE)
 );
 
+
+--2022/04/17
 ALTER TABLE IF EXISTS rtc_scada_node RENAME TO _rtc_scada_node_;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rtc_scada_x_dma", "column":"scada_id", "newName":"node_id"}}$$);
@@ -38,17 +40,21 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rtc_scada_
 ALTER TABLE rtc_scada_x_dma ADD CONSTRAINT rtc_scada_x_dma_pkey PRIMARY KEY(node_id, dma_id);
 ALTER TABLE rtc_scada_x_sector ADD CONSTRAINT rtc_scada_x_sector_pkey PRIMARY KEY(node_id, sector_id);
 
-CREATE TABLE IF NOT EXISTS rtc_scada (
+ALTER TABLE rtc_scada_x_sector RENAME TO ext_rtc_scada_x_sector;
+ALTER TABLE rtc_scada_x_dma RENAME TO ext_rtc_scada_x_dma;
+
+
+CREATE TABLE IF NOT EXISTS ext_rtc_scada (
 node_id varchar(16),
 scada_id varchar(30),
 code varchar(50),
 type varchar(50),
 descript text,
-CONSTRAINT rtc_scada_pkey PRIMARY KEY (node_id)
+CONSTRAINT ext_rtc_scada_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE IF NOT EXISTS rtc_scada_x_data (
+CREATE TABLE IF NOT EXISTS ext_rtc_scada_x_data (
 node_id varchar(16),
 cat_period_id varchar(16),
 value double precision,
@@ -56,19 +62,27 @@ custom_value double precision,
 value_type integer,
 value_status integer,
 value_state integer,
-CONSTRAINT rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
+CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
 );
 
-drop table if exists rtc_nrw;
-CREATE TABLE IF NOT EXISTS rtc_nrw (
+drop table if exists om_waterbalance;
+CREATE TABLE IF NOT EXISTS om_waterbalance (
 expl_id integer,
 dma_id integer,
 cat_period_id varchar(16),
-scada_value double precision,
-crm_value double precision,
-nrw_value double precision,
-efficiency double precision,
+total_sys_input double precision,
+auth_bill_met_export double precision,
+auth_bill_met_hydro double precision,
+auth_bill_unmet double precision,
+auth_unbill_met double precision,
+auth_unbill_unmet double precision,
+loss_app_unath double precision,
+loss_app_met_error double precision,
+loss_app_data_error double precision,
+loss_real_leak_main double precision,
+loss_real_leak_service double precision,
+loss_real_storage double precision,
 type varchar(50),
 descript text,
-CONSTRAINT rtc_nrw_pkey PRIMARY KEY (dma_id, cat_period_id)
+CONSTRAINT om_waterbalance_pkey PRIMARY KEY (dma_id, cat_period_id)
 );

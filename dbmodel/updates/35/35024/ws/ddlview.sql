@@ -52,3 +52,41 @@ SELECT
          SELECT temp_arc.addparam::json ->> 'curve_id'::text
            FROM temp_arc))
   ORDER BY id,4;
+
+--2022/04/17
+CREATE OR REPLACE VIEW v_om_waterbalance AS
+SELECT
+e.name as exploitation,
+d.name as dma,
+p.code as period,
+(coalesce(auth_bill_met_export,0) + coalesce(auth_bill_met_hydro,0) + coalesce(auth_bill_unmet,0))::numeric(12,2) as auth_bill,
+(coalesce(auth_unbill_met,0) + coalesce(auth_unbill_unmet,0) + coalesce(loss_app_unath,0))::numeric(12,2) as auth_unbill,
+(coalesce(loss_app_met_error,0) + coalesce(loss_app_data_error,0))::numeric(12,2) as loss_app,
+(coalesce(loss_real_leak_main,0) + coalesce(loss_real_leak_service,0) + coalesce(loss_real_storage,0))::numeric(12,2) as loss_real,
+coalesce(total_sys_input,0) as total
+FROM om_waterbalance
+JOIN exploitation e USING (expl_id)
+JOIN dma d USING (expl_id)
+JOIN ext_cat_period p ON id = cat_period_id;
+
+
+CREATE OR REPLACE VIEW v_om_waterbalance_nrw AS
+SELECT
+exploitation,
+dma,
+period,
+auth_bill::numeric(12,2) as rw,
+(total - auth_bill)::numeric(12,2) as nrw,
+case when total > 0 then (100*auth_bill/total)::numeric(12,2) else 0::numeric(12,2) end as eff
+FROM v_om_waterbalance;
+
+
+CREATE OR REPLACE VIEW v_om_waterbalance_loss AS
+SELECT
+exploitation,
+dma,
+period,
+(auth_bill + auth_unbill)::numeric(12,2) as auth,
+(total - auth_bill - auth_unbill)::numeric(12,2) as loss,
+case when total > 0 then (100*(auth_bill+auth_unbill)/total)::numeric(12,2) else 0::numeric(12,2) end as eff
+FROM v_om_waterbalance;

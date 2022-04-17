@@ -4,3 +4,4 @@
 - Editable view v_edit_inp_coverages
 - New table inp_dscenario_rules and editable view v_edit_inp_dscenario_rules (WS)
 - New table inp_dscenario_controls and editable view v_edit_inp_dscenario_controls 
+- Add waterbalance strategy according IWA standards with om_waterbalance reports, functions, tables and views

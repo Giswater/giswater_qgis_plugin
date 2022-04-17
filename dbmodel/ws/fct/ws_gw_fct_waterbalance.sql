@@ -1,20 +1,20 @@
 /*
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 3142
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_set_nrw(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_nrw(p_data json)  RETURNS json AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_waterbalance(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_waterbalance(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_set_nrw($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"exploitation":1, "period":"5"}}}$$)::text;
-SELECT SCHEMA_NAME.gw_fct_set_nrw($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"exploitation":2, "period":"5"}}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"exploitation":1, "period":"5"}}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"exploitation":2, "period":"5"}}}$$)::text;
 
-SELECT * FROM rtc_nrw
+SELECT * FROM om_waterbalance
 
 -- fid: 441
 
@@ -51,40 +51,36 @@ BEGIN
 	DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('NRW BY EXPLOITATION AND PERIOD'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '---------------------------------------------------------');
 
 
-	INSERT INTO rtc_nrw (expl_id, dma_id, cat_period_id)
-	SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl
+	INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
+	SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
 	ON CONFLICT (cat_period_id, dma_id) do nothing;
 
-	--SELECT cat_period_id, dma_id, (sum(value*flow_sign))::numeric(12,2) from rtc_scada_x_data  JOIN rtc_scada_x_dma s USING (node_id) GROUP BY cat_period_id, dma_id
-
-	UPDATE rtc_nrw n SET scada_value =  value FROM (SELECT cat_period_id, dma_id, (sum(value*flow_sign))::numeric(12,2) as value from rtc_scada_x_data
-					JOIN rtc_scada_x_dma s USING (node_id) GROUP BY cat_period_id, dma_id)a
+	UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
+					FROM ext_rtc_scada_x_data JOIN ext_rtc_scada_x_dma s USING (node_id) GROUP BY cat_period_id, dma_id)a
 					WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
 	GET DIAGNOSTICS v_count = row_count;
 
-	UPDATE rtc_nrw n SET crm_value = value FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
+	UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
 						FROM ext_rtc_hydrometer_x_data d
 						JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 						JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
 						WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
-	UPDATE rtc_nrw SET nrw_value = scada_value - crm_value, efficiency = (100*(1-(scada_value-crm_value)/scada_value))::numeric(12,2)
-			WHERE expl_id = v_expl AND cat_period_id  = v_period;
-
-	SELECT sum(scada_value) as scada, sum(crm_value) as crm, sum(nrw_value) as nrw, (100*(1 - sum(nrw_value))/sum(scada_value))::numeric (12,2) as eff INTO rec_nrw
-	FROM rtc_nrw WHERE expl_id = v_expl AND cat_period_id  = v_period;
+	SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc,
+		(sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
+		FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'Process done succesfully');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total of volume water measured by meters: ', rec_nrw.scada, ' CM'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total of volume water billed: ', rec_nrw.crm, ' CM'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('NRW: ', rec_nrw.nrw, ' CM'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Efficiency: ', rec_nrw.eff, ' %'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi, ' CM'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc, ' CM'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw, ' CM'));
+	
 
 	-- get results
 	-- info
