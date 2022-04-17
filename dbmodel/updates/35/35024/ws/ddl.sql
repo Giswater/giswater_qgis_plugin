@@ -44,6 +44,9 @@ ALTER TABLE rtc_scada_x_sector RENAME TO ext_rtc_scada_x_sector;
 ALTER TABLE rtc_scada_x_dma RENAME TO ext_rtc_scada_x_dma;
 
 
+DROP TABLE IF EXISTS _ext_rtc_scada_x_data_;
+DROP TABLE IF EXISTS _ext_rtc_scada_;
+
 CREATE TABLE IF NOT EXISTS ext_rtc_scada (
 node_id varchar(16),
 scada_id varchar(30),
@@ -65,7 +68,7 @@ value_state integer,
 CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
 );
 
-drop table if exists om_waterbalance;
+
 CREATE TABLE IF NOT EXISTS om_waterbalance (
 expl_id integer,
 dma_id integer,

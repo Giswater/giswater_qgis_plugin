@@ -152,9 +152,5 @@ VALUES (441, 'Water balance calculation','ws',null, 'core', false, 'Function pro
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3142, 'gw_fct_waterbalance', 'ws', 'function', NULL, 'json', 'Function to calculate water balance', 'role_om', NULL, 'core');
-ON CONFLICT (fid) DO NOTHING;
-
-UI
-
- 
+VALUES (3142, 'gw_fct_waterbalance', 'ws', 'function', NULL, 'json', 'Function to calculate water balance according stardards of IWA.', 'role_om', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
