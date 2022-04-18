@@ -1,5 +1,4 @@
-## WELCOME TO GISWATER PROJECT
-
+## WELCOME TO GISWATER PROJECT-DB-MODEL
 Water management has always been complex and expensive. It has always been difficult to plan new water supply networks or effective control existing ones without making further capital investments. Nonetheless all these situations have come to an end. Since 2014 when GISWATER was born, it have been the first open source software specifically designed for water supply and water management. <br>
 
 This software connects different IT solutions and pre-existent databases allowing you to setup a high performance management system in combination with hydraulic software as well EPANET or SWMM.<br>
@@ -9,8 +8,7 @@ has access from any geographic information system (GIS). It is compatible with a
 
 It is also possible to integrate business management tools like ERP, CRM or Business Intelligence and also corporate mobile devices.<br>
 
-GISWATER is developed in Python and PL/SQL. It is compatible with any spatial database and with all GIS systems.<br>
-
+As well as Giswater is developed in Python (qgis plugin) and PL/SQL(PostgreSQL database) there are three main repositories to manage it (QGIS-PLUGIN, DB-MODEL and DOCS). Right now this is the repository for the DB-MODEL.
 
 ## TABLE OF CONTENTS
 Here after you will find all the information you need to getting started with Giswater<br>
@@ -41,10 +39,10 @@ As Giswater is as server-client software you need to install it into two separat
 Works as well on Windows, MaC or Linux O/S.<br>
 Install PostgreSQL (from 9.5 to 14).<br>
 Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL.<br>
-	`create extension postgis;`
-	`create extension pgrouting;`
-	`create extension tablefunc;`
-	`create extension unaccent;`
+	`create extension postgis;`<br>
+	`create extension pgrouting;`<br>
+	`create extension tablefunc;`<br>
+	`create extension unaccent;`<br>
 
 ### Frontend environment:
 Works as well on Windows, MaC or Linux O/S, but only on Windows to enjoy EPA models.<br>
