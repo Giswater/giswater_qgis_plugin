@@ -19,6 +19,7 @@ GISWATER is developed in Python and PL/SQL. It is compatible with any spatial da
 
 ## GETTING STARTED
 Here after you will find all the information you need to getting started with Giswater
+
 	1- Requirements
 	2- Install
 	3- Test
@@ -40,26 +41,28 @@ QGIS: Geoprocessing software
 ## INSTALL
 As Giswater is as server-client software you need to install it into two separate environments
 
-# Backend environment (linux, windows or mac)
-	Install PostgreSQL (from 9.5 to 14)
-	Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL
-		`create extension postgis;`
-		`create extension pgrouting;`
-		`create extension tablefunc;`
-		`create extension unaccent;`
+# Backend environment
+Works as well on Windows, MaC or Linux O/S
+Install PostgreSQL (from 9.5 to 14)
+Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL
+	`create extension postgis;`
+	`create extension pgrouting;`
+	`create extension tablefunc;`
+	`create extension unaccent;`
 
-# Frontend environment (windows to enjoy 100% capabilities)
-	Install QGIS  (always last LTR)
-	Install SWMM (5.1) and EPANET (2.2) ->If uses linux on front-end EPANET and SWMM will not work properly
+# Frontend environment
+Works as well on Windows, MaC or Linux O/S, but only on Windows to enjoy EPA models
+Install QGIS  (always last LTR)
+Install SWMM (5.1) and EPANET (2.2) ->If uses linux on front-end EPANET and SWMM will not work properly
 
 
 ## TEST
-	You can use the example projects, ready to test with lots of dataset integrated
-	Here below you can find videos to setup your environment and work with sample data
-		Install plugin: https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4
-		Setup Postgis connection: https://www.youtube.com/watch?v=LJGCUrqa0es&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=3
-		Create example project schema: https://www.youtube.com/watch?v=nR3PBtfGi9k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=2
-		Create QGIS project and work with: https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=1
+You can use the example projects, ready to test with lots of dataset integrated
+Here below you can find videos to setup your environment and work with sample data
+Install:https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4
+Setup:https://www.youtube.com/watch?v=LJGCUrqa0es&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=3
+Create example-1:https://www.youtube.com/watch?v=nR3PBtfGi9k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=2
+Create example-1:https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=1
 
 
 ## DEPLOYMENT
