@@ -1,23 +1,13 @@
-## Welcome to Giswater contributors guide
+## WELCOME TO GISWATER CONTRIBUTORS GUIDE
 Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on https://github.com/Giswater/ repos.<br>
 As well as License is GNU-GPL3 the contributions need to be made under same License, it means that it applies the inbound=outbound approach.<br>
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.<br>
 
-## Table of contents
+## TABLE OF CONTENTS
 1- New contribution.<br>
 2- Create a new issue.<br>
 3- Make new contribution.<br>
 4- Contributors list.<br>
-
-## New contribution
-To get an overview of the project, read the README. Here are some resources to help you get started with open source contributions.<br>
-
-### Finding ways to contribute with project
-- Set up Git.<br>
-- GitHub flow.<br>
-- Collaborating with pull requests.<br>
-- Getting started.<br>
-- To navigate our codebase with confidence, see the introduction to working in the docs repository.<br>
 
 ## Create a new issue
 If you spot a problem with the docs, search if an issue already exists. If a related issue doesn't exist, you can open a new issue using a relevant issue form..<br>
@@ -25,7 +15,15 @@ If you spot a problem with the docs, search if an issue already exists. If a rel
 ### Solve an issue
 Scan through our existing issues to find one that interests you. You can narrow down the search using labels as filters. See Labels for more information. As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix..<br>
 
-## Make new contribution
+## MAKE NEW CONTRIBUTION
+To get an overview of the project, read the README. Here are some resources to help you get started with open source contributions.<br>
+
+### Finding ways to contribute with project:
+- Set up Git.<br>
+- GitHub flow.<br>
+- Collaborating with pull requests.<br>
+- Getting started.<br>
+- To navigate our codebase with confidence, see the introduction to working in the docs repository.<br>
 
 ### Choose te repo:
 To make new code you need to choose what repo are you looking for:<br>
@@ -54,9 +52,8 @@ Enable the checkbox to allow maintainer edits so the branch can be updated for a
 We may ask for changes to be made before a PR can be merged, either using suggested changes or pull request comments.<br>
 As you update your PR and apply changes, mark each conversation as resolved. Once your PR is merged, your contributions will be publicly visible on the GitHub.<br>
 
-
-## Contributors list
-
+## CONTRIBUTORS LIST
+Nicole Aguiar, Frelance GIS consultant.<br>
 Elies Bertran, Stagier on BGEO OPEN GIS.<br>
 Ivan Moreno, Stagier on BGEO OPEN GIS.<br>
 Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>
