@@ -1,21 +1,23 @@
 ## WELCOME TO GISWATER CONTRIBUTORS GUIDE
-Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on https://github.com/Giswater/ repos.<br>
-As well as License is GNU-GPL3 the contributions need to be made under same License, it means that it applies the inbound=outbound approach.<br>
+Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on https://github.com/Giswater/ repos. As well as License is GNU-GPL3 the contributions need to be made under same License, it means that it applies the inbound=outbound approach.<br>
+
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.<br>
 
 ## TABLE OF CONTENTS
 1- New contribution.<br>
-2- Create a new issue.<br>
-3- Make new contribution.<br>
+2- Working with issues.<br>
+3- Make new code contribution.<br>
 4- Contributors list.<br>
 
-## Create a new issue
+## WORKING WITH ISSUES
+
+### Create a new issue:
 If you spot a problem with the docs, search if an issue already exists. If a related issue doesn't exist, you can open a new issue using a relevant issue form..<br>
 
-### Solve an issue
+### Solve an issue:
 Scan through our existing issues to find one that interests you. You can narrow down the search using labels as filters. See Labels for more information. As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix..<br>
 
-## MAKE NEW CONTRIBUTION
+## MAKE NEW CODE CONTRIBUTION
 To get an overview of the project, read the README. Here are some resources to help you get started with open source contributions.<br>
 
 ### Finding ways to contribute with project:
@@ -27,11 +29,10 @@ To get an overview of the project, read the README. Here are some resources to h
 
 ### Choose te repo:
 To make new code you need to choose what repo are you looking for:<br>
-	Use the https://github.com/Giswater/docs repository to work with.<br>
-	Use the https://github.com/Giswater/giswater_qgis_plugin repository to work with.<br>
-	Use the https://github.com/Giswater/giswater_dbmodel repository to work with.<br>
-
-	Rest of repositories are no significant. Some of them they are deprecated or some of them are not used.
+Use the https://github.com/Giswater/docs repository to work with.<br>
+Use the https://github.com/Giswater/giswater_qgis_plugin repository to work with.<br>
+Use the https://github.com/Giswater/giswater_dbmodel repository to work with.<br>
+Rest of repositories are no significant. Some of them they are deprecated or some of them are not used.
 
 ### Make changes locally:
 1- Install Git LFS.<br>
@@ -60,6 +61,7 @@ Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>
 Luigi Pirelli, Freelance GIS developer.<br>
 Vicente Medina, Barcelona Tech university.<br>
 Xavier Calatrava, Aigües de Blanes, SA.<br>
+Diego Guedes, SANEAGO.<br>
 Pablo Marques, SANEAGO.<br>
 Abel Garcia Juanes, Frelance GIS consultant.<br>
 Natasa Cica, GIS developer on BGEO OPEN GIS.<br>
