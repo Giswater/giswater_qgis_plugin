@@ -12,7 +12,7 @@ It is also possible to integrate business management tools like ERP, CRM or Busi
 GISWATER is developed in Python and PL/SQL. It is compatible with any spatial database and with all GIS systems.<br>
 
 
-## GETTING STARTED
+## TABLE OF CONTENTS
 Here after you will find all the information you need to getting started with Giswater<br>
 
 	1- Requirements
