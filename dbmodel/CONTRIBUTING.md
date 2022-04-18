@@ -44,10 +44,11 @@ To get an overview of the project, read the README. Here are some resources to h
 
 ### Choose te repo:
 To make new code you need to choose what repo are you looking for:<br>
-Use the https://github.com/Giswater/docs repository to work with.<br>
-Use the https://github.com/Giswater/giswater_qgis_plugin repository to work with.<br>
-Use the https://github.com/Giswater/giswater_dbmodel repository to work with.<br>
-Rest of repositories are no significant. Some of them they are deprecated or some of them are not used.
+Use the https://github.com/Giswater/docs repository to work with DOCS<br>
+Use the https://github.com/Giswater/giswater_qgis_plugin repository to work with PYTHON QGIS PLUGIN.<br>
+Use the https://github.com/Giswater/giswater_dbmodel repository to work with DATABASE MODEL.<br>
+Rest of repositories are no significant. Some of them they are deprecated or some of them are not used yet.
+
 
 ### Make changes locally:
 1- Install Git LFS.<br>
@@ -70,6 +71,7 @@ As you update your PR and apply changes, mark each conversation as resolved. Onc
 
 ## CONTRIBUTORS LIST
 Nicole Aguiar, Frelance GIS consultant.<br>
+Jordi Blanch, Stagier on BGEO OPEN GIS.<br>
 Elies Bertran, Stagier on BGEO OPEN GIS.<br>
 Ivan Moreno, Stagier on BGEO OPEN GIS.<br>
 Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>

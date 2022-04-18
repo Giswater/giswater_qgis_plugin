@@ -21,9 +21,10 @@ Here after you will find all the information you need to getting started with Gi
 	4- Deployment
 	5- Wiki
 	6- FAQ's
-	6- Versioning
-	7- License
-	8- Thanks
+	7- Code repositories
+	8- Versioning
+	9- License
+	10- Thanks to
 	
 
 ## REQUIREMENTS
@@ -93,6 +94,11 @@ You can find more information on https://github.com/Giswater/giswater_dbmodel/wi
 ## FAQ's
 You can find the Frequent Answers and Questions for project on https://github.com/Giswater/giswater_dbmodel/wiki/FAQs
 
+## CODE REPOSITORY
+Use the https://github.com/Giswater/docs repository to find some info about DOCS<br>
+Use the https://github.com/Giswater/giswater_qgis_plugin repository to find some info about PYTHON QGIS PLUGIN.<br>
+Use the https://github.com/Giswater/giswater_dbmodel repository to find some info about DATABASE MODEL.<br>
+Rest of repositories are no significant. Some of them they are deprecated or some of them are not used yet.
 
 ## VERSIONING
 Giswater works using three degrees of releases wich it means that the number three codes:
