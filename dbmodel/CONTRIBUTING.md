@@ -1,4 +1,4 @@
-## WELCOME TO GISWATER CONTRIBUTORS GUIDE-DB-MODEL
+## WELCOME TO GISWATER CONTRIBUTORS GUIDE (giswater_dbmodel)
 Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on https://github.com/Giswater/ repos. As well as License is GNU-GPL3 the contributions need to be made under same License, it means that it applies the inbound=outbound approach.<br>
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.<br>
