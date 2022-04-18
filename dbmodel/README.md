@@ -41,7 +41,7 @@ QGIS: Geoprocessing software
 ## INSTALL
 As Giswater is as server-client software you need to install it into two separate environments
 
-# Backend environment
+### Backend environment
 Works as well on Windows, MaC or Linux O/S
 Install PostgreSQL (from 9.5 to 14)
 Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL
@@ -50,7 +50,7 @@ Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL
 	`create extension tablefunc;`
 	`create extension unaccent;`
 
-# Frontend environment
+### Frontend environment
 Works as well on Windows, MaC or Linux O/S, but only on Windows to enjoy EPA models
 Install QGIS  (always last LTR)
 Install SWMM (5.1) and EPANET (2.2) ->If uses linux on front-end EPANET and SWMM will not work properly
@@ -58,20 +58,24 @@ Install SWMM (5.1) and EPANET (2.2) ->If uses linux on front-end EPANET and SWMM
 
 ## TEST
 You can use the example projects, ready to test with lots of dataset integrated
-Here below you can find videos to setup your environment and work with sample data
-Install:https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4<br>
-Setup:https://www.youtube.com/watch?v=LJGCUrqa0es&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=3<br>
-Create example-1:https://www.youtube.com/watch?v=nR3PBtfGi9k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=2<br>
-Create example-1:https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=1<br>
+Here below you can find videos to setup your environment and work with sample data:
+
+Install plugin:https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4<br>
+
+Setup connection :https://www.youtube.com/watch?v=LJGCUrqa0es&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=3<br>
+
+Create db schema example:https://www.youtube.com/watch?v=nR3PBtfGi9k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=2<br>
+
+Create qgis project:https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=1<br>
 
 
 ## DEPLOYMENT
 
-# Requirements
+### Requirements
 You need to have permissions to connect to postgreSQL database (compatible versions) and your user need to be a db superuser in order to be allowed 
 to create project schemas, roles, backups, restores among others db admin operations.
 
-# Mandatory information for the project:
+### Mandatory information for the project:
 Project works with catalogs and you need to fill at least the mandatory ones [materials, node, arc].
 The Inventory Layers are network shape layers, which also includes some mandatory and optional fields that you must know.
 Project also uses mapzones and you need to create at least the mandatory ones [macroexplotation, exploitation, municipality, sector, dma].
@@ -80,12 +84,12 @@ To start now, take a look on Start from scratch and enjoy it!
 Another option is start with Giswater loading inp file. Although this is a beta functionality, you can take a look on Import inp file debug 
 mode for more info!
 
-# Useful tips:
+### Useful tips:
 With mapzones and catalogs well-defined (at least the mandatory ones) you can insert your first two nodes. After that arc can be inserted too. 
 You can get more information for  about config options here
 	https://github.com/Giswater/giswater_dbmodel/wiki/Config
 
-# Start from scratch
+### Start from scratch
 Here you can find more information with the steps to create an empty project
 	https://github.com/Giswater/giswater_dbmodel/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project
 
@@ -114,7 +118,7 @@ This program is free software: you can redistribute it and/or modify it under th
 by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See LICENSE file for more information
 
 
-## THANKS
+## THANKS TO
 GITS-BarcelonaTech University
 Aigües de Mataró
 Aigües de Girona
