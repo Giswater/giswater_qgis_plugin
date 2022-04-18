@@ -1,4 +1,4 @@
-## WELCOME TO GISWATER PROJECT-DB-MODEL
+## WELCOME TO GISWATER PROJECT (giswater_dbmodel)
 Water management has always been complex and expensive. It has always been difficult to plan new water supply networks or effective control existing ones without making further capital investments. Nonetheless all these situations have come to an end. Since 2014 when GISWATER was born, it have been the first open source software specifically designed for water supply and water management. <br>
 
 This software connects different IT solutions and pre-existent databases allowing you to setup a high performance management system in combination with hydraulic software as well EPANET or SWMM.<br>
