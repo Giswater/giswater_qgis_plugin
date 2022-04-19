@@ -74,6 +74,7 @@ As you update your PR and apply changes, mark each conversation as resolved. Onc
 ## CONTRIBUTORS LIST
 Nicole Aguiar, Frelance GIS consultant.<br>
 Jordi Blanch, Stagier on BGEO OPEN GIS.<br>
+Guillem Esteve, Stagier on BGEO OPEN GIS.<br>
 Elies Bertran, Stagier on BGEO OPEN GIS.<br>
 Ivan Moreno, Stagier on BGEO OPEN GIS.<br>
 Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>
