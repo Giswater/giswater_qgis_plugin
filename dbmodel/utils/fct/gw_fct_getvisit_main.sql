@@ -125,6 +125,7 @@ v_fileid text;
 v_message json;
 v_message1 text;
 v_message2 text;
+v_message_aux text;
 v_return json;
 v_currentactivetab text;
 v_values json;
@@ -178,6 +179,7 @@ rec record;
 v_filter text;
 v_filter_aux text;
 v_unit integer;
+v_count integer;
 
 BEGIN
 	
@@ -233,27 +235,54 @@ BEGIN
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_userrole;
-
+	
 	 -- LOTS MANAGE UNITS (um visitclass)
 	 -- if feature_type is unit, we change to arc/node and select one of the elements that are in this unit
 	IF v_featuretype = 'unit' THEN
+		-- don't allow to visit units with orderby bigger than others that have not been visited the same day. NULLs can be visited
+		IF (SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer) IS NOT NULL THEN
+			FOR rec IN SELECT * FROM om_visit_lot_x_unit WHERE lot_id=v_lot AND orderby<(SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer)
+			LOOP
+				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id AND date_trunc('day', startdate)=current_date;
+				IF v_count = 0 THEN
+					--raise exception 'no pots visitar';
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3197", "function":"2740","debug_msg":""}}$$);'INTO v_message;
+					
+					v_message_aux = ((((v_message->>'body')::json->>'data')::json->>'info')::json->>'text')::text;
+					
+					RETURN ('{"status":"Warning", "message":"'||v_message_aux||'", "version":'||v_version||
+					 ',"body":{"feature":{"featureType":"visit", "tableName":"", "idName":"visit_id", "id":""}'||
+					', "form":{"formTabs":{"active":true, "fields":{}}}'
+					', "data":{}}'||
+					'}')::json;
+					
+				   
+				END IF;
+			END LOOP;
+		END IF;
+	
+	
 		v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
-		v_unit = v_featureid;
+		v_unit=v_featureid;
 	
 		v_featuretype='arc';
 		v_featuretablename='v_edit_arc';
 		v_new_featureid=(SELECT arc_id FROM om_visit_lot_x_arc WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
 		v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='ARC');
-	
+		
 		IF v_new_featureid IS NULL THEN
 			v_featuretype='node';
 			v_featuretablename='v_edit_node';
 			v_new_featureid=(SELECT node_id FROM om_visit_lot_x_node WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
 			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='NODE');
+			
 		END IF;
 	
 		v_featureid=v_new_featureid;
 		v_visitclass=v_new_visitclass;
+		
+		
 	
 	END IF;
 
