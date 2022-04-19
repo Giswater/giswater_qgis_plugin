@@ -45,9 +45,9 @@ BEGIN
             WHERE node_id=OLD.node_id;
 
         ELSIF v_epatype = 'conduit' THEN
-            UPDATE inp_divider 
-            SET divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
-            WHERE node_id=OLD.node_id; 
+            UPDATE inp_conduit 
+            SET barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0 
+            WHERE arc_id=OLD.arc_id; 
         END IF;
 
 		RETURN NEW;
