@@ -79,12 +79,15 @@ v_msgerr json;
 v_lot integer;
 v_unit_id integer;
 v_arc_id integer;
+v_gully_id integer;
 rec_node record;
 rec_arc record;
+rec_gully record;
 id_last integer;
 v_parent_id integer;
 v_visitclass_arc integer;
 v_visitclass_node integer;
+v_visitclass_gully integer;
 v_feature_id integer;
 
 
@@ -321,6 +324,8 @@ BEGIN
 			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_arc WHERE arc_id=v_arc_id::text AND lot_id=v_lot;
 		ELSIF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'node' THEN
 			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_node WHERE node_id=v_node_id::text AND lot_id=v_lot;
+		ELSIF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'gully' THEN
+			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_gully WHERE gully_id=v_gully_id::text AND lot_id=v_lot;
 		END IF;
 		
 		UPDATE om_visit_lot_x_unit SET status=v_status WHERE unit_id=v_unit_id;
@@ -329,8 +334,10 @@ BEGIN
 		-- get generic v_feature_id whenever is arc or node
 		IF v_arc_id IS NOT NULL THEN
 			v_feature_id=v_arc_id;
-		ELSE
+		ELSIF v_node_id IS NOT NULL THEN
 			v_feature_id=v_node_id;
+		ELSE
+			v_feature_id=v_gully_id;
 		END IF;
 		
 		-- select visitclass for arc and loop for every arc on om_visit_lot_x_arc. Then insert visit and events with same values of the one triggered by this setvisit
@@ -350,6 +357,16 @@ BEGIN
 			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
 			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
+	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
+		END LOOP;
+	
+		-- select visitclass for gully and loop for every gully on om_visit_lot_x_gully. Then insert visit and events with same values of the one triggered by this setvisit
+		SELECT id INTO v_visitclass_gully FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='gully';
+		FOR rec_gully IN SELECT * FROM om_visit_lot_x_gully WHERE unit_id=v_unit_id AND gully_id::integer <> v_feature_id::integer
+		LOOP
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_gully, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit_x_gully (visit_id, gully_id) VALUES(id_last, rec_gully.gully_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
 		END LOOP;
 	
