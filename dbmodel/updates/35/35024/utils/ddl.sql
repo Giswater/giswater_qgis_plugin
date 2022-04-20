@@ -27,3 +27,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table", "column":"macrosector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"orderby", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_report", "column":"descript", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_report", "column":"active", "dataType":"boolean"}}$$);
+
+ALTER TABLE config_report ALTER COLUMN active SET DEFAULT true;

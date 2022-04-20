@@ -219,7 +219,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_basic'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_basic;
 
@@ -228,7 +228,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_om'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_om;
 
@@ -238,7 +238,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_edit'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_edit;
 
@@ -247,7 +247,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_epa'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_epa;
 
@@ -256,7 +256,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_master'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_master;
 
@@ -265,7 +265,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_admin'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_admin;
 	END IF;

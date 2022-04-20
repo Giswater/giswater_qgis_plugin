@@ -50,3 +50,4 @@ INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('v_anl_grafanalytics_mapzones', 'View to work with grafanalytics related to mapzones', 'role_epa',  '{"level_1":"EPA","level_2":"DSCENARIO"}',15, 'Controls Dscenario', 
 'core');
 
+UPDATE config_report SET active=TRUE;
