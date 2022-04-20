@@ -119,7 +119,7 @@ BEGIN
 		v_device = '';
 	END IF;
 		
-	IF p_filterfield IS NOT NULL THEN
+	IF p_filterfield IS NOT NULL AND p_filterfield!='' THEN
 		v_filter_widgets = ' AND columnname NOT IN('||p_filterfield||') ';
 	END IF;
 
