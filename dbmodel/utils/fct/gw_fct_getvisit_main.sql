@@ -278,6 +278,14 @@ BEGIN
 			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='NODE');
 			
 		END IF;
+        
+        IF v_new_featureid IS NULL THEN
+			v_featuretype='gully';
+			v_featuretablename='v_edit_gully';
+			v_new_featureid=(SELECT gully_id FROM om_visit_lot_x_gully WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='GULLY');
+			
+		END IF;
 	
 		v_featureid=v_new_featureid;
 		v_visitclass=v_new_visitclass;
