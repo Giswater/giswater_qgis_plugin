@@ -25,3 +25,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table", "column":"macroexpl_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table", "column":"macrosector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"orderby", "dataType":"integer"}}$$);

@@ -30,3 +30,25 @@ i.active
 FROM selector_inp_dscenario, inp_dscenario_controls i 
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+ CREATE OR REPLACE VIEW v_anl_grafanalytics_mapzones AS 
+ SELECT temp_anlgraf.arc_id,
+    temp_anlgraf.node_1,
+    temp_anlgraf.node_2,
+    temp_anlgraf.flag,
+    a2.flag AS flagi,
+    a2.value,
+    a2.trace
+   FROM temp_anlgraf
+     JOIN ( SELECT temp_anlgraf_1.arc_id,
+            temp_anlgraf_1.node_1,
+            temp_anlgraf_1.node_2,
+            temp_anlgraf_1.water,
+            temp_anlgraf_1.flag,
+            temp_anlgraf_1.checkf,
+            temp_anlgraf_1.value,
+	    temp_anlgraf_1.trace
+           FROM temp_anlgraf temp_anlgraf_1
+          WHERE temp_anlgraf_1.water = 1) a2 ON temp_anlgraf.node_1::text = a2.node_2::text
+  WHERE temp_anlgraf.flag < 2 AND temp_anlgraf.water = 0 AND a2.flag = 0;

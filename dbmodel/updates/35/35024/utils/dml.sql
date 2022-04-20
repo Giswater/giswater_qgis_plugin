@@ -45,3 +45,8 @@ UPDATE sys_function SET source = 'core' WHERE source = 'giswater' or source IS N
 UPDATE sys_fprocess SET source = 'core' WHERE source = 'giswater' or source IS NULL;
 UPDATE sys_message SET source = 'core' WHERE source = 'giswater' or source IS NULL;
 UPDATE sys_param_user SET source = 'core' WHERE source = 'giswater' or source IS NULL;
+
+INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
+VALUES ('v_anl_grafanalytics_mapzones', 'View to work with grafanalytics related to mapzones', 'role_epa',  '{"level_1":"EPA","level_2":"DSCENARIO"}',15, 'Controls Dscenario', 
+'core');
+
