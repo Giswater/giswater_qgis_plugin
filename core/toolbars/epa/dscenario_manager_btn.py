@@ -107,7 +107,7 @@ class GwDscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if field.get('hidden') is not None: continue
             model = self.tbl_dscenario.model()
             if model is None:
                 model = QStandardItemModel()

@@ -109,10 +109,10 @@ class GwEpaFileManager(GwTask):
         elif result:
 
             if self.go2epa_export_inp and self.complet_result:
-                if 'status' in self.complet_result:
+                if self.complet_result.get('status') is not None:
                     if self.complet_result['status'] == "Accepted":
-                        if 'body' in self.complet_result:
-                            if 'data' in self.complet_result['body']:
+                        if self.complet_result.get('body') is not None:
+                            if self.complet_result['body'].get('data') is not None:
                                 tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
                                                    f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
                                                    f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
@@ -121,10 +121,10 @@ class GwEpaFileManager(GwTask):
                                                         call_set_tabs_enabled=False)
 
             if self.go2epa_import_result and self.rpt_result:
-                if 'status' in self.rpt_result:
+                if self.rpt_result.get('status') is not None:
                     if self.rpt_result['status'] == "Accepted":
-                        if 'body' in self.rpt_result:
-                            if 'data' in self.rpt_result['body']:
+                        if self.rpt_result.get('body') is not None:
+                            if self.rpt_result['body'].get('data') is not None:
                                 tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
                                     f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
                                                    f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
@@ -158,11 +158,11 @@ class GwEpaFileManager(GwTask):
             if self.json_result is None or not self.json_result:
                 tools_log.log_warning("Function failed finished")
             if self.complet_result:
-                if 'status' in self.complet_result:
+                if self.complet_result.get('status') is not None:
                     if "Failed" in self.complet_result['status']:
                         tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
-                if 'status' in self.rpt_result:
+                if self.rpt_result.get('status') is not None:
                     if "Failed" in self.rpt_result['status']:
                         tools_gw.manage_json_exception(self.rpt_result)
 
@@ -278,7 +278,7 @@ class GwEpaFileManager(GwTask):
         self.complet_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True
-        elif 'status' in json_result:
+        elif json_result.get('status') is not None:
             if json_result['status'] == 'Failed':
                 tools_log.log_warning(json_result)
                 self.function_failed = True
@@ -329,7 +329,7 @@ class GwEpaFileManager(GwTask):
                 read = False
             elif bool(re.match('\[(.*?)\]', row['text'])):
                 read = True
-            if 'text' in row and row['text'] is not None and read:
+            if  row.get('text') is not None and read:
                 line = row['text'].rstrip() + "\n"
                 file_inp.write(line)
 
@@ -354,7 +354,7 @@ class GwEpaFileManager(GwTask):
                         save_file = True
                 elif bool(re.match('\[(.*?)\]', row['text'])):
                     read = False
-                if 'text' in row and row['text'] is not None and read:
+                if row.get('text') is not None and read:
                     line = row['text'].rstrip() + "\n"
                     aditional_file.write(line)
 
@@ -581,7 +581,7 @@ class GwEpaFileManager(GwTask):
             self.function_failed = True
             return False
 
-        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+        if self.json_result.get('status') is not None and self.json_result['status'] == 'Failed':
             tools_log.log_warning(self.json_result)
             self.function_failed = True
             return False

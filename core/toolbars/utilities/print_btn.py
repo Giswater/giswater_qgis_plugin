@@ -313,9 +313,9 @@ class GwPrintButton(GwAction):
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if field.get('stylesheet') is not None and field['stylesheet'].get('label') is not None:
                 label = tools_gw.set_stylesheet(field, label)
-            if 'tooltip' in field:
+            if field.get('tooltip') is not None:
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
@@ -329,7 +329,7 @@ class GwPrintButton(GwAction):
             widget = tools_gw.add_combo(field)
             widget = tools_gw.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
-            if 'widgetfunction' in field:
+            if field.get('widgetfunction') is not None:
                 if field['widgetfunction']['functionName'] is not None:
                     function_name = field['widgetfunction']['functionName']
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))

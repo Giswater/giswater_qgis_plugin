@@ -97,7 +97,7 @@ class GwSearch:
                     label.setObjectName('lbl_' + field['label'])
                     label.setText(field['label'].capitalize())
 
-                    if 'tooltip' in field:
+                    if field.get('tooltip') is not None:
                         label.setToolTip(field['tooltip'])
                     else:
                         label.setToolTip(field['label'].capitalize())
@@ -269,7 +269,7 @@ class GwSearch:
                 break
 
         for line_edit in line_list:
-            if 'id' in item:
+            if item.get('id') is not None:
                 line_edit.setProperty('id_', item['id'])
 
         # Show info in docker?
@@ -487,7 +487,7 @@ class GwSearch:
         widget.setProperty('columnname', field['columnname'])
         list_items = self._get_list_items(widget, field)
         tools_qt.fill_combo_values(widget, list_items, 1)
-        if 'selectedId' in field:
+        if field.get('selectedId') is not None:
             tools_qt.set_combo_value(widget, field['selectedId'], 0)
         # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self._clear_lineedits))
@@ -509,9 +509,9 @@ class GwSearch:
         widget.clear()
         widget.blockSignals(False)
         list_items = []
-        if 'comboIds' in field:
+        if field.get('comboIds') is not None:
             for i in range(0, len(field['comboIds'])):
-                if 'comboFeature' in field:
+                if field.get('comboFeature') is not None:
                     elem = [field['comboIds'][i], field['comboNames'][i], field['comboFeature'][i]]
                 else:
                     elem = [field['comboIds'][i], field['comboNames'][i]]
@@ -741,7 +741,8 @@ class GwSearch:
         """ Get folder dialog """
 
         widget.setStyleSheet(None)
-        if 'nt' in sys.builtin_module_names:
+        #if 'nt' in sys.builtin_module_names:
+        if sys.builtin_module_names.get('nt') is not None:
             folder_path = os.path.expanduser("~/Documents")
         else:
             folder_path = os.path.expanduser("~")

@@ -114,11 +114,11 @@ class GwSelector:
             return False
 
         # Get styles
-        stylesheet = json_result['body']['form']['style'] if 'style' in json_result['body']['form'] else None
+        stylesheet = json_result['body']['form']['style'] if json_result['body']['form'].get('style') is not None else None
         color_rows = False
         if stylesheet:
             # Color selectors zebra-styled
-            if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
+            if stylesheet.get('rowsColor') is not None:
                 color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
 
         for form_tab in json_result['body']['form']['formTabs']:
@@ -137,7 +137,7 @@ class GwSelector:
                 main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
             else:
                 main_tab.addTab(tab_widget, form_tab['tabLabel'])
-            if 'typeaheadForced' in form_tab and form_tab['typeaheadForced'] is not None:
+            if form_tab.get('typeaheadForced') is not None:
                 tab_widget.setProperty('typeahead_forced', form_tab['typeaheadForced'])
 
             # Create a new QGridLayout and put it into tab
@@ -147,7 +147,7 @@ class GwSelector:
             field = {}
             i = 0
 
-            if 'typeaheadFilter' in form_tab:
+            if form_tab.get('typeaheadFilter') is not None:
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
@@ -169,7 +169,7 @@ class GwSelector:
                 gridlayout.addWidget(widget, int(field['layoutorder']), 2)
                 widget.setFocus()
 
-            if 'manageAll' in form_tab:
+            if form_tab.get('manageAll') is not None:
                 if (form_tab['manageAll']).lower() == 'true':
                     if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()

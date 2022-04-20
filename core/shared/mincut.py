@@ -961,7 +961,7 @@ class GwMincut:
         self.dlg_mincut.mincutCanceled = True
 
         if self.mincut_class == 1:
-            if 'geometry' in result['body']['data']:
+            if result['body']['data'].get('geometry') is not None:
                 polygon = result['body']['data']['geometry']
                 polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
@@ -1876,7 +1876,7 @@ class GwMincut:
         if signal[1]:
             complet_result = signal[1]
             real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            if complet_result.get('mincutOverlap') is not None and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
@@ -1988,7 +1988,7 @@ class GwMincut:
 
         if signal[1]:
             complet_result = signal[1]
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            if complet_result.get('mincutOverlap') is not None and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
@@ -2115,7 +2115,7 @@ class GwMincut:
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
 
             if result is not None and result['status'] == 'Accepted' and result['message']:
-                level = int(result['message']['level']) if 'level' in result['message'] else 1
+                level = int(result['message']['level']) if result['message'].get('level') is not None else 1
                 tools_qgis.show_message(result['message']['text'], level)
 
         # Disconnect snapping and related signals
@@ -2446,7 +2446,7 @@ class GwMincut:
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body, log_sql=True)
             if result is not None and result['status'] == 'Accepted' and result['message']:
-                level = int(result['message']['level']) if 'level' in result['message'] else 1
+                level = int(result['message']['level']) if result['message'].get('level') is not None else 1
                 tools_qgis.show_message(result['message']['text'], level)
 
 

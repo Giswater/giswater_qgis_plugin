@@ -539,7 +539,7 @@ class GwPsector:
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
 
         if tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
-            if 'nt' in sys.builtin_module_names:
+            if sys.builtin_module_names.get('nt') is not None:
                 plugin_dir = os.path.expanduser("~\Documents")
             else:
                 plugin_dir = os.path.expanduser("~")
@@ -1071,7 +1071,7 @@ class GwPsector:
 
         if close_dlg:
             json_result = self.set_plan()
-            if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['status'] is not None and json_result['status'] == 'Accepted':
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 

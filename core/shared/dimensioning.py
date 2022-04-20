@@ -101,7 +101,7 @@ class GwDimensioning:
 
         layout_list = []
         for field in db_return['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
+            if field.get('hidden') is not None:
                 continue
 
             label, widget = self._set_widgets(self.dlg_dim, db_return, field)
@@ -461,9 +461,9 @@ class GwDimensioning:
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            if field.get('stylesheet') is not None and field['stylesheet'].get('label') is not None:
                 label = tools_gw.set_stylesheet(field, label)
-            if 'tooltip' in field:
+            if field.get('tooltip') is not None:
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())

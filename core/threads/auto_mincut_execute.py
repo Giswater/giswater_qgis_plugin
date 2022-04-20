@@ -95,10 +95,10 @@ class GwAutoMincutTask(GwTask):
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished but postgres function failed
-        elif 'status' in self.complet_result and self.complet_result['status'] == 'Failed':
+        elif self.complet_result.get('status') is not None and self.complet_result['status'] == 'Failed':
             self.task_finished.emit([False, self.complet_result])
             tools_gw.manage_json_exception(self.complet_result)
 
         # Task finished with Accepted result
-        elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
+        elif self.complet_result.get('mincutOverlap') is not None or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
