@@ -441,6 +441,11 @@ BEGIN
 		
 		v_featurecat = NEW.node_type;
 
+		--arc_id
+		IF NEW.arc_id IS NULL AND (SELECT isarcdivide FROM cat_feature_node WHERE id=v_featurecat) IS FALSE THEN
+			NEW.arc_id = (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, the_geom, 0.1) LIMIT 1);
+		END IF;
+
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
 			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
