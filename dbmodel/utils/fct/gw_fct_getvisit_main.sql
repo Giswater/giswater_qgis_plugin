@@ -243,7 +243,7 @@ BEGIN
 		IF (SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer) IS NOT NULL THEN
 			FOR rec IN SELECT * FROM om_visit_lot_x_unit WHERE lot_id=v_lot AND orderby<(SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer)
 			LOOP
-				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id AND date_trunc('day', startdate)=current_date;
+				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id;
 				IF v_count = 0 THEN
 					--raise exception 'no pots visitar';
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
