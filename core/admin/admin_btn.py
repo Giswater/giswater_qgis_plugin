@@ -1780,7 +1780,7 @@ class GwAdminButton:
 
         # Manage folders 'i18n'
         manage_i18n = i18n
-        if filedir.get('i18n') is not None:
+        if 'i18n' in filedir:
             manage_i18n = True
 
         if manage_i18n:
@@ -2020,12 +2020,12 @@ class GwAdminButton:
 
                 if complet_result['status'] == 'Failed':
                     msg = f'The importation process has failed!'
-                    if complet_result['body']['data'].get('replace') is not None:
+                    if 'replace' in complet_result['body']['data']:
                         msg += f'<br>This can be fixed in the next dialog.'
                     msg += f'<br>See Info log for more details.'
                     self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
-                    if complet_result['body']['data'].get('replace') is not None:
+                    if 'replace' in complet_result['body']['data']:
                         retry = self._build_replace_dlg(complet_result['body']['data']['replace'])
                         if retry:
                             sql = "DELETE FROM temp_csv WHERE fid = 239;"
@@ -2944,12 +2944,12 @@ class GwAdminButton:
     def _manage_json_message(self, json_result, parameter=None, title=None):
         """ Manage message depending result @status """
 
-        if json_result.get('message') is not None:
+        if 'message' in json_result:
 
             level = 1
-            if json_result['message'].get('level') is not None:
+            if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
-            if json_result['message'].get('text') is not None:
+            if 'text' in json_result['message']:
                 msg = json_result['message']['text']
             else:
                 msg = "Key on returned json from ddbb is missed"

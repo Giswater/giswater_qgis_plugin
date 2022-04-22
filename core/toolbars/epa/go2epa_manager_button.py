@@ -74,7 +74,7 @@ class GwGo2EpaManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden') is not None: continue
+            if 'hidden' in field and field['hidden']: continue
             model = self.dlg_manager.tbl_rpt_cat_result.model()
             if model is None:
                 model = QStandardItemModel()

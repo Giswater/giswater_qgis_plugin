@@ -169,7 +169,7 @@ class GwCSVButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-            if result.get('message') is not None:
+            if 'message' in result:
                 msg = result['message']['text']
                 tools_qt.show_info_box(msg)
 

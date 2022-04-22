@@ -159,7 +159,7 @@ class GwConfigButton(GwAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                         if field['widgettype'] == 'typeahead':
                             completer = QCompleter()
-                            if field.get('dv_querytext') is not None:
+                            if 'dv_querytext' in field:
                                 widget.setProperty('typeahead', True)
                                 model = QStringListModel()
                                 widget.textChanged.connect(
@@ -211,7 +211,7 @@ class GwConfigButton(GwAction):
 
                     elif field['widgettype'] == 'spinbox':
                         widget = QDoubleSpinBox()
-                        if field.get('value') is not None:
+                        if 'value' in field and field['value'] is not None:
                             value = float(str(field['value']))
                             widget.setValue(value)
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
@@ -274,7 +274,7 @@ class GwConfigButton(GwAction):
         widget.clear()
         widget.blockSignals(False)
         combolist = []
-        if field.get('comboIds') is not None:
+        if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
                 if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
                     elem = [field['comboIds'][i], field['comboNames'][i]]
@@ -284,7 +284,7 @@ class GwConfigButton(GwAction):
             # Populate combo
             for record in records_sorted:
                 widget.addItem(record[1], record)
-        if field.get('value') is not None:
+        if 'value' in field:
             if str(field['value']) != 'None':
                 tools_qt.set_combo_value(widget, field['value'], 0)
 

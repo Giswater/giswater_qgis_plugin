@@ -65,7 +65,7 @@ class GwUpdateSchemaTask(GwTask):
         if self.status:
             # Set info project
             self.admin._set_info_project()
-            if self.status.get('body') is not None:
+            if 'body' in self.status:
                 tools_gw.fill_tab_log(self.admin.dlg_readsql_show_info, self.status['body']['data'], True, True, 1)
             else:
                 tools_log.log_warning(f"Key not found: 'body'")

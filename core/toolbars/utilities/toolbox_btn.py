@@ -211,7 +211,7 @@ class GwToolBoxButton(GwAction):
         if self.function_selected in self.no_clickable_items:
             return
 
-        if index.parent().parent().data().lower().get('reports') is not None:
+        if 'reports' in index.parent().parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
@@ -240,13 +240,13 @@ class GwToolBoxButton(GwAction):
                 label = None
                 widget = None
 
-                if field.get('label') is not None:
+                if 'label' in field and field['label']:
                     label = QLabel()
                     label.setObjectName('lbl_' + field['widgetname'])
                     label.setText(field['label'].capitalize())
-                    if field.get('stylesheet') is not None and field['stylesheet'].get('label') is not None:
+                    if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
                         label = tools_gw.set_stylesheet(field, label)
-                    if field.get('tooltip') is not None:
+                    if 'tooltip' in field:
                         label.setToolTip(field['tooltip'])
                     else:
                         label.setToolTip(field['label'].capitalize())
@@ -304,7 +304,7 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
 
-        elif index.parent().parent().data().lower().get('processes') is not None:
+        elif 'processes' in index.parent().parent().data().lower():
 
             self.dlg_functions = GwToolboxManagerUi()
             tools_gw.load_settings(self.dlg_functions)
@@ -547,11 +547,11 @@ class GwToolBoxButton(GwAction):
                 # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
                 # hide the other and mark the one that the user tells us.
                 # Options: "selectionType":"selected" //  "selectionType":"all"
-                if function[0]['input_params'].get('selectionType') is not None:
-                    if function[0]['input_params']['selectionType'].get('selected') is not None:
+                if 'selectionType' in function[0]['input_params']:
+                    if 'selected' in function[0]['input_params']['selectionType']:
                         dialog.rbt_previous.setChecked(True)
                         dialog.rbt_layer.setVisible(False)
-                    elif function[0]['input_params']['selectionType'].get('all') is not None:
+                    elif 'all' in function[0]['input_params']['selectionType']:
                         dialog.rbt_layer.setChecked(True)
                         dialog.rbt_previous.setVisible(False)
 

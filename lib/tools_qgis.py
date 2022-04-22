@@ -47,10 +47,8 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
 
     # Get optional parameter 'show_message_durations'
     dev_duration = None
-
-    if user_parameters.get('show_message_durations') is not None:
+    if 'show_message_durations' in user_parameters:
         dev_duration = user_parameters['show_message_durations']
-
     # If is set, use this value
     if dev_duration not in (None, "None"):
         if message_level in (1, 2) and int(dev_duration) < 10:
@@ -87,7 +85,7 @@ def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, 
 
     # Get optional parameter 'show_message_durations'
     dev_duration = None
-    if user_parameters.get('show_message_durations') is not None:
+    if 'show_message_durations' in user_parameters:
         dev_duration = user_parameters['show_message_durations']
     # If is set, use this value
     if dev_duration not in (None, "None"):
@@ -310,11 +308,11 @@ def get_layer_source(layer):
                 list_uri.append(elem_uri)
 
     splt_dct = dict(list_uri)
-    if splt_dct.get('service') is not None:
+    if 'service' in splt_dct:
         splt_dct['service'] = splt_dct['service']
-    if splt_dct.get('dbname') is not None:
+    if 'dbname' in splt_dct:
         splt_dct['db'] = splt_dct['dbname']
-    if splt_dct.get('table') is not None:
+    if 'table' in splt_dct:
         splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
 
     for key in layer_source.keys():
@@ -390,7 +388,7 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
     # Iterate over all layers
     layer = None
     if schema_name is None:
-        if global_vars.project_vars.get('main_schema') is not None:
+        if 'main_schema' in global_vars.project_vars:
             schema_name = global_vars.project_vars['main_schema']
         else:
             tools_log.log_warning("Key not found", parameter='main_schema')

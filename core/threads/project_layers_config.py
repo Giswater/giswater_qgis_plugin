@@ -90,7 +90,7 @@ class GwProjectLayersConfig(GwTask):
         for layer in all_layers_toc:
             layer_source = tools_qgis.get_layer_source(layer)
             # Filter to take only the layers of the current schema
-            if layer_source.get('schema') is not None:
+            if 'schema' in layer_source:
                 schema = layer_source['schema']
                 if schema and schema.replace('"', '') == self.schema_name:
                     table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"

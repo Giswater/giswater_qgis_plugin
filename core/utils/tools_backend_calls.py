@@ -41,8 +41,8 @@ def add_query_layer(**kwargs):
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     query = kwargs['query']
-    layer_name = kwargs['layerName'] if kwargs.get('layerName') is not None else 'QueryLayer'
-    group = kwargs['group'] if kwargs.get('group') is not None else 'GW Layers'
+    layer_name = kwargs['layerName'] if 'layerName' in kwargs else 'QueryLayer'
+    group = kwargs['group'] if 'group' in kwargs else 'GW Layers'
 
     uri = tools_db.get_uri()
 
@@ -89,7 +89,7 @@ def refresh_attribute_table(**kwargs):
             field_idx = layer.fields().indexFromName(field['columnname'])
 
             # Hide selected fields according table config_form_fields.hidden
-            if field.get('hidden') is not None:
+            if 'hidden' in field:
                 kwargs = {"layer": layer, "field": field['columnname'], "hidden": field['hidden']}
                 set_column_visibility(**kwargs)
 
@@ -115,7 +115,7 @@ def refresh_attribute_table(**kwargs):
 
             # Manage fields
             if field['widgettype'] == 'combo':
-                if field.get('comboIds') is not None:
+                if 'comboIds' in field:
                     for i in range(0, len(field['comboIds'])):
                         _values[field['comboNames'][i]] = field['comboIds'][i]
                 # Set values into valueMap
@@ -232,12 +232,12 @@ def load_qml(**kwargs):
     """
 
     # Get layer
-    layer = tools_qgis.get_layer_by_tablename(kwargs['layerName']) if kwargs.get('layerName') is not None else None
+    layer = tools_qgis.get_layer_by_tablename(kwargs['layerName']) if 'layerName' in kwargs else None
     if layer is None:
         return False
 
     # Get qml path
-    qml_path = kwargs['qmlPath'] if kwargs.get('qmlPath') is not None else None
+    qml_path = kwargs['qmlPath'] if 'qmlPath' in kwargs else None
 
     if not os.path.exists(qml_path):
         tools_log.log_warning("File not found", parameter=qml_path)
@@ -285,7 +285,7 @@ def get_selector(**kwargs):
     Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
     """
 
-    tab_name = kwargs['tab'] if kwargs.get('tab') is not None else None
+    tab_name = kwargs['tab'] if 'tab' in kwargs else None
     global_vars.signal_manager.refresh_selectors.emit(tab_name)
 
 
@@ -300,9 +300,9 @@ def show_message(**kwargs):
     Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
     """
 
-    text = kwargs['text'] if kwargs.get('text') is not None else 'No message found'
-    level = kwargs['level'] if kwargs.get('level') is not None else 1
-    duration = kwargs['duration'] if kwargs.get('duration') is not None else 10
+    text = kwargs['text'] if 'text' in kwargs else 'No message found'
+    level = kwargs['level'] if 'level' in kwargs else 1
+    duration = kwargs['duration'] if 'duration' in kwargs else 10
 
     global_vars.signal_manager.show_message.emit(text, level, duration)
 

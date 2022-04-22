@@ -115,7 +115,7 @@ class GwWorkspaceManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden') is not None: continue
+            if 'hidden' in field and field['hidden']: continue
             model = self.tbl_wrkspcm.model()
             if model is None:
                 model = QStandardItemModel()
@@ -230,7 +230,7 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            if result.get('message') is not None:
+            if 'message' in result and result['message']:
                 message = result['message']
                 tools_qgis.show_message(message['text'], message['level'])
             self._fill_tbl(self.filter_name.text())
@@ -246,7 +246,7 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            if result.get('message') is not None:
+            if 'message' in result and result['message']:
                 message = result['message']
                 tools_qgis.show_message(message['text'], message['level'])
             self._fill_tbl(self.filter_name.text())
@@ -276,7 +276,7 @@ class GwWorkspaceManagerButton(GwAction):
             result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
             if result and result['status'] == "Accepted":
-                if result.get('message') is not None:
+                if 'message' in result and result['message']:
                     message = result['message']
                     tools_qgis.show_message(message['text'], message['level'])
 
@@ -293,7 +293,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result['status'] == "Accepted":
             value = "0"
-            if result['body']['data'].get('userValues') is not None:
+            if 'userValues' in result['body']['data']:
                 for user_value in result['body']['data']['userValues']:
                     if user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
                         value = user_value['value']

@@ -1102,7 +1102,7 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
             if dont_show in description:
                 show_exception_msg = False
                 break
-        if description.get('server sent data') is not None and description.get('without prior row description') is not None:
+        if 'server sent data' in description and 'without prior row description' in description:
             show_exception_msg = False
 
     try:

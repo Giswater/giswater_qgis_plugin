@@ -454,7 +454,7 @@ class GwLoadProject(QObject):
         if not status:
             return False
         if result and 'variables' in result['body']:
-            if result['body']['variables'].get('setQgisLayers') is not None:
+            if 'setQgisLayers' in result['body']['variables']:
                 if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
                     return
 
@@ -502,8 +502,8 @@ class GwLoadProject(QObject):
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                if result['body'].get('variables') is not None:
-                    if result['body']['variables'].get('useGuideMap') is not None:
+                if 'variables' in result['body']:
+                    if 'useGuideMap' in result['body']['variables']:
                         guided_map = result['body']['variables']['useGuideMap']
                         if guided_map:
                             tools_log.log_info("manage_guided_map")

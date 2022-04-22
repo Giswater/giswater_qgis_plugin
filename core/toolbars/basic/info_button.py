@@ -162,7 +162,7 @@ class GwInfoButton(GwMaptool):
                 sub_menu = main_menu.addMenu(layer_name.name())
             # Create one QAction for each id
             for feature in layer['ids']:
-                if feature.get('label') is not None:
+                if 'label' in feature:
                     label = str(feature['label'])
                 else:
                     label = str(feature['id'])
@@ -183,7 +183,7 @@ class GwInfoButton(GwMaptool):
         main_menu.addSeparator()
 
         # Open/close valve
-        if json_result['body']['data'].get('valve') is not None:
+        if 'valve' in json_result['body']['data']:
             valve_id = json_result['body']['data']['valve']['id']
             valve_text = json_result['body']['data']['valve']['text']
             valve_table = json_result['body']['data']['valve']['tableName']

@@ -59,18 +59,18 @@ class GwAddChildLayerButton(GwAction):
         for field in json_result['body']['data']['fields']:
             if field['context'] is not None:
                 context = json.loads(field['context'])
-                if context.get('level_1') is not None and context['level_1'] not in dict_menu:
+                if 'level_1' in context and context['level_1'] not in dict_menu:
                     menu_level_1 = main_menu.addMenu(f"{context['level_1']}")
                     dict_menu[context['level_1']] = menu_level_1
-                if context.get('level_2') is not None and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
+                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
                     menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
-                if context.get('level_3') is not None and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
+                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
                     menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(f"{context['level_3']}")
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
 
                 alias = field['layerName'] if field['layerName'] is not None else field['tableName']
-                if context.get('level_3') is not None:
+                if 'level_3' in context:
                     menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
                         # LEVEL 3 - LOAD ALL
