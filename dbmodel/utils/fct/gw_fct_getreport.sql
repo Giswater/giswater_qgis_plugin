@@ -20,6 +20,8 @@ SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "in
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "code", "filterValue": "6"}, {"filterName": "dma_id", "filterValue": "5"}], "listId":"102"}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "init", "filterValue": null}], "listId":"902"}}$$);
+
 */
 
 DECLARE
@@ -41,6 +43,7 @@ v_querytext text;
 
 v_version text;
 v_error_context text;
+v_filterdefault text;
 
 BEGIN
 
@@ -80,28 +83,42 @@ BEGIN
 
 	--list data
 	--execute query 
-	SELECT CASE WHEN vdefault IS NOT NULL THEN  concat(query_text, ' ORDER BY ',json_extract_path_text(vdefault,'orderBy'),' ',json_extract_path_text(vdefault,'orderType')) 
+	SELECT CASE WHEN vdefault IS NOT NULL THEN concat(query_text, ' ORDER BY ',json_extract_path_text(vdefault,'orderBy'),' ',json_extract_path_text(vdefault,'orderType')) 
 	ELSE  query_text END AS query INTO v_querytext FROM config_report WHERE id = v_list_id;
+
+	-- temporary line before it is not applied the filter sign for each filter (remove after 3.5.025)
+	v_filtersign = (SELECT json_extract_path_text(vdefault,'filterSign') FROM config_report WHERE id = v_list_id);
+
+	v_filterdefault = (SELECT json_extract_path_text(vdefault,'filterDefault') FROM config_report WHERE id = v_list_id);
+
 
 	IF v_filterinput IS NOT NULL THEN
 
-	RAISE NOTICE ' v_filterinput %', v_filterinput;
-
 		FOREACH rec_filter IN ARRAY v_filterinput LOOP
+
+			RAISE NOTICE ' rec_filter %', rec_filter;
 		
 			v_filtername = concat('"',json_extract_path_text(rec_filter::json,'filterName'),'"');
 			v_filtervalue = json_extract_path_text(rec_filter::json,'filterValue');
-			v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
+
+			-- temporary line before it is not applied the filter sign for each filter (remove after 3.5.025)
+			IF v_filtersign IS NULL THEN
+				v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
+			END IF;
 
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
 			END IF;
 			
 			IF v_filtername != '' AND v_filtervalue != '' THEN
-				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername,v_filtersign,quote_literal(v_filtervalue));
+				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 			END IF;
-			
 		END LOOP;
+	ELSE 
+
+		IF v_filterdefault IS NOT NULL THEN
+			v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filterdefault);
+		END IF;	
 	END IF;
 	
 	raise notice 'v_querytext,%',v_querytext;
@@ -130,4 +147,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
