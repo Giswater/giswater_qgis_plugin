@@ -48,13 +48,20 @@ DROP TABLE IF EXISTS _ext_rtc_scada_x_data_;
 DROP TABLE IF EXISTS _ext_rtc_scada_;
 
 CREATE TABLE IF NOT EXISTS ext_rtc_scada (
-node_id varchar(16),
 scada_id varchar(30),
+source varchar(30),
+source_id varchar(30),
+node_id varchar(16),
 code varchar(50),
-type varchar(50),
+type_id varchar(50),
+class_id varchar(50),
+category_id varchar(50),
+catalog_id varchar(50),
 descript text,
-CONSTRAINT ext_rtc_scada_pkey PRIMARY KEY (node_id)
+CONSTRAINT ext_rtc_scada_pkey PRIMARY KEY (scada_id),
+CONSTRAINT ext_rtc_scada_unique UNIQUE (source, source_id)
 );
+
 
 CREATE TABLE IF NOT EXISTS ext_rtc_scada_x_data (
 node_id varchar(16),
@@ -63,7 +70,9 @@ value double precision,
 value_type integer,
 value_status integer,
 value_state integer,
-CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (node_id,cat_period_id)
+value_date timestamp,
+data_type text,
+CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (node_id, cat_period_id)
 );
 
 
@@ -93,7 +102,6 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTR
 
 ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_dma_id_fkey FOREIGN KEY (dma_id)
 REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
 
 ALTER TABLE dma DROP CONSTRAINT dma_pattern_id_fkey;
 
