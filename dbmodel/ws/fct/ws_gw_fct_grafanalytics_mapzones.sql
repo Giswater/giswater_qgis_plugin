@@ -312,7 +312,11 @@ BEGIN
 
 		-- reset rtc_scada_x_dma or rtc_scada_x_dma
 		IF v_class = 'DMA' THEN
-			DELETE FROM om_waterbalance_dma_graf;
+			DELETE FROM om_waterbalance_dma_graf
+			WHERE node_id IN 
+			(SELECT node_id FROM om_waterbalance_dma_graf
+			JOIN node USING (node_id)
+			WHERE expl_id IN (SELECT (json_array_elements_text(v_expl))::integer));
 		END IF;
 			
 		-- save state selector 
@@ -639,28 +643,32 @@ BEGIN
 					RAISE NOTICE 'Disconnecteds';
 
 					-- disconnected arcs
-					SELECT count(*)/2 INTO v_count FROM temp_anlgraf WHERE trace is null;
+					SELECT arc_id, count(*) INTO v_count FROM temp_anlgraf WHERE trace is null GROUP BY arc_id HAVING count(*) > 1;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, criticity, error_message)
 						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
 					ELSE
 						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('INFO: ', v_count ,' arc''s have been disconnected'));
+						VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
 					END IF;
 
 					-- disconnected connecs
-					SELECT count(*)/2 INTO v_count FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE trace is null;
-					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+					IF v_count > 0 THEN 
+						SELECT arc_id, count(*) INTO v_count FROM temp_anlgraf JOIN v_edit_connec USING (arc_id) WHERE trace is null GROUP BY arc_id HAVING count(*) > 1;
+						IF v_count > 0 THEN
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+						ELSE
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+						END IF;
 					ELSE
 						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('INFO: ', v_count ,' connec''s have been disconnected'));
+						VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
 					END IF;
+					
 
 					RAISE NOTICE 'Manage conflicts';
-
-					
 
 					-- manage conflicts
 					FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
@@ -755,7 +763,7 @@ BEGIN
 				(SELECT '||quote_ident(v_field)||'
 				FROM '||quote_ident(v_table)||' WHERE active=true
 				)
-				)';
+				) ON CONFLICT (node_id, dma_id) DO NOTHING';
 				EXECUTE v_querytext;
 			END IF;
 
