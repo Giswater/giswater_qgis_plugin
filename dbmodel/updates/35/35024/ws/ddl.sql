@@ -107,3 +107,6 @@ ALTER TABLE dma DROP CONSTRAINT dma_pattern_id_fkey;
 
 ALTER TABLE dma ADD CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id)
 REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE restrict;
+
+
+ALTER TABLE ext_rtc_sector_period RENAME TO _ext_rtc_sector_period_; 

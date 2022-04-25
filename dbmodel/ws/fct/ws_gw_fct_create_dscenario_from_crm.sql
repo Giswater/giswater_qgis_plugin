@@ -154,15 +154,6 @@ BEGIN
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 		
-		ELSIF v_pattern = 3 THEN -- sector period
-
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM ext_rtc_sector_period s 
-			JOIN connec USING (sector_id) 
-			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
-			AND dscenario_id = v_scenarioid;
-
 		ELSIF v_pattern = 4 THEN -- dma default
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
