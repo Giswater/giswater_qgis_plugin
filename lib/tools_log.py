@@ -33,7 +33,7 @@ class GwLogger(object):
 
         # Define log folder in users folder
         main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-        log_folder = main_folder + os.sep + "log" + os.sep
+        log_folder = f"{main_folder}{os.sep}core{os.sep}log{os.sep}"
         if folder_has_tstamp:
             tstamp = str(time.strftime(log_suffix))
             log_folder += tstamp + os.sep
