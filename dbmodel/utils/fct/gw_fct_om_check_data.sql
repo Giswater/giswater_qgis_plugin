@@ -30,6 +30,7 @@ SELECT * FROM audit_check_data WHERE fid = 125
 
 DECLARE
 
+v_record record;
 v_project_type text;
 v_count integer;
 v_saveondatabase boolean;
@@ -1202,6 +1203,21 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '106','INFO: There are  no nodes duplicated',v_count);
 	END IF;
+
+	-- Removing isaudit false sys_fprocess
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	LOOP
+		-- remove anl tables
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+
+		IF v_project_type = 'UD' THEN
+			DELETE FROM anl_gully WHERE fid = v_record.fid AND cur_user = current_user;
+		END IF;
+
+		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
+	END LOOP;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');

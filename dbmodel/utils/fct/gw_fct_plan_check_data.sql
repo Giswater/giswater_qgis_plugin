@@ -23,6 +23,7 @@ SELECT * FROM anl_node WHERE fid=115 AND cur_user=current_user;
 */
 
 DECLARE 
+v_record record;
 v_project_type 	text;
 v_table_count integer;
 v_count integer;
@@ -466,6 +467,17 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
 	END IF;
+
+	-- Removing isaudit false sys_fprocess
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	LOOP
+		-- remove anl tables
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+
+		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
+	END LOOP;
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '');

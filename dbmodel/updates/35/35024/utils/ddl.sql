@@ -36,3 +36,8 @@ ALTER TABLE config_report ALTER COLUMN active SET DEFAULT true;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"float_value", "dataType":"double precision"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"int_value", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"flag", "dataType":"boolean"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"addparam", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_fprocess", "column":"active", "dataType":"boolean"}}$$);
+
+

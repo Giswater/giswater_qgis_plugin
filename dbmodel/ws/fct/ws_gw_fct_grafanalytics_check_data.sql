@@ -26,6 +26,7 @@ select * FROM audit_check_data WHERE fid=211 AND cur_user=current_user;
 
 DECLARE
 
+v_record record;
 v_project_type text;
 v_count	integer;
 v_saveondatabase boolean;
@@ -371,6 +372,17 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (211, 1, 367, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'),0);
 		END IF;
+	END LOOP;
+
+	-- Removing isaudit false sys_fprocess
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	LOOP
+		-- remove anl tables
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+
+		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
 	END LOOP;
 
 	

@@ -6,29 +6,27 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2998
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_user_check_data(json);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_user_check_data(p_data json)
-  RETURNS json AS
-$BODY$
+RETURNS json AS
 
-	/*EXAMPLE
+/*
+EXAMPLE
 		
+SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
+{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":true, "selectionMode":"userSelectors"}}}$$)::text
 
-	SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
-	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":true, "selectionMode":"userSelectors"}}}$$)::text
-
-	--Project - audit_check_project - only errors
-	--User - errors and info
-	--isAudit - errors and info for statistics (data copied to audit_fid_log)
+--Project - audit_check_project - only errors
+--User - errors and info
+--isAudit - errors and info for statistics (data copied to audit_fid_log)
 
 -- fid: 251
 
 */
+  
+$BODY$
 
 DECLARE
-
 v_schemaname text;
 v_count integer;
 v_countquery text;
@@ -127,7 +125,7 @@ BEGIN
 		INTO v_cur_expl;
 	END IF;
 
-	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
+	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') AND active IS TRUE ORDER BY orderby' LOOP
 		
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'warning' INTO v_warning_val;
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'error' INTO v_error_val;
@@ -266,9 +264,9 @@ BEGIN
 
 
 		--  Exception handling
-	/*EXCEPTION WHEN OTHERS THEN
+	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;*/
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 $BODY$
