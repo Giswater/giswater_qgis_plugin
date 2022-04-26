@@ -47,3 +47,6 @@ UPDATE sys_message SET source = 'core' WHERE source = 'giswater' or source IS NU
 UPDATE sys_param_user SET source = 'core' WHERE source = 'giswater' or source IS NULL;
 
 UPDATE config_report SET active=TRUE;
+
+INSERT INTO config_param_system VALUES ('admin_checkproject', '{"ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}', 'Variable to manage customization for admin_checkproject function')
+ON CONFLICT (parameter) DO NOTHING;

@@ -85,6 +85,9 @@ v_uservalues json;
 v_user_expl text;
 v_isaudit text;
 v_selection_mode text;
+v_ignoregrafanalytics boolean;
+v_ignoreepa boolean;
+v_ignoreplan boolean;
 
 BEGIN 
 
@@ -139,6 +142,11 @@ BEGIN
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
 	SELECT value INTO v_qgis_layers_setpropierties FROM config_param_user where parameter='qgis_layers_set_propierties' AND cur_user=current_user;
+
+	-- get system parameters
+	SELECT value::json->>'ignoreGrafanalytics' INTO v_ignoregrafanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
+	SELECT value::json->>'ignorePlan' INTO v_ignoreplan FROM config_param_system WHERE parameter = 'admin_checkproject';
+	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
 
 	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
@@ -347,7 +355,7 @@ BEGIN
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
 		
-		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+		IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'"}}}$$)';
@@ -359,18 +367,22 @@ BEGIN
 			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
-			IF v_project_type = 'WS' THEN
+			IF v_ignoregrafanalytics THEN
 
-				EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
-				"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "grafClass":"ALL"}}}$$)';
-				-- insert results 
-				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
-				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+			ELSE 
+				IF v_project_type = 'WS' THEN
 
-				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-				WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+					EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
+					"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "grafClass":"ALL"}}}$$)';
+					-- insert results 
+					UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
+					WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
+					INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+					SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
+					WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+				END IF;
 			END IF;
 		END IF;
 
@@ -392,6 +404,9 @@ BEGIN
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
+			IF v_ignoreepa THEN
+
+			ELSE
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
@@ -401,10 +416,14 @@ BEGIN
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+			END IF;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
+			IF v_ignoreplan THEN
+
+			ELSE
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
@@ -414,6 +433,7 @@ BEGIN
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=115 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+			END IF;
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
