@@ -59,17 +59,17 @@ BEGIN
 
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, '----------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, '-------');
 
 	--arc catalog
 	SELECT count(*) INTO v_table_count FROM cat_arc WHERE active=TRUE;
@@ -476,14 +476,14 @@ BEGIN
 		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
+		DELETE FROM audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = 115;		
 	END LOOP;
 
 	-- insert spacers
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, '');
 
 	-- get results
 	-- info

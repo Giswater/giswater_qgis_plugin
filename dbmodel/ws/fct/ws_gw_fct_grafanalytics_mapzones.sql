@@ -1009,7 +1009,7 @@ BEGIN
 		EXECUTE 'UPDATE connec t SET '||v_field||'  = '||v_valuefordisconnected||' FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text  IN (''0'',''-1'')';
 	END IF;
 			
-    	-- restore state selector (if it's needed)
+    -- restore state selector (if it's needed)
 	IF v_usepsector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
 		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user

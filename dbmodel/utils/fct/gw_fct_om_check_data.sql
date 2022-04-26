@@ -1212,11 +1212,7 @@ BEGIN
 		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		IF v_project_type = 'UD' THEN
-			DELETE FROM anl_gully WHERE fid = v_record.fid AND cur_user = current_user;
-		END IF;
-
-		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
+		DELETE FROM audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = 125;		
 	END LOOP;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');

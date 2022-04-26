@@ -48,5 +48,5 @@ UPDATE sys_param_user SET source = 'core' WHERE source = 'giswater' or source IS
 
 UPDATE config_report SET active=TRUE;
 
-INSERT INTO config_param_system VALUES ('admin_checkproject', '{"ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}', 'Variable to manage customization for admin_checkproject function')
+INSERT INTO config_param_system VALUES ('admin_checkproject', '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":true}', 'Variable to manage customization for admin_checkproject function')
 ON CONFLICT (parameter) DO NOTHING;

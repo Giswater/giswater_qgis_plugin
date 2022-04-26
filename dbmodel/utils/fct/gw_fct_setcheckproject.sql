@@ -13,10 +13,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcheckproject (p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":101}}$$);
-
- SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "isAudit":false,"addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "logFolderVolume":"34MB", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+"version":"3.5.021.1", "fid":101, "initProject":false, "addSchema":"NULL", "mainSchema":"NULL", "projecRole":"role_admin", "infoType":"full", "logFolderVolume":"139.56 MB", 
+"projectType":"SCHEMA_NAME", "qgisVersion":"3.16.6-Hannover", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
 	om: 125
@@ -88,6 +87,7 @@ v_selection_mode text;
 v_ignoregrafanalytics boolean;
 v_ignoreepa boolean;
 v_ignoreplan boolean;
+v_usepsector boolean;
 
 BEGIN 
 
@@ -147,6 +147,8 @@ BEGIN
 	SELECT value::json->>'ignoreGrafanalytics' INTO v_ignoregrafanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignorePlan' INTO v_ignoreplan FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
+	SELECT value::json->>'usePsectors' INTO v_usepsector FROM config_param_system WHERE parameter = 'admin_checkproject';
+
 
 	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
@@ -229,7 +231,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
 	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
-		
 	
 	v_errortext=concat('Logged as ', current_user,' on ', now());
 	
@@ -318,6 +319,18 @@ BEGIN
 		END IF;
 		SET search_path = 'SCHEMA_NAME';
 	END IF;
+
+	-- Force psector selector in case of v_usepsector is false 
+	IF v_usepsector IS NOT TRUE THEN
+	
+		-- save psector selector 
+		DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
+		INSERT INTO temp_table (fid, text_column)
+		SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+
+		-- set psector selector
+		DELETE FROM selector_psector WHERE cur_user=current_user;
+	END IF;
 	
 	-- Force hydrometer selector in case of null values
 	IF (SELECT count(*) FROM selector_hydrometer WHERE cur_user=current_user) < 1 THEN 
@@ -325,7 +338,8 @@ BEGIN
 		v_errortext=concat('Set hydrometer state = 1 for user');
 		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 	END IF;
-	
+
+
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 	
@@ -343,6 +357,8 @@ BEGIN
 			v_errortext=concat('Current psector: ',v_psector_vdef);
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
+
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Use psectors on check db): ', upper(v_usepsector::text)));
 	END IF;
 
 	IF v_selection_mode = 'userSelectors' THEN
@@ -367,11 +383,8 @@ BEGIN
 			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
-			IF v_ignoregrafanalytics THEN
-
-			ELSE 
+			IF v_ignoregrafanalytics IS FALSE THEN
 				IF v_project_type = 'WS' THEN
-
 					EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
 					"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "grafClass":"ALL"}}}$$)';
@@ -404,9 +417,7 @@ BEGIN
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			IF v_ignoreepa THEN
-
-			ELSE
+			IF v_ignoreepa IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
@@ -421,9 +432,7 @@ BEGIN
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			IF v_ignoreplan THEN
-
-			ELSE
+			IF v_ignoreplan IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
@@ -481,6 +490,13 @@ BEGIN
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	v_uservalues := COALESCE(v_uservalues, '{}');
+
+	  -- restore state selector (if it's needed)
+	IF v_usepsector IS NOT TRUE THEN
+		INSERT INTO selector_psector (psector_id, cur_user)
+		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
+		ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	END IF;
 		
 	-- show form
 	IF v_hidden_form IS FALSE AND v_fid=101 THEN
@@ -545,17 +561,17 @@ BEGIN
 			VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
 		-- start process
 		FOR v_rectable IN SELECT * FROM sys_table WHERE sys_role IN 
