@@ -98,7 +98,7 @@ def initialize_parsers():
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
-                      chk_user_params=True, get_none=False, force_reload=False) -> str:
+                      chk_user_params=True, get_none=False, force_reload=False, plugin='core') -> str:
     """ Load a simple parser value """
 
     if config_type not in ("user", "project"):
@@ -108,6 +108,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
+
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        parser = None
+        chk_user_params = False
 
     # Needed to avoid errors with giswater plugins
     if path is None:
@@ -151,7 +156,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
-                      comment=None, prefix=True, chk_user_params=True):
+                      comment=None, prefix=True, chk_user_params=True, plugin='core'):
     """ Save simple parser value """
 
     if config_type not in ("user", "project"):
@@ -160,6 +165,10 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
+
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        chk_user_params = False
 
     try:
 
@@ -3410,7 +3419,7 @@ def _get_parser_from_filename(filename):
     """ Get parser of file @filename.config """
 
     if filename in ('init', 'session'):
-        folder = global_vars.user_folder_dir
+        folder = f"{global_vars.user_folder_dir}{os.sep}core"
     elif filename in ('dev', 'giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:

@@ -197,7 +197,7 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Check if user config folder exists
-        self._manage_user_config_folder(global_vars.user_folder_dir)
+        self._manage_user_config_folder(f"{global_vars.user_folder_dir}{os.sep}core")
 
         # Initialize parsers of configuration files: init, session, giswater, user_params
         tools_gw.initialize_parsers()

@@ -188,9 +188,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir=None):
     """ Get @parameter from metadata.txt file """
 
+    if not plugin_dir:
+        plugin_dir = os.path.dirname(__file__)
+        plugin_dir = plugin_dir.rstrip(f'{os.sep}lib')
     # Check if metadata file exists
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
@@ -231,7 +234,7 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(plugin_dir, default_version='3.5'):
+def get_major_version(plugin_dir=None, default_version='3.5'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
