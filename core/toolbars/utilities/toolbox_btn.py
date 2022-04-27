@@ -22,6 +22,7 @@ from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
 from ...threads.toolbox_execute import GwToolBoxTask
+from ...threads.toolbox_report import GwReportTask
 from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi, GwToolboxReportsUi
 from ...utils import tools_gw, tools_backend_calls
 from ....lib import tools_qt, tools_qgis, tools_db
@@ -226,80 +227,21 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
             self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
-            extras = f'"filterText":null, "listId":"{self.function_selected}"'
-            body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
-            if not json_result or json_result['status'] == 'Failed':
-                return False
+            # Disable buttons
+            tools_qt.set_widget_enabled(self.dlg_reports, 'btn_export', False)
+            tools_qt.set_widget_enabled(self.dlg_reports, 'btn_close', False)
 
-            layout = self.dlg_reports.findChild(QGridLayout, 'lyt_filters')
+            # Create timer
+            self.t0 = time()
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_reports))
+            self.timer.start(1000)
 
-            order = 0
-
-            for field in json_result['body']['data']['fields']:
-                label = None
-                widget = None
-
-                if 'label' in field and field['label']:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['widgetname'])
-                    label.setText(field['label'].capitalize())
-                    if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                        label = tools_gw.set_stylesheet(field, label)
-                    if 'tooltip' in field:
-                        label.setToolTip(field['tooltip'])
-                    else:
-                        label.setToolTip(field['label'].capitalize())
-
-                if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
-                    completer = QCompleter()
-                    widget = tools_gw.add_lineedit(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget = tools_gw.set_data_type(field, widget)
-                    widget.textChanged.connect(partial(self._update_tbl_reports))
-                    if field['widgettype'] == 'typeahead':
-                        widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
-                elif field['widgettype'] == 'combo':
-                    widget = tools_gw.add_combo(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'check':
-                    widget = tools_gw.add_checkbox(field)
-                    widget.stateChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'datetime':
-                    widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    widget.valueChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'list':
-                    if field['value'] is None:
-                        msg = "No results found. Please check values set on selector of state and exploitation"
-                        tools_qgis.show_warning(msg)
-                        return
-                    numrows = len(field['value'])
-                    numcols = len(field['value'][0])
-
-                    self.dlg_reports.tbl_reports.setColumnCount(numcols)
-                    self.dlg_reports.tbl_reports.setRowCount(numrows)
-
-                    i = 0
-                    dict_keys = {}
-                    for key in field['value'][0].keys():
-                        dict_keys[i] = f"{key}"
-                        self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
-                        i = i + 1
-
-                    for row in range(numrows):
-                        for column in range(numcols):
-                            column_name = dict_keys[column]
-                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{field['value'][row][column_name]}"))
-
-                    continue
-
-                order = order + 1
-
-                if label:
-                    layout.addWidget(label, 0, order)
-                if widget:
-                    layout.addWidget(widget, 1, order)
+            # Create thread
+            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, timer=self.timer)
+            self.report_thread.finished_execute.connect(self._report_finished)
+            QgsApplication.taskManager().addTask(self.report_thread)
+            QgsApplication.taskManager().triggerTask(self.report_thread)
 
             self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
@@ -346,6 +288,81 @@ class GwToolBoxButton(GwAction):
             # Open form and set title
             self.dlg_functions.setWindowTitle(f"{self.function_selected}")
             tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+
+
+    def _report_finished(self, status, json_result):
+        if not status:
+            return
+
+        layout = self.dlg_reports.findChild(QGridLayout, 'lyt_filters')
+
+        order = 0
+
+        for field in json_result['body']['data']['fields']:
+            label = None
+            widget = None
+
+            if 'label' in field and field['label']:
+                label = QLabel()
+                label.setObjectName('lbl_' + field['widgetname'])
+                label.setText(field['label'].capitalize())
+                if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                    label = tools_gw.set_stylesheet(field, label)
+                if 'tooltip' in field:
+                    label.setToolTip(field['tooltip'])
+                else:
+                    label.setToolTip(field['label'].capitalize())
+
+            if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+                completer = QCompleter()
+                widget = tools_gw.add_lineedit(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget = tools_gw.set_data_type(field, widget)
+                widget.textChanged.connect(partial(self._update_tbl_reports))
+                if field['widgettype'] == 'typeahead':
+                    widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
+            elif field['widgettype'] == 'combo':
+                widget = tools_gw.add_combo(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'check':
+                widget = tools_gw.add_checkbox(field)
+                widget.stateChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'datetime':
+                widget = tools_gw.add_calendar(self.dlg_reports, field)
+                widget.valueChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'list':
+                if field['value'] is None:
+                    msg = "No results found. Please check values set on selector of state and exploitation"
+                    tools_qgis.show_warning(msg)
+                    return
+                numrows = len(field['value'])
+                numcols = len(field['value'][0])
+
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
+
+                i = 0
+                dict_keys = {}
+                for key in field['value'][0].keys():
+                    dict_keys[i] = f"{key}"
+                    self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
+                    i = i + 1
+
+                for row in range(numrows):
+                    for column in range(numcols):
+                        column_name = dict_keys[column]
+                        self.dlg_reports.tbl_reports.setItem(row, column,
+                                                             QTableWidgetItem(f"{field['value'][row][column_name]}"))
+
+                continue
+
+            order = order + 1
+
+            if label:
+                layout.addWidget(label, 0, order)
+            if widget:
+                layout.addWidget(widget, 1, order)
 
 
     def _update_tbl_reports(self):
@@ -477,7 +494,7 @@ class GwToolBoxButton(GwAction):
 
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(self._calculate_elapsed_time)
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_functions))
         self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)
@@ -485,19 +502,19 @@ class GwToolBoxButton(GwAction):
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 
 
-    def _calculate_elapsed_time(self):
+    def _calculate_elapsed_time(self, dialog):
 
         tf = time()  # Final time
         td = tf - self.t0  # Delta time
-        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}")
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
 
-    def _update_time_elapsed(self, text):
+    def _update_time_elapsed(self, text, dialog):
 
-        if isdeleted(self.dlg_functions):
+        if isdeleted(dialog):
             self.timer.stop()
             return
 
-        lbl_time = self.dlg_functions.findChild(QLabel, 'lbl_time')
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
         lbl_time.setText(text)
 
 
