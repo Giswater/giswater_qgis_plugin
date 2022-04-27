@@ -3106,6 +3106,29 @@ def create_sqlite_conn(file_name):
     return status, cursor
 
 
+def check_old_userconfig(user_folder_dir):
+    """ Function to transfer user configuration from version 3.5.023 or older to new `.../core/` folder """
+
+    # Move all files in old config folder to new core config folder
+    old_folder_path = f"{user_folder_dir}{os.sep}config"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            old = f"{old_folder_path}{os.sep}{file}"
+            new = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}"
+            if os.path.exists(new):
+                os.remove(new)
+            os.rename(old, new)
+        os.removedirs(old_folder_path)
+
+    # Remove old log folder
+    old_folder_path = f"{user_folder_dir}{os.sep}log"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            path = f"{old_folder_path}{os.sep}{file}"
+            os.remove(path)
+        os.removedirs(old_folder_path)
+
+
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
