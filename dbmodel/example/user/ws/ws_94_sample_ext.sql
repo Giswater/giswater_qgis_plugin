@@ -10417,14 +10417,6 @@ INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pat
 INSERT INTO ext_rtc_dma_period (id, dma_id, cat_period_id, effc, minc, maxc, pattern_id, pattern_volume) VALUES (18, '6', '7', 0.800000000000000044, NULL, NULL, 'PTN-DMA-06-P7', NULL);
 
 
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '5', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P5');
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '6', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P6');
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (5, '7', 0.819999999999999951, 0.200000000000000011, 2.20000000000000018, 'PTN-SECT-05-P7');
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '6', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P6');
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '7', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P7');
-INSERT INTO ext_rtc_sector_period (sector_id, cat_period_id, effc, minc, maxc, pattern_id) VALUES (3, '5', 0.729999999999999982, 0.299999999999999989, 3.20000000000000018, 'PTN-SECT-03-P5');
-
-
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (1, 'low', NULL);
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (2, 'medium', NULL);
 INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (3, 'high', NULL);
