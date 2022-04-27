@@ -325,18 +325,27 @@ class GwToolBoxButton(GwAction):
                 widget = tools_gw.add_lineedit(field)
                 widget = tools_gw.set_widget_size(widget, field)
                 widget = tools_gw.set_data_type(field, widget)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.textChanged.connect(partial(self._update_tbl_reports))
                 if field['widgettype'] == 'typeahead':
                     widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
             elif field['widgettype'] == 'combo':
                 widget = tools_gw.add_combo(field)
                 widget = tools_gw.set_widget_size(widget, field)
+                widget.setProperty('filterSign', field.get('filterSign'))
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
             elif field['widgettype'] == 'check':
                 widget = tools_gw.add_checkbox(field)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.stateChanged.connect(partial(self._update_tbl_reports))
             elif field['widgettype'] == 'datetime':
                 widget = tools_gw.add_calendar(self.dlg_reports, field)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.valueChanged.connect(partial(self._update_tbl_reports))
             elif field['widgettype'] == 'list':
                 if field['value'] is None:
@@ -392,7 +401,10 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
             else:
                 continue
-            _json = {"filterName":f"{widget.objectName()}", "filterValue":f"{value}"}
+            filterSign = widget.property('filterSign')
+            if filterSign is None:
+                filterSign = '='
+            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}"}
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
