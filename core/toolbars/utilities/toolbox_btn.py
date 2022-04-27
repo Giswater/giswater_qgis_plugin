@@ -221,6 +221,13 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
 
+            # Set description & query labels
+            sql = f"SELECT alias, query_text FROM config_report WHERE id = {self.function_selected}"
+            row = tools_db.get_row(sql)
+            if row:
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', row[0])
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_query', row[1])
+
             # Set listeners
             self.dlg_reports.btn_export_path.clicked.connect(self._select_file_report)
             self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, self.dlg_reports.tbl_reports, self.dlg_reports.txt_export_path))
