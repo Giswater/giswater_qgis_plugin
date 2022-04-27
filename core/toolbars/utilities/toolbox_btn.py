@@ -364,6 +364,9 @@ class GwToolBoxButton(GwAction):
             if widget:
                 layout.addWidget(widget, 1, order)
 
+            # Set scale-to-fit
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports)
+
 
     def _update_tbl_reports(self):
 
