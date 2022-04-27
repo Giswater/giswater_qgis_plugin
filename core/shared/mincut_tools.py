@@ -254,7 +254,7 @@ class GwMincutTools:
             elif str(state_id) in ('1', '2'):
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from: exec_start')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to: exec_end')
-                dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
+                dates_filter = f"AND (exec_start BETWEEN {interval})"
             else:
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from:')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to:')
