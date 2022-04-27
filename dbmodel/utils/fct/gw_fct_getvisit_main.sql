@@ -180,6 +180,12 @@ v_filter text;
 v_filter_aux text;
 v_unit integer;
 v_count integer;
+v_fields_aux json;
+v_record record;
+v_disable_widget_name text[];
+v_fields_keys text[];
+v_field text;
+v_load_visit_aux boolean;
 
 BEGIN
 	
@@ -195,7 +201,7 @@ BEGIN
 	select upper(value::json->>'lotManage'::text) INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
 
 	IF v_pluginlot = 'TRUE' THEN
-		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id='test');
+		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
 	END IF;
 
 	-- fix diferent ways to say null on client
@@ -223,7 +229,7 @@ BEGIN
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
 	v_tram_exec_visit = ((p_data ->>'data')::json->>'fields')::json->>'tram_exec_visit';
-	
+	v_fields_aux = ((p_data ->>'data')::json->>'fields')::json;
 	--   Get editability of layer
 	v_querystring = concat('SELECT r1.rolname as "role"
 		FROM pg_catalog.pg_roles r JOIN pg_catalog.pg_auth_members m
@@ -403,56 +409,62 @@ BEGIN
 		END IF;
 		
 		--new visit
-		IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
+		IF v_visitclass IS NULL THEN
+			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
 
-			-- get vdefault visitclass
-			IF v_offline THEN
-				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
-				v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
-				END IF;
-			ELSE
-				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
-				IF p_visittype=1 THEN
-					IF v_lot IS NOT NULL AND v_visitclass IS NULL THEN
-						v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot)::integer;
-					ELSIF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_planned_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
-					END IF;	
-				ELSIF  p_visittype=2 THEN
-					
-					IF v_featuretablename IS NOT NULL THEN
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_unspected_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
-					ELSE
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;
+				-- get vdefault visitclass
+				IF v_offline THEN
+					-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
+					v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+					IF v_visitclass IS NULL THEN
+						v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
 					END IF;
-				END IF;
+				ELSE
+					-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
+					IF p_visittype=1 THEN
+						IF v_lot IS NOT NULL AND v_visitclass IS NULL THEN
+							v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot)::integer;
+						ELSIF v_visitclass IS NULL THEN
+							v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_planned_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
+						END IF;	
+					ELSIF  p_visittype=2 THEN
 
-				-- Set visitclass for unexpected generic
-				IF v_featuretype IS NULL THEN
-					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type IS NULL AND visit_type=p_visittype LIMIT 1);
-				END IF;
+						IF v_featuretablename IS NOT NULL THEN
+							v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_unspected_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
+						ELSE
+							v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;
+						END IF;
+					END IF;
 
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=p_visittype LIMIT 1);
-				END IF;
-			END IF;				
-							
-		-- existing visit
-		ELSIF v_load_visit AND v_id IS NULL THEN
-			v_querystring = concat('SELECT class_id FROM om_visit WHERE id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
-			v_debug_vars := json_build_object('v_visit_id', v_visit_id);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 60);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_visitclass;
-			v_id = v_visit_id;
-		ELSE 
-			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);			
+					-- Set visitclass for unexpected generic
+					IF v_featuretype IS NULL THEN
+						v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type IS NULL AND visit_type=p_visittype LIMIT 1);
+					END IF;
+
+					IF v_visitclass IS NULL THEN
+						v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=p_visittype LIMIT 1);
+					END IF;
+				END IF;				
+
+			-- existing visit
+			ELSIF v_load_visit AND v_id IS NULL THEN
+				v_querystring = concat('SELECT class_id FROM om_visit WHERE id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
+				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 60);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_visitclass;
+				v_id = v_visit_id;
+			ELSE 
+				v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);			
+			END IF;
 		END IF;
 	--END IF;
-
+	IF v_visitclass IS NOT NULL THEN
+		v_load_visit_aux = true;
+	END IF;
+	
 	--  get formname and tablename
+	
 	v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_visitclass);
@@ -511,12 +523,14 @@ BEGIN
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user)::integer;
 		--code
 		IF v_featureid IS NOT NULL THEN
+			
             v_querystring = concat('SELECT feature_type FROM config_visit_class WHERE id = ', quote_nullable(v_visitclass));
             v_debug_vars := json_build_object('v_visitclass', v_visitclass);
             v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 70);
             SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
             EXECUTE v_querystring INTO v_check_code;
-            IF v_check_code IS NOT NULL THEN
+			
+            IF v_check_code IS NOT NULL AND v_featuretype IS NOT NULL THEN
                 v_querystring = concat('SELECT code FROM ',v_featuretablename,' WHERE ',(v_featuretype),'_id = ',quote_nullable(v_featureid),'::text');
                 v_debug_vars := json_build_object('v_featuretablename', v_featuretablename, 'v_featuretype', v_featuretype, 'v_featureid', v_featureid);
                 v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 80);
@@ -648,6 +662,21 @@ BEGIN
 	END IF;
 	*/
 	--END IF;
+	
+	-- WIP
+	IF v_fields_aux->>'unit_id' IS NOT NULL THEN
+		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_fields_aux->>'unit_id')||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
+	ELSE
+		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_unit)||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
+	END IF;
+	
+	IF v_record.enddate IS NULL AND v_record.user_name IS NOT NULL THEN
+		v_disable_widget_name = '{startvisit}';
+	ELSE
+		v_disable_widget_name = '{endvisit}';
+	END IF;
+	
+	
 	--  Create tabs array	
 	v_formtabs := '[';
      
@@ -688,9 +717,14 @@ BEGIN
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 				
 				SELECT gw_fct_getformfields(v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
+				
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP		
-				raise notice 'aux_json,%',aux_json;
+					
+					IF (aux_json->>'column_id') = v_disable_widget_name[1] THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
+					
 					-- setting feature id value
 					IF (aux_json->>'columnname') = 'arc_id' OR (aux_json->>'columnname')='node_id' OR (aux_json->>'columnname')='connec_id' OR (aux_json->>'columnname') ='gully_id' 
 					OR (aux_json->>'columnname') ='pol_id' OR (aux_json->>'columnname') ='sys_pol_id' THEN
@@ -779,6 +813,20 @@ BEGIN
 
 					END IF;
 					
+					-- WIP Manage v_fields_aux
+					EXECUTE 'SELECT array_agg(a) FROM json_object_keys('''||v_fields_aux||''')a' INTO v_fields_keys;
+					
+					raise notice 'ASDF -> %',v_fields_aux;
+					IF v_fields_aux::text != '{}' THEN
+					FOREACH v_field IN ARRAY v_fields_keys
+					LOOP	
+						IF (aux_json->>'widgettype')='combo' AND (aux_json->>'column_id') = v_field THEN
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_fields_aux->>v_field);
+						ELSIF (aux_json->>'column_id') = v_field THEN
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_fields_aux->>v_field);
+						END IF;
+					END LOOP;
+					END IF;
 					-- disable visit type if project is offline
 					IF (aux_json->>'columnname') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
@@ -807,6 +855,10 @@ BEGIN
 					array_index := array_index + 1;
 
 					v_fieldvalue := (v_values->>(aux_json->>'columnname'));	
+					
+					IF (aux_json->>'column_id') = v_disable_widget_name[1] THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
 					
 					-- Disable widgets from visit form if user has no permisions
 					IF v_userrole LIKE '%role_basic%' THEN
@@ -893,7 +945,8 @@ BEGIN
 		
 		--show tab only if it is not new visit or offline is true
 		
-		IF NOT v_new_visit THEN
+		--IF NOT v_new_visit THEN
+		IF NOT isnewvisit OR v_load_visit_aux THEN
 			--filling tab (only if it's active)
 			
 			IF v_activefilestab THEN
