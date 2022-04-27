@@ -86,11 +86,6 @@ BEGIN
 	SELECT CASE WHEN vdefault IS NOT NULL THEN concat(query_text, ' ORDER BY ',json_extract_path_text(vdefault,'orderBy'),' ',json_extract_path_text(vdefault,'orderType')) 
 	ELSE  query_text END AS query INTO v_querytext FROM config_report WHERE id = v_list_id;
 
-	-- temporary line before it is not applied the filter sign for each filter (remove after 3.5.025)
-	v_filtersign = (SELECT json_extract_path_text(vdefault,'filterSign') FROM config_report WHERE id = v_list_id);
-
-	v_filterdefault = (SELECT json_extract_path_text(vdefault,'filterDefault') FROM config_report WHERE id = v_list_id);
-
 
 	IF v_filterinput IS NOT NULL THEN
 
@@ -99,12 +94,8 @@ BEGIN
 			RAISE NOTICE ' rec_filter %', rec_filter;
 		
 			v_filtername = concat('"',json_extract_path_text(rec_filter::json,'filterName'),'"');
+			v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
 			v_filtervalue = json_extract_path_text(rec_filter::json,'filterValue');
-
-			-- temporary line before it is not applied the filter sign for each filter (remove after 3.5.025)
-			IF v_filtersign IS NULL THEN
-				v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
-			END IF;
 
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
@@ -115,10 +106,21 @@ BEGIN
 			END IF;
 		END LOOP;
 	ELSE 
+		-- Look for default values in each widget
+		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
-		IF v_filterdefault IS NOT NULL THEN
-			v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filterdefault);
-		END IF;	
+			SELECT filterparam::jsonb->>i into v_filterparam FROM config_report WHERE id = v_list_id;
+
+			v_filtername = concat('"',json_extract_path_text(v_filterparam::json,'columnname'),'"');
+			v_filtersign = json_extract_path_text(v_filterparam::json,'filterSign');
+			SELECT COALESCE(json_extract_path_text(v_filterparam::json,'filterDefault'), '') INTO v_filterdefault;
+
+			IF v_filtername != '""' AND v_filterdefault != '' THEN
+				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
+			END IF;
+
+			i=i+1;
+		END LOOP;
 	END IF;
 	
 	raise notice 'v_querytext,%',v_querytext;
