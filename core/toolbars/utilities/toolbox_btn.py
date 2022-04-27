@@ -352,8 +352,10 @@ class GwToolBoxButton(GwAction):
                 for row in range(numrows):
                     for column in range(numcols):
                         column_name = dict_keys[column]
-                        self.dlg_reports.tbl_reports.setItem(row, column,
-                                                             QTableWidgetItem(f"{field['value'][row][column_name]}"))
+                        value = field['value'][row][column_name]
+                        if value is None:
+                            value = 'null'
+                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
 
                 continue
 
@@ -759,7 +761,10 @@ class GwToolBoxButton(GwAction):
         for rows in range(0, model.rowCount()):
             row = []
             for col in range(0, model.columnCount()):
-                row.append(str(model.data(model.index(rows, col))))
+                value = str(model.data(model.index(rows, col)))
+                if value == 'null':
+                    value = ''
+                row.append(value)
             all_rows.append(row)
 
         # Write list into csv file
