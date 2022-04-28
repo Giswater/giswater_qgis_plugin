@@ -144,7 +144,12 @@ BEGIN
 	IF v_id IS NULL AND (SELECT count(id) FROM om_visit) = 0 THEN
 		v_id=1;
 	END IF;
-		
+
+    -- set status=4 (finished) when status is null (is hidden or simply missing)
+	IF v_status IS NULL THEN 
+		v_status=4;
+	END IF;
+
 	-- setting output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 
