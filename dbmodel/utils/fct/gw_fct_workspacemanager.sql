@@ -97,7 +97,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-----------------------------');
 
 		
-	IF v_action = 'CREATE' OR v_action = 'CHECK' THEN
+	IF v_action = 'CREATE' OR v_action = 'CHECK' OR v_action = 'UPDATE' THEN
 
 		IF v_action = 'CREATE' AND v_workspace_name IN (SELECT name FROM cat_workspace) THEN
 			
@@ -216,6 +216,10 @@ BEGIN
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
 
 		v_return_msg = 'Workspace successfully created';
+
+	ELSIF v_action = 'UPDATE' THEN
+		-- update configuration of selected workspace
+		UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
