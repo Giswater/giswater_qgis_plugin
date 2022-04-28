@@ -370,7 +370,7 @@ class GwToolBoxButton(GwAction):
                         column_name = dict_keys[column]
                         value = field['value'][row][column_name]
                         if value is None:
-                            value = 'null'
+                            value = ''
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
 
                 continue
@@ -383,7 +383,7 @@ class GwToolBoxButton(GwAction):
                 layout.addWidget(widget, 1, order)
 
             # Set scale-to-fit
-            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports)
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
 
 
     def _update_tbl_reports(self):
@@ -781,8 +781,6 @@ class GwToolBoxButton(GwAction):
             row = []
             for col in range(0, model.columnCount()):
                 value = str(model.data(model.index(rows, col)))
-                if value == 'null':
-                    value = ''
                 row.append(value)
             all_rows.append(row)
 
