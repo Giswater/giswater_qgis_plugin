@@ -39,7 +39,7 @@ BEGIN
 		INTO v_epaunits;
 
 	-- Reset values of inp_rpt table
-	UPDATE temp_node SET demand=0, pattern_id=null;
+	UPDATE temp_node SET demand=0, pattern_id=null WHERE epa_type = 'JUNCTION';
 
 	-- delete previous results on rpt_inp_pattern_value
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
