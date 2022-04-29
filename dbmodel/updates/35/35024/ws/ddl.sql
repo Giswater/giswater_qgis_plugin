@@ -110,3 +110,30 @@ REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE res
 
 
 ALTER TABLE ext_rtc_sector_period RENAME TO _ext_rtc_sector_period_; 
+
+
+
+--2022/04/17
+ALTER TABLE inp_dscenario_inlet ADD CONSTRAINT inp_dscenario_inlet_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_pipe ADD CONSTRAINT inp_dscenario_pipe_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+   
+ALTER TABLE inp_dscenario_pump ADD CONSTRAINT inp_dscenario_pump_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_pump_additional ADD CONSTRAINT inp_dscenario_pump_additional_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_reservoir ADD CONSTRAINT inp_dscenario_reservoir_additional_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_shortpipe ADD CONSTRAINT inp_dscenario_shortpipe_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_tank ADD CONSTRAINT inp_dscenario_tank_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_dscenario_valve ADD CONSTRAINT inp_dscenario_valve_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
