@@ -393,8 +393,11 @@ class GwDscenarioManagerButton(GwAction):
         self._manage_feature_type()
 
         # Get current layer and remove selection
-        current_layer = self.iface.activeLayer()
-        current_layer.removeSelection()
+        try:
+            current_layer = self.iface.activeLayer()
+            current_layer.removeSelection()
+        except AttributeError:
+            pass
 
         # Set active layer
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
