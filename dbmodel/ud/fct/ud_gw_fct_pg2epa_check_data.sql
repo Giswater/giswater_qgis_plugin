@@ -66,8 +66,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 284, 295, 427) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 187, 294, 379) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (284, 295, 427) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 294, 379) AND cur_user=current_user;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));

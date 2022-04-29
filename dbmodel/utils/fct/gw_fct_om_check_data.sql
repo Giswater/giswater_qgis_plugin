@@ -226,7 +226,7 @@ BEGIN
 
 	RAISE NOTICE '08 - Check nodes with state_type isoperative = false (187)';
 	v_querytext = 'SELECT node_id, nodecat_id, the_geom, n.expl_id FROM '||v_edit||'node n JOIN value_state_type ON id=state_type 
-	WHERE n.state > 0 AND is_operative IS FALSE';
+	 	WHERE n.state > 0 AND is_operative IS FALSE';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
@@ -239,10 +239,9 @@ BEGIN
 		VALUES (125, '187', 1, 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
 	END IF;
 
-
 	RAISE NOTICE '09 - Check arcs with state_type isoperative = false (188)';
 	v_querytext = 'SELECT arc_id, arccat_id, the_geom, a.expl_id FROM '||v_edit||'arc a JOIN value_state_type ON id=state_type 
-	WHERE a.state > 0 AND is_operative IS FALSE';
+	WHERE a.state > 0 AND is_operative IS FALSE'; 
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -1303,3 +1302,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  grant all on all functions in schema ws to role_basic

@@ -62,8 +62,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 153, 187, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 169, 229, 230, 295) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 153, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (169, 229, 230, 295) AND cur_user=current_user;
 
 
 	-- Header
@@ -803,7 +803,7 @@ BEGIN
 	END IF;	
 
 	-- Removing isaudit false sys_fprocess
-	FOR v_record IN SELECT * FROM ws.sys_fprocess WHERE isaudit is false
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
 		-- remove anl tables
 		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
