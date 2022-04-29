@@ -70,11 +70,11 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Current workspace</string>
+         <string>Set current</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="9">
+      <item row="5" column="10">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -84,6 +84,13 @@
         </property>
         <property name="text">
          <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_workspace_name">
+        <property name="text">
+         <string>Filter by: Workspace name</string>
         </property>
        </widget>
       </item>
@@ -100,13 +107,6 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_workspace_name">
-        <property name="text">
-         <string>Filter by: Workspace name</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="0">
        <widget class="QLineEdit" name="txt_name">
         <property name="sizePolicy">
@@ -120,23 +120,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="10">
-       <widget class="QTableView" name="tbl_wrkspcm">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_update">
+        <property name="text">
+         <string>Update</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_toggle_visibility">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="7" column="10">
+       <widget class="QPushButton" name="btn_cancel">
         <property name="text">
-         <string>Toggle visibility</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -153,7 +147,7 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="7">
+      <item row="5" column="8">
        <widget class="QPushButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -162,14 +156,14 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Create workspace</string>
+         <string>Create</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="9">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
+      <item row="6" column="0" colspan="11">
+       <widget class="QTableView" name="tbl_wrkspcm">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
        </widget>
       </item>
@@ -186,10 +180,16 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="8">
-       <widget class="QPushButton" name="btn_update">
+      <item row="5" column="7">
+       <widget class="QPushButton" name="btn_toggle_visibility">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Update config</string>
+         <string>Toggle privacy</string>
         </property>
        </widget>
       </item>
