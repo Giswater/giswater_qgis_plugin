@@ -60,7 +60,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
-        self.dlg_workspace_manager.btn_toggle_visibility.clicked.connect(partial(self._toggle_visibility_workspace))
+        self.dlg_workspace_manager.btn_toggle_privacy.clicked.connect(partial(self._toggle_privacy_workspace))
         self.dlg_workspace_manager.btn_update.clicked.connect(partial(self._update_workspace))
         selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_info))
@@ -208,7 +208,7 @@ class GwWorkspaceManagerButton(GwAction):
             tools_gw.refresh_selectors()
 
 
-    def _toggle_visibility_workspace(self):
+    def _toggle_privacy_workspace(self):
         """ Set the selected workspace as public/private """
 
         action = "TOGGLE"

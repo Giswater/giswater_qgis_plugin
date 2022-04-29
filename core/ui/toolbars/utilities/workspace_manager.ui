@@ -181,7 +181,7 @@
        </widget>
       </item>
       <item row="5" column="7">
-       <widget class="QPushButton" name="btn_toggle_visibility">
+       <widget class="QPushButton" name="btn_toggle_privacy">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
