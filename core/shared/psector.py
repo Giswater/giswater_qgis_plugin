@@ -25,6 +25,7 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
+from ..toolbars.edit.arc_fusion_button import GwArcFusionButton
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
@@ -107,6 +108,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "17", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112", sub_folder="24x24")
@@ -361,6 +363,8 @@ class GwPsector:
             # Set check active True as default for new pesectors
             tools_qt.set_checked(self.dlg_plan_psector, "active", True)
 
+        if self.dlg_plan_psector.tab_feature.currentIndex() != 1:
+            self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
         if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
             self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
@@ -401,6 +405,8 @@ class GwPsector:
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
+        self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
+            partial(self._arc_fusion))
         self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
             partial(self._set_to_arc))
 
@@ -411,9 +417,7 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(self._enable_arc_replace))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(self._enable_set_to_arc))
+            partial(self._manage_tab_feature_buttons))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -2146,26 +2150,112 @@ class GwPsector:
             tools_gw.reset_rubberband(self.rubber_band)
 
 
-    def _enable_arc_replace(self):
+    def _arc_fusion(self):
 
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node, 'psector',
+                                'arc_fusion_xyCoordinates_mouse_move_node')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_fusion_form, 'psector',
+                                'arc_fusion_ep_canvasClicked_open_arc_fusion_form')
+
+
+    def _open_arc_fusion_form(self, point):
+
+        event_point = self.snapper_manager.get_event_point(point=point)
+        self.node_id = None
+
+        # Manage current psector
+        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        current_psector = row[0]
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+        if str(current_psector) != str(selected_psector):
+            message = "This psector does not match the current one. Value of current psector will be updated."
+            tools_qt.show_info_box(message)
+
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{selected_psector}' "
+                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+            tools_db.execute_sql(sql)
+
+        # Snap point
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.node_id = snapped_feat.attribute('node_id')
+                self.node_state = snapped_feat.attribute('state')
+
+                # Set highlight
+                feature = tools_qt.get_feature_by_id(layer, self.node_id, 'node_id')
+                try:
+                    geometry = feature.geometry()
+                    self.rubber_band.setToGeometry(geometry, None)
+                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band.setWidth(5)
+                    self.rubber_band.show()
+                except AttributeError:
+                    pass
+
+        if self.node_id is None:
+            return
+
+        # cridar arc_fusion_button passant-li un node_id i psector_id?
+        self.arc_fusion = GwArcFusionButton(None, None, None, None, None)
+        self.arc_fusion.node_id = self.node_id
+        self.arc_fusion.node_state = self.node_state
+        self.arc_fusion.psector_id = selected_psector
+        self.arc_fusion.open_arc_fusion_dlg()
+
+
+    def _manage_tab_feature_buttons(self):
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
 
+        # Disable all by default
         self.dlg_plan_psector.btn_select_arc.setEnabled(False)
+        self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
         if tab_idx == 0:
+            # Enable btn select_arc
             self.dlg_plan_psector.btn_select_arc.setEnabled(True)
 
+        if tab_idx == 1:
+            # Enable btn arc_fusion
+            self.dlg_plan_psector.btn_arc_fusion.setEnabled(True)
 
-    def _enable_set_to_arc(self):
-
-        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-
-        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        # Tabs connec/gully
         if self.qtbl_connec.selectionModel() is None:
             return
         if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
-            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+            self._enable_set_to_arc()
         elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
-            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+            self._enable_set_to_arc()
+
+
+    def _enable_set_to_arc(self):
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
 
 
     def _mouse_move_arc(self, point):
@@ -2175,6 +2265,22 @@ class GwPsector:
 
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
+
+        # Get clicked point and add marker
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def _mouse_move_node(self, point):
+
+        if not self.layer_node:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(self.layer_node)
 
         # Get clicked point and add marker
         self.vertex_marker.hide()
