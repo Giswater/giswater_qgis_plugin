@@ -1900,6 +1900,22 @@ class GwPsector:
                 self._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
 
 
+    def _refresh_tables_relations(self):
+        # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
+        if self.project_type.upper() == 'UD':
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc',
+                                       isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec',
+                                       isQStandardItemModel=True)
+        if self.project_type.upper() == 'UD':
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully',
+                                           isQStandardItemModel=True)
+
+
     def _check_layers_visible(self, layer_name, the_geom, field_id):
         """ Check layers visibility and add it if it is not in the toc """
 
@@ -2128,16 +2144,7 @@ class GwPsector:
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
-        if self.project_type.upper() == 'UD':
-            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc', isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec', isQStandardItemModel=True)
-        if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully', isQStandardItemModel=True)
+        self._refresh_tables_relations()
 
         message = json_result['message']['text']
         if message is not None:
@@ -2169,35 +2176,15 @@ class GwPsector:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node, 'psector',
                                 'arc_fusion_xyCoordinates_mouse_move_node')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_fusion_form, 'psector',
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._perform_arc_fusion, 'psector',
                                 'arc_fusion_ep_canvasClicked_open_arc_fusion_form')
 
 
-    def _open_arc_fusion_form(self, point):
-
-        event_point = self.snapper_manager.get_event_point(point=point)
-        self.node_id = None
-
-        # Manage current psector
-        sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-        current_psector = row[0]
-        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-
-        if str(current_psector) != str(selected_psector):
-            message = "This psector does not match the current one. Value of current psector will be updated."
-            tools_qt.show_info_box(message)
-
-            sql = (f"UPDATE config_param_user "
-                   f"SET value = '{selected_psector}' "
-                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
-            tools_db.execute_sql(sql)
+    def _perform_arc_fusion(self, point):
 
         # Snap point
+        event_point = self.snapper_manager.get_event_point(point=point)
         result = self.snapper_manager.snap_to_current_layer(event_point)
-
         if result.isValid():
             # Check feature
             layer = self.snapper_manager.get_snapped_layer(result)
@@ -2207,26 +2194,42 @@ class GwPsector:
                 self.node_id = snapped_feat.attribute('node_id')
                 self.node_state = snapped_feat.attribute('state')
 
-                # Set highlight
-                feature = tools_qt.get_feature_by_id(layer, self.node_id, 'node_id')
-                try:
-                    geometry = feature.geometry()
-                    self.rubber_band.setToGeometry(geometry, None)
-                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
-                    self.rubber_band.setWidth(5)
-                    self.rubber_band.show()
-                except AttributeError:
-                    pass
+                # Manage current psector
+                sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+                       " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+                       " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+                row = tools_db.get_row(sql)
+                current_psector = row[0]
+                selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
-        if self.node_id is None:
-            return
+                if str(current_psector) != str(selected_psector):
+                    message = "This psector does not match the current one. Value of current psector will be updated."
+                    tools_qt.show_info_box(message)
 
-        # cridar arc_fusion_button passant-li un node_id i psector_id?
-        self.arc_fusion = GwArcFusionButton(None, None, None, None, None)
-        self.arc_fusion.node_id = self.node_id
-        self.arc_fusion.node_state = self.node_state
-        self.arc_fusion.psector_id = selected_psector
-        self.arc_fusion.open_arc_fusion_dlg()
+                    sql = (f"UPDATE config_param_user "
+                           f"SET value = '{selected_psector}' "
+                           f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+                    tools_db.execute_sql(sql)
+
+                # Execute setarcfusion
+                workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
+                feature_id = f'"id":["{self.node_id}"]'
+                extras = f'"enddate":null'
+                if workcat_id not in (None, 'null', ''):
+                    extras += f', "workcatId":"{workcat_id}"'
+                extras += f', "psectorId": "{selected_psector}"'
+                extras += f', "action_mode": 1'
+                extras += f', "state_type": null'
+                body = tools_gw.create_body(feature=feature_id, extras=extras)
+                # Execute SQL function and show result to the user
+                result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
+                if not result or result['status'] == 'Failed':
+                    return
+
+                # Refresh map canvas
+                tools_qgis.refresh_map_canvas()
+                # Refresh tables
+                self._refresh_tables_relations()
 
 
     def _manage_tab_feature_buttons(self):
