@@ -149,10 +149,12 @@ BEGIN
 	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'usePsectors' INTO v_usepsector FROM config_param_system WHERE parameter = 'admin_checkproject';
 
-
 	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = FALSE; END IF;
+	IF v_ignoregrafanalytics IS NULL THEN v_ignoregrafanalytics = FALSE; END IF;
+	IF v_ignoreepa IS NULL THEN v_ignoreepa = FALSE; END IF;
+	IF v_ignoreplan IS NULL THEN v_ignoreplan = FALSE; END IF;
 
 	-- when funcion gw_fct_setcheckproject is called by click on utils button, force to show user dialog and user control
 	IF v_init_project IS FALSE THEN
