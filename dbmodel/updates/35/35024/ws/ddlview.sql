@@ -51,7 +51,7 @@ SELECT
         UNION
          SELECT temp_arc.addparam::json ->> 'curve_id'::text
            FROM temp_arc))
-  ORDER BY id,4;
+  ORDER BY id ASC ,4;
 
 --2022/04/17
 CREATE OR REPLACE VIEW v_om_waterbalance AS
