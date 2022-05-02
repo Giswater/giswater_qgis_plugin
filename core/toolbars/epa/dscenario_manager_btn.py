@@ -18,6 +18,7 @@ from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
 from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi
 from ...utils import tools_gw
+from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 
@@ -248,11 +249,16 @@ class GwDscenarioManagerButton(GwAction):
         model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setEditStrategy(QSqlTableModel.OnRowChange)
         model.setSort(0, 0)
         model.select()
-        # In order to make the first column not editable, we need to override the QSqlTableModel flags
-        model.flags = lambda index: self.flags(index, model)
+        # Set item delegates
+        readonly_delegate = ReadOnlyDelegate(widget)
+        widget.setItemDelegateForColumn(0, readonly_delegate)
+        widget.setItemDelegateForColumn(1, readonly_delegate)
+        editable_delegate = EditableDelegate(widget)
+        for x in range(2, model.columnCount()):
+            widget.setItemDelegateForColumn(x, editable_delegate)
 
 
         # Check for errors
@@ -277,17 +283,6 @@ class GwDscenarioManagerButton(GwAction):
         geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
         if geom_col_idx is not False:
             widget.setColumnHidden(geom_col_idx, True)
-
-
-    def flags(self, index, model):
-
-        flags = QSqlTableModel.flags(model, index)
-
-        if index.column() == 1:
-            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-            return flags
-
-        return QSqlTableModel.flags(model, index)
 
 
     def _manage_current_changed(self):
