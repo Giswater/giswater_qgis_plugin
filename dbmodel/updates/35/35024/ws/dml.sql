@@ -155,3 +155,8 @@ VALUES (3142, 'Water balance by Exploitation and Period', '{"featureType":[]}', 
 {"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY code", "layoutname":"grl_option_parameters","layoutorder":3, "value":""}
 ]', NULL, true) 
 ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM sys_table WHERE id='v_anl_grafanalytics_mapzones';
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES ('v_anl_grafanalytics_upstream', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
+ON CONFLICT (id) DO NOTHING;
