@@ -550,6 +550,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '20 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
+
 	v_querytext='SELECT count(*) FROM '||v_edit||'arc';
 	EXECUTE v_querytext INTO v_count;
 	IF v_count < 5000 THEN -- too big
@@ -607,7 +608,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	
 	RAISE NOTICE '21 - Check vnode inconsistency (vnode without link) (259)';
 	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN '||v_edit||'link ON vnode_id = exit_id::integer where link_id IS NULL';
 	
@@ -911,6 +911,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
 		VALUES (125, 1, '372','INFO: All arcs has well-defined topology',v_count);
 	END IF;
+	
 
 	RAISE NOTICE '32 - Check arcs shorter than value set as node proximity (391)';
 
@@ -971,8 +972,8 @@ BEGIN
 	DELETE FROM temp_arc;
 
 	IF v_edit IS NULL THEN 
-		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', link.sector_id, link.state, link.the_geom 
-		FROM link l JOIN connec c ON feature_id = connec_id WHERE link.state = 1 and link.feature_type = 'CONNEC';
+		INSERT INTO temp_arc (arc_id, node_1, result_id, state, the_geom) SELECT link_id, feature_id, '417', l.state, l.the_geom 
+		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
 		UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
 		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
@@ -980,10 +981,10 @@ BEGIN
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	ELSE
 		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
-		FROM v_edit_link l JOIN v_edit_connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
+		FROM v_edit_link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
 		UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
-		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_connec c, v_edit_link l
+		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, v_edit_link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
@@ -1302,4 +1303,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-  grant all on all functions in schema ws to role_basic

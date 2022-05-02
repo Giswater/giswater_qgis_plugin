@@ -23,6 +23,7 @@ SELECT * FROM anl_node WHERE fid=115 AND cur_user=current_user;
 */
 
 DECLARE 
+
 v_record record;
 v_project_type 	text;
 v_table_count integer;
@@ -318,18 +319,6 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (115, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
 		END IF;
-
-		--check cat_grate cost_ut column (345)
-		SELECT count(*) INTO v_count FROM cat_grate WHERE cost_ut IS NOT NULL and active=TRUE;
-		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '345', 'cat_grate', 'cost_ut', 2, FALSE, concat('WARNING-345: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.cost_ut column.'), v_count);
-		ELSE
-			v_count = 0;
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '345', 1,'INFO: There is/are no row(s) without values on cat_grate.cost_ut column.',v_count);
-		END IF;
-	
 	END IF;	
 
 	--table plan_arc_x_pavement
