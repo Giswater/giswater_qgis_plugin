@@ -285,6 +285,9 @@ class GwDscenarioManagerButton(GwAction):
         if geom_col_idx is not False:
             widget.setColumnHidden(geom_col_idx, True)
 
+        # Sort the table by feature id
+        model.sort(1, 0)
+
 
     def _manage_current_changed(self):
         """ Manages tab changes """
