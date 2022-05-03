@@ -249,7 +249,7 @@ class GwDscenarioManagerButton(GwAction):
         model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
-        model.setEditStrategy(QSqlTableModel.OnRowChange)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
         # Set item delegates
@@ -270,9 +270,10 @@ class GwDscenarioManagerButton(GwAction):
             widget.model().setFilter(expr)
         else:
             widget.setModel(model)
+        widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
         tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
