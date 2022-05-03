@@ -421,6 +421,8 @@ class GwProfileButton(GwAction):
                         level = int(result['message']['level'])
                         tools_qgis.show_message(result['message']['text'], level)
                         if result['message']['level'] != 3:
+                            # If error reset profile
+                            self._clear_profile()
                             return
 
                     self._remove_selection()
