@@ -86,9 +86,9 @@ BEGIN
                         END IF;
 
                         SELECT string_agg (concat, ' ') INTO v_num_elem_visit FROM (
-                        SELECT concat('trams:', array_agg(arc_id)) FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id
+                        SELECT concat('trams:', array_agg(arc_id)) FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND lot_id=NEW.lot_id
                         UNION 
-                        SELECT concat('nodes:', array_agg(node_id)) FROM om_visit_lot_x_node WHERE unit_id=v_unit_id)b;
+                        SELECT concat('nodes:', array_agg(node_id)) FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND lot_id=NEW.lot_id)b;
 
                         v_new_value_param=v_num_elem_visit;
                    	END IF;
