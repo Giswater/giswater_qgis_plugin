@@ -322,6 +322,12 @@ BEGIN
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 						UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
+                        
+						-- update link only with enabled variable
+						IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+							UPDATE arc SET link=rec_aux1.arc_id where arc_id=rec_aux1.arc_id;
+							UPDATE arc SET link=rec_aux2.arc_id where arc_id=rec_aux2.arc_id;
+						END IF;
 						
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Update values of arcs node_1 and node_2.');
@@ -650,6 +656,12 @@ BEGIN
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 						UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
+                        
+						-- update link only with enabled variable
+						IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+							UPDATE arc SET link=rec_aux1.arc_id where arc_id=rec_aux1.arc_id;
+							UPDATE arc SET link=rec_aux2.arc_id where arc_id=rec_aux2.arc_id;
+						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Insert new values from new arcs into addfields table.');
