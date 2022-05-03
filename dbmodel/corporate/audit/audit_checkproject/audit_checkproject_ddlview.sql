@@ -14,7 +14,7 @@ order by 1,2,3
 
 CREATE OR REPLACE VIEW audit.v_fidlog_gam AS 
  SELECT ct.date,
-    2 AS criticity,
+    'WARNING' AS criticity,
     ct.omdata,
     ct.omtopology,
     ct.grafdata,
@@ -31,7 +31,7 @@ SELECT date, type, value FROM audit.v_fidlog where expl_id = 1 and criticity in 
 ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
 UNION
  SELECT ct.date,
-    3 AS criticity,
+    'ERROR' AS criticity,
     ct.omdata,
     ct.omtopology,
     ct.grafdata,
@@ -55,12 +55,40 @@ GRANT ALL ON TABLE audit.v_fidlog_gam TO role_master;
 
 
 CREATE OR REPLACE VIEW audit.v_fidlog_gam_index AS 
-SELECT date, a.total as errors, b.total as warnings, a.km,  index_3 as err100km, index_2 as war100km, concat(index_3, '.', index_2) as index  FROM crosstab ('SELECT date, criticity, index  FROM audit.v_fidlog_gam'::text, 'VALUES (''2''), (''3'')'::text) as ct(date date, index_2 integer, index_3 integer)
-join (SELECT date, total, km, index FROM audit.v_fidlog_gam WHERE criticity = 3) a USING (date)
-join (SELECT date, total, km, index FROM audit.v_fidlog_gam WHERE criticity = 2) b USING (date)
-where index_3 is not null and index_2 is not null;
-
+ SELECT ct.date,
+    a.total AS errors,
+    b.total AS warnings,
+    a.km,
+    ct.index_3 AS err100km,
+    ct.index_2 AS war100km,
+    concat(ct.index_3, '.', ct.index_2) AS index
+   FROM crosstab('SELECT date, criticity, index  FROM audit.v_fidlog_gam'::text, 'VALUES (''WARNING''), (''ERROR'')'::text) ct(date date, index_2 integer, index_3 integer)
+     JOIN ( SELECT v_fidlog_gam.date,
+            v_fidlog_gam.total,
+            v_fidlog_gam.km,
+            v_fidlog_gam.index
+           FROM audit.v_fidlog_gam
+          WHERE v_fidlog_gam.criticity = 'ERROR'::text) a USING (date)
+     JOIN ( SELECT v_fidlog_gam.date,
+            v_fidlog_gam.total,
+            v_fidlog_gam.km,
+            v_fidlog_gam.index
+           FROM audit.v_fidlog_gam
+          WHERE v_fidlog_gam.criticity = 'WARNING'::text) b USING (date)
+  WHERE ct.index_3 IS NOT NULL AND ct.index_2 IS NOT NULL;
 GRANT ALL ON TABLE audit.v_fidlog_gam TO role_master;
+
+
+CREATE or replace VIEW audit.v_log_gam AS
+SELECT user_name,  count (*) , action, date FROM 
+(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log
+JOIN (SELECT unnest(username) username FROM ws.cat_manager WHERE id = 3)a ON user_name = username where  schema = 'ws')a
+group by user_name, date, action
+ORDER BY date desc;
+
+GRANT ALL ON TABLE audit.v_log_gam TO role_master;
+
+
 
 
   

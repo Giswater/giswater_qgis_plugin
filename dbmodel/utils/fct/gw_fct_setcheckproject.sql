@@ -398,6 +398,10 @@ BEGIN
 					SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 					WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 				END IF;
+			ELSE
+				-- delete old values on result table
+				DELETE FROM audit_check_data WHERE fid=211 AND cur_user=current_user;
+				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 			END IF;
 		END IF;
 
@@ -428,7 +432,7 @@ BEGIN
 
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;	
 			END IF;
 		END IF;
 
@@ -444,6 +448,12 @@ BEGIN
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=115 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
+			ELSE
+				-- delete old values on result table
+				DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
+				DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
+				DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252);
+				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
 			END IF;
 		END IF;
 
@@ -726,5 +736,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
