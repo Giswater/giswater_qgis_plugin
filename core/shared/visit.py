@@ -486,7 +486,7 @@ class GwVisit(QObject):
         self.tabs.currentChanged.connect(partial(self._manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self._manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self._document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(self._document_delete)
         self.dlg_add_visit.btn_doc_new.clicked.connect(self._manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -1725,6 +1725,35 @@ class GwVisit(QObject):
             tools_qgis.show_info(message)
 
         self.dlg_add_visit.tbl_document.model().select()
+
+
+    def _document_delete(self):
+        """ Delete a document from the current visit. """
+
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_document.selectionModel().selectedRows(0)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qt.show_info_box(message)
+            return
+
+        selected_id = []
+        for index in selected_list:
+            doc_id = index.data()
+            selected_id.append(str(doc_id))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(message, title, ','.join(selected_id))
+        if answer:
+            # Delete from table
+            sql = (f"DELETE FROM doc_x_visit"
+                   f" WHERE id IN ({','.join(selected_id)})")
+            status = tools_db.execute_sql(sql)
+            if status:
+                message = "Documents deleted successfully"
+                tools_qgis.show_info(message)
+
+            self.tbl_document.model().select()
 
 
     def _populate_position_id(self):
