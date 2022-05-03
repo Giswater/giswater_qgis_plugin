@@ -1761,14 +1761,14 @@ class GwVisit(QObject):
         self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
         self.dlg_event.position_value.setEnabled(self.feature_type == 'arc')
         node_list = []
+        node_1 = None
+        node_2 = None
         if self.feature_type != 'all':
             widget_name = f"tbl_visit_x_{self.feature_type}"
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
-            node_1 = widget_table.model().record(0).value('node_1')
-            node_2 = widget_table.model().record(0).value('node_2')
-        else:
-            node_1 = None
-            node_2 = None
+            if widget_table.model():
+                node_1 = widget_table.model().record(0).value('node_1')
+                node_2 = widget_table.model().record(0).value('node_2')
 
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])
