@@ -260,13 +260,13 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,'INFO: Creating map zones and catalogs -> Done');
 
 			-- MAPZONES
-			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
-			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1) ON CONFLICT (expl_id) DO NOTHING;
-			INSERT INTO sector(sector_id,name) VALUES(1,'sector1') ON CONFLICT (sector_id) DO NOTHING;
-			INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1',1) ON CONFLICT (dma_id) DO NOTHING;
-			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(1,'dqa1',1) ON CONFLICT (dqa_id) DO NOTHING;
-			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (presszone_id) DO NOTHING;
-			INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1') ON CONFLICT (muni_id) DO NOTHING;
+			INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
+			INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
+			INSERT INTO sector(sector_id,name) VALUES(1,'sector1');
+			INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1',1);
+			INSERT INTO dqa(dqa_id,name,expl_id) VALUES(1,'dqa1',1);
+			INSERT INTO presszone(presszone_id,name,expl_id) VALUES(1,'presszone1',1);
+			INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
 
 			-- SELECTORS
 			INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user) ON CONFLICT (expl_id,cur_user) do nothing;
