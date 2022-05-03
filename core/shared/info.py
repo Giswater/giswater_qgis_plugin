@@ -1876,7 +1876,7 @@ class GwInfo(QObject):
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
                     if close_dlg:
-                        if global_vars.session_vars['dialog_docker']:
+                        if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                             tools_gw.close_docker()
                             return True
                         tools_gw.close_dialog(dialog)
