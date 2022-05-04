@@ -22,3 +22,6 @@ INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('v_edit_inp_coverage', 'Editable view to manage coverage', 'role_epa',  '{"level_1":"EPA","level_2":"HYDRAULICS"}',17, 'Inp coverage', 
 'core');
 
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES ('v_anl_grafanalytics_upstream', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
+ON CONFLICT (id) DO NOTHING;

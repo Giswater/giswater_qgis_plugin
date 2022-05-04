@@ -156,11 +156,6 @@ VALUES (3142, 'Water balance by Exploitation and Period', '{"featureType":[]}', 
 ]', NULL, true) 
 ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM sys_table WHERE id='v_anl_grafanalytics_mapzones';
-INSERT INTO sys_table (id, descript, sys_role, source)
-VALUES ('v_anl_grafanalytics_upstream', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
-ON CONFLICT (id) DO NOTHING;
-
 UPDATE config_form_fields set widgetcontrols = 
 '{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'
 WHERE columnname = 'expl_id' and formname IN ('v_edit_inp_pattern', 'v_edit_inp_curve', 'v_edit_cat_dscenario');
