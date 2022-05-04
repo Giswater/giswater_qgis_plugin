@@ -47,15 +47,15 @@ from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
-def load_settings(dialog):
+def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
 
     # Get user UI config file
     try:
-        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session")
-        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session")
-        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session")
-        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session", plugin=plugin)
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session", plugin=plugin)
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session", plugin=plugin)
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session", plugin=plugin)
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -74,16 +74,16 @@ def load_settings(dialog):
         pass
 
 
-def save_settings(dialog):
+def save_settings(dialog, plugin='core'):
     """ Save user UI related with dialog position and size """
 
     try:
         x, y = dialog.geometry().x(), dialog.geometry().y()
         w, h = dialog.geometry().width(), dialog.geometry().height()
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}", plugin=plugin)
     except Exception:
         pass
 
@@ -122,7 +122,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     raw_parameter = parameter
     if parser is None:
-        tools_log.log_info(f"Creating parser for file: {path}")
+        if plugin == 'core':
+            tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
@@ -264,10 +265,10 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg, delete_dlg=True):
+def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
-    save_settings(dlg)
+    save_settings(dlg, plugin=plugin)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
     if delete_dlg:
@@ -3104,6 +3105,27 @@ def create_sqlite_conn(file_name):
         tools_log.log_warning(str(e))
 
     return status, cursor
+
+
+def manage_user_config_folder(user_folder_dir):
+    """ Check if user config folder exists. If not create empty files init.config and session.config """
+
+    try:
+        config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+        if not os.path.exists(config_folder):
+            tools_log.log_info(f"Creating user config folder: {config_folder}")
+            os.makedirs(config_folder)
+
+        # Check if config files exists. If not create them empty
+        filepath = f"{config_folder}{os.sep}init.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+        filepath = f"{config_folder}{os.sep}session.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+
+    except Exception as e:
+        tools_log.log_warning(f"manage_user_config_folder: {e}")
 
 
 def check_old_userconfig(user_folder_dir):
