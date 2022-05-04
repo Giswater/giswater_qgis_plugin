@@ -622,7 +622,15 @@ BEGIN
 			VALUES (NEW.node_id, v_epavdef ->>'valv_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric, v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
 
 		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
+
+			v_customfeature	:= (SELECT nodetype_id FROM cat_node WHERE id = NEW.nodecat_id);		
+			SELECT vdef INTO v_epavdef FROM (
+			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_shortpipe_vdefault'
+			)a WHERE id = v_customfeature;
+			
+			INSERT INTO inp_shortpipe (node_id, status, minorloss) 
+			VALUES (NEW.node_id,  v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
+
 				
 		ELSIF (NEW.epa_type = 'INLET') THEN
 			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);		

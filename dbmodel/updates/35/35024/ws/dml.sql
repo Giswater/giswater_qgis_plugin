@@ -169,3 +169,6 @@ INSERT INTO config_param_system(parameter, value, descript, label, isenabled, pr
 VALUES ('edit_mapzones_set_lastupdate', FALSE, 'If true, value of lastupdate is updated on node, arc, connec features and set to the date of executing the algorithm.',
 'Set lastupdate on mapzone process', FALSE, 'ws') ON CONFLICT (parameter) DO NOTHING;
 
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type) VALUES(
+'epa_shortpipe_vdefault', '{"catfeatureId":["CHECK_VALVE"], "vdefault":{"minorloss":0.001, "status":"OPEN"}}', 
+'Vdefault values for epa shortpipes. This parameter must be according the epa_default definition for all shortpipes', FALSE, 'ws')

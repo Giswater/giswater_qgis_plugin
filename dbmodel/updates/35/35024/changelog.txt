@@ -7,4 +7,5 @@
 - Add waterbalance strategy according IWA standards with om_waterbalance reports, functions, tables and views
 - New columns on config_report - descript, active.
 - Drop table ext_rtc_sector_period.
-- New parameter on config_param_system - edit_mapzones_set_lastupdate
+- New parameter on config_param_system - edit_mapzones_set_lastupdate (WS)
+- New parameter on config_param_system - epa_shortpipe_vdefault (WS)
