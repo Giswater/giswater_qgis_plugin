@@ -3199,7 +3199,7 @@ def remove_deprecated_config_vars():
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
     # Remove deprecated sections for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3218,7 +3218,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated sections for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3237,7 +3237,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3261,7 +3261,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
