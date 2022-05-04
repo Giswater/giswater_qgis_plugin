@@ -175,6 +175,7 @@ v_nodemapzone text;
 rec_conflict record;
 v_valuefordisconnected integer;
 v_floodonlymapzone text;
+v_islastupdate boolean;
 
 BEGIN
 	-- Search path
@@ -210,6 +211,8 @@ BEGIN
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+
+	SELECT value::boolean INTO v_islastupdate FROM config_param_system WHERE parameter='edit_mapzones_set_lastupdate';
 
 	-- data quality analysis
 	IF v_checkdata = 'FULL' THEN
@@ -598,7 +601,33 @@ BEGIN
 				-- used connec using v_edit_arc because the exploitation filter (same before)
 				v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
 				EXECUTE v_querytext;
-		
+				
+				IF v_islastupdate IS TRUE THEN
+					v_querytext = 'UPDATE arc SET lastupdate = now(), lastupdate_user=current_user FROM temp_anlgraf t WHERE arc.arc_id = t.arc_id AND water = 1';
+					EXECUTE v_querytext;
+
+					v_querytext = 'UPDATE node SET lastupdate = now(), lastupdate_user=current_user FROM v_edit_arc a WHERE a.arc_id=node.arc_id';
+					EXECUTE v_querytext;
+
+					EXECUTE 'UPDATE node SET lastupdate = now(), lastupdate_user=current_user  FROM (
+					SELECT distinct on(node) node, trace FROM(
+
+					select node, count(*) c, trace FROM(
+					select id, node, arc_id, trace, flag from(
+					select id, node_1 node, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0
+					union all
+					select id, node_2, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0)a
+					order by node
+					)b group by node, trace order by 1, 2 desc
+					
+					)c order by node, c desc)a
+					WHERE node = node_id';
+
+					v_querytext = 'UPDATE connec SET lastupdate = now(), lastupdate_user=current_user  FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
+					EXECUTE v_querytext;
+
+				END IF;
+
 				-- recalculate staticpressure (fid=147)
 				IF v_fid=146 THEN
 

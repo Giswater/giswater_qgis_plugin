@@ -164,3 +164,8 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE config_form_fields set widgetcontrols = 
 '{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'
 WHERE columnname = 'expl_id' and formname IN ('v_edit_inp_pattern', 'v_edit_inp_curve', 'v_edit_cat_dscenario');
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled, project_type)
+VALUES ('edit_mapzones_set_lastupdate', FALSE, 'If true, value of lastupdate is updated on node, arc, connec features and set to the date of executing the algorithm.',
+'Set lastupdate on mapzone process', FALSE, 'ws') ON CONFLICT (parameter) DO NOTHING;
+
