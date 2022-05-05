@@ -35,7 +35,7 @@ class GwDocument(QObject):
         self.files_path = []
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None):
         """ Button 34: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -60,18 +60,22 @@ class GwDocument(QObject):
 
         # Setting layers
         self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
+        
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
-
+        params = ['arc', 'node', 'connec', 'gully']
+        if list_tabs:
+            for i in params:
+                if i not in list_tabs:
+                    tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         # Remove all previous selections
         if self.single_tool_mode:

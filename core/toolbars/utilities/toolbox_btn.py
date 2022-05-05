@@ -175,7 +175,7 @@ class GwToolBoxButton(GwAction):
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if json_result or json_result['status'] != 'Failed':
+        if json_result and json_result['status'] != 'Failed':
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))

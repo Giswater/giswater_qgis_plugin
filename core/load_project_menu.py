@@ -64,7 +64,7 @@ class GwMenuLoad(QObject):
 
                 for index_action in buttons_toolbar:
 
-                    if index_action in project_exclusive:
+                    if project_exclusive and index_action in project_exclusive:
                         continue
 
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"

@@ -12,10 +12,12 @@ from ...shared.document import GwDocument
 class GwDocumentButton(GwAction):
     """ Button 34: Document """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.list_tabs=list_tabs if list_tabs else ["node", "arc", "connec", "gully"]
         self.document = GwDocument()
 
 
     def clicked_event(self):
-        self.document.get_document()
+        self.document.get_document(list_tabs=self.list_tabs)
+
