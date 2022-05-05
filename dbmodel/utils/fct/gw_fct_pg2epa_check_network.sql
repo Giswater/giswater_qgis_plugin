@@ -448,11 +448,11 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result, 2, 
-				concat('WARNING-227: {removeDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
+				concat('WARNING-227: {delDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result, 1, 
-				concat('INFO: {removeDisconnectNetwork} is enabled but nothing have been removed.'));
+				concat('INFO: {delDisconnectNetwork} is enabled but nothing have been removed.'));
 			END IF;
 
 			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
