@@ -666,14 +666,16 @@ BEGIN
 	-- WIP
 	IF v_fields_aux->>'unit_id' IS NOT NULL THEN
 		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_fields_aux->>'unit_id')||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
-	ELSE
+	ELSIF v_unit IS NOT NULL THEN
 		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_unit)||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
 	END IF;
 	
-	IF v_record.enddate IS NULL AND v_record.user_name IS NOT NULL THEN
-		v_disable_widget_name = '{startvisit}';
-	ELSE
-		v_disable_widget_name = '{endvisit}';
+	IF v_record IS NOT NULL THEN
+		IF v_record.enddate IS NULL AND v_record.user_name IS NOT NULL THEN
+			v_disable_widget_name = '{startvisit}';
+		ELSE
+			v_disable_widget_name = '{endvisit}';
+		END IF;
 	END IF;
 	
 	
