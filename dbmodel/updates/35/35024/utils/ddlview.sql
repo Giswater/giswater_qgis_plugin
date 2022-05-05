@@ -30,3 +30,14 @@ i.active
 FROM selector_inp_dscenario, inp_dscenario_controls i 
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE i.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+DROP VIEW IF EXISTS v_ui_workspace;
+CREATE OR REPLACE VIEW ws_sample.v_ui_workspace AS 
+ SELECT cat_workspace.id,
+    cat_workspace.name,
+    cat_workspace.private,
+    cat_workspace.descript,
+    cat_workspace.config
+	FROM ws_sample.cat_workspace
+  WHERE cat_workspace.private IS FALSE OR cat_workspace.private IS TRUE AND cat_workspace.cur_user = CURRENT_USER::text;
