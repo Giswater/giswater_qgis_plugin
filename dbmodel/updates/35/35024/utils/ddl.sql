@@ -41,9 +41,38 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fproces
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_fprocess", "column":"active", "dataType":"boolean"}}$$);
 
 
-CREATE INDEX temp_data_feature_id ON temp_data
+CREATE INDEX IF NOT EXISTS temp_data_feature_id ON temp_data
  USING btree (feature_id);
   
-CREATE INDEX temp_data_feature_type ON temp_data
+CREATE INDEX IF NOT EXISTS temp_data_feature_type ON temp_data
   USING btree (feature_type);
-	
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_arc_arc_id ON plan_psector_x_arc
+  USING btree (arc_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_node_node_id ON plan_psector_x_node
+  USING btree (node_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_connec_connec_id ON plan_psector_x_connec
+  USING btree (connec_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_arc_state ON plan_psector_x_arc
+  USING btree (state);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_node_state ON plan_psector_x_node
+  USING btree (state);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_connec_state ON plan_psector_x_connec
+  USING btree (state);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_arc_psector_id ON plan_psector_x_arc
+  USING btree (psector_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_node_psector_id ON plan_psector_x_node
+  USING btree (psector_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_connec_psector_id ON plan_psector_x_connec
+  USING btree (psector_id);
+
+CREATE INDEX IF NOT EXISTS plan_psector_x_connec_arc_id ON plan_psector_x_connec
+  USING btree (arc_id);
