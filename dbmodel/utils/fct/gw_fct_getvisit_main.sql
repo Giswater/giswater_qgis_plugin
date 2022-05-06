@@ -181,7 +181,7 @@ v_filter_aux text;
 v_unit integer;
 v_count integer;
 v_fields_aux json;
-v_record record;
+v_record record = NULL;
 v_disable_widget_name text[];
 v_fields_keys text[];
 v_field text;
@@ -244,19 +244,23 @@ BEGIN
 	
 	 -- LOTS MANAGE UNITS (um visitclass)
 	 -- if feature_type is unit, we change to arc/node and select one of the elements that are in this unit
+	
 	IF v_featuretype = 'unit' THEN
+	
 		-- don't allow to visit units with orderby bigger than others that have not been visited the same day. NULLs can be visited
 		IF (SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer) IS NOT NULL THEN
+			
 			FOR rec IN SELECT * FROM om_visit_lot_x_unit WHERE lot_id=v_lot AND orderby<(SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer)
 			LOOP
 				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id;
+				 
 				IF v_count = 0 THEN
 					--raise exception 'no pots visitar';
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3197", "function":"2740","debug_msg":""}}$$);'INTO v_message;
 					
 					v_message_aux = ((((v_message->>'body')::json->>'data')::json->>'info')::json->>'text')::text;
-					
+					v_message_aux := COALESCE(v_message_aux, '');
 					RETURN ('{"status":"Warning", "message":"'||v_message_aux||'", "version":'||v_version||
 					 ',"body":{"feature":{"featureType":"visit", "tableName":"", "idName":"visit_id", "id":""}'||
 					', "form":{"formTabs":{"active":true, "fields":{}}}'
@@ -340,9 +344,11 @@ BEGIN
 
 		IF v_offline THEN
 			v_id = NULL;
-		ELSE
-			IF v_pluginlot = 'TRUE' THEN
-				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+		else
+		
+			IF v_pluginlot then
+				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL then
+				
 					-- getting visit class in function: 1st v_lot, 2nd feature_type
 					IF v_lot IS NOT NULL AND p_visittype = 1 AND v_visitclass IS NULL THEN
 						v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
@@ -363,13 +369,12 @@ BEGIN
 					-- get if visit already exists
 					v_querystring = concat('SELECT visit_id FROM om_visit_x_', (v_featuretype) ,' 
 						JOIN om_visit ON om_visit.id = om_visit_x_', (v_featuretype) ,'.visit_id 
-						WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text ', v_filter_lot_null ,' AND om_visit.class_id = ',v_visitclass ,'
+						WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text ', v_filter_lot_null ,' AND om_visit.class_id = ',v_visitclass , ' AND status <> 4
 						ORDER BY om_visit_x_', (v_featuretype) ,'.id desc LIMIT 1');
 					v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid, 'v_filter_lot_null', v_filter_lot_null, 'v_visitclass', v_visitclass);
 					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 30);
 					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_visit_id;
-
 					
 				END IF;
 			ELSIF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
@@ -387,22 +392,24 @@ BEGIN
 				EXECUTE v_querystring INTO v_visit_id;
 			END IF;
 			-- if visit exists, get v_id and control if we have to load its form according to days interval
+			
 			IF v_visit_id IS NOT NULL THEN
 			
-				v_querystring = concat('SELECT true FROM om_visit WHERE startdate > now() - ''7 days''::interval AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
+				v_querystring = concat('SELECT true FROM om_visit WHERE status<>4 AND id = ', quote_nullable(v_visit_id),' AND lot_id = ',v_lot,' ORDER BY id desc LIMIT 1');
 				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 50);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_load_visit;
+				
 			END IF;
             
             IF v_visit_id IS NOT NULL AND v_id IS NULL THEN
             	v_id = v_visit_id;
             END IF;
-			
-			IF v_load_visit IS NOT TRUE AND v_id IS NULL THEN
+			IF v_load_visit IS NOT TRUE THEN
 				v_new_visit=TRUE;
-			ELSIF v_tram_exec_visit IS NULL THEN
+			END IF;
+			IF v_tram_exec_visit IS NULL THEN
 				v_tram_exec_visit=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'tram_exec_visit');
 			END IF;
             
@@ -671,13 +678,10 @@ BEGIN
 	END IF;
 	
 	IF v_record IS NOT NULL THEN
-		IF v_record.enddate IS NULL AND v_record.user_name IS NOT NULL THEN
-			v_disable_widget_name = '{startvisit}';
-		ELSE
-			v_disable_widget_name = '{endvisit}';
-		END IF;
+		v_disable_widget_name = '{startvisit}';
+	ELSE
+		v_disable_widget_name = '{endvisit}';
 	END IF;
-	
 	
 	--  Create tabs array	
 	v_formtabs := '[';
@@ -1083,10 +1087,12 @@ BEGIN
 		    '}')::json;
 
 	-- Exception handling
+
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+
 END;
-$BODY$
+$BODY$;
   LANGUAGE plpgsql VOLATILE
   COST 100;
