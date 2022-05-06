@@ -54,10 +54,14 @@ BEGIN
 	END IF;
 	
 	-- only for planified visits insert lot_id
-	IF v_pluginlot AND v_visit_type=1 THEN
+	IF v_pluginlot AND v_visit_type=1 AND (SELECT parent_id FROM config_visit_class WHERE id=NEW.class_id) IS NOT NULL THEN
 		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status, unit_id) 
 		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
 		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status, NEW.unit_id);
+	ELSIF v_pluginlot AND v_visit_type=1 THEN
+		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
+		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
 	ELSE 
 		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, status) 
 		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
