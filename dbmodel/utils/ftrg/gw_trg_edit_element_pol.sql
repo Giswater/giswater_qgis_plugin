@@ -27,7 +27,8 @@ BEGIN
 		IF (NEW.element_id IS NULL) THEN
 			NEW.element_id := (SELECT element_id FROM v_edit_element WHERE ST_DWithin(NEW.the_geom, v_edit_element.the_geom,0.001) LIMIT 1);
 			IF (NEW.element_id IS NULL) THEN
-				RETURN audit_function(2094,2460);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+   			"data":{"message":"2094", "function":"2996","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 					
@@ -50,7 +51,8 @@ BEGIN
 		
 		IF (NEW.element_id != OLD.element_id) THEN
 			IF (SELECT element_id FROM v_edit_element WHERE element_id=NEW.element_id) iS NULL THEN
-				RETURN audit_function(2098,2460);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+   			"data":{"message":"2098", "function":"2996","debug_msg":null}}$$);';
 			END IF;
 			UPDATE v_edit_element SET pol_id=NULL WHERE element_id=OLD.element_id;
 			UPDATE v_edit_element SET pol_id=NEW.pol_id WHERE element_id=NEW.element_id;
