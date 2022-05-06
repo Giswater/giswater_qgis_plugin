@@ -41,3 +41,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fproces
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_fprocess", "column":"active", "dataType":"boolean"}}$$);
 
 
+CREATE INDEX temp_data_feature_id ON temp_data
+ USING btree (feature_id);
+  
+CREATE INDEX temp_data_feature_type ON temp_data
+  USING btree (feature_type);
+	
