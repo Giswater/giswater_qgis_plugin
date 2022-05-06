@@ -181,7 +181,7 @@ v_filter_aux text;
 v_unit integer;
 v_count integer;
 v_fields_aux json;
-v_record record = NULL;
+v_record record;
 v_disable_widget_name text[];
 v_fields_keys text[];
 v_field text;
@@ -1093,6 +1093,6 @@ BEGIN
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
-$BODY$;
+$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
