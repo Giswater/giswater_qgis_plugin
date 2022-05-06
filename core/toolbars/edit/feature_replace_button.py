@@ -23,7 +23,7 @@ class GwFeatureReplaceButton(GwMaptool):
     """ Button 44: Replace feature
     User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1, actions=None, list_tables=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
@@ -34,7 +34,12 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_edit_type = None
         self.feature_type_cat = None
         self.feature_id = None
-        self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+        self.actions = actions
+        if not self.actions:
+            self.actions=['ARC','NODE','CONNEC']
+        self.list_tables=list_tables
+        if not self.list_tables:
+            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -162,11 +167,10 @@ class GwFeatureReplaceButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['ARC', 'NODE', 'CONNEC']
         if global_vars.project_type in ('UD', 'ud'):
-            actions.append('GULLY')
+            self.actions.append('GULLY')
 
-        for action in actions:
+        for action in self.actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))
