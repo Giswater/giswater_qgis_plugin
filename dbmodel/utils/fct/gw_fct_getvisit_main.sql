@@ -181,11 +181,12 @@ v_filter_aux text;
 v_unit integer;
 v_count integer;
 v_fields_aux json;
-v_record record;
 v_disable_widget_name text[];
 v_fields_keys text[];
 v_field text;
 v_load_visit_aux boolean;
+v_user_name text;
+v_end_date text;
 
 BEGIN
 	
@@ -241,7 +242,7 @@ BEGIN
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_userrole;
-	
+	 
 	 -- LOTS MANAGE UNITS (um visitclass)
 	 -- if feature_type is unit, we change to arc/node and select one of the elements that are in this unit
 	
@@ -296,7 +297,7 @@ BEGIN
 			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='GULLY');
 			
 		END IF;
-	
+		
 		v_featureid=v_new_featureid;
 		v_visitclass=v_new_visitclass;
 		
@@ -406,9 +407,11 @@ BEGIN
             IF v_visit_id IS NOT NULL AND v_id IS NULL THEN
             	v_id = v_visit_id;
             END IF;
+
 			IF v_load_visit IS NOT TRUE THEN
 				v_new_visit=TRUE;
 			END IF;
+			
 			IF v_tram_exec_visit IS NULL THEN
 				v_tram_exec_visit=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'tram_exec_visit');
 			END IF;
@@ -672,15 +675,15 @@ BEGIN
 	
 	-- WIP
 	IF v_fields_aux->>'unit_id' IS NOT NULL THEN
-		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_fields_aux->>'unit_id')||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
+		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_fields_aux->>'unit_id')||' AND lot_id = '||v_lot||' ORDER BY startdate DESC LIMIT 1' INTO v_user_name, v_end_date;
 	ELSIF v_unit IS NOT NULL THEN
-		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_unit)||' ORDER BY startdate DESC LIMIT 1' INTO v_record;
+		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_unit)||' AND lot_id = '||v_lot||' ORDER BY startdate DESC LIMIT 1' INTO v_user_name, v_end_date;
 	END IF;
-	
-	IF v_record IS NOT NULL THEN
-		v_disable_widget_name = '{startvisit}';
+
+	IF v_user_name IS NULL OR v_end_date IS NOT NULL THEN
+		v_disable_widget_name = '{endvisit}';	
 	ELSE
-		v_disable_widget_name = '{endvisit}';
+		v_disable_widget_name = '{startvisit}';	
 	END IF;
 	
 	--  Create tabs array	
@@ -1077,7 +1080,7 @@ BEGIN
 	IF v_offline THEN
 		v_id = '""';
 	END IF;
-  
+ 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
