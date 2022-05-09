@@ -9,3 +9,4 @@
 - Drop table ext_rtc_sector_period.
 - New parameter on config_param_system - edit_mapzones_set_lastupdate (WS)
 - New parameter on config_param_system - epa_shortpipe_vdefault (WS)
+- Bug fix on copy schema function

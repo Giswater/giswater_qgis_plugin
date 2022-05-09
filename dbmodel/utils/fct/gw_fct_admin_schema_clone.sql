@@ -221,7 +221,7 @@ BEGIN
 			
 
 			EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
-			ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
+			ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
 		  
 		ELSE   
 
@@ -230,7 +230,7 @@ BEGIN
 	   
 
 			EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
-			'||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
+			'||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
 
 		END IF;
 
