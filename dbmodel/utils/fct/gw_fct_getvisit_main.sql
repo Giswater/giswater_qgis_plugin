@@ -249,11 +249,11 @@ BEGIN
 	IF v_featuretype = 'unit' THEN
 	
 		-- don't allow to visit units with orderby bigger than others that have not been visited the same day. NULLs can be visited
-		IF (SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer) IS NOT NULL THEN
+		IF (SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer AND lot_id=v_lot) IS NOT NULL THEN
 			
-			FOR rec IN SELECT * FROM om_visit_lot_x_unit WHERE lot_id=v_lot AND orderby<(SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer)
+			FOR rec IN SELECT * FROM om_visit_lot_x_unit WHERE lot_id=v_lot AND orderby<(SELECT orderby FROM om_visit_lot_x_unit WHERE unit_id=v_featureid::integer AND lot_id=v_lot)
 			LOOP
-				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id;
+				SELECT count(*) INTO v_count FROM om_visit WHERE unit_id=rec.unit_id AND lot_id=v_lot;
 				 
 				IF v_count = 0 THEN
 					--raise exception 'no pots visitar';
