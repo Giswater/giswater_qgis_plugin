@@ -73,30 +73,55 @@ BEGIN
 	END IF;
 
 	-- Computing process
-	IF v_selectionmode = 'previousSelection' THEN
-		FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN ('||v_array||') 
-		AND isarcdivide= '||v_isarcdivide||' AND 
-		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
-		LOOP
-			--find the closest arc and the distance between arc and node
-			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
-			FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
-		
-			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
-			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
-		END LOOP;
-	ELSE
-		FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide='||v_isarcdivide||' AND 
-		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
-		LOOP
-			--find the closest arc and the distance between arc and node
-			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
-			FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
-		
-			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
-			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
-		END LOOP;
-	END IF;
+    IF v_selectionmode = 'previousSelection' then
+            IF v_isarcdivide = 'true' THEN
+                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN ('||v_array||') 
+                AND isarcdivide= ''true'' AND 
+                (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
+                LOOP
+                    --find the closest arc and the distance between arc and node
+                    SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+                    FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+                
+                    INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
+                    VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+                END LOOP;
+            ELSIF v_isarcdivide = 'false' THEN
+                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN ('||v_array||') 
+                AND isarcdivide= ''false'' AND arc_id IS NULL' 
+                LOOP
+                    --find the closest arc and the distance between arc and node
+                    SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+                    FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+                
+                    INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
+                    VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+                END LOOP;
+            END IF;
+        ELSE
+            IF v_isarcdivide = 'true' THEN
+                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=''true'' AND 
+                (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
+                LOOP
+                    --find the closest arc and the distance between arc and node
+                    SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+                    FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+                
+                    INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
+                    VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+                END LOOP;
+            ELSIF v_isarcdivide = 'false' THEN
+                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL' 
+                LOOP
+                    --find the closest arc and the distance between arc and node
+                    SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+                    FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+                
+                    INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
+                    VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+                END LOOP;
+            END IF;
+        END IF;
 
 	-- set selector
 	DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
