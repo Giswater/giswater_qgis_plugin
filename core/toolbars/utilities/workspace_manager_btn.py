@@ -282,6 +282,12 @@ class GwWorkspaceManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         message = "Are you sure you want to delete these records?"
+        sql = f"SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user"
+        row = tools_db.get_row(sql)
+        if row and row[0]:
+            if row[0] == f'{value}':
+                message = f"WARNING: This will remove the 'utils_workspace_vdefault' variable for your user!\n{message}"
+
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
