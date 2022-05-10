@@ -409,7 +409,12 @@ BEGIN
             END IF;
 
 			IF v_load_visit IS NOT TRUE THEN
-				v_new_visit=TRUE;
+				-- for getvisit HARDCODED v_id IS NOT NULL, so it's never new visit
+                IF v_id IS NULL THEN
+					v_new_visit=TRUE;
+				ELSE
+					v_new_visit=FALSE;
+				END IF;
 			END IF;
 			
 			IF v_tram_exec_visit IS NULL THEN
@@ -507,9 +512,10 @@ BEGIN
 	IF v_new_visit IS FALSE THEN
 
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
-		v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
-		v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_visitclass);
-		v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_visitclass);
+		v_formname := (SELECT formname FROM config_visit_class WHERE id=v_extvisitclass);
+		v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_extvisitclass);
+		v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_extvisitclass);
+
 	END IF;
 
 	-- get change class
@@ -517,10 +523,10 @@ BEGIN
 	
 		v_isclasschanged = true;
 		-- update change of class
-		UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
+		--UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
 
 		-- message
-		SELECT gw_fct_getmessage(v_feature, 60) INTO v_message;
+		--SELECT gw_fct_getmessage(v_feature, 60) INTO v_message;
 	END IF;
 
 	-- setting values default of new visit
