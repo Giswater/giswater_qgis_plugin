@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/03/02
-UPDATE config_form_fields SET formname='v_edit_inp_coverage' where formname ='inp_coverage_land_x_subc';
+UPDATE config_form_fields SET formname='v_edit_inp_coverage' WHERE formname ='inp_coverage_land_x_subc';
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -25,3 +25,7 @@ VALUES ('v_edit_inp_coverage', 'Editable view to manage coverage', 'role_epa',  
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_anl_grafanalytics_upstream', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_fields SET label='dma' WHERE columnname='dma_id' AND label='dma_id' AND formname LIKE 've_%';
+UPDATE config_form_fields SET label='sector' WHERE columnname='sector_id' AND label='sector_id' AND formname LIKE 've_%';
+UPDATE config_form_fields SET label='exploitation' WHERE columnname='expl_id' AND label='expl_id' AND formname LIKE 've_%';
