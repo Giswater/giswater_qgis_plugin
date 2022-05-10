@@ -23,9 +23,10 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 class GwFeatureEndButton(GwAction):
     """ Button 68: End feature """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.list_tabs=list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
 
 
     def clicked_event(self):
@@ -70,12 +71,19 @@ class GwFeatureEndButton(GwAction):
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+        # Remove tabs
+        params = ['arc', 'node', 'connec', 'gully', 'element']
+        if self.list_tabs:
+            for i in params:
+                if i not in self.list_tabs:
+                    tools_qt.remove_tab(self.dlg_work_end.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111", sub_folder="24x24")
