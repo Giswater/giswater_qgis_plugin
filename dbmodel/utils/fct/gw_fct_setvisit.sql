@@ -121,6 +121,7 @@ BEGIN
 	v_addphotos = (p_data ->>'data')::json->>'photos';
 	v_lot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id';
 	v_arc_id = ((p_data ->>'data')::json->>'fields')::json->>'arc_id';
+    v_gully_id = ((p_data ->>'data')::json->>'fields')::json->>'gully_id';
 
 	-- setting sequences of related visit tables
 	PERFORM setval('"SCHEMA_NAME".om_visit_event_id_seq', (SELECT max(id) FROM om_visit_event), true);
