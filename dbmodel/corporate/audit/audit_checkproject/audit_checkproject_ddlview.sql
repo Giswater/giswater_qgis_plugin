@@ -48,9 +48,6 @@ SELECT date, type, value FROM audit.v_fidlog where expl_id = 1 and criticity in 
 ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
   ORDER BY 1, 2, 3, 4;
 
-ALTER TABLE audit.v_fidlog_gam
-  OWNER TO bgeoadmin;
-GRANT ALL ON TABLE audit.v_fidlog_gam TO bgeoadmin;
 GRANT ALL ON TABLE audit.v_fidlog_gam TO role_master;
 
 
@@ -87,6 +84,70 @@ group by user_name, date, action
 ORDER BY date desc;
 
 GRANT ALL ON TABLE audit.v_log_gam TO role_master;
+
+
+CREATE OR REPLACE VIEW audit.v_fidlog AS 
+ SELECT ct.date,
+    'WARNING' AS criticity,
+    ct.omdata,
+    ct.omtopology,
+    ct.grafdata,
+    ct.epaconfig,
+    ct.epadata,
+    ct.epatopology,
+    ct.planconfig,
+    COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) +COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0) AS total,
+    (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
+    (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) +COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
+   FROM crosstab('
+SELECT date, type, value FROM audit.v_fidlog where criticity in (0,2)
+'::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) 
+ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
+UNION
+ SELECT ct.date,
+    'ERROR' AS criticity,
+    ct.omdata,
+    ct.omtopology,
+    ct.grafdata,
+    ct.epaconfig,
+    ct.epadata,
+    ct.epatopology,
+    ct.planconfig,
+    COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) +COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0) AS total,
+    (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
+    (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) +COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
+   FROM crosstab('
+SELECT date, type, value FROM audit.v_fidlog where criticity in (0,3)
+'::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) 
+ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
+  ORDER BY 1, 2, 3, 4;
+
+GRANT ALL ON TABLE audit.v_fidlog TO role_master;
+
+
+CREATE OR REPLACE VIEW audit.v_fidlog_index AS 
+ SELECT ct.date,
+    a.total AS errors,
+    b.total AS warnings,
+    a.km,
+    ct.index_3 AS err100km,
+    ct.index_2 AS war100km,
+    concat(ct.index_3, '.', ct.index_2) AS index
+   FROM crosstab('SELECT date, criticity, index  FROM audit.v_fidlog_gam'::text, 'VALUES (''WARNING''), (''ERROR'')'::text) ct(date date, index_2 integer, index_3 integer)
+     JOIN ( SELECT v_fidlog_gam.date,
+            v_fidlog_gam.total,
+            v_fidlog_gam.km,
+            v_fidlog_gam.index
+           FROM audit.v_fidlog_gam
+          WHERE v_fidlog_gam.criticity = 'ERROR'::text) a USING (date)
+     JOIN ( SELECT v_fidlog_gam.date,
+            v_fidlog_gam.total,
+            v_fidlog_gam.km,
+            v_fidlog_gam.index
+           FROM audit.v_fidlog_gam
+          WHERE v_fidlog_gam.criticity = 'WARNING'::text) b USING (date)
+  WHERE ct.index_3 IS NOT NULL AND ct.index_2 IS NOT NULL;
+GRANT ALL ON TABLE audit.v_fidlog_gam TO role_master;
 
 
 
