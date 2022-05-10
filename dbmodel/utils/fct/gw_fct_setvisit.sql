@@ -348,7 +348,7 @@ BEGIN
 		
 		-- select visitclass for arc and loop for every arc on om_visit_lot_x_arc. Then insert visit and events with same values of the one triggered by this setvisit
 		SELECT id INTO v_visitclass_arc FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='arc';
-		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND arc_id::integer <> v_feature_id::integer
+		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND lot_id=v_lot AND arc_id::integer <> v_feature_id::integer
 		LOOP
 			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
 			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
@@ -358,7 +358,7 @@ BEGIN
 		
 		-- select visitclass for node and loop for every node on om_visit_lot_x_node. Then insert visit and events with same values of the one triggered by this setvisit
 		SELECT id INTO v_visitclass_node FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='node';
-		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND node_id::integer <> v_feature_id::integer
+		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND lot_id=v_lot AND node_id::integer <> v_feature_id::integer
 		LOOP
 			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
 			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
@@ -368,7 +368,7 @@ BEGIN
 	
 		-- select visitclass for gully and loop for every gully on om_visit_lot_x_gully. Then insert visit and events with same values of the one triggered by this setvisit
 		SELECT id INTO v_visitclass_gully FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='gully';
-		FOR rec_gully IN SELECT * FROM om_visit_lot_x_gully WHERE unit_id=v_unit_id AND gully_id::integer <> v_feature_id::integer
+		FOR rec_gully IN SELECT * FROM om_visit_lot_x_gully WHERE unit_id=v_unit_id AND lot_id=v_lot AND gully_id::integer <> v_feature_id::integer
 		LOOP
 			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
 			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_gully, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
