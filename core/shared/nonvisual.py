@@ -52,7 +52,11 @@ class GwNonVisual:
         self.dialog = GwNonVisualCurveUi()
         tools_gw.load_settings(self.dialog)
 
+        # Define variables
+        tbl_curve_value = self.dialog.tbl_curve_value
+
         # Connect dialog signals
+        tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         self._connect_dialog_signals()
 
         # Open dialog
