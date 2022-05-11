@@ -30,7 +30,7 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
-    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
+    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
         """ Button 33: Add element """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -73,12 +73,18 @@ class GwElement:
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         self.point_xy = {"x": None, "y": None}
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+        params = ['arc', 'node', 'connec', 'gully']
+        if list_tabs:
+            for i in params:
+                if i not in list_tabs:
+                    tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")

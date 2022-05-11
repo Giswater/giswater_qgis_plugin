@@ -12,10 +12,11 @@ from ...shared.element import GwElement
 class GwElementButton(GwAction):
     """ Button 33: Element """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully"]
         self.element = GwElement()
 
 
     def clicked_event(self):
-        self.element.get_element()
+        self.element.get_element(list_tabs=self.list_tabs)
