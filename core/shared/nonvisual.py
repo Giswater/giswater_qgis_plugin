@@ -136,6 +136,9 @@ class GwNonVisual:
     def _manage_ws_patterns_dlg(self):
         tbl_pattern_value = self.dialog.tbl_pattern_value
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
+        # TODO: Connect signal to draw graphic?
+
+        # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
 
 
     def _manage_ud_patterns_dlg(self):

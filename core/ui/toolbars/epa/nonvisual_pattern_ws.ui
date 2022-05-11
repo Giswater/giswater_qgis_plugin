@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dscenario manager</string>
+   <string>Pattern Editor</string>
   </property>
   <layout class="QGridLayout" name="verticalLayout_4">
    <item row="2" column="0" colspan="2">
