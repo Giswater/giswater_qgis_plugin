@@ -183,7 +183,7 @@ BEGIN
 	END IF;
 	
 	-- looking for additional schema 
-	IF v_addschema NOT IN (NULL, 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+	IF (v_addschema IS NOT NULL OR v_addschema != 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 		v_querystring = concat('SET search_path = ',v_addschema,', public');
 		v_debug_vars := json_build_object('v_addschema', v_addschema);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 10);
