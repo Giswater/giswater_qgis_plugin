@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_psector_manager</class>
- <widget class="QDialog" name="dlg_psector_manager">
+ <class>dlg_nonvisual_manager</class>
+ <widget class="QDialog" name="dlg_nonvisual_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1063</width>
-    <height>786</height>
+    <width>951</width>
+    <height>704</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Non-visual Objects Manager</string>
+   <string>Non-Visual Objects Manager</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -25,38 +25,18 @@
      <property name="title">
       <string/>
      </property>
-     <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="1" column="6">
-       <widget class="QPushButton" name="btn_delete">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_filter">
+        <property name="text">
+         <string>Filter by:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="txt_filter">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_psector_name">
-        <property name="text">
-         <string>Filter by: Psector name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="lbl_vdefault_psector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -66,7 +46,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
+      <item row="1" column="1">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -79,8 +59,8 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0">
-       <widget class="QLineEdit" name="txt_name">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btn_duplicate">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -88,14 +68,50 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string/>
+         <string>Duplicate</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="7">
-       <widget class="QTableView" name="tbl_psm"/>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="btn_create">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Create</string>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="0" colspan="5">
+      <item row="1" column="4">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="5">
+       <widget class="QTabWidget" name="mainTab">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -108,29 +124,10 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="4">
-       <widget class="QPushButton" name="btn_update_psector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="3" column="4">
+       <widget class="QPushButton" name="btn_cancel">
         <property name="text">
-         <string>Current psector</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="QPushButton" name="btn_duplicate">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Duplicate</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -165,10 +162,9 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>txt_name</tabstop>
-  <tabstop>btn_update_psector</tabstop>
+  <tabstop>txt_filter</tabstop>
+  <tabstop>btn_duplicate</tabstop>
   <tabstop>btn_delete</tabstop>
-  <tabstop>tbl_psm</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>

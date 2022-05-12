@@ -28,6 +28,22 @@ class GwNonVisual:
         self.schema_name = global_vars.schema_name
         self.canvas = global_vars.canvas
         self.dialog = None
+        self.manager_dlg = None
+
+
+    def manage_nonvisual(self):
+        """  """
+
+        # Get dialog
+        self.manager_dlg = GwNonVisualManagerUi()
+        tools_gw.load_settings(self.manager_dlg)
+
+        # Connect dialog signals
+        self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
+        self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
+
+        # Open dialog
+        tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
 
 
     def get_nonvisual(self, object_name):
