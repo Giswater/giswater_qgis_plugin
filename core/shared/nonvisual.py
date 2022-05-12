@@ -154,11 +154,65 @@ class GwNonVisual:
 
 
     def _manage_ws_patterns_dlg(self):
+        # Variables
         tbl_pattern_value = self.dialog.tbl_pattern_value
+
+        # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
         # TODO: Connect signal to draw graphic?
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
+        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws)
+
+
+    def _accept_pattern_ws(self):
+        # Variables
+        txt_id = self.dialog.txt_pattern_id
+        txt_observ = self.dialog.txt_observ
+        txt_expl_id = self.dialog.txt_expl_id
+        txt_log = self.dialog.txt_log
+        tbl_pattern_value = self.dialog.tbl_pattern_value
+
+        pattern_id = tools_qt.get_text(self.dialog, txt_id)
+        observ = tools_qt.get_text(self.dialog, txt_observ)
+        # tscode ?
+        tscode = "null"
+        # tsparameters ?
+        tsparameters = "null"
+        expl_id = tools_qt.get_text(self.dialog, txt_expl_id)
+        log = tools_qt.get_text(self.dialog, txt_log)
+
+        # Insert inp_pattern
+        sql = f"INSERT INTO v_edit_inp_pattern (pattern_id, observ, tscode, tsparameters, expl_id, log)" \
+              f"VALUES('{pattern_id}', '{observ}', '{tscode}', '{tsparameters}', '{expl_id}', '{log}')"
+        # result = tools_db.execute_sql(sql)
+        # if not result:
+        #     msg = "There was an error inserting pattern."
+        #     tools_qgis.show_warning(msg)
+        #     return
+        print(sql)
+
+        # Insert inp_pattern_value
+        values = list()
+        for y in range(0, tbl_pattern_value.rowCount()):
+            # values[y] = list()
+            values.append(list())
+            for x in range(0, tbl_pattern_value.columnCount()):
+                value = "null"
+                item = tbl_pattern_value.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        for row in values:
+            if row == (['null'] * tbl_pattern_value.columnCount()):
+                continue
+            # INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+            # VALUES('PTN-DMA-06-P6', 1.8500, 2.2000, 2.2000, 1.9000, 1.0000, 0.7000, 0.9000, 1.3000, 1.2000, 0.7000, 0.5000, 0.3000, NULL, NULL, NULL, NULL, NULL, NULL);
+            sql = f"INSERT INTO inp_pattern_value () VALUES ({pattern_id}, "
+            for x in row:
+                sql += f"{x}, "
+            print(sql)
 
 
     def _manage_ud_patterns_dlg(self):
