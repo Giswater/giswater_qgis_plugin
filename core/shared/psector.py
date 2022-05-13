@@ -1619,6 +1619,8 @@ class GwPsector:
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
