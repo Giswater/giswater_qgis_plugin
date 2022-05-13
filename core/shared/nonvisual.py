@@ -213,6 +213,18 @@ class GwNonVisual:
                     value = item.data(0)
                 values[y].append(value)
 
+        is_empty = True
+        for row in values:
+            if row == (['null'] * tbl_pattern_value.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
         for row in values:
             if row == (['null'] * tbl_pattern_value.columnCount()):
                 continue
