@@ -70,13 +70,59 @@ class GwNonVisual:
 
         # Define variables
         tbl_curve_value = self.dialog.tbl_curve_value
+        cmb_expl_id = self.dialog.cmb_expl_id
+        cmb_curve_type = self.dialog.cmb_curve_type
+
+        # Populate combobox
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+
+        curve_type_list = []
+        curve_type_headers = {}
+        if not curve_type_list:
+            if global_vars.project_type == 'ws':
+                curve_type_list = ['HEADLOSS', 'VOLUME', 'PUMP', 'EFFICIENCY']
+                curve_type_headers = {
+                    "HEADLOSS": ['Flow', 'Headloss'], "VOLUME": ['Height', 'Volume'], "PUMP": ['Flow', 'Head'],
+                    "EFFICIENCY": ['Flow', 'Efficiency']
+                }
+            elif global_vars.project_type == 'ud':
+                curve_type_list = ['CONTROL', 'DIVERSION', 'PUMP-TYPE1', 'PUMP-TYPE2', 'PUMP-TYPE3', 'PUMP-TYPE4',
+                                   'RATING', 'SHAPE', 'STORAGE', 'TIDAL', 'WEIR']
+                curve_type_headers = {
+                    "CONTROL": ['Value', 'Setting'], "DIVERSION": ['Inflow', 'Outflow'],
+                    "PUMP-TYPE1": ['Volume', 'Flow'], "PUMP-TYPE2": ['Depth', 'Flow'], "PUMP-TYPE3": ['Head', 'Flow'],
+                    "PUMP-TYPE4": ['Depth', 'Flow'], "RATING": ['Head', 'Outflow'], "SHAPE": ['Depth/\nFull Depth', 'Width/\nFull Depth'],
+                    "STORAGE": ['Depth', 'Area'], "TIDAL": ['Hour', 'Stage'], "WEIR": ['Head', 'Coefficient']
+                }
+        else:
+            curve_type_list = []  # TODO: populate with parameter passed in constructor (improve modularity)
+            curve_type_headers = {}  # TODO: same as list
+
+        tools_qt.fill_combo_values(cmb_curve_type, [[x, x] for x in curve_type_list])
+
 
         # Connect dialog signals
+        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         self._connect_dialog_signals()
 
+        # Set initial curve_value table headers
+        self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
+
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+
+    def _manage_curve_type(self, curve_type_headers, table, index):
+        """  """
+
+        curve_type = tools_qt.get_text(self.dialog, 'cmb_curve_type')
+        if curve_type:
+            headers = curve_type_headers.get(curve_type)
+            table.setHorizontalHeaderLabels(headers)
 
 
     def get_patterns(self):
