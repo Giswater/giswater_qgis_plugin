@@ -291,7 +291,6 @@ BEGIN
 		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'), 
 			(SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault') AND cur_user = current_user ORDER BY parameter)a)::text, 
 			'{}');
-		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'), '{}');
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
 		
