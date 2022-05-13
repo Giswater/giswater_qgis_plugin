@@ -155,6 +155,8 @@ class GwProjectCheckTask(GwTask):
 
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        if result:
+            tools_gw.manage_current_selections_docker(result, open=False)
         try:
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
