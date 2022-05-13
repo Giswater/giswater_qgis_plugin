@@ -1850,6 +1850,8 @@ class GwPsector:
                 elif type(widget) == QComboBox:
                     widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QCheckBox:
+                    if widget.objectName() == 'chk_enable_all':
+                        continue
                     widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QTextEdit:
                     widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
