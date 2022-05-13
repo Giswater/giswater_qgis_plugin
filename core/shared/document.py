@@ -33,6 +33,7 @@ class GwDocument(QObject):
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.files_path = []
+        self.project_type=tools_gw.get_project_type()
 
 
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None):
@@ -73,7 +74,6 @@ class GwDocument(QObject):
                     tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
         else:
             # Remove 'gully' if not 'UD'
-            self.project_type = tools_gw.get_project_type()
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
