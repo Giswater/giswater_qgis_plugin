@@ -55,7 +55,7 @@ class GwNonVisualButton(GwAction):
         actions = menu_actions
         if actions is None:
             if global_vars.project_type == 'ws':
-                actions = ['ROUGHNESS', 'CURVES', 'PATTERNS', 'CONTROLS', 'RULES']
+                actions = ['CURVES', 'PATTERNS', 'CONTROLS', 'RULES']
             elif global_vars.project_type == 'ud':
                 actions = ['CURVES', 'PATTERNS', 'CONTROLS', 'TIMESERIES']
             else:

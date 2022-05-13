@@ -20,20 +20,6 @@
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <widget class="QPushButton" name="btn_load">
-       <property name="text">
-        <string>Load...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_save">
-       <property name="text">
-        <string>Save...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -57,13 +43,6 @@
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
         <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_help">
-       <property name="text">
-        <string>Help</string>
        </property>
       </widget>
      </item>
@@ -107,20 +86,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="txt_observ">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="lbl_pattern_id">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -130,23 +99,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="lbl_observ">
+        <item row="2" column="0">
+         <widget class="QLabel" name="lbl_pattern_type">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Observation</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="lbl_expl_id">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -156,15 +112,8 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="lbl_pattern_type">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="txt_expl_id">
+        <item row="3" column="0">
+         <widget class="QComboBox" name="cmb_expl_id">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -172,9 +121,6 @@
            </sizepolicy>
           </property>
          </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QComboBox" name="cmb_pattern_type"/>
         </item>
         <item row="3" column="1" colspan="2">
          <widget class="QLineEdit" name="txt_log"/>
@@ -189,6 +135,29 @@
           </property>
           <property name="text">
            <string>Log</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QLineEdit" name="txt_observ">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLabel" name="lbl_observ">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Observation</string>
           </property>
          </widget>
         </item>
@@ -261,61 +230,6 @@
           <column>
            <property name="text">
             <string>12</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>13</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>14</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>15</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>16</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>17</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>18</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>19</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>20</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>21</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>23</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>24</string>
            </property>
           </column>
          </widget>
