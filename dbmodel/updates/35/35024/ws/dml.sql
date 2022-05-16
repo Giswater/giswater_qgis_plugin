@@ -186,4 +186,6 @@ UPDATE config_toolbox set functionparams = '[
 ]' WHERE id=2768;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
-VALUES (3144, 'gw_trg_mincut', 'ws', 'trigger function', 'Trigger to fill mincut data', 'role_om','core');
+VALUES (3144, 'gw_trg_mincut', 'ws', 'trigger function', 'Trigger to fill mincut data', 'role_om','core')
+ON CONFLICT (id) DO NOTHING;
+

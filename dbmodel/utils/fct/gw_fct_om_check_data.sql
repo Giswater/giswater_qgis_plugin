@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424
+	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443
 
 */
 
@@ -50,6 +50,7 @@ v_feature_id text;
 v_arc_array text[];
 rec_arc text;
 v_node_1 text;
+v_partialquery text;
 
 BEGIN
 
@@ -79,7 +80,7 @@ BEGIN
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443);
 	DELETE FROM temp_arc;
 
 	-- Starting process
@@ -1204,6 +1205,53 @@ BEGIN
 		VALUES (125, 1, '106','INFO: There are  no nodes duplicated',v_count);
 	END IF;
 
+	RAISE NOTICE '41 - Check orphan nodes with isarcdivide=TRUE (OM)(442)';
+
+	IF v_project_type = 'WS' THEN
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
+	ELSIF v_project_type = 'UD' THEN
+		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
+	END IF;
+
+	v_querytext = 'SELECT  * FROM '||v_edit||'node a '||v_partialquery||' WHERE a.state>0 AND isarcdivide= ''true'' 
+	AND (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 442, node_id, nodecat_id, ''Orphan nodes with isarcdivide=TRUE'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '442', concat('WARNING-442 (anl_node): There is/are ',v_count,' orphan nodes with isarcdivide=TRUE.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '442','INFO: There are no orphan nodes with isarcdivide=TRUE',v_count);
+	END IF;
+
+	RAISE NOTICE '42 - Check orphan nodes with isarcdivide=FALSE (OM)(443)';
+
+	IF v_project_type = 'WS' THEN
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
+	ELSIF v_project_type = 'UD' THEN
+		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
+	END IF;
+
+	v_querytext = 'SELECT  * FROM '||v_edit||'node a '||v_partialquery||' WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 443, node_id, nodecat_id, ''Orphan nodes with isarcdivide=FALSE'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '443', concat('WARNING-443 (anl_node): There is/are ',v_count,' orphan nodes with isarcdivide=FALSE.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '443','INFO: There are no orphan nodes with isarcdivide=FALSE',v_count);
+	END IF;
+
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
@@ -1239,7 +1287,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT node_id as id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"()
-	AND fid IN (106,177,187,202)
+	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291)) row) features;

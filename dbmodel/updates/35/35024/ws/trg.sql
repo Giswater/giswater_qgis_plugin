@@ -12,7 +12,7 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario_rules INSTEAD OF INSERT OR UPDATE OR DE
 ON v_edit_inp_dscenario_rules FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('RULES');
 
 CREATE TRIGGER gw_trg_mincut
-  AFTER UPDATE ON work_order, mincut_class, mincut_type, received_date, expl_id, macroexpl_id, muni_id, postcode, streetaxis_id, postnumber, 
+  AFTER UPDATE OF work_order, mincut_class, mincut_type, received_date, expl_id, macroexpl_id, muni_id, postcode, streetaxis_id, postnumber, 
   anl_cause, anl_tstamp, anl_user, anl_descript, anl_feature_id, anl_feature_type, anl_the_geom, forecast_start, forecast_end, assigned_to   
   ON om_mincut
   FOR EACH ROW

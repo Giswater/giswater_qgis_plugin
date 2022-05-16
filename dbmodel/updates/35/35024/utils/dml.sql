@@ -50,3 +50,22 @@ UPDATE config_report SET active=TRUE;
 
 INSERT INTO config_param_system VALUES ('admin_checkproject', '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":true}', 'Variable to manage customization for admin_checkproject function')
 ON CONFLICT (parameter) DO NOTHING;
+
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(442, 'Node orphan with isarcdivide=TRUE (OM)', 'utils', NULL, 'core', true, 'Check om-topology', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(443, 'Node orphan with isarcdivide=FALSE (OM)', 'utils', NULL, 'core', true, 'Check om-topology', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_fprocess
+SET fprocess_name='Node orphan (EPA)'
+WHERE fid=107;
+
+UPDATE config_toolbox
+SET inputparams=NULL
+WHERE id=2110;

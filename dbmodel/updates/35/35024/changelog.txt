@@ -11,3 +11,5 @@
 - New parameter on config_param_system - epa_shortpipe_vdefault (WS)
 - Bug fix on copy schema function
 - New trigger gw_trg_mincut for updating modification_date on mincut
+- New fprocess for node orphan related to OM and add to fct_om_check_data
+- Enhance fct_anl_node_orphan without input params. Always runs with nodes that divide/doesn't divide arc
