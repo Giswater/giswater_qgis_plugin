@@ -107,6 +107,7 @@ class GwNonVisual:
         # Connect dialog signals
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
+        self.dialog.btn_accept.clicked.connect(self._accept_curves)
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
@@ -123,6 +124,82 @@ class GwNonVisual:
         if curve_type:
             headers = curve_type_headers.get(curve_type)
             table.setHorizontalHeaderLabels(headers)
+
+
+    def _accept_curves(self):
+        # Variables
+        txt_id = self.dialog.txt_curve_id
+        txt_descript = self.dialog.txt_descript
+        cmb_expl_id = self.dialog.cmb_expl_id
+        cmb_curve_type = self.dialog.cmb_curve_type
+        txt_log = self.dialog.txt_log
+        tbl_curve_value = self.dialog.tbl_curve_value
+
+        # Get widget values
+        curve_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
+        curve_type = tools_qt.get_combo_value(self.dialog, cmb_curve_type)
+        descript = tools_qt.get_text(self.dialog, txt_descript, add_quote=True)
+        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
+        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+
+        # Check that there are no empty fields
+        if not curve_id or curve_id == 'null':
+            tools_qt.set_stylesheet(txt_id)
+            return
+        tools_qt.set_stylesheet(txt_id, style="")
+
+        # Insert inp_curve
+        sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id, log)" \
+              f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id}, {log})"
+        result = tools_db.execute_sql(sql, commit=False)
+        if not result:
+            msg = "There was an error inserting curve."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        # Insert inp_pattern_value
+        values = list()
+        for y in range(0, tbl_curve_value.rowCount()):
+            values.append(list())
+            for x in range(0, tbl_curve_value.columnCount()):
+                value = "null"
+                item = tbl_curve_value.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        is_empty = True
+        for row in values:
+            if row == (['null'] * tbl_curve_value.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        for row in values:
+            if row == (['null'] * tbl_curve_value.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
+                  f"VALUES ({curve_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting curve value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+
+        # Commit and close dialog
+        global_vars.dao.commit()
+        tools_gw.close_dialog(self.dialog)
 
 
     def get_patterns(self):
