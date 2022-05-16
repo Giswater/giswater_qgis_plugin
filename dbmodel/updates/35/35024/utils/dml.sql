@@ -50,6 +50,3 @@ UPDATE config_report SET active=TRUE;
 
 INSERT INTO config_param_system VALUES ('admin_checkproject', '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":true}', 'Variable to manage customization for admin_checkproject function')
 ON CONFLICT (parameter) DO NOTHING;
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
-VALUES (3132, 'gw_trg_mincut', 'ws', 'trigger function', 'Trigger to fill mincut data', 'role_om','core');
