@@ -10,3 +10,4 @@
 - New parameter on config_param_system - edit_mapzones_set_lastupdate (WS)
 - New parameter on config_param_system - epa_shortpipe_vdefault (WS)
 - Bug fix on copy schema function
+- New trigger gw_trg_mincut for updating modification_date on mincut
