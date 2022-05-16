@@ -76,3 +76,7 @@ CREATE INDEX IF NOT EXISTS plan_psector_x_connec_psector_id ON plan_psector_x_co
 
 CREATE INDEX IF NOT EXISTS plan_psector_x_connec_arc_id ON plan_psector_x_connec
   USING btree (arc_id);
+  
+ALTER TABLE cat_feature_node ALTER COLUMN isprofilesurface SET DEFAULT true;
+ALTER TABLE cat_feature_node ALTER COLUMN choose_hemisphere SET DEFAULT false;
+ALTER TABLE cat_feature ALTER COLUMN code_autofill SET DEFAULT true;

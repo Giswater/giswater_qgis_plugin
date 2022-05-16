@@ -19,3 +19,5 @@ CREATE INDEX IF NOT EXISTS plan_psector_x_gully_state ON plan_psector_x_gully
 
 CREATE INDEX IF NOT EXISTS plan_psector_x_gully_gully_id ON plan_psector_x_gully
   USING btree (gully_id);
+
+ALTER TABLE cat_feature_node ALTER COLUMN isexitupperintro DROP DEFAULT;
