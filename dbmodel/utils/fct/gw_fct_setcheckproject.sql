@@ -244,6 +244,8 @@ BEGIN
 			INSERT INTO config_param_user 
 			SELECT 'inp_options_hydrology_scenario', hydrology_id, current_user FROM cat_hydrology LIMIT 1
 			ON CONFLICT (parameter, cur_user) DO NOTHING;
+			UPDATE config_param_user SET value = hydrology_id FROM (SELECT hydrology_id FROM cat_hydrology LIMIT 1) a
+			WHERE parameter =  'inp_options_hydrology_scenario' and value is null;
 		END IF;
 	END IF;
    
