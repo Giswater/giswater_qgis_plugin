@@ -227,10 +227,10 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
 
         # Get widget values
-        pattern_id = tools_qt.get_text(self.dialog, txt_id)
-        observ = tools_qt.get_text(self.dialog, txt_observ)
+        pattern_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
+        observ = tools_qt.get_text(self.dialog, txt_observ, add_quote=True)
         expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
-        log = tools_qt.get_text(self.dialog, txt_log)
+        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
 
         # Check that there are no empty fields
         if not pattern_id or pattern_id == 'null':
@@ -240,7 +240,7 @@ class GwNonVisual:
 
         # Insert inp_pattern
         sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id, log)" \
-              f"VALUES('{pattern_id}', '{observ}', {expl_id}, '{log}')"
+              f"VALUES({pattern_id}, {observ}, {expl_id}, {log})"
         result = tools_db.execute_sql(sql, commit=False)
         if not result:
             msg = "There was an error inserting pattern."
@@ -276,7 +276,7 @@ class GwNonVisual:
                 continue
 
             sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12) " \
-                  f"VALUES ('{pattern_id}', "
+                  f"VALUES ({pattern_id}, "
             for x in row:
                 sql += f"{x}, "
             sql = sql.rstrip(', ') + ")"
