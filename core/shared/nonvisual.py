@@ -107,6 +107,7 @@ class GwNonVisual:
         # Connect dialog signals
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, tbl_curve_value))
         self.dialog.btn_accept.clicked.connect(self._accept_curves)
         self._connect_dialog_signals()
 
@@ -124,6 +125,48 @@ class GwNonVisual:
         if curve_type:
             headers = curve_type_headers.get(curve_type)
             table.setHorizontalHeaderLabels(headers)
+
+
+    def _manage_curve_value(self, table, row, column):
+        # Control data depending on curve type
+        valid = True
+        if column == 0:
+            # If not first row, check if previous row has a smaller value than current row
+            if row - 1 >= 0:
+                cur_cell = table.item(row, column)
+                prev_cell = table.item(row-1, column)
+                if None not in (cur_cell, prev_cell):
+                    if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
+                        cur_value = float(cur_cell.data(0))
+                        prev_value = float(prev_cell.data(0))
+                        if cur_value < prev_value:
+                            valid = False
+
+            # If first check is valid, check all rows for column for final validation
+            if valid:
+                # Create list with column values
+                values = []
+                for n in range(0, table.rowCount()):
+                    item = table.item(n, column)
+                    if item is not None:
+                        if item.data(0) not in (None, ''):
+                            values.append(float(item.data(0)))
+                            continue
+                    values.append(None)
+
+                # Iterate through values
+                for i, n in enumerate(values):
+                    if i == 0 or n is None:
+                        continue
+                    if n > values[i-1]:
+                        continue
+                    valid = False
+                    break
+        self._set_curve_values_valid(valid)
+
+
+    def _set_curve_values_valid(self, valid):
+        self.dialog.btn_accept.setEnabled(valid)
 
 
     def _accept_curves(self):
