@@ -1924,6 +1924,10 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
+        # Force a map refresh
+        tools_qgis.refresh_map_canvas()  # First refresh all the layers
+        global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+
         if close_dlg:
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
