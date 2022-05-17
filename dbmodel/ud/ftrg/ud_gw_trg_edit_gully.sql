@@ -448,7 +448,14 @@ BEGIN
  
 				-- get grate dimensions
 				v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
-				v_length = v_length*v_unitsfactor;
+                
+                --multiply length x units if is not null
+				IF NEW.units IS NOT NULL THEN
+					v_length = v_length*v_unitsfactor*NEW.units;
+				ELSE
+					v_length = v_length*v_unitsfactor;
+				END IF;
+                
 				v_width = v_width*v_unitsfactor;
 
 				-- calculate center coordinates
@@ -665,7 +672,7 @@ BEGIN
 
 
 		-- calculate rotation
-		IF v_doublegeometry AND (ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE) OR (NEW.gratecat_id != OLD.gratecat_id) THEN
+		IF v_doublegeometry AND (ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE) OR (NEW.gratecat_id != OLD.gratecat_id) OR (NEW.units <> OLD.units) THEN
 			WITH index_query AS(
 			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
 			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
@@ -681,7 +688,7 @@ BEGIN
 		END IF;
 
 		-- double geometry catalog update
-		IF v_doublegeometry AND NEW.gratecat_id != OLD.gratecat_id THEN
+		IF v_doublegeometry AND (NEW.gratecat_id != OLD.gratecat_id) OR (NEW.units <> OLD.units) THEN
 
 			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id);
 			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id);
@@ -695,7 +702,14 @@ BEGIN
 
 					-- get grate dimensions
 					v_unitsfactor = 0.01*v_unitsfactor; -- using 0.01 to convert from cms of catalog  to meters of the map
-					v_length = v_length*v_unitsfactor;
+                    
+                    --multiply length x units if is not null
+                    IF NEW.units IS NOT NULL THEN
+                        v_length = v_length*v_unitsfactor*NEW.units;
+                    ELSE
+                        v_length = v_length*v_unitsfactor;
+                    END IF;
+                    
 					v_width = v_width*v_unitsfactor;
 
 
