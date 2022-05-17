@@ -75,6 +75,7 @@ SELECT
 exploitation,
 dma,
 period,
+total,
 auth_bill::numeric(12,2) as rw,
 (total - auth_bill)::numeric(12,2) as nrw,
 case when total > 0 then (100*auth_bill/total)::numeric(12,2) else 0::numeric(12,2) end as eff
@@ -86,6 +87,7 @@ SELECT
 exploitation,
 dma,
 period,
+total,
 (auth_bill + auth_unbill)::numeric(12,2) as auth,
 (total - auth_bill - auth_unbill)::numeric(12,2) as loss,
 case when total > 0 then (100*(auth_bill+auth_unbill)/total)::numeric(12,2) else 0::numeric(12,2) end as eff
