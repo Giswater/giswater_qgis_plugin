@@ -141,27 +141,51 @@ class GwNonVisual:
                         prev_value = float(prev_cell.data(0))
                         if cur_value < prev_value:
                             valid = False
+        # Check column 1 if curve_type == PUMP
 
-            # If first check is valid, check all rows for column for final validation
-            if valid:
-                # Create list with column values
-                values = []
-                for n in range(0, table.rowCount()):
-                    item = table.item(n, column)
-                    if item is not None:
-                        if item.data(0) not in (None, ''):
-                            values.append(float(item.data(0)))
-                            continue
-                    values.append(None)
+        # If first check is valid, check all rows for column for final validation
+        if valid:
+            # Create list with column values
+            x_values = []
+            y_values = []
+            for n in range(0, table.rowCount()):
+                x_item = table.item(n, 0)
+                if x_item is not None:
+                    if x_item.data(0) not in (None, ''):
+                        x_values.append(float(x_item.data(0)))
+                    else:
+                        x_values.append(None)
+                else:
+                    x_values.append(None)
 
-                # Iterate through values
-                for i, n in enumerate(values):
+                y_item = table.item(n, 1)
+                if y_item is not None:
+                    if y_item.data(0) not in (None, ''):
+                        y_values.append(float(y_item.data(0)))
+                    else:
+                        y_values.append(None)
+                else:
+                    y_values.append(None)
+
+
+            # Iterate through values
+            for i, n in enumerate(x_values):
+                if i == 0 or n is None:
+                    continue
+                if n > x_values[i-1]:
+                    continue
+                valid = False
+                break
+            curve_type = tools_qt.get_text(self.dialog, 'cmb_curve_type')
+            if curve_type == 'PUMP':
+                for i, n in enumerate(y_values):
                     if i == 0 or n is None:
                         continue
-                    if n > values[i-1]:
+                    if n < y_values[i - 1]:
                         continue
                     valid = False
                     break
+
         self._set_curve_values_valid(valid)
 
 
