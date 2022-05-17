@@ -619,7 +619,7 @@ UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
 UPDATE inp_junction SET pattern_id = 'PTN-JUNCTION';
 
 INSERT INTO connec VALUES ('114464','114464',45.7800,null,'PVC50-PN16-GRE',3,'114464',1,2,'2072',null,null,null,null,2,'3','soil1',null,null,'St. Fluid',null,'work1',null,null,'2021-12-31',null,'owner1',1,null,null,null,null,null,null,null,null,null,'VERIFIED',null,'0101000020E76400000B01F0AD8F931941257A500266755141',null,null,null,null,TRUE,TRUE,1,null,'CONNEC','2021-12-31 19:15:57.626916','CONNEC','114464','2021-12-31 20:53:41.174039','postgres','postgres',2047,null,null,1,null,null,null,null,null,'JUNCTION');
-INSERT INTO man_wjoin VALUES ('114464');
+INSERT INTO man_greentap VALUES ('114464');
 INSERT INTO inp_connec VALUES ('114464',0.5,'PTN-CONNEC');
 
 UPDATE inp_dscenario_demand SET feature_type  ='NODE', pattern_id = 'PTN-HYDRANT', demand_type = 3 , source = concat('NODE ', feature_id);
