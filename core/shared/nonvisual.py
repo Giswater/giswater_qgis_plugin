@@ -402,10 +402,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
-        sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_sector_id, rows, index_to_show=1)
+        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
 
         # Connect dialog signals
         self.dialog.btn_accept.clicked.connect(self._accept_controls)
@@ -456,11 +453,48 @@ class GwNonVisual:
         self.dialog = GwNonVisualRulesUi()
         tools_gw.load_settings(self.dialog)
 
+        # Populate sector id combobox
+        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
+
         # Connect dialog signals
+        self.dialog.btn_accept.clicked.connect(self._accept_rules)
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
+
+
+    def _accept_rules(self):
+
+        # Variables
+        cmb_sector_id = self.dialog.cmb_sector_id
+        chk_active = self.dialog.chk_active
+        txt_text = self.dialog.txt_text
+
+        # Get widget values
+        sector_id = tools_qt.get_combo_value(self.dialog, cmb_sector_id)
+        active = tools_qt.is_checked(self.dialog, chk_active)
+        text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
+
+        # Check that there are no empty fields
+        if not text or text == 'null':
+            tools_qt.set_stylesheet(txt_text)
+            return
+        tools_qt.set_stylesheet(txt_text, style="")
+
+        # Insert inp_controls
+        sql = f"INSERT INTO inp_rules (sector_id,text,active)" \
+              f"VALUES({sector_id}, {text}, {active})"
+        result = tools_db.execute_sql(sql, commit=False)
+        if not result:
+            msg = "There was an error inserting control."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        # Commit and close dialog
+        global_vars.dao.commit()
+        tools_gw.close_dialog(self.dialog)
 
 
     def get_timeseries(self):
@@ -500,3 +534,10 @@ class GwNonVisual:
                     if item.data(0) not in (None, ''):
                         return
             table.setRowCount(table.rowCount()-1)
+
+
+    def _populate_cmb_sector_id(self, combobox):
+        sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
