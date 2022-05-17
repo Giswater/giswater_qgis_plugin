@@ -418,6 +418,14 @@ class GwInfo(QObject):
         self.dlg_cf = GwInfoFeatureUi(sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
+        # Get widget controls
+        self._get_widget_controls(new_feature)
+
+        self._get_features(complet_result)
+        if self.layer is None:
+            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
+            return False, self.dlg_cf
+
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
         # But if it has not been received, it is drawn
         # Using variable exist_rb for check if alredy exist rubberband
@@ -426,14 +434,6 @@ class GwInfo(QObject):
             exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
-
-        # Get widget controls
-        self._get_widget_controls(new_feature)
-
-        self._get_features(complet_result)
-        if self.layer is None:
-            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
-            return False, self.dlg_cf
 
         # Remove unused tabs
         tabs_to_show = []
