@@ -60,7 +60,7 @@ class GwNonVisual:
         """  """
         pass
 
-
+    # region curves
     def get_curves(self):
         """  """
 
@@ -141,7 +141,7 @@ class GwNonVisual:
                         prev_value = float(prev_cell.data(0))
                         if cur_value < prev_value:
                             valid = False
-        # Check column 1 if curve_type == PUMP
+        # TODO: Check column 1 if curve_type == PUMP
 
         # If first check is valid, check all rows for column for final validation
         if valid:
@@ -267,8 +267,9 @@ class GwNonVisual:
         # Commit and close dialog
         global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
+    # endregion
 
-
+    # region patterns
     def get_patterns(self):
         """ """
 
@@ -292,55 +293,6 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_pattern_{global_vars.project_type}')
-
-
-    def get_controls(self):
-        """  """
-
-        # Get dialog
-        self.dialog = GwNonVisualControlsUi()
-        tools_gw.load_settings(self.dialog)
-
-        # Connect dialog signals
-        self._connect_dialog_signals()
-
-        # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
-
-
-    def get_rules(self):
-        """  """
-
-        # Get dialog
-        self.dialog = GwNonVisualRulesUi()
-        tools_gw.load_settings(self.dialog)
-
-        # Connect dialog signals
-        self._connect_dialog_signals()
-
-        # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
-
-
-    def get_timeseries(self):
-        """  """
-
-        # Get dialog
-        self.dialog = GwNonVisualTimeseriesUi()
-        tools_gw.load_settings(self.dialog)
-
-        # Connect dialog signals
-        self._connect_dialog_signals()
-
-        # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
-
-
-    def _connect_dialog_signals(self):
-
-        # self.dialog.btn_accept.clicked.connect(self.dialog.accept)
-        self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
-        self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
 
     def _manage_ws_patterns_dlg(self):
@@ -438,6 +390,98 @@ class GwNonVisual:
 
     def _manage_ud_patterns_dlg(self):
         pass
+
+    # endregion
+
+    # region controls
+    def get_controls(self):
+        """  """
+
+        # Get dialog
+        self.dialog = GwNonVisualControlsUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Populate sector id combobox
+        sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.dialog.cmb_sector_id, rows, index_to_show=1)
+
+        # Connect dialog signals
+        self.dialog.btn_accept.clicked.connect(self._accept_controls)
+        self._connect_dialog_signals()
+
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
+
+
+    def _accept_controls(self):
+
+        # Variables
+        cmb_sector_id = self.dialog.cmb_sector_id
+        chk_active = self.dialog.chk_active
+        txt_text = self.dialog.txt_text
+
+        # Get widget values
+        sector_id = tools_qt.get_combo_value(self.dialog, cmb_sector_id)
+        active = tools_qt.is_checked(self.dialog, chk_active)
+        text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
+
+        # Check that there are no empty fields
+        if not text or text == 'null':
+            tools_qt.set_stylesheet(txt_text)
+            return
+        tools_qt.set_stylesheet(txt_text, style="")
+
+        # Insert inp_controls
+        sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
+              f"VALUES({sector_id}, {text}, {active})"
+        result = tools_db.execute_sql(sql, commit=False)
+        if not result:
+            msg = "There was an error inserting control."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        # Commit and close dialog
+        global_vars.dao.commit()
+        tools_gw.close_dialog(self.dialog)
+
+    # endregion
+
+    def get_rules(self):
+        """  """
+
+        # Get dialog
+        self.dialog = GwNonVisualRulesUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Connect dialog signals
+        self._connect_dialog_signals()
+
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
+
+
+    def get_timeseries(self):
+        """  """
+
+        # Get dialog
+        self.dialog = GwNonVisualTimeseriesUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Connect dialog signals
+        self._connect_dialog_signals()
+
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
+
+
+    def _connect_dialog_signals(self):
+
+        # self.dialog.btn_accept.clicked.connect(self.dialog.accept)
+        self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
+        self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
 
     def _onCellChanged(self, table, row, column):
