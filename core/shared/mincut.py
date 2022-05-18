@@ -60,6 +60,12 @@ class GwMincut:
         self.emit_point = None
         self.vertex_marker = None
 
+        # Other variables
+        self.col1 = "customer_code"
+        self.col2 = "hydrometer_customer_code"
+        self.lbl1 = "Connec customer code:"
+        self.lbl2 = "Hydrometer customer code:"
+
 
     def manage_mincuts(self, dialog):
         """ Button 27: Mincut management """
@@ -1205,10 +1211,6 @@ class GwMincut:
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Get hydrometer filter columns
-        self.col1 = "customer_code"
-        self.col2 = "hydrometer_customer_code"
-        self.lbl1 = "Connec customer code:"
-        self.lbl2 = "Hydrometer customer code:"
         row = tools_gw.get_config_value('om_mincut_hydrometer_filter', table='config_param_system')
         if row:
             values = json.loads(row[0])

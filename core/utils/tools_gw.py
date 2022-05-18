@@ -47,15 +47,15 @@ from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
-def load_settings(dialog):
+def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
 
     # Get user UI config file
     try:
-        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session")
-        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session")
-        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session")
-        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session", plugin=plugin)
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session", plugin=plugin)
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session", plugin=plugin)
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session", plugin=plugin)
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -74,16 +74,16 @@ def load_settings(dialog):
         pass
 
 
-def save_settings(dialog):
+def save_settings(dialog, plugin='core'):
     """ Save user UI related with dialog position and size """
 
     try:
         x, y = dialog.geometry().x(), dialog.geometry().y()
         w, h = dialog.geometry().width(), dialog.geometry().height()
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}", plugin=plugin)
     except Exception:
         pass
 
@@ -98,7 +98,7 @@ def initialize_parsers():
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
-                      chk_user_params=True, get_none=False, force_reload=False) -> str:
+                      chk_user_params=True, get_none=False, force_reload=False, plugin='core') -> str:
     """ Load a simple parser value """
 
     if config_type not in ("user", "project"):
@@ -109,6 +109,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
 
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        parser = None
+        chk_user_params = False
+
     # Needed to avoid errors with giswater plugins
     if path is None:
         tools_log.log_warning(f"get_config_parser: Config file is not set")
@@ -117,7 +122,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     raw_parameter = parameter
     if parser is None:
-        tools_log.log_info(f"Creating parser for file: {path}")
+        if plugin == 'core':
+            tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
@@ -151,7 +157,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
-                      comment=None, prefix=True, chk_user_params=True):
+                      comment=None, prefix=True, chk_user_params=True, plugin='core'):
     """ Save simple parser value """
 
     if config_type not in ("user", "project"):
@@ -160,6 +166,10 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
+
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        chk_user_params = False
 
     try:
 
@@ -255,10 +265,10 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg, delete_dlg=True):
+def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
-    save_settings(dlg)
+    save_settings(dlg, plugin=plugin)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
     if delete_dlg:
@@ -521,6 +531,10 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    try:
+        uri.setSrid(f"{global_vars.data_epsg}")
+    except:
+        pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
 
@@ -3097,6 +3111,50 @@ def create_sqlite_conn(file_name):
     return status, cursor
 
 
+def manage_user_config_folder(user_folder_dir):
+    """ Check if user config folder exists. If not create empty files init.config and session.config """
+
+    try:
+        config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+        if not os.path.exists(config_folder):
+            tools_log.log_info(f"Creating user config folder: {config_folder}")
+            os.makedirs(config_folder)
+
+        # Check if config files exists. If not create them empty
+        filepath = f"{config_folder}{os.sep}init.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+        filepath = f"{config_folder}{os.sep}session.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+
+    except Exception as e:
+        tools_log.log_warning(f"manage_user_config_folder: {e}")
+
+
+def check_old_userconfig(user_folder_dir):
+    """ Function to transfer user configuration from version 3.5.023 or older to new `.../core/` folder """
+
+    # Move all files in old config folder to new core config folder
+    old_folder_path = f"{user_folder_dir}{os.sep}config"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            old = f"{old_folder_path}{os.sep}{file}"
+            new = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}"
+            if os.path.exists(new):
+                os.remove(new)
+            os.rename(old, new)
+        os.removedirs(old_folder_path)
+
+    # Remove old log folder
+    old_folder_path = f"{user_folder_dir}{os.sep}log"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            path = f"{old_folder_path}{os.sep}{file}"
+            os.remove(path)
+        os.removedirs(old_folder_path)
+
+
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
@@ -3167,7 +3225,7 @@ def remove_deprecated_config_vars():
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
     # Remove deprecated sections for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3186,7 +3244,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated sections for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3205,7 +3263,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3229,7 +3287,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3410,7 +3468,7 @@ def _get_parser_from_filename(filename):
     """ Get parser of file @filename.config """
 
     if filename in ('init', 'session'):
-        folder = global_vars.user_folder_dir
+        folder = f"{global_vars.user_folder_dir}{os.sep}core"
     elif filename in ('dev', 'giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:

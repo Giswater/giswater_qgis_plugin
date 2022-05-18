@@ -188,9 +188,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir=None):
     """ Get @parameter from metadata.txt file """
 
+    if not plugin_dir:
+        plugin_dir = os.path.dirname(__file__)
+        plugin_dir = plugin_dir.rstrip(f'{os.sep}lib')
     # Check if metadata file exists
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
@@ -231,7 +234,7 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(plugin_dir, default_version='3.5'):
+def get_major_version(plugin_dir=None, default_version='3.5'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
@@ -279,6 +282,22 @@ def get_project_layers():
     layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
 
     return layers
+
+
+def find_toc_group(root, group, case_sensitive=False):
+    """ Find a group of layers in the ToC """
+
+    for grp in root.findGroups(True):
+        group1 = grp.name()
+        group2 = group
+        if not case_sensitive:
+            group1 = group1.lower()
+            group2 = group2.lower()
+
+        if group1 == group2:
+            return grp
+
+    return None
 
 
 def get_layer_source(layer):
@@ -855,7 +874,7 @@ def set_margin(layer, margin):
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
 
-    config_folder = f'{global_vars.user_folder_dir}{os.sep}temp'
+    config_folder = f'{global_vars.user_folder_dir}{os.sep}core{os.sep}temp'
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
     path_temp_file = f"{config_folder}{os.sep}temporal_layer.qml"

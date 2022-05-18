@@ -180,14 +180,15 @@ class GwAdminButton:
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.show_question(msg, "Info Message")
+                result = tools_qt.show_question(msg, "Info Message", force_action=True)
                 if result:
                     self.project_epsg = '25831'
+                    project_srid = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
                     self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
-                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
-                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
+                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
+                    tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
                     return
 

@@ -25,6 +25,7 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
+from ..toolbars.edit.arc_fusion_button import GwArcFusionButton
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
@@ -107,6 +108,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "17", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112", sub_folder="24x24")
@@ -322,31 +324,28 @@ class GwPsector:
                 row = tools_db.get_row(sql)
                 if row[0]:
                     list_coord = re.search('\(\((.*)\)\)', str(row[0]))
-                else:
-                    msg = "Empty coordinate list"
-                    tools_qgis.show_warning(msg)
-                    return
 
-            # Get canvas extend in order to create a QgsRectangle
-            ext = self.canvas.extent()
-            start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-            end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-            canvas_rec = QgsRectangle(start_point, end_point)
-            canvas_width = ext.xMaximum() - ext.xMinimum()
-            canvas_height = ext.yMaximum() - ext.yMinimum()
+            if list_coord:
+                # Get canvas extend in order to create a QgsRectangle
+                ext = self.canvas.extent()
+                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
+                canvas_rec = QgsRectangle(start_point, end_point)
+                canvas_width = ext.xMaximum() - ext.xMinimum()
+                canvas_height = ext.yMaximum() - ext.yMinimum()
 
-            points = tools_qgis.get_geometry_vertex(list_coord)
-            polygon = QgsGeometry.fromPolygonXY([points])
-            psector_rec = polygon.boundingBox()
-            tools_gw.reset_rubberband(self.rubber_band)
-            rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
-            if rb_duration == "0": rb_duration = None
-            tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
+                points = tools_qgis.get_geometry_vertex(list_coord)
+                polygon = QgsGeometry.fromPolygonXY([points])
+                psector_rec = polygon.boundingBox()
+                tools_gw.reset_rubberband(self.rubber_band)
+                rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
+                if rb_duration == "0": rb_duration = None
+                tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
 
-            # Manage Zoom to rectangle
-            if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
-                max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-                tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+                # Manage Zoom to rectangle
+                if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
+                    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+                    tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
@@ -364,6 +363,8 @@ class GwPsector:
             # Set check active True as default for new pesectors
             tools_qt.set_checked(self.dlg_plan_psector, "active", True)
 
+        if self.dlg_plan_psector.tab_feature.currentIndex() != 1:
+            self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
         if self.dlg_plan_psector.tab_feature.currentIndex() not in (2, 3):
             self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
@@ -404,6 +405,8 @@ class GwPsector:
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
+        self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
+            partial(self._arc_fusion))
         self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
             partial(self._set_to_arc))
 
@@ -414,9 +417,7 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(self._enable_arc_replace))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(self._enable_set_to_arc))
+            partial(self._manage_tab_feature_buttons))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -1618,6 +1619,8 @@ class GwPsector:
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
@@ -1847,6 +1850,8 @@ class GwPsector:
                 elif type(widget) == QComboBox:
                     widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QCheckBox:
+                    if widget.objectName() == 'chk_enable_all':
+                        continue
                     widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QTextEdit:
                     widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
@@ -1897,6 +1902,22 @@ class GwPsector:
             self._check_layers_visible('v_plan_psector_node', 'the_geom', 'node_id')
             if self.project_type == 'ud':
                 self._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
+
+
+    def _refresh_tables_relations(self):
+        # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
+        if self.project_type.upper() == 'UD':
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc',
+                                       isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec',
+                                       isQStandardItemModel=True)
+        if self.project_type.upper() == 'UD':
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully',
+                                           isQStandardItemModel=True)
 
 
     def _check_layers_visible(self, layer_name, the_geom, field_id):
@@ -2127,16 +2148,7 @@ class GwPsector:
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
-        if self.project_type.upper() == 'UD':
-            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc', isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec', isQStandardItemModel=True)
-        if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully', isQStandardItemModel=True)
+        self._refresh_tables_relations()
 
         message = json_result['message']['text']
         if message is not None:
@@ -2149,26 +2161,108 @@ class GwPsector:
             tools_gw.reset_rubberband(self.rubber_band)
 
 
-    def _enable_arc_replace(self):
+    def _arc_fusion(self):
 
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'replace_arc_ep_canvasClicked_open_arc_replace_form')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+
+        # Vertex marker
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Set signals
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node, 'psector',
+                                'arc_fusion_xyCoordinates_mouse_move_node')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._perform_arc_fusion, 'psector',
+                                'arc_fusion_ep_canvasClicked_open_arc_fusion_form')
+
+
+    def _perform_arc_fusion(self, point):
+
+        # Snap point
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            # Check feature
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                self.node_id = snapped_feat.attribute('node_id')
+                self.node_state = snapped_feat.attribute('state')
+
+                # Manage current psector
+                sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
+                       " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+                       " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+                row = tools_db.get_row(sql)
+                current_psector = row[0]
+                selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+
+                if str(current_psector) != str(selected_psector):
+                    message = "This psector does not match the current one. Value of current psector will be updated."
+                    tools_qt.show_info_box(message)
+
+                    sql = (f"UPDATE config_param_user "
+                           f"SET value = '{selected_psector}' "
+                           f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+                    tools_db.execute_sql(sql)
+
+                # Execute setarcfusion
+                workcat_id = tools_qt.get_combo_value(self.dlg_plan_psector, self.workcat_id)
+                feature_id = f'"id":["{self.node_id}"]'
+                extras = f'"enddate":null'
+                if workcat_id not in (None, 'null', ''):
+                    extras += f', "workcatId":"{workcat_id}"'
+                extras += f', "psectorId": "{selected_psector}"'
+                extras += f', "action_mode": 1'
+                extras += f', "state_type": null'
+                body = tools_gw.create_body(feature=feature_id, extras=extras)
+                # Execute SQL function and show result to the user
+                result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
+                if not result or result['status'] == 'Failed':
+                    return
+
+                # Refresh map canvas
+                tools_qgis.refresh_map_canvas()
+                # Refresh tables
+                self._refresh_tables_relations()
+
+
+    def _manage_tab_feature_buttons(self):
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
 
+        # Disable all by default
         self.dlg_plan_psector.btn_select_arc.setEnabled(False)
+        self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
         if tab_idx == 0:
+            # Enable btn select_arc
             self.dlg_plan_psector.btn_select_arc.setEnabled(True)
 
+        if tab_idx == 1:
+            # Enable btn arc_fusion
+            self.dlg_plan_psector.btn_arc_fusion.setEnabled(True)
 
-    def _enable_set_to_arc(self):
-
-        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
-
-        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+        # Tabs connec/gully
         if self.qtbl_connec.selectionModel() is None:
             return
         if tab_idx == 2 and self.qtbl_connec.selectionModel().selectedRows():
-            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+            self._enable_set_to_arc()
         elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
-            self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
+            self._enable_set_to_arc()
+
+
+    def _enable_set_to_arc(self):
+        self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
 
 
     def _mouse_move_arc(self, point):
@@ -2178,6 +2272,22 @@ class GwPsector:
 
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
+
+        # Get clicked point and add marker
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def _mouse_move_node(self, point):
+
+        if not self.layer_node:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(self.layer_node)
 
         # Get clicked point and add marker
         self.vertex_marker.hide()

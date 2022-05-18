@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
+    <width>1003</width>
     <height>786</height>
    </rect>
   </property>
@@ -61,7 +61,20 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="5" column="8">
+      <item row="5" column="6">
+       <widget class="QPushButton" name="btn_current">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Set current</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="10">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -107,23 +120,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="9">
-       <widget class="QTableView" name="tbl_wrkspcm">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_update">
+        <property name="text">
+         <string>Update</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
-       <widget class="QPushButton" name="btn_current">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="7" column="10">
+       <widget class="QPushButton" name="btn_cancel">
         <property name="text">
-         <string>Current workspace</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -140,7 +147,7 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="7">
+      <item row="5" column="8">
        <widget class="QPushButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -149,14 +156,14 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Create workspace</string>
+         <string>Create</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="8">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
+      <item row="6" column="0" colspan="11">
+       <widget class="QTableView" name="tbl_wrkspcm">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
        </widget>
       </item>
@@ -173,8 +180,8 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_toggle_visibility">
+      <item row="5" column="7">
+       <widget class="QPushButton" name="btn_toggle_privacy">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -182,7 +189,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Toggle visibility</string>
+         <string>Toggle privacy</string>
         </property>
        </widget>
       </item>

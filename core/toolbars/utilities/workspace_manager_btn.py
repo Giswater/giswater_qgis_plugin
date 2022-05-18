@@ -60,9 +60,8 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.txt_name.textChanged.connect(partial(self._fill_tbl))
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
-        self.dlg_workspace_manager.btn_toggle_visibility.clicked.connect(partial(self._toggle_visibility_workspace))
-        # btn_reset disabled for now. Must add the button to the ui before uncommenting this next line
-        # self.dlg_workspace_manager.btn_reset.clicked.connect(partial(self._reset_workspace))
+        self.dlg_workspace_manager.btn_toggle_privacy.clicked.connect(partial(self._toggle_privacy_workspace))
+        self.dlg_workspace_manager.btn_update.clicked.connect(partial(self._update_workspace))
         selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_info))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
@@ -209,7 +208,7 @@ class GwWorkspaceManagerButton(GwAction):
             tools_gw.refresh_selectors()
 
 
-    def _toggle_visibility_workspace(self):
+    def _toggle_privacy_workspace(self):
         """ Set the selected workspace as public/private """
 
         action = "TOGGLE"
@@ -236,20 +235,34 @@ class GwWorkspaceManagerButton(GwAction):
             self._fill_tbl(self.filter_name.text())
 
 
-    def _reset_workspace(self):
+    def _update_workspace(self):
         """ Reset the values of the selected workspace """
 
-        action = "RESET"
+        action = "UPDATE"
 
-        extras = f'"action":"{action}"'
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        # Get selected row
+        selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
 
-        if result and result['status'] == "Accepted":
-            if 'message' in result and result['message']:
-                message = result['message']
-                tools_qgis.show_message(message['text'], message['level'])
-            self._fill_tbl(self.filter_name.text())
+        # Get selected workspace id
+        index = self.tbl_wrkspcm.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        message = "Are you sure you want to override the configuration of this workspace?"
+        answer = tools_qt.show_question(message, "Update configuration", index.sibling(index.row(), 1).data())
+        if answer:
+            extras = f'"action":"{action}", "id": "{value}"'
+            body = tools_gw.create_body(extras=extras)
+            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+
+            if result and result['status'] == "Accepted":
+                if 'message' in result and result['message']:
+                    message = result['message']
+                    tools_qgis.show_message(message['text'], message['level'])
+                self._fill_tbl(self.filter_name.text())
 
 
     def _delete_workspace(self):
@@ -269,6 +282,12 @@ class GwWorkspaceManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         message = "Are you sure you want to delete these records?"
+        sql = f"SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user"
+        row = tools_db.get_row(sql)
+        if row and row[0]:
+            if row[0] == f'{value}':
+                message = f"WARNING: This will remove the 'utils_workspace_vdefault' variable for your user!\n{message}"
+
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'

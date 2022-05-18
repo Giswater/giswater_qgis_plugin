@@ -421,6 +421,8 @@ class GwProfileButton(GwAction):
                         level = int(result['message']['level'])
                         tools_qgis.show_message(result['message']['text'], level)
                         if result['message']['level'] != 3:
+                            # If error reset profile
+                            self._clear_profile()
                             return
 
                     self._remove_selection()
@@ -500,7 +502,7 @@ class GwProfileButton(GwAction):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        temp_folder = f"{global_vars.user_folder_dir}{os.sep}temp"
+        temp_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}temp"
         img_path = f"{temp_folder}{os.sep}profile.png"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)

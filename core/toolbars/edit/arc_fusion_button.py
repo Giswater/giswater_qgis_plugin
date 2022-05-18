@@ -72,7 +72,9 @@ class GwArcFusionButton(GwMaptool):
         feature_id = f'"id":["{self.node_id}"]'
         extras = f'"enddate":"{enddate_str}"'
         if workcat_id_end not in (None, 'null', ''):
-            extras += f', "workcat_id_end":"{workcat_id_end}"'
+            extras += f', "workcatId":"{workcat_id_end}"'
+        if self.psector_id:
+            extras += f', "psectorId": "{self.psector_id}"'
         if action_mode is not None:
             extras += f', "action_mode": {action_mode}'
             if action_mode == 1 and state_type is not None:
@@ -117,6 +119,7 @@ class GwArcFusionButton(GwMaptool):
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
             self.node_state = snapped_feat.attribute('state')
+            self.psector_id = None
 
             # If the node has state 0 (obsolete) don't open arc fusion dlg
             if self.node_state is not None and self.node_state == 0:
@@ -124,54 +127,62 @@ class GwArcFusionButton(GwMaptool):
                 tools_qgis.show_warning(msg, title="Arc fusion")
                 return
 
-            self.dlg_fusion = GwArcFusionUi()
-            tools_gw.load_settings(self.dlg_fusion)
+            self.open_arc_fusion_dlg()
 
-            # Fill ComboBox cmb_nodeaction
-            rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
-            tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, 1, sort_by=0)
-            node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
-            if node_action not in (None, 'None', ''):
-                tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
 
-            # Fill ComboBox workcat_id_end
-            sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(self.dlg_fusion.workcat_id_end, rows)
+    def open_arc_fusion_dlg(self):
+        self.dlg_fusion = GwArcFusionUi()
+        tools_gw.load_settings(self.dlg_fusion)
 
-            # Fill ComboBox cmb_statetype
-            sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, 1, add_empty=True)
-            state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
-            if state_type not in (None, 'None', ''):
-                tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)
+        # Fill ComboBox cmb_nodeaction
+        rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, 1, sort_by=0)
+        node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
+        if node_action not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
 
-            # Set QDateEdit to current date
-            current_date = QDate.currentDate()
-            tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
+        # Fill ComboBox workcat_id_end
+        sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_fusion.workcat_id_end, rows)
 
-            # If the node has state 2 (planified) only allow remove node
-            if self.node_state is not None and self.node_state == 2:
-                self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
-                self.dlg_fusion.cmb_nodeaction.setEnabled(False)
-                tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
-            # Disable some widgets
-            if self.dlg_fusion.cmb_nodeaction.currentIndex() != 1:
-                self.dlg_fusion.enddate.setEnabled(False)
-                self.dlg_fusion.workcat_id_end.setEnabled(False)
-                self.dlg_fusion.cmb_statetype.setEnabled(False)
+        # Fill ComboBox cmb_statetype
+        sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, 1, add_empty=True)
+        state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
+        if state_type not in (None, 'None', ''):
+            tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)
 
-            # Disable tab log
-            tools_gw.disable_tab_log(self.dlg_fusion)
+        # Set QDateEdit to current date
+        current_date = QDate.currentDate()
+        tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
-            # Set signals
-            self.dlg_fusion.cmb_nodeaction.currentIndexChanged.connect(partial(self._manage_nodeaction))
-            self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
-            self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
-            self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+        # If the node has state 2 (planified) only allow remove node
+        if self.node_state is not None and self.node_state == 2:
+            sql = f"SELECT psector_id FROM v_plan_psector_node WHERE node_id = '{self.node_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                self.psector_id = row[0]
+            self.dlg_fusion.cmb_nodeaction.setCurrentIndex(2)
+            self.dlg_fusion.cmb_nodeaction.setEnabled(False)
+            tools_qt.set_stylesheet(self.dlg_fusion.cmb_nodeaction, style="color: black")
+        # Disable some widgets
+        if self.dlg_fusion.cmb_nodeaction.currentIndex() != 1:
+            self.dlg_fusion.enddate.setEnabled(False)
+            self.dlg_fusion.workcat_id_end.setEnabled(False)
+            self.dlg_fusion.cmb_statetype.setEnabled(False)
 
-            tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_fusion)
+
+        # Set signals
+        self.dlg_fusion.cmb_nodeaction.currentIndexChanged.connect(partial(self._manage_nodeaction))
+        self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
+        self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+        self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+
+        tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
 
     def _manage_nodeaction(self, index):

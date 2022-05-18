@@ -18,6 +18,7 @@ from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
 from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi
 from ...utils import tools_gw
+from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 
@@ -251,8 +252,13 @@ class GwDscenarioManagerButton(GwAction):
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
-        # In order to make the first column not editable, we need to override the QSqlTableModel flags
-        model.flags = lambda index: self.flags(index, model)
+        # Set item delegates
+        readonly_delegate = ReadOnlyDelegate(widget)
+        widget.setItemDelegateForColumn(0, readonly_delegate)
+        widget.setItemDelegateForColumn(1, readonly_delegate)
+        editable_delegate = EditableDelegate(widget)
+        for x in range(2, model.columnCount()):
+            widget.setItemDelegateForColumn(x, editable_delegate)
 
 
         # Check for errors
@@ -264,9 +270,10 @@ class GwDscenarioManagerButton(GwAction):
             widget.model().setFilter(expr)
         else:
             widget.setModel(model)
+        widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
         tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
@@ -278,16 +285,8 @@ class GwDscenarioManagerButton(GwAction):
         if geom_col_idx is not False:
             widget.setColumnHidden(geom_col_idx, True)
 
-
-    def flags(self, index, model):
-
-        flags = QSqlTableModel.flags(model, index)
-
-        if index.column() == 1:
-            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-            return flags
-
-        return QSqlTableModel.flags(model, index)
+        # Sort the table by feature id
+        model.sort(1, 0)
 
 
     def _manage_current_changed(self):
@@ -393,8 +392,11 @@ class GwDscenarioManagerButton(GwAction):
         self._manage_feature_type()
 
         # Get current layer and remove selection
-        current_layer = self.iface.activeLayer()
-        current_layer.removeSelection()
+        try:
+            current_layer = self.iface.activeLayer()
+            current_layer.removeSelection()
+        except AttributeError:
+            pass
 
         # Set active layer
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()

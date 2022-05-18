@@ -25,11 +25,13 @@ class GwProjectCheckTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, description='', params=None):
+    def __init__(self, description='', params=None, timer=None):
 
         super().__init__(description)
         self.params = params
         self.result = None
+        self.dlg_audit_project = None
+        self.timer = timer
 
 
     def run(self):
@@ -38,6 +40,7 @@ class GwProjectCheckTask(GwTask):
 
         layers = self.params['layers']
         init_project = self.params['init_project']
+        self.dlg_audit_project = self.params['dialog']
         tools_log.log_info(f"Task 'Check project' execute function 'fill_check_project_table'")
         status, self.result = self.fill_check_project_table(layers, init_project)
         if not status:
@@ -51,6 +54,9 @@ class GwProjectCheckTask(GwTask):
 
         super().finished(result)
 
+        self.dlg_audit_project.progressBar.setVisible(False)
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             self.setProgress(100)
             return
@@ -149,6 +155,8 @@ class GwProjectCheckTask(GwTask):
 
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        if result:
+            tools_gw.manage_current_selections_docker(result, open=False)
         try:
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
@@ -162,11 +170,6 @@ class GwProjectCheckTask(GwTask):
     def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
-        # Create dialog
-        self.dlg_audit_project = GwProjectCheckUi()
-        tools_gw.load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(tools_gw.save_settings, self.dlg_audit_project))
-
         # Populate info_log and missing layers
         critical_level = 0
         text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
@@ -177,7 +180,6 @@ class GwProjectCheckTask(GwTask):
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
-            tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
 
     def _add_selected_layers(self, dialog, m_layers):
