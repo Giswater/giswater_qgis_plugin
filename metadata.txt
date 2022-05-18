@@ -9,7 +9,15 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.5.024
-
+  - Major improvements in reporting tool (make thread, add description, manage nulls, etc)
+  - Improve usability of Dscenario tables
+  - Add button 'Update config' to workspace manager
+  - Allow deleting selected workspace
+  - Improve filters in Mincut manager
+  - Add 'Exec. time' timer to check project dialog
+  - Bug fix with addSchema functionality (info & search)
+  - Bug fix in 'Show current selectors' docker
+  - Bug fix in psector with chk_enable_all
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
