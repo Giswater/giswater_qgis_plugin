@@ -10,7 +10,7 @@ import sys
 from functools import partial
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QTabWidget, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -132,7 +132,7 @@ class GwNonVisual:
         pass
 
     # region curves
-    def get_curve(self):
+    def get_curves(self):
         """  """
 
         # Get dialog
@@ -341,7 +341,7 @@ class GwNonVisual:
     # endregion
 
     # region patterns
-    def get_pattern(self):
+    def get_patterns(self):
         """ """
 
         # Get dialog
@@ -460,7 +460,128 @@ class GwNonVisual:
 
 
     def _manage_ud_patterns_dlg(self):
-        pass
+        # Variables
+        cmb_pattern_type = self.dialog.cmb_pattern_type
+        cmb_expl_id = self.dialog.cmb_expl_id
+
+        # Populate combobox
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_pattern'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_pattern_type, rows)
+
+        # Signals
+        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, cmb_pattern_type))
+
+        self._manage_patterns_tableviews(cmb_pattern_type)
+
+        # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
+        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ud)
+
+
+    def _manage_patterns_tableviews(self, cmb_pattern_type):
+
+        # Variables
+        tbl_monthly = self.dialog.tbl_monthly
+        tbl_daily = self.dialog.tbl_daily
+        tbl_hourly = self.dialog.tbl_hourly
+        tbl_weekend = self.dialog.tbl_weekend
+
+        # Hide all tables
+        tbl_monthly.setVisible(False)
+        tbl_daily.setVisible(False)
+        tbl_hourly.setVisible(False)
+        tbl_weekend.setVisible(False)
+
+        # Only show the pattern_type one
+        pattern_type = tools_qt.get_combo_value(self.dialog, cmb_pattern_type)
+        self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}").setVisible(True)
+
+
+    def _accept_pattern_ud(self):
+
+        # Variables
+        txt_id = self.dialog.txt_pattern_id
+        txt_observ = self.dialog.txt_observ
+        cmb_expl_id = self.dialog.cmb_expl_id
+        cmb_pattern_type = self.dialog.cmb_pattern_type
+        txt_log = self.dialog.txt_log
+
+        # Get widget values
+        pattern_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
+        pattern_type = tools_qt.get_combo_value(self.dialog, cmb_pattern_type)
+        observ = tools_qt.get_text(self.dialog, txt_observ, add_quote=True)
+        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
+        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+
+        # Check that there are no empty fields
+        if not pattern_id or pattern_id == 'null':
+            tools_qt.set_stylesheet(txt_id)
+            return
+        tools_qt.set_stylesheet(txt_id, style="")
+
+        table = self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
+
+        # Insert inp_pattern
+        sql = f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log)" \
+              f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id}, {log})"
+        result = tools_db.execute_sql(sql, commit=False)
+        if not result:
+            msg = "There was an error inserting pattern."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        # Insert inp_pattern_value
+        values = list()
+        for y in range(0, table.rowCount()):
+            values.append(list())
+            for x in range(0, table.columnCount()):
+                value = "null"
+                item = table.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        is_empty = True
+        for row in values:
+            if row == (['null'] * table.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        for row in values:
+            if row == (['null'] * table.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_pattern_value (pattern_id, "
+            for n, x in enumerate(row):
+                sql += f"factor_{n+1}, "
+            sql = sql.rstrip(', ') + ")"
+            sql += f"VALUES ({pattern_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting pattern value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+
+        # Commit and close dialog
+        global_vars.dao.commit()
+        tools_gw.close_dialog(self.dialog)
 
     # endregion
 
