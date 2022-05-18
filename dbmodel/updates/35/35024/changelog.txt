@@ -14,3 +14,4 @@
 - New fprocess for node orphan related to OM and add to fct_om_check_data
 - Enhance fct_anl_node_orphan without input params. Always runs with nodes that divide/doesn't divide arc
 - Multiply gully polygon for units if is not null
+- Add editable for cat_feature objects

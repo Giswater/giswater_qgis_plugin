@@ -280,3 +280,73 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir AS
            FROM temp_anlgraf temp_anlgraf_1
           WHERE temp_anlgraf_1.water = 1) a2 ON temp_anlgraf.node_2::text = a2.node_1::text
   WHERE temp_anlgraf.flag < 2 AND temp_anlgraf.water = 0 AND a2.flag = 0;
+   
+
+-- 2022/05/18
+CREATE OR REPLACE VIEW v_edit_cat_feature_node AS
+SELECT
+id,
+system_id as sys_type,
+epa_default,
+isarcdivide,
+isprofilesurface,
+shortcut_key,
+choose_hemisphere,
+double_geom::text,
+num_arcs,
+isexitupperintro,
+code_autofill,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_node USING (id);
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_arc AS
+SELECT
+id,
+system_id as sys_type,
+epa_default,
+shortcut_key,
+code_autofill,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_arc USING (id);
+
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_connec AS
+SELECT
+id,
+system_id as sys_type,
+shortcut_key
+code_autofill,
+double_geom::text,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_connec USING (id);
+
+
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_gully AS
+SELECT
+id,
+system_id as sys_type,
+shortcut_key,
+code_autofill,
+double_geom::text,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_connec USING (id);
+
+
+

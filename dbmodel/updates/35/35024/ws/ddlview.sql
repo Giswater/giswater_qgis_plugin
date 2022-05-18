@@ -92,3 +92,55 @@ total,
 (total - auth_bill - auth_unbill)::numeric(12,2) as loss,
 case when total > 0 then (100*(auth_bill+auth_unbill)/total)::numeric(12,2) else 0::numeric(12,2) end as eff
 FROM v_om_waterbalance;
+
+
+-- 2022/05/18
+CREATE OR REPLACE VIEW v_edit_cat_feature_node AS
+SELECT
+id,
+system_id as sys_type,
+epa_default,
+isarcdivide,
+isprofilesurface,
+choose_hemisphere,
+double_geom json,
+num_arcs,
+graf_delimiter,
+shortcut_key
+code_autofill,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_node USING (id);
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_arc AS
+SELECT
+id,
+system_id as sys_type,
+epa_default,
+shortcut_key
+code_autofill,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_arc USING (id);
+
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_connec AS
+SELECT
+id,
+system_id as sys_type,
+epa_default,
+shortcut_key
+code_autofill,
+link_path,
+config::text,
+descript,
+active
+FROM cat_feature
+JOIN cat_feature_connec USING (id);
+
