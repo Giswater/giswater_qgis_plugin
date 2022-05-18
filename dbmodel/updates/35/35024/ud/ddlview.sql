@@ -286,7 +286,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir AS
 CREATE OR REPLACE VIEW v_edit_cat_feature_node AS
 SELECT
 id,
-system_id as sys_type,
+system_id,
 epa_default,
 isarcdivide,
 isprofilesurface,
@@ -306,7 +306,7 @@ JOIN cat_feature_node USING (id);
 CREATE OR REPLACE VIEW v_edit_cat_feature_arc AS
 SELECT
 id,
-system_id as sys_type,
+system_id,
 epa_default,
 shortcut_key,
 code_autofill,
@@ -321,7 +321,7 @@ JOIN cat_feature_arc USING (id);
 CREATE OR REPLACE VIEW v_edit_cat_feature_connec AS
 SELECT
 id,
-system_id as sys_type,
+system_id,
 shortcut_key,
 code_autofill,
 double_geom::text,
@@ -337,7 +337,7 @@ JOIN cat_feature_connec USING (id);
 CREATE OR REPLACE VIEW v_edit_cat_feature_gully AS
 SELECT
 id,
-system_id as sys_type,
+system_id,
 shortcut_key,
 code_autofill,
 double_geom::text,

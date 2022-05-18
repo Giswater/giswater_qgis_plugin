@@ -14,3 +14,4 @@ ON v_edit_inp_curve_value FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_curve('
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario_controls INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_dscenario_controls FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONTROLS');
+

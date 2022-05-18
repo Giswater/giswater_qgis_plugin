@@ -17,3 +17,22 @@ CREATE TRIGGER gw_trg_mincut
   ON om_mincut
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_mincut();
+
+CREATE TRIGGER gw_trg_edit_cat_feature
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_cat_feature_node
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_cat_feature('node');
+
+  CREATE TRIGGER gw_trg_edit_cat_feature
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_cat_feature_arc
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_cat_feature('arc');
+
+  CREATE TRIGGER gw_trg_edit_cat_feature
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_cat_feature_connec
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_cat_feature('connec');
+

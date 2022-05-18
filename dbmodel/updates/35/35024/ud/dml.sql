@@ -29,3 +29,33 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE config_form_fields SET label='dma' WHERE columnname='dma_id' AND label='dma_id' AND formname LIKE 've_%';
 UPDATE config_form_fields SET label='sector' WHERE columnname='sector_id' AND label='sector_id' AND formname LIKE 've_%';
 UPDATE config_form_fields SET label='exploitation' WHERE columnname='expl_id' AND label='expl_id' AND formname LIKE 've_%';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_feature_node', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_feature_node' and columnname in ('epa_default', 'isarcdivide', 'isprofilesurface','isexitupperintro', 'choose_hemisphere',
+'num_arcs', 'double_geom');
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_feature_gully' and columnname in ('double_geom');
+
+UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
+
+UPDATE config_form_fields SET dvqueytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''GULLY'' ' 
+WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_gully';
+
+UPDATE config_form_fields SET dvqueytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''NODE'' ' 
+WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_node';
+
+INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
+VALUES ('v_edit_cat_feature_gully', 'Editable view for cat_feature_gully configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',4, 'Gully feature catalog', null,null,null,'core',null,null);
+
