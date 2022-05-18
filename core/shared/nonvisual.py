@@ -185,7 +185,7 @@ class GwNonVisual:
         # Set initial curve_value table headers
         self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1)
+        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
@@ -724,7 +724,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
 
         # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1)
+        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Connect dialog signals
         tbl_timeseries_value.cellChanged.connect(partial(self._onCellChanged, tbl_timeseries_value))
@@ -763,7 +763,7 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id)
             return
         tools_qt.set_stylesheet(txt_id, style="")
-        # INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log) VALUES('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m', NULL, NULL, NULL, NULL);
+
         # Insert inp_timeseries
         sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log)" \
               f"VALUES({timeseries_id}, '{timeser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}', {log})"
@@ -786,10 +786,10 @@ class GwNonVisual:
                 item = tbl_timeseries_value.item(y, x)
                 if item is not None and item.data(0) not in (None, ''):
                     value = item.data(0)
-                try:
-                    value = float(value)
-                except ValueError:
-                    value = f"'{value}'"
+                    try:  # Try to convert to float, otherwise put quotes
+                        value = float(value)
+                    except ValueError:
+                        value = f"'{value}'"
                 values[y].append(value)
 
         # Check if table is empty
@@ -805,31 +805,49 @@ class GwNonVisual:
             global_vars.dao.rollback()
             return
 
-        if cmb_times_type == 'ABSOLUTE':
-            sql = f""
-        elif cmb_times_type == 'RELATIVE':
-            sql = f""
+        if times_type == 'ABSOLUTE':
+            for row in values:
+                if row == (['null'] * tbl_timeseries_value.columnCount()):
+                    continue
+                if 'null' in (row[0], row[1], row[2]):
+                    msg = "You have to fill in 'date', 'time' and 'value' fields!"
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
 
-        for row in values:
-            if row == (['null'] * tbl_timeseries_value.columnCount()):
-                continue
+                sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, value) "
+                sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
 
-            sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, time, value) " \
-                  f"VALUES ({timeseries_id}, "
-            for x in row:
-                sql += f"{x}, "
-            sql = sql.rstrip(', ') + ")"
-            result = tools_db.execute_sql(sql, commit=False)
-            if not result:
-                msg = "There was an error inserting pattern value."
-                tools_qgis.show_warning(msg)
-                global_vars.dao.rollback()
-                return
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    msg = "There was an error inserting pattern value."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
+        elif times_type == 'RELATIVE':
+
+            for row in values:
+                if row == (['null'] * tbl_timeseries_value.columnCount()):
+                    continue
+                if 'null' in (row[1], row[2]):
+                    msg = "You have to fill in 'time' and 'value' fields!"
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
+
+                sql = f"INSERT INTO inp_timeseries_value (timser_id, time, value) "
+                sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
+
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    msg = "There was an error inserting pattern value."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
 
         # Commit and close dialog
         global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
-        # INSERT INTO inp_timeseries_value (timser_id, "date", "hour", "time", value) VALUES('T5-5m', NULL, NULL, '0:00', 0.7800);
 
     # endregion
 
