@@ -39,14 +39,15 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 FROM config_form_fields WHERE formname='cat_feature_node' and columnname in ('epa_default', 'isarcdivide', 'isprofilesurface','isexitupperintro', 'choose_hemisphere',
 'num_arcs', 'double_geom');
 
-
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_gully' and columnname in ('double_geom');
+FROM config_form_fields WHERE formname='cat_feature_gully';
+
+UPDATE config_form_fields SET columnname='system_id' WHERE columnname='type' and formname ilike 'cat_feature_gully';
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
 

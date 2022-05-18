@@ -32,12 +32,20 @@ BEGIN
 
   	ELSIF v_table='connec' THEN
 
-  	  UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
+  	  IF v_project_type='ws' THEN
+  	  	UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
+  	  ELSIF v_project_type='ud' THEN
+  	 		UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+  	 	END IF;
 
   	ELSIF v_table='node' THEN
 
+  		IF NEW.choose_hemisphere IS NULL THEN 
+  	  		NEW.choose_hemisphere=false;
+  	  	END IF;
+
   	  IF v_project_type='ws' THEN
-  	 		UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
+  	  	UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
   	 		double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, graf_delimiter=NEW.graf_delimiter  WHERE id=NEW.id;
 
   	 	ELSIF v_project_type='ud' THEN
@@ -64,7 +72,11 @@ BEGIN
 
   	ELSIF v_table='connec' THEN
   	
-  	  UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
+  		IF v_project_type='ws' THEN
+  	  	UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
+  	  ELSIF v_project_type='ud' THEN
+  	 		UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+  	 	END IF;
 
   	ELSIF v_table='node' THEN
   	  IF v_project_type='ws' THEN
