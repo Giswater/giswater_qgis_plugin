@@ -442,7 +442,7 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
-        # Populate table curve_values
+        # Populate table pattern_values
         sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12 " \
               f"FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
@@ -584,7 +584,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, cmb_pattern_type, row['pattern_type'])
         tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
-        # Populate table curve_values
+        # Populate table pattern_values
         sql = f"SELECT * FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -851,7 +851,7 @@ class GwNonVisual:
     # endregion
 
     # region timeseries
-    def get_timeseries(self):
+    def get_timeseries(self, timser_id=None):
         """  """
 
         # Get dialog
@@ -864,32 +864,90 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
+        is_new = timser_id is None
+
         # Populate combobox
-        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(cmb_timeser_type, rows, index_to_show=1)
+        self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
 
-        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
-
-        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+        if not is_new:
+            self._populate_timeser_widgets(timser_id)
 
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Connect dialog signals
         tbl_timeseries_value.cellChanged.connect(partial(self._onCellChanged, tbl_timeseries_value))
-        self.dialog.btn_accept.clicked.connect(self._accept_timeseries)
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_timeseries, is_new))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
+
+
+    def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type):
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_timeser_type, rows, index_to_show=1)
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+
+
+    def _populate_timeser_widgets(self, timser_id):
+
+        # Variables
+        txt_id = self.dialog.txt_id
+        txt_idval = self.dialog.txt_idval
+        cmb_timeser_type = self.dialog.cmb_timeser_type
+        cmb_times_type = self.dialog.cmb_times_type
+        txt_descript = self.dialog.txt_descript
+        cmb_expl_id = self.dialog.cmb_expl_id
+        txt_fname = self.dialog.txt_fname
+        txt_log = self.dialog.txt_log
+        tbl_timeseries_value = self.dialog.tbl_timeseries_value
+
+        sql = f"SELECT * FROM v_edit_inp_timeseries WHERE id = '{timser_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        # Populate text & combobox widgets
+        tools_qt.set_widget_text(self.dialog, txt_id, timser_id)
+        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        tools_qt.set_widget_text(self.dialog, txt_idval, row['idval'])
+        tools_qt.set_widget_text(self.dialog, cmb_timeser_type, row['timser_type'])
+        tools_qt.set_widget_text(self.dialog, cmb_times_type, row['times_type'])
+        tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
+        tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
+        tools_qt.set_widget_text(self.dialog, txt_fname, row['fname'])
+        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
+
+        # Populate table timeseries_values
+        sql = f"SELECT id, date, hour, time, value FROM v_edit_inp_timeseries_value WHERE timser_id = '{timser_id}'"
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return
+
+        row0, row1, row2 = None, None, None
+        if row['times_type'] == 'FILE':
+            return
+        elif row['times_type'] == 'RELATIVE':
+            row0, row1, row2 = None, 'time', 'value'
+        elif row['times_type'] == 'ABSOLUTE':
+            row0, row1, row2 = 'date', 'hour', 'value'
+
+        for n, row in enumerate(rows):
+            if row0:
+                tbl_timeseries_value.setItem(n, 0, QTableWidgetItem(f"{row[row0]}"))
+            tbl_timeseries_value.setItem(n, 1, QTableWidgetItem(f"{row[row1]}"))
+            tbl_timeseries_value.setItem(n, 2, QTableWidgetItem(f"{row[row2]}"))
+            tbl_timeseries_value.insertRow(tbl_timeseries_value.rowCount())
 
 
     def _accept_timeseries(self):
