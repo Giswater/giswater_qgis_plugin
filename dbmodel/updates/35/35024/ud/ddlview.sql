@@ -322,7 +322,7 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_connec AS
 SELECT
 id,
 system_id as sys_type,
-shortcut_key
+shortcut_key,
 code_autofill,
 double_geom::text,
 link_path,
@@ -346,7 +346,7 @@ config::text,
 descript,
 active
 FROM cat_feature
-JOIN cat_feature_connec USING (id);
+JOIN cat_feature_gully USING (id);
 
 
 
