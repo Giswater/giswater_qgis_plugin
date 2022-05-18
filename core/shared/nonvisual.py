@@ -184,6 +184,8 @@ class GwNonVisual:
 
         # Set initial curve_value table headers
         self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
+        # Set scale-to-fit
+        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
@@ -638,6 +640,7 @@ class GwNonVisual:
 
     # endregion
 
+    # region rules
     def get_rules(self):
         """  """
 
@@ -688,7 +691,9 @@ class GwNonVisual:
         global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
 
+    # endregion
 
+    # region timeseries
     def get_timeseries(self):
         """  """
 
@@ -696,13 +701,139 @@ class GwNonVisual:
         self.dialog = GwNonVisualTimeseriesUi()
         tools_gw.load_settings(self.dialog)
 
+        # Variables
+        cmb_timeser_type = self.dialog.cmb_timeser_type
+        cmb_times_type = self.dialog.cmb_times_type
+        cmb_expl_id = self.dialog.cmb_expl_id
+        tbl_timeseries_value = self.dialog.tbl_timeseries_value
+
+        # Populate combobox
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_timeser_type, rows, index_to_show=1)
+
+        sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
+
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+
+        # Set scale-to-fit
+        tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1)
+
         # Connect dialog signals
+        tbl_timeseries_value.cellChanged.connect(partial(self._onCellChanged, tbl_timeseries_value))
+        self.dialog.btn_accept.clicked.connect(self._accept_timeseries)
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
 
 
+    def _accept_timeseries(self):
+
+        # Variables
+        txt_id = self.dialog.txt_id
+        txt_idval = self.dialog.txt_idval
+        cmb_timeser_type = self.dialog.cmb_timeser_type
+        cmb_times_type = self.dialog.cmb_times_type
+        txt_descript = self.dialog.txt_descript
+        cmb_expl_id = self.dialog.cmb_expl_id
+        txt_fname = self.dialog.txt_fname
+        txt_log = self.dialog.txt_log
+        tbl_timeseries_value = self.dialog.tbl_timeseries_value
+
+        # Get widget values
+        timeseries_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
+        idval = tools_qt.get_text(self.dialog, txt_idval, add_quote=True)
+        timeser_type = tools_qt.get_combo_value(self.dialog, cmb_timeser_type)
+        times_type = tools_qt.get_combo_value(self.dialog, cmb_times_type)
+        descript = tools_qt.get_text(self.dialog, txt_descript, add_quote=True)
+        fname = tools_qt.get_text(self.dialog, txt_fname, add_quote=True)
+        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
+        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+
+        # Check that there are no empty fields
+        if not timeseries_id or timeseries_id == 'null':
+            tools_qt.set_stylesheet(txt_id)
+            return
+        tools_qt.set_stylesheet(txt_id, style="")
+        # INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log) VALUES('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m', NULL, NULL, NULL, NULL);
+        # Insert inp_timeseries
+        sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log)" \
+              f"VALUES({timeseries_id}, '{timeser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}', {log})"
+        result = tools_db.execute_sql(sql, commit=False)
+        if not result:
+            msg = "There was an error inserting timeseries."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        if fname not in (None, 'null'):
+            sql = ""  # No need to insert to inp_timeseries_value?
+
+        # Insert inp_timeseries_value
+        values = list()
+        for y in range(0, tbl_timeseries_value.rowCount()):
+            values.append(list())
+            for x in range(0, tbl_timeseries_value.columnCount()):
+                value = "null"
+                item = tbl_timeseries_value.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = f"'{value}'"
+                values[y].append(value)
+
+        # Check if table is empty
+        is_empty = True
+        for row in values:
+            if row == (['null'] * tbl_timeseries_value.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return
+
+        if cmb_times_type == 'ABSOLUTE':
+            sql = f""
+        elif cmb_times_type == 'RELATIVE':
+            sql = f""
+
+        for row in values:
+            if row == (['null'] * tbl_timeseries_value.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, time, value) " \
+                  f"VALUES ({timeseries_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting pattern value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+
+        # Commit and close dialog
+        global_vars.dao.commit()
+        tools_gw.close_dialog(self.dialog)
+        # INSERT INTO inp_timeseries_value (timser_id, "date", "hour", "time", value) VALUES('T5-5m', NULL, NULL, '0:00', 0.7800);
+
+    # endregion
+
+    # region private functions
     def _connect_dialog_signals(self):
 
         # self.dialog.btn_accept.clicked.connect(self.dialog.accept)
@@ -733,3 +864,5 @@ class GwNonVisual:
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+
+    # endregion
