@@ -309,7 +309,7 @@ class GwNonVisual:
         self.dialog.btn_accept.setEnabled(valid)
 
 
-    def _accept_curves(self, is_new=True):
+    def _accept_curves(self, is_new):
         # Variables
         txt_id = self.dialog.txt_curve_id
         txt_descript = self.dialog.txt_descript
@@ -431,7 +431,8 @@ class GwNonVisual:
         # TODO: Connect signal to draw graphic?
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
-        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws, (pattern_id is None))
+        is_new = pattern_id is None
+        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws, is_new)
 
 
     def _populate_ws_patterns_widgets(self, pattern_id):
@@ -471,7 +472,7 @@ class GwNonVisual:
         tbl_pattern_value.setVerticalHeaderLabels(headers)
 
 
-    def _accept_pattern_ws(self, is_new=True):
+    def _accept_pattern_ws(self, is_new):
         # Variables
         txt_id = self.dialog.txt_pattern_id
         txt_observ = self.dialog.txt_observ
@@ -571,7 +572,8 @@ class GwNonVisual:
         self._manage_patterns_tableviews(cmb_pattern_type)
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
-        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ud, (pattern_id is None))
+        is_new = pattern_id is None
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ud, is_new))
 
 
     def _populate_ud_patterns_widgets(self, pattern_id):
@@ -627,7 +629,7 @@ class GwNonVisual:
         self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}").setVisible(True)
 
 
-    def _accept_pattern_ud(self, is_new=True):
+    def _accept_pattern_ud(self, is_new):
 
         # Variables
         txt_id = self.dialog.txt_pattern_id
@@ -711,7 +713,7 @@ class GwNonVisual:
     # endregion
 
     # region controls
-    def get_controls(self):
+    def get_controls(self, control_id=None):
         """  """
 
         # Get dialog
@@ -721,15 +723,37 @@ class GwNonVisual:
         # Populate sector id combobox
         self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
 
+        if control_id is not None:
+            self._populate_controls_widgets(control_id)
+
         # Connect dialog signals
-        self.dialog.btn_accept.clicked.connect(self._accept_controls)
+        is_new = control_id is None
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, is_new))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
 
 
-    def _accept_controls(self):
+    def _populate_controls_widgets(self, control_id):
+
+        # Variables
+        cmb_sector_id = self.dialog.cmb_sector_id
+        chk_active = self.dialog.chk_active
+        txt_text = self.dialog.txt_text
+
+        sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        # Populate text & combobox widgets
+        tools_qt.set_combo_value(cmb_sector_id, str(row['sector_id']), 0)
+        tools_qt.set_checked(self.dialog, chk_active, row['active'])
+        tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
+
+
+    def _accept_controls(self, is_new):
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -741,30 +765,31 @@ class GwNonVisual:
         active = tools_qt.is_checked(self.dialog, chk_active)
         text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
 
-        # Check that there are no empty fields
-        if not text or text == 'null':
-            tools_qt.set_stylesheet(txt_text)
-            return
-        tools_qt.set_stylesheet(txt_text, style="")
+        if is_new:
+            # Check that there are no empty fields
+            if not text or text == 'null':
+                tools_qt.set_stylesheet(txt_text)
+                return
+            tools_qt.set_stylesheet(txt_text, style="")
 
-        # Insert inp_controls
-        sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
-              f"VALUES({sector_id}, {text}, {active})"
-        result = tools_db.execute_sql(sql, commit=False)
-        if not result:
-            msg = "There was an error inserting control."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
+            # Insert inp_controls
+            sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
+                  f"VALUES({sector_id}, {text}, {active})"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting control."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
 
-        # Commit and close dialog
-        global_vars.dao.commit()
+            # Commit and close dialog
+            global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
 
     # endregion
 
     # region rules
-    def get_rules(self):
+    def get_rules(self, rule_id=None):
         """  """
 
         # Get dialog
@@ -774,15 +799,37 @@ class GwNonVisual:
         # Populate sector id combobox
         self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
 
+        if rule_id is not None:
+            self._populate_rules_widgets(rule_id)
+
         # Connect dialog signals
-        self.dialog.btn_accept.clicked.connect(self._accept_rules)
+        is_new = rule_id is None
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, is_new))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
 
 
-    def _accept_rules(self):
+    def _populate_rules_widgets(self, rule_id):
+
+        # Variables
+        cmb_sector_id = self.dialog.cmb_sector_id
+        chk_active = self.dialog.chk_active
+        txt_text = self.dialog.txt_text
+
+        sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        # Populate text & combobox widgets
+        tools_qt.set_combo_value(cmb_sector_id, str(row['sector_id']), 0)
+        tools_qt.set_checked(self.dialog, chk_active, row['active'])
+        tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
+
+
+    def _accept_rules(self, is_new):
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -794,24 +841,25 @@ class GwNonVisual:
         active = tools_qt.is_checked(self.dialog, chk_active)
         text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
 
-        # Check that there are no empty fields
-        if not text or text == 'null':
-            tools_qt.set_stylesheet(txt_text)
-            return
-        tools_qt.set_stylesheet(txt_text, style="")
+        if is_new:
+            # Check that there are no empty fields
+            if not text or text == 'null':
+                tools_qt.set_stylesheet(txt_text)
+                return
+            tools_qt.set_stylesheet(txt_text, style="")
 
-        # Insert inp_controls
-        sql = f"INSERT INTO inp_rules (sector_id,text,active)" \
-              f"VALUES({sector_id}, {text}, {active})"
-        result = tools_db.execute_sql(sql, commit=False)
-        if not result:
-            msg = "There was an error inserting control."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
+            # Insert inp_controls
+            sql = f"INSERT INTO inp_rules (sector_id,text,active)" \
+                  f"VALUES({sector_id}, {text}, {active})"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting control."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
 
-        # Commit and close dialog
-        global_vars.dao.commit()
+            # Commit and close dialog
+            global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
 
     # endregion
