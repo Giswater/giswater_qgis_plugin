@@ -99,7 +99,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="5">
-       <widget class="QTabWidget" name="mainTab">
+       <widget class="QTabWidget" name="main_tab">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>

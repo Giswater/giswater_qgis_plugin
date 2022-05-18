@@ -5,12 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
+import sys
 
+from functools import partial
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox
-
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QTabWidget, QWidget
+from qgis.PyQt.QtSql import QSqlTableModel
+from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi
 from ..utils.snap_manager import GwSnapManager
@@ -38,12 +40,81 @@ class GwNonVisual:
         self.manager_dlg = GwNonVisualManagerUi()
         tools_gw.load_settings(self.manager_dlg)
 
+        # Make and populate tabs
+        self._manage_tabs_manager()
+
         # Connect dialog signals
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
+        self.manager_dlg.main_tab.currentChanged.connect(
+            partial(self._fill_manager_table, set_edit_triggers=QTableView.DoubleClicked))
+
 
         # Open dialog
         tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
+
+
+    def _manage_tabs_manager(self):
+
+        # ws = ['curves', 'patterns', 'controls', 'rules']
+        # ud = ['curves', 'patterns', 'controls', 'timeseries', 'lids']
+        views = ['v_edit_inp_curve','v_edit_inp_pattern','v_edit_inp_controls', 'v_edit_inp_rules']
+
+        # Select all views
+        # sql = f"SELECT views"
+        # rows = tools_db.get_rows(sql)
+        # if rows:
+        # views = [x[0] for x in rows]
+
+        module = sys.modules[__name__]
+
+        for view in views:
+            qtableview = QTableView()
+            qtableview.setObjectName(f"tbl_{view}")
+            tab_idx = self.manager_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
+            self.manager_dlg.main_tab.widget(tab_idx).setObjectName(view)
+
+            function_name = f"get_{view.split('_')[-1]}"
+            _id = 0
+            kwargs = {'id':_id}
+            qtableview.doubleClicked.connect(partial(getattr(self, function_name), **kwargs))
+
+        self._fill_manager_table(set_edit_triggers=QTableView.DoubleClicked)
+
+
+    def _fill_manager_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+        """  """
+
+        table_name = f"{self.manager_dlg.main_tab.currentWidget().objectName()}"
+        widget = self.manager_dlg.main_tab.currentWidget()
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            tools_qgis.show_warning(model.lastError().text())
+        # Attach model to table view
+        if expr:
+            widget.setModel(model)
+            widget.model().setFilter(expr)
+        else:
+            widget.setModel(model)
+        widget.setSortingEnabled(True)
+
+        # Set widget & model properties
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
+        tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
+
+        # Sort the table by feature id
+        model.sort(1, 0)
 
 
     def get_nonvisual(self, object_name):
@@ -61,7 +132,7 @@ class GwNonVisual:
         pass
 
     # region curves
-    def get_curves(self):
+    def get_curve(self):
         """  """
 
         # Get dialog
@@ -270,7 +341,7 @@ class GwNonVisual:
     # endregion
 
     # region patterns
-    def get_patterns(self):
+    def get_pattern(self):
         """ """
 
         # Get dialog

@@ -5,15 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 
 from ..dialog import GwAction
 from ...shared.nonvisual import GwNonVisual
-from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis, tools_db, tools_os
-from .... import global_vars
 
 
 class GwNonVisualManagerButton(GwAction):
@@ -27,3 +21,5 @@ class GwNonVisualManagerButton(GwAction):
 
     def clicked_event(self):
         self.nonvisual.manage_nonvisual()
+
+
