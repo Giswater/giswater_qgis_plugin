@@ -50,10 +50,10 @@ FROM config_form_fields WHERE formname='cat_feature_gully' and columnname in ('d
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
 
-UPDATE config_form_fields SET dvqueytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''GULLY'' ' 
+UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''GULLY'' ' 
 WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_gully';
 
-UPDATE config_form_fields SET dvqueytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''NODE'' ' 
+UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''NODE'' ' 
 WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_node';
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
