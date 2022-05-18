@@ -1,4 +1,5 @@
 ## WELCOME TO GISWATER CONTRIBUTORS GUIDE-QGIS PLUGIN
+
 Thank you for investing your time in contributing to our project! Any contribution you make will be reflected on https://github.com/Giswater/ repos. As well as License is GNU-GPL3 the contributions need to be made under same License, it means that it applies the inbound=outbound approach.<br>
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.<br>
@@ -6,7 +7,6 @@ In this guide you will get an overview of the contribution workflow from opening
 You can find more information about our code of conduct on: https://github.com/Giswater/docs/blob/master/github/pdf/code_of_conduct.pdf
 
 As well as Giswater is developed in Python (qgis plugin) and PL/SQL(PostgreSQL database) there are three main repositories to manage it (QGIS-PLUGIN, DB-MODEL and DOCS). Right now this is the repository for the QGIS-PLUGIN.
-
 
 ## TABLE OF CONTENTS
 1- Bug report.<br>
@@ -75,6 +75,7 @@ As you update your PR and apply changes, mark each conversation as resolved. Onc
 ## CONTRIBUTORS LIST
 Nicole Aguiar, Frelance GIS consultant.<br>
 Jordi Blanch, Stagier on BGEO OPEN GIS.<br>
+Guillem Esteve, Stagier on BGEO OPEN GIS.<br>
 Elies Bertran, Stagier on BGEO OPEN GIS.<br>
 Ivan Moreno, Stagier on BGEO OPEN GIS.<br>
 Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>
@@ -93,3 +94,4 @@ Edgar Fuste, GIS developer on BGEO OPEN GIS.<br>
 Albert Bofill, GIS analyst on BGEO OPEN GIS.<br>
 Barbara Rzepka, GIS analyst on BGEO OPEN GIS.<br>
 Xavier Torret, GIS analyst on BGEO OPEN GIS.<br>
+
