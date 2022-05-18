@@ -106,7 +106,7 @@ choose_hemisphere,
 double_geom::text,
 num_arcs,
 graf_delimiter,
-shortcut_key
+shortcut_key,
 code_autofill,
 link_path,
 config::text,
@@ -120,7 +120,7 @@ SELECT
 id,
 system_id as sys_type,
 epa_default,
-shortcut_key
+shortcut_key,
 code_autofill,
 link_path,
 config::text,
@@ -135,7 +135,7 @@ SELECT
 id,
 system_id as sys_type,
 epa_default,
-shortcut_key
+shortcut_key,
 code_autofill,
 link_path,
 config::text,
