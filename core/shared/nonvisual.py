@@ -152,7 +152,7 @@ class GwNonVisual:
 
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
-        tools_qt.fill_combo_values(cmb_curve_type, [[x, x] for x in curve_type_list])
+        tools_qt.fill_combo_values(cmb_curve_type, curve_type_list)
 
         # Populate data if editing curve
         if curve_id:
@@ -177,26 +177,12 @@ class GwNonVisual:
     def _create_curve_type_lists(self):
         curve_type_list = []
         curve_type_headers = {}
-        if not curve_type_list:
-            if global_vars.project_type == 'ws':
-                curve_type_list = ['HEADLOSS', 'VOLUME', 'PUMP', 'EFFICIENCY']
-                curve_type_headers = {
-                    "HEADLOSS": ['Flow', 'Headloss'], "VOLUME": ['Height', 'Volume'], "PUMP": ['Flow', 'Head'],
-                    "EFFICIENCY": ['Flow', 'Efficiency']
-                }
-            elif global_vars.project_type == 'ud':
-                curve_type_list = ['CONTROL', 'DIVERSION', 'PUMP-TYPE1', 'PUMP-TYPE2', 'PUMP-TYPE3', 'PUMP-TYPE4',
-                                   'RATING', 'SHAPE', 'STORAGE', 'TIDAL', 'WEIR']
-                curve_type_headers = {
-                    "CONTROL": ['Value', 'Setting'], "DIVERSION": ['Inflow', 'Outflow'],
-                    "PUMP-TYPE1": ['Volume', 'Flow'], "PUMP-TYPE2": ['Depth', 'Flow'], "PUMP-TYPE3": ['Head', 'Flow'],
-                    "PUMP-TYPE4": ['Depth', 'Flow'], "RATING": ['Head', 'Outflow'],
-                    "SHAPE": ['Depth/\nFull Depth', 'Width/\nFull Depth'],
-                    "STORAGE": ['Depth', 'Area'], "TIDAL": ['Hour', 'Stage'], "WEIR": ['Head', 'Coefficient']
-                }
-        else:
-            curve_type_list = []  # TODO: populate with parameter passed in constructor (improve modularity)
-            curve_type_headers = {}  # TODO: same as list
+        sql = f"SELECT id, idval, addparam FROM inp_typevalue WHERE typevalue = 'inp_value_curve'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            curve_type_list = [[row['id'], row['idval']] for row in rows]
+            curve_type_headers = {row['id']: row['addparam'].get('header') for row in rows}
+
         return curve_type_headers, curve_type_list
 
 
