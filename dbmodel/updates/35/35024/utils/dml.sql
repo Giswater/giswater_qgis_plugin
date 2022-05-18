@@ -133,10 +133,13 @@ UPDATE sys_table set orderby = orderby+2 WHERE context='{"level_1":"INVENTORY","
 UPDATE sys_table set context=null  WHERE id='cat_feature_node' or id = 'cat_feature';
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
-VALUES ('v_edit_cat_feature_arc', 'Editable view for cat_feature_arc configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 1,'Arc feature catalog', null,null,null,'core',null,null);
+VALUES ('v_edit_cat_feature_arc', 'Editable view for cat_feature_arc configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 1,'Arc feature catalog', null,null,null,'core',null,null) 
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
-VALUES ('v_edit_cat_feature_node', 'Editable view for cat_feature_node configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',2, 'Node feature catalog', null,null,null,'core',null,null);
+VALUES ('v_edit_cat_feature_node', 'Editable view for cat_feature_node configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',2, 'Node feature catalog', null,null,null,'core',null,null) 
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
-VALUES ('v_edit_cat_feature_connec', 'Editable view for cat_feature_connec configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',3, 'Connec feature catalog', null,null,null,'core',null,null);
+VALUES ('v_edit_cat_feature_connec', 'Editable view for cat_feature_connec configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',3, 'Connec feature catalog', null,null,null,'core',null,null) 
+ON CONFLICT (id) DO NOTHING;

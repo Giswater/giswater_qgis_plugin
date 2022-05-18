@@ -20,7 +20,7 @@ FROM config_form_fields WHERE columnname ilike 'hydrology_id' AND formname='v_ed
 
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('v_edit_inp_coverage', 'Editable view to manage coverage', 'role_epa',  '{"level_1":"EPA","level_2":"HYDRAULICS"}',17, 'Inp coverage', 
-'core');
+'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_anl_grafanalytics_upstream', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
@@ -47,7 +47,8 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature_gully';
 
-UPDATE config_form_fields SET columnname='system_id' WHERE columnname='type' and formname ilike 'cat_feature_gully';
+UPDATE config_form_fields SET columnname='system_id' WHERE columnname='type' and formname ilike 'v_edit_cat_feature_gully';
+UPDATE config_form_fields SET iseditable=true WHERE  formname ilike 'v_edit_cat_feature_gully';
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
 
@@ -58,5 +59,6 @@ UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM sy
 WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_node';
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, source, style_id, addparam)
-VALUES ('v_edit_cat_feature_gully', 'Editable view for cat_feature_gully configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',4, 'Gully feature catalog', null,null,null,'core',null,null);
+VALUES ('v_edit_cat_feature_gully', 'Editable view for cat_feature_gully configuration', 'role_admin', null, '{"level_1":"INVENTORY","level_2":"CATALOGS"}',4, 'Gully feature catalog', null,null,null,'core',null,null)
+ON CONFLICT (id) DO NOTHING;
 
