@@ -103,7 +103,7 @@ epa_default,
 isarcdivide,
 isprofilesurface,
 choose_hemisphere,
-double_geom json,
+double_geom::text,
 num_arcs,
 graf_delimiter,
 shortcut_key
