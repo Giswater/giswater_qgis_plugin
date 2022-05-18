@@ -10,7 +10,7 @@ import sys
 from functools import partial
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -132,7 +132,7 @@ class GwNonVisual:
         pass
 
     # region curves
-    def get_curves(self):
+    def get_curves(self, curve_id=None):
         """  """
 
         # Get dialog
@@ -150,6 +150,31 @@ class GwNonVisual:
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
 
+        # Create & fill cmb_curve_type
+        curve_type_headers, curve_type_list = self._create_curve_type_lists()
+        tools_qt.fill_combo_values(cmb_curve_type, [[x, x] for x in curve_type_list])
+
+        # Populate data if editing curve
+        if curve_id:
+            self._populate_curve_widgets(curve_id)
+
+        # Connect dialog signals
+        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
+        tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, tbl_curve_value))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, (curve_id is None)))
+        self._connect_dialog_signals()
+
+        # Set initial curve_value table headers
+        self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
+        # Set scale-to-fit
+        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
+
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+
+    def _create_curve_type_lists(self):
         curve_type_list = []
         curve_type_headers = {}
         if not curve_type_list:
@@ -165,30 +190,49 @@ class GwNonVisual:
                 curve_type_headers = {
                     "CONTROL": ['Value', 'Setting'], "DIVERSION": ['Inflow', 'Outflow'],
                     "PUMP-TYPE1": ['Volume', 'Flow'], "PUMP-TYPE2": ['Depth', 'Flow'], "PUMP-TYPE3": ['Head', 'Flow'],
-                    "PUMP-TYPE4": ['Depth', 'Flow'], "RATING": ['Head', 'Outflow'], "SHAPE": ['Depth/\nFull Depth', 'Width/\nFull Depth'],
+                    "PUMP-TYPE4": ['Depth', 'Flow'], "RATING": ['Head', 'Outflow'],
+                    "SHAPE": ['Depth/\nFull Depth', 'Width/\nFull Depth'],
                     "STORAGE": ['Depth', 'Area'], "TIDAL": ['Hour', 'Stage'], "WEIR": ['Head', 'Coefficient']
                 }
         else:
             curve_type_list = []  # TODO: populate with parameter passed in constructor (improve modularity)
             curve_type_headers = {}  # TODO: same as list
+        return curve_type_headers, curve_type_list
 
-        tools_qt.fill_combo_values(cmb_curve_type, [[x, x] for x in curve_type_list])
 
+    def _populate_curve_widgets(self, curve_id):
 
-        # Connect dialog signals
-        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, tbl_curve_value))
-        self.dialog.btn_accept.clicked.connect(self._accept_curves)
-        self._connect_dialog_signals()
+        # Variables
+        txt_id = self.dialog.txt_curve_id
+        txt_descript = self.dialog.txt_descript
+        cmb_expl_id = self.dialog.cmb_expl_id
+        cmb_curve_type = self.dialog.cmb_curve_type
+        txt_log = self.dialog.txt_log
+        tbl_curve_value = self.dialog.tbl_curve_value
 
-        # Set initial curve_value table headers
-        self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
-        # Set scale-to-fit
-        tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
+        sql = f"SELECT * FROM v_edit_inp_curve WHERE id = '{curve_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
 
-        # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+        # Populate text & combobox widgets
+        tools_qt.set_widget_text(self.dialog, txt_id, curve_id)
+        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
+        tools_qt.set_widget_text(self.dialog, cmb_expl_id, row['expl_id'])
+        tools_qt.set_widget_text(self.dialog, cmb_curve_type, row['curve_type'])
+        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
+
+        # Populate table curve_values
+        sql = f"SELECT x_value, y_value FROM v_edit_inp_curve_value WHERE curve_id = '{curve_id}'"
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return
+
+        for n, row in enumerate(rows):
+            tbl_curve_value.setItem(n, 0, QTableWidgetItem(f"{row[0]}"))
+            tbl_curve_value.setItem(n, 1, QTableWidgetItem(f"{row[1]}"))
+            tbl_curve_value.insertRow(tbl_curve_value.rowCount())
 
 
     def _manage_curve_type(self, curve_type_headers, table, index):
@@ -214,7 +258,6 @@ class GwNonVisual:
                         prev_value = float(prev_cell.data(0))
                         if cur_value < prev_value:
                             valid = False
-        # TODO: Check column 1 if curve_type == PUMP
 
         # If first check is valid, check all rows for column for final validation
         if valid:
@@ -266,7 +309,7 @@ class GwNonVisual:
         self.dialog.btn_accept.setEnabled(valid)
 
 
-    def _accept_curves(self):
+    def _accept_curves(self, is_new=True):
         # Variables
         txt_id = self.dialog.txt_curve_id
         txt_descript = self.dialog.txt_descript
@@ -282,63 +325,64 @@ class GwNonVisual:
         expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
         log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
 
-        # Check that there are no empty fields
-        if not curve_id or curve_id == 'null':
-            tools_qt.set_stylesheet(txt_id)
-            return
-        tools_qt.set_stylesheet(txt_id, style="")
+        if is_new:
+            # Check that there are no empty fields
+            if not curve_id or curve_id == 'null':
+                tools_qt.set_stylesheet(txt_id)
+                return
+            tools_qt.set_stylesheet(txt_id, style="")
 
-        # Insert inp_curve
-        sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id, log)" \
-              f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id}, {log})"
-        result = tools_db.execute_sql(sql, commit=False)
-        if not result:
-            msg = "There was an error inserting curve."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
-
-        # Insert inp_pattern_value
-        values = list()
-        for y in range(0, tbl_curve_value.rowCount()):
-            values.append(list())
-            for x in range(0, tbl_curve_value.columnCount()):
-                value = "null"
-                item = tbl_curve_value.item(y, x)
-                if item is not None and item.data(0) not in (None, ''):
-                    value = item.data(0)
-                values[y].append(value)
-
-        is_empty = True
-        for row in values:
-            if row == (['null'] * tbl_curve_value.columnCount()):
-                continue
-            is_empty = False
-
-        if is_empty:
-            msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
-
-        for row in values:
-            if row == (['null'] * tbl_curve_value.columnCount()):
-                continue
-
-            sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
-                  f"VALUES ({curve_id}, "
-            for x in row:
-                sql += f"{x}, "
-            sql = sql.rstrip(', ') + ")"
+            # Insert inp_curve
+            sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id, log)" \
+                  f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id}, {log})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
-                msg = "There was an error inserting curve value."
+                msg = "There was an error inserting curve."
                 tools_qgis.show_warning(msg)
                 global_vars.dao.rollback()
                 return
 
-        # Commit and close dialog
-        global_vars.dao.commit()
+            # Insert inp_pattern_value
+            values = list()
+            for y in range(0, tbl_curve_value.rowCount()):
+                values.append(list())
+                for x in range(0, tbl_curve_value.columnCount()):
+                    value = "null"
+                    item = tbl_curve_value.item(y, x)
+                    if item is not None and item.data(0) not in (None, ''):
+                        value = item.data(0)
+                    values[y].append(value)
+
+            is_empty = True
+            for row in values:
+                if row == (['null'] * tbl_curve_value.columnCount()):
+                    continue
+                is_empty = False
+
+            if is_empty:
+                msg = "You need at least one row of values."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+
+            for row in values:
+                if row == (['null'] * tbl_curve_value.columnCount()):
+                    continue
+
+                sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
+                      f"VALUES ({curve_id}, "
+                for x in row:
+                    sql += f"{x}, "
+                sql = sql.rstrip(', ') + ")"
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    msg = "There was an error inserting curve value."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
+
+            # Commit and close dialog
+            global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
     # endregion
 
