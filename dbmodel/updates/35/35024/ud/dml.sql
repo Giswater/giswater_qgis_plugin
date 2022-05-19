@@ -30,6 +30,14 @@ UPDATE config_form_fields SET label='dma' WHERE columnname='dma_id' AND label='d
 UPDATE config_form_fields SET label='sector' WHERE columnname='sector_id' AND label='sector_id' AND formname LIKE 've_%';
 UPDATE config_form_fields SET label='exploitation' WHERE columnname='expl_id' AND label='expl_id' AND formname LIKE 've_%';
 
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+VALUES( 'v_edit_cat_feature_node', 'form_feature', 'main', 'double_geom', null, null, 'string', 'text', 'double geom', null, 
+null, false, false, true, false, false, null, null, null, null, 
+null, null, null, null, null, false);
+
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
@@ -60,7 +68,7 @@ UPDATE config_form_fields SET iseditable=true WHERE  formname ilike 'v_edit_cat_
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
 
-UPDATE config_form_fields SET widgettype='combo' WHERE columnname='system_id' and formname in ('cat_feature_gully', 'v_edit_cat_feature_gully');
+UPDATE config_form_fields SET widgettype='combo', dv_isnullvalue=false WHERE columnname='system_id' and formname in ('cat_feature_gully', 'v_edit_cat_feature_gully');
 
 UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''GULLY'' ' 
 WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_gully';
