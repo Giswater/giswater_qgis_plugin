@@ -47,10 +47,20 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature_gully';
 
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_feature' AND columnname in ('link_path', 'shortcut_key', 'codeautofill', 'descript', 'active');
+
 UPDATE config_form_fields SET columnname='system_id' WHERE columnname='type' and formname ilike 'v_edit_cat_feature_gully';
 UPDATE config_form_fields SET iseditable=true WHERE  formname ilike 'v_edit_cat_feature_gully';
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature%';
+
+UPDATE config_form_fields SET widgettype='combo' WHERE columnname='system_id' and formname in ('cat_feature_gully', 'v_edit_cat_feature_gully');
 
 UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM sys_feature_cat WHERE id IS NOT NULL AND type=''GULLY'' ' 
 WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_gully';
