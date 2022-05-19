@@ -103,13 +103,12 @@ epa_default,
 isarcdivide,
 isprofilesurface,
 choose_hemisphere,
+code_autofill,
 double_geom::text,
 num_arcs,
 graf_delimiter,
 shortcut_key,
-code_autofill,
 link_path,
-config::text,
 descript,
 active
 FROM cat_feature
@@ -120,10 +119,9 @@ SELECT
 id,
 system_id,
 epa_default,
-shortcut_key,
 code_autofill,
+shortcut_key,
 link_path,
-config::text,
 descript,
 active
 FROM cat_feature
@@ -135,10 +133,9 @@ SELECT
 id,
 system_id,
 epa_default,
-shortcut_key,
 code_autofill,
+shortcut_key,
 link_path,
-config::text,
 descript,
 active
 FROM cat_feature

@@ -92,7 +92,7 @@ VALUES (101, 'Connecs by Exploitation',
 "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ORDER BY name","isNullValue":"true"}]',
 'role_basic');
 
-
+DELETE FROM config_report WHERE id = 102;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
 VALUES (102, 'Input Water by Exploitation, Dma & Period', 
 'SELECT exploitation as "Exploitation", period "Period", dma as "Dma", total as "Input Water" FROM v_om_waterbalance',
@@ -106,7 +106,7 @@ VALUES (102, 'Input Water by Exploitation, Dma & Period',
 ]',
 'role_om');
 
-
+DELETE FROM config_report WHERE id = 103;
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
 VALUES (103, 'NRW by Exploitation, Dma & Period', 
 'SELECT exploitation as "Exploitation", dma as "Dma", period as "Period", total as "Total", rw as "Revenue Water", nrw as "NRW", eff as "Efficiency" FROM v_om_waterbalance_nrw',
@@ -121,7 +121,7 @@ VALUES (103, 'NRW by Exploitation, Dma & Period',
 
 
 INSERT INTO config_report(id, alias, query_text, vdefault, filterparam, sys_role)
-VALUES (104, 'Losses by Exploitation, Dma and Period', 
+VALUES (104, 'Losses by Exploitation, Dma & Period', 
 'SELECT exploitation as "Exploitation", dma as "Dma", period as "Period", total as "Total", auth as "Auth. Consumption", loss as "Water Losses", eff as "Efficiency" FROM v_om_waterbalance_loss',
 '{"orderBy":"1", "orderType": "DESC"}',
 '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
@@ -134,7 +134,7 @@ VALUES (104, 'Losses by Exploitation, Dma and Period',
 
 
 INSERT INTO config_report(id, alias, query_text, sys_role)
-VALUES (105, 'Water consumption, Dma and Period', 
+VALUES (105, 'Water consumption, Dma & Period', 
 'SELECT p.code, dma_id, name as dma_name, round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
 JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
 JOIN connec c using (connec_id) JOIN dma using(dma_id) GROUP BY p.code, dma_id,dma_name',
@@ -142,7 +142,7 @@ JOIN connec c using (connec_id) JOIN dma using(dma_id) GROUP BY p.code, dma_id,d
 
 
 INSERT INTO config_report(id, alias, query_text, sys_role)
-VALUES (106, 'Full water balance, Dma and Period', 
+VALUES (106, 'Full water balance, Dma & Period', 
 'SELECT name, w.* FROM om_waterbalance w JOIN dma USING (dma_id)',
 'role_om');
 
