@@ -244,6 +244,14 @@ class GwLoadProject(QObject):
         if global_vars.project_type not in ('ws','ud'):
             return False
 
+        sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
+        row= tools_db.get_row(sql)
+        if row:
+            addparam=row[0]
+            add_type=addparam.get("type")
+            if add_type and add_type.lower() not in("ws","ud"):
+                return False
+
         return True
 
 
