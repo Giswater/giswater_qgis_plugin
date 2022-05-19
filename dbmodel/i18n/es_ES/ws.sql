@@ -81,7 +81,6 @@ INSERT INTO node_type VALUES ('DEPOSITO', 'TANK', 'TANK', 'man_tank', 'inp_tank'
 INSERT INTO node_type VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Válvula acelaración');
 INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Unión donde convergen 3 tuberías');
 INSERT INTO node_type VALUES ('POZO_CAPTACION', 'WATERWELL', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pozo de captación');
-INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tap');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unión donde convergen 4 tuberías');
 INSERT INTO node_type VALUES ('CAPTACION', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captación');
 INSERT INTO node_type VALUES ('POZO_ACCESO', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pozo de acceso para inspección');

@@ -79,7 +79,6 @@ INSERT INTO node_type VALUES ('DIPOSIT', 'TANK', 'TANK', 'man_tank', 'inp_tank',
 INSERT INTO node_type VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula d''acceleració');
 INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Unió on 3 conductes convergeixen');
 INSERT INTO node_type VALUES ('POU', 'WATERWELL', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou');
-INSERT INTO node_type VALUES ('FONT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tap');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unió on 4 conductes convergeixen');
 INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captació');
 INSERT INTO node_type VALUES ('POU_ACCES', 'MANHOLE', 'RESERVOIR', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou accés');
