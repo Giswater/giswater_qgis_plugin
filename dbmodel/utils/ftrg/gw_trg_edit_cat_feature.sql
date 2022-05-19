@@ -68,7 +68,7 @@ BEGIN
 			ELSIF v_project_type='ud' THEN
 			
 				-- control nulls
-				IF NEW.exitupperintro IS NULL THEN NEW.exitupperintro='0'; END IF;
+				IF NEW.isexitupperintro IS NULL THEN NEW.isexitupperintro=1; END IF;
 			
 				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, isexitupperintro=NEW.isexitupperintro  WHERE id=NEW.id;
@@ -78,7 +78,7 @@ BEGIN
 
 			IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
 
-			UPDATE cat_feature_gully SET epa_default=NEW.epa_default, double_geom=NEW.double_geom::json WHERE id=NEW.id;
+			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 		END IF;
 
 		RETURN NEW;
@@ -113,9 +113,9 @@ BEGIN
 
 		ELSIF v_table='gully' THEN
   	
-			UPDATE cat_feature_connec SET epa_default=NEW.epa_default, double_geom=NEW.double_geom::json WHERE id=NEW.id;
+			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 
-			END IF;
+		END IF;
 
 		RETURN NEW;
 

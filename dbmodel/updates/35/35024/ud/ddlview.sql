@@ -320,9 +320,9 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_connec AS
 SELECT
 id,
 system_id,
-shortcut_key,
 code_autofill,
 double_geom::text,
+shortcut_key,
 link_path,
 descript,
 active
@@ -335,9 +335,9 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_gully AS
 SELECT
 id,
 system_id,
-shortcut_key,
 code_autofill,
 double_geom::text,
+shortcut_key,
 link_path,
 descript,
 active
