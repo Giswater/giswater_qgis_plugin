@@ -950,7 +950,7 @@ class GwNonVisual:
             tbl_timeseries_value.insertRow(tbl_timeseries_value.rowCount())
 
 
-    def _accept_timeseries(self):
+    def _accept_timeseries(self, is_new):
 
         # Variables
         txt_id = self.dialog.txt_id
@@ -973,95 +973,96 @@ class GwNonVisual:
         expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
         log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
 
-        # Check that there are no empty fields
-        if not timeseries_id or timeseries_id == 'null':
-            tools_qt.set_stylesheet(txt_id)
-            return
-        tools_qt.set_stylesheet(txt_id, style="")
+        if is_new:
+            # Check that there are no empty fields
+            if not timeseries_id or timeseries_id == 'null':
+                tools_qt.set_stylesheet(txt_id)
+                return
+            tools_qt.set_stylesheet(txt_id, style="")
 
-        # Insert inp_timeseries
-        sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log)" \
-              f"VALUES({timeseries_id}, '{timeser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}', {log})"
-        result = tools_db.execute_sql(sql, commit=False)
-        if not result:
-            msg = "There was an error inserting timeseries."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
+            # Insert inp_timeseries
+            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log)" \
+                  f"VALUES({timeseries_id}, '{timeser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}', {log})"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting timeseries."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
 
-        if fname not in (None, 'null'):
-            sql = ""  # No need to insert to inp_timeseries_value?
+            if fname not in (None, 'null'):
+                sql = ""  # No need to insert to inp_timeseries_value?
 
-        # Insert inp_timeseries_value
-        values = list()
-        for y in range(0, tbl_timeseries_value.rowCount()):
-            values.append(list())
-            for x in range(0, tbl_timeseries_value.columnCount()):
-                value = "null"
-                item = tbl_timeseries_value.item(y, x)
-                if item is not None and item.data(0) not in (None, ''):
-                    value = item.data(0)
-                    try:  # Try to convert to float, otherwise put quotes
-                        value = float(value)
-                    except ValueError:
-                        value = f"'{value}'"
-                values[y].append(value)
+            # Insert inp_timeseries_value
+            values = list()
+            for y in range(0, tbl_timeseries_value.rowCount()):
+                values.append(list())
+                for x in range(0, tbl_timeseries_value.columnCount()):
+                    value = "null"
+                    item = tbl_timeseries_value.item(y, x)
+                    if item is not None and item.data(0) not in (None, ''):
+                        value = item.data(0)
+                        try:  # Try to convert to float, otherwise put quotes
+                            value = float(value)
+                        except ValueError:
+                            value = f"'{value}'"
+                    values[y].append(value)
 
-        # Check if table is empty
-        is_empty = True
-        for row in values:
-            if row == (['null'] * tbl_timeseries_value.columnCount()):
-                continue
-            is_empty = False
-
-        if is_empty:
-            msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return
-
-        if times_type == 'ABSOLUTE':
+            # Check if table is empty
+            is_empty = True
             for row in values:
                 if row == (['null'] * tbl_timeseries_value.columnCount()):
                     continue
-                if 'null' in (row[0], row[1], row[2]):
-                    msg = "You have to fill in 'date', 'time' and 'value' fields!"
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
+                is_empty = False
 
-                sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, value) "
-                sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
+            if is_empty:
+                msg = "You need at least one row of values."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
 
-                result = tools_db.execute_sql(sql, commit=False)
-                if not result:
-                    msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
-        elif times_type == 'RELATIVE':
+            if times_type == 'ABSOLUTE':
+                for row in values:
+                    if row == (['null'] * tbl_timeseries_value.columnCount()):
+                        continue
+                    if 'null' in (row[0], row[1], row[2]):
+                        msg = "You have to fill in 'date', 'time' and 'value' fields!"
+                        tools_qgis.show_warning(msg)
+                        global_vars.dao.rollback()
+                        return
 
-            for row in values:
-                if row == (['null'] * tbl_timeseries_value.columnCount()):
-                    continue
-                if 'null' in (row[1], row[2]):
-                    msg = "You have to fill in 'time' and 'value' fields!"
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
+                    sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, value) "
+                    sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
 
-                sql = f"INSERT INTO inp_timeseries_value (timser_id, time, value) "
-                sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
+                    result = tools_db.execute_sql(sql, commit=False)
+                    if not result:
+                        msg = "There was an error inserting pattern value."
+                        tools_qgis.show_warning(msg)
+                        global_vars.dao.rollback()
+                        return
+            elif times_type == 'RELATIVE':
 
-                result = tools_db.execute_sql(sql, commit=False)
-                if not result:
-                    msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
+                for row in values:
+                    if row == (['null'] * tbl_timeseries_value.columnCount()):
+                        continue
+                    if 'null' in (row[1], row[2]):
+                        msg = "You have to fill in 'time' and 'value' fields!"
+                        tools_qgis.show_warning(msg)
+                        global_vars.dao.rollback()
+                        return
 
-        # Commit and close dialog
-        global_vars.dao.commit()
+                    sql = f"INSERT INTO inp_timeseries_value (timser_id, time, value) "
+                    sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
+
+                    result = tools_db.execute_sql(sql, commit=False)
+                    if not result:
+                        msg = "There was an error inserting pattern value."
+                        tools_qgis.show_warning(msg)
+                        global_vars.dao.rollback()
+                        return
+
+            # Commit and close dialog
+            global_vars.dao.commit()
         tools_gw.close_dialog(self.dialog)
 
     # endregion
