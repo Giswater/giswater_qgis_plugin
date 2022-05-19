@@ -218,7 +218,10 @@ class GwElement:
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
+        if feature_type is None:
+            feature_type = "arc"
+        viewname = f"v_edit_{feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_element.feature_id, str(feature_type) + "_id")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
@@ -226,7 +229,7 @@ class GwElement:
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
-        self.feature_type = "arc"
+        self.feature_type = feature_type
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True

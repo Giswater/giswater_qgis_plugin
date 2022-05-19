@@ -34,9 +34,11 @@ class GwDocument(QObject):
         self.schema_name = global_vars.schema_name
         self.files_path = []
         self.project_type=tools_gw.get_project_type()
+        self.doc_tables = None
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None):
+
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
         """ Button 34: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -77,6 +79,7 @@ class GwDocument(QObject):
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
+        self.doc_tables=doc_tables
         # Remove all previous selections
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
@@ -326,14 +329,10 @@ class GwDocument(QObject):
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
 
         # Manage records in tables @table_object_x_@feature_type
-        sql += (f"\nDELETE FROM doc_x_node"
-                f" WHERE doc_id = '{doc_id}';")
-        sql += (f"\nDELETE FROM doc_x_arc"
-                f" WHERE doc_id = '{doc_id}';")
-        sql += (f"\nDELETE FROM doc_x_connec"
-                f" WHERE doc_id = '{doc_id}';")
-        if self.project_type == 'ud':
-            sql += (f"\nDELETE FROM doc_x_gully"
+        for table in self.doc_tables:
+            if table == 'doc_x_gully' and self.project_type != 'ud':
+                continue
+            sql += (f"\nDELETE FROM {table}"
                     f" WHERE doc_id = '{doc_id}';")
 
         if self.list_ids['arc']:
