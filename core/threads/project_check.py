@@ -136,7 +136,7 @@ class GwProjectCheckTask(GwTask):
         # Get log folder size
         log_folder_volume = 0
         if global_vars.user_folder_dir:
-            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 
