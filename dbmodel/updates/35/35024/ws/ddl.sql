@@ -137,3 +137,5 @@ REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE
 
 ALTER TABLE inp_dscenario_valve ADD CONSTRAINT inp_dscenario_valve_dscenario_id_fkey FOREIGN KEY (dscenario_id)
 REFERENCES cat_dscenario (dscenario_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE cat_feature_node ALTER COLUMN graf_delimiter SET DEFAULT 'NONE';
