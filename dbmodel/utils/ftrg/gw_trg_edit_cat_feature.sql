@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3146
 
-CREATE OR REPLACE FUNCTION "ws_sample".gw_trg_edit_cat_feature()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_cat_feature()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -39,7 +39,12 @@ BEGIN
 
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
+				
 			ELSIF v_project_type='ud' THEN
+
+				-- control nulls
+				IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
+			
 				UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 			END IF;
 
