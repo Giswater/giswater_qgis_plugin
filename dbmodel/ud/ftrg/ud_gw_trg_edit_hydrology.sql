@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_hydrology()  RETURNS trigge
 $BODY$
 
 DECLARE 
-
+v_id integer;
 
 BEGIN
 
@@ -18,10 +18,10 @@ BEGIN
 	
 	IF TG_OP = 'INSERT' THEN
 
-		INSERT INTO cat_hydrology(hydrology_id, name, infiltration, text, active, expl_id, log)
-    VALUES (NEW.hydrology_id, NEW.name, NEW.infiltration, NEW.text, NEW.active, NEW.expl_id, NEW.log);
+		INSERT INTO cat_hydrology(name, infiltration, text, active, expl_id, log)
+    VALUES (NEW.name, NEW.infiltration, NEW.text, NEW.active, NEW.expl_id, NEW.log) RETURNING hydrology_id INTO v_id;
 
-    UPDATE config_param_user SET value=NEW.id WHERE parameter='inp_options_hydrology_scenario' AND cur_user=current_user;
+    UPDATE config_param_user SET value=v_id WHERE parameter='inp_options_hydrology_scenario' AND cur_user=current_user;
 
 		RETURN NEW;
 		

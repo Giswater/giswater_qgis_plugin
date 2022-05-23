@@ -10,7 +10,8 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_dwf()  RETURNS trigger 
 $BODY$
 
 DECLARE 
-
+v_table text;
+v_id integer;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -21,9 +22,9 @@ BEGIN
 
     	IF v_table = 'cat_dwf_scenario' THEN
 				INSERT INTO cat_dwf_scenario(id, idval, startdate, enddate, observ, active, expl_id, log)
-	  	  VALUES (NEW.id, NEW.idval, NEW.startdate, NEW.enddate, NEW.observ, NEW.active, NEW.expl_id, NEW.log);
+	  	  VALUES (NEW.id, NEW.idval, NEW.startdate, NEW.enddate, NEW.observ, NEW.active, NEW.expl_id, NEW.log) RETURNING id INTO v_id;
 
-  	  	UPDATE config_param_user SET value=NEW.id WHERE parameter='inp_options_dwfscenario' AND cur_user=current_user;
+  	  	UPDATE config_param_user SET value=v_id WHERE parameter='inp_options_dwfscenario' AND cur_user=current_user;
   	ELSE
 			INSERT INTO inp_dwf (node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
 			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4, NEW.dwfscenario_id);
