@@ -200,7 +200,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_id, curve_id)
         tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
-        tools_qt.set_widget_text(self.dialog, cmb_expl_id, row['expl_id'])
+        tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, cmb_curve_type, row['curve_type'])
         tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
