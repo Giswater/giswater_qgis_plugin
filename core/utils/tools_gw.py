@@ -3396,6 +3396,17 @@ def get_vertex_flag(default_value):
     return vertex_flag
 
 
+def get_sysversion_addparam():
+    """ Gets addparam field from table sys_version """
+    sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
+    row = tools_db.get_row(sql)
+
+    if row:
+        return row[0]
+
+    return None
+
+
 def create_giswater_menu(project_loaded=False):
     """ Create Giswater menu """
     if global_vars.load_project_menu is None:
