@@ -157,7 +157,7 @@ class GwNonVisual:
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, tbl_curve_value))
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, (curve_id is None)))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, (curve_id is None), curve_id))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
@@ -290,7 +290,7 @@ class GwNonVisual:
         self.dialog.btn_accept.setEnabled(valid)
 
 
-    def _accept_curves(self, is_new):
+    def _accept_curves(self, is_new, curve_id):
         # Variables
         txt_id = self.dialog.txt_curve_id
         txt_descript = self.dialog.txt_descript
@@ -364,6 +364,13 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif curve_id is not None:
+            table_name = 'v_edit_inp_curve'
+            fields = {"curve_type": curve_type,
+                      "descript": descript,
+                      "expl_id": expl_id,
+                      "log": log}
+            self._setfields(curve_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
     # endregion
 
@@ -525,6 +532,12 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif pattern_id is not None:
+            table_name = 'v_edit_inp_pattern'
+            fields = {"observ": observ,
+                      "expl_id": expl_id,
+                      "log": log}
+            self._setfields(pattern_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
 
 
@@ -689,6 +702,13 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif pattern_id is not None:
+            table_name = 'v_edit_inp_pattern'
+            fields = {"pattern_type": pattern_type,
+                      "observ": observ,
+                      "expl_id": expl_id,
+                      "log": log}
+            self._setfields(pattern_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
 
     # endregion
@@ -709,7 +729,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         is_new = control_id is None
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, is_new))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, is_new, control_id))
         self._connect_dialog_signals()
 
         # Open dialog
@@ -734,7 +754,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
 
 
-    def _accept_controls(self, is_new):
+    def _accept_controls(self, is_new, control_id):
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -765,6 +785,12 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif control_id is not None:
+            table_name = 'v_edit_inp_controls'
+            fields = {"sector_id": sector_id,
+                      "active": active,
+                      "text": text}
+            self._setfields(control_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
 
     # endregion
@@ -785,7 +811,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         is_new = rule_id is None
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, is_new))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, is_new, rule_id))
         self._connect_dialog_signals()
 
         # Open dialog
@@ -810,7 +836,7 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
 
 
-    def _accept_rules(self, is_new):
+    def _accept_rules(self, is_new, rule_id):
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -841,6 +867,12 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif rule_id is not None:
+            table_name = 'v_edit_inp_rules'
+            fields = {"sector_id": sector_id,
+                      "active": active,
+                      "text": text}
+            self._setfields(rule_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
 
     # endregion
@@ -1058,11 +1090,38 @@ class GwNonVisual:
 
             # Commit and close dialog
             global_vars.dao.commit()
+        elif timeseries_id is not None:
+            table_name = 'v_edit_inp_pattern'
+            # timeseries_id
+            # idval
+            # timeser_type
+            # times_type
+            # descript
+            # fname
+            # expl_id
+            # log
+            fields = {"idval": idval,
+                      "timser_type": timeser_type,
+                      "times_type": times_type,
+                      "descript": descript,
+                      "fname": fname,
+                      "expl_id": expl_id,
+                      "log": log}
+            self._setfields(timeseries_id, table_name, fields)
         tools_gw.close_dialog(self.dialog)
 
     # endregion
 
     # region private functions
+    def _setfields(self, id, table_name, fields):
+
+        feature = f'"id":"{id}", '
+        feature += f'"tableName":"{table_name}" '
+        extras = f'"fields":{fields}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
+
+
     def _connect_dialog_signals(self):
 
         # self.dialog.btn_accept.clicked.connect(self.dialog.accept)
