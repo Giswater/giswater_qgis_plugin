@@ -31,6 +31,11 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg = None
+        self.dict_views = {'ws':{'v_edit_inp_curve':'curves', 'v_edit_inp_pattern':'patterns',
+                                 'v_edit_inp_controls':'controls', 'v_edit_inp_rules':'rules'},
+                           'ud':{'v_edit_inp_curve':'curves', 'v_edit_inp_pattern':'patterns',
+                                 'v_edit_inp_controls':'controls', 'v_edit_inp_timeseries':'timeseries',
+                                 'v_edit_lid_controls':'lids'}}
 
 
     def manage_nonvisual(self):
@@ -46,9 +51,6 @@ class GwNonVisual:
         # Connect dialog signals
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
-        self.manager_dlg.main_tab.currentChanged.connect(
-            partial(self._fill_manager_table, set_edit_triggers=QTableView.DoubleClicked))
-
 
         # Open dialog
         tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
@@ -56,37 +58,30 @@ class GwNonVisual:
 
     def _manage_tabs_manager(self):
 
-        # ws = ['curves', 'patterns', 'controls', 'rules']
-        # ud = ['curves', 'patterns', 'controls', 'timeseries', 'lids']
-        views = ['v_edit_inp_curve','v_edit_inp_pattern','v_edit_inp_controls', 'v_edit_inp_rules']
+        dict_views_project = self.dict_views[global_vars.project_type]
 
-        # Select all views
-        # sql = f"SELECT views"
-        # rows = tools_db.get_rows(sql)
-        # if rows:
-        # views = [x[0] for x in rows]
-
-        module = sys.modules[__name__]
-
-        for view in views:
+        for key in dict_views_project.keys():
             qtableview = QTableView()
-            qtableview.setObjectName(f"tbl_{view}")
-            tab_idx = self.manager_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
-            self.manager_dlg.main_tab.widget(tab_idx).setObjectName(view)
-
-            function_name = f"get_{view.split('_')[-1]}"
+            qtableview.setObjectName(f"tbl_{dict_views_project[key]}")
+            tab_idx = self.manager_dlg.main_tab.addTab(qtableview, f"{dict_views_project[key].capitalize()}")
+            self.manager_dlg.main_tab.widget(tab_idx).setObjectName(key)
+            function_name = f"get_{dict_views_project[key]}"
             _id = 0
-            kwargs = {'id':_id}
-            qtableview.doubleClicked.connect(partial(getattr(self, function_name), **kwargs))
 
-        self._fill_manager_table(set_edit_triggers=QTableView.DoubleClicked)
+            self._fill_manager_table(qtableview, key)
+
+            qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
 
 
-    def _fill_manager_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+    def _get_nonvisual_object(self, tbl_view, function_name):
+
+        object_id = tbl_view.selectionModel().selectedRows()[0].data()
+        if hasattr(self, function_name):
+            getattr(self, function_name)(object_id)
+
+
+    def _fill_manager_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """  """
-
-        table_name = f"{self.manager_dlg.main_tab.currentWidget().objectName()}"
-        widget = self.manager_dlg.main_tab.currentWidget()
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
