@@ -51,3 +51,9 @@ UPDATE sys_table SET context=a.context, orderby=a.orderby, alias=a.alias FROM (S
 WHERE id='v_edit_cat_dwf_scenario';
 
 UPDATE sys_table SET context=NULL, orderby=NULL, alias=NULL WHERE id='cat_hydrology' or id='cat_dwf_scenario';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(447, 'Import cat_feature_gully table', 'utils', NULL, 'core', true, '"Function process"', NULL) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
+VALUES (447, 'Import cat_feature_gully', 'Import cat_feature_gully', 'gw_fct_import_cat_feature', true,15, '{"table": "cat_feature_gully"}');
