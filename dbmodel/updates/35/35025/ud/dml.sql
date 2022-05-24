@@ -27,3 +27,27 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_dscenario' AND columnname IN ('expl_id', 'log') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_hydrology', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_hydrology' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_hydrology', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_dscenario' AND columnname IN ('expl_id', 'log') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+UPDATE sys_table SET context=a.context, orderby=a.orderby, alias=a.alias FROM (SELECT context, orderby, alias FROM sys_table WHERE id='cat_hydrology')a 
+WHERE id='v_edit_cat_hydrology';
+UPDATE sys_table SET context=a.context, orderby=a.orderby, alias=a.alias FROM (SELECT context, orderby, alias FROM sys_table WHERE id='cat_dwf_scenario')a 
+WHERE id='v_edit_cat_dwf_scenario';
+
+UPDATE sys_table SET context=NULL, orderby=NULL, alias=NULL WHERE id='cat_hydrology' or id='cat_dwf_scenario';
