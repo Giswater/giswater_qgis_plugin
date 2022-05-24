@@ -23,10 +23,11 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 class GwFeatureEndButton(GwAction):
     """ Button 68: End feature """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.list_tabs=list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
+        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
+        self.feature_type = feature_type
 
 
     def clicked_event(self):
@@ -135,7 +136,10 @@ class GwFeatureEndButton(GwAction):
         self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_work_end.feature_id, "arc_id")
+        if self.feature_type is None:
+            self.feature_type = "arc"
+        viewname=f"v_edit_{self.feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.feature_type + "_id"))
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
