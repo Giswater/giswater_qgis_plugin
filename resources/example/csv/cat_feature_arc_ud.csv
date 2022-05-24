@@ -1,0 +1,6 @@
+id,system_id,epa_default,code_autofill,shortcut_key,link_path,descript,active
+CONDUIT,CONDUIT,CONDUIT,true,Alt+X,,,true
+SIPHON,SIPHON,CONDUIT,true,Alt+B,,,true
+WACCEL,WACCEL,CONDUIT,true,Alt+G,,,true
+VARC,VARC,VIRTUAL,true,Alt+Q,,,true
+PUMP_PIPE,CONDUIT,CONDUIT,true,Alt+U,,,true
