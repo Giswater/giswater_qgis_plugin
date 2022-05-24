@@ -1091,15 +1091,7 @@ class GwNonVisual:
             # Commit and close dialog
             global_vars.dao.commit()
         elif timeseries_id is not None:
-            table_name = 'v_edit_inp_pattern'
-            # timeseries_id
-            # idval
-            # timeser_type
-            # times_type
-            # descript
-            # fname
-            # expl_id
-            # log
+            table_name = 'v_edit_inp_timeseries'
             fields = {"idval": idval,
                       "timser_type": timeser_type,
                       "times_type": times_type,
