@@ -453,7 +453,10 @@ class GwNonVisual:
 
         for n, row in enumerate(rows):
             for i, cell in enumerate(row):
-                tbl_pattern_value.setItem(n, i, QTableWidgetItem(f"{cell}"))
+                value = f"{cell}"
+                if value in (None, 'None'):
+                    value = ''
+                tbl_pattern_value.setItem(n, i, QTableWidgetItem(value))
             tbl_pattern_value.insertRow(tbl_pattern_value.rowCount())
         # Set headers
         headers = ['Multiplier' for n in range(0, tbl_pattern_value.rowCount() + 1)]
