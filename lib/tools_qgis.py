@@ -287,7 +287,7 @@ def get_project_layers():
 def find_toc_group(root, group, case_sensitive=False):
     """ Find a group of layers in the ToC """
 
-    for grp in root.findGroups(True):
+    for grp in root.findGroups():
         group1 = grp.name()
         group2 = group
         if not case_sensitive:
