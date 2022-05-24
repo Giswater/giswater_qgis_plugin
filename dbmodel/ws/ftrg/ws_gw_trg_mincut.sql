@@ -22,7 +22,8 @@ BEGIN
 		OLD.work_order!=NEW.work_order OR NEW.mincut_class!=OLD.mincut_class OR NEW.expl_id!=OLD.expl_id OR OLD.macroexpl_id!=NEW.macroexpl_id OR 
 		OLD.muni_id!=NEW.muni_id OR OLD.postcode!=NEW.postcode OR OLD.streetaxis_id!=NEW.streetaxis_id OR NEW.postnumber!=OLD.postnumber OR 
 		NEW.anl_user!=OLD.anl_user OR NEW.anl_descript!=OLD.anl_descript OR OLD.anl_feature_id!=NEW.anl_feature_id OR NEW.anl_feature_type!=OLD.anl_feature_type OR 
-		NEW.anl_the_geom::text!=OLD.anl_the_geom::text OR NEW.forecast_start!=OLD.forecast_start OR NEW.forecast_end!=OLD.forecast_end OR NEW.assigned_to!=OLD.assigned_to THEN
+		NEW.anl_the_geom::text!=OLD.anl_the_geom::text OR NEW.forecast_start!=OLD.forecast_start OR NEW.forecast_end!=OLD.forecast_end OR NEW.assigned_to!=OLD.assigned_to
+        OR NEW.output::text!=OLD.output::text THEN
 
 			UPDATE om_mincut SET modification_date=now() WHERE id = NEW.id;
 
