@@ -23,7 +23,7 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_inp_dscenario_controls', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_inp_controls';
+FROM config_form_fields WHERE formname='v_edit_inp_controls' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -31,7 +31,7 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_inp_dscenario_controls', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE columnname='dscenario_id' AND formname='v_edit_inp_dscenario_junction';
+FROM config_form_fields WHERE columnname='dscenario_id' AND formname='v_edit_inp_dscenario_junction' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('inp_dscenario_controls', '"Table to manage scenario for controls"', 'role_epa', null,null,NULL, 'core');
@@ -82,7 +82,7 @@ SELECT 'v_edit_cat_feature_arc', formtype, tabname, columnname, layoutname, layo
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature' and columnname in ('id', 'system_id', 'shortcut_key', 'code_autofill', 'link_path', 
-'config', 'descript', 'active');
+'config', 'descript', 'active') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -90,7 +90,7 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_arc', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_default');
+FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_default') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
@@ -100,7 +100,7 @@ SELECT 'v_edit_cat_feature_connec', formtype, tabname, columnname, layoutname, l
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature' and columnname in ('id', 'system_id', 'shortcut_key', 'code_autofill', 'link_path', 
-'config', 'descript', 'active');
+'config', 'descript', 'active') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -108,7 +108,7 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_connec', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_connec' and columnname in ('epa_default');
+FROM config_form_fields WHERE formname='cat_feature_connec' and columnname in ('epa_default') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
@@ -118,7 +118,7 @@ SELECT 'v_edit_cat_feature_node', formtype, tabname, columnname, layoutname, lay
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature' and columnname in ('id', 'system_id', 'shortcut_key', 'code_autofill', 'link_path', 
-'config', 'descript', 'active');
+'config', 'descript', 'active') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET label='sys_type' WHERE columnname='system_id' and formname ilike 'v_edit_cat_feature_%';
 

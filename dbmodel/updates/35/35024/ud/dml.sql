@@ -16,7 +16,8 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_inp_coverage', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE columnname ilike 'hydrology_id' AND formname='v_edit_inp_subcatchment';
+FROM config_form_fields WHERE columnname ilike 'hydrology_id' AND formname='v_edit_inp_subcatchment' 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role,  context, orderby, alias, source)
 VALUES ('v_edit_inp_coverage', 'Editable view to manage coverage', 'role_epa',  '{"level_1":"EPA","level_2":"HYDRAULICS"}',17, 'Inp coverage', 
@@ -36,7 +37,7 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
 VALUES( 'v_edit_cat_feature_node', 'form_feature', 'main', 'double_geom', null, null, 'string', 'text', 'double geom', null, 
 null, false, false, true, false, false, null, null, null, null, 
-null, null, null, null, null, false);
+null, null, null, null, null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -45,7 +46,7 @@ SELECT 'v_edit_cat_feature_node', formtype, tabname, columnname, layoutname, lay
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='cat_feature_node' and columnname in ('epa_default', 'isarcdivide', 'isprofilesurface','isexitupperintro', 'choose_hemisphere',
-'num_arcs', 'double_geom');
+'num_arcs', 'double_geom') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -53,7 +54,7 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_gully';
+FROM config_form_fields WHERE formname='cat_feature_gully' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -61,7 +62,8 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature' AND columnname in ('link_path', 'shortcut_key', 'codeautofill', 'descript', 'active');
+FROM config_form_fields WHERE formname='cat_feature' AND columnname in ('link_path', 'shortcut_key', 'codeautofill', 'descript', 'active') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET columnname='system_id' WHERE columnname='type' and formname ilike 'v_edit_cat_feature_gully';
 UPDATE config_form_fields SET iseditable=true WHERE  formname ilike 'v_edit_cat_feature_gully';
