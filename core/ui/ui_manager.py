@@ -213,6 +213,10 @@ class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
 FROM_CLASS = _get_ui_class('nonvisual_timeseries.ui', 'epa')
 class GwNonVisualTimeseriesUi(GwDialog, FROM_CLASS):
     pass
+
+FROM_CLASS = _get_ui_class('nonvisual_lids.ui', 'epa')
+class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
+    pass
 # endregion
 
 

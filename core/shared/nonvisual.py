@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
 import sys
 
 from functools import partial
@@ -14,7 +15,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTab
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
-    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi
+    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
 from ..utils.snap_manager import GwSnapManager
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_db, tools_os, tools_log
@@ -26,6 +27,7 @@ class GwNonVisual:
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
 
+        self.plugin_dir = global_vars.plugin_dir
         self.iface = global_vars.iface
         self.schema_name = global_vars.schema_name
         self.canvas = global_vars.canvas
@@ -1256,6 +1258,66 @@ class GwNonVisual:
                     return False
 
         return True
+
+    # endregion
+
+    # region lids
+    def get_lids(self):
+        ''''''
+
+        # Get dialog
+        self.dialog = GwNonVisualLidsUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Populate LID Type combo
+        sql =f"SELECT lidco_id FROM inp_lid"
+        rows = tools_db.get_rows(sql)
+
+        if rows:
+            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
+
+        # Signals
+        self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
+
+        self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
+
+
+    def _manage_lids_tabs(self, cmb_lidtype, tab_lidlayers):
+
+        lidco_id = str(cmb_lidtype.currentText())
+        sql = f"select lidlayer from inp_lid_value where lidco_id = '{lidco_id}'"
+        rows = tools_db.get_rows(sql)
+
+        # Tabs to show
+        lidtabs = []
+        if rows:
+            for row in rows:
+                lidtabs.append(row[0])
+
+        for i in range(tab_lidlayers.count()):
+            tab_name = tab_lidlayers.widget(i).objectName().upper()
+            if tab_name not in lidtabs:
+                tab_lidlayers.setTabVisible(i, False)
+            else:
+                tab_lidlayers.setTabVisible(i, True)
+
+        # Set image
+        self._manage_lids_images(lidco_id)
+        print(tab_lidlayers.count())
+
+
+    def _manage_lids_images(self, lidco_id):
+        ''' Manage images depending on lidco_id selected'''
+
+        sql = f"select lidco_type from inp_lid where lidco_id = '{lidco_id}'"
+        row = tools_db.get_row(sql)
+        img = f"ud_lid_{row[0]}"
+
+        tools_qt.add_image(self.dialog, 'lbl_section_image',
+                           f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
+
 
     # endregion
 
