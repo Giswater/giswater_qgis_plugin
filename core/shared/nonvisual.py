@@ -323,55 +323,90 @@ class GwNonVisual:
                 global_vars.dao.rollback()
                 return
 
-            # Insert inp_pattern_value
-            values = list()
-            for y in range(0, tbl_curve_value.rowCount()):
-                values.append(list())
-                for x in range(0, tbl_curve_value.columnCount()):
-                    value = "null"
-                    item = tbl_curve_value.item(y, x)
-                    if item is not None and item.data(0) not in (None, ''):
-                        value = item.data(0)
-                    values[y].append(value)
+            # Insert inp_curve_value
+            result = self._insert_curve_values(tbl_curve_value, curve_id)
 
-            is_empty = True
-            for row in values:
-                if row == (['null'] * tbl_curve_value.columnCount()):
-                    continue
-                is_empty = False
+            # Commit and close dialog
+            if result:
+                global_vars.dao.commit()
+        elif curve_id is not None:
+            # Update curve fields
+            table_name = 'v_edit_inp_curve'
 
-            if is_empty:
-                msg = "You need at least one row of values."
+            curve_type = curve_type.strip("'")
+            descript = descript.strip("'")
+            log = log.strip("'")
+            fields = f"""{{"curve_type": "{curve_type}", "descript": "{descript}", "expl_id": {expl_id}, "log": "{log}"}}"""
+
+            result = self._setfields(curve_id.strip("'"), table_name, fields)
+            if not result:
+                return
+
+            # Delete existing curve values
+            sql = f"DELETE FROM v_edit_inp_curve_value WHERE curve_id = {curve_id}"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error deleting old curve values."
                 tools_qgis.show_warning(msg)
                 global_vars.dao.rollback()
                 return
 
-            for row in values:
-                if row == (['null'] * tbl_curve_value.columnCount()):
-                    continue
+            # Insert new curve values
+            result = self._insert_curve_values(tbl_curve_value, curve_id)
+            if not result:
+                return
 
-                sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
-                      f"VALUES ({curve_id}, "
-                for x in row:
-                    sql += f"{x}, "
-                sql = sql.rstrip(', ') + ")"
-                result = tools_db.execute_sql(sql, commit=False)
-                if not result:
-                    msg = "There was an error inserting curve value."
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
-
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
-        elif curve_id is not None:
-            table_name = 'v_edit_inp_curve'
-            fields = {"curve_type": curve_type,
-                      "descript": descript,
-                      "expl_id": expl_id,
-                      "log": log}
-            self._setfields(curve_id, table_name, fields)
+            # Reload manager table
+            try:
+                self.manager_dlg.main_tab.currentWidget().model().select()
+            except:
+                pass
+
         tools_gw.close_dialog(self.dialog)
+
+
+    def _insert_curve_values(self, tbl_curve_value, curve_id):
+        values = list()
+        for y in range(0, tbl_curve_value.rowCount()):
+            values.append(list())
+            for x in range(0, tbl_curve_value.columnCount()):
+                value = "null"
+                item = tbl_curve_value.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        is_empty = True
+        for row in values:
+            # TODO: check that all rows have two values
+            if row == (['null'] * tbl_curve_value.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return False
+
+        for row in values:
+            if row == (['null'] * tbl_curve_value.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
+                  f"VALUES ({curve_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting curve value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return False
+        return True
     # endregion
 
     # region patterns
@@ -1114,7 +1149,13 @@ class GwNonVisual:
         feature += f'"tableName":"{table_name}" '
         extras = f'"fields":{fields}'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, commit=False)
+
+        if (not json_result) or ('status' in json_result and json_result['status'] == 'Failed'):
+            global_vars.dao.rollback()
+            return False
+
+        return True
 
 
     def _connect_dialog_signals(self):
