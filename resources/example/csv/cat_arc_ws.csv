@@ -1,8 +1,3 @@
-id,arctype_id
-PVC_90,PIPE
-PVC_110,PIPE
-PVC_63,PIPE
-FC_110,PIPE
-FC_63,PIPE
-FD_150,PIPE
-PEHD_110,PIPE
+id,system_id,epa_default,code_autofill,shortcut_key,link_path,descript,active
+PIPE,PIPE,PIPE,true,Alt+I,,Water distribution pipe,true
+VARC,VARC,PIPE,true,Alt+T,,Virtual section of the pipe network. Used to connect arcs and nodes when polygons exists,true
