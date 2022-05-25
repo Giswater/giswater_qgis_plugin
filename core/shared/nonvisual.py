@@ -359,10 +359,7 @@ class GwNonVisual:
             # Commit
             global_vars.dao.commit()
             # Reload manager table
-            try:
-                self.manager_dlg.main_tab.currentWidget().model().select()
-            except:
-                pass
+            self._reload_manager_table()
 
         tools_gw.close_dialog(self.dialog)
 
@@ -825,10 +822,19 @@ class GwNonVisual:
             global_vars.dao.commit()
         elif control_id is not None:
             table_name = 'v_edit_inp_controls'
-            fields = {"sector_id": sector_id,
-                      "active": active,
-                      "text": text}
-            self._setfields(control_id, table_name, fields)
+
+            text = text.strip("'")
+            text = text.replace("\n", "\\n")
+            fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+
+            result = self._setfields(control_id, table_name, fields)
+            if not result:
+                return
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
+
         tools_gw.close_dialog(self.dialog)
 
     # endregion
@@ -1156,6 +1162,13 @@ class GwNonVisual:
             return False
 
         return True
+
+
+    def _reload_manager_table(self):
+        try:
+            self.manager_dlg.main_tab.currentWidget().model().select()
+        except:
+            pass
 
 
     def _connect_dialog_signals(self):
