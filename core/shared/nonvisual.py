@@ -328,10 +328,13 @@ class GwNonVisual:
 
             # Insert inp_curve_value
             result = self._insert_curve_values(tbl_curve_value, curve_id)
+            if not result:
+                return
 
-            # Commit and close dialog
-            if result:
-                global_vars.dao.commit()
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif curve_id is not None:
             # Update curve fields
             table_name = 'v_edit_inp_curve'
@@ -534,8 +537,10 @@ class GwNonVisual:
             if not result:
                 return
 
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif pattern_id is not None:
             # Update inp_pattern
             table_name = 'v_edit_inp_pattern'
@@ -731,8 +736,10 @@ class GwNonVisual:
             if not result:
                 return
 
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif pattern_id is not None:
             # Update inp_pattern
             table_name = 'v_edit_inp_pattern'
@@ -883,8 +890,10 @@ class GwNonVisual:
                 global_vars.dao.rollback()
                 return
 
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif control_id is not None:
             table_name = 'v_edit_inp_controls'
 
@@ -974,8 +983,10 @@ class GwNonVisual:
                 global_vars.dao.rollback()
                 return
 
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif rule_id is not None:
             table_name = 'v_edit_inp_rules'
 
@@ -1151,8 +1162,10 @@ class GwNonVisual:
             if not result:
                 return
 
-            # Commit and close dialog
+            # Commit
             global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         elif timeseries_id is not None:
             # Update inp_timeseries
             table_name = 'v_edit_inp_timeseries'
