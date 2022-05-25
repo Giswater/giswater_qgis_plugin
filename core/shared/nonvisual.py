@@ -913,10 +913,18 @@ class GwNonVisual:
             global_vars.dao.commit()
         elif rule_id is not None:
             table_name = 'v_edit_inp_rules'
-            fields = {"sector_id": sector_id,
-                      "active": active,
-                      "text": text}
-            self._setfields(rule_id, table_name, fields)
+
+            text = text.strip("'")
+            text = text.replace("\n", "\\n")
+            fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+
+            result = self._setfields(rule_id, table_name, fields)
+            if not result:
+                return
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         tools_gw.close_dialog(self.dialog)
 
     # endregion
