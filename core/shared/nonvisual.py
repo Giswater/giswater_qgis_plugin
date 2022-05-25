@@ -38,6 +38,7 @@ class GwNonVisual:
                                  'v_edit_lid_controls':'lids'}}
 
 
+    # region manager
     def manage_nonvisual(self):
         """  """
 
@@ -110,7 +111,7 @@ class GwNonVisual:
 
         # Sort the table by feature id
         model.sort(1, 0)
-
+    # endregion
 
     def get_nonvisual(self, object_name):
         """  """
@@ -527,53 +528,85 @@ class GwNonVisual:
                 return
 
             # Insert inp_pattern_value
-            values = list()
-            for y in range(0, tbl_pattern_value.rowCount()):
-                values.append(list())
-                for x in range(0, tbl_pattern_value.columnCount()):
-                    value = "null"
-                    item = tbl_pattern_value.item(y, x)
-                    if item is not None and item.data(0) not in (None, ''):
-                        value = item.data(0)
-                    values[y].append(value)
-
-            is_empty = True
-            for row in values:
-                if row == (['null'] * tbl_pattern_value.columnCount()):
-                    continue
-                is_empty = False
-
-            if is_empty:
-                msg = "You need at least one row of values."
-                tools_qgis.show_warning(msg)
-                global_vars.dao.rollback()
+            result = self._insert_ws_pattern_values(tbl_pattern_value, pattern_id)
+            if not result:
                 return
-
-            for row in values:
-                if row == (['null'] * tbl_pattern_value.columnCount()):
-                    continue
-
-                sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12) " \
-                      f"VALUES ({pattern_id}, "
-                for x in row:
-                    sql += f"{x}, "
-                sql = sql.rstrip(', ') + ")"
-                result = tools_db.execute_sql(sql, commit=False)
-                if not result:
-                    msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
 
             # Commit and close dialog
             global_vars.dao.commit()
         elif pattern_id is not None:
+            # Update inp_pattern
             table_name = 'v_edit_inp_pattern'
-            fields = {"observ": observ,
-                      "expl_id": expl_id,
-                      "log": log}
-            self._setfields(pattern_id, table_name, fields)
+
+            observ = observ.strip("'")
+            log = log.strip("'")
+            fields = f"""{{"expl_id": {expl_id}, "observ": "{observ}", "log": "{log}"}}"""
+
+            result = self._setfields(pattern_id.strip("'"), table_name, fields)
+            if not result:
+                return
+
+            # Update inp_pattern_value
+            sql = f"DELETE FROM v_edit_inp_pattern_value WHERE pattern_id = {pattern_id}"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error deleting old curve values."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+            result = self._insert_ws_pattern_values(tbl_pattern_value, pattern_id)
+            if not result:
+                return
+
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         tools_gw.close_dialog(self.dialog)
+
+
+    def _insert_ws_pattern_values(self, tbl_pattern_value, pattern_id):
+
+        # Insert inp_pattern_value
+        values = list()
+        for y in range(0, tbl_pattern_value.rowCount()):
+            values.append(list())
+            for x in range(0, tbl_pattern_value.columnCount()):
+                value = "null"
+                item = tbl_pattern_value.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        is_empty = True
+        for row in values:
+            if row == (['null'] * tbl_pattern_value.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return False
+
+        for row in values:
+            if row == (['null'] * tbl_pattern_value.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12) " \
+                  f"VALUES ({pattern_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting pattern value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return False
+
+        return True
 
 
     def _manage_ud_patterns_dlg(self, pattern_id):
@@ -681,8 +714,6 @@ class GwNonVisual:
                 return
             tools_qt.set_stylesheet(txt_id, style="")
 
-            table = self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
-
             # Insert inp_pattern
             sql = f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log)" \
                   f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id}, {log})"
@@ -694,57 +725,89 @@ class GwNonVisual:
                 return
 
             # Insert inp_pattern_value
-            values = list()
-            for y in range(0, table.rowCount()):
-                values.append(list())
-                for x in range(0, table.columnCount()):
-                    value = "null"
-                    item = table.item(y, x)
-                    if item is not None and item.data(0) not in (None, ''):
-                        value = item.data(0)
-                    values[y].append(value)
-
-            is_empty = True
-            for row in values:
-                if row == (['null'] * table.columnCount()):
-                    continue
-                is_empty = False
-
-            if is_empty:
-                msg = "You need at least one row of values."
-                tools_qgis.show_warning(msg)
-                global_vars.dao.rollback()
+            result = self._insert_ud_pattern_values(pattern_type, pattern_id)
+            if not result:
                 return
-
-            for row in values:
-                if row == (['null'] * table.columnCount()):
-                    continue
-
-                sql = f"INSERT INTO inp_pattern_value (pattern_id, "
-                for n, x in enumerate(row):
-                    sql += f"factor_{n+1}, "
-                sql = sql.rstrip(', ') + ")"
-                sql += f"VALUES ({pattern_id}, "
-                for x in row:
-                    sql += f"{x}, "
-                sql = sql.rstrip(', ') + ")"
-                result = tools_db.execute_sql(sql, commit=False)
-                if not result:
-                    msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
-                    global_vars.dao.rollback()
-                    return
 
             # Commit and close dialog
             global_vars.dao.commit()
         elif pattern_id is not None:
+            # Update inp_pattern
             table_name = 'v_edit_inp_pattern'
-            fields = {"pattern_type": pattern_type,
-                      "observ": observ,
-                      "expl_id": expl_id,
-                      "log": log}
-            self._setfields(pattern_id, table_name, fields)
+
+            observ = observ.strip("'")
+            log = log.strip("'")
+            fields = f"""{{"pattern_type": {pattern_type}, "expl_id": {expl_id}, "observ": "{observ}", "log": "{log}"}}"""
+
+            result = self._setfields(pattern_id.strip("'"), table_name, fields)
+            if not result:
+                return
+
+            # Update inp_pattern_value
+            sql = f"DELETE FROM v_edit_inp_pattern_value WHERE pattern_id = {pattern_id}"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error deleting old pattern values."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+            result = self._insert_ud_pattern_values(pattern_type, pattern_id)
+            if not result:
+                return
+
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
         tools_gw.close_dialog(self.dialog)
+
+
+    def _insert_ud_pattern_values(self, pattern_type, pattern_id):
+
+        table = self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
+
+        values = list()
+        for y in range(0, table.rowCount()):
+            values.append(list())
+            for x in range(0, table.columnCount()):
+                value = "null"
+                item = table.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                values[y].append(value)
+
+        is_empty = True
+        for row in values:
+            if row == (['null'] * table.columnCount()):
+                continue
+            is_empty = False
+
+        if is_empty:
+            msg = "You need at least one row of values."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return False
+
+        for row in values:
+            if row == (['null'] * table.columnCount()):
+                continue
+
+            sql = f"INSERT INTO inp_pattern_value (pattern_id, "
+            for n, x in enumerate(row):
+                sql += f"factor_{n + 1}, "
+            sql = sql.rstrip(', ') + ")"
+            sql += f"VALUES ({pattern_id}, "
+            for x in row:
+                sql += f"{x}, "
+            sql = sql.rstrip(', ') + ")"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting pattern value."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return False
+
+        return True
 
     # endregion
 
