@@ -157,14 +157,14 @@ class GwNonVisual:
             self._populate_curve_widgets(curve_id)
 
         # Connect dialog signals
-        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, curve_type_headers, tbl_curve_value))
+        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, tbl_curve_value))
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, (curve_id is None), curve_id))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, (curve_id is None), curve_id))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
-        self._manage_curve_type(curve_type_headers, tbl_curve_value, 0)
+        self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
@@ -219,16 +219,16 @@ class GwNonVisual:
             tbl_curve_value.insertRow(tbl_curve_value.rowCount())
 
 
-    def _manage_curve_type(self, curve_type_headers, table, index):
+    def _manage_curve_type(self, dialog, curve_type_headers, table, index):
         """  """
 
-        curve_type = tools_qt.get_text(self.dialog, 'cmb_curve_type')
+        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
         if curve_type:
             headers = curve_type_headers.get(curve_type)
             table.setHorizontalHeaderLabels(headers)
 
 
-    def _manage_curve_value(self, table, row, column):
+    def _manage_curve_value(self, dialog, table, row, column):
         # Control data depending on curve type
         valid = True
         if column == 0:
@@ -276,7 +276,7 @@ class GwNonVisual:
                     continue
                 valid = False
                 break
-            curve_type = tools_qt.get_text(self.dialog, 'cmb_curve_type')
+            curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
             if curve_type == 'PUMP':
                 for i, n in enumerate(y_values):
                     if i == 0 or n is None:
@@ -286,28 +286,28 @@ class GwNonVisual:
                     valid = False
                     break
 
-        self._set_curve_values_valid(valid)
+        self._set_curve_values_valid(dialog, valid)
 
 
-    def _set_curve_values_valid(self, valid):
-        self.dialog.btn_accept.setEnabled(valid)
+    def _set_curve_values_valid(self, dialog, valid):
+        dialog.btn_accept.setEnabled(valid)
 
 
-    def _accept_curves(self, is_new, curve_id):
+    def _accept_curves(self, dialog, is_new, curve_id):
         # Variables
-        txt_id = self.dialog.txt_curve_id
-        txt_descript = self.dialog.txt_descript
-        cmb_expl_id = self.dialog.cmb_expl_id
-        cmb_curve_type = self.dialog.cmb_curve_type
-        txt_log = self.dialog.txt_log
-        tbl_curve_value = self.dialog.tbl_curve_value
+        txt_id = dialog.txt_curve_id
+        txt_descript = dialog.txt_descript
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_curve_type = dialog.cmb_curve_type
+        txt_log = dialog.txt_log
+        tbl_curve_value = dialog.tbl_curve_value
 
         # Get widget values
-        curve_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
-        curve_type = tools_qt.get_combo_value(self.dialog, cmb_curve_type)
-        descript = tools_qt.get_text(self.dialog, txt_descript, add_quote=True)
-        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
-        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+        curve_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
+        curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
+        descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -364,7 +364,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
 
     def _insert_curve_values(self, tbl_curve_value, curve_id):
@@ -455,7 +455,7 @@ class GwNonVisual:
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = pattern_id is None
-        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws, is_new)
+        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws, self.dialog, is_new)
 
 
     def _populate_ws_patterns_widgets(self, pattern_id):
@@ -498,19 +498,19 @@ class GwNonVisual:
         tbl_pattern_value.setVerticalHeaderLabels(headers)
 
 
-    def _accept_pattern_ws(self, is_new):
+    def _accept_pattern_ws(self, dialog, is_new):
         # Variables
-        txt_id = self.dialog.txt_pattern_id
-        txt_observ = self.dialog.txt_observ
-        cmb_expl_id = self.dialog.cmb_expl_id
-        txt_log = self.dialog.txt_log
-        tbl_pattern_value = self.dialog.tbl_pattern_value
+        txt_id = dialog.txt_pattern_id
+        txt_observ = dialog.txt_observ
+        cmb_expl_id = dialog.cmb_expl_id
+        txt_log = dialog.txt_log
+        tbl_pattern_value = dialog.tbl_pattern_value
 
         # Get widget values
-        pattern_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
-        observ = tools_qt.get_text(self.dialog, txt_observ, add_quote=True)
-        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
-        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+        pattern_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
+        observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -564,7 +564,7 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
 
     def _insert_ws_pattern_values(self, tbl_pattern_value, pattern_id):
@@ -631,13 +631,13 @@ class GwNonVisual:
             self._populate_ud_patterns_widgets(pattern_id)
 
         # Signals
-        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, cmb_pattern_type))
+        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type))
 
-        self._manage_patterns_tableviews(cmb_pattern_type)
+        self._manage_patterns_tableviews(self.dialog, cmb_pattern_type)
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = pattern_id is None
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ud, is_new))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ud, self.dialog, is_new))
 
 
     def _populate_ud_patterns_widgets(self, pattern_id):
@@ -674,13 +674,13 @@ class GwNonVisual:
                 table.setItem(n, i, QTableWidgetItem(f"{row[f'factor_{i+1}']}"))
 
 
-    def _manage_patterns_tableviews(self, cmb_pattern_type):
+    def _manage_patterns_tableviews(self, dialog, cmb_pattern_type):
 
         # Variables
-        tbl_monthly = self.dialog.tbl_monthly
-        tbl_daily = self.dialog.tbl_daily
-        tbl_hourly = self.dialog.tbl_hourly
-        tbl_weekend = self.dialog.tbl_weekend
+        tbl_monthly = dialog.tbl_monthly
+        tbl_daily = dialog.tbl_daily
+        tbl_hourly = dialog.tbl_hourly
+        tbl_weekend = dialog.tbl_weekend
 
         # Hide all tables
         tbl_monthly.setVisible(False)
@@ -689,25 +689,25 @@ class GwNonVisual:
         tbl_weekend.setVisible(False)
 
         # Only show the pattern_type one
-        pattern_type = tools_qt.get_combo_value(self.dialog, cmb_pattern_type)
-        self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}").setVisible(True)
+        pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
+        dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}").setVisible(True)
 
 
-    def _accept_pattern_ud(self, is_new):
+    def _accept_pattern_ud(self, dialog, is_new):
 
         # Variables
-        txt_id = self.dialog.txt_pattern_id
-        txt_observ = self.dialog.txt_observ
-        cmb_expl_id = self.dialog.cmb_expl_id
-        cmb_pattern_type = self.dialog.cmb_pattern_type
-        txt_log = self.dialog.txt_log
+        txt_id = dialog.txt_pattern_id
+        txt_observ = dialog.txt_observ
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_pattern_type = dialog.cmb_pattern_type
+        txt_log = dialog.txt_log
 
         # Get widget values
-        pattern_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
-        pattern_type = tools_qt.get_combo_value(self.dialog, cmb_pattern_type)
-        observ = tools_qt.get_text(self.dialog, txt_observ, add_quote=True)
-        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
-        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+        pattern_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
+        pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
+        observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -727,7 +727,7 @@ class GwNonVisual:
                 return
 
             # Insert inp_pattern_value
-            result = self._insert_ud_pattern_values(pattern_type, pattern_id)
+            result = self._insert_ud_pattern_values(dialog, pattern_type, pattern_id)
             if not result:
                 return
 
@@ -753,7 +753,7 @@ class GwNonVisual:
                 tools_qgis.show_warning(msg)
                 global_vars.dao.rollback()
                 return
-            result = self._insert_ud_pattern_values(pattern_type, pattern_id)
+            result = self._insert_ud_pattern_values(dialog, pattern_type, pattern_id)
             if not result:
                 return
 
@@ -761,12 +761,12 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
 
-    def _insert_ud_pattern_values(self, pattern_type, pattern_id):
+    def _insert_ud_pattern_values(self, dialog, pattern_type, pattern_id):
 
-        table = self.dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
+        table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
 
         values = list()
         for y in range(0, table.rowCount()):
@@ -829,7 +829,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         is_new = control_id is None
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, is_new, control_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id))
         self._connect_dialog_signals()
 
         # Open dialog
@@ -854,17 +854,17 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
 
 
-    def _accept_controls(self, is_new, control_id):
+    def _accept_controls(self, dialog, is_new, control_id):
 
         # Variables
-        cmb_sector_id = self.dialog.cmb_sector_id
-        chk_active = self.dialog.chk_active
-        txt_text = self.dialog.txt_text
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+        txt_text = dialog.txt_text
 
         # Get widget values
-        sector_id = tools_qt.get_combo_value(self.dialog, cmb_sector_id)
-        active = tools_qt.is_checked(self.dialog, chk_active)
-        text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
+        sector_id = tools_qt.get_combo_value(dialog, cmb_sector_id)
+        active = tools_qt.is_checked(dialog, chk_active)
+        text = tools_qt.get_text(dialog, txt_text, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -900,7 +900,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
     # endregion
 
@@ -945,17 +945,17 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
 
 
-    def _accept_rules(self, is_new, rule_id):
+    def _accept_rules(self, dialog, is_new, rule_id):
 
         # Variables
-        cmb_sector_id = self.dialog.cmb_sector_id
-        chk_active = self.dialog.chk_active
-        txt_text = self.dialog.txt_text
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+        txt_text = dialog.txt_text
 
         # Get widget values
-        sector_id = tools_qt.get_combo_value(self.dialog, cmb_sector_id)
-        active = tools_qt.is_checked(self.dialog, chk_active)
-        text = tools_qt.get_text(self.dialog, txt_text, add_quote=True)
+        sector_id = tools_qt.get_combo_value(dialog, cmb_sector_id)
+        active = tools_qt.is_checked(dialog, chk_active)
+        text = tools_qt.get_text(dialog, txt_text, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -990,7 +990,7 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
     # endregion
 
@@ -1021,7 +1021,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         tbl_timeseries_value.cellChanged.connect(partial(self._onCellChanged, tbl_timeseries_value))
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_timeseries, is_new))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_timeseries, self.dialog, is_new))
         self._connect_dialog_signals()
 
         # Open dialog
@@ -1103,28 +1103,28 @@ class GwNonVisual:
             tbl_timeseries_value.insertRow(tbl_timeseries_value.rowCount())
 
 
-    def _accept_timeseries(self, is_new):
+    def _accept_timeseries(self, dialog, is_new):
 
         # Variables
-        txt_id = self.dialog.txt_id
-        txt_idval = self.dialog.txt_idval
-        cmb_timeser_type = self.dialog.cmb_timeser_type
-        cmb_times_type = self.dialog.cmb_times_type
-        txt_descript = self.dialog.txt_descript
-        cmb_expl_id = self.dialog.cmb_expl_id
-        txt_fname = self.dialog.txt_fname
-        txt_log = self.dialog.txt_log
-        tbl_timeseries_value = self.dialog.tbl_timeseries_value
+        txt_id = dialog.txt_id
+        txt_idval = dialog.txt_idval
+        cmb_timeser_type = dialog.cmb_timeser_type
+        cmb_times_type = dialog.cmb_times_type
+        txt_descript = dialog.txt_descript
+        cmb_expl_id = dialog.cmb_expl_id
+        txt_fname = dialog.txt_fname
+        txt_log = dialog.txt_log
+        tbl_timeseries_value = dialog.tbl_timeseries_value
 
         # Get widget values
-        timeseries_id = tools_qt.get_text(self.dialog, txt_id, add_quote=True)
-        idval = tools_qt.get_text(self.dialog, txt_idval, add_quote=True)
-        timser_type = tools_qt.get_combo_value(self.dialog, cmb_timeser_type)
-        times_type = tools_qt.get_combo_value(self.dialog, cmb_times_type)
-        descript = tools_qt.get_text(self.dialog, txt_descript, add_quote=True)
-        fname = tools_qt.get_text(self.dialog, txt_fname, add_quote=True)
-        expl_id = tools_qt.get_combo_value(self.dialog, cmb_expl_id)
-        log = tools_qt.get_text(self.dialog, txt_log, add_quote=True)
+        timeseries_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
+        idval = tools_qt.get_text(dialog, txt_idval, add_quote=True)
+        timser_type = tools_qt.get_combo_value(dialog, cmb_timeser_type)
+        times_type = tools_qt.get_combo_value(dialog, cmb_times_type)
+        descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
+        fname = tools_qt.get_text(dialog, txt_fname, add_quote=True)
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -1185,7 +1185,7 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
-        tools_gw.close_dialog(self.dialog)
+        tools_gw.close_dialog(dialog)
 
 
     def _insert_timeseries_value(self, tbl_timeseries_value, times_type, timeseries_id):
