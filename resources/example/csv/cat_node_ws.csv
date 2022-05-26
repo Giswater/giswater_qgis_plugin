@@ -1,39 +1,69 @@
-id,system_id,epa_default,isarcdivide,isprofilesurface,choose_hemisphere,code_autofill,double_geom,num_arcs,graf_delimiter,shortcut_key,link_path,descript,active
-PR_BREAK_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,PRESSZONE,,,Pressure break valve,true
-PR_SUSTA_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,PRESSZONE,,,Pressure sustainer valve,true
-CONTROL_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,,,Control register,true
-FL_CONTR_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,MINSECTOR,,,Flow control valve,false
-GEN_PURP_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,MINSECTOR,,,General purpose valve,false
-THROTTLE_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,MINSECTOR,,,Throttle-valve,false
-ADAPTATION,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,,,Adaptation junction,false
-BYPASS_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,,,Bypass-register,false
-VALVE_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,,,Valve register,false
-AIR_VALVE,VALVE,UNDEFINED,false,true,true,true,"{""activated"":false,""value"":1}",0,NONE,Alt+A,,Air valve,true
-CHECK_VALVE,VALVE,SHORTPIPE,true,true,true,true,"{""activated"":false,""value"":1}",2,MINSECTOR,C,,Check valve,true
-ENDLINE,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",1,NONE,E,,End of the line,true
-EXPANTANK,EXPANSIONTANK,JUNCTION,true,true,true,true,"{""activated"":true,""value"":3}",2,NONE,K,,Expansiontank,true
-FILTER,FILTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,F,,Filter,true
-FLEXUNION,FLEXUNION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,L,,Flex union,true
-FLOWMETER,METER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,DMA,W,,Flow meter,true
-GREEN_VALVE,VALVE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,G,,Green valve,true
-HYDRANT,HYDRANT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,H,,Hydrant,true
-JUNCTION,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,J,,Junction,true
-NETELEMENT,NETELEMENT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,N,,Netelement,true
-NETSAMPLEPOINT,NETSAMPLEPOINT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,S,,Netsamplepoint,true
-OUTFALL_VALVE,VALVE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,O,,Outfall valve,true
-PR_REDUC_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}",2,PRESSZONE,Alt+Q,,Pressure reduction valve,true
-PRESSURE_METER,METER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,B,,Pressure meter,true
-PUMP,PUMP,PUMP,true,true,true,true,"{""activated"":false,""value"":1}",2,PRESSZONE,U,,Pump,true
-REDUCTION,REDUCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,Z,,Reduction,true
-REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,R,,Register,true
-SHUTOFF_VALVE,VALVE,SHORTPIPE,true,true,true,true,"{""activated"":false,""value"":1}",2,MINSECTOR,I,,Shutoff valve,true
-SOURCE,SOURCE,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}",2,SECTOR,D,,Source,true
-T,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",3,NONE,T,,Junction where 3 pipes converge,true
-TANK,TANK,TANK,true,true,true,true,"{""activated"":true,""value"":3}",9,SECTOR,Alt+K,,Tank,true
-WATER_CONNECTION,NETWJOIN,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,Y,,Water connection,true
-WATERWELL,WATERWELL,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}",2,SECTOR,Alt+Y,,Waterwell,true
-X,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",4,NONE,X,,Junction where 4 pipes converge,true
-CLORINATHOR,NETELEMENT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,DQA,,,Element to reclorate water,false
-CURVE,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,V,,Curve,false
-MANHOLE,MANHOLE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}",2,NONE,M,,Inspection chamber,false
-WTP,WTP,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}",2,SECTOR,P,,Water treatment point,false
+id,nodetype_id,matcat_id,pnom,dnom,dint,dext,shape,descript,link,brand,model,svg,estimated_depth,cost_unit,cost,active,label,ischange,acoeff
+FILTER-01-DN200,FILTER,Iron,"16","200",186.00000,,,Filter 200,c:\users\users\catalog.pdf,,,,1.00,u,N_FILTER-01,true,,"2",
+PRV-VALVE100-PN6/16,PR_REDUC_VALVE,Iron,"6","100",86.00000,,,Pressure reduction valve,c:\users\users\catalog.pdf,,,,1.00,u,N_PRVAL100_6/16,true,,"2",
+TDN110-63 PN16,T,PVC,"16","110",,,,PVC T,c:\users\users\catalog.pdf,,,,1.00,u,N_T110-63_PN16,true,,"2",
+TDN200-160 PN16,T,Iron,"16","200",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T200-160_PN16,true,,"2",
+PUMP-01,PUMP,Iron,"16","110",98.00000,,,Pump station,c:\users\users\catalog.pdf,,,,1.00,u,N_PUMP-01,true,,"2",
+TDN160-110 PN16,T,Iron,"16","110",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T160-110_PN16,true,,"2",
+PRV-VALVE200-PN6/16,PR_REDUC_VALVE,Iron,"6","200",186.00000,,,Pressure reduction valve,c:\users\users\catalog.pdf,,,,1.00,u,N_PRVAL200_6/16,true,,"2",
+PRV-VALVE150-PN6/16,PR_REDUC_VALVE,Iron,"6","150",145.00000,,,Pressure reduction valve,c:\users\users\catalog.pdf,,,,1.00,u,N_PRVAL150_6/16,true,,"2",
+TDN160-160 PN16,T,Iron,"16","160",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T160-160_PN16,true,,"2",
+CURVE30DN110 PVCPN16,CURVE,PVC,"16","110",94.00000,,,PVC curve,c:\users\users\catalog.pdf,,,,1.00,u,N_CUR30_PVC110,true,,"2",
+TDN160-110-63 PN16,T,Iron,"16","160",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T160-110-63,true,,"2",
+CURVE45DN110 PVCPN16,CURVE,PVC,"16","110",94.00000,,,PVC curve,c:\users\users\catalog.pdf,,,,1.00,u,N_CUR45_PVC110,true,,"2",
+OUTFALL VALVE-DN150,OUTFALL_VALVE,Iron,"16","150",145.00000,,,Outfall valve ,c:\users\users\catalog.pdf,,,,1.00,u,N_OUTVAL-01,true,,"2",
+FLOWMETER-01-DN200,FLOWMETER,Iron,"16","200",186.00000,,,Flow meter 200,c:\users\users\catalog.pdf,,,,1.00,u,N_FLOWMETER110,true,,"2",
+FLOWMETER-02-DN110,FLOWMETER,Iron,"16","110",98.00000,,,Flow meter 110,c:\users\users\catalog.pdf,,,,1.00,u,N_FLOWMETER200,true,,"2",
+GREENVALVEDN63 PN16,GREEN_VALVE,Iron,"16","63",,,,Green valve 63mm,c:\users\users\catalog.pdf,,,,1.00,u,N_GREVAL63_PN16,true,,"2",
+GREENVALVEDN110 PN16,GREEN_VALVE,Iron,"16","110",,,,Green valve 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_GREVAL110_PN16,true,,"2",
+GREENVALVEDN50 PN16,GREEN_VALVE,Iron,"16","50",,,,Green valve 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_GREVAL50_PN16,true,,"2",
+AIR VALVE DN50,AIR_VALVE,Iron,"16","50",,,,Air valve 50mm,c:\users\users\catalog.pdf,,,,1.00,u,N_AIRVAL_DN50,true,,"2",
+TDN63-63-110 PN16,T,PVC,"16","63",,,,PVC T,c:\users\users\catalog.pdf,,,,1.00,u,N_T63-63-110,true,,"2",
+PUMP-02,PUMP,Iron,"16","125",110.00000,,,Pump tank,c:\users\users\catalog.pdf,,,,1.00,u,N_PUMP-01,true,,"2",
+TDN110-90 PN16,T,Iron,"16","110",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T110-63_PN16,true,,"2",
+TDN110-90-63 PN16,T,Iron,"16","110",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T110-63_PN16,true,,"2",
+CHK-VALVE63-PN16,CHECK_VALVE,Iron,"16","63",65.00000,,,Check valve 63mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL63_PN10,true,,"2",
+CHK-VALVE150-PN16,CHECK_VALVE,Iron,"16","150",154.00000,,,Check valve 150mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL150_PN10,true,,"2",
+CHK-VALVE100-PN16,CHECK_VALVE,Iron,"16","100",102.00000,,,Check valve 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL100_PN10,true,,"2",
+CHK-VALVE200-PN16,CHECK_VALVE,Iron,"16","200",205.00000,,,Check valve 200mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL200_PN10,true,,"2",
+CHK-VALVE300-PN16,CHECK_VALVE,Iron,"16","300",306.00000,,,Check valve 300mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL300_PN10,true,,"2",
+PRESMETER-63-PN16,PRESSURE_METER,Iron,"16","63",65.00000,,,Pressure meter 63,c:\users\users\catalog.pdf,,,,1.00,u,N_PRESME200_PN16,true,,"2",
+PRESMETER-110-PN16,PRESSURE_METER,Iron,"16","110",115.00000,,,Pressure meter 110,c:\users\users\catalog.pdf,,,,1.00,u,N_PRESME110_PN16,true,,"2",
+FILTER-02-DN150,FILTER,Iron,"16","150",145.00000,,,Filter 150,c:\users\users\catalog.pdf,,,,1.00,u,N_FILTER-01,true,,"2",
+CHK-VALVE90-PN16,CHECK_VALVE,Iron,"16","90",82.00000,,,Check valve 90mm,c:\users\users\catalog.pdf,,,,1.00,u,N_CHKVAL100_PN10,true,,"2",
+SHTFF-VALVE160-PN16,SHUTOFF_VALVE,Iron,"16","160",148.00000,,,Shutoff valve 160,c:\users\users\catalog.pdf,,,,1.00,u,N_SHTVAL160_PN16,true,,"2",
+SHTFF-VALVE110-PN16,SHUTOFF_VALVE,Iron,"16","110",98.00000,,,Shutoff valve 110,c:\users\users\catalog.pdf,,,,1.00,u,N_SHTVAL110_PN16,true,,"2",
+SHTFF-VALVEN63 PN16,SHUTOFF_VALVE,Iron,"16","63",55.00000,,,Shutoff valve 63,c:\users\users\catalog.pdf,,,,1.00,u,N_SHTVAL63_PN16,true,,"2",
+HYDRANT 1X110,HYDRANT,Iron,"16","110",,,,Green valve 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_HYD_1x100,true,,"2",
+HYDRANT 1X110-2X63,HYDRANT,Iron,"16","110",,,,Green valve 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_HYD_1x110-2x63,true,,"2",
+TDN63-63 PN16,T,PVC,"16","63",,,,PVC T,c:\users\users\catalog.pdf,,,,1.00,u,N_T63-63_PN16,true,,"2",
+XDN110 PN16,X,Iron,"16","110",,,,X,c:\users\users\catalog.pdf,,,,1.00,u,N_XDN110_PN16,true,,"2",
+TDN110-110 PN16,T,Iron,"16","110",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T110-110_PN16,true,,"2",
+REDUC_110-90 PN16,REDUCTION,PVC,"16","110",,,,Reduction,c:\users\users\catalog.pdf,,,,1.00,u,N_REDUC_110-90,true,,"1",
+REDUC_160-90 PN16,REDUCTION,PVC,"16","160",,,,Reduction,c:\users\users\catalog.pdf,,,,1.00,u,N_REDUC_160-90,true,,"1",
+REDUC_110-63 PN16,REDUCTION,PVC,"16","110",,,,Reduction,c:\users\users\catalog.pdf,,,,1.00,u,N_REDUC_110-63,true,,"1",
+REDUC_200-110 PN16,REDUCTION,PVC,"16","110",,,,Reduction,c:\users\users\catalog.pdf,,,,1.00,u,N_REDUC_200-110,true,,"1",
+REDUC_160-110 PN16,REDUCTION,PVC,"16","110",,,,Reduction,c:\users\users\catalog.pdf,,,,1.00,u,N_REDUC_160-110,true,,"1",
+REGISTER,REGISTER,Unknown,,,,,,Register,c:\users\users\catalog.pdf,,,,1.00,u,N_REGISTER,true,,"2",
+WATER-CONNECTION,WATER_CONNECTION,Unknown,,,,,,Netwjoin,c:\users\users\catalog.pdf,,,,1.00,u,N_WATER-CONNECT,true,,"2",
+FLEXUNION,FLEXUNION,Unknown,,,,,,Flexunion,c:\users\users\catalog.pdf,,,,1.00,u,N_FLEXUNION,true,,"2",
+TANK_01,TANK,Iron,,,,,,Tank,c:\users\users\catalog.pdf,,,,1.00,m3,N_TANK_30x10x3,true,,"2",
+WATERWELL-01,WATERWELL,Iron,,,,,,Waterwell,c:\users\users\catalog.pdf,,,,1.00,u,N_WATERWELL-01,true,,"2",
+SOURCE-01,SOURCE,Unknown,,,,,,Source,c:\users\users\catalog.pdf,,,,1.00,u,N_SOURCE-01,true,,"2",
+EXPANTANK,EXPANTANK,Unknown,,,,,,Expansiontank,c:\users\users\catalog.pdf,,,,1.00,u,N_EXPANTANK,true,,"2",
+PRESMETER,PRESSURE_METER,Iron,,,,,,Pressure meter,c:\users\users\catalog.pdf,,,,1.00,u,N_PRESME200_PN16,true,,"2",
+NETSAMPLEPOINT,NETSAMPLEPOINT,Unknown,,,,,,Netsamplepoint,c:\users\users\catalog.pdf,,,,1.00,u,N_NETSAMPLEP,true,,"2",
+NETELEMENT,NETELEMENT,Unknown,,,,,,Netelement,c:\users\users\catalog.pdf,,,,1.00,u,N_NETELEMENT,true,,"2",
+ETAP,WTP,Unknown,,,,,,Wtp,c:\users\users\catalog.pdf,,,,1.00,u,N_ETAP,true,,"2",
+MANHOLE,MANHOLE,Unknown,,,,,,Wtp,c:\users\users\catalog.pdf,,,,1.00,u,N_SOURCE-01,true,,"2",
+TDN160-63 PN16,T,Iron,"16","160",,,,FD T,c:\users\users\catalog.pdf,,,,1.00,u,N_T160-63_PN16,true,,"2",
+XDN110-90 PN16,X,Iron,"16","110",,,,X,c:\users\users\catalog.pdf,,,,1.00,u,N_XDN110-90_PN16,true,,"2",
+JUNCTION DN63,JUNCTION,Iron,"16","63",,,,Juntion 63mm,c:\users\users\catalog.pdf,,,,1.00,u,N_JUN63,true,,"0",
+JUNCTION DN110,JUNCTION,Iron,"16","110",,,,Juntion 110mm,c:\users\users\catalog.pdf,,,,1.00,u,N_JUN110,true,,"0",
+JUNCTION DN160,JUNCTION,Iron,"16","150",154.00000,,,Juntion 160mm,c:\users\users\catalog.pdf,,,,1.00,u,N_JUN160,true,,"0",
+JUNCTION DN200,JUNCTION,Iron,"16","200",205.00000,,,Juntion 200mm,c:\users\users\catalog.pdf,,,,1.00,u,N_JUN200,true,,"0",
+JUNCTION DN90,JUNCTION,Iron,"16","90",93.00000,,,Juntion 90mm,c:\users\users\catalog.pdf,,,,1.00,u,N_JUN110,true,,"0",
+ENDLINE DN63,ENDLINE,PVC,"16","63",54.00000,,,End line,c:\users\users\catalog.pdf,,,,1.00,u,N_ENDLINE,true,,"0",
+ENDLINE DN150,ENDLINE,Iron,"16","150",154.00000,,,End line,c:\users\users\catalog.pdf,,,,1.00,u,N_ENDLINE,true,,"0",
+ENDLINE DN90,ENDLINE,PVC,"16","90",77.00000,,,End line,c:\users\users\catalog.pdf,,,,1.00,u,N_ENDLINE,true,,"0",
+JUNCTION CHNGMAT,JUNCTION,Unknown,"16","160",,,,Change of arc material,c:\users\users\catalog.pdf,,,,1.00,u,N_JUNCT_CHNGMAT,true,,"1",
