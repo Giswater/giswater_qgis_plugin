@@ -113,9 +113,15 @@ BEGIN
 
 		ELSIF v_fid=446 THEN
 		--connec
-			INSERT INTO v_edit_cat_feature_connec(id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active)
-			SELECT csv1, csv2, csv3, csv4::boolean, csv5, csv6, csv7, csv8::boolean
-			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
+			IF v_project_type = 'WS' THEN 
+				INSERT INTO v_edit_cat_feature_connec(id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active)
+				SELECT csv1, csv2, csv3, csv4::boolean, csv5, csv6, csv7, csv8::boolean
+				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
+			ELSIF v_project_type = 'UD' THEN 
+				INSERT INTO v_edit_cat_feature_connec(id, system_id, code_autofill, double_geom, shortcut_key, link_path, descript, active)
+				SELECT csv1, csv2, csv3::boolean, csv4::json, csv5, csv6, csv7, csv8::boolean
+				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
+			END IF;
 
 		ELSIF v_fid=447 THEN
 		--gully

@@ -62,4 +62,4 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES(451, 'Import cat_grate table', 'utils', NULL, 'core', true, '"Function process"', NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (451, 'Import cat_grate', 'Import cat_grate', 'gw_fct_import_catalog', true,15, null) ON CONFLICT (fid) DO NOTHING;
+VALUES (451, 'Import cat_grate', 'Import cat_grate', 'gw_fct_import_catalog', true,18, null) ON CONFLICT (fid) DO NOTHING;
