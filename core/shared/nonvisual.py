@@ -7,16 +7,15 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
+import pandas as pd
 
 from functools import partial
-from qgis.PyQt.QtCore import QRegExp
-from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
-from ..utils.snap_manager import GwSnapManager
+from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_db, tools_os, tools_log
 from ... import global_vars
@@ -371,15 +370,7 @@ class GwNonVisual:
 
 
     def _insert_curve_values(self, tbl_curve_value, curve_id):
-        values = list()
-        for y in range(0, tbl_curve_value.rowCount()):
-            values.append(list())
-            for x in range(0, tbl_curve_value.columnCount()):
-                value = "null"
-                item = tbl_curve_value.item(y, x)
-                if item is not None and item.data(0) not in (None, ''):
-                    value = item.data(0)
-                values[y].append(value)
+        values = self._read_tbl_values(tbl_curve_value)
 
         is_empty = True
         for row in values:
@@ -443,6 +434,12 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Create plot widget
+        plot_widget = MplCanvas(self.dialog, width=5, height=4, dpi=100)
+        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+        plot_widget.setMinimumSize(100, 100)
+        self.dialog.lyt_plot.addWidget(plot_widget, 0, 0)
+
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
@@ -454,11 +451,11 @@ class GwNonVisual:
 
         # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
-        # TODO: Connect signal to draw graphic?
+        tbl_pattern_value.cellChanged.connect(partial(self._manage_ws_patterns_plot, tbl_pattern_value, plot_widget))
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = pattern_id is None
-        self.dialog.btn_accept.clicked.connect(self._accept_pattern_ws, self.dialog, is_new)
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
 
 
     def _populate_ws_patterns_widgets(self, pattern_id):
@@ -575,15 +572,7 @@ class GwNonVisual:
     def _insert_ws_pattern_values(self, tbl_pattern_value, pattern_id):
 
         # Insert inp_pattern_value
-        values = list()
-        for y in range(0, tbl_pattern_value.rowCount()):
-            values.append(list())
-            for x in range(0, tbl_pattern_value.columnCount()):
-                value = "null"
-                item = tbl_pattern_value.item(y, x)
-                if item is not None and item.data(0) not in (None, ''):
-                    value = item.data(0)
-                values[y].append(value)
+        values = self._read_tbl_values(tbl_pattern_value)
 
         is_empty = True
         for row in values:
@@ -614,6 +603,49 @@ class GwNonVisual:
                 return False
 
         return True
+
+
+    def _manage_ws_patterns_plot(self, table, plot_widget, row, column):
+        """ Note: row & column parameters are passed by the signal """
+
+        # Clear plot
+        plot_widget.axes.cla()
+        # Read row values
+        values = self._read_tbl_values(table)
+        temp_list = []  # String list with all table values
+        for v in values:
+            temp_list.append(v)
+        # Create dataframe list
+        temp_dfl = []  # String list excluding 'null' values
+        for x in range(0, 12):
+            ltemp = []
+            for y in range(0, len(temp_list) - 1):
+                value = temp_list[y][x]
+                ltemp.append(value)
+            temp_dfl.append(ltemp)
+        # Clean nulls of the end of the list
+        last_idx = -1
+        for i, item in enumerate(temp_dfl):
+            if item != ['null'] * (len(temp_list)-1):
+                last_idx = i
+        temp_dfl = temp_dfl[:last_idx+1]
+
+        # Create pandas dataframe
+        dfl = []  # Float list
+        for i, item in enumerate(temp_dfl):
+            ltemp = []
+            for v in item:
+                try:
+                    value = float(v)
+                except ValueError:
+                    value = 0
+                ltemp.append(value)
+            dfl.append(ltemp)
+
+        # Draw plot
+        df = pd.DataFrame(dfl)
+        df.plot.bar(ax=plot_widget.axes, width=1, align='edge', edgecolor='black')
+        plot_widget.draw()
 
 
     def _manage_ud_patterns_dlg(self, pattern_id):
@@ -775,15 +807,7 @@ class GwNonVisual:
 
         table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
 
-        values = list()
-        for y in range(0, table.rowCount()):
-            values.append(list())
-            for x in range(0, table.columnCount()):
-                value = "null"
-                item = table.item(y, x)
-                if item is not None and item.data(0) not in (None, ''):
-                    value = item.data(0)
-                values[y].append(value)
+        values = self._read_tbl_values(table)
 
         is_empty = True
         for row in values:
@@ -1431,6 +1455,21 @@ class GwNonVisual:
                     if item.data(0) not in (None, ''):
                         return
             table.setRowCount(table.rowCount()-1)
+
+
+    def _read_tbl_values(self, table, clear_nulls=False):
+        values = list()
+        for y in range(0, table.rowCount()):
+            values.append(list())
+            for x in range(0, table.columnCount()):
+                value = "null"
+                item = table.item(y, x)
+                if item is not None and item.data(0) not in (None, ''):
+                    value = item.data(0)
+                if clear_nulls and value == "null":
+                    continue
+                values[y].append(value)
+        return values
 
 
     def _populate_cmb_sector_id(self, combobox):

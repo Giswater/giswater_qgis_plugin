@@ -68,11 +68,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="0" colspan="2">
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QGraphicsView" name="graphicsView"/>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="lyt_plot"/>
       </item>
       <item row="0" column="0" colspan="2">
        <layout class="QGridLayout" name="gridLayout_2">
