@@ -54,6 +54,11 @@ BEGIN
 			END IF;
 			
 		END IF;
+
+		IF v_projecttype ='WS' AND NEW.type ='VALVE' and NEW.isarcdivide IS TRUE THEN
+			INSERT INTO config_graf_valve (id)
+			VALUES (NEW.id) ON CONFLICT (id) DO NOTHING;
+		END IF;
 		
 		RETURN NEW;
 	ELSE
