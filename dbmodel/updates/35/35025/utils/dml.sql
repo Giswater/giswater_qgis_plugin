@@ -42,16 +42,16 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES(448, 'Import cat_node table', 'utils', NULL, 'core', true, '"Function process"', NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (448, 'Import cat_node', 'Import cat_node', 'gw_fct_import_cat_feature', true,16, null) ON CONFLICT (fid) DO NOTHING;;
+VALUES (448, 'Import cat_node', 'Import cat_node', 'gw_fct_import_catalog', true,16, null) ON CONFLICT (fid) DO NOTHING;;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES(449, 'Import cat_connec table', 'utils', NULL, 'core', true, '"Function process"', NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (449, 'Import cat_connec', 'Import cat_connec', 'gw_fct_import_cat_feature', true,17,null) ON CONFLICT (fid) DO NOTHING;;
+VALUES (449, 'Import cat_connec', 'Import cat_connec', 'gw_fct_import_catalog', true,17,null) ON CONFLICT (fid) DO NOTHING;;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES(450, 'Import cat_arc table', 'utils', NULL, 'core', true, '"Function process"', NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (450, 'Import cat_arc', 'Import cat_arc', 'gw_fct_import_cat_feature', true,15, null) ON CONFLICT (fid) DO NOTHING;
+VALUES (450, 'Import cat_arc', 'Import cat_arc', 'gw_fct_import_catalog', true,15, null) ON CONFLICT (fid) DO NOTHING;
