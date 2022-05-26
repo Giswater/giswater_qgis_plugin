@@ -6,24 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>489</height>
+    <width>704</width>
+    <height>498</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>LIDS</string>
   </property>
   <widget class="QTabWidget" name="tab_lidlayers">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>380</x>
      <y>20</y>
-     <width>301</width>
-     <height>451</height>
+     <width>291</width>
+     <height>441</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>6</number>
    </property>
    <widget class="QWidget" name="surface">
     <attribute name="title">
@@ -96,7 +99,7 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="surface_2">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -105,8 +108,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.0</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
+    <widget class="QLineEdit" name="surface_3">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -115,8 +121,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.0</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_3">
+    <widget class="QLineEdit" name="surface_4">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -125,8 +134,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.1</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_4">
+    <widget class="QLineEdit" name="surface_5">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -134,6 +146,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>1.0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_28">
@@ -155,7 +170,7 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_26">
+    <widget class="QLineEdit" name="surface_6">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -163,6 +178,241 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>5</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="soil">
+    <attribute name="title">
+     <string>Soil</string>
+    </attribute>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>32</y>
+       <width>71</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Thickness (in. or mm)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_2">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>32</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>80</y>
+       <width>101</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Porosity    (volume fraction)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_7">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>272</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>10.0</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>128</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Field Capacity (volume fraction)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_3">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>82</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0.5</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>318</y>
+       <width>91</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Suction Head (in. or mm)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_4">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>122</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0.2</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>222</y>
+       <width>101</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Conductivity    (in/hr or mm/hr)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_5">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>172</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0.1</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_8">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>312</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>3.5</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>176</y>
+       <width>101</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Wilting Point (volume fraction)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="soil_6">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>222</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0.5</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>270</y>
+       <width>101</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Conductivity Slope</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
@@ -205,7 +455,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_5">
+    <widget class="QLineEdit" name="pavement_3">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -214,8 +464,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.15</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_6">
+    <widget class="QLineEdit" name="pavement_5">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -224,8 +477,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>100</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_7">
+    <widget class="QLineEdit" name="pavement_4">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -233,6 +489,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_9">
@@ -251,7 +510,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_8">
+    <widget class="QLineEdit" name="pavement_2">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -259,6 +518,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_10">
@@ -293,7 +555,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_9">
+    <widget class="QLineEdit" name="pavement_7">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -302,8 +564,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_11">
+    <widget class="QLineEdit" name="pavement_8">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -311,6 +576,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -329,7 +597,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_12">
+    <widget class="QLineEdit" name="pavement_6">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -337,6 +605,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">
@@ -350,220 +621,6 @@
      </property>
      <property name="text">
       <string>Regeneration Fraction</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="soil">
-    <attribute name="title">
-     <string>Soil</string>
-    </attribute>
-    <widget class="QLabel" name="label_11">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>32</y>
-       <width>71</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Thickness (in. or mm)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_10">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>32</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_15">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>80</y>
-       <width>101</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Porosity    (volume fraction)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_13">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>272</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_16">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>128</y>
-       <width>110</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Field Capacity (volume fraction)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_14">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>82</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_17">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>318</y>
-       <width>91</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Suction Head (in. or mm)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_15">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>122</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_18">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>222</y>
-       <width>101</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Conductivity    (in/hr or mm/hr)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_16">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>172</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_17">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>312</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_19">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>176</y>
-       <width>101</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Wilting Point (volume fraction)</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_18">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>222</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_20">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>270</y>
-       <width>101</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Conductivity Slope</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -590,7 +647,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_19">
+    <widget class="QLineEdit" name="storage_2">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -598,6 +655,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_22">
@@ -632,7 +692,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_21">
+    <widget class="QLineEdit" name="storage_3">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -641,8 +701,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.75</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_22">
+    <widget class="QLineEdit" name="storage_4">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -651,8 +714,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.5</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_23">
+    <widget class="QLineEdit" name="storage_5">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -660,6 +726,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_26">
@@ -700,7 +769,7 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="storage_check">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -734,7 +803,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_27">
+    <widget class="QLineEdit" name="drain_6">
      <property name="geometry">
       <rect>
        <x>201</x>
@@ -744,7 +813,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_30">
@@ -763,7 +832,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_29">
+    <widget class="QLineEdit" name="drain_2">
      <property name="geometry">
       <rect>
        <x>201</x>
@@ -773,7 +842,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_31">
@@ -792,7 +861,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_30">
+    <widget class="QLineEdit" name="drain_4">
      <property name="geometry">
       <rect>
        <x>201</x>
@@ -802,10 +871,10 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>6</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_31">
+    <widget class="QLineEdit" name="drain_5">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -815,10 +884,10 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>6</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_32">
+    <widget class="QLineEdit" name="drain_3">
      <property name="geometry">
       <rect>
        <x>201</x>
@@ -828,7 +897,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>0.5</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_33">
@@ -882,7 +951,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_33">
+    <widget class="QLineEdit" name="drain_7">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -892,7 +961,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_32">
@@ -911,7 +980,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QComboBox" name="drain_8">
      <property name="geometry">
       <rect>
        <x>138</x>
@@ -919,6 +988,9 @@
        <width>131</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_36">
@@ -942,7 +1014,7 @@
     <attribute name="title">
      <string>Drainage Mat</string>
     </attribute>
-    <widget class="QLineEdit" name="lineEdit_24">
+    <widget class="QLineEdit" name="drainmat_4">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -951,8 +1023,11 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="text">
+      <string>0.1</string>
+     </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_25">
+    <widget class="QLineEdit" name="drainmat_3">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -960,6 +1035,9 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>0.5</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_24">
@@ -1010,7 +1088,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_20">
+    <widget class="QLineEdit" name="drainmat_2">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -1018,6 +1096,46 @@
        <width>81</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>3</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="rooftop">
+    <attribute name="title">
+     <string>Roof Drain</string>
+    </attribute>
+    <widget class="QLineEdit" name="rooftop_2">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>26</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_38">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>30</y>
+       <width>101</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Flow Capacity (in/hr or mm/hr)</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="margin">
+      <number>0</number>
      </property>
     </widget>
    </widget>

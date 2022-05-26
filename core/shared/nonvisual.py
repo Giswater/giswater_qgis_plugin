@@ -1283,7 +1283,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate LID Type combo
-        sql =f"SELECT lidco_id FROM inp_lid"
+        sql =f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype'"
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -1291,6 +1291,8 @@ class GwNonVisual:
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
+        self.dialog.tab_lidlayers.currentChanged.connect(partial(self._test_))
+        self.dialog.btn_ok.clicked.connect(partial(self._insert_lids_value, self.dialog))
 
         self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
         # Open dialog
@@ -1299,16 +1301,25 @@ class GwNonVisual:
 
     def _manage_lids_tabs(self, cmb_lidtype, tab_lidlayers):
 
+        layer_tabs = {'BC': {'SURFACE', 'SOIL', 'STORAGE', 'DRAIN'},
+                           'RG': {'SURFACE', 'SOIL', 'STORAGE'},
+                           'GR': {'SURFACE', 'SOIL', 'DRAINMAT'},
+                           'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
+                           'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
+                           'RB': {'SURFACE', 'DRAIN'},
+                           'RD': {'SURFACE', 'ROOFTOP'},
+                           'VS': {'SURFACE'}}
+
         lidco_id = str(cmb_lidtype.currentText())
-        sql = f"select lidlayer from inp_lid_value where lidco_id = '{lidco_id}'"
-        rows = tools_db.get_rows(sql)
+        sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval =  '{lidco_id}'"
+        row = tools_db.get_row(sql)
 
         # Tabs to show
         lidtabs = []
-        if rows:
-            for row in rows:
-                lidtabs.append(row[0])
+        if row:
+            lidtabs= layer_tabs[row[0]]
 
+        # Show tabs
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
             if tab_name not in lidtabs:
@@ -1318,19 +1329,59 @@ class GwNonVisual:
 
         # Set image
         self._manage_lids_images(lidco_id)
-        print(tab_lidlayers.count())
 
 
     def _manage_lids_images(self, lidco_id):
         ''' Manage images depending on lidco_id selected'''
 
-        sql = f"select lidco_type from inp_lid where lidco_id = '{lidco_id}'"
+        sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval = '{lidco_id}'"
         row = tools_db.get_row(sql)
-        img = f"ud_lid_{row[0]}"
+        if row:
+            img = f"ud_lid_{row[0]}"
 
         tools_qt.add_image(self.dialog, 'lbl_section_image',
                            f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
+
+    def _test_(self):
+
+        list = self.dialog.tab_lidlayers.currentWidget().children()
+        #for i in list:
+         #   print(i.objectName())
+
+
+    def _get_lidco_type_lids(self, dialog, cmb_lidtype, lidco_id):
+
+        sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval = '{lidco_id}'"
+        row = tools_db.get_row(sql)
+
+        if row:
+            return row[0]
+
+
+    def _insert_lids_value(self, dialog):
+        '''Insert the values from LIDS dialog'''
+
+        # Insert in table 'inp_lid'
+        cmb_text = str(dialog.cmb_lidtype.currentText())
+        lidco_type= self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
+        lidco_id = dialog.txt_name.text()
+
+        sql= f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
+        result= tools_db.execute_sql(sql)
+
+        if not result:
+            msg = "There was an error inserting lid."
+            tools_qgis.show_warning(msg)
+            global_vars.dao.rollback()
+            return False
+
+        # Inserts in table inp_lid_valu
+        for i in range(dialog.tab_lidlayers.count()):
+            if dialog.tab_lidlayers.isTabVisible(i):
+                tab_name = dialog.tab_lidlayers.widget(i).objectName()
+                #list with all children
+                list = dialog.tab_lidlayers.widget(i).children()
 
     # endregion
 
