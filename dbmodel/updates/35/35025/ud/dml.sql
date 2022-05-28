@@ -63,3 +63,13 @@ VALUES(451, 'Import cat_grate table', 'utils', NULL, 'core', true, '"Function pr
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
 VALUES (451, 'Import cat_grate', 'Import cat_grate', 'gw_fct_import_catalog', true,18, null) ON CONFLICT (fid) DO NOTHING;
+
+UPDATE config_form_fields SET hidden = true where columnname IN ('geom5','geom6','geom7','geom8') and formname  ='cat_arc';
+
+INSERT INTO inp_typevalue VALUES ('inp_value_lidtype', 'RB', 'RAIN BARREL')
+ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE inp_typevalue SET idval = replace (idval, ' (5.1)' , '') WHERE typevalue = 'inp_value_lidtype';
+
+UPDATE sys_table SET alias = 'Dwf catalog' WHERE id = 'v_edit_cat_dwf_dscenario';
+UPDATE sys_table SET alias = 'Hydrology catalog' WHERE id = 'v_edit_cat_hydrology';
