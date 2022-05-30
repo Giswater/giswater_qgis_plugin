@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 
 from functools import partial
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -1313,6 +1313,13 @@ class GwNonVisual:
         if rows:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
+        # Populate Control Curve combo
+        sql =f"SELECT id FROM v_edit_inp_curve; "
+        rows = tools_db.get_rows(sql)
+
+        if rows:
+            tools_qt.fill_combo_values(self.dialog.drain_8, rows)
+
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
         self.dialog.tab_lidlayers.currentChanged.connect(partial(self._test_))
@@ -1367,13 +1374,6 @@ class GwNonVisual:
                            f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
 
-    def _test_(self):
-
-        list = self.dialog.tab_lidlayers.currentWidget().children()
-        #for i in list:
-         #   print(i.objectName())
-
-
     def _get_lidco_type_lids(self, dialog, cmb_lidtype, lidco_id):
 
         sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval = '{lidco_id}'"
@@ -1386,16 +1386,23 @@ class GwNonVisual:
     def _insert_lids_value(self, dialog):
         '''Insert the values from LIDS dialog'''
 
+       
         # Insert in table 'inp_lid'
         cmb_text = str(dialog.cmb_lidtype.currentText())
         lidco_type= self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
         lidco_id = dialog.txt_name.text()
 
-        sql= f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
-        result= tools_db.execute_sql(sql)
+        if lidco_id != '':
+            sql= f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
+            result= tools_db.execute_sql(sql)
 
-        if not result:
-            msg = "There was an error inserting lid."
+            if not result:
+                msg = "There was an error inserting lid."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return False
+        else:
+            msg = "You have to fill in 'Control Name' field!"
             tools_qgis.show_warning(msg)
             global_vars.dao.rollback()
             return False
@@ -1403,10 +1410,34 @@ class GwNonVisual:
         # Inserts in table inp_lid_valu
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
-                tab_name = dialog.tab_lidlayers.widget(i).objectName()
-                #list with all children
+                tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
+                # List with all children that are not QLabel
                 list = dialog.tab_lidlayers.widget(i).children()
+                list = [widget for widget in list if type(widget) != QLabel]
 
+                # Order list by objectName
+                for x in range(len(list)):
+                    for j in range (0, (len(list)-x-1)):
+                        if list[j].objectName() > list[(j+1)].objectName():
+                            list[j], list[(j+1)] = list[(j+1)], list[j]
+
+                sql=f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
+                for y,widget in enumerate(list):
+                    sql+=f"value_{y+2}, "
+                sql = sql.rstrip(', ') + ")"
+                sql += f"VALUES ('{lidco_id}', '{tab_name}', "
+                for widget in list:
+                    value=tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
+                    sql+=f"{value}, "
+                    print(value)
+                sql = sql.rstrip(', ') + ")"
+                print(f"SQL -> {sql}")
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    msg = "There was an error inserting lid."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return False
     # endregion
 
     # region private functions
