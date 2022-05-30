@@ -163,6 +163,9 @@
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <widget class="QTableWidget" name="tbl_pattern_value">
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>50</number>
+          </attribute>
           <row>
            <property name="text">
             <string>Multiplier</string>
