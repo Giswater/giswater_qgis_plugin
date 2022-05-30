@@ -610,41 +610,49 @@ class GwNonVisual:
 
         # Clear plot
         plot_widget.axes.cla()
+
         # Read row values
         values = self._read_tbl_values(table)
         temp_list = []  # String list with all table values
         for v in values:
             temp_list.append(v)
-        # Create dataframe list
-        temp_dfl = []  # String list excluding 'null' values
-        for x in range(0, 12):
-            ltemp = []
-            for y in range(0, len(temp_list) - 1):
-                value = temp_list[y][x]
-                ltemp.append(value)
-            temp_dfl.append(ltemp)
-        # Clean nulls of the end of the list
-        last_idx = -1
-        for i, item in enumerate(temp_dfl):
-            if item != ['null'] * (len(temp_list)-1):
-                last_idx = i
-        temp_dfl = temp_dfl[:last_idx+1]
 
-        # Create pandas dataframe
-        dfl = []  # Float list
-        for i, item in enumerate(temp_dfl):
-            ltemp = []
-            for v in item:
+        # Clean nulls of the end of the list
+        clean_list = []
+        for i, item in enumerate(temp_list):
+            last_idx = -1
+            for j, value in enumerate(item):
+                if value != 'null':
+                    last_idx = j
+            clean_list.append(item[:last_idx+1])
+
+        # Convert list items to float
+        float_list = []
+        for lst in clean_list:
+            temp_lst = []
+            for item in lst:
                 try:
-                    value = float(v)
+                    value = float(item)
                 except ValueError:
                     value = 0
-                ltemp.append(value)
-            dfl.append(ltemp)
+                temp_lst.append(value)
+            float_list.append(temp_lst)
+
+        # Create lists for pandas DataFrame
+        x_offset = 0
+        for lst in float_list:
+            if not lst:
+                continue
+            # Create lists with x zeros as offset to append new rows to the graph
+            df_list = [0] * x_offset
+            df_list.extend(lst)
+            # Create pandas DataFrame & attach plot to graph widget
+            df = pd.DataFrame(df_list)
+            df.plot.bar(ax=plot_widget.axes, width=1, align='edge', color='lightcoral', edgecolor='indianred',
+                        legend=False)
+            x_offset += len(lst)
 
         # Draw plot
-        df = pd.DataFrame(dfl)
-        df.plot.bar(ax=plot_widget.axes, width=1, align='edge', edgecolor='black')
         plot_widget.draw()
 
 
