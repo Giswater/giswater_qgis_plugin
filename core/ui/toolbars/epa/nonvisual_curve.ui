@@ -79,52 +79,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="lbl_descript">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Description</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="txt_descript">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QComboBox" name="cmb_curve_type">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="lbl_curve_type">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Curve Type</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="lbl_curve_id">
           <property name="sizePolicy">
@@ -145,24 +99,54 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QLineEdit" name="txt_log"/>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="cmb_expl_id"/>
         </item>
-        <item row="2" column="1" colspan="2">
-         <widget class="QLabel" name="lbl_log">
+        <item row="1" column="1">
+         <widget class="QComboBox" name="cmb_curve_type">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lbl_curve_type">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Log</string>
+           <string>Curve Type</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="cmb_expl_id"/>
+        <item row="3" column="0" colspan="3">
+         <widget class="QLineEdit" name="txt_descript">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QLabel" name="lbl_descript">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -196,14 +180,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QGraphicsView" name="graphicsView">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="lyt_plot"/>
         </item>
        </layout>
       </item>

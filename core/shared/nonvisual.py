@@ -136,6 +136,9 @@ class GwNonVisual:
         self.dialog = GwNonVisualCurveUi()
         tools_gw.load_settings(self.dialog)
 
+        # Create plot widget
+        plot_widget = self._create_plot_widget(self.dialog)
+
         # Define variables
         tbl_curve_value = self.dialog.tbl_curve_value
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -159,6 +162,7 @@ class GwNonVisual:
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, tbl_curve_value, plot_widget))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, (curve_id is None), curve_id))
         self._connect_dialog_signals()
 
@@ -286,6 +290,53 @@ class GwNonVisual:
                     break
 
         self._set_curve_values_valid(dialog, valid)
+
+
+    def _manage_curve_plot(self, table, plot_widget, row, column):
+        """ Note: row & column parameters are passed by the signal """
+
+        # Clear plot
+        plot_widget.axes.cla()
+
+        # Read row values
+        values = self._read_tbl_values(table)
+        temp_list = []  # String list with all table values
+        for v in values:
+            temp_list.append(v)
+
+        # Clean nulls of the end of the list
+        clean_list = []
+        for i, item in enumerate(temp_list):
+            last_idx = -1
+            for j, value in enumerate(item):
+                if value != 'null':
+                    last_idx = j
+            clean_list.append(item[:last_idx+1])
+
+        # Convert list items to float
+        float_list = []
+        for lst in clean_list:
+            temp_lst = []
+            if len(lst) < 2:
+                continue
+            for item in lst:
+                try:
+                    value = float(item)
+                except ValueError:
+                    value = 0
+                temp_lst.append(value)
+            float_list.append(temp_lst)
+
+        # Create x & y coordinate points to draw line
+        # float_list = [[x1, y1], [x2, y2], [x3, y3]]
+        x_list = [x[0] for x in float_list]  # x_list = [x1, x2, x3]
+        y_list = [x[1] for x in float_list]  # y_list = [y1, y2, y3]
+
+        plot_widget.axes.plot(x_list, y_list, color='indianred')
+
+        # Draw plot
+        plot_widget.draw()
+
 
 
     def _set_curve_values_valid(self, dialog, valid):
@@ -435,10 +486,7 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
 
         # Create plot widget
-        plot_widget = MplCanvas(self.dialog, width=5, height=4, dpi=100)
-        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
-        plot_widget.setMinimumSize(100, 100)
-        self.dialog.lyt_plot.addWidget(plot_widget, 0, 0)
+        plot_widget = self._create_plot_widget(self.dialog)
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
@@ -663,10 +711,7 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
 
         # Create plot widget
-        plot_widget = MplCanvas(self.dialog, width=5, height=4, dpi=100)
-        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
-        plot_widget.setMinimumSize(100, 100)
-        self.dialog.lyt_plot.addWidget(plot_widget, 0, 0)
+        plot_widget = self._create_plot_widget(self.dialog)
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
@@ -1582,5 +1627,15 @@ class GwNonVisual:
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+
+
+    def _create_plot_widget(self, dialog):
+
+        plot_widget = MplCanvas(dialog, width=5, height=4, dpi=100)
+        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+        plot_widget.setMinimumSize(100, 100)
+        dialog.lyt_plot.addWidget(plot_widget, 0, 0)
+
+        return plot_widget
 
     # endregion
