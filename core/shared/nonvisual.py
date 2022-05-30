@@ -448,6 +448,7 @@ class GwNonVisual:
 
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id)
+            self._manage_ws_patterns_plot(tbl_pattern_value, plot_widget, None, None)
 
         # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
@@ -661,6 +662,12 @@ class GwNonVisual:
         cmb_pattern_type = self.dialog.cmb_pattern_type
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Create plot widget
+        plot_widget = MplCanvas(self.dialog, width=5, height=4, dpi=100)
+        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+        plot_widget.setMinimumSize(100, 100)
+        self.dialog.lyt_plot.addWidget(plot_widget, 0, 0)
+
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
@@ -676,9 +683,9 @@ class GwNonVisual:
             self._populate_ud_patterns_widgets(pattern_id)
 
         # Signals
-        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type))
+        cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, plot_widget))
 
-        self._manage_patterns_tableviews(self.dialog, cmb_pattern_type)
+        self._manage_patterns_tableviews(self.dialog, cmb_pattern_type, plot_widget)
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = pattern_id is None
@@ -719,7 +726,7 @@ class GwNonVisual:
                 table.setItem(n, i, QTableWidgetItem(f"{row[f'factor_{i+1}']}"))
 
 
-    def _manage_patterns_tableviews(self, dialog, cmb_pattern_type):
+    def _manage_patterns_tableviews(self, dialog, cmb_pattern_type, plot_widget):
 
         # Variables
         tbl_monthly = dialog.tbl_monthly
@@ -735,7 +742,14 @@ class GwNonVisual:
 
         # Only show the pattern_type one
         pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
-        dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}").setVisible(True)
+        cur_table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
+        cur_table.setVisible(True)
+        try:
+            cur_table.cellChanged.disconnect()
+        except TypeError:
+            pass
+        cur_table.cellChanged.connect(partial(self._manage_ud_patterns_plot, cur_table, plot_widget))
+        self._manage_ud_patterns_plot(cur_table, plot_widget, None, None)
 
 
     def _accept_pattern_ud(self, dialog, is_new):
@@ -849,6 +863,58 @@ class GwNonVisual:
                 return False
 
         return True
+
+
+    def _manage_ud_patterns_plot(self, table, plot_widget, row, column):
+        """ Note: row & column parameters are passed by the signal """
+
+        # Clear plot
+        plot_widget.axes.cla()
+
+        # Read row values
+        values = self._read_tbl_values(table)
+        temp_list = []  # String list with all table values
+        for v in values:
+            temp_list.append(v)
+
+        # Clean nulls of the end of the list
+        clean_list = []
+        for i, item in enumerate(temp_list):
+            last_idx = -1
+            for j, value in enumerate(item):
+                if value != 'null':
+                    last_idx = j
+            clean_list.append(item[:last_idx+1])
+
+        # Convert list items to float
+        float_list = []
+        for lst in clean_list:
+            temp_lst = []
+            for item in lst:
+                try:
+                    value = float(item)
+                except ValueError:
+                    value = 0
+                temp_lst.append(value)
+            float_list.append(temp_lst)
+
+        # Create lists for pandas DataFrame
+        x_offset = 0
+        for lst in float_list:
+            if not lst:
+                continue
+            # Create lists with x zeros as offset to append new rows to the graph
+            df_list = [0] * x_offset
+            df_list.extend(lst)
+            # Create pandas DataFrame & attach plot to graph widget
+            df = pd.DataFrame(df_list)
+            df.plot.bar(ax=plot_widget.axes, width=1, align='edge', color='lightcoral', edgecolor='indianred',
+                        legend=False)
+            x_offset += len(lst)
+
+        # Draw plot
+        plot_widget.draw()
+
 
     # endregion
 
