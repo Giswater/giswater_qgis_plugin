@@ -35,11 +35,11 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg = None
-        self.dict_views = {'ws':{'v_edit_inp_curve':'curves', 'v_edit_inp_pattern':'patterns',
-                                 'v_edit_inp_controls':'controls', 'v_edit_inp_rules':'rules'},
-                           'ud':{'v_edit_inp_curve':'curves', 'v_edit_inp_pattern':'patterns',
-                                 'v_edit_inp_controls':'controls', 'v_edit_inp_timeseries':'timeseries',
-                                 'v_edit_lid_controls':'lids'}}
+        self.dict_views = {'ws': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
+                                  'v_edit_inp_controls': 'controls', 'v_edit_inp_rules': 'rules'},
+                           'ud': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
+                                  'v_edit_inp_controls': 'controls', 'v_edit_inp_timeseries': 'timeseries',
+                                  'inp_lid': 'lids'}}
         self.dict_ids = {'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
                          'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
                          'v_edit_inp_controls': 'id',
