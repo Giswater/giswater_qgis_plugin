@@ -72,51 +72,12 @@
         <item row="6" column="0">
          <widget class="QComboBox" name="cmb_expl_id"/>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>idval</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="txt_id">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QComboBox" name="cmb_times_type"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="lbl_curve_id">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Time Series ID</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Times Type</string>
           </property>
          </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QComboBox" name="cmb_timeser_type"/>
-        </item>
-        <item row="8" column="0" colspan="2">
-         <widget class="QLineEdit" name="txt_descript"/>
         </item>
         <item row="7" column="0" colspan="2">
          <widget class="QLabel" name="label_2">
@@ -138,6 +99,62 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="txt_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QComboBox" name="cmb_timeser_type"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>idval</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="cmb_times_type"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="lbl_curve_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Time Series ID</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="QLineEdit" name="txt_descript"/>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="txt_fname">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="lbl_fname">
+          <property name="text">
+           <string>File name</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="txt_idval">
           <property name="sizePolicy">
@@ -152,33 +169,6 @@
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Exploitation ID</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLineEdit" name="txt_fname">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>fname</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0" colspan="2">
-         <widget class="QLineEdit" name="txt_log"/>
-        </item>
-        <item row="9" column="0" colspan="2">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Log</string>
           </property>
          </widget>
         </item>

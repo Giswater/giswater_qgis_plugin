@@ -220,7 +220,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
@@ -445,6 +445,8 @@ class GwNonVisual:
         curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
         descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        if expl_id in (None, ''):
+            expl_id = "null"
 
         if is_new:
             # Check that there are no empty fields
@@ -582,7 +584,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id)
@@ -647,6 +649,8 @@ class GwNonVisual:
         pattern_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
         observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        if expl_id in (None, ''):
+            expl_id = "null"
 
         if is_new:
             # Check that there are no empty fields
@@ -808,7 +812,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_pattern'"
         rows = tools_db.get_rows(sql)
@@ -906,6 +910,8 @@ class GwNonVisual:
         pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
         observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        if expl_id in (None, ''):
+            expl_id = "null"
 
         if is_new:
             # Check that there are no empty fields
@@ -1290,7 +1296,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
 
     def _populate_timeser_widgets(self, timser_id):
@@ -1303,7 +1309,6 @@ class GwNonVisual:
         txt_descript = self.dialog.txt_descript
         cmb_expl_id = self.dialog.cmb_expl_id
         txt_fname = self.dialog.txt_fname
-        txt_log = self.dialog.txt_log
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
         sql = f"SELECT * FROM v_edit_inp_timeseries WHERE id = '{timser_id}'"
@@ -1320,7 +1325,6 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, txt_fname, row['fname'])
-        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
         # Populate table timeseries_values
         sql = f"SELECT id, date, hour, time, value FROM v_edit_inp_timeseries_value WHERE timser_id = '{timser_id}'"
@@ -1369,7 +1373,6 @@ class GwNonVisual:
         txt_descript = dialog.txt_descript
         cmb_expl_id = dialog.cmb_expl_id
         txt_fname = dialog.txt_fname
-        txt_log = dialog.txt_log
         tbl_timeseries_value = dialog.tbl_timeseries_value
 
         # Get widget values
@@ -1380,7 +1383,8 @@ class GwNonVisual:
         descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
         fname = tools_qt.get_text(dialog, txt_fname, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
-        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
+        if expl_id in (None, ''):
+            expl_id = "null"
 
         if is_new:
             # Check that there are no empty fields
@@ -1390,8 +1394,8 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_timeseries
-            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log)" \
-                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}', {log})"
+            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id)" \
+                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}')"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting timeseries."
@@ -1420,8 +1424,7 @@ class GwNonVisual:
             times_type = times_type.strip("'")
             descript = descript.strip("'")
             fname = fname.strip("'")
-            log = log.strip("'")
-            fields = f"""{{"expl_id": {expl_id}, "idval": "{idval}", "timser_type": "{timser_type}", "times_type": "{times_type}", "descript": "{descript}", "fname": "{fname}", "log": "{log}"}}"""
+            fields = f"""{{"expl_id": {expl_id}, "idval": "{idval}", "timser_type": "{timser_type}", "times_type": "{times_type}", "descript": "{descript}", "fname": "{fname}"}}"""
 
             result = self._setfields(timeseries_id.strip("'"), table_name, fields)
             if not result:
