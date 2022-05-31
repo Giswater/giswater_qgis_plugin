@@ -1267,9 +1267,12 @@ class GwNonVisual:
         tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Connect dialog signals
+        cmb_times_type.currentTextChanged.connect(partial(self._manage_times_type, tbl_timeseries_value))
         tbl_timeseries_value.cellChanged.connect(partial(self._onCellChanged, tbl_timeseries_value))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_timeseries, self.dialog, is_new))
         self._connect_dialog_signals()
+
+        self._manage_times_type(tbl_timeseries_value, tools_qt.get_combo_value(self.dialog, cmb_times_type))
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
@@ -1349,6 +1352,12 @@ class GwNonVisual:
             tbl_timeseries_value.setItem(n, 2, QTableWidgetItem(f"{value}"))
             tbl_timeseries_value.insertRow(tbl_timeseries_value.rowCount())
 
+
+    def _manage_times_type(self, tbl_timeseries_value, text):
+        if text == 'RELATIVE':
+            tbl_timeseries_value.setColumnHidden(0, True)
+            return
+        tbl_timeseries_value.setColumnHidden(0, False)
 
     def _accept_timeseries(self, dialog, is_new):
 
