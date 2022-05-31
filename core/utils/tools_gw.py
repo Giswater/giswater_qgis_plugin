@@ -2659,7 +2659,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, visible"
+    sql = (f"SELECT columnindex, width, alias, visible, style"
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
@@ -2672,6 +2672,12 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         if not row['visible']:
             columns_to_delete.append(row['columnindex'])
         else:
+            style = row.get('style')
+            if style:
+                stretch = style.get('stretch')
+                if stretch is not None:
+                    stretch = 1 if stretch else 0
+                    widget.horizontalHeader().setSectionResizeMode(row['columnindex'], stretch)
             width = row['width']
             if width is None:
                 width = 100
