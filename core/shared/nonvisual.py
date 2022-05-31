@@ -13,7 +13,7 @@ import numpy as np
 from functools import partial
 from scipy.interpolate import CubicSpline
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel, QLineEdit
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -1504,7 +1504,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate LID Type combo
-        sql =f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype'"
+        sql =f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -1519,7 +1519,6 @@ class GwNonVisual:
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
-        self.dialog.tab_lidlayers.currentChanged.connect(partial(self._test_))
         self.dialog.btn_ok.clicked.connect(partial(self._insert_lids_value, self.dialog))
 
         self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
@@ -1534,7 +1533,7 @@ class GwNonVisual:
                            'GR': {'SURFACE', 'SOIL', 'DRAINMAT'},
                            'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
                            'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
-                           'RB': {'SURFACE', 'DRAIN'},
+                           'RB': {'STORAGE', 'DRAIN'},
                            'RD': {'SURFACE', 'ROOFTOP'},
                            'VS': {'SURFACE'}}
 
@@ -1544,8 +1543,10 @@ class GwNonVisual:
 
         # Tabs to show
         lidtabs = []
+        lid_id =''
         if row:
             lidtabs= layer_tabs[row[0]]
+            lid_id=row[0]
 
         # Show tabs
         for i in range(tab_lidlayers.count()):
@@ -1554,9 +1555,35 @@ class GwNonVisual:
                 tab_lidlayers.setTabVisible(i, False)
             else:
                 tab_lidlayers.setTabVisible(i, True)
+                self._manage_lids_hide_widgets(self.dialog, lid_id)
 
         # Set image
         self._manage_lids_images(lidco_id)
+
+
+    def _manage_lids_hide_widgets(self, dialog, lid_id):
+        '''Hides widgets that are not necessary in specific tabs'''
+
+        # List of widgets
+        widgets_hide = {'BC' : {'lbl_surface_6', 'surface_6','lbl_drain_5','drain_5'},
+                      'RG' : {'lbl_surface_6', 'surface_6'},
+                      'GR' : {'lbl_surface_5', 'surface_5'},
+                      'IT' : {'lbl_surface_6', 'surface_6','lbl_drain_5','drain_5'},
+                      'PP' : {'lbl_surface_6', 'surface_6', 'lbl_drain_5','drain_5'},
+                      'RB' : {'lbl_storage_4', 'storage_4', 'lbl_storage_5', 'storage_5'},
+                      'RD' : {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6'},
+                      'VS' : {''}}
+
+        # Hide widgets in list
+        for i in range(dialog.tab_lidlayers.count()):
+            if dialog.tab_lidlayers.isTabVisible(i):
+                # List of children
+                list = dialog.tab_lidlayers.widget(i).children()
+                for y in list:
+                    y.show()
+                    for j in widgets_hide[lid_id]:
+                        if j == y.objectName():
+                            y.hide()
 
 
     def _manage_lids_images(self, lidco_id):
@@ -1583,7 +1610,6 @@ class GwNonVisual:
     def _insert_lids_value(self, dialog):
         '''Insert the values from LIDS dialog'''
 
-       
         # Insert in table 'inp_lid'
         cmb_text = str(dialog.cmb_lidtype.currentText())
         lidco_type= self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
@@ -1591,7 +1617,7 @@ class GwNonVisual:
 
         if lidco_id != '':
             sql= f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
-            result= tools_db.execute_sql(sql)
+            result= tools_db.execute_sql(sql, commit=False)
 
             if not result:
                 msg = "There was an error inserting lid."
@@ -1609,8 +1635,8 @@ class GwNonVisual:
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all children that are not QLabel
-                list = dialog.tab_lidlayers.widget(i).children()
-                list = [widget for widget in list if type(widget) != QLabel]
+                child_list = dialog.tab_lidlayers.widget(i).children()
+                list = [widget for widget in child_list if type(widget) != QLabel]
 
                 # Order list by objectName
                 for x in range(len(list)):
@@ -1619,22 +1645,25 @@ class GwNonVisual:
                             list[j], list[(j+1)] = list[(j+1)], list[j]
 
                 sql=f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
-                for y,widget in enumerate(list):
-                    sql+=f"value_{y+2}, "
+                for y, widget in enumerate(list):
+                    if not widget.isHidden():
+                        sql+=f"value_{y+2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
                 for widget in list:
-                    value=tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
-                    sql+=f"{value}, "
-                    print(value)
+                    if not widget.isHidden():
+                        value=tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
+                        sql+=f"{value}, "
                 sql = sql.rstrip(', ') + ")"
-                print(f"SQL -> {sql}")
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
                     msg = "There was an error inserting lid."
                     tools_qgis.show_warning(msg)
                     global_vars.dao.rollback()
                     return False
+
+        global_vars.dao.commit()
+
     # endregion
 
     # region private functions

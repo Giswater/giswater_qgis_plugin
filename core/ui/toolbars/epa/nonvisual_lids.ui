@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
-    <height>498</height>
+    <width>700</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,13 +26,13 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="surface">
     <attribute name="title">
      <string>Surface</string>
     </attribute>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="lbl_surface2">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -48,7 +48,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="lbl_surface_3">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -64,7 +64,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="lbl_surface_4">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -80,7 +80,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_6">
+    <widget class="QLabel" name="lbl_surface_5">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -151,7 +151,7 @@
       <string>1.0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_28">
+    <widget class="QLabel" name="lbl_surface_6">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -631,12 +631,12 @@
     <attribute name="title">
      <string>Storage</string>
     </attribute>
-    <widget class="QLabel" name="label_21">
+    <widget class="QLabel" name="lbl_storage_2">
      <property name="geometry">
       <rect>
        <x>40</x>
        <y>32</y>
-       <width>71</width>
+       <width>91</width>
        <height>32</height>
       </rect>
      </property>
@@ -660,12 +660,12 @@
       <string>0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_22">
+    <widget class="QLabel" name="lbl_storage_3">
      <property name="geometry">
       <rect>
        <x>40</x>
        <y>80</y>
-       <width>91</width>
+       <width>111</width>
        <height>32</height>
       </rect>
      </property>
@@ -676,7 +676,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_23">
+    <widget class="QLabel" name="lbl_storage_4">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -731,7 +731,7 @@
       <string>0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_26">
+    <widget class="QLabel" name="lbl_storage_5">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -755,7 +755,7 @@
     <attribute name="title">
      <string>Drain</string>
     </attribute>
-    <widget class="QLabel" name="label_29">
+    <widget class="QLabel" name="lbl_drain_7">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -784,7 +784,7 @@
       <string>0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_30">
+    <widget class="QLabel" name="lbl_drain_2">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -813,7 +813,7 @@
       <string>0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_31">
+    <widget class="QLabel" name="lbl_drain_6">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -868,7 +868,7 @@
       <string>0.5</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_33">
+    <widget class="QLabel" name="lbl_drain_5">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -887,7 +887,7 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_34">
+    <widget class="QLabel" name="lbl_drain_3">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -903,7 +903,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_35">
+    <widget class="QLabel" name="lbl_drain_4">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -932,7 +932,7 @@
       <string>0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_32">
+    <widget class="QLabel" name="lbl_drain_8">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1114,7 +1114,7 @@
      <x>20</x>
      <y>30</y>
      <width>311</width>
-     <height>71</height>
+     <height>74</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -1167,8 +1167,8 @@
     <rect>
      <x>20</x>
      <y>450</y>
-     <width>311</width>
-     <height>26</height>
+     <width>345</width>
+     <height>30</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="btn_layout">
