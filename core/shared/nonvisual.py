@@ -804,6 +804,9 @@ class GwNonVisual:
         cmb_pattern_type = self.dialog.cmb_pattern_type
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Set scale-to-fit for tableview
+        self._scale_to_fit_pattern_tableviews(self.dialog)
+
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
 
@@ -829,6 +832,13 @@ class GwNonVisual:
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = pattern_id is None
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ud, self.dialog, is_new))
+
+
+    def _scale_to_fit_pattern_tableviews(self, dialog):
+        tables = [dialog.tbl_monthly, dialog.tbl_daily, dialog.tbl_hourly, dialog.tbl_weekend]
+        for table in tables:
+            table.horizontalHeader().setSectionResizeMode(1)
+            table.horizontalHeader().setMinimumSectionSize(50)
 
 
     def _populate_ud_patterns_widgets(self, pattern_id):
