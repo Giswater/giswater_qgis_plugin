@@ -481,6 +481,10 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Set scale-to-fit for tableview
+        tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
+        tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
+
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
 
@@ -509,7 +513,6 @@ class GwNonVisual:
         txt_id = self.dialog.txt_pattern_id
         txt_observ = self.dialog.txt_observ
         cmb_expl_id = self.dialog.cmb_expl_id
-        txt_log = self.dialog.txt_log
         tbl_pattern_value = self.dialog.tbl_pattern_value
 
         sql = f"SELECT * FROM v_edit_inp_pattern WHERE pattern_id = '{pattern_id}'"
@@ -522,10 +525,10 @@ class GwNonVisual:
         tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_observ, row['observ'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
-        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
         # Populate table pattern_values
-        sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12 " \
+        sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
+              f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
               f"FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -548,14 +551,12 @@ class GwNonVisual:
         txt_id = dialog.txt_pattern_id
         txt_observ = dialog.txt_observ
         cmb_expl_id = dialog.cmb_expl_id
-        txt_log = dialog.txt_log
         tbl_pattern_value = dialog.tbl_pattern_value
 
         # Get widget values
         pattern_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
         observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
-        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -565,8 +566,8 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_pattern
-            sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id, log)" \
-                  f"VALUES({pattern_id}, {observ}, {expl_id}, {log})"
+            sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id)" \
+                  f"VALUES({pattern_id}, {observ}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
@@ -588,8 +589,7 @@ class GwNonVisual:
             table_name = 'v_edit_inp_pattern'
 
             observ = observ.strip("'")
-            log = log.strip("'")
-            fields = f"""{{"expl_id": {expl_id}, "observ": "{observ}", "log": "{log}"}}"""
+            fields = f"""{{"expl_id": {expl_id}, "observ": "{observ}"}}"""
 
             result = self._setfields(pattern_id.strip("'"), table_name, fields)
             if not result:
@@ -635,7 +635,9 @@ class GwNonVisual:
             if row == (['null'] * tbl_pattern_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12) " \
+            sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
+                  f"factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, " \
+                  f"factor_15, factor_16, factor_17, factor_18) " \
                   f"VALUES ({pattern_id}, "
             for x in row:
                 sql += f"{x}, "
