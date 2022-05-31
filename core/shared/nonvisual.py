@@ -48,7 +48,6 @@ class GwNonVisual:
                          'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
                          }
 
-
     # region manager
     def manage_nonvisual(self):
         """  """
@@ -1518,21 +1517,21 @@ class GwNonVisual:
 
     # region lids
     def get_lids(self):
-        ''''''
+        """  """
 
         # Get dialog
         self.dialog = GwNonVisualLidsUi()
         tools_gw.load_settings(self.dialog)
 
         # Populate LID Type combo
-        sql =f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
+        sql = f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
 
         if rows:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
-        sql =f"SELECT id FROM v_edit_inp_curve; "
+        sql = f"SELECT id FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -1543,6 +1542,7 @@ class GwNonVisual:
         self.dialog.btn_ok.clicked.connect(partial(self._insert_lids_value, self.dialog))
 
         self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
+
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
 
@@ -1550,13 +1550,13 @@ class GwNonVisual:
     def _manage_lids_tabs(self, cmb_lidtype, tab_lidlayers):
 
         layer_tabs = {'BC': {'SURFACE', 'SOIL', 'STORAGE', 'DRAIN'},
-                           'RG': {'SURFACE', 'SOIL', 'STORAGE'},
-                           'GR': {'SURFACE', 'SOIL', 'DRAINMAT'},
-                           'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
-                           'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
-                           'RB': {'STORAGE', 'DRAIN'},
-                           'RD': {'SURFACE', 'ROOFTOP'},
-                           'VS': {'SURFACE'}}
+                      'RG': {'SURFACE', 'SOIL', 'STORAGE'},
+                      'GR': {'SURFACE', 'SOIL', 'DRAINMAT'},
+                      'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
+                      'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
+                      'RB': {'STORAGE', 'DRAIN'},
+                      'RD': {'SURFACE', 'ROOFTOP'},
+                      'VS': {'SURFACE'}}
 
         lidco_id = str(cmb_lidtype.currentText())
         sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval =  '{lidco_id}'"
@@ -1564,10 +1564,10 @@ class GwNonVisual:
 
         # Tabs to show
         lidtabs = []
-        lid_id =''
+        lid_id = ''
         if row:
-            lidtabs= layer_tabs[row[0]]
-            lid_id=row[0]
+            lidtabs = layer_tabs[row[0]]
+            lid_id = row[0]
 
         # Show tabs
         for i in range(tab_lidlayers.count()):
@@ -1583,17 +1583,17 @@ class GwNonVisual:
 
 
     def _manage_lids_hide_widgets(self, dialog, lid_id):
-        '''Hides widgets that are not necessary in specific tabs'''
+        """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC' : {'lbl_surface_6', 'surface_6','lbl_drain_5','drain_5'},
-                      'RG' : {'lbl_surface_6', 'surface_6'},
-                      'GR' : {'lbl_surface_5', 'surface_5'},
-                      'IT' : {'lbl_surface_6', 'surface_6','lbl_drain_5','drain_5'},
-                      'PP' : {'lbl_surface_6', 'surface_6', 'lbl_drain_5','drain_5'},
-                      'RB' : {'lbl_storage_4', 'storage_4', 'lbl_storage_5', 'storage_5'},
-                      'RD' : {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6'},
-                      'VS' : {''}}
+        widgets_hide = {'BC': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
+                        'RG': {'lbl_surface_6', 'surface_6'},
+                        'GR': {'lbl_surface_5', 'surface_5'},
+                        'IT': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
+                        'PP': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
+                        'RB': {'lbl_storage_4', 'storage_4', 'lbl_storage_5', 'storage_5'},
+                        'RD': {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6'},
+                        'VS': {''}}
 
         # Hide widgets in list
         for i in range(dialog.tab_lidlayers.count()):
@@ -1608,13 +1608,14 @@ class GwNonVisual:
 
 
     def _manage_lids_images(self, lidco_id):
-        ''' Manage images depending on lidco_id selected'''
+        """ Manage images depending on lidco_id selected"""
 
         sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval = '{lidco_id}'"
         row = tools_db.get_row(sql)
-        if row:
-            img = f"ud_lid_{row[0]}"
+        if not row:
+            return
 
+        img = f"ud_lid_{row[0]}"
         tools_qt.add_image(self.dialog, 'lbl_section_image',
                            f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
@@ -1629,16 +1630,16 @@ class GwNonVisual:
 
 
     def _insert_lids_value(self, dialog):
-        '''Insert the values from LIDS dialog'''
+        """ Insert the values from LIDS dialog """
 
         # Insert in table 'inp_lid'
         cmb_text = str(dialog.cmb_lidtype.currentText())
-        lidco_type= self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
+        lidco_type = self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
         lidco_id = dialog.txt_name.text()
 
         if lidco_id != '':
-            sql= f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
-            result= tools_db.execute_sql(sql, commit=False)
+            sql = f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
+            result = tools_db.execute_sql(sql, commit=False)
 
             if not result:
                 msg = "There was an error inserting lid."
@@ -1665,16 +1666,16 @@ class GwNonVisual:
                         if list[j].objectName() > list[(j+1)].objectName():
                             list[j], list[(j+1)] = list[(j+1)], list[j]
 
-                sql=f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
+                sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
                 for y, widget in enumerate(list):
                     if not widget.isHidden():
-                        sql+=f"value_{y+2}, "
+                        sql += f"value_{y+2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
                 for widget in list:
                     if not widget.isHidden():
-                        value=tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
-                        sql+=f"{value}, "
+                        value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
+                        sql += f"{value}, "
                 sql = sql.rstrip(', ') + ")"
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
