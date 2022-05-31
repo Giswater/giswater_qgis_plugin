@@ -200,11 +200,6 @@ class GwNonVisual:
         # Execute method get_{object_name}
         getattr(self, f'get_{object_name.lower()}')()
 
-
-    def get_roughness(self):
-        """  """
-        pass
-
     # region curves
     def get_curves(self, curve_id=None):
         """  """
