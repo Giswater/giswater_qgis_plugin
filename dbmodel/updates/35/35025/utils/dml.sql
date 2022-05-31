@@ -55,3 +55,24 @@ VALUES(450, 'Import cat_arc table', 'utils', NULL, 'core', true, '"Function proc
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
 VALUES (450, 'Import cat_arc', 'Import cat_arc', 'gw_fct_import_catalog', true,15, null) ON CONFLICT (fid) DO NOTHING;
+
+--2022/05/31
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_curve','id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_curve','curve_type',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','utils','v_edit_inp_curve','descript',2,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_curve','expl_id',3,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_curve','log',4,false);
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_controls','id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_controls','sector_id',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','utils','v_edit_inp_controls','text',2,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','utils','v_edit_inp_controls','active',3,true);

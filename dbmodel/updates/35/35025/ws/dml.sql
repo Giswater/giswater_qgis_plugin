@@ -26,3 +26,25 @@ UPDATE inp_typevalue
 UPDATE inp_typevalue
 	SET addparam='{"header": ["Height", "Volume"]}'::json
 	WHERE typevalue='inp_value_curve' AND id='VOLUME';
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','pattern_id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','observ',1,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','tscode',2,false);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','tsparameters',3,false);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','expl_id',4,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','log',5,false);
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_rules','id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_rules','sector_id',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','ws','v_edit_inp_rules','text',2,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_rules','active',3,true);

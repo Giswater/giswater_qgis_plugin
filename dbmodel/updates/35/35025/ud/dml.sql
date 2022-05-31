@@ -105,3 +105,42 @@ UPDATE inp_typevalue
 UPDATE inp_typevalue
 	SET addparam='{"header": ["Depth/\nFull Depth", "Width/\nFull Depth"]}'::json
 	WHERE typevalue='inp_value_curve' AND id='SHAPE';
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','pattern_id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','pattern_type',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','observ',2,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','tsparameters',3,false);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','expl_id',4,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','log',5,false);
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','timeser_type',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','times_type',2,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','idval',3,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible, style)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','descript',4,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','fname',5,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','expl_id',6,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_timeseries','log',7,false);
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','inp_lid','lidco_id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','inp_lid','lidco_type',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
+	VALUES ('nonvisual manager','ud','inp_lid','observ',2,true,'{"stretch": true}'::json);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('nonvisual manager','ud','inp_lid','log',3,false);
