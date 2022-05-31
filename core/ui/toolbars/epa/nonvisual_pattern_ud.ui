@@ -103,16 +103,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="txt_observ">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="lbl_pattern_id">
           <property name="sizePolicy">
@@ -123,19 +113,6 @@
           </property>
           <property name="text">
            <string>Pattern ID</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="lbl_observ">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Observation</string>
           </property>
          </widget>
         </item>
@@ -152,34 +129,41 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="2">
+         <widget class="QComboBox" name="cmb_expl_id"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="cmb_pattern_type"/>
+        </item>
+        <item row="0" column="1">
          <widget class="QLabel" name="lbl_pattern_type">
           <property name="text">
            <string>Pattern Type</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QComboBox" name="cmb_pattern_type"/>
-        </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QLineEdit" name="txt_log"/>
-        </item>
-        <item row="2" column="1" colspan="2">
-         <widget class="QLabel" name="lbl_log">
+        <item row="3" column="0" colspan="3">
+         <widget class="QLineEdit" name="txt_observ">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QLabel" name="lbl_observ">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Log</string>
+           <string>Observation</string>
           </property>
          </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="cmb_expl_id"/>
         </item>
        </layout>
       </item>

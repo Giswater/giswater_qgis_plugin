@@ -763,7 +763,6 @@ class GwNonVisual:
         txt_observ = self.dialog.txt_observ
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_pattern_type = self.dialog.cmb_pattern_type
-        txt_log = self.dialog.txt_log
 
         sql = f"SELECT * FROM v_edit_inp_pattern WHERE pattern_id = '{pattern_id}'"
         row = tools_db.get_row(sql)
@@ -776,7 +775,6 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_observ, row['observ'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, cmb_pattern_type, row['pattern_type'])
-        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
         # Populate table pattern_values
         sql = f"SELECT * FROM v_edit_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
@@ -823,14 +821,12 @@ class GwNonVisual:
         txt_observ = dialog.txt_observ
         cmb_expl_id = dialog.cmb_expl_id
         cmb_pattern_type = dialog.cmb_pattern_type
-        txt_log = dialog.txt_log
 
         # Get widget values
         pattern_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
         pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
         observ = tools_qt.get_text(dialog, txt_observ, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
-        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -840,8 +836,8 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_pattern
-            sql = f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id, log)" \
-                  f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id}, {log})"
+            sql = f"INSERT INTO inp_pattern (pattern_id, pattern_type, observ, expl_id)" \
+                  f"VALUES({pattern_id}, '{pattern_type}', {observ}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
@@ -863,8 +859,7 @@ class GwNonVisual:
             table_name = 'v_edit_inp_pattern'
 
             observ = observ.strip("'")
-            log = log.strip("'")
-            fields = f"""{{"pattern_type": {pattern_type}, "expl_id": {expl_id}, "observ": "{observ}", "log": "{log}"}}"""
+            fields = f"""{{"pattern_type": {pattern_type}, "expl_id": {expl_id}, "observ": "{observ}"}}"""
 
             result = self._setfields(pattern_id.strip("'"), table_name, fields)
             if not result:
