@@ -168,6 +168,7 @@ class GwNonVisual:
 
         # Set initial curve_value table headers
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
+        self._manage_curve_plot(tbl_curve_value, plot_widget, None, None)
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
@@ -194,7 +195,6 @@ class GwNonVisual:
         txt_descript = self.dialog.txt_descript
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_curve_type = self.dialog.cmb_curve_type
-        txt_log = self.dialog.txt_log
         tbl_curve_value = self.dialog.tbl_curve_value
 
         sql = f"SELECT * FROM v_edit_inp_curve WHERE id = '{curve_id}'"
@@ -208,7 +208,6 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, cmb_curve_type, row['curve_type'])
-        tools_qt.set_widget_text(self.dialog, txt_log, row['log'])
 
         # Populate table curve_values
         sql = f"SELECT x_value, y_value FROM v_edit_inp_curve_value WHERE curve_id = '{curve_id}'"
@@ -349,7 +348,6 @@ class GwNonVisual:
         txt_descript = dialog.txt_descript
         cmb_expl_id = dialog.cmb_expl_id
         cmb_curve_type = dialog.cmb_curve_type
-        txt_log = dialog.txt_log
         tbl_curve_value = dialog.tbl_curve_value
 
         # Get widget values
@@ -357,7 +355,6 @@ class GwNonVisual:
         curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
         descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
-        log = tools_qt.get_text(dialog, txt_log, add_quote=True)
 
         if is_new:
             # Check that there are no empty fields
@@ -367,8 +364,8 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_curve
-            sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id, log)" \
-                  f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id}, {log})"
+            sql = f"INSERT INTO inp_curve (id, curve_type, descript, expl_id)" \
+                  f"VALUES({curve_id}, '{curve_type}', {descript}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting curve."
@@ -391,8 +388,7 @@ class GwNonVisual:
 
             curve_type = curve_type.strip("'")
             descript = descript.strip("'")
-            log = log.strip("'")
-            fields = f"""{{"curve_type": "{curve_type}", "descript": "{descript}", "expl_id": {expl_id}, "log": "{log}"}}"""
+            fields = f"""{{"curve_type": "{curve_type}", "descript": "{descript}", "expl_id": {expl_id}}}"""
 
             result = self._setfields(curve_id.strip("'"), table_name, fields)
             if not result:
