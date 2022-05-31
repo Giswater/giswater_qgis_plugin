@@ -944,7 +944,7 @@ class GwNonVisual:
             table_name = 'v_edit_inp_pattern'
 
             observ = observ.strip("'")
-            fields = f"""{{"pattern_type": {pattern_type}, "expl_id": {expl_id}, "observ": "{observ}"}}"""
+            fields = f"""{{"pattern_type": "{pattern_type}", "expl_id": {expl_id}, "observ": "{observ}"}}"""
 
             result = self._setfields(pattern_id.strip("'"), table_name, fields)
             if not result:
