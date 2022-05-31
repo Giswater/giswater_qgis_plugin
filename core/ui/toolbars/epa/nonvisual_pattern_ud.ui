@@ -559,6 +559,11 @@
           </column>
           <column>
            <property name="text">
+            <string>SAT</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>SUN</string>
            </property>
           </column>
