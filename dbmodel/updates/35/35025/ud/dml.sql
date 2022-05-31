@@ -73,3 +73,35 @@ UPDATE inp_typevalue SET idval = replace (idval, ' (5.1)' , '') WHERE typevalue 
 
 UPDATE sys_table SET alias = 'Dwf catalog' WHERE id = 'v_edit_cat_dwf_dscenario';
 UPDATE sys_table SET alias = 'Hydrology catalog' WHERE id = 'v_edit_cat_hydrology';
+
+--2022/05/31
+UPDATE inp_typevalue
+    SET addparam='{"header": ["Depth", "Area"]}'::json
+    WHERE typevalue='inp_value_curve' AND id='STORAGE';
+UPDATE inp_typevalue
+    SET addparam='{"header": ["Hour", "Stage"]}'::json
+    WHERE typevalue='inp_value_curve' AND id='TIDAL';
+UPDATE inp_typevalue
+    SET addparam='{"header": ["Value", "Setting"]}'::json
+    WHERE typevalue='inp_value_curve' AND id='CONTROL';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Inflow", "Outflow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='DIVERSION';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Volume", "Flow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='PUMP1';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Depth", "Flow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='PUMP2';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Head", "Flow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='PUMP3';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Depth", "Flow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='PUMP4';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Head", "Outflow"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='RATING';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Depth/\nFull Depth", "Width/\nFull Depth"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='SHAPE';

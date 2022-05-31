@@ -12,3 +12,17 @@ UPDATE config_param_system set layoutorder = layoutorder + 10 WHERE parameter in
 
 UPDATE sys_table set alias = 'Pattern values' WHERE id = 'v_edit_inp_pattern_value';
 UPDATE sys_table set alias = 'Curve values' WHERE id = 'v_edit_inp_curve_value';
+
+--2022/05/31
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Flow", "Efficiency"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='EFFICIENCY';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Flow", "Headloss"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='HEADLOSS';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Flow", "Head"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='PUMP';
+UPDATE inp_typevalue
+	SET addparam='{"header": ["Height", "Volume"]}'::json
+	WHERE typevalue='inp_value_curve' AND id='VOLUME';
