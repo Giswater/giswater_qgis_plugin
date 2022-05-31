@@ -40,6 +40,13 @@ class GwNonVisual:
                            'ud':{'v_edit_inp_curve':'curves', 'v_edit_inp_pattern':'patterns',
                                  'v_edit_inp_controls':'controls', 'v_edit_inp_timeseries':'timeseries',
                                  'v_edit_lid_controls':'lids'}}
+        self.dict_ids = {'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
+                         'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
+                         'v_edit_inp_controls': 'id',
+                         'v_edit_inp_rules': 'id',
+                         'v_edit_inp_timeseries': 'id', 'v_edit_inp_timeseries_value': 'timser_id',
+                         'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
+                         }
 
 
     # region manager
@@ -54,6 +61,7 @@ class GwNonVisual:
         self._manage_tabs_manager()
 
         # Connect dialog signals
+        self.manager_dlg.btn_delete.clicked.connect(partial(self._delete_object, self.manager_dlg))
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
 
@@ -115,6 +123,62 @@ class GwNonVisual:
 
         # Sort the table by feature id
         model.sort(1, 0)
+
+
+    def _delete_object(self, dialog):
+        """ Deletes selected object and its values """
+
+        # Variables
+        table = dialog.main_tab.currentWidget()
+        tablename = table.objectName()
+        tablename_value = f"{tablename}_value"
+
+        # Get selected row
+        selected_list = table.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected workspace id
+        index = table.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        message = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 0).data())
+        if answer:
+            # Add quotes to id if not numeric
+            try:
+                value = int(value)
+            except ValueError:
+                value = f"'{value}'"
+
+            # Delete values
+            id_field = self.dict_ids.get(tablename_value)
+            if id_field is not None:
+                sql = f"DELETE FROM {tablename_value} WHERE {id_field} = {value}"
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    msg = "There was an error deleting object values."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return
+
+            # Delete object from main table
+            id_field = self.dict_ids.get(tablename)
+            sql = f"DELETE FROM {tablename} WHERE {id_field} = {value}"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error deleting object."
+                tools_qgis.show_warning(msg)
+                global_vars.dao.rollback()
+                return
+
+            # Commit & refresh table
+            global_vars.dao.commit()
+            self._reload_manager_table()
+
+
     # endregion
 
     def get_nonvisual(self, object_name):
