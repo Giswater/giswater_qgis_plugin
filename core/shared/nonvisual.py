@@ -61,6 +61,7 @@ class GwNonVisual:
         self._manage_tabs_manager()
 
         # Connect dialog signals
+        self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
         self.manager_dlg.btn_delete.clicked.connect(partial(self._delete_object, self.manager_dlg))
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
@@ -78,6 +79,7 @@ class GwNonVisual:
             qtableview.setObjectName(f"tbl_{dict_views_project[key]}")
             tab_idx = self.manager_dlg.main_tab.addTab(qtableview, f"{dict_views_project[key].capitalize()}")
             self.manager_dlg.main_tab.widget(tab_idx).setObjectName(key)
+            self.manager_dlg.main_tab.widget(tab_idx).setProperty('function', f"get_{dict_views_project[key]}")
             function_name = f"get_{dict_views_project[key]}"
             _id = 0
 
@@ -123,6 +125,15 @@ class GwNonVisual:
 
         # Sort the table by feature id
         model.sort(1, 0)
+
+
+    def _create_object(self, dialog):
+        """ Creates a new non-visual object from the manager """
+
+        table = dialog.main_tab.currentWidget()
+        function_name = table.property('function')
+
+        getattr(self, function_name)()
 
 
     def _delete_object(self, dialog):
