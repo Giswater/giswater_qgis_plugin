@@ -8,8 +8,11 @@ or (at your option) any later version.
 import os
 import sys
 import pandas as pd
+import numpy as np
 
 from functools import partial
+from scipy.interpolate import CubicSpline
+
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
@@ -162,13 +165,13 @@ class GwNonVisual:
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
-        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, tbl_curve_value, plot_widget))
+        tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, (curve_id is None), curve_id))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
-        self._manage_curve_plot(tbl_curve_value, plot_widget, None, None)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, None, None)
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
@@ -291,7 +294,7 @@ class GwNonVisual:
         self._set_curve_values_valid(dialog, valid)
 
 
-    def _manage_curve_plot(self, table, plot_widget, row, column):
+    def _manage_curve_plot(self, dialog, table, plot_widget, row, column):
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
@@ -331,9 +334,27 @@ class GwNonVisual:
         x_list = [x[0] for x in float_list]  # x_list = [x1, x2, x3]
         y_list = [x[1] for x in float_list]  # y_list = [y1, y2, y3]
 
-        plot_widget.axes.plot(x_list, y_list, color='indianred')
+        # Create curve if only one value with curve_type 'PUMP'
+        curve_type = tools_qt.get_combo_value(dialog, dialog.cmb_curve_type)
+        if len(x_list) == 1 and curve_type == 'PUMP':
+            # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
+            x = x_list[0]
+            y = y_list[0]
+            x_array = np.array([0, x, 2*x])
+            y_array = np.array([1.33*y, y, 0])
 
-        # Draw plot
+            # Define x_array as 100 equally spaced values between the min and max of original x_array
+            xnew = np.linspace(x_array.min(), x_array.max(), 100)
+
+            # Define spline
+            spl = CubicSpline(x_array, y_array)
+            y_smooth = spl(xnew)
+
+            x_list = xnew
+            y_list = y_smooth
+
+        # Create and draw plot
+        plot_widget.axes.plot(x_list, y_list, color='indianred')
         plot_widget.draw()
 
 
