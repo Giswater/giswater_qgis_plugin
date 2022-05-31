@@ -14,5 +14,5 @@ ALTER VIEW v_edit_cat_dwf_dscenario RENAME TO v_edit_cat_dwf_scenario;
 
 --2022/05/30
 DROP VIEW vi_lid_controls;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_lid_value", "column":"value_8"}}$$)
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CREATE","table":"inp_lid_value", "column":"value_8", "dataType":"text", "isUtils":"False"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_lid_value", "column":"value_8"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CREATE","table":"inp_lid_value", "column":"value_8", "dataType":"text", "isUtils":"False"}}$$);
