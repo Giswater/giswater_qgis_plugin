@@ -76,3 +76,7 @@ INSERT INTO config_form_tableview (location_type,project_type,tablename,columnna
 	VALUES ('nonvisual manager','utils','v_edit_inp_controls','text',2,true,'{"stretch": true}'::json);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
 	VALUES ('nonvisual manager','utils','v_edit_inp_controls','active',3,true);
+    
+--2022/06/01
+UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text, '"valueRelation":{"nullValue":false, ', '"valueRelation":{"nullValue":true, '))::json 
+WHERE widgetcontrols->>'valueRelation' IS NOT NULL and formname in ('cat_connec', 'cat_arc', 'cat_node', 'cat_grate') and columnname='matcat_id';
