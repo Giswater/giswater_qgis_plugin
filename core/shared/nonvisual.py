@@ -60,6 +60,7 @@ class GwNonVisual:
         self._manage_tabs_manager()
 
         # Connect dialog signals
+        self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
         self.manager_dlg.btn_delete.clicked.connect(partial(self._delete_object, self.manager_dlg))
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
@@ -135,6 +136,34 @@ class GwNonVisual:
         getattr(self, function_name)()
 
 
+    def _duplicate_object(self, dialog):
+        """ Duplicates the selected object """
+
+        # Variables
+        table = dialog.main_tab.currentWidget()
+        tablename = table.objectName()
+        function_name = table.property('function')
+
+        # Get selected row
+        selected_list = table.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected workspace id
+        index = table.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        try:
+            value = int(value)
+        except ValueError:
+            pass
+
+        # Open dialog with values but no id
+        getattr(self, function_name)(value, duplicate=True)
+
+
     def _delete_object(self, dialog):
         """ Deletes selected object and its values """
 
@@ -201,7 +230,7 @@ class GwNonVisual:
         getattr(self, f'get_{object_name.lower()}')()
 
     # region curves
-    def get_curves(self, curve_id=None):
+    def get_curves(self, curve_id=None, duplicate=False):
         """  """
 
         # Get dialog
@@ -228,14 +257,17 @@ class GwNonVisual:
 
         # Populate data if editing curve
         if curve_id:
-            self._populate_curve_widgets(curve_id)
+            self._populate_curve_widgets(curve_id, duplicate=duplicate)
+
+        # Treat as new object if curve_id is None or if we're duplicating
+        is_new = (curve_id is None) or duplicate
 
         # Connect dialog signals
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, (curve_id is None), curve_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new, curve_id))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
@@ -260,7 +292,7 @@ class GwNonVisual:
         return curve_type_headers, curve_type_list
 
 
-    def _populate_curve_widgets(self, curve_id):
+    def _populate_curve_widgets(self, curve_id, duplicate=False):
 
         # Variables
         txt_id = self.dialog.txt_curve_id
@@ -275,8 +307,9 @@ class GwNonVisual:
             return
 
         # Populate text & combobox widgets
-        tools_qt.set_widget_text(self.dialog, txt_id, curve_id)
-        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        if not duplicate:
+            tools_qt.set_widget_text(self.dialog, txt_id, curve_id)
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, cmb_curve_type, row['curve_type'])
@@ -543,7 +576,7 @@ class GwNonVisual:
     # endregion
 
     # region patterns
-    def get_patterns(self, pattern_id=None):
+    def get_patterns(self, pattern_id=None, duplicate=False):
         """ """
 
         # Get dialog
@@ -559,7 +592,7 @@ class GwNonVisual:
         # Manage widgets depending on the project_type
         #    calls -> def _manage_ws_patterns_dlg(self):
         #             def _manage_ud_patterns_dlg(self):
-        getattr(self, f'_manage_{global_vars.project_type}_patterns_dlg')(pattern_id)
+        getattr(self, f'_manage_{global_vars.project_type}_patterns_dlg')(pattern_id, duplicate=duplicate)
 
         # Connect dialog signals
         self._connect_dialog_signals()
@@ -568,7 +601,7 @@ class GwNonVisual:
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_pattern_{global_vars.project_type}')
 
 
-    def _manage_ws_patterns_dlg(self, pattern_id):
+    def _manage_ws_patterns_dlg(self, pattern_id, duplicate=False):
         # Variables
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -587,7 +620,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
         if pattern_id:
-            self._populate_ws_patterns_widgets(pattern_id)
+            self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
             self._manage_ws_patterns_plot(tbl_pattern_value, plot_widget, None, None)
 
         # Signals
@@ -595,11 +628,11 @@ class GwNonVisual:
         tbl_pattern_value.cellChanged.connect(partial(self._manage_ws_patterns_plot, tbl_pattern_value, plot_widget))
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
-        is_new = pattern_id is None
+        is_new = (pattern_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
 
 
-    def _populate_ws_patterns_widgets(self, pattern_id):
+    def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
 
         # Variables
         txt_id = self.dialog.txt_pattern_id
@@ -613,8 +646,9 @@ class GwNonVisual:
             return
 
         # Populate text & combobox widgets
-        tools_qt.set_widget_text(self.dialog, txt_id, pattern_id)
-        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        if not duplicate:
+            tools_qt.set_widget_text(self.dialog, txt_id, pattern_id)
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_observ, row['observ'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
 
@@ -797,7 +831,7 @@ class GwNonVisual:
         plot_widget.draw()
 
 
-    def _manage_ud_patterns_dlg(self, pattern_id):
+    def _manage_ud_patterns_dlg(self, pattern_id, duplicate=False):
         # Variables
         cmb_pattern_type = self.dialog.cmb_pattern_type
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -820,7 +854,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_pattern_type, rows)
 
         if pattern_id:
-            self._populate_ud_patterns_widgets(pattern_id)
+            self._populate_ud_patterns_widgets(pattern_id, duplicate=duplicate)
 
         # Signals
         cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, plot_widget))
@@ -828,7 +862,7 @@ class GwNonVisual:
         self._manage_patterns_tableviews(self.dialog, cmb_pattern_type, plot_widget)
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
-        is_new = pattern_id is None
+        is_new = (pattern_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ud, self.dialog, is_new))
 
 
@@ -839,7 +873,7 @@ class GwNonVisual:
             table.horizontalHeader().setMinimumSectionSize(50)
 
 
-    def _populate_ud_patterns_widgets(self, pattern_id):
+    def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False):
 
         # Variables
         txt_id = self.dialog.txt_pattern_id
@@ -853,8 +887,9 @@ class GwNonVisual:
             return
 
         # Populate text & combobox widgets
-        tools_qt.set_widget_text(self.dialog, txt_id, pattern_id)
-        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        if not duplicate:
+            tools_qt.set_widget_text(self.dialog, txt_id, pattern_id)
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_observ, row['observ'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, cmb_pattern_type, row['pattern_type'])
@@ -1059,11 +1094,10 @@ class GwNonVisual:
         # Draw plot
         plot_widget.draw()
 
-
     # endregion
 
     # region controls
-    def get_controls(self, control_id=None):
+    def get_controls(self, control_id=None, duplicate=False):
         """  """
 
         # Get dialog
@@ -1077,7 +1111,7 @@ class GwNonVisual:
             self._populate_controls_widgets(control_id)
 
         # Connect dialog signals
-        is_new = control_id is None
+        is_new = (control_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id))
         self._connect_dialog_signals()
 
@@ -1156,7 +1190,7 @@ class GwNonVisual:
     # endregion
 
     # region rules
-    def get_rules(self, rule_id=None):
+    def get_rules(self, rule_id=None, duplicate=False):
         """  """
 
         # Get dialog
@@ -1170,7 +1204,7 @@ class GwNonVisual:
             self._populate_rules_widgets(rule_id)
 
         # Connect dialog signals
-        is_new = rule_id is None
+        is_new = (rule_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, is_new, rule_id))
         self._connect_dialog_signals()
 
@@ -1248,7 +1282,7 @@ class GwNonVisual:
     # endregion
 
     # region timeseries
-    def get_timeseries(self, timser_id=None):
+    def get_timeseries(self, timser_id=None, duplicate=False):
         """  """
 
         # Get dialog
@@ -1261,16 +1295,16 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
-        is_new = timser_id is None
-
         # Populate combobox
         self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
 
-        if not is_new:
-            self._populate_timeser_widgets(timser_id)
+        if timser_id is not None:
+            self._populate_timeser_widgets(timser_id, duplicate=duplicate)
 
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
+
+        is_new = (timser_id is None) or duplicate
 
         # Connect dialog signals
         cmb_times_type.currentTextChanged.connect(partial(self._manage_times_type, tbl_timeseries_value))
@@ -1299,7 +1333,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
 
 
-    def _populate_timeser_widgets(self, timser_id):
+    def _populate_timeser_widgets(self, timser_id, duplicate=False):
 
         # Variables
         txt_id = self.dialog.txt_id
@@ -1317,8 +1351,9 @@ class GwNonVisual:
             return
 
         # Populate text & combobox widgets
-        tools_qt.set_widget_text(self.dialog, txt_id, timser_id)
-        tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+        if not duplicate:
+            tools_qt.set_widget_text(self.dialog, txt_id, timser_id)
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
         tools_qt.set_widget_text(self.dialog, txt_idval, row['idval'])
         tools_qt.set_widget_text(self.dialog, cmb_timeser_type, row['timser_type'])
         tools_qt.set_widget_text(self.dialog, cmb_times_type, row['times_type'])
