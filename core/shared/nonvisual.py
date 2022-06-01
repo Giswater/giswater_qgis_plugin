@@ -1525,7 +1525,6 @@ class GwNonVisual:
     # region lids
     def get_lids(self):
         """  """
-
         # Get dialog
         self.dialog = GwNonVisualLidsUi()
         tools_gw.load_settings(self.dialog)
