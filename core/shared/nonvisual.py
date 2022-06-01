@@ -13,7 +13,7 @@ import numpy as np
 from functools import partial
 from scipy.interpolate import CubicSpline
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel, QLineEdit
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel, QLineEdit, QGridLayout
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -1608,12 +1608,13 @@ class GwNonVisual:
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 # List of children
-                list = dialog.tab_lidlayers.widget(i).children()[0].children()
+                list = dialog.tab_lidlayers.widget(i).children()
                 for y in list:
-                    y.show()
-                    for j in widgets_hide[lid_id]:
-                        if j == y.objectName():
-                            y.hide()
+                    if type(y) != QGridLayout:
+                        y.show()
+                        for j in widgets_hide[lid_id]:
+                            if j == y.objectName():
+                                y.hide()
 
 
     def _manage_lids_images(self, lidco_id):
@@ -1665,9 +1666,9 @@ class GwNonVisual:
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
-                # List with all children that are not QLabel
+                # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                list = [widget for widget in child_list if type(widget) != QLabel]
+                list = [widget for widget in child_list if type(widget) == QLineEdit]
 
                 # Order list by objectName
                 for x in range(len(list)):
