@@ -45,3 +45,41 @@ CREATE OR REPLACE VIEW vi_lid_controls AS
              LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
           WHERE inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
   ORDER BY a.lidco_id, a.id;
+
+--2022/06/01
+CREATE OR REPLACE VIEW v_edit_inp_pattern_value
+AS SELECT DISTINCT inp_pattern_value.id,
+    p.pattern_id,
+    p.pattern_type,
+    p.observ,
+    p.tsparameters::text AS tsparameters,
+    p.expl_id,
+    inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18,
+    inp_pattern_value.factor_19,
+    inp_pattern_value.factor_20,
+    inp_pattern_value.factor_21,
+    inp_pattern_value.factor_22,
+    inp_pattern_value.factor_23,
+    inp_pattern_value.factor_24
+   FROM selector_expl s,
+    inp_pattern p
+     JOIN inp_pattern_value USING (pattern_id)
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY inp_pattern_value.id;
