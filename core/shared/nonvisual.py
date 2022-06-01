@@ -1562,7 +1562,7 @@ class GwNonVisual:
                       'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
                       'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
                       'RB': {'STORAGE', 'DRAIN'},
-                      'RD': {'SURFACE', 'ROOFTOP'},
+                      'RD': {'SURFACE', 'DRAIN'},
                       'VS': {'SURFACE'}}
 
         lidco_id = str(cmb_lidtype.currentText())
@@ -1599,7 +1599,10 @@ class GwNonVisual:
                         'IT': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
                         'PP': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
                         'RB': {'lbl_storage_4', 'storage_4', 'lbl_storage_5', 'storage_5'},
-                        'RD': {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6'},
+                        'RD': {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6',
+                               'lbl_drain_3','lbl_drain_4', 'lbl_drain_5', 'lbl_drain_6',
+                               'lbl_drain_7', 'lbl_drain_8', 'lbl_drain_9', 'drain_3',
+                               'drain_4', 'drain_5', 'drain_6', 'drain_7', 'drain_8',},
                         'VS': {''}}
 
         # Hide widgets in list
@@ -1692,6 +1695,7 @@ class GwNonVisual:
                     return False
 
         global_vars.dao.commit()
+        tools_gw.close_dialog(dialog)
 
     # endregion
 
