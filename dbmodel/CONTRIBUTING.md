@@ -72,6 +72,7 @@ We may ask for changes to be made before a PR can be merged, either using sugges
 As you update your PR and apply changes, mark each conversation as resolved. Once your PR is merged, your contributions will be publicly visible on the GitHub.<br>
 
 ## CONTRIBUTORS LIST
+Adrian Valenciano,  Frelance GIS consultant.<br>
 Nicole Aguiar, Frelance GIS consultant.<br>
 Jordi Blanch, Stagier on BGEO OPEN GIS.<br>
 Guillem Esteve, Stagier on BGEO OPEN GIS.<br>
