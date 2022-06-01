@@ -246,7 +246,7 @@ class GwNonVisual:
         cmb_curve_type = self.dialog.cmb_curve_type
 
         # Populate combobox
-        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
@@ -614,7 +614,7 @@ class GwNonVisual:
         plot_widget = self._create_plot_widget(self.dialog)
 
         # Populate combobox
-        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
@@ -1327,7 +1327,7 @@ class GwNonVisual:
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
-        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL"
+        sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
