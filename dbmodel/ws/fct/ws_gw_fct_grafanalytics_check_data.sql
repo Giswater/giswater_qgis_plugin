@@ -140,7 +140,7 @@ BEGIN
 	END IF;
 
 	-- valves closed/broken with null values (176)
-	v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom, expl_id FROM man_valve JOIN '||v_edit||'node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
+	v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom, expl_id FROM man_valve JOIN '||v_edit||'node n USING (node_id) WHERE n.state = 1 AND (broken IS NULL OR closed IS NULL)) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
