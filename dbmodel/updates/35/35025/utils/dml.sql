@@ -80,3 +80,6 @@ INSERT INTO config_form_tableview (location_type,project_type,tablename,columnna
 --2022/06/01
 UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text, '"valueRelation":{"nullValue":false, ', '"valueRelation":{"nullValue":true, '))::json 
 WHERE widgetcontrols->>'valueRelation' IS NOT NULL and formname in ('cat_connec', 'cat_arc', 'cat_node', 'cat_grate') and columnname='matcat_id';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(444, 'Planified arc without start-end nodes', 'utils', NULL, 'core', true, 'Check plan-data', NULL);
