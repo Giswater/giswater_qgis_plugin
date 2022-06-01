@@ -544,8 +544,10 @@ BEGIN
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
+	WHERE arc.state>1
 	UNION ALL
-	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_2 = node_id ) a
+	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_2 = node_id
+	WHERE arc.state>1) a
 	JOIN node USING (node_id)
 	GROUP BY node_id
 	HAVING count(*)>2)b
