@@ -561,7 +561,7 @@ class GwNonVisual:
             if row == (['null'] * tbl_curve_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO inp_curve_value (curve_id, x_value, y_value) " \
+            sql = f"INSERT INTO v_edit_inp_curve_value (curve_id, x_value, y_value) " \
                   f"VALUES ({curve_id}, "
             for x in row:
                 sql += f"{x}, "
@@ -763,7 +763,7 @@ class GwNonVisual:
             if row == (['null'] * tbl_pattern_value.columnCount()):
                 continue
 
-            sql = f"INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
+            sql = f"INSERT INTO v_edit_inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, " \
                   f"factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, " \
                   f"factor_15, factor_16, factor_17, factor_18) " \
                   f"VALUES ({pattern_id}, "
@@ -1026,7 +1026,7 @@ class GwNonVisual:
             if row == (['null'] * table.columnCount()):
                 continue
 
-            sql = f"INSERT INTO inp_pattern_value (pattern_id, "
+            sql = f"INSERT INTO v_edit_inp_pattern_value (pattern_id, "
             for n, x in enumerate(row):
                 sql += f"factor_{n + 1}, "
             sql = sql.rstrip(', ') + ")"
@@ -1523,7 +1523,7 @@ class GwNonVisual:
                     global_vars.dao.rollback()
                     return False
 
-                sql = f"INSERT INTO inp_timeseries_value (timser_id, date, hour, value) "
+                sql = f"INSERT INTO v_edit_inp_timeseries_value (timser_id, date, hour, value) "
                 sql += f"VALUES ({timeseries_id}, {row[0]}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
@@ -1543,7 +1543,7 @@ class GwNonVisual:
                     global_vars.dao.rollback()
                     return False
 
-                sql = f"INSERT INTO inp_timeseries_value (timser_id, time, value) "
+                sql = f"INSERT INTO v_edit_inp_timeseries_value (timser_id, time, value) "
                 sql += f"VALUES ({timeseries_id}, {row[1]}, {row[2]})"
 
                 result = tools_db.execute_sql(sql, commit=False)
