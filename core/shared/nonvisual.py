@@ -1606,7 +1606,7 @@ class GwNonVisual:
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 # List of children
-                list = dialog.tab_lidlayers.widget(i).children()
+                list = dialog.tab_lidlayers.widget(i).children()[0].children()
                 for y in list:
                     y.show()
                     for j in widgets_hide[lid_id]:
