@@ -1203,6 +1203,8 @@ class GwNonVisual:
 
         if control_id is not None:
             self._populate_controls_widgets(control_id)
+        else:
+            self._load_controls_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (control_id is None) or duplicate
@@ -1229,6 +1231,36 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_sector_id, str(row['sector_id']), 0)
         tools_qt.set_checked(self.dialog, chk_active, row['active'])
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
+
+
+    def _load_controls_widgets(self, dialog):
+
+        # Variables
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+
+        # Get values
+        sector_id = tools_gw.get_config_parser('nonvisual_controls', 'cmb_sector_id', "user", "session")
+        active = tools_gw.get_config_parser('nonvisual_controls', 'chk_active', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0)
+        tools_qt.set_checked(dialog, chk_active, active)
+
+
+    def _save_controls_widgets(self, dialog):
+
+        # Variables
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+
+        # Get values
+        sector_id = tools_qt.get_combo_value(dialog, cmb_sector_id)
+        active = tools_qt.is_checked(dialog, chk_active)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_controls', 'cmb_sector_id', sector_id)
+        tools_gw.set_config_parser('nonvisual_controls', 'chk_active', active)
 
 
     def _accept_controls(self, dialog, is_new, control_id):
@@ -1279,6 +1311,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
+        self._save_controls_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
     # endregion
@@ -1296,6 +1329,8 @@ class GwNonVisual:
 
         if rule_id is not None:
             self._populate_rules_widgets(rule_id)
+        else:
+            self._load_rules_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (rule_id is None) or duplicate
@@ -1322,6 +1357,36 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_sector_id, str(row['sector_id']), 0)
         tools_qt.set_checked(self.dialog, chk_active, row['active'])
         tools_qt.set_widget_text(self.dialog, txt_text, row['text'])
+
+
+    def _load_rules_widgets(self, dialog):
+
+        # Variables
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+
+        # Get values
+        sector_id = tools_gw.get_config_parser('nonvisual_rules', 'cmb_sector_id', "user", "session")
+        active = tools_gw.get_config_parser('nonvisual_rules', 'chk_active', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0)
+        tools_qt.set_checked(dialog, chk_active, active)
+
+
+    def _save_rules_widgets(self, dialog):
+
+        # Variables
+        cmb_sector_id = dialog.cmb_sector_id
+        chk_active = dialog.chk_active
+
+        # Get values
+        sector_id = tools_qt.get_combo_value(dialog, cmb_sector_id)
+        active = tools_qt.is_checked(dialog, chk_active)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_rules', 'cmb_sector_id', sector_id)
+        tools_gw.set_config_parser('nonvisual_rules', 'chk_active', active)
 
 
     def _accept_rules(self, dialog, is_new, rule_id):
@@ -1371,6 +1436,8 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        self._save_rules_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
     # endregion
