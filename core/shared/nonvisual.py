@@ -141,7 +141,6 @@ class GwNonVisual:
 
         # Variables
         table = dialog.main_tab.currentWidget()
-        tablename = table.objectName()
         function_name = table.property('function')
 
         # Get selected row
@@ -258,6 +257,8 @@ class GwNonVisual:
         # Populate data if editing curve
         if curve_id:
             self._populate_curve_widgets(curve_id, duplicate=duplicate)
+        else:
+            self._load_curve_widgets(self.dialog)
 
         # Treat as new object if curve_id is None or if we're duplicating
         is_new = (curve_id is None) or duplicate
@@ -324,6 +325,36 @@ class GwNonVisual:
             tbl_curve_value.setItem(n, 0, QTableWidgetItem(f"{row[0]}"))
             tbl_curve_value.setItem(n, 1, QTableWidgetItem(f"{row[1]}"))
             tbl_curve_value.insertRow(tbl_curve_value.rowCount())
+
+
+    def _load_curve_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_curve_type = dialog.cmb_curve_type
+
+        # Get values
+        expl_id = tools_gw.get_config_parser('nonvisual_curves', 'cmb_expl_id', "user", "session")
+        curve_type = tools_gw.get_config_parser('nonvisual_curves', 'cmb_curve_type', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+        tools_qt.set_widget_text(dialog, cmb_curve_type, curve_type)
+
+
+    def _save_curve_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_curve_type = dialog.cmb_curve_type
+
+        # Get values
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_curves', 'cmb_expl_id', expl_id)
+        tools_gw.set_config_parser('nonvisual_curves', 'cmb_curve_type', curve_type)
 
 
     def _manage_curve_type(self, dialog, curve_type_headers, table, index):
@@ -538,6 +569,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
+        self._save_curve_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
 
