@@ -1205,7 +1205,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         is_new = (rule_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, is_new, rule_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, self.dialog, is_new, rule_id))
         self._connect_dialog_signals()
 
         # Open dialog
