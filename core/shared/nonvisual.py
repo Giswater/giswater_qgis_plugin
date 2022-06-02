@@ -1461,6 +1461,8 @@ class GwNonVisual:
 
         if timser_id is not None:
             self._populate_timeser_widgets(timser_id, duplicate=duplicate)
+        else:
+            self._load_timeseries_widgets(self.dialog)
 
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_timeseries_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
@@ -1559,6 +1561,43 @@ class GwNonVisual:
             return
         tbl_timeseries_value.setColumnHidden(0, False)
 
+
+    def _load_timeseries_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_timeser_type = dialog.cmb_timeser_type
+        cmb_times_type = dialog.cmb_times_type
+
+        # Get values
+        expl_id = tools_gw.get_config_parser('nonvisual_timeseries', 'cmb_expl_id', "user", "session")
+        timeser_type = tools_gw.get_config_parser('nonvisual_timeseries', 'cmb_timeser_type', "user", "session")
+        times_type = tools_gw.get_config_parser('nonvisual_timeseries', 'cmb_times_type', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+        tools_qt.set_combo_value(cmb_timeser_type, str(timeser_type), 0)
+        tools_qt.set_combo_value(cmb_times_type, str(times_type), 0)
+
+
+    def _save_timeseries_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_timeser_type = dialog.cmb_timeser_type
+        cmb_times_type = dialog.cmb_times_type
+
+        # Get values
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        timeser_type = tools_qt.get_combo_value(dialog, cmb_timeser_type)
+        times_type = tools_qt.get_combo_value(dialog, cmb_times_type)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_timeseries', 'cmb_expl_id', expl_id)
+        tools_gw.set_config_parser('nonvisual_timeseries', 'cmb_timeser_type', timeser_type)
+        tools_gw.set_config_parser('nonvisual_timeseries', 'cmb_times_type', times_type)
+
+
     def _accept_timeseries(self, dialog, is_new):
 
         # Variables
@@ -1642,6 +1681,8 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        self._save_timeseries_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
 
