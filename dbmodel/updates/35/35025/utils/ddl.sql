@@ -9,3 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/05/31
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_tableview", "column":"style", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class", "column":"parent_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"unit_id", "dataType":"integer"}}$$);
