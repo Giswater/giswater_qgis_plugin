@@ -1430,7 +1430,7 @@ class GwNonVisual:
 
             # Insert inp_timeseries
             sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id)" \
-                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {idval}, {descript}, {fname}, '{expl_id}')"
+                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {idval}, {descript}, {fname}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting timeseries."
