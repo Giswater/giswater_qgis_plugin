@@ -1703,7 +1703,7 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                list = [widget for widget in child_list if type(widget) == QLineEdit]
+                list = [widget for widget in child_list if type(widget) == QLineEdit and not widget.isHidden()]
 
                 # Order list by objectName
                 for x in range(len(list)):
@@ -1713,14 +1713,12 @@ class GwNonVisual:
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
                 for y, widget in enumerate(list):
-                    if not widget.isHidden():
-                        sql += f"value_{y+2}, "
+                    sql += f"value_{y+2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
                 for widget in list:
-                    if not widget.isHidden():
-                        value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
-                        sql += f"{value}, "
+                    value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
+                    sql += f"{value}, "
                 sql = sql.rstrip(', ') + ")"
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
