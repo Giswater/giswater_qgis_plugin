@@ -27,8 +27,8 @@ UPDATE inp_typevalue
 	SET addparam='{"header": ["Height", "Volume"]}'::json
 	WHERE typevalue='inp_value_curve' AND id='VOLUME';
 
-INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
-	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','pattern_id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,width,visible)
+	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','pattern_id',0,150,true);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
 	VALUES ('nonvisual manager','ws','v_edit_inp_pattern','observ',1,true,'{"stretch": true}'::json);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)

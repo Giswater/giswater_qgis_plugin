@@ -106,8 +106,8 @@ UPDATE inp_typevalue
 	SET addparam='{"header": ["Depth/\nFull Depth", "Width/\nFull Depth"]}'::json
 	WHERE typevalue='inp_value_curve' AND id='SHAPE';
 
-INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
-	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','pattern_id',0,true);
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,width,visible)
+	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','pattern_id',0,150,true);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
 	VALUES ('nonvisual manager','ud','v_edit_inp_pattern','pattern_type',1,true);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible,style)
