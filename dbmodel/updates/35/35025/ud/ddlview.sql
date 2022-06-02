@@ -26,8 +26,8 @@ CREATE OR REPLACE VIEW vi_lid_controls AS
             NULL::numeric AS other2,
             NULL::numeric AS other3,
             NULL::numeric AS other4,
-            NULL::numeric AS other5,
-            NULL::numeric AS other6,
+            NULL::text AS other5,
+            NULL::text AS other6,
             NULL::text AS other7
            FROM inp_lid
         UNION
