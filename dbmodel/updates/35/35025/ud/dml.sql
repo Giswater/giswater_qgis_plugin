@@ -144,3 +144,15 @@ INSERT INTO config_form_tableview (location_type,project_type,tablename,columnna
 	VALUES ('nonvisual manager','ud','inp_lid','observ',2,true,'{"stretch": true}'::json);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
 	VALUES ('nonvisual manager','ud','inp_lid','log',3,false);
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_arc", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where (formname ilike 've_arc%' OR formname='v_edit_arc' OR formname='cat_arc') AND columnname='arc_type';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_node", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where (formname ilike 've_node%' OR formname='v_edit_node' OR formname='cat_node') AND columnname='node_type';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_connec", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where (formname ilike 've_connec%' OR formname='v_edit_connec' OR formname='cat_connec') AND columnname='connec_type';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_gully", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where (formname ilike 've_gully%' OR formname='v_edit_gully' OR formname='cat_grate')  AND columnname='gully_type';	

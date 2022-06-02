@@ -48,3 +48,13 @@ INSERT INTO config_form_tableview (location_type,project_type,tablename,columnna
 	VALUES ('nonvisual manager','ws','v_edit_inp_rules','text',2,true,'{"stretch": true}'::json);
 INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
 	VALUES ('nonvisual manager','ws','v_edit_inp_rules','active',3,true);
+
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_arc", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where formname='cat_arc' AND columnname='arctype_id';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_node", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where formname='cat_node' AND columnname='nodetype_id';
+
+UPDATE config_form_fields set widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_cat_feature_connec", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+where formname='cat_connec' AND columnname='connectype_id';
