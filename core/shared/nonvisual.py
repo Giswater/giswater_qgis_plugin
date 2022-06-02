@@ -654,6 +654,8 @@ class GwNonVisual:
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
             self._manage_ws_patterns_plot(tbl_pattern_value, plot_widget, None, None)
+        else:
+            self._load_ws_pattern_widgets(self.dialog)
 
         # Signals
         tbl_pattern_value.cellChanged.connect(partial(self._onCellChanged, tbl_pattern_value))
@@ -702,6 +704,30 @@ class GwNonVisual:
         # Set headers
         headers = ['Multiplier' for n in range(0, tbl_pattern_value.rowCount() + 1)]
         tbl_pattern_value.setVerticalHeaderLabels(headers)
+
+
+    def _load_ws_pattern_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+
+        # Get values
+        expl_id = tools_gw.get_config_parser('nonvisual_patterns', 'cmb_expl_id', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+
+
+    def _save_ws_pattern_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+
+        # Get values
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_patterns', 'cmb_expl_id', expl_id)
 
 
     def _accept_pattern_ws(self, dialog, is_new):
@@ -771,6 +797,8 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        self._save_ws_pattern_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
 
@@ -887,6 +915,8 @@ class GwNonVisual:
 
         if pattern_id:
             self._populate_ud_patterns_widgets(pattern_id, duplicate=duplicate)
+        else:
+            self._load_ud_pattern_widgets(self.dialog)
 
         # Signals
         cmb_pattern_type.currentIndexChanged.connect(partial(self._manage_patterns_tableviews, self.dialog, cmb_pattern_type, plot_widget))
@@ -936,6 +966,36 @@ class GwNonVisual:
         for n, row in enumerate(rows):
             for i in range(0, table.columnCount()):
                 table.setItem(n, i, QTableWidgetItem(f"{row[f'factor_{i+1}']}"))
+
+
+    def _load_ud_pattern_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_pattern_type = dialog.cmb_pattern_type
+
+        # Get values
+        expl_id = tools_gw.get_config_parser('nonvisual_patterns', 'cmb_expl_id', "user", "session")
+        pattern_type = tools_gw.get_config_parser('nonvisual_patterns', 'cmb_pattern_type', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+        tools_qt.set_combo_value(cmb_pattern_type, str(pattern_type), 0)
+
+
+    def _save_ud_pattern_widgets(self, dialog):
+
+        # Variables
+        cmb_expl_id = dialog.cmb_expl_id
+        cmb_pattern_type = dialog.cmb_pattern_type
+
+        # Get values
+        expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
+        pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_patterns', 'cmb_expl_id', expl_id)
+        tools_gw.set_config_parser('nonvisual_patterns', 'cmb_pattern_type', pattern_type)
 
 
     def _manage_patterns_tableviews(self, dialog, cmb_pattern_type, plot_widget):
@@ -1033,6 +1093,8 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        self._save_ud_pattern_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
 
