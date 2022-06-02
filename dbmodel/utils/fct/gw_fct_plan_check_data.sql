@@ -56,7 +56,7 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,444);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
 
 
@@ -459,19 +459,19 @@ BEGIN
 	END IF;
 
 
-	-- Check node_1 or node_2 nulls for planified features (444)
+	-- Check node_1 or node_2 nulls for planified features (452)
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom, expl_id FROM arc WHERE state = 2 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom, expl_id FROM 
 	arc WHERE state = 2 AND node_2 IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
-			SELECT 444, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
+			SELECT 452, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (115, 2, '444', concat('WARNING-444 (anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+		VALUES (115, 2, '452', concat('WARNING-452 (anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
-		VALUES (115, 1, '444','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
+		VALUES (115, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
 	END IF;
 
 	-- Removing isaudit false sys_fprocess
@@ -513,7 +513,7 @@ BEGIN
 	AND fid IN (252, 354, 355)
 	UNION
 	SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"()
-	AND fid IN (252, 444)
+	AND fid IN (252, 452)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (252)) row) features;
@@ -536,7 +536,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355, 444)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355, 452)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
