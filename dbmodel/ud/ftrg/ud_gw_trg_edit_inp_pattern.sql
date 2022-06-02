@@ -34,7 +34,7 @@ BEGIN
 			factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) 
 			VALUES (NEW.pattern_id,NEW.factor_1,NEW.factor_2,NEW.factor_3,NEW.factor_4,NEW.factor_5,NEW.factor_6,NEW.factor_7,NEW.factor_8,NEW.factor_9,
 			NEW.factor_10, NEW.factor_11,NEW.factor_12, NEW.factor_13,NEW.factor_14,NEW.factor_15,NEW.factor_16,NEW.factor_17,
-			NEW.factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24);
+			NEW.factor_18, NEW.factor_19, NEW.factor_20, NEW.factor_21, NEW.factor_22,NEW.factor_23, NEW.factor_24);
 			
 		END IF;
 		
