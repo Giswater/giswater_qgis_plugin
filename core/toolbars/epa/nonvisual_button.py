@@ -12,7 +12,6 @@ from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 from ..dialog import GwAction
 from ...shared.nonvisual import GwNonVisual
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 

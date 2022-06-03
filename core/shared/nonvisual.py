@@ -6,16 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import sys
 import pandas as pd
 import numpy as np
 
 from functools import partial
 from scipy.interpolate import CubicSpline
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QTableWidget, QComboBox, QTabWidget, QWidget, QTableWidgetItem, QSizePolicy, QLabel, QLineEdit, QGridLayout
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout
 from qgis.PyQt.QtSql import QSqlTableModel
-from ..models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
 from ..utils.matplotlib_widget import MplCanvas
@@ -48,9 +46,19 @@ class GwNonVisual:
                          'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
                          }
 
+
+    def get_nonvisual(self, object_name):
+        """ Opens Non-Visual object dialog. Called from 'New Non-Visual object' button. """
+
+        if object_name is None:
+            return
+
+        # Execute method get_{object_name}
+        getattr(self, f'get_{object_name.lower()}')()
+
     # region manager
     def manage_nonvisual(self):
-        """  """
+        """ Opens Non-Visual objects manager. Called from 'Non-Visual object manager' button. """
 
         # Get dialog
         self.manager_dlg = GwNonVisualManagerUi()
@@ -73,6 +81,7 @@ class GwNonVisual:
 
 
     def _manage_tabs_manager(self):
+        """ Creates and populates manager tabs """
 
         dict_views_project = self.dict_views[global_vars.project_type]
 
@@ -91,6 +100,7 @@ class GwNonVisual:
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
+        """ Opens Non-Visual object dialog. Called from manager tables. """
 
         object_id = tbl_view.selectionModel().selectedRows()[0].data()
         if hasattr(self, function_name):
@@ -98,7 +108,7 @@ class GwNonVisual:
 
 
     def _fill_manager_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
-        """  """
+        """ Fills manager table """
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
@@ -122,7 +132,8 @@ class GwNonVisual:
         widget.setSortingEnabled(True)
 
         # Set widget & model properties
-        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0, stretchLastSection=False)
+        tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers,
+                                      sectionResizeMode=0, stretchLastSection=False)
         tools_gw.set_tablemodel_config(self.manager_dlg, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
 
         # Sort the table by feature id
@@ -234,21 +245,11 @@ class GwNonVisual:
             global_vars.dao.commit()
             self._reload_manager_table()
 
-
     # endregion
-
-    def get_nonvisual(self, object_name):
-        """  """
-
-        if object_name is None:
-            return
-
-        # Execute method get_{object_name}
-        getattr(self, f'get_{object_name.lower()}')()
 
     # region curves
     def get_curves(self, curve_id=None, duplicate=False):
-        """  """
+        """ Opens dialog for curve """
 
         # Get dialog
         self.dialog = GwNonVisualCurveUi()
@@ -300,6 +301,8 @@ class GwNonVisual:
 
 
     def _create_curve_type_lists(self):
+        """ Creates a list & dict to manage curve_values table headers """
+
         curve_type_list = []
         curve_type_headers = {}
         sql = f"SELECT id, idval, addparam FROM inp_typevalue WHERE typevalue = 'inp_value_curve'"
@@ -312,6 +315,7 @@ class GwNonVisual:
 
 
     def _populate_curve_widgets(self, curve_id, duplicate=False):
+        """ Fills in all the values for curve dialog """
 
         # Variables
         txt_id = self.dialog.txt_curve_id
@@ -346,6 +350,7 @@ class GwNonVisual:
 
 
     def _load_curve_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -361,6 +366,7 @@ class GwNonVisual:
 
 
     def _save_curve_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -376,7 +382,7 @@ class GwNonVisual:
 
 
     def _manage_curve_type(self, dialog, curve_type_headers, table, index):
-        """  """
+        """ Manage curve values table headers """
 
         curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
         if curve_type:
@@ -385,6 +391,8 @@ class GwNonVisual:
 
 
     def _manage_curve_value(self, dialog, table, row, column):
+        """ Validate data in curve values table """
+
         # Control data depending on curve type
         valid = True
         if column == 0:
@@ -423,8 +431,8 @@ class GwNonVisual:
                 else:
                     y_values.append(None)
 
-
             # Iterate through values
+            # Check that x_values are ascending
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
@@ -432,6 +440,7 @@ class GwNonVisual:
                     continue
                 valid = False
                 break
+            # If PUMP, check that y_values are descending
             curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
             if curve_type == 'PUMP':
                 for i, n in enumerate(y_values):
@@ -515,12 +524,13 @@ class GwNonVisual:
         plot_widget.draw()
 
 
-
     def _set_curve_values_valid(self, dialog, valid):
         dialog.btn_accept.setEnabled(valid)
 
 
     def _accept_curves(self, dialog, is_new, curve_id):
+        """ Manage accept button (insert & update) """
+
         # Variables
         txt_id = dialog.txt_curve_id
         txt_descript = dialog.txt_descript
@@ -598,11 +608,12 @@ class GwNonVisual:
 
 
     def _insert_curve_values(self, tbl_curve_value, curve_id):
+        """ Insert table values into v_edit_inp_curve_values """
+
         values = self._read_tbl_values(tbl_curve_value)
 
         is_empty = True
         for row in values:
-            # TODO: check that all rows have two values
             if row == (['null'] * tbl_curve_value.columnCount()):
                 continue
             is_empty = False
@@ -633,7 +644,7 @@ class GwNonVisual:
 
     # region patterns
     def get_patterns(self, pattern_id=None, duplicate=False):
-        """ """
+        """ Opens dialog for patterns """
 
         # Get dialog
         if global_vars.project_type == 'ws':
@@ -691,6 +702,7 @@ class GwNonVisual:
 
 
     def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
+        """ Fills in all the values for ws pattern dialog """
 
         # Variables
         txt_id = self.dialog.txt_pattern_id
@@ -731,6 +743,7 @@ class GwNonVisual:
 
 
     def _load_ws_pattern_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -743,6 +756,7 @@ class GwNonVisual:
 
 
     def _save_ws_pattern_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -755,6 +769,8 @@ class GwNonVisual:
 
 
     def _accept_pattern_ws(self, dialog, is_new):
+        """ Manage accept button (insert & update) """
+
         # Variables
         txt_id = dialog.txt_pattern_id
         txt_observ = dialog.txt_observ
@@ -827,6 +843,7 @@ class GwNonVisual:
 
 
     def _insert_ws_pattern_values(self, tbl_pattern_value, pattern_id):
+        """ Insert table values into v_edit_inp_pattern_values """
 
         # Insert inp_pattern_value
         values = self._read_tbl_values(tbl_pattern_value)
@@ -960,6 +977,7 @@ class GwNonVisual:
 
 
     def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False):
+        """ Fills in all the values for ud pattern dialog """
 
         # Variables
         txt_id = self.dialog.txt_pattern_id
@@ -996,6 +1014,7 @@ class GwNonVisual:
 
 
     def _load_ud_pattern_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -1011,6 +1030,7 @@ class GwNonVisual:
 
 
     def _save_ud_pattern_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -1052,6 +1072,7 @@ class GwNonVisual:
 
 
     def _accept_pattern_ud(self, dialog, is_new):
+        """ Manage accept button (insert & update) """
 
         # Variables
         txt_id = dialog.txt_pattern_id
@@ -1126,6 +1147,7 @@ class GwNonVisual:
 
 
     def _insert_ud_pattern_values(self, dialog, pattern_type, pattern_id):
+        """ Insert table values into v_edit_inp_pattern_values """
 
         table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
 
@@ -1219,7 +1241,7 @@ class GwNonVisual:
 
     # region controls
     def get_controls(self, control_id=None, duplicate=False):
-        """  """
+        """ Opens dialog for controls """
 
         # Get dialog
         self.dialog = GwNonVisualControlsUi()
@@ -1243,6 +1265,7 @@ class GwNonVisual:
 
 
     def _populate_controls_widgets(self, control_id):
+        """ Fills in all the values for control dialog """
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -1261,6 +1284,7 @@ class GwNonVisual:
 
 
     def _load_controls_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1276,6 +1300,7 @@ class GwNonVisual:
 
 
     def _save_controls_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1291,6 +1316,7 @@ class GwNonVisual:
 
 
     def _accept_controls(self, dialog, is_new, control_id):
+        """ Manage accept button (insert & update) """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1345,7 +1371,7 @@ class GwNonVisual:
 
     # region rules
     def get_rules(self, rule_id=None, duplicate=False):
-        """  """
+        """ Opens dialog for rules """
 
         # Get dialog
         self.dialog = GwNonVisualRulesUi()
@@ -1369,6 +1395,7 @@ class GwNonVisual:
 
 
     def _populate_rules_widgets(self, rule_id):
+        """ Fills in all the values for rule dialog """
 
         # Variables
         cmb_sector_id = self.dialog.cmb_sector_id
@@ -1387,6 +1414,7 @@ class GwNonVisual:
 
 
     def _load_rules_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1402,6 +1430,7 @@ class GwNonVisual:
 
 
     def _save_rules_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1417,6 +1446,7 @@ class GwNonVisual:
 
 
     def _accept_rules(self, dialog, is_new, rule_id):
+        """ Manage accept button (insert & update) """
 
         # Variables
         cmb_sector_id = dialog.cmb_sector_id
@@ -1471,7 +1501,7 @@ class GwNonVisual:
 
     # region timeseries
     def get_timeseries(self, timser_id=None, duplicate=False):
-        """  """
+        """ Opens dialog for timeseries """
 
         # Get dialog
         self.dialog = GwNonVisualTimeseriesUi()
@@ -1509,6 +1539,8 @@ class GwNonVisual:
 
 
     def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type):
+        """ Populates timeseries dialog combos """
+
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -1524,6 +1556,7 @@ class GwNonVisual:
 
 
     def _populate_timeser_widgets(self, timser_id, duplicate=False):
+        """ Fills in all the values for timeseries dialog """
 
         # Variables
         txt_id = self.dialog.txt_id
@@ -1583,6 +1616,8 @@ class GwNonVisual:
 
 
     def _manage_times_type(self, tbl_timeseries_value, text):
+        """ Manage timeseries table columns depending on times_type """
+
         if text == 'RELATIVE':
             tbl_timeseries_value.setColumnHidden(0, True)
             return
@@ -1590,6 +1625,7 @@ class GwNonVisual:
 
 
     def _load_timeseries_widgets(self, dialog):
+        """ Load values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -1608,6 +1644,7 @@ class GwNonVisual:
 
 
     def _save_timeseries_widgets(self, dialog):
+        """ Save values from session.config """
 
         # Variables
         cmb_expl_id = dialog.cmb_expl_id
@@ -1626,6 +1663,7 @@ class GwNonVisual:
 
 
     def _accept_timeseries(self, dialog, is_new):
+        """ Manage accept button (insert & update) """
 
         # Variables
         txt_id = dialog.txt_id
@@ -1714,6 +1752,7 @@ class GwNonVisual:
 
 
     def _insert_timeseries_value(self, tbl_timeseries_value, times_type, timeseries_id):
+        """ Insert table values into v_edit_inp_timeseries_value """
 
         values = list()
         for y in range(0, tbl_timeseries_value.rowCount()):
@@ -1788,7 +1827,8 @@ class GwNonVisual:
 
     # region lids
     def get_lids(self, lidco_id=None, duplicate=None):
-        """  """
+        """ Opens dialog for lids """
+
         # Get dialog
         self.dialog = GwNonVisualLidsUi()
         tools_gw.load_settings(self.dialog)
@@ -1798,70 +1838,76 @@ class GwNonVisual:
         # Populate LID Type combo
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
-
         if rows:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows, 1)
 
         # Populate Control Curve combo
         sql = f"SELECT id FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
-
         if rows:
             tools_qt.fill_combo_values(self.dialog.drain_8, rows)
 
         # Signals
-        self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
+        self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog))
         self.dialog.btn_ok.clicked.connect(partial(self._accept_lids, self.dialog, is_new, lidco_id))
 
-        self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
+        self._manage_lids_tabs(self.dialog)
 
         if lidco_id:
-            self._populate_lids_widgets(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers, lidco_id, duplicate)
+            self._populate_lids_widgets(self.dialog, lidco_id, duplicate)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
 
 
-    def _populate_lids_widgets(self, cmb_lidtype, tab_lidlayers, lidco_id, duplicate=False):
+    def _populate_lids_widgets(self, dialog, lidco_id, duplicate=False):
+        """ Fills in all the values for lid dialog """
 
         # Get lidco_type
+        cmb_lidtype = dialog.cmb_lidtype
+
         sql = f"SELECT lidco_type FROM inp_lid WHERE lidco_id='{lidco_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
-        lidco_type=row[0]
+        lidco_type = row[0]
 
         if not duplicate:
             tools_qt.set_widget_text(self.dialog, self.dialog.txt_name, lidco_id)
             tools_qt.set_widget_enabled(self.dialog, self.dialog.txt_name, False)
-
         tools_qt.set_combo_value(cmb_lidtype, str(lidco_type), 0)
 
         # Populate tab values
-        sql = f"SELECT value_2, value_3, value_4, value_5, value_6, value_7,value_8 FROM inp_lid_value WHERE lidco_id='{lidco_id}'"
+        sql = f"SELECT value_2, value_3, value_4, value_5, value_6, value_7,value_8 " \
+              f"FROM inp_lid_value WHERE lidco_id='{lidco_id}'"
         rows = tools_db.get_rows(sql)
 
         if rows:
             idx = 0
             for i in range(self.dialog.tab_lidlayers.count()):
                 if self.dialog.tab_lidlayers.isTabVisible(i):
-                    row = rows[idx]
-                    current_tab=self.dialog.tab_lidlayers.widget(i)
+                    try:
+                        row = rows[idx]
+                    except IndexError:  # The tab exists in dialog but not in db (drain might be optional)
+                        continue
 
                     # List with all QLineEdit children
                     child_list = self.dialog.tab_lidlayers.widget(i).children()
-                    list = [widget for widget in child_list if type(widget) == QLineEdit and not widget.isHidden()]
-                    list = self._order_list(list)
+                    visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit]
+                    visible_widgets = self._order_list(visible_widgets)
 
-                    for x,value in enumerate(row):
+                    for x, value in enumerate(row):
                         if value in ('null', None):
                             continue
-                        widget= list[x]
+                        widget = visible_widgets[x]
                         tools_qt.set_widget_text(self.dialog, widget, f"{value}")
                     idx += 1
 
 
-    def _manage_lids_tabs(self, cmb_lidtype, tab_lidlayers):
+    def _manage_lids_tabs(self, dialog):
+
+        cmb_lidtype = dialog.cmb_lidtype
+        tab_lidlayers = dialog.tab_lidlayers
 
         layer_tabs = {'BC': {'SURFACE', 'SOIL', 'STORAGE', 'DRAIN'},
                       'RG': {'SURFACE', 'SOIL', 'STORAGE'},
@@ -1939,7 +1985,8 @@ class GwNonVisual:
 
 
     def _accept_lids(self, dialog, is_new, lidco_id):
-        """ Insert the values from LIDS dialog """
+        """ Manage accept button (insert & update) """
+
         # Variables
         cmb_lidtype=dialog.cmb_lidtype
         txt_lidco_id = dialog.txt_name
@@ -1967,7 +2014,7 @@ class GwNonVisual:
                     return False
 
             # Inserts in table inp_lid_value
-            result =  self._insert_lids_values(dialog, lidco_id.strip("'"))
+            result = self._insert_lids_values(dialog, lidco_id.strip("'"))
             if not result:
                 return
 
@@ -2004,26 +2051,27 @@ class GwNonVisual:
             global_vars.dao.commit()
             # Reload manager table
             self._reload_manager_table()
-        #TO_DO -> Last values
+
+        # TODO: Get last values from user config file
         tools_gw.close_dialog(dialog)
 
 
     def _insert_lids_values(self, dialog, lidco_id):
+
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                list = [widget for widget in child_list if type(widget) == QLineEdit and not widget.isHidden()]
-
-                list = self._order_list(list)
+                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit]
+                visible_widgets = self._order_list(visible_widgets)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
-                for y, widget in enumerate(list):
+                for y, widget in enumerate(visible_widgets):
                     sql += f"value_{y + 2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
-                for widget in list:
+                for widget in visible_widgets:
                     value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
                     if value == "null":
                         value = "'0'"
@@ -2036,15 +2084,6 @@ class GwNonVisual:
                     global_vars.dao.rollback()
                     return False
         return True
-
-
-    def _order_list(self, list):
-        # Order list by objectName
-        for x in range(len(list)):
-            for j in range(0, (len(list) - x - 1)):
-                if list[j].objectName() > list[(j + 1)].objectName():
-                    list[j], list[(j + 1)] = list[(j + 1)], list[j]
-        return list
 
     # endregion
 
@@ -2065,6 +2104,7 @@ class GwNonVisual:
 
 
     def _reload_manager_table(self):
+
         try:
             self.manager_dlg.main_tab.currentWidget().model().select()
         except:
@@ -2073,7 +2113,6 @@ class GwNonVisual:
 
     def _connect_dialog_signals(self):
 
-        # self.dialog.btn_accept.clicked.connect(self.dialog.accept)
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.rejected.connect(partial(tools_gw.close_dialog, self.dialog))
 
@@ -2097,6 +2136,7 @@ class GwNonVisual:
 
 
     def _read_tbl_values(self, table, clear_nulls=False):
+
         values = list()
         for y in range(0, table.rowCount()):
             values.append(list())
@@ -2112,6 +2152,7 @@ class GwNonVisual:
 
 
     def _populate_cmb_sector_id(self, combobox):
+
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -2126,5 +2167,15 @@ class GwNonVisual:
         dialog.lyt_plot.addWidget(plot_widget, 0, 0)
 
         return plot_widget
+
+
+    def _order_list(self, lst):
+        """Order widget list by objectName"""
+
+        for x in range(len(lst)):
+            for j in range(0, (len(lst) - x - 1)):
+                if lst[j].objectName() > lst[(j + 1)].objectName():
+                    lst[j], lst[(j + 1)] = lst[(j + 1)], lst[j]
+        return lst
 
     # endregion
