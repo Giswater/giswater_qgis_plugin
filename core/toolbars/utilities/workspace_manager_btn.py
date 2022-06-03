@@ -81,6 +81,9 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
         self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_create_workspace)
+
         # Connect create workspace dialog signals
         self.new_workspace_name.textChanged.connect(partial(self._check_exists))
         self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
