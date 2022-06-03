@@ -276,6 +276,14 @@
 			<source>215_text</source>
 			<translation>Gestor d'escenaris dinàmics</translation>
 		</message>
+		<message>
+			<source>217_text</source>
+			<translation>Nou objecte no visual</translation>
+		</message>
+		<message>
+			<source>218_text</source>
+			<translation>Planificador d'objectes no visuals</translation>
+		</message>
 	</context>
 
 	<!-- PYTHON MESSAGES -->
