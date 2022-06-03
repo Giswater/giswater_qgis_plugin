@@ -2671,7 +2671,7 @@ class GwInfo(QObject):
     def _fill_tab_visit(self, geom_type):
         """ Fill tab Visit """
 
-        sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
+        sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}') AND ui_tablename IS NOT NULL"
         rows = tools_db.get_rows(sql)
         table_visit_node_dict = {}
         if not rows:
@@ -2714,7 +2714,7 @@ class GwInfo(QObject):
         sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
                " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
                " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
-               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "' AND ui_tablename IS NOT NULL")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
 
