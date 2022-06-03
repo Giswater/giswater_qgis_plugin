@@ -60,6 +60,8 @@ class GwNonVisual:
         self._manage_tabs_manager()
 
         # Connect dialog signals
+        self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg))
+        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
         self.manager_dlg.btn_delete.clicked.connect(partial(self._delete_object, self.manager_dlg))
@@ -125,6 +127,22 @@ class GwNonVisual:
 
         # Sort the table by feature id
         model.sort(1, 0)
+
+
+    def _filter_table(self, dialog, text):
+        """ Filters manager table by id """
+
+        widget_table = dialog.main_tab.currentWidget()
+        tablename = widget_table.objectName()
+        id_field = self.dict_ids.get(tablename)
+
+        if text is None:
+            text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
+
+        expr = f"{id_field}::text ILIKE '%{text}%'"
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr)
+        widget_table.model().select()
 
 
     def _create_object(self, dialog):
