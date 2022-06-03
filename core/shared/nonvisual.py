@@ -989,7 +989,10 @@ class GwNonVisual:
         table = self.dialog.findChild(QTableWidget, f"tbl_{row['pattern_type'].lower()}")
         for n, row in enumerate(rows):
             for i in range(0, table.columnCount()):
-                table.setItem(n, i, QTableWidgetItem(f"{row[f'factor_{i+1}']}"))
+                value = f"{row[f'factor_{i+1}']}"
+                if value == 'None':
+                    value = ''
+                table.setItem(n, i, QTableWidgetItem(value))
 
 
     def _load_ud_pattern_widgets(self, dialog):
