@@ -442,6 +442,12 @@ class GwNonVisual:
                     valid = False
                     break
 
+            if valid:
+                # Check that all values are in pairs
+                x_len = len([x for x in x_values if x is not None])  # Length of the x_values list without Nones
+                y_len = len([y for y in y_values if y is not None])  # Length of the y_values list without Nones
+                valid = x_len == y_len
+
         self._set_curve_values_valid(dialog, valid)
 
 
