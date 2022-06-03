@@ -1778,18 +1778,20 @@ class GwNonVisual:
     # endregion
 
     # region lids
-    def get_lids(self):
+    def get_lids(self, lidco_id=None, duplicate=None):
         """  """
         # Get dialog
         self.dialog = GwNonVisualLidsUi()
         tools_gw.load_settings(self.dialog)
 
+        is_new = (lidco_id is None) or duplicate
+
         # Populate LID Type combo
-        sql = f"SELECT idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
+        sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
 
         if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
+            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows, 1)
 
         # Populate Control Curve combo
         sql = f"SELECT id FROM v_edit_inp_curve; "
@@ -1800,12 +1802,54 @@ class GwNonVisual:
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog.cmb_lidtype, self.dialog.tab_lidlayers))
-        self.dialog.btn_ok.clicked.connect(partial(self._insert_lids_value, self.dialog))
+        self.dialog.btn_ok.clicked.connect(partial(self._accept_lids, self.dialog, is_new, lidco_id))
 
         self._manage_lids_tabs(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers)
 
+        if lidco_id:
+            self._populate_lids_widgets(self.dialog.cmb_lidtype, self.dialog.tab_lidlayers, lidco_id, duplicate)
+
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
+
+
+    def _populate_lids_widgets(self, cmb_lidtype, tab_lidlayers, lidco_id, duplicate=False):
+
+        # Get lidco_type
+        sql = f"SELECT lidco_type FROM inp_lid WHERE lidco_id='{lidco_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+        lidco_type=row[0]
+
+        if not duplicate:
+            tools_qt.set_widget_text(self.dialog, self.dialog.txt_name, lidco_id)
+            tools_qt.set_widget_enabled(self.dialog, self.dialog.txt_name, False)
+
+        tools_qt.set_combo_value(cmb_lidtype, str(lidco_type), 0)
+
+        # Populate tab values
+        sql = f"SELECT value_2, value_3, value_4, value_5, value_6, value_7,value_8 FROM inp_lid_value WHERE lidco_id='{lidco_id}'"
+        rows = tools_db.get_rows(sql)
+
+        if rows:
+            idx = 0
+            for i in range(self.dialog.tab_lidlayers.count()):
+                if self.dialog.tab_lidlayers.isTabVisible(i):
+                    row = rows[idx]
+                    current_tab=self.dialog.tab_lidlayers.widget(i)
+
+                    # List with all QLineEdit children
+                    child_list = self.dialog.tab_lidlayers.widget(i).children()
+                    list = [widget for widget in child_list if type(widget) == QLineEdit and not widget.isHidden()]
+                    list = self._order_list(list)
+
+                    for x,value in enumerate(row):
+                        if value in ('null', None):
+                            continue
+                        widget= list[x]
+                        tools_qt.set_widget_text(self.dialog, widget, f"{value}")
+                    idx += 1
 
 
     def _manage_lids_tabs(self, cmb_lidtype, tab_lidlayers):
@@ -1885,39 +1929,77 @@ class GwNonVisual:
                            f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
 
-    def _get_lidco_type_lids(self, dialog, cmb_lidtype, lidco_id):
-
-        sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval = '{lidco_id}'"
-        row = tools_db.get_row(sql)
-
-        if row:
-            return row[0]
-
-
-    def _insert_lids_value(self, dialog):
+    def _accept_lids(self, dialog, is_new, lidco_id):
         """ Insert the values from LIDS dialog """
+        # Variables
+        cmb_lidtype=dialog.cmb_lidtype
+        txt_lidco_id = dialog.txt_name
+
+        # Get widget values
+        lidco_type = tools_qt.get_combo_value(dialog, cmb_lidtype)
+        lidco_id = tools_qt.get_text(dialog, txt_lidco_id, add_quote=True)
 
         # Insert in table 'inp_lid'
-        cmb_text = str(dialog.cmb_lidtype.currentText())
-        lidco_type = self._get_lidco_type_lids(dialog, dialog.cmb_lidtype, cmb_text)
-        lidco_id = dialog.txt_name.text()
+        if is_new:
+            if not lidco_id or lidco_id == 'null':
+                tools_qt.set_stylesheet(txt_lidco_id)
+                return
+            tools_qt.set_stylesheet(txt_lidco_id, style="")
 
-        if lidco_id != '':
-            sql = f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES('{lidco_id}', '{lidco_type}')"
-            result = tools_db.execute_sql(sql, commit=False)
+            # Insert in inp_lid
+            if lidco_id != '':
+                sql = f"INSERT INTO inp_lid(lidco_id, lidco_type) VALUES({lidco_id}, '{lidco_type}')"
+                result = tools_db.execute_sql(sql, commit=False)
 
+                if not result:
+                    msg = "There was an error inserting lid."
+                    tools_qgis.show_warning(msg)
+                    global_vars.dao.rollback()
+                    return False
+
+            # Inserts in table inp_lid_value
+            result =  self._insert_lids_values(dialog, lidco_id.strip("'"))
             if not result:
-                msg = "There was an error inserting lid."
+                return
+
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
+
+        elif lidco_id is not None:
+            # Update inp_lid fields
+            table_name = 'inp_lid'
+
+            fields = f"""{{"lidco_type": "{lidco_type}"}}"""
+
+            result = self._setfields(lidco_id.strip("'"), table_name, fields)
+            if not result:
+                return
+
+            # Delete existing inp_lid_value values
+            sql = f"DELETE FROM inp_lid_value WHERE lidco_id = {lidco_id}"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error deleting old lid values."
                 tools_qgis.show_warning(msg)
                 global_vars.dao.rollback()
-                return False
-        else:
-            msg = "You have to fill in 'Control Name' field!"
-            tools_qgis.show_warning(msg)
-            global_vars.dao.rollback()
-            return False
+                return
 
-        # Inserts in table inp_lid_valu
+            # Inserts in table inp_lid_value
+            result = self._insert_lids_values(dialog, lidco_id.strip("'"))
+            if not result:
+                return
+
+            # Commit
+            global_vars.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
+        #TO_DO -> Last values
+        tools_gw.close_dialog(dialog)
+
+
+    def _insert_lids_values(self, dialog, lidco_id):
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
@@ -1925,19 +2007,17 @@ class GwNonVisual:
                 child_list = dialog.tab_lidlayers.widget(i).children()
                 list = [widget for widget in child_list if type(widget) == QLineEdit and not widget.isHidden()]
 
-                # Order list by objectName
-                for x in range(len(list)):
-                    for j in range (0, (len(list)-x-1)):
-                        if list[j].objectName() > list[(j+1)].objectName():
-                            list[j], list[(j+1)] = list[(j+1)], list[j]
+                list = self._order_list(list)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
                 for y, widget in enumerate(list):
-                    sql += f"value_{y+2}, "
+                    sql += f"value_{y + 2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
                 for widget in list:
                     value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
+                    if value == "null":
+                        value = "'0'"
                     sql += f"{value}, "
                 sql = sql.rstrip(', ') + ")"
                 result = tools_db.execute_sql(sql, commit=False)
@@ -1946,9 +2026,16 @@ class GwNonVisual:
                     tools_qgis.show_warning(msg)
                     global_vars.dao.rollback()
                     return False
+        return True
 
-        global_vars.dao.commit()
-        tools_gw.close_dialog(dialog)
+
+    def _order_list(self, list):
+        # Order list by objectName
+        for x in range(len(list)):
+            for j in range(0, (len(list) - x - 1)):
+                if list[j].objectName() > list[(j + 1)].objectName():
+                    list[j], list[(j + 1)] = list[(j + 1)], list[j]
+        return list
 
     # endregion
 
