@@ -531,6 +531,11 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    if the_geom:
+        try:
+            uri.setSrid(f"{global_vars.data_epsg}")
+        except:
+            pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
 
@@ -1428,20 +1433,20 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
 
-    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and (widget.isReadOnly() is False or ignore_editability):
-        if widget.isReadOnly():
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+        if widget.isReadOnly() and not ignore_editability:
             return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
-        if not widget.isEnabled():
+    elif type(widget) is QComboBox:
+        if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_combo_value(dialog, widget, 0)
-    elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
-        if not widget.isEnabled():
+    elif type(widget) is QCheckBox:
+        if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.is_checked(dialog, widget)
-    elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
-        if not widget.isEnabled():
+    elif type(widget) is QgsDateTimeEdit:
+        if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_calendar_date(dialog, widget)
 

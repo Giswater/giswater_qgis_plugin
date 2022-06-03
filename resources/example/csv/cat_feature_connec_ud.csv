@@ -1,0 +1,3 @@
+id,system_id,code_autofill,double_geom,shortcut_key,link_path,descript,active
+CONNEC,CONNEC,true,"{""activated"":false,""value"":1}",Alt+C,,,true
+VCONNEC,CONNEC,true,"{""activated"":false,""value"":1}",Alt+2,,,true
