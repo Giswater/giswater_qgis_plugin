@@ -9,7 +9,9 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.5.025
-
+    - Added two new buttons: "New Non-Visual object" and "Non-Visual object manager"
+    - Update QGIS templates (epa catalogs, composers)
+    - Info visit tab: Added button for visit intervals
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
