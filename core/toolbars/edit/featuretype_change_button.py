@@ -28,7 +28,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
     A form is opened showing current feature_type.type and combos to replace it
     """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1, actions=None, list_tables=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.project_type = None
@@ -38,7 +38,12 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_edit_type = None
         self.feature_type_cat = None
         self.feature_id = None
-        self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+        self.actions = actions
+        if not self.actions:
+            self.actions = ['ARC', 'NODE', 'CONNEC']
+        self.list_tables = list_tables
+        if not self.list_tables:
+            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -135,11 +140,10 @@ class GwFeatureTypeChangeButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['ARC', 'NODE', 'CONNEC']
         if global_vars.project_type.lower() == 'ud':
-            actions.append('GULLY')
+            self.actions.append('GULLY')
 
-        for action in actions:
+        for action in self.actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))

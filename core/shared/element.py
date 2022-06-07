@@ -30,7 +30,7 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
-    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
+    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
         """ Button 33: Add element """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -73,12 +73,18 @@ class GwElement:
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         self.point_xy = {"x": None, "y": None}
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+        params = ['arc', 'node', 'connec', 'gully']
+        if list_tabs:
+            for i in params:
+                if i not in list_tabs:
+                    tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -212,7 +218,10 @@ class GwElement:
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
+        if feature_type is None:
+            feature_type = "arc"
+        viewname = f"v_edit_{feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_element.feature_id, str(feature_type) + "_id")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
@@ -220,7 +229,7 @@ class GwElement:
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
-        self.feature_type = "arc"
+        self.feature_type = feature_type
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True
