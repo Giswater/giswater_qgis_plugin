@@ -744,7 +744,7 @@ BEGIN
 				END IF;
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 				
-				SELECT gw_fct_getformfields(v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
+				SELECT gw_fct_getformfields(v_formname, 'form_visit', 'data', v_tablename, null, v_featureid, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
 				
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP		
@@ -844,7 +844,6 @@ BEGIN
 					-- WIP Manage v_fields_aux
 					EXECUTE 'SELECT array_agg(a) FROM json_object_keys('''||v_fields_aux||''')a' INTO v_fields_keys;
 					
-					raise notice 'ASDF -> %',v_fields_aux;
 					IF v_fields_aux::text != '{}' THEN
 					FOREACH v_field IN ARRAY v_fields_keys
 					LOOP	
@@ -862,7 +861,8 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
+			
+				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, v_featureid, null, 'INSERT', v_filter, v_device, null) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
@@ -937,8 +937,23 @@ BEGIN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
 						END IF;
 					END IF;
-									
-				END LOOP;			
+				
+				
+				EXECUTE 'SELECT array_agg(a) FROM json_object_keys('''||v_fields_aux||''')a' INTO v_fields_keys;
+
+				IF v_fields_aux::text != '{}' THEN
+				FOREACH v_field IN ARRAY v_fields_keys
+				LOOP	
+					IF (aux_json->>'widgettype')='combo' AND (aux_json->>'column_id') = v_field THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_fields_aux->>v_field);
+					ELSIF (aux_json->>'column_id') = v_field THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_fields_aux->>v_field);
+					END IF;
+				END LOOP;
+				END IF;
+				
+				END LOOP;	
+					
 			END IF;	
 
 			v_fields_json = array_to_json (v_fields);
