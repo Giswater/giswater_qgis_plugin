@@ -136,7 +136,7 @@ class GwProjectCheckTask(GwTask):
         # Get log folder size
         log_folder_volume = 0
         if global_vars.user_folder_dir:
-            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 
@@ -155,6 +155,8 @@ class GwProjectCheckTask(GwTask):
 
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        if result:
+            tools_gw.manage_current_selections_docker(result, open=False)
         try:
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result

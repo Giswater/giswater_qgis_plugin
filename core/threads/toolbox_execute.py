@@ -27,6 +27,7 @@ class GwToolBoxTask(GwTask):
         self.dialog = dialog
         self.combo = combo
         self.result = result
+        self.body = None
         self.json_result = None
         self.exception = None
         self.function_name = None

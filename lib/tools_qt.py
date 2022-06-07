@@ -649,19 +649,20 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub
 
     QgsProject.instance().addMapLayer(layer, False)
     root = QgsProject.instance().layerTreeRoot()
-    first_group = root.findGroup(group)
+    first_group = tools_qgis.find_toc_group(root, group)
+
     if create_groups:
         if not first_group:
             first_group = root.insertGroup(0, group)
-        if not first_group.findGroup(sub_group):
+        if not tools_qgis.find_toc_group(first_group, sub_group):
             second_group = first_group.insertGroup(0, sub_group)
-            if sub_sub_group and not second_group.findGroup(sub_sub_group):
+            if sub_sub_group and not tools_qgis.find_toc_group(second_group, sub_sub_group):
                 second_group.insertGroup(0, sub_sub_group)
 
     if first_group and sub_group:
-        second_group = first_group.findGroup(sub_group)
+        second_group = tools_qgis.find_toc_group(first_group, sub_group)
         if second_group:
-            third_group = second_group.findGroup(sub_sub_group)
+            third_group = tools_qgis.find_toc_group(second_group, sub_sub_group)
             if third_group:
                 third_group.insertLayer(0, layer)
                 global_vars.iface.setActiveLayer(layer)
@@ -1097,7 +1098,7 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
     if exception:
         description = str(exception)
         dont_show_list = ['unknown error', 'server closed the connection unexpectedly',
-                          'message contents do not agree with length in message']
+                          'message contents do not agree with length in message', 'unexpected field count in']
         for dont_show in dont_show_list:
             if dont_show in description:
                 show_exception_msg = False

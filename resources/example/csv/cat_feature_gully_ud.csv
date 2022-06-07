@@ -1,0 +1,4 @@
+id,system_id,code_autofill,double_geom,shortcut_key,link_path,descript,active
+PGULLY,GULLY,true,"{""activated"":false,""value"":1}",Alt+K,,,true
+VGULLY,GULLY,true,"{""activated"":false,""value"":1}",Alt+1,,,true
+GULLY,GULLY,true,"{""activated"":true,""value"":1}",Alt+M,,,true

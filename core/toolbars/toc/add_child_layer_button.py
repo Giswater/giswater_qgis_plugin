@@ -55,6 +55,7 @@ class GwAddChildLayerButton(GwAction):
             return False
 
         dict_menu = {}
+        load_all_text = "Load all     "
 
         for field in json_result['body']['data']['fields']:
             if field['context'] is not None:
@@ -70,12 +71,13 @@ class GwAddChildLayerButton(GwAction):
                     dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
 
                 alias = field['layerName'] if field['layerName'] is not None else field['tableName']
+                alias = f"{alias}     "
                 if 'level_3' in context:
                     menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
                     if f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all" not in dict_menu:
                         # LEVEL 3 - LOAD ALL
                         widget = QCheckBox()
-                        widget.setText("Load all")
+                        widget.setText(load_all_text)
                         widget.setStyleSheet("margin: 5px 5px 5px 8px;")
                         widgetAction = QWidgetAction(menu)
                         widgetAction.setDefaultWidget(widget)
@@ -95,7 +97,7 @@ class GwAddChildLayerButton(GwAction):
                     if f"{context['level_1']}_{context['level_2']}_load_all" not in dict_menu:
                         # LEVEL 2 - LOAD ALL
                         widget = QCheckBox()
-                        widget.setText("Load all")
+                        widget.setText(load_all_text)
                         widget.setStyleSheet("margin: 5px 5px 5px 8px;")
                         widgetAction = QWidgetAction(menu)
                         widgetAction.setDefaultWidget(widget)
@@ -131,7 +133,7 @@ class GwAddChildLayerButton(GwAction):
                 sub_sub_group = context.get('level_3')
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
-                            sub_sub_group, style_id, alias))
+                            sub_sub_group, style_id, alias.strip()))
 
         main_menu.exec_(click_point)
 

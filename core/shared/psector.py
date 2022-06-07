@@ -1619,6 +1619,8 @@ class GwPsector:
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
@@ -1848,6 +1850,8 @@ class GwPsector:
                 elif type(widget) == QComboBox:
                     widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QCheckBox:
+                    if widget.objectName() == 'chk_enable_all':
+                        continue
                     widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
                 elif type(widget) == QTextEdit:
                     widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))

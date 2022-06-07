@@ -243,8 +243,9 @@ class GwSearch:
         return widget
 
 
-    def _check_tab(self, completer, is_add_schema=False):
+    def _check_tab(self, completer):
 
+        is_add_schema = False
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
 

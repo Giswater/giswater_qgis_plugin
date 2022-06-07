@@ -519,6 +519,7 @@ class GwToolBoxButton(GwAction):
         self.t0 = time()
         self.timer = QTimer()
         self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_functions))
+
         self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)

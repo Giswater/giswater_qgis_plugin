@@ -81,6 +81,9 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
         self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_create_workspace)
+
         # Connect create workspace dialog signals
         self.new_workspace_name.textChanged.connect(partial(self._check_exists))
         self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
@@ -141,6 +144,7 @@ class GwWorkspaceManagerButton(GwAction):
         # Get id of selected workspace
         cols = selected.indexes()
         if not cols:
+            tools_qt.set_widget_text(self.dlg_workspace_manager, 'txt_infolog', "")
             return
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
         workspace_id = json.loads(cols[col_ind].data())
@@ -282,6 +286,12 @@ class GwWorkspaceManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         message = "Are you sure you want to delete these records?"
+        sql = f"SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user"
+        row = tools_db.get_row(sql)
+        if row and row[0]:
+            if row[0] == f'{value}':
+                message = f"WARNING: This will remove the 'utils_workspace_vdefault' variable for your user!\n{message}"
+
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'

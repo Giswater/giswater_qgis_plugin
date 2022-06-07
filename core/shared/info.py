@@ -418,6 +418,14 @@ class GwInfo(QObject):
         self.dlg_cf = GwInfoFeatureUi(sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
+        # Get widget controls
+        self._get_widget_controls(new_feature)
+
+        self._get_features(complet_result)
+        if self.layer is None:
+            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
+            return False, self.dlg_cf
+
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
         # But if it has not been received, it is drawn
         # Using variable exist_rb for check if alredy exist rubberband
@@ -426,14 +434,6 @@ class GwInfo(QObject):
             exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
-
-        # Get widget controls
-        self._get_widget_controls(new_feature)
-
-        self._get_features(complet_result)
-        if self.layer is None:
-            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
-            return False, self.dlg_cf
 
         # Remove unused tabs
         tabs_to_show = []
@@ -613,6 +613,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
         # tab visit
         tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_visit_intervals, "136c", "24x24")
         # tab event
         tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
@@ -1924,6 +1925,10 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
+        # Force a map refresh
+        tools_qgis.refresh_map_canvas()  # First refresh all the layers
+        global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+
         if close_dlg:
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
@@ -2691,6 +2696,9 @@ class GwInfo(QObject):
         btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2")
         btn_open_gallery.setEnabled(False)
 
+        btn_visit_intervals = self.dlg_cf.findChild(QPushButton, "btn_visit_intervals")
+        btn_visit_intervals.setEnabled(False)
+
         feature_key = f"{geom_type}_id"
         feature_type = geom_type.upper()
 
@@ -2723,6 +2731,8 @@ class GwInfo(QObject):
                 visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
             btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+
+            btn_visit_intervals.clicked.connect(partial(self._open_visit_intervals))
 
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
@@ -2777,6 +2787,8 @@ class GwInfo(QObject):
         # Enable/Disable buttons
         btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2")
         btn_open_visit_doc = self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc")
+        btn_visit_intervals = self.dlg_cf.findChild(QPushButton, "btn_visit_intervals")
+        btn_visit_intervals.setEnabled(False)
         btn_open_gallery.setEnabled(False)
         btn_open_visit_doc.setEnabled(False)
 
@@ -2786,6 +2798,20 @@ class GwInfo(QObject):
         self.visit_id = self.tbl_visit_cf.model().record(selected_row).value("visit_id")
         self.parameter_id = self.tbl_visit_cf.model().record(selected_row).value("parameter_id")
 
+        #Visit intervals
+        sql = f"SELECT lot_id, unit_id FROM om_visit WHERE id = '{self.visit_id}' "
+        row = tools_db.get_row(sql)
+
+        if row:
+            self.visit_lot_id = row[0]
+            self.visit_unit_id = row[1]
+            if self.visit_lot_id is not None and self.visit_unit_id is not None:
+                sql = f"SELECT * FROM om_unit_intervals WHERE unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
+                rows = tools_db.get_rows(sql)
+                if rows:
+                        btn_visit_intervals.setEnabled(True)
+
+        #gallery
         if type(table_name) is dict:
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
@@ -2817,6 +2843,22 @@ class GwInfo(QObject):
             status, message = tools_os.open_file(path[0])
             if status is False and message is not None:
                 tools_qgis.show_warning(message, parameter=path[0])
+
+
+    def _open_visit_intervals(self):
+
+        self.visit_intervals_qtable = QTableView()
+        filter = f"unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
+        tools_qt.fill_table(self.visit_intervals_qtable, 'om_unit_intervals', filter)
+
+        self.visit_intervals_qtable.window().setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.visit_intervals_qtable.window().setWindowTitle("Visit Intervals")
+        self.visit_intervals_qtable.window().resize(600, 300)
+        self.visit_intervals_qtable.window().setMinimumSize(500, 200)
+        self.visit_intervals_qtable.horizontalHeader().setSectionResizeMode(1)
+        self.visit_intervals_qtable.horizontalHeader().setMinimumSectionSize(100)
+        self.visit_intervals_qtable.show()
+
 
 
     def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,

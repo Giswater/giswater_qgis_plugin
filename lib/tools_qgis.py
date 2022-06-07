@@ -284,6 +284,22 @@ def get_project_layers():
     return layers
 
 
+def find_toc_group(root, group, case_sensitive=False):
+    """ Find a group of layers in the ToC """
+
+    for grp in root.findGroups():
+        group1 = grp.name()
+        group2 = group
+        if not case_sensitive:
+            group1 = group1.lower()
+            group2 = group2.lower()
+
+        if group1 == group2:
+            return grp
+
+    return None
+
+
 def get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
