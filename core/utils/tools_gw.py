@@ -3410,7 +3410,7 @@ def get_vertex_flag(default_value):
 def get_sysversion_addparam():
     """ Gets addparam field from table sys_version """
     sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
-    row = tools_db.get_row(sql)
+    row = tools_db.get_row(sql, is_admin=True)
 
     if row:
         return row[0]
