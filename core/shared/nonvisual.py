@@ -1899,7 +1899,10 @@ class GwNonVisual:
                     for x, value in enumerate(row):
                         if value in ('null', None):
                             continue
-                        widget = visible_widgets[x]
+                        try:
+                            widget = visible_widgets[x]
+                        except IndexError:  # The widget exists in dialog but not in db (db error, extra values)
+                            continue
                         tools_qt.set_widget_text(self.dialog, widget, f"{value}")
                     idx += 1
 
