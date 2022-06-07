@@ -40,8 +40,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_id = None
         self.actions = actions
         if not self.actions:
-            self.actions=['ARC', 'NODE', 'CONNEC']
-        self.list_tables=list_tables
+            self.actions = ['ARC', 'NODE', 'CONNEC']
+        self.list_tables = list_tables
         if not self.list_tables:
             self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 

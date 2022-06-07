@@ -14,7 +14,7 @@ class GwDocumentButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, doc_tables=None, feature_type=None):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.list_tabs=list_tabs if list_tabs else ["node", "arc", "connec", "gully"]
+        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully"]
         self.doc_tables = doc_tables if doc_tables else ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
         self.feature_type = feature_type
         self.document = GwDocument()

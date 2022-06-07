@@ -33,7 +33,7 @@ class GwDocument(QObject):
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.files_path = []
-        self.project_type=tools_gw.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         self.doc_tables = None
 
 
@@ -79,7 +79,7 @@ class GwDocument(QObject):
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
-        self.doc_tables=doc_tables
+        self.doc_tables = doc_tables
         # Remove all previous selections
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)

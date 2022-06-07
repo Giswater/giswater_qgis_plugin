@@ -27,9 +27,9 @@ class GwFeatureDeleteButton(GwAction):
         if not self.list_feature_type:
             self.list_feature_type = tuple(['ARC', 'NODE', 'CONNEC'])
         else:
-            self.list_feature_type=tuple(self.list_feature_type)
+            self.list_feature_type = tuple(self.list_feature_type)
         if len(self.list_feature_type) == 1:
-            self.list_feature_type=f"('{self.list_feature_type[0]}')"
+            self.list_feature_type = f"('{self.list_feature_type[0]}')"
 
 
     def clicked_event(self):
