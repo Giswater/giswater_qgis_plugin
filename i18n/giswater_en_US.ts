@@ -276,6 +276,14 @@
 			<source>215_text</source>
 			<translation>Dscenario manager</translation>
 		</message>
+		<message>
+			<source>217_text</source>
+			<translation>New Non-Visual object</translation>
+		</message>
+		<message>
+			<source>218_text</source>
+			<translation>Non-Visual object manager</translation>
+		</message>
 	</context>
 
 	<!-- PYTHON MESSAGES -->

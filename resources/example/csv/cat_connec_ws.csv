@@ -1,0 +1,6 @@
+id,system_id,epa_default,code_autofill,shortcut_key,link_path,descript,active
+WJOIN,WJOIN,JUNCTION,true,Alt+M,,Wjoin,true
+FOUNTAIN,FOUNTAIN,JUNCTION,true,Alt+N,,Ornamental fountain,true
+GREENTAP,GREENTAP,JUNCTION,true,Alt+G,,Greentap,true
+TAP,TAP,JUNCTION,true,Alt+C,,Water source,false
+VCONNEC,WJOIN,JUNCTION,true,Alt+U,,Virtual connec,false
