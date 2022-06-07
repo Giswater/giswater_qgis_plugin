@@ -81,6 +81,9 @@ class GwWorkspaceManagerButton(GwAction):
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
         self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
 
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_create_workspace)
+
         # Connect create workspace dialog signals
         self.new_workspace_name.textChanged.connect(partial(self._check_exists))
         self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._create_workspace))
@@ -141,6 +144,7 @@ class GwWorkspaceManagerButton(GwAction):
         # Get id of selected workspace
         cols = selected.indexes()
         if not cols:
+            tools_qt.set_widget_text(self.dlg_workspace_manager, 'txt_infolog', "")
             return
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
         workspace_id = json.loads(cols[col_ind].data())

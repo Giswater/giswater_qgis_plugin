@@ -1172,7 +1172,7 @@ class GwVisit(QObject):
                        f"FROM om_visit "
                        f"WHERE id = '{visit_id}'")
                 row = tools_db.get_row(sql)
-                tools_qt.set_combo_value(self.exploitation, row[0], 0)
+                tools_qt.set_combo_value(self.exploitation, str(row[0]), 0)
 
         # Relations tab
         # fill feature_type

@@ -19,7 +19,7 @@
      <item row="0" column="0">
       <widget class="QGroupBox" name="grb_info">
        <property name="title">
-        <string>GroupBox</string>
+        <string>Info</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
@@ -64,6 +64,9 @@
             </property>
             <property name="wordWrap">
              <bool>true</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
