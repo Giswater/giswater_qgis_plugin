@@ -77,6 +77,13 @@ def load_settings(dialog, plugin='core'):
 def save_settings(dialog, plugin='core'):
     """ Save user UI related with dialog position and size """
 
+    # Ensure that 'plugin' parameter isn't being populated with int from signal
+    try:
+        plugin = int(plugin)
+        plugin = 'core'
+    except ValueError:
+        pass
+
     try:
         x, y = dialog.geometry().x(), dialog.geometry().y()
         w, h = dialog.geometry().width(), dialog.geometry().height()
