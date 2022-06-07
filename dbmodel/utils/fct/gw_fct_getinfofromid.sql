@@ -15,46 +15,46 @@ $BODY$
 UPSERT FEATURE 
 arc no nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E7640000020000000056560000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{"addSchema":"SCHEMA_NAME"}}$$)
 INFO BASIC
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"}, 
 		"feature":{"tableName":"v_edit_arc","id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "form":{}, "feature":{"tableName":"ve_node_air_valve"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "coordinates":{"x1":418957.8771109133, "y1":4576670.596288238}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831, "cur_user":"test_user"}, "form":{}, "feature":{"tableName":"ve_node_air_valve"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "coordinates":{"x1":418957.8771109133, "y1":4576670.596288238}}}$$);
 
 */
 
@@ -131,6 +131,8 @@ v_formheader_new_text text;
 v_tabdata_lytname json;
 v_tabdata_lytname_result json;
 v_record record;
+v_cur_user text;
+v_prev_cur_user text;
 
 BEGIN
 	
@@ -148,6 +150,12 @@ BEGIN
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
 
 	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -174,7 +182,7 @@ BEGIN
 		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
 		
 		IF v_idname IS NULL THEN
-				
+			EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 			
@@ -192,6 +200,7 @@ BEGIN
 
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
+		EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
 		RETURN v_return;
 	END IF;
 	
@@ -770,6 +779,8 @@ BEGIN
 		v_tabdata_lytname_result := gw_fct_json_object_set_key(v_tabdata_lytname_result,concat('index_', v_record.index), v_record.text);
 	END LOOP;
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
+	
+	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
 	
 	--    Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||

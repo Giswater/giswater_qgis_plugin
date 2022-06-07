@@ -19,15 +19,15 @@ AS $BODY$
 -- GET FORMS FOR WORK OFFLINE
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('1', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('1', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"true", "relatedFeature":{"type":"node", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":"node", "tableName":"ve_node},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 -- modificacions de codi (a totes online i offline)
@@ -46,15 +46,15 @@ SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":4,"infoType":
 GET ONLINE FORMS
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"false", "relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es", "cur_user":"test_user"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 	
@@ -188,6 +188,9 @@ v_load_visit_aux boolean;
 v_user_name text;
 v_end_date text;
 
+v_cur_user text;
+v_prev_cur_user text;
+
 BEGIN
 	
 	-- Set search path to local schema
@@ -231,6 +234,13 @@ BEGIN
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
 	v_tram_exec_visit = ((p_data ->>'data')::json->>'fields')::json->>'tram_exec_visit';
 	v_fields_aux = ((p_data ->>'data')::json->>'fields')::json;
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
+
 	--   Get editability of layer
 	v_querystring = concat('SELECT r1.rolname as "role"
 		FROM pg_catalog.pg_roles r JOIN pg_catalog.pg_auth_members m
@@ -262,6 +272,9 @@ BEGIN
 					
 					v_message_aux = ((((v_message->>'body')::json->>'data')::json->>'info')::json->>'text')::text;
 					v_message_aux := COALESCE(v_message_aux, '');
+					
+					EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+					
 					RETURN ('{"status":"Warning", "message":"'||v_message_aux||'", "version":'||v_version||
 					 ',"body":{"feature":{"featureType":"visit", "tableName":"", "idName":"visit_id", "id":""}'||
 					', "form":{"formTabs":{"active":true, "fields":{}}}'
@@ -1086,7 +1099,9 @@ BEGIN
 	IF v_offline THEN
 		v_id = '""';
 	END IF;
- 
+	
+	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	
 	-- Return
 	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||

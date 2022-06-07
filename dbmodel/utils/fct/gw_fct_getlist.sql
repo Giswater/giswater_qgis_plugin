@@ -17,14 +17,14 @@ TOC
 ----------
 -- attribute table using custom filters
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001"},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001"},
 "data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
@@ -33,14 +33,14 @@ VISIT
 ----------
 -- Visit -> visites
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
 "data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
 
 -- Visit -> events
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
@@ -48,20 +48,20 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 -- Visit -> files
 -- first call
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{},
 	"pageInfo":{}}}$$)
 	
 -- not first call
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001"},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getlist($$
-{"client":{"device":4, "infoType":1, "lang":"ES"},
+{"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idname":"visit_id","id":10002},
 "form":{"tabData":{"active":false}, "tabFiles":{"active":true}},
 "data":{"relatedFeature":{"type":"arc"},
@@ -72,7 +72,7 @@ FEATURE FORMS
 -------------
 -- Arc -> elements
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
@@ -81,7 +81,7 @@ MANAGER FORMS
 -------------
 -- Lots
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"tableName":"om_visit_lot"},
 "data":{"filterFields":{"limit":10},
 	"pageInfo":{"currentPage":null}}}$$)
@@ -146,6 +146,9 @@ v_level integer;
 v_message text;
 v_value_type text;
 
+v_cur_user text;
+v_prev_cur_user text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -180,6 +183,12 @@ BEGIN
 	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 	v_isattribute := (p_data ->> 'data')::json->> 'isAttribute';
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
 
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
@@ -481,6 +490,8 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
     END IF;
+	
+	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
 	
 	-- Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||

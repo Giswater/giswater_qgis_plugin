@@ -12,10 +12,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
 fid: 397
 
@@ -61,6 +61,10 @@ v_explfromsector boolean;
 v_sectorfrommacroexpl boolean;
 v_explmuni text;
 v_zonetable text;
+v_cur_user text;
+v_prev_cur_user text;
+
+
 BEGIN
 
 	-- Set search path to local schema
@@ -82,7 +86,12 @@ BEGIN
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
 	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
 	v_data = p_data->>'data';
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
 
 	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
@@ -358,7 +367,9 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_action := COALESCE(v_action, 'null');
-
+	
+	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
 	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'"}}');

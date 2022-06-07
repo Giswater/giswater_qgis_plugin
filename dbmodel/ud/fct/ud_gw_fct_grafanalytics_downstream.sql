@@ -14,7 +14,7 @@ RETURNS json AS $BODY$
 /*
 example:
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_downstream($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"id":["20607"]},
 "data":{}}$$)
 
@@ -35,12 +35,21 @@ DECLARE
   v_level integer;
   v_message text;
   v_audit_result text;
+  
+  v_cur_user text;
+  v_prev_cur_user text;
 
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-
+	
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 221 OR fid = 220);
@@ -73,7 +82,9 @@ BEGIN
 		v_result_polygon = '{"geometryType":"", "features":[]}';
 		v_result_line = '{"geometryType":"", "features":[]}';
 		v_result_point = '{"geometryType":"", "features":[]}';
-
+		
+		EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+		
 		--  Return
 		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||

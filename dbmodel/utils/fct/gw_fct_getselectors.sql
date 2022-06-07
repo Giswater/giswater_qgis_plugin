@@ -7,15 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2796
 
--- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getselectors(p_data json);
+-- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getselectors(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
   RETURNS json AS
 $BODY$
 
 /*example
 
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_psector"}, "feature":{}, "data":{"selectorType":"selector_basic", "useAtlas":true}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{"currentTab":"tab_psector"}, "feature":{}, "data":{"selectorType":"selector_basic", "useAtlas":true}}$$);
 
 */
 
@@ -70,6 +70,8 @@ v_message text;
 v_uservalues json;
 v_action text;
 v_zonetable text;
+v_cur_user text;
+v_prev_cur_user text;
 
 BEGIN
 
@@ -87,6 +89,12 @@ BEGIN
 	v_geometry := ((p_data ->> 'data')::json->>'geometry');
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
 	v_message := (p_data ->> 'message')::json;
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user THEN
+		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	END IF;
 
 	-- profilactic control of message
 	IF v_message is null THEN
@@ -279,7 +287,9 @@ BEGIN
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
-
+	
+	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	
 	-- Return
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
@@ -293,6 +303,7 @@ BEGIN
 			'{}');
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
+		
 		
 		-- Return formtabs
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
