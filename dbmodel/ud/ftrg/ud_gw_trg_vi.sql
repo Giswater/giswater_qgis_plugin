@@ -360,7 +360,7 @@ BEGIN
 			INSERT INTO inp_backdrop (text) VALUES (NEW.text);
 			
 		ELSIF v_view='vi_labels' THEN
-			INSERT INTO inp_labels (xcoord, ycoord, label, anchor, font, size, bold, italic) 
+			INSERT INTO inp_label (xcoord, ycoord, label, anchor, font, size, bold, italic) 
 			VALUES (NEW.xcoord, NEW.ycoord, NEW.label, NEW.anchor, NEW.font, NEW.size, NEW.bold, NEW.italic);
 	    END IF;
 	END IF;
