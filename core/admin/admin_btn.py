@@ -13,9 +13,10 @@ import sys
 import mmap
 from functools import partial
 from sip import isdeleted
-from time import sleep
+from time import time
+from datetime import timedelta
 
-from qgis.PyQt.QtCore import QSettings, Qt, QDate
+from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
@@ -203,11 +204,17 @@ class GwAdminButton:
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
         self.schema = project_name_schema
         # Set background task 'GwCreateSchemaTask'
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_project))
+
+        self.timer.start(1000)
+
         description = f"Create schema"
         params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
                   'project_name_schema': project_name_schema, 'project_locale': project_locale,
                   'project_srid': project_srid, 'example_data': example_data}
-        self.task_create_schema = GwCreateSchemaTask(self, description, params)
+        self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
@@ -330,9 +337,15 @@ class GwAdminButton:
             message_log.setVisible(True)
             QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
 
+            # Create timer
+            self.t0 = time()
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_show_info))
+            self.timer.start(1000)
+
             description = f"Update schema"
             params = {'project_type': project_type}
-            self.task_update_schema = GwUpdateSchemaTask(self, description, params)
+            self.task_update_schema = GwUpdateSchemaTask(self, description, params, timer=self.timer)
             QgsApplication.taskManager().addTask(self.task_update_schema)
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
@@ -3207,5 +3220,21 @@ class GwAdminButton:
                             return False
 
         return True
+
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
     # endregion
