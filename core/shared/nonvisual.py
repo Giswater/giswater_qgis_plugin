@@ -12,7 +12,7 @@ import numpy as np
 from functools import partial
 from scipy.interpolate import CubicSpline
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
@@ -2066,7 +2066,7 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit]
+                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
                 visible_widgets = self._order_list(visible_widgets)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
