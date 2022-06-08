@@ -6,11 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import pandas as pd
-import numpy as np
-
 from functools import partial
-from scipy.interpolate import CubicSpline
+
+try:
+    from scipy.interpolate import CubicSpline
+    import numpy as np
+    scipy_imported = True
+except ImportError:
+    scipy_imported = False
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -502,7 +505,7 @@ class GwNonVisual:
 
         # Create curve if only one value with curve_type 'PUMP'
         curve_type = tools_qt.get_combo_value(dialog, dialog.cmb_curve_type)
-        if len(x_list) == 1 and curve_type == 'PUMP':
+        if scipy_imported and len(x_list) == 1 and curve_type == 'PUMP':
             # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
             x = x_list[0]
             y = y_list[0]
@@ -922,10 +925,9 @@ class GwNonVisual:
             # Create lists with x zeros as offset to append new rows to the graph
             df_list = [0] * x_offset
             df_list.extend(lst)
-            # Create pandas DataFrame & attach plot to graph widget
-            df = pd.DataFrame(df_list)
-            df.plot.bar(ax=plot_widget.axes, width=1, align='edge', color='lightcoral', edgecolor='indianred',
-                        legend=False)
+
+            plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align='edge', color='lightcoral', edgecolor='indianred')
+            plot_widget.axes.set_xticks(range(0, len(df_list)))
             x_offset += len(lst)
 
         # Draw plot
@@ -1228,10 +1230,9 @@ class GwNonVisual:
             # Create lists with x zeros as offset to append new rows to the graph
             df_list = [0] * x_offset
             df_list.extend(lst)
-            # Create pandas DataFrame & attach plot to graph widget
-            df = pd.DataFrame(df_list)
-            df.plot.bar(ax=plot_widget.axes, width=1, align='edge', color='lightcoral', edgecolor='indianred',
-                        legend=False)
+
+            plot_widget.axes.bar(range(0, len(df_list)), df_list, width=1, align='edge', color='lightcoral', edgecolor='indianred')
+            plot_widget.axes.set_xticks(range(0, len(df_list)))
             x_offset += len(lst)
 
         # Draw plot
