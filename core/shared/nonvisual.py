@@ -1975,26 +1975,17 @@ class GwNonVisual:
 
         cmb_lidtype = dialog.cmb_lidtype
         tab_lidlayers = dialog.tab_lidlayers
-
-        layer_tabs = {'BC': {'SURFACE', 'SOIL', 'STORAGE', 'DRAIN'},
-                      'RG': {'SURFACE', 'SOIL', 'STORAGE'},
-                      'GR': {'SURFACE', 'SOIL', 'DRAINMAT'},
-                      'IT': {'SURFACE', 'STORAGE', 'DRAIN'},
-                      'PP': {'SURFACE', 'PAVEMENT', 'SOIL', 'STORAGE', 'DRAIN'},
-                      'RB': {'STORAGE', 'DRAIN'},
-                      'RD': {'SURFACE', 'DRAIN'},
-                      'VS': {'SURFACE'}}
-
         lidco_id = str(cmb_lidtype.currentText())
-        sql = f"SELECT id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval =  '{lidco_id}'"
-        row = tools_db.get_row(sql)
 
         # Tabs to show
+        sql = f"SELECT addparam, id FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' and idval =  '{lidco_id}'"
+        row = tools_db.get_row(sql)
+
         lidtabs = []
-        lid_id = ''
         if row:
-            lidtabs = layer_tabs[row[0]]
-            lid_id = row[0]
+            json_result = row[0]
+            lid_id = row[1]
+            lidtabs = json_result[f"{lid_id}"]
 
         # Show tabs
         for i in range(tab_lidlayers.count()):
