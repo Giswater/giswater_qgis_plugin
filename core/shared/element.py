@@ -30,7 +30,7 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
-    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
+    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None, list_element=None):
         """ Button 33: Add element """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -48,6 +48,9 @@ class GwElement:
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
+        # Set list elements
+        self.list_element = list_element
+        
         # Get layers of every feature_type
 
         # Setting lists
@@ -529,12 +532,9 @@ class GwElement:
 
             sql += f" WHERE element_id = '{element_id}';"
         # Manage records in tables @table_object_x_@feature_type
-        sql += (f"\nDELETE FROM element_x_node"
-                f" WHERE element_id = '{element_id}';")
-        sql += (f"\nDELETE FROM element_x_arc"
-                f" WHERE element_id = '{element_id}';")
-        sql += (f"\nDELETE FROM element_x_connec"
-                f" WHERE element_id = '{element_id}';")
+        for elem in self.list_element:
+            sql += (f"\nDELETE FROM element_x_{elem}"
+                    f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
