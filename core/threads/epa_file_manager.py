@@ -23,7 +23,7 @@ class GwEpaFileManager(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, go2epa):
+    def __init__(self, description, go2epa, timer=None):
 
         super().__init__(description)
         self.go2epa = go2epa
@@ -31,6 +31,7 @@ class GwEpaFileManager(GwTask):
         self.rpt_result = None
         self.fid = 140
         self.function_name = None
+        self.timer = timer
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
@@ -98,6 +99,8 @@ class GwEpaFileManager(GwTask):
         self.dlg_go2epa.btn_accept.setEnabled(True)
 
         self._close_file()
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             return
 
