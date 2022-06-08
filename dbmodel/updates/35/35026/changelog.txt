@@ -1,0 +1,4 @@
+3.5.025
+*************
+- Recreate mincut views with geometry saved on mincut tables
+- Add field active on cat_workspace
