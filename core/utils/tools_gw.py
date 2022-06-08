@@ -581,13 +581,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(layer, qml)
 
-            # Set layer config
-            if tablename:
-                feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
-                extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
-                body = create_body(feature=feature, extras=extras)
-                json_result = execute_procedure('gw_fct_getinfofromid', body)
-                config_layer_attributes(json_result, layer, alias)
+        # Set layer config
+        if tablename:
+            feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
+            extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+            body = create_body(feature=feature, extras=extras)
+            json_result = execute_procedure('gw_fct_getinfofromid', body)
+            config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 
