@@ -974,7 +974,7 @@ def get_locale():
         return locale
 
 
-def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
+def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None):
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
 
@@ -984,7 +984,9 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
         return
 
     row = index.row()
-    column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+    if not table_field:
+        table_field = field_id
+    column_index = tools_qt.get_col_index_by_col_name(qtable, table_field)
     _id = index.sibling(row, column_index).data()
     feature = tools_qt.get_feature_by_id(layer, _id, field_id)
     try:

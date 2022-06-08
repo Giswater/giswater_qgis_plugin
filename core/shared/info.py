@@ -2491,7 +2491,24 @@ class GwInfo(QObject):
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_relations, table_relations)
+        self.tbl_relations.selectionModel().selectionChanged.connect(partial(self._manage_tab_relations_highlight, self.tbl_relations))
         self.tbl_relations.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_relations))
+
+
+    def _manage_tab_relations_highlight(self, qtable, selected):
+
+        # Get id of selected row
+        index = selected.indexes()
+        if not index:
+            self.rubber_band.reset()
+            return
+
+        # Get tablename
+        index = index[0]
+        table_name = qtable.model().record(index.row()).value("sys_table_id")
+        # Highlight feature
+        tools_qgis.hilight_feature_by_id(qtable, table_name, f"{table_name.split('_')[-1]}_id", self.rubber_band, 5,
+                                         index, table_field="feature_id")
 
 
     def _open_selected_feature(self, qtable):
