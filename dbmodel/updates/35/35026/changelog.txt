@@ -2,3 +2,4 @@
 *************
 - Recreate mincut views with geometry saved on mincut tables
 - Add field active on cat_workspace
+- Check OM - check nodes planified duplicated (fid 453)

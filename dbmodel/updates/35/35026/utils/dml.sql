@@ -11,3 +11,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_workspace", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 ALTER TABLE cat_workspace ALTER COLUMN active SET DEFAULT True;
+
+UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fprocess_type='"Function process"';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (453, 'Node planified duplicated', 'utils', null, 'core', true, 'Check plan-data', null) ON CONFLICT (fid) DO NOTHING;

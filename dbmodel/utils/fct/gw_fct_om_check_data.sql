@@ -1190,7 +1190,7 @@ BEGIN
 	RAISE NOTICE '40 - Check nodes duplicated(106)';
 
 	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 106, t1.the_geom
-	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
+	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 1 AND a.state2 = 1';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -1199,10 +1199,10 @@ BEGIN
 		SELECT 106, node_1, nodecat_1, ''Duplicated nodes'', the_geom, expl_id FROM (', v_querytext,')a');
 
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 3, '106', concat('ERROR-106 (anl_node): There is/are ',v_count,' nodes duplicated.'),v_count);
+		VALUES (125, 3, '106', concat('ERROR-106 (anl_node): There is/are ',v_count,' nodes duplicated with state 1.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '106','INFO: There are  no nodes duplicated',v_count);
+		VALUES (125, 1, '106','INFO: There are no nodes duplicated with state 1',v_count);
 	END IF;
 
 	RAISE NOTICE '41 - Check orphan nodes with isarcdivide=TRUE (OM)(442)';
@@ -1251,6 +1251,25 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '443','INFO: There are no orphan nodes with isarcdivide=FALSE',v_count);
 	END IF;
+
+	RAISE NOTICE '43 - Check nodes planified duplicated(453)';
+
+	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom
+	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.state2 = 2';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 453, node_1, nodecat_1, ''Duplicated nodes'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 3, '453', concat('ERROR-453 (anl_node): There is/are ',v_count,' nodes duplicated with state 2.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '453','INFO: There are no nodes duplicated with state 2',v_count);
+	END IF;
+
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
