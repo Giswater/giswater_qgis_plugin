@@ -2860,6 +2860,10 @@ class GwAdminButton:
                     list_aux = row.split("\t")
                     dirty_list = []
                     for x in range(0, len(list_aux)):
+                        # If text in between double-quotes, put all the text in a single column
+                        if re.compile(r'".*"').search(list_aux[x]):
+                            dirty_list.append(list_aux[x].strip('"'))
+                            continue
                         aux = list_aux[x].split(" ")
                         for i in range(len(aux)):
                             dirty_list.append(aux[i])
