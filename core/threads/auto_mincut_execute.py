@@ -16,12 +16,13 @@ class GwAutoMincutTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, description, mincut_class, element_id):
+    def __init__(self, description, mincut_class, element_id, timer=None):
 
         super().__init__(description)
         self.mincut_class = mincut_class
         self.element_id = element_id
         self.exception = None
+        self.timer = timer
 
 
     def run(self):
@@ -75,6 +76,8 @@ class GwAutoMincutTask(GwTask):
         tools_log.log_info(f"Task 'Mincut execute' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.complet_result, sql, None)
 
+        if self.timer:
+            self.timer.stop()
         # If user cancel task
         if self.isCanceled():
             self.task_finished.emit([False, self.complet_result])

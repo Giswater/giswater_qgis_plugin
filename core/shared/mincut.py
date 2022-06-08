@@ -7,11 +7,13 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
-from datetime import datetime
+from sip import isdeleted
+from time import time
+from datetime import datetime, timedelta
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -36,6 +38,7 @@ class GwMincut:
         self.plugin_dir = global_vars.plugin_dir
         self.settings = global_vars.giswater_settings
         self.schema_name = global_vars.schema_name
+        self.timer = None
 
         # Create separate class to manage 'actionConfig'
         self.mincut_tools = GwMincutTools(self)
@@ -1803,7 +1806,17 @@ class GwMincut:
             # Create task to manage Mincut execution
             self.dlg_mincut.btn_cancel_task.show()
             self.dlg_mincut.btn_cancel.hide()
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
+
+            # Create timer
+            self.t0 = time()
+            if self.timer:
+                self.timer.stop()
+                del self.timer
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
+            self.timer.start(1000)
+
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
@@ -1971,7 +1984,17 @@ class GwMincut:
             element_id = row['anl_feature_id']
             self.dlg_mincut.btn_cancel_task.show()
             self.dlg_mincut.btn_cancel.hide()
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
+
+            # Create timer
+            self.t0 = time()
+            if self.timer:
+                self.timer.stop()
+                del self.timer
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
+            self.timer.start(1000)
+
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished))
@@ -2451,5 +2474,20 @@ class GwMincut:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
 
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
     # endregion
