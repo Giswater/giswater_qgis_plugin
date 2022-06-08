@@ -1855,6 +1855,8 @@ class GwNonVisual:
 
         if lidco_id:
             self._populate_lids_widgets(self.dialog, lidco_id, duplicate)
+        else:
+            self._load_lids_widgets(self.dialog)
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
@@ -1905,6 +1907,68 @@ class GwNonVisual:
                             continue
                         tools_qt.set_widget_text(self.dialog, widget, f"{value}")
                     idx += 1
+
+
+    def _load_lids_widgets(self, dialog):
+        """ Load values from session.config """
+
+        # Variable
+        cmb_lidtype = dialog.cmb_lidtype
+
+        # Get values
+        lidtype = tools_gw.get_config_parser('nonvisual_lids', 'cmb_lidtype', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_lidtype, str(lidtype), 0)
+
+        for i in range(dialog.tab_lidlayers.count()):
+            if dialog.tab_lidlayers.isTabVisible(i):
+                tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
+                # List with all QLineEdit children
+                child_list = dialog.tab_lidlayers.widget(i).children()
+                visible_widgets = [widget for widget in child_list if
+                                   type(widget) == QLineEdit or type(widget) == QComboBox]
+                visible_widgets = self._order_list(visible_widgets)
+
+                for y, widget in enumerate(visible_widgets):
+                    value = tools_gw.get_config_parser('nonvisual_lids', f"{widget.objectName()}", "user", "session")
+
+                    if type(widget) == QLineEdit:
+                        tools_qt.set_widget_text(dialog, widget, str(value))
+                    else:
+                        tools_qt.set_combo_value(widget, str(value), 0)
+
+
+    def _save_lids_widgets(self, dialog):
+        """ Save values from session.config """
+
+        # Variables
+        txt_name = dialog.txt_name
+        cmb_lidtype = dialog.cmb_lidtype
+
+        # Get values
+        name = tools_qt.get_text(dialog, txt_name)
+        lidtype = tools_qt.get_combo_value(dialog, cmb_lidtype)
+
+        for i in range(dialog.tab_lidlayers.count()):
+            if dialog.tab_lidlayers.isTabVisible(i):
+                tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
+                # List with all QLineEdit children
+                child_list = dialog.tab_lidlayers.widget(i).children()
+                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
+                visible_widgets = self._order_list(visible_widgets)
+
+                for y, widget in enumerate(visible_widgets):
+                    if type(widget) == QLineEdit:
+                        value = tools_qt.get_text(dialog, widget)
+                    else:
+                        value = tools_qt.get_combo_value(dialog, widget)
+                    tools_gw.set_config_parser('nonvisual_lids', f"{widget.objectName()}", value)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_lids', 'cmb_lidtype', lidtype)
+        tools_gw.set_config_parser('nonvisual_lids', 'txt_name', name)
+
 
 
     def _manage_lids_tabs(self, dialog):
@@ -2055,7 +2119,7 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
-        # TODO: Get last values from user config file
+        self._save_lids_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
 
