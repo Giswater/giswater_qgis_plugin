@@ -26,7 +26,7 @@ SELECT * FROM audit_check_data WHERE fid = 139
 SELECT * FROM temp_anlgraf;
 
 -- fid: main:139
-	other: 227,231,233,228,404,431
+	other: 227,231,233,228,404,431,454
 
 */
 
@@ -93,7 +93,7 @@ BEGIN
 	END IF;
 	
 	TRUNCATE temp_anlgraf;
-	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404,431);
+	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404,431,454);
 	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 		
@@ -131,11 +131,27 @@ BEGIN
 		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, v_result_id, concat('ERROR-228: There is/are ',v_count,
-		' node''s orphan on this result. This could be because closests arcs maybe UNDEFINED among others.'),v_count);
+		' orphan node''s on this result. This could be because closests arcs maybe UNDEFINED among others.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,  error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No orphan node(s) found on this result. ', v_count);
 	END IF;
+
+	RAISE NOTICE '2 - Check node_1 or node_2 nulls on on temp_table (454)';
+	v_querytext = '(SELECT arc_id, arccat_id, the_geom, expl_id FROM temp_arc WHERE node_1 IS NULL UNION SELECT arc_id, 
+	arccat_id, the_geom, expl_id FROM temp_arc WHERE node_2 IS NULL) a';
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			SELECT 454, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '454', concat('ERROR-454 (anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
+		VALUES (v_fid, 1, '454','INFO: No arcs with without node_1 or node_2 nodes found.', v_count);
+	END IF;
+
 
 	RAISE NOTICE '2 - Check result duplicated nodes on rpt tables (fid:  290)';
 	v_querytext = '(SELECT DISTINCT ON(the_geom) n1.node_id as n1, n2.node_id as n2, n1.the_geom FROM temp_node n1, temp_node n2 
@@ -584,7 +600,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fid, the_geom
-			  FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (139,227,232,404)
+			  FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (139,227,232,404,454)
 			 ) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
@@ -605,9 +621,9 @@ BEGIN
 	    '}')::json, 2680, null, null, null);
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
 END;
 $BODY$

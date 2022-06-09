@@ -16,3 +16,8 @@ UPDATE sys_fprocess SET fprocess_type='Function process' WHERE fprocess_type='"F
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (453, 'Node planified duplicated', 'utils', null, 'core', true, 'Check plan-data', null) ON CONFLICT (fid) DO NOTHING;
+
+--2022/06/09
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(454, 'Check node_1 and node_2 on temp_table', 'utils', NULL, 'core', true, '"Function process"', NULL) 
+ON CONFLICT (fid) DO NOTHING;
