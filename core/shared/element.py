@@ -28,9 +28,12 @@ class GwElement:
         self.canvas = global_vars.canvas
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
+        self.list_element = []
+        self.list_tabs = []
+        self.feature_type = None
 
 
-    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None, list_element=None):
+    def get_element(self, new_element_id=True, feature=None, selected_object_id=None):
         """ Button 33: Add element """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -47,9 +50,6 @@ class GwElement:
         widget_list = self.dlg_add_element.findChildren(QTableView)
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
-
-        # Set list elements
-        self.list_element = list_element
         
         # Get layers of every feature_type
 
@@ -77,9 +77,9 @@ class GwElement:
         self.point_xy = {"x": None, "y": None}
 
         params = ['arc', 'node', 'connec', 'gully']
-        if list_tabs:
+        if self.list_tabs:
             for i in params:
-                if i not in list_tabs:
+                if i not in self.list_tabs:
                     tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
         else:
             # Remove 'gully' if not 'UD'
@@ -98,7 +98,7 @@ class GwElement:
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
         if feature:
-            layer = self.layers[feature_type][0]
+            layer = self.layers[self.feature_type][0]
             layer.selectByIds([feature.id()])
 
         self._check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
@@ -221,18 +221,18 @@ class GwElement:
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        if feature_type is None:
-            feature_type = "arc"
-        viewname = f"v_edit_{feature_type}"
-        tools_gw.set_completer_widget(viewname, self.dlg_add_element.feature_id, str(feature_type) + "_id")
+        if self.feature_type is None:
+            self.feature_type = "arc"
+        viewname = f"v_edit_{self.feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_element.feature_id, str(self.feature_type) + "_id")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
-                self._fill_tbl_new_element, self.dlg_add_element, feature_type, feature[feature_type + "_id"]))
+                self._fill_tbl_new_element, self.dlg_add_element, self.feature_type, feature[self.feature_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
-        self.feature_type = feature_type
+        #self.feature_type = feature_type
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True
