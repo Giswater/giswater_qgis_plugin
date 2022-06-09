@@ -93,7 +93,13 @@ BEGIN
 			AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 		ELSIF v_networkmode = 4 THEN
-			-- nothing to do because it is automatic. Connec exists as feature exported
+		
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
+			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
+			FROM  inp_dscenario_demand d ,temp_node n
+			WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			
 		END IF;
 
 		-- remove those demands which for some reason linked node is not exported
