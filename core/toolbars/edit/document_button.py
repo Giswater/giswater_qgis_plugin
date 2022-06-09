@@ -18,8 +18,11 @@ class GwDocumentButton(GwAction):
         self.doc_tables = doc_tables if doc_tables else ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
         self.feature_type = feature_type
         self.document = GwDocument()
+        self.document.list_tabs = self.list_tabs
+        self.document.feature_type = self.feature_type
+        self.document.doc_tables = self.doc_tables
 
 
     def clicked_event(self):
-        self.document.get_document(list_tabs=self.list_tabs, doc_tables=self.doc_tables, feature_type=self.feature_type)
+        self.document.get_document()
 

@@ -34,11 +34,13 @@ class GwDocument(QObject):
         self.schema_name = global_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = None
+        self.doc_tables =[]
+        self.list_tabs = []
+        self.feature_type = None
 
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, row=None):
         """ Button 34: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -70,22 +72,21 @@ class GwDocument(QObject):
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
         params = ['arc', 'node', 'connec', 'gully']
-        if list_tabs:
+        if self.list_tabs:
             for i in params:
-                if i not in list_tabs:
+                if i not in self.list_tabs:
                     tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
         else:
             # Remove 'gully' if not 'UD'
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
-        self.doc_tables = doc_tables
         # Remove all previous selections
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         if feature is not None:
-            layer = self.layers[feature_type][0]
+            layer = self.layers[self.feature_type][0]
             layer.selectByIds([feature.id()])
 
         # Set icons
@@ -110,10 +111,10 @@ class GwDocument(QObject):
         tools_gw.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        if feature_type is None:
-            feature_type = "arc"
-        viewname = f"v_edit_{feature_type}"
-        tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
+        if self.feature_type is None:
+            self.feature_type = "arc"
+        viewname = f"v_edit_{self.feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(self.feature_type) + "_id")
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -154,11 +155,12 @@ class GwDocument(QObject):
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
-                partial(self._fill_table_doc, self.dlg_add_doc, feature_type, feature[feature_type + "_id"]))
+                partial(self._fill_table_doc, self.dlg_add_doc, self.feature_type, feature[self.feature_type + "_id"]))
 
         # Set default tab 'arc'
+        if self.feature_type is None:
+            self.feature_type = "arc"
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
-        self.feature_type = "arc"
         tools_gw.get_signal_change_tab(self.dlg_add_doc, self.excluded_layers)
 
         # Open the dialog
