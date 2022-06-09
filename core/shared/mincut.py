@@ -62,6 +62,7 @@ class GwMincut:
         self.previous_snapping = None
         self.emit_point = None
         self.vertex_marker = None
+        self.snapper_manager = None
 
         # Other variables
         self.col1 = "customer_code"
@@ -2045,7 +2046,8 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
         self.set_visible_mincut_layers()
-        self.snapper_manager.restore_snap_options(self.previous_snapping)
+        if self.snapper_manager:
+            self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
 
 
