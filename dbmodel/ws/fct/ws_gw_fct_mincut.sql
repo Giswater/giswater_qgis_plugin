@@ -70,7 +70,7 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+	SELECT json_extract_path_text(value::json,'status')::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 	SELECT json_extract_path_text(value::json,'version')::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_config';
 
 	-- Get project version

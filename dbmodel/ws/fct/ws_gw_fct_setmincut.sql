@@ -65,7 +65,17 @@ BEGIN
 	v_arc := ((p_data ->>'data')::json->>'arcId')::integer;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
 	
+
 	IF v_action = 'mincutNetwork' THEN
+		--check if arc exists in database or look for a new arc_id in the same location
+
+		IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
+			SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
+
+			IF v_arc IS NULL AND v_usepsectors is true then
+				SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
+			end if;
+		END IF;
 
 		RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
 		
