@@ -974,8 +974,8 @@ class GwMincut:
         self.dlg_mincut.mincutCanceled = True
 
         if self.mincut_class == 1:
-            if 'geometry' in result['body']['data']:
-                polygon = result['body']['data']['geometry']
+            polygon = result['body']['data'].get('geometry')
+            if polygon:
                 polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
                 if polygon[0] == '':
@@ -1907,19 +1907,21 @@ class GwMincut:
                     tools_qgis.show_message(message.get('text'), message.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                tools_qgis.show_warning(message)
-                tools_qgis.restore_cursor()
-                self.action_mincut.setChecked(False)
-                return
+            polygon = complet_result['body']['data'].get('geometry')
+            if polygon:
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                if polygon[0] == '':
+                    message = "Error on create auto mincut, you need to review data"
+                    tools_qgis.show_warning(message)
+                    tools_qgis.restore_cursor()
+                    self.action_mincut.setChecked(False)
+                    return
 
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
@@ -2033,18 +2035,19 @@ class GwMincut:
                     tools_qgis.show_message(message.get('text'), message.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                tools_qgis.show_warning(message)
-                tools_qgis.restore_cursor()
-                return
+            polygon = complet_result['body']['data'].get('geometry')
+            if polygon:
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                if polygon[0] == '':
+                    message = "Error on create auto mincut, you need to review data"
+                    tools_qgis.show_warning(message)
+                    tools_qgis.restore_cursor()
+                    return
 
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
