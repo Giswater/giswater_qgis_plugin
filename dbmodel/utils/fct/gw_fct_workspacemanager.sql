@@ -341,8 +341,12 @@ BEGIN
 
     END IF;
 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	IF (SELECT id FROM cat_workspace WHERE id=v_workspace_id) is null THEN
+		v_result_info = '{}';
+	ELSE
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	END IF;
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- get uservalues
