@@ -529,7 +529,7 @@ def enable_dialog(dialog, enable, ignore_widgets=['', None]):
 
 
 def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers,
-                         sectionResizeMode=3, stretchLastSection=True):
+                         sectionResizeMode=3, stretchLastSection=True, sortingEnabled=True):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
@@ -537,6 +537,7 @@ def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_tr
     widget.horizontalHeader().setStretchLastSection(stretchLastSection)
     widget.horizontalHeader().setMinimumSectionSize(100)
     widget.setEditTriggers(edit_triggers)
+    widget.setSortingEnabled(sortingEnabled)
 
 
 def get_col_index_by_col_name(qtable, column_name):

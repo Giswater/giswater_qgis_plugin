@@ -1505,6 +1505,7 @@ class GwPsector:
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Set signals
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
