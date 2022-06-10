@@ -665,6 +665,9 @@ class GwMincut:
 
     def _real_start(self):
 
+        # Run fct like 'Refresh mincut' but with action="startMincut"
+        self._refresh_mincut(action="startMincut")
+
         date_start = QDate.currentDate()
         time_start = QTime.currentTime()
         self.dlg_mincut.cbx_date_start.setDate(date_start)
@@ -1962,7 +1965,7 @@ class GwMincut:
         self.dlg_mincut.btn_accept.setEnabled(True)
 
 
-    def _refresh_mincut(self):
+    def _refresh_mincut(self, triggered=None, action="mincutNetwork"):
         """ B2-125: Refresh current mincut """
 
         # Manage if task is already running
@@ -1999,7 +2002,7 @@ class GwMincut:
             self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
             self.timer.start(1000)
 
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, action=action, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished))
