@@ -305,6 +305,9 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- force expl = 0
+	INSERT INTO selector_expl (expl_id, cur_user) SELECT 0, current_user FROM exploitation LIMIT 1 ON CONFLICT (expl_id, cur_user) DO NOTHING;
+				
 	-- Force state selector in case of null values
 	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
 	  	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
