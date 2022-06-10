@@ -25,22 +25,22 @@ SELECT 'om_mincut_config',json_build_object('version', p1.value, 'usePgrouting',
 'Mincut system config. version - Mincut version; usePgrouting - Different ways to use mincut.If true, mincut is done with pgrouting, an extension of Postgis.',
 'Mincut system config', TRUE, 1,'ws', false, false,'json', 'linetext', true,true,'lyt_admin_om'
 FROM config_param_system p1 ,config_param_system p2
-WHERE p1.parameter='om_mincut_version' and p2.parameter='om_mincut_use_pgrouting';
+WHERE p1.parameter='om_mincut_version' and p2.parameter='om_mincut_use_pgrouting' ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label,
 isenabled, layoutorder, project_type, dv_isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable, layoutname)
 SELECT 'om_mincut_debug',json_build_object('status', value::boolean) as value,concat(descript), 'Mincut debug',
 isenabled, layoutorder, project_type, dv_isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable, layoutname
 FROM config_param_system
-WHERE parameter='admin_debug';
+WHERE parameter='admin_debug' ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label,
 isenabled, layoutorder, project_type, dv_isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable, layoutname)
-SELECT 'om_mincut_settings',json_build_object('valveStatusUnaccess', p2.value::boolean,'redoOnStart',json_build_object('status',false,'days',0)) as value,
+SELECT 'om_mincut_settings',json_build_object('valveStatusUnaccess', p1.value::boolean,'redoOnStart',json_build_object('status',false,'days',0)) as value,
 'Mincut settings. valveStatus - Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status ; redoOnStart - If true, on starting the mincut the process will be recalculated if the indicated number of days since receving the mincut has passed.',
 'Mincut settings', TRUE, 4,'ws', false, false,'json', 'linetext', true,true,'lyt_admin_om'
-FROM config_param_system p1 ,config_param_system p2
-WHERE  p2.parameter='om_mincut_valvestatus_unaccess';
+FROM config_param_system p1
+WHERE  p2.parameter='om_mincut_valvestatus_unaccess' ON CONFLICT (parameter) DO NOTHING;
 
 DELETE FROM config_param_system WHERE parameter='om_mincut_version' or parameter='om_mincut_use_pgrouting' or parameter='om_mincut_valve2tank_traceability' or 
-parameter='om_mincut_disable_check_temporary_overlap' or parameter='om_mincut_valvestatus_unaccess';
+parameter='om_mincut_disable_check_temporary_overlap' or parameter='om_mincut_valvestatus_unaccess' OR parameter='admin_debug';
