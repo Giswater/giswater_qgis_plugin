@@ -20,6 +20,7 @@ node_aux public.geometry;
 arc_aux public.geometry;
 stack varchar[];
 v_debug Boolean;
+v_node_type text;
 
 BEGIN
 
@@ -45,7 +46,7 @@ BEGIN
         END IF;
 
         -- Get node  public.geometry
-        SELECT the_geom INTO node_aux FROM v_edit_node  JOIN value_state_type ON state_type=value_state_type.id WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
+        SELECT the_geom, node_type INTO node_aux, v_node_type FROM v_edit_node  JOIN value_state_type ON state_type=value_state_type.id WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
 
         -- Check node_id being a valve
         SELECT node_id INTO exists_id FROM om_mincut_valve 
@@ -66,7 +67,7 @@ BEGIN
 			IF v_debug THEN	
 				RAISE NOTICE ' Inserting into om_mincut_node; %', node_id_arg;
 			END IF;
-			INSERT INTO om_mincut_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);
+			INSERT INTO om_mincut_node (node_id, the_geom, result_id, node_type) VALUES(node_id_arg, node_aux, result_id_arg, v_node_type);
 
 			-- Loop for all the upstream nodes
 			FOR rec_table IN SELECT * FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 

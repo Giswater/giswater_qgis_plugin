@@ -161,11 +161,12 @@ BEGIN
 		ON CONFLICT (arc_id, result_id) DO NOTHING';
 
 	-- insert node results into table
-	EXECUTE 'INSERT INTO om_mincut_node (result_id, node_id, the_geom)
-		SELECT '||v_mincutid||', b.node_1, the_geom FROM (SELECT DISTINCT node_1, the_geom FROM
+	EXECUTE 'INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
+		SELECT '||v_mincutid||', b.node_1, the_geom, b.nodetype_id FROM (SELECT DISTINCT node_1, the_geom, nodetype_id FROM
 		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
 		JOIN node ON node.node_id = a.node_1
-		GROUP BY node_1, water, the_geom HAVING water=1) b
+		JOIN cat_node cn ON node.nodecat_id=cn.id
+		GROUP BY node_1, water, the_geom, nodetype_id HAVING water=1) b
 		ON CONFLICT (node_id, result_id) DO NOTHING';
 
 	-- insert valve results into table

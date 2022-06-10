@@ -1,5 +1,6 @@
-3.5.025
+3.5.026
 *************
 - Recreate mincut views with geometry saved on mincut tables
 - Add field active on cat_workspace
 - Check OM - check nodes planified duplicated (fid 453)
+- Add fields customer_code on om_mincut_connec and node_type on om_mincut_node

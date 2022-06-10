@@ -28,7 +28,8 @@ exists_id text;
 polygon_aux public.geometry;
 polygon_aux2 public.geometry;
 arc_aux public.geometry;
-node_aux public.geometry;    
+node_aux public.geometry;
+v_node_type text;
 srid_schema text;
 expl_id_arg integer;
 macroexpl_id_arg integer;
@@ -84,6 +85,11 @@ BEGIN
 	IF v_debug THEN
 		RAISE NOTICE '1-Delete previous data from same result_id';
 	END IF;
+
+	DELETE FROM temp_data WHERE fid=199 AND cur_user=current_user;
+
+	INSERT INTO temp_data(fid, addparam) SELECT 199, output FROM om_mincut where id=result_id_arg;
+
 	DELETE FROM "om_mincut_node" where result_id=result_id_arg;
 
 	DELETE FROM "om_mincut_arc" where result_id=result_id_arg;
@@ -300,15 +306,15 @@ BEGIN
 		INSERT INTO selector_mincut_result(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
 	END IF;
 
-	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;			
+	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;		
 	
 	-- insert connecs
 	IF p_usepsectors IS TRUE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
-		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, c.the_geom FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE
-		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT result_id_arg, connec_id, connec.the_geom, customer_code FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
 	END IF;
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
@@ -378,7 +384,11 @@ BEGIN
 	v_mincutdetails := COALESCE(v_mincutdetails, '{}'); 
 	v_geometry := COALESCE(v_geometry, '{}'); 
 	
-	IF v_error_message is null THEN
+	IF (SELECT addparam::text FROM temp_data WHERE fid=199 AND cur_user=current_user) != v_mincutdetails::text THEN
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'There were diferences between previously executed mincut and current version of the process. Mincut has been updated.';
+	ELSIF v_error_message is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
 		v_message = 'Mincut done successfully';
