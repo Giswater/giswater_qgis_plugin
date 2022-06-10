@@ -33,12 +33,12 @@ BEGIN
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;
 	SELECT anl_feature_type INTO feature_type_aux FROM om_mincut WHERE id=v_result_id;
 
-	-- In case of variable om_mincut_valvestatus_unaccess on TRUE and valve closed status on TRUE) -> change status to open
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter='om_mincut_valvestatus_unaccess') IS TRUE AND (SELECT closed FROM man_valve WHERE node_id=v_node_id) IS TRUE THEN
+	-- In case of variable valveStatusUnaccess on TRUE and valve closed status on TRUE) -> change status to open
+	IF (SELECT json_extract_path_text(value::json,'valveStatusUnaccess')::boolean FROM config_param_system WHERE parameter='om_mincut_settings') IS TRUE AND (SELECT closed FROM man_valve WHERE node_id=v_node_id) IS TRUE THEN
 		UPDATE man_valve SET closed=FALSE WHERE node_id=v_node_id;
 		v_flag := true;
 
-	-- The rest of cases. In case of closed valves without om_mincut_valvestatus_unaccess on true -> nothing
+	-- The rest of cases. In case of closed valves without valveStatusUnaccess on true -> nothing
 	ELSIF (SELECT closed FROM man_valve WHERE node_id=v_node_id) IS FALSE THEN 
 
 		-- Changing temporary status of accessibility
@@ -53,7 +53,7 @@ BEGIN
 	-- Recalculate the mincut
 	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id, v_usepsectors);
 	
-	-- In case of variable om_mincut_valvestatus_unaccess on TRUE and valve closed status on TRUE)
+	-- In case of variable valveStatusUnaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN
 		-- Modify result values
 		INSERT INTO om_mincut_valve (result_id, node_id) VALUES (v_result_id, v_node_id) ON CONFLICT (result_id, node_id) DO NOTHING;

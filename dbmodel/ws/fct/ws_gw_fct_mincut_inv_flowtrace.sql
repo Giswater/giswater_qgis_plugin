@@ -42,8 +42,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get debug variable
-	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_debug';
-	SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
+	SELECT json_extract_path_text(value::json,'status')::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+	SELECT json_extract_path_text(value::json,'version')::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_config';
 	
 	-- Starting process
 	SELECT * INTO mincut_rec FROM om_mincut WHERE id=result_id_arg;
@@ -111,7 +111,7 @@ BEGIN
 							FROM temp_mincut'','||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 
 			IF query_text IS NOT NULL THEN	
-				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
+				IF v_debug IS TRUE THEN 
 					IF v_debug THEN
 						RAISE NOTICE' query_text: %',query_text;
 					END IF;
@@ -127,7 +127,7 @@ BEGIN
 					RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
 					RAISE NOTICE '-------------------------------------------------------------------------------';
 				END IF;
-				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
+				IF v_debug IS TRUE THEN 
 					FOR rec_result IN EXECUTE query_text
 					LOOP 
 						INSERT INTO audit_log_data(fid, feature_id, log_message, cur_user) VALUES (129, rec_result.edge, concat(result_id_arg, ':', 

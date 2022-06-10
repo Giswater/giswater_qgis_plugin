@@ -41,7 +41,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get debug variable
-	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_debug';
+	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 
 	-- Get parameters from input json
 	v_message_id = lower(((p_data ->>'data')::json->>'message')::text);

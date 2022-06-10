@@ -28,8 +28,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Get debug variable
-    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_debug';
-
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
     --Push first element into the array
     stack := array_append(stack, node_id_arg);
 
