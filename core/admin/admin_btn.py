@@ -1936,16 +1936,13 @@ class GwAdminButton:
             else:
                 continue
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
+        tools_qgis.set_cursor_wait()
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = tools_gw.create_body(extras=extras)
-        self.task1.setProgress(50)
         result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False)
         if not result or result['status'] == 'Failed':
+            tools_qgis.restore_cursor()
             return
-        self.task1.setProgress(100)
 
         # Show message
         status = (self.error_count == 0)
@@ -1961,6 +1958,7 @@ class GwAdminButton:
 
         # Reset count error variable to 0
         self.error_count = 0
+        tools_qgis.restore_cursor()
 
 
     def _delete_schema(self):
@@ -2952,11 +2950,11 @@ class GwAdminButton:
         if status:
             if msg_ok is None:
                 msg_ok = "Process finished successfully"
-            tools_qt.show_info_box(msg_ok, "Info", parameter=parameter)
+            tools_qgis.show_info(msg_ok, parameter=parameter)
         else:
             if msg_error is None:
                 msg_error = "Process finished with some errors"
-            tools_qt.show_info_box(msg_error, "Warning", parameter=parameter)
+            tools_qgis.show_warning(msg_error, parameter=parameter)
 
 
     def _manage_json_message(self, json_result, parameter=None, title=None):
