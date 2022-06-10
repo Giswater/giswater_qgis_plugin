@@ -2022,8 +2022,12 @@ class GwMincut:
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
-                message = "Mincut done successfully"
-                tools_qgis.show_message(message, 3)
+                message = complet_result.get('message')
+                if not message:
+                    message = "Mincut done successfully"
+                    tools_qgis.show_message(message, 3)
+                else:
+                    tools_qgis.show_message(message.get('text'), message.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data']['geometry']
