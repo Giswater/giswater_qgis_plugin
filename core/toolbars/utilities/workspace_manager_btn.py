@@ -10,7 +10,7 @@ import re
 from functools import partial
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
-from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QTableView
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox
 
@@ -144,6 +144,9 @@ class GwWorkspaceManagerButton(GwAction):
         # Get id of selected workspace
         cols = selected.indexes()
         if not cols:
+            if deselected.indexes():
+                self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.Select)
+                return
             tools_qt.set_widget_text(self.dlg_workspace_manager, 'txt_infolog', "")
             return
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
@@ -304,6 +307,8 @@ class GwWorkspaceManagerButton(GwAction):
                     tools_qgis.show_message(message['text'], message['level'])
 
             self._fill_tbl(self.filter_name.text())
+            self._set_labels_current_workspace(name="", result=result)
+
 
     def _check_workspace(self):
         """ Reset the values of the selected workspace """
