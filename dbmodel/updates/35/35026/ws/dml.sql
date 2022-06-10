@@ -40,7 +40,7 @@ SELECT 'om_mincut_settings',json_build_object('valveStatusUnaccess', p1.value::b
 'Mincut settings. valveStatus - Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status ; redoOnStart - If true, on starting the mincut the process will be recalculated if the indicated number of days since receving the mincut has passed.',
 'Mincut settings', TRUE, 4,'ws', false, false,'json', 'linetext', true,true,'lyt_admin_om'
 FROM config_param_system p1
-WHERE  p2.parameter='om_mincut_valvestatus_unaccess' ON CONFLICT (parameter) DO NOTHING;
+WHERE p1.parameter='om_mincut_valvestatus_unaccess' ON CONFLICT (parameter) DO NOTHING;
 
 DELETE FROM config_param_system WHERE parameter='om_mincut_version' or parameter='om_mincut_use_pgrouting' or parameter='om_mincut_valve2tank_traceability' or 
 parameter='om_mincut_disable_check_temporary_overlap' or parameter='om_mincut_valvestatus_unaccess' OR parameter='admin_debug';
