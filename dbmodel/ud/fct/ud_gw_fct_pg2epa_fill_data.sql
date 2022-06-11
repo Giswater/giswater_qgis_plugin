@@ -172,18 +172,32 @@ BEGIN
 		-- netgully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, 
-		outlet_type, total_width, total_length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
+		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, outlet_type,
+		case when custom_width is null then total_width else custom_width end, 
+		case when custom_length is null then total_length else custom_length end,
+		case when custom_depth is null then depth else custom_depth end,
+		method, weir_cd, orifice_cd, 
+		case when custom_a_param is null then a_param else custom_a_param end,
+		case when custom_b_param is null then b_param else custom_b_param end,
+		efficiency, the_geom
 		FROM v_edit_inp_netgully g 
-		AND g.sector_id > 0 '||v_statetype||';';
+		LEFT JOIN value_state_type ON id=state_type
+		WHERE g.sector_id > 0 '||v_statetype||';';
 
 		-- gully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, 
-		outlet_type, total_width, total_length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
-		FROM v_edit_inp_gully g 
-		AND g.sector_id > 0 '||v_statetype||';';
+		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, outlet_type,
+		case when custom_width is null then total_width else custom_width end, 
+		case when custom_length is null then total_length else custom_length end,
+		case when custom_depth is null then depth else custom_depth end,
+		method, weir_cd, orifice_cd, 
+		case when custom_a_param is null then a_param else custom_a_param end,
+		case when custom_b_param is null then b_param else custom_b_param end,
+		efficiency, the_geom
+		FROM v_edit_inp_gully g
+		LEFT JOIN value_state_type ON id=state_type
+		WHERE g.sector_id > 0 '||v_statetype||';';
 		
 	END IF;
 
