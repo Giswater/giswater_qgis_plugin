@@ -101,3 +101,11 @@ CREATE TABLE temp_gully(
   the_geom geometry(Point,SRID_VALUE),
   CONSTRAINT temp_gully_pkey PRIMARY KEY (gully_id)
 );
+
+
+ALTER TABLE inp_pattern_value DROP CONSTRAINT inp_pattern_value_pkey;
+ALTER TABLE inp_pattern_value ADD CONSTRAINT inp_pattern_value_pkey PRIMARY KEY(pattern_id);
+DROP VIEW v_edit_inp_pattern_value;
+DROP VIEW vi_patterns;
+ALTER TABLE inp_pattern_value DROP column id;
+DROP SEQUENCE inp_pattern_value_id_seq;

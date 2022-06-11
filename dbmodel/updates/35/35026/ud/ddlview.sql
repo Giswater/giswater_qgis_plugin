@@ -477,3 +477,105 @@ CREATE OR REPLACE VIEW vi_gully AS
     b_param::numeric(12,3),
     efficiency
    FROM temp_gully;
+   
+   
+   CREATE OR REPLACE VIEW v_edit_inp_pattern_value AS 
+ SELECT
+    p.pattern_id,
+    p.pattern_type,
+    p.observ,
+    p.tsparameters::text AS tsparameters,
+    p.expl_id,
+    inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18,
+    inp_pattern_value.factor_19,
+    inp_pattern_value.factor_20,
+    inp_pattern_value.factor_21,
+    inp_pattern_value.factor_22,
+    inp_pattern_value.factor_23,
+    inp_pattern_value.factor_24
+   FROM selector_expl s, inp_pattern p
+     JOIN inp_pattern_value USING (pattern_id)
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY 1;
+
+
+ CREATE OR REPLACE VIEW vi_patterns AS 
+  SELECT inp_pattern_value.* from selector_expl s, inp_pattern p JOIN inp_pattern_value USING (pattern_id) 
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY 1;
+
+
+CREATE OR REPLACE VIEW vi_timeseries AS 
+SELECT timser_id, other1, other2, other3 FROM selector_expl s ,(
+ SELECT a.timser_id,
+    a.other1,
+    a.other2,
+    a.other3,
+    expl_id
+   FROM ( SELECT inp_timeseries_value.id,
+            inp_timeseries_value.timser_id,
+            inp_timeseries_value.date AS other1,
+            inp_timeseries_value.hour AS other2,
+            inp_timeseries_value.value AS other3,
+            expl_id
+           FROM inp_timeseries_value
+             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+          WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text
+        UNION
+         SELECT inp_timeseries_value.id,
+            inp_timeseries_value.timser_id,
+            concat('FILE', ' ', inp_timeseries.fname) AS other1,
+            NULL::character varying AS other2,
+            NULL::numeric AS other3,
+            expl_id
+           FROM inp_timeseries_value
+             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+          WHERE inp_timeseries.times_type::text = 'FILE'::text
+        UNION
+         SELECT inp_timeseries_value.id,
+            inp_timeseries_value.timser_id,
+            inp_timeseries_value."time" AS other1,
+            inp_timeseries_value.value::text AS other2,
+            NULL::numeric AS other3,
+            expl_id
+           FROM inp_timeseries_value
+             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+          WHERE inp_timeseries.times_type::text = 'RELATIVE'::text) a
+  ORDER BY a.id) t
+  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
+
+  
+
+CREATE OR REPLACE VIEW vi_curves AS 
+ SELECT inp_curve_value.curve_id,
+        CASE
+            WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
+               FROM inp_curve_value sub
+              WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
+            ELSE NULL::character varying
+        END AS curve_type,
+    inp_curve_value.x_value,
+    inp_curve_value.y_value
+   FROM selector_expl s, inp_curve c
+     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text
+  AND c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
+  ORDER BY inp_curve_value.id;
