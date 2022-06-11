@@ -19,3 +19,20 @@ CREATE OR REPLACE VIEW v_price_compost AS
    FROM plan_price
      LEFT JOIN plan_price_compost ON plan_price.id::text = plan_price_compost.compost_id::text
   GROUP BY plan_price.id, plan_price.unit, plan_price.descript;
+
+  
+CREATE OR REPLACE VIEW vi_controls AS 
+ SELECT c.text
+           FROM ( SELECT inp_controls.id,
+                    inp_controls.text
+                   FROM selector_sector,
+                    inp_controls
+                  WHERE selector_sector.sector_id = inp_controls.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_controls.active IS NOT FALSE
+                  UNION
+                  SELECT id,
+                    text
+                   FROM selector_sector s,
+                    v_edit_inp_dscenario_controls d
+                  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
+                  ORDER BY 1)c
+  ORDER BY c.id;

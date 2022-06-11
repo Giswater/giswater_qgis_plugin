@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ws_sample, public, pg_catalog;
 
 --2022/06/07
 DROP VIEW v_om_mincut_node;
@@ -43,3 +43,21 @@ SELECT om_mincut_connec.id,
     om_mincut_connec     
      JOIN om_mincut ON om_mincut_connec.result_id = om_mincut.id
   WHERE selector_mincut_result.result_id::text = om_mincut_connec.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_rules AS 
+ SELECT c.text
+           FROM ( SELECT inp_rules.id,
+                    inp_rules.text
+                   FROM selector_sector,
+                    inp_rules
+                  WHERE selector_sector.sector_id = inp_rules.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_rules.active IS NOT FALSE
+                  UNION
+                  SELECT id,
+                    text
+                   FROM selector_sector s,
+                    v_edit_inp_dscenario_rules d
+                  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
+                  ORDER BY 1)c
+  ORDER BY c.id;
+ 
