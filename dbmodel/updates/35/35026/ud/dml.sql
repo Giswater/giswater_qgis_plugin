@@ -57,3 +57,54 @@ INSERT INTO sys_table (id, descript, sys_role, source) VALUES
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES 
 ('inp_netgully', 'Table to manage epa-side of netgully. Special case where netgully has two epa-sides (junction and also gully)', 
 'role_epa','core');
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(455, 'Check arc_id null for gully', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(456, 'Check gullies with null values on (custom)top_elev', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(457, 'Check gullies with null values on (custom)width', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(458, 'Check gullies with null values on (custom)length', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
+ON CONFLICT (fid) DO NOTHING;
+
+--crear variables de valores por defecto de usuario (method, outlet_type, cd_weir, cd_orifice, efficiency)
+
+delete from sys_param_user where id = 'epa_gully_outlet_type_vdefault';
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
+VALUES ('epa_gully_outlet_type_vdefault', 'config', 'Default value for enable /disable gully. Two options are available (Sink, To network). In case of Sink water is lossed.',
+'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_outlet_type''' ,'To network', 'core', true ,'1D/2D Gully outlet_type vdefault:', 'lyt_epa',2)
+ON CONFLICT (id) DO NOTHING;
+
+delete from sys_param_user where id = 'epa_gully_method_vdefault';
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
+VALUES ('epa_gully_method_vdefault', 'config', 'Default value for calculation method on gullies. Two options are available (UPC, W/O).',
+'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_method''' ,'W/O', 'core', true ,'1D/2D Gully calculation method vdefault:', 'lyt_epa',3)
+ON CONFLICT (id) DO NOTHING;
+
+delete from sys_param_user where id = 'epa_gully_cd_weir_vdefault';
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
+VALUES ('epa_gully_cd_weir_vdefault', 'config', 'Default value for cd_weir using calculation method W/O on gullies.',
+'role_epa', true, 'ud', true, 'numeric', 'text', true, '1.6', 'core', true ,'1D/2D Gully CD-WEIR vdefault for W/O method:', 'lyt_epa',4)
+ON CONFLICT (id) DO NOTHING;
+
+delete from sys_param_user where id = 'epa_gully_cd_orifice_vdefault';
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
+VALUES ('epa_gully_cd_orifice_vdefault', 'config', 'Default value for cd_orifice using calculation method W/O on gullies.',
+'role_epa', true, 'ud', true, 'numeric', 'text', true, '0.7', 'core', true ,'1D/2D Gully CD-ORIFICE vdefault for W/O method:', 'lyt_epa',5)
+ON CONFLICT (id) DO NOTHING;
+
+delete from sys_param_user where id = 'epa_gully_efficiency_vdefault';
+INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
+VALUES ('epa_gully_efficiency_vdefault', 'config', 'Default value for efficiency on gullies.',
+'role_epa', true, 'ud', true, 'numeric', 'text', true, '100', 'core', true ,'1D/2D Gully efficiency vdefault:', 'lyt_epa',6)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_param_user SET formname  ='hidden' where id in('edit_update_elevation_from_dem', 'utils_debug_mode', 'utils_checkproject_qgislayer');
+
