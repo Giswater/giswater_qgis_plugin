@@ -547,6 +547,21 @@ BEGIN
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
 
+	RAISE NOTICE '22 - Check valid relative timeseries(459)';
+	SELECT count(*) INTO v_count FROM 
+	(SELECT id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value) a JOIN
+	(SELECT id-1 as id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value)b USING (id)
+	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-459: There is/are ',v_count,' columns on relative timeserires related to this exploitation with errors. '),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All relative timeseries related ot this exploitation are correctly defined.',v_count);
+	END IF;	
+
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
