@@ -5,3 +5,4 @@
 - Check OM - check nodes planified duplicated (fid 453)
 - Add fields customer_code on om_mincut_connec and node_type on om_mincut_node
 - Refactor of system parameters related to mincut (config_param_system)
+- 1D/2D coupled model - Generation of csv file with information of gullies to be used on IBER-SWMM
