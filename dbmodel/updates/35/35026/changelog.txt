@@ -7,7 +7,8 @@
 - Refactor of system parameters related to mincut (config_param_system)
 - 1D/2D coupled model - Generation of csv file with information of gullies to be used on IBER-SWMM
 - Add check relative timeseries control on pg2epa check data
-- Limite the exportation of timeseries, curves and patterns to only those related to active exploitations
+- Limit the exportation of timeseries, curves and patterns to only those related to active exploitations
 - Enable dscenario strategy for controls and rules
 - Manage staticpressure when insert or update nodes and connecs for ws
+- Minor improvements on mincut (recalculate mincut before start & check overlap only for operative)
 - Various minor bug fix
