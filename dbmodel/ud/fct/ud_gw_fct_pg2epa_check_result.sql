@@ -78,6 +78,7 @@ v_defaultval text;
 v_dwfscenarioval text;
 v_exportmodeval text;
 v_networkmode integer;
+v_setallraingages text;
 
 object_rec record;
 
@@ -101,6 +102,7 @@ BEGIN
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_networkmode = (SELECT (value) FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user)::integer;
+	v_setallraingages = (SELECT (value) FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
 
 
 	-- manage no found results
@@ -190,6 +192,11 @@ BEGIN
 		IF v_debug::boolean THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
+
+		IF v_setallraingages IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Enabled set all raingages with ONLY ONE timeseries: ', v_setallraingages));
+		END IF;
+		
 		
 		RAISE NOTICE '1- Check subcatchments';
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment WHERE outlet_id is null;
