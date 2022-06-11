@@ -172,7 +172,9 @@ BEGIN
 		-- netgully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, outlet_type,
+		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, 
+		case when custom_top_elev is null then top_elev else custom_top_elev end, 
+		units, units_placement, outlet_type,
 		case when custom_width is null then total_width else custom_width end, 
 		case when custom_length is null then total_length else custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
@@ -187,7 +189,9 @@ BEGIN
 		-- gully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, outlet_type,
+		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, 
+		case when custom_top_elev is null then top_elev else custom_top_elev end, 
+		units, units_placement, outlet_type,
 		case when custom_width is null then total_width else custom_width end, 
 		case when custom_length is null then total_length else custom_length end,
 		case when custom_depth is null then depth else custom_depth end,

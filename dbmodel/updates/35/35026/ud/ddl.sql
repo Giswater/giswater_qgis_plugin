@@ -52,6 +52,7 @@ CREATE TABLE inp_netgully (
 CREATE TABLE inp_gully(
   gully_id character varying(16) NOT NULL,
   outlet_type varchar(30),
+  custom_top_elev double precision,
   custom_width double precision,
   custom_length double precision,
   custom_depth double precision,
@@ -66,6 +67,13 @@ CREATE TABLE inp_gully(
       REFERENCES gully (gully_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+
+DROP VIEW vi_grate;
+DROP VIEW vi_gully;
+DROP VIEW vi_lxsections;
+DROP VIEW vi_gully2pjoint;
+DROP VIEW vi_link;
 
 DROP TABLE temp_gully;
 CREATE TABLE temp_gully(

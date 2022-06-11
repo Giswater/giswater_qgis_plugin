@@ -388,6 +388,7 @@ CREATE OR REPLACE VIEW v_edit_inp_gully AS
     ymax-sandbox as depth,
     g.annotation,
     outlet_type,
+	custom_top_elev,
     custom_width,
     i.custom_length,
     custom_depth,
@@ -410,6 +411,7 @@ CREATE OR REPLACE VIEW v_edit_inp_netgully AS
  SELECT node_id,
     code,
     top_elev,
+    custom_top_elev,
     node_type,
     gratecat_id,
     (cat_grate.width/100)::NUMERIC(12,3) as grate_width,
@@ -432,7 +434,7 @@ CREATE OR REPLACE VIEW v_edit_inp_netgully AS
     (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3) 
          when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
          else (length/100)::NUMERIC(12,3) end) as total_length,
-   ymax-sander_depth as depth,
+    ymax-sander_depth as depth,
     annotation,
     outlet_type,
     custom_width,
