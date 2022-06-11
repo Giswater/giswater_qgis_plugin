@@ -168,25 +168,21 @@ BEGIN
 
 	-- fill temp_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
-	
+
+		-- netgully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, g.sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
-		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
-		(case when pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end) as pjoint_id,
-		pjoint_type,
-		(case when custom_length is not null then custom_length else connec_length end),
-		shape, 
-		case when custom_n is not null then custom_n else n end, 
-		connec_y1, connec_y2, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
-		the_geom
-		FROM selector_sector, v_edit_inp_gully g 
-		JOIN cat_grate c ON id = gratecat_id 
-		left JOIN cat_connec a ON connec_arccat_id = a.id
-		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
-		left JOIN value_state_type s ON state_type = s.id
-		WHERE g.sector_id=selector_sector.sector_id 
-		AND selector_sector.cur_user=current_user
+		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, 
+		outlet_type, total_width, total_length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
+		FROM v_edit_inp_netgully g 
+		AND g.sector_id > 0 '||v_statetype||';';
+
+		-- gully
+		EXECUTE 'INSERT INTO temp_gully 
+		SELECT 
+		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, top_elev, units, units_placement, 
+		outlet_type, total_width, total_length, depth, method, weir_cd, orifice_cd, a_param, b_param, efficiency, the_geom
+		FROM v_edit_inp_gully g 
 		AND g.sector_id > 0 '||v_statetype||';';
 		
 	END IF;
