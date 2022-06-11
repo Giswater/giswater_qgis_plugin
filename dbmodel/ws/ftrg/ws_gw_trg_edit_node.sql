@@ -343,7 +343,6 @@ BEGIN
 
 		END IF;
 		
-		
 		--Inventory
 		IF NEW.inventory IS NULL THEN 
 			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -636,6 +635,11 @@ BEGIN
 			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);		
 		END IF;
 
+		-- static pressure
+		IF v_ispresszone AND NEW.presszone_id IS NOT NULL THEN
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation WHERE node_id = NEW.node_id;
+		END IF;
+
 		-- man2inp_values
 		PERFORM gw_fct_man2inp_values(v_input);
 
@@ -643,6 +647,12 @@ BEGIN
 
     -- UPDATE
     ELSIF TG_OP = 'UPDATE' THEN
+
+    	-- static pressure
+		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation 
+			WHERE node_id = NEW.node_id;
+		END IF;
 
 		-- EPA update
 		IF (NEW.epa_type != OLD.epa_type) THEN    

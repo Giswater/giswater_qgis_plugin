@@ -136,6 +136,8 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+v_elevation float;
+v_staticpressure float;
 
 BEGIN
 
@@ -402,6 +404,16 @@ BEGIN
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) 
 		AND active IS TRUE LIMIT 1); 
 
+		-- Dem elevation
+		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem THEN
+			v_elevation = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
+		END IF;
+
+		-- static pressure
+		IF v_project_type = 'WS' AND v_presszone_id IS NOT NULL THEN
+			v_staticpressure = (SELECT head from presszone WHERE presszone_id = v_presszone_id) - v_elevation;
+		END IF;
+
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
 		-- getting values from feature
@@ -567,7 +579,7 @@ BEGIN
 
 				-- dynamic mapzones
 				WHEN 'presszone_id' THEN
-					field_value = v_presszone_id;			
+					field_value = v_presszone_id;
 				WHEN 'sector_id' THEN 
 					field_value = v_sector_id;
 				WHEN 'dma_id' THEN 
@@ -586,14 +598,13 @@ BEGIN
 					field_value = v_muni_id;
 
 				-- elevation from raster
-				WHEN 'elevation', 'top_elev' THEN 
-					IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem THEN
-						field_value = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE 
-						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
-					ELSE
-						field_value = null;
-					END IF;
-								
+				WHEN 'elevation', 'top_elev' THEN
+					field_value = v_elevation;
+
+				-- staticpressure
+				WHEN 'staticpressure' THEN
+					field_value = v_staticpressure;
+													
 				-- catalog values
 				WHEN 'cat_dnom' THEN
 					field_value = v_dnom;

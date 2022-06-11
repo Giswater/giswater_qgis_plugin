@@ -569,15 +569,6 @@ BEGIN
 
 				RAISE NOTICE ' Update nodes';
 
-				/*
-				-- update node table
-				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM temp_anlgraf a JOIN 
-						(SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||
-						quote_ident(v_table)||' WHERE active IS TRUE) b 
-						 ON  nodeparent::integer = trace WHERE a.node_1=node.node_id AND water = 1';
-				EXECUTE v_querytext;
-				*/
-
 				-- update disconnected nodes from parent arcs
 				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=node.arc_id';
 				EXECUTE v_querytext;
@@ -637,13 +628,19 @@ BEGIN
 					INSERT INTO temp_data (fid, feature_type, feature_id, log_message)
 					SELECT 147, 'node', n.node_id, 
 					concat('{"staticpressure":',case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
-					then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END,
-					', "nodeparent":"',anl_node.descript,'"}')
+					then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END, '}')
 					FROM node n 
-					JOIN anl_node USING (node_id)
 					JOIN 
-					(select head, json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id from presszone) pz ON pz.node_id = anl_node.descript
-					WHERE fid=146 AND cur_user=current_user;
+						(SELECT distinct on(node) node as node_id, trace as presszone_id FROM(
+						select node, count(*) c, trace FROM(
+						select id, node, arc_id, trace, flag from(
+						select id, node_1 node, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0
+						union all
+						select id, node_2, arc_id, trace, flag from temp_anlgraf where trace > 0 and flag = 0)a
+						order by node
+						)b group by node, trace order by 1, 2 desc
+						)c order by node, c desc) t USING (node_id)
+					JOIN presszone pz ON pz.presszone_id = t.presszone_id::text;		
 
 					-- update on node table those elements connected on graf
 					UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_data a WHERE a.feature_id=node_id 
@@ -651,7 +648,7 @@ BEGIN
 					
 					-- update on node table those elements disconnected from graf
 					UPDATE node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(v_edit_arc.the_geom, n.the_geom))::numeric(12,3)
-									FROM v_edit_arc,node n
+									FROM v_edit_arc, node n
 									WHERE st_dwithin(v_edit_arc.the_geom, n.the_geom, 0.05::double precision) AND v_edit_arc.state = 1 AND n.state = 1
 									and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 					-- updat connec table
