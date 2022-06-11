@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
+--2022/06/08
 CREATE OR REPLACE VIEW v_plan_arc AS 
  SELECT d.arc_id,
     d.node_1,
@@ -245,3 +245,233 @@ CREATE OR REPLACE VIEW v_plan_arc AS
                      JOIN cat_arc ON cat_arc.id::text = arc_1.arccat_id::text
                      LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
                   GROUP BY c.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+				  
+--2022/06/11
+
+CREATE OR REPLACE VIEW vu_gully AS 
+ SELECT gully.gully_id,
+    gully.code,
+    gully.top_elev,
+    gully.ymax,
+    gully.sandbox,
+    gully.matcat_id,
+    gully.gully_type,
+    cat_feature.system_id AS sys_type,
+    gully.gratecat_id,
+    cat_grate.matcat_id AS cat_grate_matcat,
+    gully.units,
+    gully.groove,
+    gully.siphon,
+    gully.connec_arccat_id,
+    gully.connec_length,
+        CASE
+            WHEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric) IS NOT NULL THEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric)::numeric(12,3)
+            ELSE gully.connec_depth
+        END AS connec_depth,
+    gully.arc_id,
+    gully.expl_id,
+    exploitation.macroexpl_id,
+    gully.sector_id,
+    sector.macrosector_id,
+    gully.state,
+    gully.state_type,
+    gully.annotation,
+    gully.observ,
+    gully.comment,
+    gully.dma_id,
+    dma.macrodma_id,
+    gully.soilcat_id,
+    gully.function_type,
+    gully.category_type,
+    gully.fluid_type,
+    gully.location_type,
+    gully.workcat_id,
+    gully.workcat_id_end,
+    gully.buildercat_id,
+    gully.builtdate,
+    gully.enddate,
+    gully.ownercat_id,
+    gully.muni_id,
+    gully.postcode,
+    gully.district_id,
+    c.descript::character varying(100) AS streetname,
+    gully.postnumber,
+    gully.postcomplement,
+    d.descript::character varying(100) AS streetname2,
+    gully.postnumber2,
+    gully.postcomplement2,
+    gully.descript,
+    cat_grate.svg,
+    gully.rotation,
+    concat(cat_feature.link_path, gully.link) AS link,
+    gully.verified,
+    gully.undelete,
+    cat_grate.label,
+    gully.label_x,
+    gully.label_y,
+    gully.label_rotation,
+    gully.publish,
+    gully.inventory,
+    gully.uncertain,
+    gully.num_value,
+    gully.pjoint_id,
+    gully.pjoint_type,
+    date_trunc('second'::text, gully.tstamp) AS tstamp,
+    gully.insert_user,
+    date_trunc('second'::text, gully.lastupdate) AS lastupdate,
+    gully.lastupdate_user,
+    gully.the_geom,
+    gully.workcat_id_plan,
+    gully.asset_id,
+        CASE
+            WHEN gully.connec_matcat_id IS NULL THEN cc.matcat_id::text
+            ELSE gully.connec_matcat_id
+        END AS connec_matcat_id,
+    gully.gratecat2_id,
+    gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
+    gully.connec_y2,
+    epa_type,
+    groove_height,
+    groove_length,
+    cat_grate.width as grate_width,
+    cat_grate.length as grate_length,
+    units_placement
+   FROM gully
+     LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN dma ON gully.dma_id = dma.dma_id
+     LEFT JOIN sector ON gully.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON gully.expl_id = exploitation.expl_id
+     LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = gully.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = gully.streetaxis2_id::text
+     LEFT JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text;
+
+
+CREATE OR REPLACE VIEW v_gully AS 
+ SELECT vu_gully.*
+ FROM vu_gully
+ JOIN v_state_gully USING (gully_id);
+
+CREATE OR REPLACE VIEW v_edit_gully AS 
+ SELECT *
+ FROM v_gully;
+
+DROP VIEW IF EXISTS v_edit_inp_gully;
+CREATE OR REPLACE VIEW v_edit_inp_gully AS 
+ SELECT g.gully_id,
+    g.code,
+    g.top_elev,
+    g.gully_type,
+    g.gratecat_id,
+    (g.grate_width/100)::NUMERIC(12,2) AS grate_width,
+    (g.grate_length/100)::NUMERIC(12,2) AS grate_length,
+    g.arc_id,
+    a.node_2 as node_id,
+    s.sector_id,
+    g.expl_id,
+    g.state,
+    g.state_type,
+    g.the_geom,
+    g.units,
+    g.units_placement,
+    g.groove,
+    g.groove_height,
+    g.groove_length,
+    a_param,
+    b_param,
+    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*grate_width/100)::NUMERIC(12,3) 
+         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*grate_length/100)::NUMERIC(12,3)
+         else (width/100)::NUMERIC(12,3) end) as total_width,
+    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*grate_width/100)::NUMERIC(12,3)
+         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*grate_length/100)::NUMERIC(12,3)
+         else (length/100)::NUMERIC(12,3) end) as total_length,
+    ymax-sandbox as depth,
+    g.annotation,
+    outlet_type,
+    custom_width,
+    i.custom_length,
+    custom_depth,
+    method,
+    weir_cd,
+    orifice_cd,
+    custom_a_param,
+    custom_b_param,
+    efficiency
+   FROM selector_sector s,
+    v_edit_gully g
+     JOIN inp_gully i USING (gully_id)
+     JOIN cat_grate ON gratecat_id = id
+     JOIN arc a USING (arc_id)
+  WHERE g.sector_id = s.sector_id AND s.cur_user = CURRENT_USER::text;
+
+
+DROP VIEW IF EXISTS v_edit_inp_netgully;
+CREATE OR REPLACE VIEW v_edit_inp_netgully AS 
+ SELECT node_id,
+    code,
+    top_elev,
+    node_type,
+    gratecat_id,
+    (cat_grate.width/100)::NUMERIC(12,3) as grate_width,
+    (cat_grate.length/100)::NUMERIC(12,3) as grate_length,
+    n.sector_id,
+    expl_id,
+    state,
+    state_type,
+    the_geom,
+    units,
+    units_placement,
+    groove,
+    groove_height,
+    groove_length,
+    a_param,
+    b_param,
+    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3)
+         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
+         else (width/100)::NUMERIC(12,3) end) as total_width,
+    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3) 
+         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
+         else (length/100)::NUMERIC(12,3) end) as total_length,
+   ymax-sander_depth as depth,
+    annotation,
+    outlet_type,
+    custom_width,
+    i.custom_length,
+    custom_depth,
+    method,
+    weir_cd,
+    orifice_cd,
+    custom_a_param,
+    custom_b_param,
+    efficiency
+   FROM selector_sector s,
+    v_edit_node n
+     JOIN man_netgully USING (node_id) 
+     JOIN inp_netgully i USING (node_id)
+     JOIN cat_grate ON gratecat_id = id
+  WHERE n.sector_id = s.sector_id AND s.cur_user = CURRENT_USER::text;
+
+
+CREATE OR REPLACE VIEW vi_gully2node AS 
+SELECT gully_id, node_id, n.expl_id, st_makeline(g.the_geom, n.the_geom) the_geom
+FROM v_edit_inp_gully g join node n USING (node_id);
+
+
+DROP VIEW IF EXISTS vi_gully;
+CREATE OR REPLACE VIEW vi_gully AS 
+ SELECT gully_id,
+    outlet_type,
+    node_id,
+    (st_x(the_geom))::numeric(12,3) as xcoord,
+    (st_y(the_geom))::numeric(12,3) as ycoord,
+    coalesce(-9999,top_elev::numeric(12,3)) as zcoord,
+    width::numeric(12,3),
+    length::numeric(12,3),
+    coalesce (-9999, depth::numeric(12,3)) as depth,
+    method,
+    weir_cd::numeric(12,3),
+    orifice_cd::numeric(12,3),
+    a_param::numeric(12,3),
+    b_param::numeric(12,3),
+    efficiency
+   FROM temp_gully;
