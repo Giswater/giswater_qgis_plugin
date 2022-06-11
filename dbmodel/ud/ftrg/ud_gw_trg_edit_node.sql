@@ -489,7 +489,6 @@ BEGIN
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF; 
 
-		
 		-- feature insert
 		IF v_matfromcat THEN
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
@@ -556,6 +555,9 @@ BEGIN
 			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon ) 
 			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 			NEW.groove, NEW.siphon );
+
+			INSERT INTO inp_netgully (node_id) VALUES (NEW.node_id);
+	
 									 			
 		ELSIF v_man_table='man_chamber' THEN
 
@@ -833,6 +835,11 @@ BEGIN
 		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;
+		END IF;
+
+		-- net gully management
+		IF NEW.sys_type !='NETGULLY' AND OLD.sys_type = 'NETGULLY' THEN
+			DELETE FROM inp_netgully WHERE node_id = OLD.node_id;
 		END IF;
 
 		-- man addfields update
