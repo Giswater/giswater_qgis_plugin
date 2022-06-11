@@ -6,8 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO inp_gully (gully_id, isepa, efficiency)
-SELECT gully_id, true, 1 FROM gully where state > 0;
+INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
+SELECT gully_id, 'To network', 'W/O', 1.6, 0.7, 100 FROM gully where state > 0;
+
+INSERT INTO inp_netgully (node_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
+SELECT gully_id, 'To network', 'W/O', 1.6, 0.7, 100 FROM node WHERE ndoe_type = 'NETGULLY' where state > 0;
+
 
 UPDATE gully set connec_matcat_id = 'Concret';
 
