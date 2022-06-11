@@ -47,7 +47,7 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_fe
 AND feature_type = ''NODE'' AND id != ''NETGULLY'''
 WHERE columnname = 'epa_type' AND formname = 'v_edit_node';
 
-DELETE FROM sys_table WHERE id in(vi_lxsections, vi_link, vi_grate);
+DELETE FROM sys_table WHERE id in('vi_lxsections', 'vi_link', 'vi_grate', 'vi_gully2pjoint');
 
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES 
 ('vi_gully2node', 'View to show what is the outlet node of gully', 'role_epa','core');
@@ -74,33 +74,31 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES(458, 'Check gullies with null values on (custom)length', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
 ON CONFLICT (fid) DO NOTHING;
 
---crear variables de valores por defecto de usuario (method, outlet_type, cd_weir, cd_orifice, efficiency)
-
-delete from sys_param_user where id = 'epa_gully_outlet_type_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_outlet_type_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_outlet_type_vdefault', 'config', 'Default value for enable /disable gully. Two options are available (Sink, To network). In case of Sink water is lossed.',
 'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_outlet_type''' ,'To network', 'core', true ,'1D/2D Gully outlet_type vdefault:', 'lyt_epa',2)
 ON CONFLICT (id) DO NOTHING;
 
-delete from sys_param_user where id = 'epa_gully_method_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_method_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_method_vdefault', 'config', 'Default value for calculation method on gullies. Two options are available (UPC, W/O).',
 'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_method''' ,'W/O', 'core', true ,'1D/2D Gully calculation method vdefault:', 'lyt_epa',3)
 ON CONFLICT (id) DO NOTHING;
 
-delete from sys_param_user where id = 'epa_gully_cd_weir_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_cd_weir_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_cd_weir_vdefault', 'config', 'Default value for cd_weir using calculation method W/O on gullies.',
 'role_epa', true, 'ud', true, 'numeric', 'text', true, '1.6', 'core', true ,'1D/2D Gully CD-WEIR vdefault for W/O method:', 'lyt_epa',4)
 ON CONFLICT (id) DO NOTHING;
 
-delete from sys_param_user where id = 'epa_gully_cd_orifice_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_cd_orifice_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_cd_orifice_vdefault', 'config', 'Default value for cd_orifice using calculation method W/O on gullies.',
 'role_epa', true, 'ud', true, 'numeric', 'text', true, '0.7', 'core', true ,'1D/2D Gully CD-ORIFICE vdefault for W/O method:', 'lyt_epa',5)
 ON CONFLICT (id) DO NOTHING;
 
-delete from sys_param_user where id = 'epa_gully_efficiency_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_efficiency_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_efficiency_vdefault', 'config', 'Default value for efficiency on gullies.',
 'role_epa', true, 'ud', true, 'numeric', 'text', true, '100', 'core', true ,'1D/2D Gully efficiency vdefault:', 'lyt_epa',6)

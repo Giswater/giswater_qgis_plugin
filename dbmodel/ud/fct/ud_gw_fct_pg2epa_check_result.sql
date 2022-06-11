@@ -537,19 +537,59 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
 	END IF;
 
-	RAISE NOTICE '6 - Check pjoint_id/pjoint_type on gullies (416)';
 	IF v_networkmode = 2 THEN
+	
+		RAISE NOTICE '6 - Check arc_id null for gully (455)';
 		SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
-		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND arc_id IS NULL) a1;
 
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '416',concat(
-			'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
+			VALUES (v_fid, v_result_id, 3, '455',concat(
+			'ERROR-455: There is/are ',v_count,' gullies with missed information on arc_id (outlet) values.'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.', v_count);
+			VALUES (v_fid, v_result_id , 1,  '455','INFO: No gullies found without arc_id (outlet) values.', v_count);
+		END IF;	
+
+		RAISE NOTICE '7 - Check gullies with null values on (custom_)top_elev (456)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE top_elev IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '456',concat(
+			'ERROR-456: There is/are ',v_count,' gullies with null values on top_elev/custom_top_elev columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '456','INFO: No gullies found with null values on top_elev.', v_count);
+		END IF;	
+
+		RAISE NOTICE '8 - Check gullies with null values on (custom)width (457)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE width IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '457',concat(
+			'ERROR-457: There is/are ',v_count,' gullies with null values on width/custom_width columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '457','INFO: No gullies found with null values on width.', v_count);
+		END IF;	
+
+		RAISE NOTICE '9 - Check gullies with null values on (custom)length (458)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE length IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '458',concat(
+			'ERROR-458: There is/are ',v_count,' gullies with null values on length/custom_length columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '458','INFO: No gullies found with null values on length.', v_count);
 		END IF;	
 	END IF;
 
