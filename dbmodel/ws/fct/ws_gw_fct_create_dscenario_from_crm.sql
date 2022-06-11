@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3042
+--FUNCTION CODE: 3110
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_crm(p_data json) 
 RETURNS json AS 
@@ -95,7 +95,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log) VALUES (v_name, v_descript, 'DEMAND', v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{·Target feature":"", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}')) ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid ;
+	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log) VALUES (v_name, v_descript, 'DEMAND', 
+	v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{·Target feature":"", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}'))
+	ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid ;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
@@ -154,7 +156,7 @@ BEGIN
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 		
-		ELSIF v_pattern = 4 THEN -- dma default
+		ELSIF v_pattern = 3 THEN -- dma default
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM dma s 
@@ -163,7 +165,7 @@ BEGIN
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 5 THEN -- dma period
+		ELSIF v_pattern = 4 THEN -- dma period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM ext_rtc_dma_period s 
@@ -172,14 +174,14 @@ BEGIN
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 6 THEN -- hydrometer period
+		ELSIF v_pattern = 5 THEN -- hydrometer period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id 
 			FROM ext_rtc_hydrometer_x_data h
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 7 THEN -- hydrometer category
+		ELSIF v_pattern = 6 THEN -- hydrometer category
 
 			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 			FROM ext_rtc_hydrometer h
