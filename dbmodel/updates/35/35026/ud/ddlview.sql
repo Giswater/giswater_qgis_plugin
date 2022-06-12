@@ -385,7 +385,7 @@ CREATE OR REPLACE VIEW v_edit_inp_gully AS
     (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*grate_width/100)::NUMERIC(12,3)
          when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*grate_length/100)::NUMERIC(12,3)
          else (length/100)::NUMERIC(12,3) end) as total_length,
-    ymax-sandbox as depth,
+    ymax - coalesce(sandbox,0) as depth,
     g.annotation,
     outlet_type,
 	custom_top_elev,
@@ -434,7 +434,7 @@ CREATE OR REPLACE VIEW v_edit_inp_netgully AS
     (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3) 
          when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
          else (length/100)::NUMERIC(12,3) end) as total_length,
-    ymax-sander_depth as depth,
+    ymax - coalesce(sander_depth,0) as depth,
     annotation,
     outlet_type,
     custom_width,
@@ -466,10 +466,10 @@ CREATE OR REPLACE VIEW vi_gully AS
     node_id,
     (st_x(the_geom))::numeric(12,3) as xcoord,
     (st_y(the_geom))::numeric(12,3) as ycoord,
-    coalesce(-9999,top_elev::numeric(12,3)) as zcoord,
+    coalesce(top_elev::numeric(12,3),-9999) as zcoord,
     width::numeric(12,3),
     length::numeric(12,3),
-    coalesce (-9999, depth::numeric(12,3)) as depth,
+    coalesce (depth::numeric(12,3),-9999) as depth,
     method,
     weir_cd::numeric(12,3),
     orifice_cd::numeric(12,3),
@@ -478,9 +478,9 @@ CREATE OR REPLACE VIEW vi_gully AS
     efficiency
    FROM temp_gully;
    
-   
-   CREATE OR REPLACE VIEW v_edit_inp_pattern_value AS 
- SELECT
+  
+CREATE OR REPLACE VIEW v_edit_inp_pattern_value AS 
+SELECT
     p.pattern_id,
     p.pattern_type,
     p.observ,
