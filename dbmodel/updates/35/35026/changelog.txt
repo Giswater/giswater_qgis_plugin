@@ -10,5 +10,5 @@
 - Limit the exportation of timeseries, curves and patterns to only those related to active exploitations
 - Enable dscenario strategy for controls and rules
 - Manage staticpressure when insert or update nodes and connecs for ws
-- Minor improvements on mincut (refactor system variables, recalculate mincut before start & check overlap only for operative)
+- Minor improvements on mincut (recalculate mincut before start & check overlap only for operative)
 - Various minor bug fix
