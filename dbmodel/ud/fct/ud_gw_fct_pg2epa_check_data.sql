@@ -551,7 +551,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM 
 	(SELECT id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value) a JOIN
 	(SELECT id-1 as id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value)b USING (id)
-	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id
+	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id;
+	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(

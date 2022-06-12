@@ -105,7 +105,6 @@ CREATE TABLE temp_gully(
 
 ALTER TABLE inp_pattern_value DROP CONSTRAINT inp_pattern_value_pkey;
 ALTER TABLE inp_pattern_value ADD CONSTRAINT inp_pattern_value_pkey PRIMARY KEY(pattern_id);
-DROP VIEW v_edit_inp_pattern_value;
-DROP VIEW vi_patterns;
+DROP VIEW IF EXISTS v_edit_inp_pattern_value;
+DROP VIEW IF EXISTS vi_patterns;
 ALTER TABLE inp_pattern_value DROP column id;
-DROP SEQUENCE inp_pattern_value_id_seq;

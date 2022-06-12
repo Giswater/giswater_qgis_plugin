@@ -559,9 +559,8 @@ SELECT timser_id, other1, other2, other3 FROM selector_expl s ,(
              JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
           WHERE inp_timeseries.times_type::text = 'RELATIVE'::text) a
   ORDER BY a.id) t
-  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
+  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL;
 
-  
 
 CREATE OR REPLACE VIEW vi_curves AS 
  SELECT inp_curve_value.curve_id,
