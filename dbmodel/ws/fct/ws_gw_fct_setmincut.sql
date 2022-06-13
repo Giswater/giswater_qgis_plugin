@@ -47,6 +47,7 @@ v_mincut_class integer;
 v_version text;
 v_error_context text;
 v_usepsectors boolean;
+v_days integer;
 
 BEGIN
 
@@ -67,8 +68,8 @@ BEGIN
 	
 
 	IF v_action = 'mincutNetwork' THEN
-		--check if arc exists in database or look for a new arc_id in the same location
 
+		--check if arc exists in database or look for a new arc_id in the same location
 		IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
 			SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
 
@@ -78,7 +79,33 @@ BEGIN
 		END IF;
 
 		RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
-		
+	
+	ELSIF v_action = 'startMincut' THEN
+
+		IF (SELECT json_extract_path_text(value::json, 'redoOnStart','status')::boolean FROM config_param_system WHERE parameter='om_mincut_settings') is true THEN
+			--reexecuting mincut on clicking start
+			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
+
+			IF (SELECT date(anl_tstamp) + v_days FROM om_mincut WHERE id=v_mincut) <= date(now()) THEN 
+
+				--check if arc exists in database or look for a new arc_id in the same location
+				IF (SELECT arc_id FROM arc WHERE arc_id::integer=v_arc) IS NULL THEN
+					SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=1 and om.id=v_mincut;
+
+					IF v_arc IS NULL AND v_usepsectors is true then
+						SELECT arc_id::integer INTO v_arc FROM arc a, om_mincut om WHERE ST_DWithin(a.the_geom, om.anl_the_geom,0.1) AND state=2;
+					end if;
+				END IF;
+
+				RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+			ELSE
+				RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}}')::json;
+			END IF;
+		ELSE
+		    --  Return
+	    RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}')::json;
+		END IF;
+
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 
 		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(p_data), 2980, null, null, null);
