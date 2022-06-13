@@ -14,4 +14,9 @@ CREATE TRIGGER gw_trg_edit_inp_pattern
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_pattern('inp_pattern_value');
 
-
+DROP TRIGGER IF EXISTS gw_trg_edit_cat_feature ON v_edit_cat_feature_gully;
+CREATE TRIGGER gw_trg_edit_cat_feature
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_cat_feature_gully
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_cat_feature('gully');

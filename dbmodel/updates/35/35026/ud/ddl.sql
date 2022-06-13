@@ -11,6 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE cat_feature_gully ADD COLUMN epa_default character varying(30);
 UPDATE cat_feature_gully SET epa_default = 'GULLY';
 ALTER TABLE cat_feature_gully ALTER COLUMN epa_default SET NOT NULL;
+ALTER TABLE cat_feature_gully ALTER COLUMN epa_default SET DEFAULT 'GULLY'::character varying;
 
 ALTER TABLE gully ADD COLUMN epa_type character varying(16);
 ALTER TABLE gully ADD COLUMN groove_height double precision;

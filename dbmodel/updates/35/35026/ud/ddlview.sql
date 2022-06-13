@@ -578,3 +578,20 @@ CREATE OR REPLACE VIEW vi_curves AS
   WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text
   AND c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
   ORDER BY inp_curve_value.id;
+
+
+DROP VIEW v_edit_cat_feature_gully;
+CREATE OR REPLACE VIEW v_edit_cat_feature_gully AS 
+ SELECT cat_feature.id,
+    cat_feature.system_id,
+    cat_feature_gully.epa_default,
+    cat_feature.code_autofill,
+    cat_feature_gully.double_geom::text AS double_geom,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_gully USING (id);
+
+

@@ -78,7 +78,7 @@ BEGIN
 
 			IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
 
-			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json, epa_default=NEW.epa_default WHERE id=NEW.id;
 		END IF;
 
 		RETURN NEW;

@@ -106,3 +106,18 @@ ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_param_user SET formname  ='hidden' where id in('edit_update_elevation_from_dem', 'utils_debug_mode', 'utils_checkproject_qgislayer');
 
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_default') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET
+dv_querytext='SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''GULLY'''
+WHERE formname='v_edit_cat_feature_gully' and columnname='epa_default';
+
+INSERT INTO sys_feature_epa_type(id, feature_type, epa_table, descript, active)
+VALUES ('UNDEFINED', 'GULLY', NULL, NULL, TRUE) ON CONFLICT (id, feature_type) DO NOTHING;
+
