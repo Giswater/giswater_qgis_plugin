@@ -5,10 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/06/07
-DROP VIEW v_om_mincut_node;
+DROP VIEW IF EXISTS v_om_mincut_node;
 CREATE OR REPLACE VIEW v_om_mincut_node AS 
  SELECT om_mincut_node.id,
     om_mincut_node.result_id,
