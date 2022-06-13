@@ -545,6 +545,10 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
+    if sub_group:
+        sub_group = sub_group.capitalize()
+    if sub_sub_group:
+        sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
         connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
