@@ -2866,7 +2866,7 @@ class GwInfo(QObject):
 
         self.visit_intervals_qtable = QTableView()
         filter = f"unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
-        tools_qt.fill_table(self.visit_intervals_qtable, 'om_unit_intervals', filter)
+        tools_qt.fill_table(self.visit_intervals_qtable, 'v_ui_om_unit_intervals', filter)
 
         self.visit_intervals_qtable.window().setWindowFlags(Qt.WindowStaysOnTopHint)
         self.visit_intervals_qtable.window().setWindowTitle("Visit Intervals")
