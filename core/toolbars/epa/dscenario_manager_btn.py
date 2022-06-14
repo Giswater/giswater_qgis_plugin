@@ -8,10 +8,11 @@ or (at your option) any later version.
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
+from qgis.core import QgsProject
+from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QRegExp
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView
+from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -192,6 +193,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_dscenario)
 
         # Add icons
+        tools_gw.add_icon(self.dlg_dscenario.btn_toc, "306", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
@@ -216,6 +218,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
+        self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_dscenario.btn_snapping.clicked.connect(partial(self._manage_select))
@@ -334,6 +337,102 @@ class GwDscenarioManagerButton(GwAction):
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.hilight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+
+
+    def _manage_add_layers(self):
+        """ Opens menu to add/remove layers to ToC """
+
+        # Create main menu and get cursor click position
+        main_menu = QMenu()
+        cursor = QCursor()
+        x = cursor.pos().x()
+        y = cursor.pos().y()
+        click_point = QPoint(x + 5, y + 5)
+
+        layer_list = []
+        for layer in QgsProject.instance().mapLayers().values():
+            layer_list.append(tools_qgis.get_layer_source_table_name(layer))
+
+        geom_layers = []
+        sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{global_vars.schema_name}' " \
+              f"AND f_table_name LIKE 'v_edit_inp_dscenario%';"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            geom_layers = [row[0] for row in rows]
+
+        # Get layers to add
+        lyr_filter = "v_edit_inp_dscenario_%"
+        sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}'"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            # LOAD ALL
+            widget = QCheckBox()
+            widget.setText("Load all")
+            widget.setStyleSheet("margin: 5px 5px 5px 8px;")
+            widgetAction = QWidgetAction(main_menu)
+            widgetAction.setDefaultWidget(widget)
+            widgetAction.defaultWidget().stateChanged.connect(partial(self._manage_load_all, main_menu))
+            main_menu.addAction(widgetAction)
+
+            # LAYERS
+            for tablename, alias, style_id, addparam in rows:
+                # Get alias
+                if not alias:
+                    alias = tablename.replace('v_edit_inp_dscenario_', '').replace('_', ' ').capitalize()
+                # Manage style_id
+                if not style_id:
+                    style_id = "-1"
+                # Get pkey
+                pk = "id"
+                if addparam:
+                    pk = addparam.get('pkey').replace(' ', '')
+                # Manage the_geom
+                the_geom = None
+                if tablename in geom_layers:
+                    the_geom = "the_geom"
+
+                # Create CheckBox
+                widget = QCheckBox()
+                widget.setText(alias)
+                widgetAction = QWidgetAction(main_menu)
+                widgetAction.setDefaultWidget(widget)
+                main_menu.addAction(widgetAction)
+
+                # Set checked if layer exists
+                if f"{tablename}" in layer_list:
+                    widget.setChecked(True)
+                widget.setStyleSheet("margin: 5px 5px 5px 8px;")
+
+                widgetAction.defaultWidget().stateChanged.connect(
+                    partial(self._check_action_ischecked, tablename, the_geom, pk, style_id, alias.strip()))
+
+        main_menu.exec_(click_point)
+
+
+    def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, state):
+        """ Control if user check or uncheck action menu, then add or remove layer from toc
+        :param tablename: Postgres table name (String)
+        :param pk: Field id of the table (String)
+        :param style_id: Id of the style we want to load (integer or String)
+        :param state: This parameter is sent by the action itself with the trigger (Bool)
+        """
+
+        if state == 2:
+            layer = tools_qgis.get_layer_by_tablename(tablename)
+            if layer is None:
+                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group="Dscenario", style_id=style_id, alias=alias)
+        elif state == 0:
+            layer = tools_qgis.get_layer_by_tablename(tablename)
+            if layer is not None:
+                tools_qgis.remove_layer_from_toc(alias, "EPA", "Dscenario")
+
+
+    def _manage_load_all(self, menu, state=None):
+
+        if state == 2:
+            for child in menu.actions():
+                if not child.isChecked():
+                    child.defaultWidget().setChecked(True)
 
 
     def _manage_insert(self):
