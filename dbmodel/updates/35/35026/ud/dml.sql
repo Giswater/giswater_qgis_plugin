@@ -86,15 +86,15 @@ VALUES ('epa_gully_method_vdefault', 'config', 'Default value for calculation me
 'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_method''' ,'W/O', 'core', true ,'1D/2D Gully calculation method vdefault:', 'lyt_epa',3)
 ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM sys_param_user where id = 'epa_gully_cd_weir_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_weir_cd_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
-VALUES ('epa_gully_cd_weir_vdefault', 'config', 'Default value for cd_weir using calculation method W/O on gullies.',
+VALUES ('epa_gully_weir_cd_vdefault', 'config', 'Default value for weir_cd using calculation method W/O on gullies.',
 'role_epa', true, 'ud', true, 'numeric', 'text', true, '1.6', 'core', true ,'1D/2D Gully CD-WEIR vdefault for W/O method:', 'lyt_epa',4)
 ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM sys_param_user where id = 'epa_gully_cd_orifice_vdefault';
+DELETE FROM sys_param_user where id = 'epa_gully_orifice_cd_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, vdefault, source, iseditable, label, layoutname, layoutorder)
-VALUES ('epa_gully_cd_orifice_vdefault', 'config', 'Default value for cd_orifice using calculation method W/O on gullies.',
+VALUES ('epa_gully_orifice_cd_vdefault', 'config', 'Default value for rifice_cd using calculation method W/O on gullies.',
 'role_epa', true, 'ud', true, 'numeric', 'text', true, '0.7', 'core', true ,'1D/2D Gully CD-ORIFICE vdefault for W/O method:', 'lyt_epa',5)
 ON CONFLICT (id) DO NOTHING;
 
@@ -112,11 +112,11 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_default') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_type') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET
 dv_querytext='SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''GULLY'''
-WHERE formname='v_edit_cat_feature_gully' and columnname='epa_default';
+WHERE formname='v_edit_cat_feature_gully' and columnname='epa_type';
 
 INSERT INTO sys_feature_epa_type(id, feature_type, epa_table, descript, active)
 VALUES ('UNDEFINED', 'GULLY', NULL, NULL, TRUE) ON CONFLICT (id, feature_type) DO NOTHING;
@@ -186,7 +186,7 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields, cat_feature WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+FROM config_form_fields, cat_feature WHERE formname='v_edit_arc' and columnname in ('epa_type') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
@@ -197,7 +197,7 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_type') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
@@ -208,6 +208,134 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_type') 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('typevalue_gully_outlet_type', 'SINK', 'SINK');
+
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('typevalue_gully_outlet_type', 'TO NETWORK', 'TO NETWORK');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('inp_typevalue', 'typevalue_gully_outlet_type', 'inp_gully', 'outlet_type',null ,true);
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('inp_typevalue', 'typevalue_gully_outlet_type', 'inp_netgully', 'outlet_type',null ,true);
+
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('typevalue_gully_method', 'UPC', 'UPC');
+
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('typevalue_gully_method', 'W/O', 'W/O');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('inp_typevalue', 'typevalue_gully_method', 'inp_gully', 'method',null ,true);
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('inp_typevalue', 'typevalue_gully_method', 'inp_netgully', 'method',null ,true);
+
+DELETE FROM config_form_fields WHERE columnname IN ('ymax', 'sandbox', 'connec_matcat_id', 'connec_length', 'connec_arccat_id', 'connec_y1', 'connec_y2', 'pjoint_id', 'pjoint_type',
+'isepa', 'custom_n', 'y0', 'ysur', 'q0', 'qmax', 'flap') and formname='v_edit_inp_gully';
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, false, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('groove_height', 'groove_length', 'units_placement') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, false, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='cat_grate' and columnname in ('a_param', 'b_param') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_gully', formtype, tabname, concat('custom_',columnname), layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_gully' and columnname in ('a_param', 'b_param') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'depth', 'lyt_data_1', NULL, 'string', 'text', 'depth', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'custom_depth', 'lyt_data_1',NULL, 'string', 'text', 'custom depth', null,
+null, false, false, true, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'custom_top_elev', 'lyt_data_1', NULL, 'string', 'text', 'custom top elev', null,
+null, false, false, true, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'custom_width', 'lyt_data_1', NULL, 'string', 'text', 'custom width', null,
+null, false, false, true, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'method', 'lyt_data_1', NULL, 'string', 'combo', 'method', null,
+null, false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''typevalue_gully_method''',true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'outlet_type', 'lyt_data_1', NULL, 'string', 'combo', 'outlet type', null,
+null, false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''typevalue_gully_outlet_type''',true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'node_id', 'lyt_data_1', NULL, 'string', 'text', 'node_id', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'orifice_cd', 'lyt_data_1', NULL, 'numeric', 'text', 'orifice cd', null,
+null, false, false, true, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'weir_cd', 'lyt_data_1', NULL, 'numeric', 'text', 'weir cd', null,
+null, false, false, true, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'total_length', 'lyt_data_1', NULL, 'numeric', 'text', 'total length', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'total_width', 'lyt_data_1', NULL, 'numeric', 'text', 'total width', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'total_width', 'lyt_data_1', NULL, 'numeric', 'text', 'total width', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'grate_width', 'lyt_data_1', NULL, 'numeric', 'text', 'grate width', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES ( 'v_edit_inp_gully', 'form_feature', 'data', 'grate_length', 'lyt_data_1', NULL, 'numeric', 'text', 'grate length', null,
+null, false, false, false, false, null,true, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
