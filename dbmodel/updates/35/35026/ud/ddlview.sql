@@ -356,6 +356,13 @@ CREATE OR REPLACE VIEW v_edit_gully AS
  SELECT *
  FROM v_gully;
 
+CREATE OR REPLACE VIEW ve_gully AS 
+ SELECT *
+ FROM v_gully;
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_gully"], "fieldName":"units_placement", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
 DROP VIEW IF EXISTS v_edit_inp_gully;
 CREATE OR REPLACE VIEW v_edit_inp_gully AS 
  SELECT g.gully_id,

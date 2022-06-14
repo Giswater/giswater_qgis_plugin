@@ -121,3 +121,45 @@ WHERE formname='v_edit_cat_feature_gully' and columnname='epa_default';
 INSERT INTO sys_feature_epa_type(id, feature_type, epa_table, descript, active)
 VALUES ('UNDEFINED', 'GULLY', NULL, NULL, TRUE) ON CONFLICT (id, feature_type) DO NOTHING;
 
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('gully_units_placement', 'WIDTH-SIDE', 'WIDTH-SIDE') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue(typevalue, id, idval)
+VALUES ('gully_units_placement', 'LENGTH-SIDE', 'LENGTH-SIDE') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('edit_typevalue', 'gully_units_placement', 'gully', 'units_placement',null ,true);
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
+VALUES ('edit_typevalue', 'gully_units_placement', 'man_netgully', 'units_placement',null ,true);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+VALUES('v_edit_gully', 'form_feature', 'data', 'units_placement', 'lyt_data_2', 44, 'string', 'combo', 'units placement', null,
+null, false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''gully_units_placement''',true, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT child_layer, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields, cat_feature WHERE formname='v_edit_gully' and columnname in ('units_placement') and 
+(feature_type='GULLY' OR system_id='NETGULLY') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
