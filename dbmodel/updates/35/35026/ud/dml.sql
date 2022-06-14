@@ -136,17 +136,20 @@ VALUES ('edit_typevalue', 'gully_units_placement', 'man_netgully', 'units_placem
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
 SELECT 'v_edit_gully', 'form_feature', 'data', 'units_placement', 'lyt_data_2', max(layoutorder) +1, 'string', 'combo', 'units placement', null,
-null, false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''gully_units_placement''',true, false);
+null, false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''gully_units_placement''',true, false
+FROM config_form_fields WHERE formname='v_edit_gully' and layoutname = 'lyt_data_2' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
 SELECT 'v_edit_gully', 'form_feature', 'data', 'groove_height', 'lyt_data_2', max(layoutorder) +1, 'double', 'text', 'groove height', null,
-null, false, false, true, false, null,true, false);
+null, false, false, true, false, null,true, false
+FROM config_form_fields WHERE formname='v_edit_gully' and layoutname = 'lyt_data_2' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
 SELECT 'v_edit_gully', 'form_feature', 'data', 'groove_length', 'lyt_data_2', max(layoutorder) +1, 'double', 'text', 'groove length', null,
-null, false, false, true, false, null,true, false);
+null, false, false, true, false, null,true, false
+FROM config_form_fields WHERE formname='v_edit_gully' and layoutname = 'lyt_data_2' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
