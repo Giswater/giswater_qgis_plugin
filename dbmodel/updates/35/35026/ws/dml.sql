@@ -55,3 +55,32 @@ set inputparams='
 {"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4,5,6], "comboNames":["NONE", "SECTOR-DEFAULT", "DMA-DEFAULT", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY"], "selectedId":""}, 
 {"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. <br> This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}]'
 WHERE id=3110;
+
+--2022/06/14
+UPDATE sys_table
+	SET orderby=10,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Connec Dscenario'
+	WHERE id='v_edit_inp_dscenario_connec';
+UPDATE sys_table
+	SET orderby=11,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Junction Dscenario'
+	WHERE id='v_edit_inp_dscenario_junction';
+UPDATE sys_table
+	SET orderby=12,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Inlet Dscenario'
+	WHERE id='v_edit_inp_dscenario_inlet';
+UPDATE sys_table
+	SET orderby=5
+	WHERE id='v_edit_inp_dscenario_reservoir';
+UPDATE sys_table
+	SET orderby=6
+	WHERE id='v_edit_inp_dscenario_shortpipe';
+UPDATE sys_table
+	SET orderby=7
+	WHERE id='v_edit_inp_dscenario_tank';
+UPDATE sys_table
+	SET orderby=8
+	WHERE id='v_edit_inp_dscenario_valve';
+UPDATE sys_table
+	SET orderby=9,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Virtual Valve Dscenario'
+	WHERE id='v_edit_inp_dscenario_virtualvalve';
+UPDATE sys_table
+	SET orderby=4,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Pump Additional Dscenario'
+	WHERE id='v_edit_inp_dscenario_pump_additional';
