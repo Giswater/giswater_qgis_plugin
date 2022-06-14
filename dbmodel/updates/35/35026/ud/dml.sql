@@ -135,16 +135,18 @@ VALUES ('edit_typevalue', 'gully_units_placement', 'man_netgully', 'units_placem
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
-VALUES('v_edit_gully', 'form_feature', 'data', 'units_placement', 'lyt_data_2', 44, 'string', 'combo', 'units placement', null,
+SELECT 'v_edit_gully', 'form_feature', 'data', 'units_placement', 'lyt_data_2', max(layoutorder) +1, 'string', 'combo', 'units placement', null,
 null, false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''gully_units_placement''',true, false);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
-placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
-placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+SELECT 'v_edit_gully', 'form_feature', 'data', 'groove_height', 'lyt_data_2', max(layoutorder) +1, 'double', 'text', 'groove height', null,
+null, false, false, true, false, null,true, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
+SELECT 'v_edit_gully', 'form_feature', 'data', 'groove_length', 'lyt_data_2', max(layoutorder) +1, 'double', 'text', 'groove length', null,
+null, false, false, true, false, null,true, false);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -152,7 +154,17 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement','groove_height','groove_length') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement','groove_height','groove_length') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
@@ -160,6 +172,39 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT child_layer, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields, cat_feature WHERE formname='v_edit_gully' and columnname in ('units_placement') and 
+FROM config_form_fields, cat_feature WHERE formname='v_edit_gully' and columnname in ('units_placement','groove_height','groove_length') and 
 (feature_type='GULLY' OR system_id='NETGULLY') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT child_layer, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields, cat_feature WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_arc' and columnname in ('epa_default') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 

@@ -407,6 +407,11 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- Epa type
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM cat_feature_gully WHERE cat_feature_gully.id=NEW.gully_type)::text;   
+		END IF;
+
 		-- elevation from raster
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
@@ -500,7 +505,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, gratecat2_id)
+				lastupdate, lastupdate_user, asset_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
@@ -508,7 +513,8 @@ BEGIN
 				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
-				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.gratecat2_id);
+				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.gratecat2_id, NEW.epa_type, NEW.units_placement,
+				NEW.groove_height, NEW.groove_length);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, 
@@ -516,7 +522,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id)
+				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
@@ -524,7 +530,8 @@ BEGIN
 				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2, 
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
-				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id);
+				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id,
+				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length);
 
 		END IF;
 
@@ -768,7 +775,8 @@ BEGIN
 			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id
+			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height, 
+			groove_length=NEW.groove_length
 			WHERE gully_id = OLD.gully_id;
 
 		ELSE
@@ -782,7 +790,8 @@ BEGIN
 			postcomplement2=NEW.postcomplement2, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id
+			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height, 
+			groove_length=NEW.groove_length
 			WHERE gully_id = OLD.gully_id;
 
 		END IF;

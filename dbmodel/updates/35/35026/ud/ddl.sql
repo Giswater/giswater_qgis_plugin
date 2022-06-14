@@ -13,18 +13,18 @@ UPDATE cat_feature_gully SET epa_default = 'GULLY';
 ALTER TABLE cat_feature_gully ALTER COLUMN epa_default SET NOT NULL;
 ALTER TABLE cat_feature_gully ALTER COLUMN epa_default SET DEFAULT 'GULLY'::character varying;
 
-ALTER TABLE gully ADD COLUMN epa_type character varying(16);
-ALTER TABLE gully ADD COLUMN groove_height double precision;
-ALTER TABLE gully ADD COLUMN groove_length double precision;
-ALTER TABLE gully ADD COLUMN units_placement character varying(16);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"epa_type", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"groove_height", "dataType":"double precision", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"groove_length", "dataType":"double precision", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"units_placement", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 UPDATE gully SET epa_type ='GULLY';
 ALTER TABLE gully ALTER COLUMN epa_type SET NOT NULL;
 
-ALTER TABLE man_netgully ADD COLUMN gratecat2_id text;
-ALTER TABLE man_netgully ADD COLUMN groove_height double precision;
-ALTER TABLE man_netgully ADD COLUMN groove_length double precision;
-ALTER TABLE man_netgully ADD COLUMN units_placement character varying(16);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netgully", "column":"gratecat2_id", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netgully", "column":"groove_height", "dataType":"double precision", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netgully", "column":"groove_length", "dataType":"double precision", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netgully", "column":"units_placement", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 ALTER TABLE inp_gully RENAME to _inp_gully_;
 ALTER TABLE _inp_gully_ DROP CONSTRAINT inp_gully_pkey;
