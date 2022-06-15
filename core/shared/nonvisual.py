@@ -1995,6 +1995,11 @@ class GwNonVisual:
                 tab_lidlayers.setTabVisible(i, False)
             else:
                 tab_lidlayers.setTabVisible(i, True)
+                if tab_name == 'DRAIN':
+                    if lid_id == 'RD':
+                        tab_lidlayers.setTabText(i, "Roof Drainage")
+                    else:
+                        tab_lidlayers.setTabText(i, "Drain")
                 self._manage_lids_hide_widgets(self.dialog, lid_id)
 
         # Set image
