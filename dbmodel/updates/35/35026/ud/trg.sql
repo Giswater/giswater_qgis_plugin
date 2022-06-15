@@ -20,3 +20,8 @@ CREATE TRIGGER gw_trg_edit_cat_feature
   ON v_edit_cat_feature_gully
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_cat_feature('gully');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_gully ON v_edit_inp_gully;
+CREATE TRIGGER gw_trg_edit_inp_gully
+INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_inp_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_gully();

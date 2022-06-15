@@ -45,18 +45,42 @@ BEGIN
             END IF;
         END IF; 
 
+        --get default values
+        IF (NEW.outlet_type IS NULL) THEN
+                NEW.outlet_type := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_outlet_type_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
+
+        IF (NEW.method IS NULL) THEN
+                NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_method_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
+
+        IF NEW.weir_cd IS NULL AND NEW.outlet_type='W/0' THEN
+                NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_weir_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
+
+        IF NEW.orifice_cd IS NULL AND NEW.outlet_type='W/0' THEN
+                NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_orifice_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
+
+        IF (NEW.efficiency IS NULL) THEN
+                NEW.efficiency := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_efficiency_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
+
+        --update inp_gully data
         UPDATE inp_gully 
-        SET custom_length=NEW.custom_length, custom_n=NEW.custom_n, efficiency=NEW.efficiency,
-        y0=NEW.y0, ysur=NEW.ysur, q0=NEW.q0, qmax=NEW.qmax, flap=NEW.flap, isepa=NEW.isepa
+        SET custom_length=NEW.custom_length, efficiency=NEW.efficiency,
+        outlet_type=NEW.outlet_type, custom_top_elev=NEW.custom_top_elev, custom_width=NEW.custom_width,
+        custom_depth=NEW.custom_depth, method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd,
+        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param
         WHERE gully_id=NEW.gully_id;
 
+
         UPDATE gully
-        SET top_elev=NEW.top_elev, ymax=NEW.ymax, sandbox=NEW.sandbox, connec_matcat_id=NEW.connec_matcat_id,
+        SET top_elev=NEW.top_elev,
         gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, state_type=NEW.state_type,
-        annotation=NEW.annotation,connec_length=NEW.connec_length, connec_arccat_id=NEW.connec_arccat_id, connec_y2=NEW.connec_y2,
+        annotation=NEW.annotation,arc_id=NEW.arc_id, units_placement=NEW.units_placement, groove_height=NEW.groove_height, groove_length=NEW.groove_length,
         the_geom=NEW.the_geom
         WHERE gully_id=NEW.gully_id;
-        RETURN NEW;
 
         RETURN NEW;
 
