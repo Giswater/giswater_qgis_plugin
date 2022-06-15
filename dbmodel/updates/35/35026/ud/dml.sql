@@ -47,6 +47,10 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_fe
 AND feature_type = ''NODE'' AND id != ''NETGULLY'''
 WHERE columnname = 'epa_type' AND formname = 'v_edit_node';
 
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE and feature_type = ''NODE'''
+FROM cat_feature 
+WHERE columnname = 'epa_type' AND system_id ='NETGULLY' AND formname=child_layer;
+
 DELETE FROM sys_table WHERE id in('vi_lxsections', 'vi_link', 'vi_grate', 'vi_gully2pjoint');
 
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES 
