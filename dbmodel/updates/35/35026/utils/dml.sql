@@ -17,3 +17,8 @@ VALUES (453, 'Node planified duplicated', 'utils', null, 'core', true, 'Check pl
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES(454, 'Check node_1 and node_2 on temp_table', 'utils', NULL, 'core', true, 'Function process', NULL) 
 ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type,input_params, return_type, descript, sys_role,  source)
+VALUES (3152, 'gw_fct_admin_reset_sequences', 'utils', 'function', null, 'json', 'Function for reserting ids and sequences for audit, anl and temp tables', 
+'role_admin','core')
+ON CONFLICT (id) DO NOTHING;

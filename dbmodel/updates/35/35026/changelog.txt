@@ -12,3 +12,4 @@
 - Manage staticpressure when insert or update nodes and connecs for ws
 - Minor improvements on mincut (recalculate mincut before start & check overlap only for operative)
 - Various minor bug fix
+- New function gw_fct_admin_reset_sequences for reserting ids and sequences for audit, anl and temp tables
