@@ -463,7 +463,7 @@ CREATE OR REPLACE VIEW v_edit_inp_netgully AS
     i.custom_b_param,
     i.efficiency
    FROM selector_sector s,
-    v_edit_node n
+    v_node n
      JOIN man_netgully USING (node_id)
      JOIN inp_netgully i USING (node_id)
      JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
