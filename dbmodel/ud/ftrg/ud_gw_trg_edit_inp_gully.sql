@@ -79,7 +79,7 @@ BEGIN
         SET top_elev=NEW.top_elev,
         gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, state_type=NEW.state_type,
         annotation=NEW.annotation,arc_id=NEW.arc_id, units_placement=NEW.units_placement, groove_height=NEW.groove_height, groove_length=NEW.groove_length,
-        the_geom=NEW.the_geom
+        sector_id=NEW.sector_id
         WHERE gully_id=NEW.gully_id;
 
         RETURN NEW;

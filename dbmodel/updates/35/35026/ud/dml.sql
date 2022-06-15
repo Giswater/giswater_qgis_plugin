@@ -163,15 +163,6 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT 've_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
-placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('units_placement','groove_height','groove_length') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
-placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT child_layer, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
@@ -244,7 +235,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
 SELECT 'v_edit_inp_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
-placeholder, ismandatory, isparent, false, isautoupdate, isfilter, 
+placeholder, ismandatory, isparent, true, isautoupdate, isfilter, 
 dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='v_edit_gully' and columnname in ('groove_height', 'groove_length', 'units_placement') 
@@ -343,3 +334,29 @@ null, false, false, false, false, null,true, false) ON CONFLICT (formname, formt
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS"}', orderby=18, alias='Inp Gully' WHERE id='v_edit_inp_gully';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS"}', orderby=19, alias='Inp Netgully' WHERE id='v_edit_inp_netgully';
 UPDATE sys_table SET context='{"level_1":"EPA","level_2":"HYDRAULICS"}', orderby=20, alias='Gully2node' WHERE id='vi_gully2node';
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_netgully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_gully' AND columnname NOT IN ('gully_id', 'gully_type', 'arc_id', 'node_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_netgully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, false, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_node' AND columnname IN ('node_id', 'node_type')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null  WHERE formname='v_edit_inp_netgully' AND columnname='gratecat_id';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
