@@ -113,7 +113,7 @@ BEGIN
 
             UPDATE man_netgully 
 			SET units=NEW.units,units_placement=NEW.units_placement,gratecat_id=NEW.gratecat_id,groove=NEW.groove,groove_height=NEW.groove_height,
-			groove_length=NEW.groove_length,
+			groove_length=NEW.groove_length
 			WHERE node_id=OLD.node_id;
 
 			UPDATE inp_netgully 
@@ -121,7 +121,7 @@ BEGIN
 	        outlet_type=NEW.outlet_type,  custom_width=NEW.custom_width,
 	        custom_depth=NEW.custom_depth, method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd,
 	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param
-	        WHERE gully_id=NEW.gully_id;
+	        WHERE node_id=OLD.node_id;
         END IF;
 
         RETURN NEW;

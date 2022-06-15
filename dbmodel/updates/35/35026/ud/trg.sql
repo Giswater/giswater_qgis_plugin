@@ -25,3 +25,9 @@ DROP TRIGGER IF EXISTS gw_trg_edit_inp_gully ON v_edit_inp_gully;
 CREATE TRIGGER gw_trg_edit_inp_gully
 INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_gully();
+
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_netgully ON v_edit_inp_netgully;
+CREATE TRIGGER gw_trg_edit_inp_node_netgully
+INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_inp_netgully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_netgully');
+

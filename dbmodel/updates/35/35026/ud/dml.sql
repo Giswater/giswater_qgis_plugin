@@ -254,7 +254,7 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
-SELECT 'v_edit_inp_gully', formtype, tabname, concat('custom_',columnname), layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+SELECT 'v_edit_inp_gully', formtype, tabname, concat('custom_',columnname), layoutname, layoutorder, datatype, widgettype,  concat('custom_',columnname), tooltip, 
 placeholder, ismandatory, isparent, true, isautoupdate, isfilter, 
 dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
@@ -355,6 +355,16 @@ placeholder, ismandatory, isparent, false, isautoupdate, isfilter,
 dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname='v_edit_node' AND columnname IN ('node_id', 'node_type')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT 'v_edit_inp_netgully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields WHERE formname='v_edit_inp_storage' AND columnname IN ('ymax', 'custom_ymax', 'elev', 'custom_elev', 'sys_elev', 'nodecat_id')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null  WHERE formname='v_edit_inp_netgully' AND columnname='gratecat_id';

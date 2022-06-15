@@ -424,50 +424,61 @@ CREATE OR REPLACE VIEW v_edit_inp_gully AS
 
 DROP VIEW IF EXISTS v_edit_inp_netgully;
 CREATE OR REPLACE VIEW v_edit_inp_netgully AS 
- SELECT node_id,
-    code,
-    top_elev,
-    custom_top_elev,
-    node_type,
-    gratecat_id,
-    (cat_grate.width/100)::NUMERIC(12,3) as grate_width,
-    (cat_grate.length/100)::NUMERIC(12,3) as grate_length,
+ SELECT n.node_id,
+    n.code,
+    n.top_elev,
+    n.custom_top_elev,
+    n.ymax,
+    n.custom_ymax,
+    n.elev,
+    n.custom_elev,
+    n.sys_elev,
+    n.node_type,
+    nodecat_id,
+    man_netgully.gratecat_id,
+    (cat_grate.width / 100::numeric)::numeric(12,3) AS grate_width,
+    (cat_grate.length / 100::numeric)::numeric(12,3) AS grate_length,
     n.sector_id,
-    expl_id,
-    state,
-    state_type,
-    the_geom,
-    units,
-    units_placement,
-    groove,
-    groove_height,
-    groove_length,
-    a_param,
-    b_param,
-    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3)
-         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
-         else (width/100)::NUMERIC(12,3) end) as total_width,
-    (case when units_placement = 'LENGTH-SIDE' THEN (coalesce(units,1)*width/100)::NUMERIC(12,3) 
-         when units_placement = 'WIDTH-SIDE' THEN (coalesce(units,1)*length/100)::NUMERIC(12,3)
-         else (length/100)::NUMERIC(12,3) end) as total_length,
-    ymax - coalesce(sander_depth,0) as depth,
-    annotation,
-    outlet_type,
-    custom_width,
+    n.macrosector_id,
+    n.expl_id,
+    n.state,
+    n.state_type,
+    n.the_geom,
+    man_netgully.units,
+    man_netgully.units_placement,
+    man_netgully.groove,
+    man_netgully.groove_height,
+    man_netgully.groove_length,
+    cat_grate.a_param,
+    cat_grate.b_param,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+        END AS total_width,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+        END AS total_length,
+    n.ymax - COALESCE(man_netgully.sander_depth, 0::numeric) AS depth,
+    n.annotation,
+    i.outlet_type,
+    i.custom_width,
     i.custom_length,
-    custom_depth,
-    method,
-    weir_cd,
-    orifice_cd,
-    custom_a_param,
-    custom_b_param,
-    efficiency
+    i.custom_depth,
+    i.method,
+    i.weir_cd,
+    i.orifice_cd,
+    i.custom_a_param,
+    i.custom_b_param,
+    i.efficiency
    FROM selector_sector s,
     v_edit_node n
-     JOIN man_netgully USING (node_id) 
+     JOIN man_netgully USING (node_id)
      JOIN inp_netgully i USING (node_id)
-     JOIN cat_grate ON gratecat_id = id
-  WHERE n.sector_id = s.sector_id AND s.cur_user = CURRENT_USER::text;
+     JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
+  WHERE n.sector_id = s.sector_id AND s.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW vi_gully2node AS 
