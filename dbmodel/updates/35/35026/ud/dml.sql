@@ -367,6 +367,48 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 FROM config_form_fields WHERE formname='v_edit_inp_storage' AND columnname IN ('ymax', 'custom_ymax', 'elev', 'custom_elev', 'sys_elev', 'nodecat_id')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null  WHERE formname='v_edit_inp_netgully' AND columnname='gratecat_id';
+UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null  WHERE formname='v_edit_inp_netgully' AND (columnname='gratecat_id' OR 
+columnname='gratecat2_id');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden)
+SELECT child_layer, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
+placeholder, ismandatory, isparent, true, isautoupdate, isfilter, 
+dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
+FROM config_form_fields, cat_feature WHERE system_id='NETGULLY' AND formname='v_edit_gully' 
+AND columnname IN ('groove_length', 'groove_height', 'units_placement', 'gratecat2_id')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null FROM cat_feature  WHERE system_id='NETGULLY' AND formname=child_layer AND (columnname='gratecat_id' OR 
+columnname='gratecat2_id');
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"NETGULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"gratecat2_id" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"NETGULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"groove_height" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"NETGULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"groove_length" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"NETGULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"units_placement" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"GULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"epa_type" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"GULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"groove_height" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"GULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"groove_length" }}$$);
+
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"GULLY"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"units_placement" }}$$);
+
+ 

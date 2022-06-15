@@ -552,9 +552,9 @@ BEGIN
 						
 		ELSIF v_man_table='man_netgully' THEN
 
-			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon ) 
+			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon, gratecat2_id, groove_length, groove_height, units_placement ) 
 			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units, 
-			NEW.groove, NEW.siphon );
+			NEW.groove, NEW.siphon, NEW.gratecat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
 
 			INSERT INTO inp_netgully (node_id) VALUES (NEW.node_id);
 	
@@ -793,7 +793,8 @@ BEGIN
 				UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id = NEW.node_id;
 			END IF;
 
-			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
+			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon,
+			gratecat2_id=NEW.gratecat2_id, groove_length=NEW.groove_length, groove_height=NEW.groove_height, units_placement=NEW.units_placement
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_outfall' THEN

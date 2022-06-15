@@ -9,3 +9,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/06/11
 ALTER TABLE cat_feature_gully ADD CONSTRAINT cat_feature_gully_inp_check CHECK (epa_default::text = ANY (ARRAY['GULLY'::text, 'UNDEFINED'::text]));
+
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_gratecat2_id_fkey;
+ALTER TABLE gully ADD CONSTRAINT gully_gratecat2_id_fkey FOREIGN KEY (gratecat2_id) REFERENCES cat_grate (id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat2_id_fkey;
+ALTER TABLE man_netgully ADD CONSTRAINT man_netgully_gratecat2_id_fkey FOREIGN KEY (gratecat2_id) REFERENCES cat_grate (id) ON DELETE RESTRICT ON UPDATE CASCADE;
