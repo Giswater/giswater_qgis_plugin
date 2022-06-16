@@ -42,6 +42,11 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
         IF v_isutils IS FALSE OR v_isutils IS NULL THEN	
                  
+            -- set id if null
+        	IF NEW.id IS NULL THEN
+        		NEW.id = (SELECT nextval('ext_address_id_seq'));
+        	END IF;
+            
        		--get muni and expl_id value if its null
             IF NEW.muni_id IS NULL THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
@@ -56,6 +61,12 @@ BEGIN
     		VALUES (NEW.id,NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.plot_id, NEW.the_geom, NEW.expl_id);
     	
     	ELSE
+        
+            -- set id if null
+        	IF NEW.id IS NULL THEN
+        		NEW.id = (SELECT nextval('ext_address_id_seq'));
+        	END IF;
+            
     		--get muni value if its null
     		IF NEW.muni_id IS NULL THEN
 				 EXECUTE 'SELECT muni_id FROM '||v_schema_utils||'.municipality 

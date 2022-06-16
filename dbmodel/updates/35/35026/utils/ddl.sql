@@ -11,3 +11,18 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_workspace", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 ALTER TABLE cat_workspace ALTER COLUMN active SET DEFAULT True;
+
+--2022/06/10
+CREATE SEQUENCE IF NOT EXISTS ext_address_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 2147483647
+  START 1
+  CACHE 1;
+  
+CREATE SEQUENCE IF NOT EXISTS ext_streetaxis_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 2147483647
+  START 1
+  CACHE 1;
