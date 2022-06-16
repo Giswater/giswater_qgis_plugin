@@ -90,10 +90,10 @@ BEGIN
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
 	v_coldqa  := COALESCE(v_coldqa, '{}');
-	v_opasector  := COALESCE(v_opasector, '0.5');
-	v_opapresszone := COALESCE(v_opapresszone, '0.5');
-	v_opadma := COALESCE(v_opadma, '0.5');
-	v_opadqa := COALESCE(v_opadqa, '0.5');
+	v_opasector  := COALESCE(v_opasector, '80');
+	v_opapresszone := COALESCE(v_opapresszone, '80');
+	v_opadma := COALESCE(v_opadma, '80');
+	v_opadqa := COALESCE(v_opadqa, '80');
 	
 
 	--    Return
@@ -117,5 +117,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-grant all on all functions in schema SCHEMA_NAME to role_basic
