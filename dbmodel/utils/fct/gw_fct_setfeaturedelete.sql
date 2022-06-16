@@ -115,13 +115,15 @@ BEGIN
 
 	IF v_feature_type='node' THEN 
 
-		--remove scada related to node
-		EXECUTE 'SELECT count(*) FROM ext_rtc_scada where node_id = '''||v_feature_id||''''
-		INTO v_count;
+		IF v_project_type = 'WS' THEN
+			--remove scada related to node
+			EXECUTE 'SELECT count(*) FROM ext_rtc_scada where node_id = '''||v_feature_id||''''
+			INTO v_count;
 
-		IF v_count > 0 THEN
-			EXECUTE 'DELETE FROM ext_rtc_scada where node_id = '''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed scada connections: ',v_count));
+			IF v_count > 0 THEN
+				EXECUTE 'DELETE FROM ext_rtc_scada where node_id = '''||v_feature_id||''';';
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed scada connections: ',v_count));
+			END IF;
 		END IF;
 
 		--remove link related to node
