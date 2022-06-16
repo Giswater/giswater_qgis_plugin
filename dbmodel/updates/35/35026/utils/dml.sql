@@ -22,3 +22,12 @@ INSERT INTO sys_function(id, function_name, project_type, function_type,input_pa
 VALUES (3152, 'gw_fct_admin_reset_sequences', 'utils', 'function', null, 'json', 'Function for reserting ids and sequences for audit, anl and temp tables', 
 'role_admin','core')
 ON CONFLICT (id) DO NOTHING;
+
+--2022/06/16
+INSERT INTO sys_function(id, function_name, project_type, function_type,input_params, return_type, descript, sys_role,  source)
+VALUES (3154, 'gw_fct_settopology', 'utils', 'function', null, 'json', 'Function for reset topology by using node ids', 
+'role_edit','core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_param_system (parameter, value, descript, project_type)
+VALUES ('admin_message_debug','false','It allows debug on message with more detailed log', 'utils');
