@@ -376,6 +376,11 @@ BEGIN
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 	
+	-- restore psector selector
+	INSERT INTO selector_psector (psector_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=287 and cur_user=current_user
+	ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	
 	-- returning
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
