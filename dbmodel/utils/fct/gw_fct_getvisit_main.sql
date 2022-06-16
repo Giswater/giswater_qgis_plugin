@@ -293,12 +293,20 @@ BEGIN
 		v_featuretype='arc';
 		v_featuretablename='v_edit_arc';
 		v_new_featureid=(SELECT arc_id FROM om_visit_lot_x_arc WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+		-- to manage unexpected lots with um's, check if unit exists without compare lot_id
+		IF v_new_featureid IS NULL THEN
+			v_new_featureid=(SELECT arc_id FROM om_visit_lot_x_arc WHERE unit_id=v_featureid::integer LIMIT 1);
+		END IF;
 		v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='ARC');
 		
 		IF v_new_featureid IS NULL THEN
 			v_featuretype='node';
 			v_featuretablename='v_edit_node';
 			v_new_featureid=(SELECT node_id FROM om_visit_lot_x_node WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+			-- to manage unexpected lots with um's, check if unit exists without compare lot_id
+			IF v_new_featureid IS NULL THEN
+				v_new_featureid=(SELECT node_id FROM om_visit_lot_x_node WHERE unit_id=v_featureid::integer LIMIT 1);
+			END IF;
 			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='NODE');
 			
 		END IF;
@@ -307,6 +315,10 @@ BEGIN
 			v_featuretype='gully';
 			v_featuretablename='v_edit_gully';
 			v_new_featureid=(SELECT gully_id FROM om_visit_lot_x_gully WHERE lot_id=v_lot AND unit_id=v_featureid::integer LIMIT 1);
+			-- to manage unexpected lots with um's, check if unit exists without compare lot_id
+			IF v_new_featureid IS NULL THEN
+				v_new_featureid=(SELECT gully_id FROM om_visit_lot_x_gully WHERE unit_id=v_featureid::integer LIMIT 1);
+			END IF;
 			v_new_visitclass=(SELECT id FROM config_visit_class WHERE parent_id=v_visitclass AND feature_type='GULLY');
 			
 		END IF;
