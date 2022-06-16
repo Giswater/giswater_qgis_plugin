@@ -31,6 +31,10 @@ v_colsector text;
 v_colpresszone text;
 v_coldma text;
 v_coldqa text;
+v_opasector text;
+v_opapresszone text;
+v_opadma text;
+v_opadqa text;
 
 BEGIN
 
@@ -57,9 +61,15 @@ BEGIN
 		v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
 		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
 
+		-- get column to simbolize
+		v_opasector := (SELECT (value::json->>'SECTOR')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_opapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_opadma := (SELECT (value::json->>'DMA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_opadqa := (SELECT (value::json->>'DQA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+
 		-- get mapzone values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and stylesheet IS NOT NULL) row' INTO v_sector ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id , stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and stylesheet IS NOT NULL) row' INTO v_presszone ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id ,  stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and stylesheet IS NOT NULL) row' INTO v_presszone ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and stylesheet IS NOT NULL) row' INTO v_dma ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and stylesheet IS NOT NULL) row' INTO v_dqa ;
 
@@ -80,19 +90,24 @@ BEGIN
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
 	v_coldqa  := COALESCE(v_coldqa, '{}');
-
+	v_opasector  := COALESCE(v_opasector, '0.5');
+	v_opapresszone := COALESCE(v_opapresszone, '0.5');
+	v_opadma := COALESCE(v_opadma, '0.5');
+	v_opadqa := COALESCE(v_opadqa, '0.5');
 	
+
 	--    Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{}'||
 			',"data":{"mapzones":
-				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "opacity":0.5, "values":' || v_sector ||'}'||
-				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
-				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "opacity":0.5, "values":' || v_dma ||'}'||
-				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "opacity":0.5, "values":' || v_dqa ||'}'||
+				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "opacity":'||v_opasector||', "values":' || v_sector ||'}'||
+				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "opacity":'||v_opapresszone||',  "values":' || v_presszone ||'}'||
+				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "opacity":'||v_opadma||', "values":' || v_dma ||'}'||
+				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "opacity":'||v_opadqa||', "values":' || v_dqa ||'}'||
 				']}}'||
 	    '}')::json;
-      
+
+
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
@@ -102,3 +117,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+grant all on all functions in schema SCHEMA_NAME to role_basic
