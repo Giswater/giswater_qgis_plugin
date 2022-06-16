@@ -114,38 +114,16 @@ class GwGisFileCreate:
 
     def _replace_spatial_parameters(self, srid, content):
 
-        # Connect to sqlite database
-        sqlite_conn, cursor = tools_gw.create_sqlite_conn("srid")
-
         aux = content
-        row = None
-        # if sqlite_conn:
-        #     sql = (f"SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
-        #            f"projection_acronym, is_geo "
-        #            f"FROM srs "
-        #            f"WHERE srid = '{srid}'")
-        #     cursor.execute(sql)
-        #     row = cursor.fetchone()
+        sql = (f"SELECT 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id "
+               f"FROM spatial_ref_sys "
+               f"WHERE srid = '{srid}'")
+        row = tools_db.get_row(sql)
 
-        if not row:
-            sql = (f"SELECT 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id "
-                   f"FROM spatial_ref_sys "
-                   f"WHERE srid = '{srid}'")
-            row = tools_db.get_row(sql)
-
-        print(row)
         if row:
-            # aux = aux.replace("__WKT__", row[0])
-            # aux = aux.replace("__PROJ4__", row[1])
             aux = aux.replace("__SRSID__", str(row[0]))
             aux = aux.replace("__SRID__", str(row[1]))
             aux = aux.replace("__AUTHID__", row[2])
-            # aux = aux.replace("__DESCRIPTION__", row[5])
-            # aux = aux.replace("__PROJECTIONACRONYM__", row[6])
-            # geo = "false"
-            # if row[7] != 0:
-            #     geo = "true"
-            # aux = aux.replace("__GEOGRAPHICFLAG__", geo)
 
         return aux
 

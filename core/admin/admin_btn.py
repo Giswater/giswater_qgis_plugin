@@ -2223,7 +2223,7 @@ class GwAdminButton:
             # Get values
             self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False,
                                                           force_reload=True)
-            # self.folder_path = self.folder_path.replace('"', '')
+
             self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project",
                                                                   "dev", False, force_reload=True)
             self.text_replace_labels = self.text_replace_labels.split(',')
@@ -2257,8 +2257,6 @@ class GwAdminButton:
                                                                        "project", "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        # TODO:: Keep replace or remove it and declare 'qgis_project_text_replace' from 'config/dev.config' without '"'.
-                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
                         f_to_read = re.sub(str(self.text_replace[0]),
                                            str(self.text_replace[1]), f_to_read)
 
@@ -2268,8 +2266,6 @@ class GwAdminButton:
                                                                        "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        # TODO:: Keep replace or remove it and declare 'qgis_project_xml_set' from 'config/dev.config' without '"'.
-                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
                         f_to_read = re.sub(str(self.text_replace[0]),
                                            str(self.text_replace[1]), f_to_read)
 
