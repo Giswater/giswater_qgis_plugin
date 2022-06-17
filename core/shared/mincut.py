@@ -428,6 +428,8 @@ class GwMincut:
 
         self._refresh_tab_hydro()
 
+        self._load_widgets_values()
+
 
     def set_id_val(self):
 
@@ -515,8 +517,32 @@ class GwMincut:
             self.iface.setActiveLayer(layer_zoomed)
             self.iface.zoomToActiveLayer()
 
-
     # region private functions
+
+    def _load_widgets_values(self):
+
+        chk_use_planified = tools_gw.get_config_parser('dlg_mincut', 'chk_use_planified', "user", "session")
+        type = tools_gw.get_config_parser('dlg_mincut', 'type', "user", "session")
+        cause = tools_gw.get_config_parser('dlg_mincut', 'cause', "user", "session")
+
+        if chk_use_planified is not None:
+            tools_qt.set_checked(self.dlg_mincut, 'chk_use_planified', chk_use_planified)
+        if type is not None:
+            tools_qt.set_widget_text(self.dlg_mincut, 'type', type)
+        if cause is not None:
+            tools_qt.set_widget_text(self.dlg_mincut, 'cause', cause)
+
+
+    def _save_widgets_values(self):
+
+        chk_use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
+        type = tools_qt.get_text(self.dlg_mincut, 'type')
+        cause = tools_qt.get_text(self.dlg_mincut, 'cause')
+
+        tools_gw.set_config_parser('dlg_mincut', 'chk_use_planified', f"{chk_use_planified}")
+        tools_gw.set_config_parser('dlg_mincut', 'type', f"{type}")
+        tools_gw.set_config_parser('dlg_mincut', 'cause', f"{cause}")
+
 
     def _set_states(self):
         """ Serialize data of mincut states """
@@ -941,6 +967,7 @@ class GwMincut:
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, close=False)
                 tools_gw.open_dialog(self.dlg_dtext)
 
+        self._save_widgets_values()
         self.iface.actionPan().trigger()
         self._remove_selection()
 
