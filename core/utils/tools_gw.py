@@ -1228,6 +1228,10 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                signal = field.get('signal')
+                if signal:
+                    widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
+                    getattr(module, signal)(dialog)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'check':
                 widget = QCheckBox()

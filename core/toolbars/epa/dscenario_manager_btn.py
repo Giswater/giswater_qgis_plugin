@@ -12,7 +12,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -49,11 +49,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager = GwDscenarioManagerUi()
         tools_gw.load_settings(self.dlg_dscenario_manager)
 
-        # Manage active buttons depending on project type
-        self._manage_active_functions()
-        action = tools_gw.get_config_parser('dscenario_manager', 'cmb_action', "user", "session")
-        if action:
-            tools_qt.set_combo_value(self.dlg_dscenario_manager.cmb_actions, action, 0)
+        # Manage btn create
+        self._manage_btn_create()
 
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
@@ -66,7 +63,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
-        self.dlg_dscenario_manager.btn_execute.clicked.connect(partial(self._open_toolbox_function, None))
+        self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario))
+        self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3042))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
@@ -79,8 +77,7 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def save_user_values(self):
-        action = tools_qt.get_combo_value(self.dlg_dscenario_manager, self.dlg_dscenario_manager.cmb_actions)
-        tools_gw.set_config_parser('dscenario_manager', 'cmb_action', action)
+        pass
 
 
     def _get_list(self, table_name='v_ui_cat_dscenario', filter_name="", filter_id=None):
@@ -126,29 +123,58 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
 
-    def _manage_active_functions(self):
-        """ Fill combobox with functions """
+    def _manage_btn_create(self):
+        """ Fill btn_create QMenu """
 
-        values = [[3042, "Manage values"], [3134, "Create empty dscenario"]]
+        # Functions
+        values = [[3134, "Create empty dscenario"]]
         if global_vars.project_type == 'ws':
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
-            values.append([3108, "Create from ToC"])
+            values.append([3108, "Create network from ToC"])
         if global_vars.project_type == 'ud':
             values.append([3118, "Create from ToC"])
-        tools_qt.fill_combo_values(self.dlg_dscenario_manager.cmb_actions, values, index_to_show=1)
+
+        # Create and populate QMenu
+        create_menu = QMenu()
+        for value in values:
+            num = value[0]
+            label = value[1]
+            action = create_menu.addAction(f"{label}")
+            action.triggered.connect(partial(self._open_toolbox_function, num))
+
+        self.dlg_dscenario_manager.btn_create.setMenu(create_menu)
 
 
-    def _open_toolbox_function(self, function=None):
+    def _open_toolbox_function(self, function, signal=None, connect=None):
         """ Execute currently selected function from combobox """
 
-        if function is None:
-            function = tools_qt.get_combo_value(self.dlg_dscenario_manager, 'cmb_actions')
-
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
-        connect = partial(self._fill_manager_table, self.filter_name.text())
-        toolbox_btn.open_function_by_id(function, connect_signal=connect)
-        return
+        if connect is None:
+            connect = partial(self._fill_manager_table, self.filter_name.text())
+        dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
+        return dlg_functions
+
+
+    def _duplicate_selected_dscenario(self):
+        """ Duplicates the selected dscenario """
+
+        # Get selected row
+        selected_list = self.tbl_dscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected dscenario id
+        index = self.tbl_dscenario.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        # Execute toolbox function
+        dlg_functions = self._open_toolbox_function(3156)
+        # Set dscenario_id in combo copyFrom
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
+        tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
 
     def _delete_selected_dscenario(self):
