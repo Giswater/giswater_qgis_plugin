@@ -1045,48 +1045,48 @@ def set_style_mapzones():
         categories = []
         status = mapzone['status']
         if status == 'Disable':
-            pass
-        else:
-            if lyr:
-			    # Loop for each id returned on json
-                for id in mapzone['values']:
-                    # initialize the default symbol for this geometry type
-                    symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                    symbol.setOpacity(int(mapzone['opacity']))
+            continue
 
-                    # Setting simp
-                    R = random.randint(0, 255)
-                    G = random.randint(0, 255)
-                    B = random.randint(0, 255)
-                    if status == 'Stylesheet':
-                        try:
-                            R = id['stylesheet']['color'][0]
-                            G = id['stylesheet']['color'][1]
-                            B = id['stylesheet']['color'][2]
-                        except TypeError:
-                            R = random.randint(0, 255)
-                            G = random.randint(0, 255)
-                            B = random.randint(0, 255)
+        if lyr:
+            # Loop for each id returned on json
+            for id in mapzone['values']:
+                # initialize the default symbol for this geometry type
+                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                symbol.setOpacity(int(mapzone['opacity']))
 
-                    elif status == 'Random':
+                # Setting simp
+                R = random.randint(0, 255)
+                G = random.randint(0, 255)
+                B = random.randint(0, 255)
+                if status == 'Stylesheet':
+                    try:
+                        R = id['stylesheet']['color'][0]
+                        G = id['stylesheet']['color'][1]
+                        B = id['stylesheet']['color'][2]
+                    except TypeError:
                         R = random.randint(0, 255)
                         G = random.randint(0, 255)
                         B = random.randint(0, 255)
 
-                    # Setting sytle
-                    layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
-                    symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+                elif status == 'Random':
+                    R = random.randint(0, 255)
+                    G = random.randint(0, 255)
+                    B = random.randint(0, 255)
 
-                    if symbol_layer is not None:
-                        symbol.changeSymbolLayer(0, symbol_layer)
-                    category = QgsRendererCategory(id['id'], symbol, str(id['id']))
-                    categories.append(category)
+                # Setting sytle
+                layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
+                symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
 
-                    # apply symbol to layer renderer
-                    lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+                if symbol_layer is not None:
+                    symbol.changeSymbolLayer(0, symbol_layer)
+                category = QgsRendererCategory(id['id'], symbol, str(id['id']))
+                categories.append(category)
 
-                    # repaint layer
-                    lyr.triggerRepaint()
+                # apply symbol to layer renderer
+                lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+
+                # repaint layer
+                lyr.triggerRepaint()
 
 
 def manage_feature_cat():
