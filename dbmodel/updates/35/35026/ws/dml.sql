@@ -84,3 +84,27 @@ UPDATE sys_table
 UPDATE sys_table
 	SET orderby=4,context='{"level_1":"EPA","level_2":"DSCENARIO"}',alias='Pump Additional Dscenario'
 	WHERE id='v_edit_inp_dscenario_pump_additional';
+
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active' WHERE fid=444;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, isarcdivide, isprofilesurface, choose_hemisphere, code_autofill, double_geom, num_arcs, graf_delimiter, shortcut_key, link_path, descript, active'
+WHERE fid=445;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active' WHERE fid=446;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, nodetype_id, matcat_id, pnom, dnom, dint, dext, shape, descript, link, brand, model, svg, estimated_depth, cost_unit, cost, active, label, ischange, acoeff'
+WHERE fid=448;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, connectype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, active, label' 
+WHERE fid=449;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost' 
+WHERE fid=450;
+

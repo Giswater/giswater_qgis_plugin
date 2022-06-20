@@ -72,3 +72,32 @@ UPDATE config_toolbox SET inputparams='[
 	WHERE id=3134;
 
 UPDATE config_toolbox SET alias='Repair nodes duplicated (one by one)' WHERE alias = 'Repair nodes duplicated';
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active' WHERE fid=444;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, isarcdivide, isprofilesurface, code_autofill, choose_hemisphere, double_geom, num_arcs, isexitupperintro, shortcut_key, link_path, descript, active' 
+WHERE fid=445;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, code_autofill, double_geom, shortcut_key, link_path, descript, active' WHERE fid=446;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, system_id, epa_default, code_autofill, double_geom, shortcut_key, link_path, descript, active' WHERE fid=447;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand, model, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff'
+WHERE fid=448;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand, model, svg, active, label, connec_type' 
+WHERE fid=449;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6,geom7, geom8, geom_r, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, tsect_id, curve_id, arc_type, acoeff, connect_cost' 
+WHERE fid=450;
+
+UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
+id, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type' 
+WHERE fid=451;
