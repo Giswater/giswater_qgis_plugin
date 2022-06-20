@@ -1651,6 +1651,12 @@ class GwInfo(QObject):
 
         dialog = kwargs['dialog']
         field = kwargs['field']
+        # If button text is empty it's because node_1/2 is not present.
+        # Then we create a QLineEdit to input a node to be connected.
+        if not field.get('value'):
+            widget = self._manage_text(**kwargs)
+            widget.editingFinished.connect(partial(self._run_settopology, widget, **kwargs))
+            return widget
         widget = tools_gw.add_button(dialog, field, module=self)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
@@ -2217,6 +2223,39 @@ class GwInfo(QObject):
             else:
                 widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         return widget
+
+
+    def _run_settopology(self, widget, **kwargs):
+        """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
+
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        complet_result = kwargs['complet_result']
+        feature_id = complet_result['body']['feature']['id']
+        text = tools_qt.get_text(dialog, widget, return_string_null=True)
+
+        feature = f'"id": "{feature_id}"'
+        extras = f'"fields":{{"{widget.property("columnname")}":"{text}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_response = tools_gw.execute_procedure('gw_fct_settopology', body)
+        if json_response and json_response['status'] != "Failed":
+            # Refresh canvas & send a message
+            tools_qgis.refresh_map_canvas()
+            tools_qgis.show_info("Node set correctly")
+
+            # Delete lineedit
+            widget.deleteLater()
+            # Create button with field from kwargs and value from {text}
+            kwargs['field']['value'] = f"{text}"
+            new_widget = self._manage_button(**kwargs)
+            if new_widget is None:
+                return
+            # Add button to layout
+            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                layout.addWidget(new_widget, int(field['layoutorder']), 2)
+            return
+        tools_qgis.show_warning("Error setting node")
 
 
     def _open_catalog(self, tab_type, feature_type, child_type):
