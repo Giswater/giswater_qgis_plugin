@@ -169,7 +169,7 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE AND feature_type = ''GULLY''', 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields, cat_feature WHERE formname='v_edit_arc' and columnname in ('epa_type') 
+FROM config_form_fields, cat_feature WHERE formname='v_edit_arc' and columnname in ('epa_type') and system_id ='GULLY'
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
