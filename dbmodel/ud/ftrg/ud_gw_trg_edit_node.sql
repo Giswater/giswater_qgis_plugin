@@ -482,6 +482,11 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'node_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- Ymax
+		IF (NEW.ymax IS NULL) THEN
+		    NEW.ymax := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_node_ymax_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+
 		--elevation from raster
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN

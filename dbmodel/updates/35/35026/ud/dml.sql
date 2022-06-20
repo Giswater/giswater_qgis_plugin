@@ -104,11 +104,11 @@ dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, 
 SELECT 'v_edit_cat_feature_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_type') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+FROM config_form_fields WHERE formname='cat_feature_arc' and columnname in ('epa_default') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET
 dv_querytext='SELECT id as id, id as idval FROM sys_feature_epa_type WHERE feature_type =''GULLY'''
-WHERE formname='v_edit_cat_feature_gully' and columnname='epa_type';
+WHERE formname='v_edit_cat_feature_gully' and columnname='epa_default';
 
 INSERT INTO sys_feature_epa_type(id, feature_type, epa_table, descript, active)
 VALUES ('UNDEFINED', 'GULLY', NULL, NULL, TRUE) ON CONFLICT (id, feature_type) DO NOTHING;
@@ -415,4 +415,8 @@ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "l
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"GULLY"},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"units_placement" }}$$);
 
- 
+INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, 
+feature_field_id,  isautoupdate, datatype, widgettype, ismandatory, 
+layoutname, iseditable, source)
+VALUES ('edit_node_ymax_vdefault', 'config', 'Default value of ymax for nodes', 'role_edit', 'Default ymax for nodes:', TRUE, 25, 'ud',FALSE,
+'ymax', FALSE, 'double', 'text', FALSE,'lyt_inventory', true, 'core') ON CONFLICT (id) DO NOTHING;
