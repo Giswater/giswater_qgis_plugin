@@ -70,3 +70,5 @@ UPDATE config_toolbox SET inputparams='[
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}
 ]'::json
 	WHERE id=3134;
+
+UPDATE config_toolbox SET alias='Repair nodes duplicated (one by one)' WHERE alias = 'Repair nodes duplicated';
