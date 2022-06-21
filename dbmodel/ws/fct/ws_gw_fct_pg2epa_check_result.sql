@@ -294,12 +294,12 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '414','INFO: No registers found without material on cat_connec table.');
 			END IF;	
-
+			
 
 			RAISE NOTICE '4.3 - Check pjoint_id/pjoint_type on connecs (415)';
 			SELECT count(*) INTO v_count FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s 
 			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND epa_type ='JUNCTION' 
-			AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+			AND (pjoint_id IS NULL OR pjoint_type IS NULL)) a1;
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -308,13 +308,14 @@ BEGIN
 				INSERT INTO anl_node (fid, node_id, descript, the_geom) 
 				SELECT 415, connec_id, 'Connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type', the_geom
 				FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s WHERE c.sector_id = s.sector_id AND cur_user=current_user 
-				AND epa_type ='JUNCTION' AND pjoint_id IS NULL OR pjoint_type IS NULL)a;
+				AND epa_type ='JUNCTION' AND (pjoint_id IS NULL OR pjoint_type IS NULL))a;
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '415','INFO: No connecs found without pjoint_id or pjoint_type values.');
 			END IF;
-			
+
+
 			RAISE NOTICE '4.4 check dint for cat_connec (400)';
 			SELECT count (*) INTO v_count FROM cat_connec where dint is null;
 			IF v_count > 0 THEN
