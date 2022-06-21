@@ -1832,6 +1832,10 @@ class GwNonVisual:
 
         # Get dialog
         self.dialog = GwNonVisualLidsUi()
+
+        # Set dialog not resizable
+        self.dialog.setFixedSize(self.dialog.size())
+
         tools_gw.load_settings(self.dialog)
 
         is_new = (lidco_id is None) or duplicate
