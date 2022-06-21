@@ -188,7 +188,7 @@ BEGIN
 	END IF;
 
     -- only if user variable is not disabled
-    IF v_user_dis_statetopocontrol IS FALSE THEN
+    IF v_user_statetopocontrol IS FALSE THEN
     
         --  Control of start/end node
         IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
