@@ -187,76 +187,80 @@ BEGIN
 		END IF;
 	END IF;
 
-	--  Control of start/end node
-	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-   
-		-- Control of same node initial and final
-		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
-			IF v_dsbl_error IS NOT TRUE THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
-			ELSE
-				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
-				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
-			END IF;
-		ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3192", "function":"1344","debug_msg":""}}$$);';
-		ELSE
-			-- Update coordinates
-			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-			NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
-			NEW.node_1:= nodeRecord1.node_id; 
-			NEW.node_2:= nodeRecord2.node_id;
+    -- only if user variable is not disabled
+    IF v_user_dis_statetopocontrol IS FALSE THEN
+    
+        --  Control of start/end node
+        IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+       
+            -- Control of same node initial and final
+            IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
+                IF v_dsbl_error IS NOT TRUE THEN
+                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
+                ELSE
+                    SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
+                    INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
+                END IF;
+            ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"3192", "function":"1344","debug_msg":""}}$$);';
+            ELSE
+                -- Update coordinates
+                NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+                NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
+                NEW.node_1:= nodeRecord1.node_id; 
+                NEW.node_2:= nodeRecord2.node_id;
 
-		END IF;
-			
-	-- Check auto insert end nodes
-	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
-		IF TG_OP = 'INSERT' THEN
+            END IF;
+                
+        -- Check auto insert end nodes
+        ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
+            IF TG_OP = 'INSERT' THEN
 
-			-- getting nodecat user's value
-			v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			-- get first value (last chance)
-			IF (v_nodecat IS NULL) THEN
-				v_nodecat := (SELECT * FROM cat_node WHERE active IS TRUE LIMIT 1);
-			END IF;
+                -- getting nodecat user's value
+                v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+                -- get first value (last chance)
+                IF (v_nodecat IS NULL) THEN
+                    v_nodecat := (SELECT * FROM cat_node WHERE active IS TRUE LIMIT 1);
+                END IF;
 
-			-- Inserting new node
-			INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, presszone_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
-			postcode, district_id, expl_id, the_geom)
-			VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
-			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
-			RETURNING node_id INTO v_node2;
-					
-			-- Update arc
-			NEW.node_1:= nodeRecord1.node_id; 
-			NEW.node_2:= v_node2;
-		END IF;
-		
-	--Error, no existing nodes
-	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-		IF v_dsbl_error IS NOT TRUE THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
-		ELSE
-			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
-		END IF;
-		
-	--Not existing nodes but accepted insertion
-	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
-		RETURN NEW;
-		
-	ELSE		
-		IF v_dsbl_error IS NOT TRUE THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
-		ELSE
-			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
-		END IF;
-	END IF;
+                -- Inserting new node
+                INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, presszone_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
+                postcode, district_id, expl_id, the_geom)
+                VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
+                NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
+                RETURNING node_id INTO v_node2;
+                        
+                -- Update arc
+                NEW.node_1:= nodeRecord1.node_id; 
+                NEW.node_2:= v_node2;
+            END IF;
+            
+        --Error, no existing nodes
+        ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
+            IF v_dsbl_error IS NOT TRUE THEN
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
+            ELSE
+                SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
+            END IF;
+            
+        --Not existing nodes but accepted insertion
+        ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
+            RETURN NEW;
+            
+        ELSE		
+            IF v_dsbl_error IS NOT TRUE THEN
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
+            ELSE
+                SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
+            END IF;
+        END IF;
+    END IF;
 	
 RETURN NEW;
 		
