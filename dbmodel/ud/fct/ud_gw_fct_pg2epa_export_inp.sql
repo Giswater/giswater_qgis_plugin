@@ -85,13 +85,13 @@ BEGIN
 			SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
 			,rpad(c13,20),rpad(c14,20),rpad(c15,20),rpad(c16,20),rpad(c17,20),rpad(c18,20),rpad(c19,20),rpad(c20,20),rpad(c21,20),rpad(c22,20),rpad(c23,20),rpad(c24,20),rpad(c25,20),rpad(c26,20)
 			,rpad(c27,20),rpad(c28,20),rpad(c29,20),rpad(c30,20)
-			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''ud_sample'' and table_name='''||rec_table.tablename||'''::text') 
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text, c14 text, c15 text, 
 			c16 text, c17 text, c18 text, c19 text, c20 text, c21 text, c22 text, c23 text, c24 text, c25 text, c26 text, c27 text, c28 text, c29 text, c30 text);
 		
 			INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
 		
-			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='ud_sample';
 		
 			--add underlines    
 			FOR num_col_rec IN 1..num_column
@@ -135,15 +135,16 @@ BEGIN
 		union
 			select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_transects','vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons') 
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', csv7) as text
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', rpad(coalesce(csv3,''),20), ' ', rpad(coalesce(csv4,''),20), ' ', rpad(coalesce(csv5,''),20), ' ', rpad(coalesce(csv6,''),20), ' ', csv7) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_junctions') 
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20),' ', rpad(csv7,20) , ' ', rpad(csv8,20), ' ', rpad(csv8,20), ' ',
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', rpad(coalesce(csv3,''),20), ' ', rpad(coalesce(csv4,''),20), ' ', rpad(coalesce(csv5,''),20), ' ', rpad(coalesce(csv6,''),20),
+			' ', rpad(coalesce(csv7,''),20) , ' ', rpad(coalesce(csv8,''),20), ' ', rpad(coalesce(csv8,''),20), ' ',
 			csv10) as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_conduits') 
 		union
 			select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('header', 'vi_evaporation','vi_temperature', 'vi_report', 'vi_map')
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files', 'vi_adjustments')
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files', 'vi_adjustments')
 		union
 			select id, 
 			case when  substring(csv2,0,5) = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),length(csv2)+2))
@@ -159,8 +160,9 @@ BEGIN
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
 			' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),
-			' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv16,20),' ',rpad(csv17,20),' ',rpad(csv18,20),' ', rpad(csv19,20), ' ', rpad(csv20,20),' ',rpad(csv21,20),
-			' ',rpad(csv22,20),' ',rpad(csv23,20),' ',rpad(csv24,20),' ', rpad(csv25,20),' ',rpad(csv26,20),' ',rpad(csv27,20),' ', rpad(csv28,20), ' ', rpad(csv29,20),' ',rpad(csv30,20)) as text
+			' ',rpad(coalesce(csv13,''),20),' ',rpad(coalesce(csv14,''),20),' ',rpad(coalesce(csv15,''),20),' ', rpad(coalesce(csv16,''),20),' ',rpad(coalesce(csv17,''),20),' ',rpad(coalesce(csv18,''),20),
+			' ', rpad(coalesce(csv19,''),20), ' ',rpad(coalesce(csv20,''),20),' ',rpad(coalesce(csv21,''),20),' ',rpad(coalesce(csv22,''),20),' ',rpad(coalesce(csv23,''),20),' ',rpad(coalesce(csv24,''),20),
+			' ', rpad(coalesce(csv25,''),20),' ',rpad(coalesce(csv26,''),20),' ',rpad(coalesce(csv27,''),20),' ', rpad(coalesce(csv28,''),20), ' ', rpad(coalesce(csv29,''),20),' ',rpad(coalesce(csv30,''),20)) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source not in
 			('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects',
 			'vi_raingages','vi_timeseries','vi_transects', 'vi_report', 'vi_map', 'vi_junctions', 'vi_conduits')
