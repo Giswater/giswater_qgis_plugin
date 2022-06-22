@@ -299,17 +299,14 @@ BEGIN
 				END IF;
 				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
-			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' THEN
-
-				IF NEW.other1 ~ '^\d+$' then
-					NEW.other1 = concat(NEW.other1,':00');
-				END IF;
-				
+			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' OR NEW.other1 ilike '%:%' THEN
+			
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'RELATIVE');
 				END IF;
+				
 				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1::time, NEW.other2::numeric);				
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1, NEW.other2::numeric);				
 				ELSE
 					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
 				END IF;				
@@ -321,7 +318,7 @@ BEGIN
 					NEW.other2 = concat(NEW.other2,':00');
 				END IF;
 				IF NEW.other3 IS NOT NULL THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2, NEW.other3::numeric);
 				END IF;
 			END IF;
 			
