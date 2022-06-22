@@ -2874,7 +2874,7 @@ class GwAdminButton:
                 sql += "INSERT INTO temp_csv (fid, source, "
                 values = "VALUES(239, $$" + target + "$$, "
                 for x in range(0, len(sp_n)):
-                    if "''" not in sp_n[x]:
+                    if sp_n[x] != "''":
                         sql += "csv" + str(x + 1) + ", "
                         value = "$$" + sp_n[x].strip().replace("\n", "") + "$$, "
                         values += value.replace("$$$$", "null")
