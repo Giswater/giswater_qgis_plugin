@@ -2354,7 +2354,7 @@ class GwInfo(QObject):
         # Check that edited field is y or elev
         has_modified = any(k in _json for k in keys_list)
         if not has_modified:
-            return True
+            return False
 
         # Get edited fields
         modified = [k for k in _json if k in keys_list]
