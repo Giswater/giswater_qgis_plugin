@@ -483,6 +483,8 @@ class GwInfo(QObject):
         result = self._get_feature_type(complet_result)
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
+        if global_vars.project_type == 'ud':
+            self._check_elev_y()
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
@@ -1831,6 +1833,11 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
+        if self._has_elev_and_y_json(_json):
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            QgsProject.instance().blockSignals(False)
+            return False
+
         # If we create a new feature
         if self.new_feature_id is not None:
             new_feature.setAttribute(id_name, newfeature_id)
@@ -2296,6 +2303,125 @@ class GwInfo(QObject):
 
         self._enable_actions(dialog, self.layer.isEditable())
 
+
+    def _check_elev_y(self):
+        """ Show a warning if feature has both y and elev values """
+
+        msg = f"This {self.feature_type} has both y & elev values! This might cause issues with profiling."
+        # ARC
+        if self.feature_type == 'arc':
+            fields1 = 'y1, custom_y1, elev1, custom_elev1'
+            sql = f"SELECT {fields1} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg)
+                    return False
+
+            fields2 = 'y2, custom_y2, elev2, custom_elev2'
+            sql = f"SELECT {fields2} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg)
+                    return False
+        # NODE
+        elif self.feature_type == 'node':
+            fields = 'ymax, custom_ymax, elev, custom_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg)
+                    return False
+        return True
+
+
+    def _has_elev_and_y_json(self, _json):
+        """ :returns True if feature has both y and elev values. False otherwise  """
+
+        msg = "There shouldn't be values in both y and elev fields."
+        keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
+                     "y2", "custom_y2", "elev2", "custom_elev2",
+                     "ymax", "custom_ymax", "elev", "custom_elev")
+
+        # Check that edited field is y or elev
+        has_modified = any(k in _json for k in keys_list)
+        if not has_modified:
+            return True
+
+        # Get edited fields
+        modified = [k for k in _json if k in keys_list]
+
+        for k in modified:
+            if _json.get(k) in (None, ''):
+                continue
+            # If edited field is Y check if feature has ELEV field
+            if 'y' in k:
+                has_elev = self._has_elev(arc_n=k[-1:])
+                if has_elev:
+                    msg = f"This feature already has elev values! {msg}"
+                    tools_qgis.show_warning(msg)
+                return has_elev
+            # If edited field is ELEV check if feature has Y field
+            if 'elev' in k:
+                has_y = self._has_y(arc_n=k[-1:])
+                if has_y:
+                    msg = f"This feature already has y values! {msg}"
+                    tools_qgis.show_warning(msg)
+                return has_y
+
+        return False
+
+
+    def _has_y(self, arc_n=1):
+        """ :returns True if feature has y values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'y{arc_n}, custom_y{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'ymax, custom_ymax'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_elev(self, arc_n=1):
+        """ :returns True if feature has elev values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'elev{arc_n}, custom_elev{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'elev, custom_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
 
     """ MANAGE TABS """
 
