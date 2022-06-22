@@ -2307,7 +2307,7 @@ class GwInfo(QObject):
     def _check_elev_y(self):
         """ Show a warning if feature has both y and elev values """
 
-        msg = f"This {self.feature_type} has both y & elev values! This might cause issues with profiling."
+        msg = f"This {self.feature_type} has both Y & ELEV values! There shouldn't be values in both Y and ELEV fields."
         # ARC
         if self.feature_type == 'arc':
             fields1 = 'y1, custom_y1, elev1, custom_elev1'
@@ -2346,7 +2346,7 @@ class GwInfo(QObject):
     def _has_elev_and_y_json(self, _json):
         """ :returns True if feature has both y and elev values. False otherwise  """
 
-        msg = "There shouldn't be values in both y and elev fields."
+        msg = "There shouldn't be values in both Y and ELEV fields."
         keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
                      "y2", "custom_y2", "elev2", "custom_elev2",
                      "ymax", "custom_ymax", "elev", "custom_elev")
@@ -2366,14 +2366,14 @@ class GwInfo(QObject):
             if 'y' in k:
                 has_elev = self._has_elev(arc_n=k[-1:])
                 if has_elev:
-                    msg = f"This feature already has elev values! {msg}"
+                    msg = f"This feature already has ELEV values! {msg}"
                     tools_qgis.show_warning(msg)
                 return has_elev
             # If edited field is ELEV check if feature has Y field
             if 'elev' in k:
                 has_y = self._has_y(arc_n=k[-1:])
                 if has_y:
-                    msg = f"This feature already has y values! {msg}"
+                    msg = f"This feature already has Y values! {msg}"
                     tools_qgis.show_warning(msg)
                 return has_y
 
