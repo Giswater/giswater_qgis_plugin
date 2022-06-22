@@ -201,6 +201,16 @@ BEGIN
 			v_status = 'Failed';
 		END IF;
 
+		-- check for quuality object id string length
+		v_count := (SELECT max(length(split_part(csv1,' ',2))) FROM temp_csv WHERE source = '[TRANSECTS]' AND csv1 not ilike ';%' AND (split_part(csv1,' ',1)='X1' AND length(split_part(csv1,' ',2)) > 16));
+		IF v_count > 0 AND v_count < 17 THEN
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: All transects objects id''s have a maximun of 16 digits');
+
+		ELSIF v_count > 16 THEN
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one transects id with more than 16 digits. Please check your data before continue');
+			v_status = 'Failed';
+		END IF;
+
 		IF v_status = 'Accepted' THEN
 
 			RAISE NOTICE 'step 1/7';
@@ -662,13 +672,19 @@ BEGIN
 
 	-- replace
 	SELECT json_agg(json_build_object(source,csv1)) INTO v_replace
-		FROM (
-		SELECT source, array_agg(distinct csv1) as csv1
+		FROM ( SELECT source, csv1 FROM
+		(SELECT source, array_agg(distinct csv1) as csv1
 		FROM temp_csv
 		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
 			and source in ('[OUTFALLS]','[JUNCTIONS]','[STORAGES]','[DIVIDERS]','[CONDUITS]','[PUMPS]','[ORIFICES]','[WEIRS]','[OUTLETS]','[SUBCATCHMENTS]', '[AQUIFERS]', 
 							'[RAINGAGES]', '[SNOWPACKS]', '[LID_CONTROLS]','[POLLUTANTS]', '[LANDUSES]', '[COVERAGES]', '[CURVES]','[PATTERNS]','[TIMESERIES]') 
-		GROUP BY source ORDER BY 1) a;
+		GROUP BY source
+		UNION
+		SELECT source, array_agg(distinct split_part(csv1,' ',2)) as csv1
+		FROM temp_csv
+		WHERE fid='239' and source = '[TRANSECTS]' AND csv1 not ilike ';%' AND (split_part(csv1,' ',1)='X1' AND length(split_part(csv1,' ',2)) > 16)
+		GROUP BY source) b
+		ORDER BY 1) a;
 	
 	--Control nulls
 	v_version := COALESCE(v_version, '{}'); 

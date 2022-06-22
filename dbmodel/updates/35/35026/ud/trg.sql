@@ -31,3 +31,8 @@ CREATE TRIGGER gw_trg_edit_inp_node_netgully
 INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_netgully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_netgully');
 
+--2022/06/22
+DROP TRIGGER IF EXISTS gw_trg_vi_patterns ON vi_patterns;
+CREATE TRIGGER gw_trg_vi_patterns 
+INSTEAD OF INSERT OR UPDATE OR DELETE
+ON vi_patterns FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_patterns');

@@ -136,7 +136,7 @@ BEGIN
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
 				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0,apond, fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
+				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
 				
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
@@ -320,7 +320,9 @@ BEGIN
 				IF NEW.other2 ~ '^\d+$' then
 					NEW.other2 = concat(NEW.other2,':00');
 				END IF;
-				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
+				IF NEW.other3 IS NOT NULL THEN
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
+				END IF;
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
