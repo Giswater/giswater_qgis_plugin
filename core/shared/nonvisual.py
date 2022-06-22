@@ -15,7 +15,7 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget
 from qgis.PyQt.QtSql import QSqlTableModel
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
@@ -2082,8 +2082,10 @@ class GwNonVisual:
                     return False
 
             # Inserts in table inp_lid_value
-            result = self._insert_lids_values(dialog, lidco_id.strip("'"))
+            result = self._insert_lids_values(dialog, lidco_id.strip("'"), lidco_type)
             if not result:
+                sql = f"DELETE FROM inp_lid WHERE lidco_id ={lidco_id}"
+                tools_db.execute_sql(sql, commit=False)
                 return
 
             # Commit
@@ -2111,7 +2113,7 @@ class GwNonVisual:
                 return
 
             # Inserts in table inp_lid_value
-            result = self._insert_lids_values(dialog, lidco_id.strip("'"))
+            result = self._insert_lids_values(dialog, lidco_id.strip("'"), lidco_type)
             if not result:
                 return
 
@@ -2124,7 +2126,16 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
 
-    def _insert_lids_values(self, dialog, lidco_id):
+    def _insert_lids_values(self, dialog, lidco_id, lidco_type):
+
+        control_values = {'BC': {'soil_2', 'storage_2'},
+                    'RG': {'soil_2', 'storage_2'},
+                    'GR': {'soil_2', 'drainmat_2'},
+                    'IT': {'storage_2'},
+                    'PP': {'pavement_2', 'storage_2'},
+                    'RB': {''},
+                    'RD': {''},
+                    'VS': {'surface_2'}}
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
@@ -2143,6 +2154,15 @@ class GwNonVisual:
                     value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
                     if value == "null":
                         value = "'0'"
+                    # Control values that cannot be 0
+                    if widget.objectName() in control_values[lidco_type] and value == "'0'":
+                        dialog.tab_lidlayers.setCurrentWidget(dialog.tab_lidlayers.widget(i))
+                        tools_qt.show_info_box("Marked values must be greater than 0", "LIDS")
+                        tools_qt.set_stylesheet(widget)
+
+                        return False
+                    tools_qt.set_stylesheet(widget, style="")
+
                     sql += f"{value}, "
                 sql = sql.rstrip(', ') + ")"
                 result = tools_db.execute_sql(sql, commit=False)
