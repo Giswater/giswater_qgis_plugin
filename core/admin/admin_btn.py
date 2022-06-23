@@ -2854,12 +2854,34 @@ class GwAdminButton:
                     list_aux = row.split("\t")
                     dirty_list = []
                     for x in range(0, len(list_aux)):
-                        # If text in between double-quotes, put all the text in a single column
-                        if re.compile(r'".*"').search(list_aux[x]):
+                        # If text in between double-quotes, put all the text in a single column (if tab-separated)
+                        if str(list_aux[x]).startswith('"') and str(list_aux[x]).endswith('"'):
                             dirty_list.append(list_aux[x].strip('"'))
-                            continue
+
                         aux = list_aux[x].split(" ")
+                        str_aux = ""
                         for i in range(len(aux)):
+                            # If text is between double-quotes, insert it without the quotes
+                            #     This includes "xxxx" and ""
+                            if str(aux[i]).startswith('"') and str(aux[i]).endswith('"'):
+                                if aux[i] == '""':
+                                    aux[i] = '\n'
+                                dirty_list.append(aux[i].strip('"'))
+                                continue
+
+                            # If text starts with '"', initialize str_aux variable
+                            #     This will insert "xxx yy" as a single string
+                            if str(aux[i]).startswith('"'):
+                                str_aux = str(aux[i])
+                                continue
+                            if str_aux:
+                                str_aux = f'{str_aux} {str(aux[i])}'
+                                if str(aux[i]).endswith('"'):
+                                    dirty_list.append(str_aux.strip('"'))
+                                    str_aux = ""
+                                continue
+
+                            # Text without quotes is inserted as-is
                             dirty_list.append(aux[i])
                 else:
                     dirty_list = [row]
