@@ -513,6 +513,11 @@ BEGIN
 	AND matcat_id IS NULL AND sys_type !='VARC';
 	
 	IF v_count > 0 THEN
+
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) SELECT 430, arc_id, ''Arc without material'', the_geom 
+		FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user 
+		AND matcat_id IS NULL AND sys_type !=''VARC'''; 
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
 		'ERROR-430: There is/are ',v_count,' arcs without matcat_id informed.'),v_count);
@@ -613,7 +618,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

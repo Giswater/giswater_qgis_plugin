@@ -420,7 +420,3 @@ feature_field_id,  isautoupdate, datatype, widgettype, ismandatory,
 layoutname, iseditable, source)
 VALUES ('edit_node_ymax_vdefault', 'config', 'Default value of ymax for nodes', 'role_edit', 'Default ymax for nodes:', TRUE, 25, 'ud',FALSE,
 'ymax', FALSE, 'double', 'text', FALSE,'lyt_inventory', true, 'core') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
-VALUES(460, 'Check arcs without material', 'ud', NULL, 'core', true, 'Check epa-result', NULL) 
-ON CONFLICT (fid) DO NOTHING;
