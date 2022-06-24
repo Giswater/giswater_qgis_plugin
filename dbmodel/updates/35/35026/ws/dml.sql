@@ -108,3 +108,6 @@ UPDATE config_csv SET descript='The csv file must contain the following columns 
 id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost' 
 WHERE fid=450;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(460, 'Check zones without numeric id', 'ws', NULL, 'core', true, 'Check graf-data', NULL) 
+ON CONFLICT (fid) DO NOTHING;

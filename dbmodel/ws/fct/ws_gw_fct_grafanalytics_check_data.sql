@@ -297,7 +297,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
-			VALUES (211, 4, '271', concat('ERROR-271: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'),v_count);
+			VALUES (211, 3, '271', concat('ERROR-271: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
 			VALUES (211, 1, '271','INFO: All presszones has grafconfig values not null.',v_count);
@@ -339,6 +339,20 @@ BEGIN
 
 	END IF;
 
+	--Check if presszone_id is a numeric value (fid 460)
+	IF v_grafclass = 'PRESSZONE' OR v_grafclass = 'ALL' THEN
+		v_querytext = 'SELECT presszone_id FROM presszone WHERE presszone_id!=''-1'' AND presszone_id ~''^\d+(\.\d+)?$'' is false' ;
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			VALUES (211, 3, '460', concat('ERROR-460: There is/are ',v_count, ' presszone with id that is not a numeric value.'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			VALUES (211, 1, '460','INFO: All presszone_ids are numeric values.',v_count);
+		END IF;	
+	END IF;	
+
 	--Check if defined nodes and arcs exist in a database (fid 367)
 
 	FOR rec IN SELECT DISTINCT lower(graf_delimiter) FROM cat_feature_node where graf_delimiter NOT IN ('MINSECTOR','NONE') AND graf_delimiter IS NOT NULL LOOP
@@ -373,6 +387,7 @@ BEGIN
 			VALUES (211, 1, 367, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'),0);
 		END IF;
 	END LOOP;
+
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
