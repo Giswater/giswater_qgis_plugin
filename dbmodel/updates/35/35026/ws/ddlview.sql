@@ -96,3 +96,20 @@ UNION
      JOIN ws_sample.v_connec ON v_connec.connec_id::text = inp_dscenario_demand.feature_id::text
   WHERE v_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS 
+ SELECT d.dscenario_id,
+    p.node_id,
+    p.order_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern,
+    p.status,
+    the_geom
+   FROM selector_inp_dscenario,
+    v_edit_inp_pump
+     JOIN inp_dscenario_pump_additional p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
