@@ -26,11 +26,11 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE inp_dscenario_demand SET feature_id=NEW.feature_id, demand=NEW.demand, pattern_id=NEW.pattern_id, 
 		demand_type=NEW.demand_type, dscenario_id=NEW.dscenario_id,  feature_type=NEW.feature_type, source = NEW.source
-		WHERE feature_id=OLD.feature_id AND dscenario_id=OLD.dscenario_id;
+		WHERE id=OLD.id;
 		RETURN NEW;
         
 	ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM inp_dscenario_demand WHERE feature_id=OLD.feature_id AND dscenario_id=OLD.dscenario_id;
+		DELETE FROM inp_dscenario_demand WHERE id=OLD.id;
 		RETURN OLD;
    
 	END IF;

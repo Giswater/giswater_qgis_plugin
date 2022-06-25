@@ -60,4 +60,39 @@ CREATE OR REPLACE VIEW vi_rules AS
                   WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
                   ORDER BY 1)c
   ORDER BY c.id;
- 
+
+
+DROP VIEW v_edit_inp_dscenario_demand;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_demand AS 
+ SELECT 
+ inp_dscenario_demand.id,
+ inp_dscenario_demand.dscenario_id,
+    inp_dscenario_demand.feature_id,
+    inp_dscenario_demand.feature_type,
+    inp_dscenario_demand.demand,
+    inp_dscenario_demand.pattern_id,
+    inp_dscenario_demand.demand_type,
+    inp_dscenario_demand.source,
+    v_node.the_geom
+   FROM ws_sample.selector_sector,
+    ws_sample.selector_inp_dscenario,
+    ws_sample.inp_dscenario_demand
+     JOIN ws_sample.v_node ON v_node.node_id::text = inp_dscenario_demand.feature_id::text
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
+UNION
+ SELECT 
+ inp_dscenario_demand.id,
+ inp_dscenario_demand.dscenario_id,
+    inp_dscenario_demand.feature_id,
+    inp_dscenario_demand.feature_type,
+    inp_dscenario_demand.demand,
+    inp_dscenario_demand.pattern_id,
+    inp_dscenario_demand.demand_type,
+    inp_dscenario_demand.source,
+    v_connec.the_geom
+   FROM ws_sample.selector_sector,
+    ws_sample.selector_inp_dscenario,
+    ws_sample.inp_dscenario_demand
+     JOIN ws_sample.v_connec ON v_connec.connec_id::text = inp_dscenario_demand.feature_id::text
+  WHERE v_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_dscenario_demand.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+

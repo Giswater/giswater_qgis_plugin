@@ -131,3 +131,6 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'SHORTPIPE', 'SHORT
 INSERT INTO inp_typevalue VALUES ('inp_options_dscenario_priority', '0', 'REMOVE ALL BASE DEMANDS & PATT.');
 UPDATE inp_typevalue SET idval ='OVERWRITE BASE DEMANDS & PATT.' WHERE typevalue ='inp_options_dscenario_priority' and id='1';
 UPDATE inp_typevalue SET idval ='JOIN DEMANDS & PATTERNS' WHERE typevalue ='inp_options_dscenario_priority' and id='2';
+
+
+UPDATE sys_table SET addparam = null where id = 'v_edit_inp_dscenario_demand';
