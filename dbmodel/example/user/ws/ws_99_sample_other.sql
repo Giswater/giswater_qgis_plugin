@@ -656,3 +656,6 @@ UPDATE arc SET sector_id = 3 WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"WS", "epsg":25831, "isSample":"TRUE"}}$$);
 
+
+update man_netwjoin set customer_code = 'cc3122';
+delete from connec where customer_code = 'cc3122';

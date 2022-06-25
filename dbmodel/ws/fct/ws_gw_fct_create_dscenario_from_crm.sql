@@ -123,7 +123,8 @@ BEGIN
 		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
-				
+
+		-- insert connecs
 		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
 		SELECT 'CONNEC' as feature_type, v_scenarioid, c.connec_id as node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, hc.hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
@@ -136,7 +137,22 @@ BEGIN
 		-- real number of hydrometers
 		GET DIAGNOSTICS v_count = row_count;	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with demands have been inserted on inp_dscenario_table, which it means ',v_count,' hydrometers.'));
+		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on CONNEC (wjoin, greentap, fountain or tap) have been inserted on inp_dscenario_demand.'));
+
+		-- insert nodes (netwjoins)
+		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
+		SELECT 'NODE' as feature_type, v_scenarioid, n.node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, h.id as hydrometer_id
+		FROM ext_rtc_hydrometer_x_data d
+		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
+		JOIN man_netwjoin n ON connec_id = customer_code
+		JOIN node USING (node_id)
+		WHERE cat_period_id  =  v_period AND node.expl_id = v_expl
+		order by 2;
+
+		-- real number of hydrometers
+		GET DIAGNOSTICS v_count = row_count;	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on NODE (netwjoin) have been inserted on inp_dscenario_demand.'));
 
 		-- real volume inserted
 		SELECT sum(demand)/v_factor INTO v_count2 FROM inp_dscenario_demand WHERE dscenario_id = v_scenarioid;

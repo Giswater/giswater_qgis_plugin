@@ -14,5 +14,6 @@
 - Various minor bug fix
 - New function gw_fct_admin_reset_sequences for reserting ids and sequences for audit, anl and temp tables
 - UD - New user variable edit_node_ymax_vdefault with default value of ymax for nodes
-- Enhance valve management for ws inp projects
+- Enhance valve management for ws go2epa exportation
 - Enhance log for go2epa exportation
+- Enable work with crm values on pg2epa using nodes (netwjoin)
