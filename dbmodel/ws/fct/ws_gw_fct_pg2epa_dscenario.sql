@@ -67,13 +67,31 @@ BEGIN
 		v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 
-		-- moving node demands to temp_demand
+		-- base demand management	
+		IF v_demandpriority = 0 THEN -- Remove whole base demand
+		
+			UPDATE temp_node SET demand = 0, pattern_id = null;
+
+		ELSIF	v_demandpriority = 1 THEN -- keep base demand and overwrites it when dscenario demand exists
+			-- EPANET standard 
+			
+		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined,  moving to temp_demand in order to do not lose base demand (because EPANET does)
+
+			-- moving node demands to temp_demand
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id)
+			SELECT DISTINCT ON (node_id) 0, node_id, n.demand, n.pattern_id 
+			FROM temp_node n
+			JOIN temp_demand ON node_id = feature_id
+			WHERE n.demand IS NOT NULL AND n.demand <> 0;
+		END IF;
+
+		-- insert node demands from dscenario to temp_demand
 		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
 		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
-		-- moving connec demands to linked object which is exported	
+		-- insert connec demands from dscenario to linked object which is exported	
 		IF v_networkmode IN(1,2) THEN
 
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
@@ -113,19 +131,6 @@ BEGIN
 		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
-		-- update demands
-		IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
-			-- EPANET standard 
-			
-		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined,  moving to temp_demand in order to do not lose base demand (because EPANET does)
-
-			-- moving node demands to temp_demand
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id)
-			SELECT DISTINCT ON (node_id) 0, node_id, n.demand, n.pattern_id 
-			FROM temp_node n
-			JOIN temp_demand ON node_id = feature_id
-			WHERE n.demand IS NOT NULL AND n.demand <> 0;
-		END IF;
 				
 		-- move patterns used demands scenario table
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
@@ -140,6 +145,13 @@ BEGIN
 
 		-- set cero where null in order to prevent user's null values on demand table
 		UPDATE temp_node SET demand=0 WHERE demand IS NULL;
+
+
+
+
+
+
+		
 
 		-- updating values for pipes
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 

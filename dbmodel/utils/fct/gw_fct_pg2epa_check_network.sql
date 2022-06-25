@@ -115,9 +115,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 1, '-------');
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 0, '-------------------------');
-
 
 	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  228)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
@@ -495,27 +492,31 @@ BEGIN
 	
 
 	RAISE NOTICE '7 - Stats';
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,concat('BASIC STATS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,concat('-------------------'));
 	
 	IF v_project_type =  'WS' THEN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Total length (Km) : ',v_sumlength,'.'));
 	
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		v_networkstats = concat('{"Total length (Km) ":"',v_sumlength,'"}');
@@ -523,38 +524,38 @@ BEGIN
 	ELSIF v_project_type  ='UD' THEN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Total length (Km) : ',coalesce(v_sumlength,0::numeric),'.'));
 		
 		IF v_linkoffsets  = 'ELEVATION' THEN
 			SELECT min(((elevmax1-elevmax2)/length)::numeric(12,4)), max(((elevmax1-elevmax2)/length)::numeric(12,4)) 
 			INTO v_min, v_max FROM temp_arc;
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 			concat('Data analysis for conduit slope. Values from [',v_min,'] to [',v_max,'] have been found.'));
 		END IF;
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 
 		v_networkstats = concat('{"Total length (Km) ":',coalesce(v_sumlength,0::numeric),'}');
@@ -566,7 +567,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 1, '');
 
 	-- get results
 	-- info

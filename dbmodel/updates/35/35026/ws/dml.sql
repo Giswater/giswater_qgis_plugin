@@ -128,3 +128,6 @@ INSERT INTO config_toolbox VALUES
 {"widgetname":"mincutId", "label":"Mincut:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id as id, id as idval FROM om_mincut", "selectedId":"$userMincut"}]', '',TRUE);
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'SHORTPIPE', 'SHORTPIPE');
+INSERT INTO inp_typevalue VALUES ('inp_options_dscenario_priority', '0', 'REMOVE ALL BASE DEMANDS & PATT.');
+UPDATE inp_typevalue SET idval ='OVERWRITE BASE DEMANDS & PATT.' WHERE typevalue ='inp_options_dscenario_priority' and id='1';
+UPDATE inp_typevalue SET idval ='JOIN DEMANDS & PATTERNS' WHERE typevalue ='inp_options_dscenario_priority' and id='2';
