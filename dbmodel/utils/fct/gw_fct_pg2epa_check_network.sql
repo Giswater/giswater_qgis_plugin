@@ -55,6 +55,7 @@ v_linkoffsets text;
 v_delnetwork boolean;
 v_removedemands boolean;
 v_minlength float;
+v_demand numeric (12,4);
 
 BEGIN
 	-- Search path
@@ -403,8 +404,8 @@ BEGIN
 				a USING (node_id);
 
 			-- insert into result table dry nodes with demands (error)
-			INSERT INTO anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand') FROM temp_node n
+			INSERT INTO anl_node (fid, node_id, the_geom, descript, demand)
+			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand'), demand FROM temp_node n
 				JOIN
 				(
 				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
@@ -426,10 +427,10 @@ BEGIN
 		END IF;
 
 		-- counting nodes
-		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
+		SELECT count(*), sum(demand) FROM anl_node INTO v_count, v_demand WHERE fid = 233 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-233: There is/are ',v_count,' Dry node(s) with demand'), v_count);
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-233: There is/are ',v_count,' Dry node(s) with associated demand and total value of ', v_demand), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'), v_count);

@@ -11,3 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_node", "column":"node_type", "dataType":"character varying(30)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_connec", "column":"customer_code", "dataType":"character varying(30)", "isUtils":"False"}}$$);
 
+--2022/06/25
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"demand", "dataType":"double precision", "isUtils":"False"}}$$);

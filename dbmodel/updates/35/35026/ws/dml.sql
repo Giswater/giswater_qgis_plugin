@@ -111,3 +111,20 @@ WHERE fid=450;
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES(460, 'Check zones without numeric id', 'ws', NULL, 'core', true, 'Check graf-data', NULL) 
 ON CONFLICT (fid) DO NOTHING;
+
+DELETE FROM config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode';
+DELETE FROM sys_param_user where id ='inp_options_valve_mode';
+
+DELETE FROM config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode_mincut_result';
+DELETE FROM sys_param_user where id ='inp_options_valve_mode_mincut_result';
+
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
+VALUES (3158,'gw_fct_create_dscenario_from_mincut','ws','function','json','json','Function to create valve dscenario from mincut','role_epa','core');
+
+INSERT INTO config_toolbox VALUES
+(3158,'Create valve dscenario from mincut','{"featureType":[]}',
+'[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
+{"widgetname":"mincutId", "label":"Mincut:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"SELECT id as id, id as idval FROM om_mincut", "selectedId":"$userMincut"}]', '',TRUE);
+
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'SHORTPIPE', 'SHORTPIPE');

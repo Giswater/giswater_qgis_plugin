@@ -651,7 +651,8 @@ UPDATE config_toolbox SET inputparams =
 ]'
 where id = 2768;
 
+UPDATE arc SET sector_id = 3 WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE state = 1);
+
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"WS", "epsg":25831, "isSample":"TRUE"}}$$);
-
 
