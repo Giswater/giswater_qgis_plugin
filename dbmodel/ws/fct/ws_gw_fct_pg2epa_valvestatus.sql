@@ -32,28 +32,36 @@ BEGIN
 	-- update shut-off valves
 	IF v_networkmode = 1 THEN -- Because shut-off valves are not exported as a shortpipe, pipes closer shut-off valves will be setted
 
+		-- shutoff valves (TCV OR SHORTPIPES)
 		UPDATE temp_arc SET status='CLOSED' 
 		FROM (SELECT temp_arc.arc_id FROM temp_arc JOIN man_valve ON node_id=node_1 where closed is true
 		UNION
 		SELECT temp_arc.arc_id from temp_arc join man_valve ON node_id=node_2  where closed is true) a 
 		WHERE a.arc_id=temp_arc.arc_id;
-				
+
+		-- mandatory nodarcs
+		UPDATE temp_arc SET status='CLOSED' 
+		FROM man_valve WHERE closed is true AND arc_id = concat(node_id, '_n2a');
+
+		-- cv valves: not applied
+			
 	ELSIF v_networkmode IN (2,3,4) THEN -- Because shut-off valves are exported as nodarcs, directly we can set the status of shut-off valves
 
-		-- getting querytext for shutoff valves in function if they are TCV OR SHORTPIPES
+		-- shutoff valves (TCV OR SHORTPIPES)
 		IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
 			v_querytext = ' AND epa_type = ''VALVE'' and addparam::json->>''valv_type'' = ''TCV''';
 		ELSE
 			v_querytext = ' AND epa_type = ''SHORTPIPE''';
 		END IF;
-			
 		EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
 		EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
 
-		-- setting values from inp valves for those that are open on man_valve
+		-- mandatory nodarcs
+		UPDATE temp_arc a SET status='OPEN' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed is not true;
+		UPDATE temp_arc a SET status='CLOSED' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed = true;
 		UPDATE temp_arc a SET status=v.status FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND a.status = 'OPEN';
 
-		-- Set CV valves 
+		-- cv valves 
 		UPDATE temp_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV';
 		UPDATE temp_arc a SET status='CV' FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV';	
 
