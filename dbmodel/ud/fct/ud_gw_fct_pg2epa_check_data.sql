@@ -508,7 +508,24 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
-	RAISE NOTICE '20 - Check matcat not null on arc (430)';
+	RAISE NOTICE '20 - Check valid relative timeseries(459)';
+	SELECT count(*) INTO v_count FROM 
+	(SELECT id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value) a JOIN
+	(SELECT id-1 as id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value)b USING (id)
+	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-459: There is/are ',v_count,' columns on relative timeserires related to this exploitation with errors. '),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All relative timeseries related ot this exploitation are correctly defined.',v_count);
+	END IF;	
+
+
+	RAISE NOTICE '21 - Check matcat not null on arc (430)';
 	SELECT count(*) INTO v_count FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user 
 	AND matcat_id IS NULL AND sys_type !='VARC';
 	
@@ -527,20 +544,34 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
 	END IF;	
 
-	RAISE NOTICE '21 - Check outlet_id assigned to subcatchments (440)';
-
-	SELECT count(DISTINCT outlet_id) INTO v_count  FROM (
-	SELECT outlet_id from v_edit_inp_subcatchment where "left"(outlet_id::text, 1) != '{'::text UNION
-	SELECT unnest(outlet_id::text[]) AS outlet_id from v_edit_inp_subcatchment where "left"(outlet_id::text, 1) = '{'::text)a
+	RAISE NOTICE '22 - Check outlet_id assigned to subcatchments (440)';
+	v_querytext = 'WITH query AS (SELECT * FROM (SELECT 440 as fid, subc_id, outlet_id, st_centroid(the_geom) from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
+	UNION
+	SELECT 440, subc_id, unnest(outlet_id::text[]), st_centroid(the_geom) from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text
+	)a
 	WHERE outlet_id not in 
 	(select node_id FROM v_edit_inp_junction UNION select node_id FROM v_edit_inp_outfall UNION
 	select node_id FROM v_edit_inp_storage UNION select node_id FROM v_edit_inp_divider UNION
-	select subc_id FROM v_edit_inp_subcatchment);
+	select subc_id FROM v_edit_inp_subcatchment))
+	SELECT q1.* FROM query q1 
+	LEFT JOIN 
+	(SELECT * FROM (
+	SELECT subc_id, outlet_id, the_geom from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
+	UNION
+	SELECT subc_id, unnest(outlet_id::text[]), the_geom AS outlet_id from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text)a)b
+	USING (outlet_id)
+	WHERE b.subc_id IS NULL';
+
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+	INTO v_count;
 
 	IF v_count > 0 THEN
+	
+		EXECUTE 'INSERT INTO anl_node (fid, descript, node_id, the_geom) SELECT * FROM ('||v_querytext||')a';
+			
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-440: There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
+		'ERROR-440 (anl_node): There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -551,22 +582,6 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
-
-	RAISE NOTICE '22 - Check valid relative timeseries(459)';
-	SELECT count(*) INTO v_count FROM 
-	(SELECT id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value) a JOIN
-	(SELECT id-1 as id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value)b USING (id)
-	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id;
-	
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-459: There is/are ',v_count,' columns on relative timeserires related to this exploitation with errors. '),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '427','INFO: All relative timeseries related ot this exploitation are correctly defined.',v_count);
-	END IF;	
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
