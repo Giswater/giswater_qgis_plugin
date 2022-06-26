@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443
+	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461
 
 */
 
@@ -79,8 +79,8 @@ BEGIN
 	
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461);
 	DELETE FROM temp_arc;
 
 	-- Starting process
@@ -153,9 +153,9 @@ BEGIN
 	IF v_project_type  ='UD' THEN
 
 		IF v_edit IS NULL THEN 
-			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM arc a WHERE sys_slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
+			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom, expl_id FROM arc a WHERE sys_slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
 		ELSE
-			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM v_edit_arc a WHERE slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
+			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom, expl_id FROM v_edit_arc a WHERE slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
 		END IF;
 		
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -554,19 +554,23 @@ BEGIN
 
 	v_querytext='SELECT count(*) FROM '||v_edit||'arc';
 	EXECUTE v_querytext INTO v_count;
-	IF v_count < 5000 THEN -- too big
+	IF v_count < 10000 THEN -- too big
 	
-		v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id
-			FROM '||v_edit||'link l
-			LEFT JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
-			INNER JOIN '||v_edit||'arc a ON st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-			WHERE exit_type = ''VNODE'' AND (a.arc_id <> c.arc_id or c.arc_id is null) 
-			AND l.feature_type = ''CONNEC'' AND a.state=1 and c.connec_id IS NOT NULL
-			and l.feature_id NOT IN (SELECT connec_id FROM '||v_edit||'node n,'||v_edit||'link l
-			LEFT JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
-			LEFT JOIN vnode v ON l.exit_id=v.vnode_id::text
-			WHERE exit_type = ''VNODE'' AND st_dwithin(v.the_geom, n.the_geom,0.01))
-			ORDER BY l.feature_type, link_id';
+		v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+			FROM '||v_edit||'arc a, '||v_edit||'link l
+			JOIN connec c ON l.feature_id = c.connec_id 
+			WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+			AND exit_type = ''VNODE''
+			AND (a.arc_id <> c.arc_id or c.arc_id is null) 
+			AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1
+			EXCEPT
+			SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+			FROM '||v_edit||'node n, '||v_edit||'link l
+			JOIN connec c ON l.feature_id = c.connec_id 
+			WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
+			AND exit_type = ''VNODE'' 
+			AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1
+			ORDER BY feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -582,17 +586,21 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-			v_querytext = 'SELECT  g.gully_id,  g.gratecat_id,  g.the_geom, g.expl_id
-						FROM '||v_edit||'link l
-						LEFT JOIN '||v_edit||'gully g ON l.feature_id = g.gully_id 
-						INNER JOIN '||v_edit||'arc a ON st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-						WHERE exit_type = ''VNODE'' AND (a.arc_id <> g.arc_id or g.arc_id is null) 
-						AND l.feature_type = ''GULLY'' AND a.state=1 AND g.gully_id IS NOT NULL
-						and l.feature_id NOT IN (SELECT gully_id FROM '||v_edit||'node n,'||v_edit||'link l
-						LEFT JOIN '||v_edit||'gully g ON l.feature_id = g.gully_id 
-						LEFT JOIN vnode v ON l.exit_id=v.vnode_id::text
-						WHERE exit_type = ''VNODE'' AND st_dwithin(v.the_geom, n.the_geom,0.01))
-						ORDER BY l.feature_type, link_id';
+			v_querytext = 'SELECT c.gully_id, c.gratecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+				FROM '||v_edit||'arc a, '||v_edit||'link l
+				JOIN gully c ON l.feature_id = c.gully_id 
+				WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+				AND exit_type = ''VNODE''
+				AND (a.arc_id <> c.arc_id or c.arc_id is null) 
+				AND l.feature_type = ''GULLY'' AND a.state=1 and c.state = 1
+				EXCEPT
+				SELECT c.gully_id, c.gratecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+				FROM '||v_edit||'node n, '||v_edit||'link l
+				JOIN gully c ON l.feature_id = c.gully_id 
+				WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
+				AND exit_type = ''VNODE'' 
+				AND l.feature_type = ''GULLY'' AND n.state=1 and c.state = 1
+				ORDER BY feature_type, link_id';
 
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -1232,12 +1240,12 @@ BEGIN
 	RAISE NOTICE '42 - Check orphan nodes with isarcdivide=FALSE (OM)(443)';
 
 	IF v_project_type = 'WS' THEN
-		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
 	ELSIF v_project_type = 'UD' THEN
-		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
+		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type WHERE a.state>0 AND isarcdivide=''false''';
 	END IF;
 
-	v_querytext = 'SELECT  * FROM '||v_edit||'node a '||v_partialquery||' WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
+	v_querytext = 'SELECT  * FROM '||v_edit||'node a '||v_partialquery;
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -1253,7 +1261,6 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '43 - Check nodes planified duplicated(453)';
-
 	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom
 	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.state2 = 2';
 
@@ -1268,6 +1275,40 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '453','INFO: There are no nodes duplicated with state 2',v_count);
+	END IF;
+
+	RAISE NOTICE '44 - Check redundant values on y-top_elev-elev (461)';
+
+	-- nodes
+	v_querytext = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM '||v_edit||'node WHERE (ymax is not null or custom_ymax is not null) 
+		      and (top_elev is not null or custom_top_elev is not null) and (elev is not null or custom_elev is not null)';
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+		SELECT 461, node_id, nodecat_id, ''Redundant values on y-top_elev-elev'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '461', concat('WARNING-461 (anl_node): There is/are ',v_count,' nodes with redundancy on ymax, top_elev & elev values.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '461','INFO: There are no nodes with redundancy on ymax, top_elev & elev values.',v_count);
+	END IF;
+
+	-- arcs
+	v_querytext = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM '||v_edit||'arc WHERE (y1 is not null or custom_y1 is not null)  
+	               and  (elev1 is not null or custom_elev1 is not null)';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+		SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '461', concat('WARNING-461 (anl_arc): There is/are ',v_count,' arcs with redundancy on y1/y2, elev1/elev2 values.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '461','INFO: There are no arcs with redundancy on y1/y2, elev1/elev2 values.',v_count);
 	END IF;
 
 
