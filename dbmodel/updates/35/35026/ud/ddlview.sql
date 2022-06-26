@@ -611,3 +611,22 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_gully AS
      JOIN cat_feature_gully USING (id);
 
 
+CREATE OR REPLACE VIEW vi_subcatchments AS 
+ SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.rg_id,
+    b.outlet_id,
+    v_edit_inp_subcatchment.area,
+    v_edit_inp_subcatchment.imperv,
+    v_edit_inp_subcatchment.width,
+    v_edit_inp_subcatchment.slope,
+    v_edit_inp_subcatchment.clength,
+    v_edit_inp_subcatchment.snow_id
+   FROM v_edit_inp_subcatchment
+   JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id);
+
