@@ -424,3 +424,5 @@ VALUES ('edit_node_ymax_vdefault', 'config', 'Default value of ymax for nodes', 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES(461, 'Check redundant values on y-top_elev-elev', 'ud', NULL, 'core', true, 'Check om-topology', NULL) 
 ON CONFLICT (fid) DO NOTHING;
+
+DELETE FROM config_param_system WHERE parameter  ='admin_debug';
