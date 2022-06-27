@@ -40,6 +40,7 @@ from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
+from ..threads.project_schema_copy import GwCopySchemaTask
 
 
 class GwAdminButton:
@@ -1910,7 +1911,7 @@ class GwAdminButton:
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
-        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self._copy_project_data_schema, schema))
+        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self._copy_project_start, schema))
         self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_copy))
 
         # Set shortcut keys
@@ -1921,7 +1922,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_copy, dlg_name='admin_renameproj')
 
 
-    def _copy_project_data_schema(self, schema):
+    def _copy_project_start(self, schema):
         """"""
 
         new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
@@ -1936,29 +1937,18 @@ class GwAdminButton:
             else:
                 continue
 
-        tools_qgis.set_cursor_wait()
-        extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False)
-        if not result or result['status'] == 'Failed':
-            tools_qgis.restore_cursor()
-            return
+        # Create timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_copy))
+        self.timer.start(1000)
 
-        # Show message
-        status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Copy project")
-        if status:
-            global_vars.dao.commit()
-            self._populate_data_schema_name(self.cmb_project_type)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
-            self._set_info_project()
-            self._close_dialog_admin(self.dlg_readsql_copy)
-        else:
-            global_vars.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
-        tools_qgis.restore_cursor()
+        # Set background task 'GwCopySchemaTask'
+        description = f"Copy schema"
+        params = {'schema': schema}
+        self.task_copy_schema = GwCopySchemaTask(self, description, params, timer=self.timer)
+        QgsApplication.taskManager().addTask(self.task_copy_schema)
+        QgsApplication.taskManager().triggerTask(self.task_copy_schema)
 
 
     def _delete_schema(self):
