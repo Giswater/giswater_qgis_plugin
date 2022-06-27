@@ -13,3 +13,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_c
 
 --2022/06/25
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"demand", "dataType":"double precision", "isUtils":"False"}}$$);
+
+--2022/06/27
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"bfactor", "dataType":"double precision", "isUtils":"False"}}$$);
