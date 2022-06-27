@@ -434,8 +434,8 @@ class Giswater(QObject):
         allwidgets = QApplication.allWidgets()
 
         # Only keep Giswater widgets that are currently open
-        windows = [x for x in allwidgets if
-                   not getattr(x, "isHidden", False) and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
+        windows = [x for x in allwidgets if getattr(x, "isVisible", False)
+                   and (issubclass(type(x), GwMainWindow) or issubclass(type(x), GwDialog))]
 
         # Close them
         for window in windows:

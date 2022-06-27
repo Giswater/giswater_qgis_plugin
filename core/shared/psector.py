@@ -945,22 +945,25 @@ class GwPsector:
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
-        tools_gw.reset_rubberband(self.rubber_band)
-        self._clear_my_json()
-        self.reload_states_selector()
-        if cur_active_layer:
-            self.iface.setActiveLayer(cur_active_layer)
-        self.layers = tools_gw.remove_selection(True, layers=self.layers)
-        self.reset_model_psector("arc")
-        self.reset_model_psector("node")
-        self.reset_model_psector("connec")
-        if self.project_type.upper() == 'UD':
-            self.reset_model_psector("gully")
-        self.reset_model_psector("other")
-        tools_gw.close_dialog(self.dlg_plan_psector)
-        tools_qgis.disconnect_snapping()
-        tools_gw.disconnect_signal('psector')
-        tools_qgis.disconnect_signal_selection_changed()
+        try:
+            tools_gw.reset_rubberband(self.rubber_band)
+            self._clear_my_json()
+            self.reload_states_selector()
+            if cur_active_layer:
+                self.iface.setActiveLayer(cur_active_layer)
+            self.layers = tools_gw.remove_selection(True, layers=self.layers)
+            self.reset_model_psector("arc")
+            self.reset_model_psector("node")
+            self.reset_model_psector("connec")
+            if self.project_type.upper() == 'UD':
+                self.reset_model_psector("gully")
+            self.reset_model_psector("other")
+            tools_gw.close_dialog(self.dlg_plan_psector)
+            tools_qgis.disconnect_snapping()
+            tools_gw.disconnect_signal('psector')
+            tools_qgis.disconnect_signal_selection_changed()
+        except RuntimeError:
+            pass
 
 
     def reset_model_psector(self, feature_type):

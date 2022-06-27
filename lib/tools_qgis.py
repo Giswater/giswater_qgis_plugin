@@ -812,11 +812,14 @@ def set_layer_visible(layer, recursive=True, visible=True):
         :param visible: Whether the layer will be visible or not (bool)
     """
 
-    if layer:
-        if recursive:
-            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
-        else:
-            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+    try:
+        if layer:
+            if recursive:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
+            else:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+    except RuntimeError:
+        pass
 
 
 def set_layer_index(layer_name):

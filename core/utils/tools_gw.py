@@ -3046,7 +3046,7 @@ def refresh_selectors(tab_name=None):
     """ Refreshes the selectors' UI if it's open """
 
     # Get the selector UI if it's open
-    windows = [x for x in QApplication.allWidgets() if not getattr(x, "isHidden", False)
+    windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                and (issubclass(type(x), GwSelectorUi))]
 
     if windows:
