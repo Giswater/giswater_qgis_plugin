@@ -115,8 +115,10 @@ BEGIN
 	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
 	v_inp_dscenario = (SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user limit 1);
 	v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0 limit 1 );
-	v_mincut = (SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user limit 1 );
-
+	
+	IF v_projectype = 'ws' THEN
+		v_mincut = (SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user limit 1 );	
+	END IF;
 
 	IF v_projectype = 'ws' THEN
 		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
