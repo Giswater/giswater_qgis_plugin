@@ -105,7 +105,7 @@ BEGIN
 				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 			END IF;
 		END LOOP;
-	ELSE 
+	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
 		-- Look for default values in each widget
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
