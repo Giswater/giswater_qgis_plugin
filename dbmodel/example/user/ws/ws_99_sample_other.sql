@@ -659,7 +659,3 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 
 update man_netwjoin set customer_code = 'cc3122';
 delete from connec where customer_code = 'cc3122';
-
-UPDATE dma set effc = 75;
-
-INSERT INTO arc_add (arc_id, bfactor) SELECT arc_id, 0.5 FROM arc where state = 1;
