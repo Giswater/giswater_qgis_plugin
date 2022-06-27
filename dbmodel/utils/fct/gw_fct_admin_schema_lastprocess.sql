@@ -348,6 +348,8 @@ BEGIN
 
 		END IF;
 
+		--reset sequences and id of anl, temp and audit tables
+		PERFORM gw_fct_admin_reset_sequences();
 		
 		-- last process
 		UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
