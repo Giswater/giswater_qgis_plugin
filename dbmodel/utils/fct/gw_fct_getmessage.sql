@@ -38,7 +38,7 @@ v_debug Boolean;
 
 BEGIN
 
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get debug variable
 	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_message_debug';
