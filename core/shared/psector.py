@@ -1082,6 +1082,9 @@ class GwPsector:
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 
+        # Refresh selectors UI if open
+        tools_gw.refresh_selectors()
+
 
     def set_plan(self):
 
