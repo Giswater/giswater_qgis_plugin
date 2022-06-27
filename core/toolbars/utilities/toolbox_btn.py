@@ -586,10 +586,12 @@ class GwToolBoxButton(GwAction):
                 self._load_settings_values(dialog, function)
                 self._load_parametric_values(dialog, function)
                 # Execute any connected signal
-                for w in function[0]['return_type']:
-                    signal = w.get('signal')
-                    if signal:
-                        getattr(module, signal)(dialog)
+                widgets = function[0].get('return_type')
+                if widgets:
+                    for w in function[0]['return_type']:
+                        signal = w.get('signal')
+                        if signal:
+                            getattr(module, signal)(dialog)
 
                 # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
                 # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,
