@@ -2923,6 +2923,8 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+        # Manage config_form_tableview
+        tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -2931,8 +2933,6 @@ class GwInfo(QObject):
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
-
-        table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
         if date_from > date_to:
             message = "Selected date interval is not valid"
             tools_qgis.show_warning(message)
@@ -2946,9 +2946,15 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, self.filter)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter, value_filter)
-
             date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
             date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+
+            # Manage config_form_tableview
+            if len(table_name.split(".")) > 1:
+                tbl_name = table_name.split(".")[1]
+            else:
+                tbl_name = table_name
+            tools_gw.set_tablemodel_config(self.dlg_cf, widget, tbl_name)
 
         # Set filter to model
         expr = self.field_id + " = '" + self.feature_id + "'"
