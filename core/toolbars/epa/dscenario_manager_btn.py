@@ -132,6 +132,7 @@ class GwDscenarioManagerButton(GwAction):
             values.append([3110, "Create from CRM"])
             values.append([3112, "Create demand from ToC"])
             values.append([3108, "Create network from ToC"])
+            values.append([3158, "Create from Mincut"])
         if global_vars.project_type == 'ud':
             values.append([3118, "Create from ToC"])
 
