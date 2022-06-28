@@ -2307,6 +2307,10 @@ class GwInfo(QObject):
     def _check_elev_y(self):
         """ Show a warning if feature has both y and elev values """
 
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
+
         msg = f"This {self.feature_type} has redundant data on "
         # ARC
         if self.feature_type == 'arc':
@@ -2348,6 +2352,10 @@ class GwInfo(QObject):
 
     def _has_elev_and_y_json(self, _json):
         """ :returns True if feature has both y and elev values. False otherwise  """
+
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
 
         keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
                      "y2", "custom_y2", "elev2", "custom_elev2",
