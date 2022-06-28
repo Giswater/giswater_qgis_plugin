@@ -2993,7 +2993,6 @@ class GwInfo(QObject):
         for row in rows:
             table_visit_node_dict[row[0]] = str(row[1])
         self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
-        # self.tbl_visit_cf.doubleClicked.connect(self.open_visit)
 
 
     def _fill_tbl_visit(self, widget, table_name, filter_, geom_type):
@@ -3034,6 +3033,7 @@ class GwInfo(QObject):
 
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
+        widget.doubleClicked.connect(partial(self._open_generic_visit, widget, table_name))
         if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
             filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
             self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
@@ -3057,6 +3057,42 @@ class GwInfo(QObject):
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
         # Manage config_form_tableview
         tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
+
+
+    def _open_generic_visit(self, widget, table_name):
+
+        table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        visit_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            visit_id = widget.model().record(row).value("visit_id")
+            break
+
+        sql = (f"SELECT gw_fct_getfeatureinfo('{table_name}', '{visit_id}', 3, 100, 'false', 'visit_id', 'integer', '')")
+        row = tools_db.get_row(sql)
+        _json = json.dumps(row[0])
+        _json = f'{{"body":{{"data":{{"fields":{_json}}}}}}}'
+        result_json = json.loads(_json)
+
+        self.dlg_generic_visit = GwInfoGenericUi()
+        tools_gw.load_settings(self.dlg_generic_visit)
+        self.dlg_generic_visit.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
+        self.dlg_generic_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
+        tools_gw.build_dialog_info(self.dlg_generic_visit, result_json)
+
+        # Disable button accept for info on generic form
+        self.dlg_generic_visit.btn_accept.setEnabled(False)
+
+        self.dlg_generic_visit.rejected.connect(self.rubber_band.reset)
+        tools_gw.open_dialog(self.dlg_generic_visit, dlg_name='info_generic')
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -3118,39 +3154,45 @@ class GwInfo(QObject):
         self.visit_id = self.tbl_visit_cf.model().record(selected_row).value("visit_id")
         self.parameter_id = self.tbl_visit_cf.model().record(selected_row).value("parameter_id")
 
-        #Visit intervals
-        sql = f"SELECT lot_id, unit_id FROM om_visit WHERE id = '{self.visit_id}' "
-        row = tools_db.get_row(sql)
+        # Visit intervals
+        sql = f"SELECT value FROM config_param_system WHERE parameter = 'plugin_lotmanage'"
+        plugin_lot = tools_db.get_row(sql)
 
-        if row:
-            self.visit_lot_id = row[0]
-            self.visit_unit_id = row[1]
-            if self.visit_lot_id is not None and self.visit_unit_id is not None:
-                sql = f"SELECT * FROM om_unit_intervals WHERE unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
-                rows = tools_db.get_rows(sql)
-                if rows:
-                        btn_visit_intervals.setEnabled(True)
+        if plugin_lot:
 
-        #gallery
-        if type(table_name) is dict:
-            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
-
-        sql = (f"SELECT column_name FROM information_schema.columns "
-               f"WHERE table_name = '{table_name}' AND column_name='photo'")
-        column_exist = tools_db.get_row(sql)
-
-        if column_exist:
-            sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+            #Visit intervals
+            sql = f"SELECT lot_id, unit_id FROM om_visit WHERE id = '{self.visit_id}' "
             row = tools_db.get_row(sql)
-        else:
-            row = None
 
-        if not row:
-            return
+            if row:
+                self.visit_lot_id = row[0]
+                self.visit_unit_id = row[1]
+                if self.visit_lot_id is not None and self.visit_unit_id is not None:
+                    sql = f"SELECT * FROM om_unit_intervals WHERE unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
+                    rows = tools_db.get_rows(sql)
+                    if rows:
+                            btn_visit_intervals.setEnabled(True)
 
-        # If gallery 'True' or 'False'
-        if str(row[0]) == 'True':
-            btn_open_gallery.setEnabled(True)
+            #gallery
+            if type(table_name) is dict:
+                table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+            sql = (f"SELECT column_name FROM information_schema.columns "
+                   f"WHERE table_name = '{table_name}' AND column_name='photo'")
+            column_exist = tools_db.get_row(sql)
+
+            if column_exist:
+                sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+                row = tools_db.get_row(sql)
+            else:
+                row = None
+
+            if not row:
+                return
+
+            # If gallery 'True' or 'False'
+            if str(row[0]) == 'True':
+                btn_open_gallery.setEnabled(True)
 
 
     def _open_visit_files(self):

@@ -1166,7 +1166,9 @@ def build_dialog_info(dialog, result, my_json=None):
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
-        widget.setProperty('ismandatory', field['ismandatory'])
+
+        if 'ismandatory' in field:
+            widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field:
             order = field['layoutorder']
