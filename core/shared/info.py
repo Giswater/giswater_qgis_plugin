@@ -2361,6 +2361,9 @@ class GwInfo(QObject):
         # Get edited fields
         modified = [k for k in _json if k in keys_list]
 
+        if self.new_feature_id is not None:
+            return self._has_elev_y_json(_json, modified)
+
         for k in modified:
             if _json.get(k) in (None, ''):
                 continue
@@ -2404,6 +2407,86 @@ class GwInfo(QObject):
                         msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
                         tools_qgis.show_warning(msg)
                     return has_y and has_top_elev
+
+        return False
+
+
+    def _has_elev_y_json(self, _json, modified):
+        """If we're creating new feature, check which keys are in json"""
+
+        if self.feature_type == 'node':
+            msg = f"This node has redundant data on (top_elev, ymax & elev) values. Review it and use at most two."
+            # y
+            ymax = _json.get('ymax')
+            custom_ymax = _json.get('custom_ymax')
+            has_ymax = (ymax, custom_ymax) != (None, None)
+            # elev
+            elev = _json.get('elev')
+            custom_elev = _json.get('custom_elev')
+            has_elev = (elev, custom_elev) != (None, None)
+            # top_elev
+            top_elev = _json.get('top_elev')
+            custom_top_elev = _json.get('custom_top_elev')
+            has_top_elev = (top_elev, custom_top_elev) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'ymax' in k:
+                    if has_elev and has_top_elev:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'top_elev' in k:
+                    if has_elev and has_ymax:
+                        tools_qgis.show_warning(msg)
+                        return True
+                elif 'elev' in k:
+                    if has_top_elev and has_ymax:
+                        tools_qgis.show_warning(msg)
+                        return True
+
+            return False
+
+        elif self.feature_type == 'arc':
+            msg = f"This arc has redundant data on both (elev & y) values. Review it and use only one."
+            # y1
+            y1 = _json.get('y1')
+            custom_y1 = _json.get('custom_y1')
+            has_y1 = (y1, custom_y1) != (None, None)
+            # elev1
+            elev1 = _json.get('elev1')
+            custom_elev1 = _json.get('custom_elev1')
+            has_elev1 = (elev1, custom_elev1) != (None, None)
+            # y2
+            y2 = _json.get('y2')
+            custom_y2 = _json.get('custom_y2')
+            has_y2 = (y2, custom_y2) != (None, None)
+            # elev2
+            elev2 = _json.get('elev2')
+            custom_elev2 = _json.get('custom_elev2')
+            has_elev2 = (elev2, custom_elev2) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'y1' in k:
+                    if has_elev1:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'elev1' in k:
+                    if has_y1:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'y2' in k:
+                    if has_elev2:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'elev2' in k:
+                    if has_y2:
+                        tools_qgis.show_warning(msg)
+                        return True
+
+            return False
 
         return False
 
