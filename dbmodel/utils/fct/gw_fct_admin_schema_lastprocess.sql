@@ -315,6 +315,9 @@ BEGIN
 			-- automatize graf analytics config for ws
 			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
 
+			-- UPDATE edit_check_redundance_y_topelev_elev
+			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
+
 		ELSIF v_isnew IS FALSE THEN
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');

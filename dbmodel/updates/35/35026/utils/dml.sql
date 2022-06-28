@@ -101,3 +101,7 @@ WHERE fid=450;
 UPDATE config_csv SET descript='The csv file must contain the following columns in the exact same order: 
 id, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type' 
 WHERE fid=451;
+
+--2022/06/28
+INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
+	VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
