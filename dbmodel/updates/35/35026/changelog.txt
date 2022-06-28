@@ -18,3 +18,4 @@
 - Enhance log for go2epa exportation
 - Enable work with crm values on pg2epa using nodes (netwjoin)
 - Add new Check redundant values on y-top_elev-elev (461) for ud
+- Add style to flowreg views in QGIS template and sys_style table
