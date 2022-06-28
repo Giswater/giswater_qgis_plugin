@@ -2307,9 +2307,10 @@ class GwInfo(QObject):
     def _check_elev_y(self):
         """ Show a warning if feature has both y and elev values """
 
-        msg = f"This {self.feature_type} has both Y & ELEV values! There shouldn't be values in both Y and ELEV fields."
+        msg = f"This {self.feature_type} has redundant data on "
         # ARC
         if self.feature_type == 'arc':
+            msg = f"{msg} both (elev & y) values. Review it and use only one."
             fields1 = 'y1, custom_y1, elev1, custom_elev1'
             sql = f"SELECT {fields1} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
@@ -2331,13 +2332,15 @@ class GwInfo(QObject):
                     return False
         # NODE
         elif self.feature_type == 'node':
-            fields = 'ymax, custom_ymax, elev, custom_elev'
+            msg = f"{msg} all (elev & ymax & top_elev) values. Review it and use at most two."
+            fields = 'ymax, custom_ymax, elev, custom_elev, top_elev, custom_top_elev'
             sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
                 has_y = (row[0], row[1]) != (None, None)
                 has_elev = (row[2], row[3]) != (None, None)
-                if has_y and has_elev:
+                has_top_elev = (row[4], row[5]) != (None, None)
+                if False not in (has_y, has_elev, has_top_elev):
                     tools_qgis.show_warning(msg)
                     return False
         return True
@@ -2346,10 +2349,9 @@ class GwInfo(QObject):
     def _has_elev_and_y_json(self, _json):
         """ :returns True if feature has both y and elev values. False otherwise  """
 
-        msg = "There shouldn't be values in both Y and ELEV fields."
         keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
                      "y2", "custom_y2", "elev2", "custom_elev2",
-                     "ymax", "custom_ymax", "elev", "custom_elev")
+                     "ymax", "custom_ymax", "elev", "custom_elev", "top_elev", "custom_top_elev")
 
         # Check that edited field is y or elev
         has_modified = any(k in _json for k in keys_list)
@@ -2362,20 +2364,46 @@ class GwInfo(QObject):
         for k in modified:
             if _json.get(k) in (None, ''):
                 continue
-            # If edited field is Y check if feature has ELEV field
-            if 'y' in k:
-                has_elev = self._has_elev(arc_n=k[-1:])
-                if has_elev:
-                    msg = f"This feature already has ELEV values! {msg}"
-                    tools_qgis.show_warning(msg)
-                return has_elev
-            # If edited field is ELEV check if feature has Y field
-            if 'elev' in k:
-                has_y = self._has_y(arc_n=k[-1:])
-                if has_y:
-                    msg = f"This feature already has Y values! {msg}"
-                    tools_qgis.show_warning(msg)
-                return has_y
+            if self.feature_type == 'arc':
+                # If edited field is Y check if feature has ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev(arc_n=k[-1:])
+                    if has_elev:
+                        msg = f"This feature already has ELEV values! Review it and use only one"
+                        tools_qgis.show_warning(msg)
+                    return has_elev
+                # If edited field is ELEV check if feature has Y field
+                if 'elev' in k:
+                    has_y = self._has_y(arc_n=k[-1:])
+                    if has_y:
+                        msg = f"This feature already has Y values! Review it and use only one"
+                        tools_qgis.show_warning(msg)
+                    return has_y
+            elif self.feature_type == 'node':
+                # If edited field is Y check if feature has ELEV & TOP_ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev()
+                    has_top_elev = self._has_top_elev()
+                    if has_elev and has_top_elev:
+                        msg = f"This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_elev and has_top_elev
+                # If edited field is TOP_ELEV check if feature has Y & ELEV field
+                if 'top_elev' in k:
+                    has_y = self._has_y()
+                    has_elev = self._has_elev()
+                    if has_y and has_elev:
+                        msg = f"This feature already has Y & ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_y and has_elev
+                # If edited field is ELEV check if feature has Y & TOP_ELEV field
+                elif 'elev' in k:
+                    has_y = self._has_y()
+                    has_top_elev = self._has_top_elev()
+                    if has_y and has_top_elev:
+                        msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_y and has_top_elev
 
         return False
 
@@ -2416,6 +2444,19 @@ class GwInfo(QObject):
 
         elif self.feature_type == 'node':
             fields = 'elev, custom_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_top_elev(self):
+        """ :returns True if feature has top_elev values. False otherwise """
+
+        if self.feature_type == 'node':
+            fields = 'top_elev, custom_top_elev'
             sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
             row = tools_db.get_row(sql)
             if row:
