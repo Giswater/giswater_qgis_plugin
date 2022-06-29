@@ -205,7 +205,7 @@ BEGIN
 			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 			FROM ext_rtc_hydrometer h
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.source = h.hydrometer_id
+			WHERE d.source = h.id::text
 			AND dscenario_id = v_scenarioid;
 		END IF;
 
