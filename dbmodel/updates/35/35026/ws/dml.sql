@@ -134,3 +134,9 @@ UPDATE inp_typevalue SET idval ='JOIN BASE DEMANDS & PAT.' WHERE typevalue ='inp
 
 
 UPDATE sys_table SET addparam = null where id = 'v_edit_inp_dscenario_demand';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES(462, 'Planified EPANET pumps with more than two acs', 'ws', NULL, 'core', true, 'Check plan-data', NULL) 
+ON CONFLICT (fid) DO NOTHING;
+
+	
