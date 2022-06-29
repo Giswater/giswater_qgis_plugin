@@ -36,6 +36,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInterpolate
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting
 is_inserting = False
@@ -1674,7 +1675,8 @@ class GwInfo(QObject):
         new_feature = kwargs['new_feature']
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
-        widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
+        if type(widget) == GwHyperLinkLineEdit:
+            widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
         return widget
 
 
