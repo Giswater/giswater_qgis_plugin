@@ -44,7 +44,7 @@ from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
-from ...lib.tools_qt import GwHyperLinkLabel
+from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 
 def load_settings(dialog, plugin='core'):
@@ -917,9 +917,11 @@ def enable_widgets(dialog, result, enable):
         for widget in widget_list:
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        if type(widget) == GwHyperLinkLineEdit:
+                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
@@ -944,11 +946,13 @@ def enable_all(dialog, result):
                 continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            if type(widget) == GwHyperLinkLineEdit:
+                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
                             widget.setStyleSheet(None)
@@ -1450,7 +1454,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
 
-    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
         if widget.isReadOnly() and not ignore_editability:
             return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
@@ -1528,7 +1532,11 @@ def add_hyperlink(field):
 
     """
 
-    widget = GwHyperLinkLabel()
+    is_editable = field.get('iseditable')
+    if is_editable:
+        widget = GwHyperLinkLineEdit()
+    else:
+        widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])

@@ -1670,8 +1670,11 @@ class GwInfo(QObject):
         """
 
         field = kwargs['field']
+        dialog = kwargs['dialog']
+        new_feature = kwargs['new_feature']
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
+        widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
         return widget
 
 
@@ -2120,6 +2123,14 @@ class GwInfo(QObject):
             widget.textChanged.connect(partial(self._enabled_accept, dialog))
             widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
             widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+
+        return widget
+
+
+    def _set_auto_update_hyperlink(self, field, dialog, widget, new_feature=None):
+
+        if self._check_tab_data(dialog):
+            widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
 
