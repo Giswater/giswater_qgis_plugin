@@ -105,7 +105,7 @@ BEGIN
 	END IF;
 
 	-- 	Calling function to build form fields
-	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
+	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',NULL, v_device, null)
 	INTO fields_array;
 	
 
