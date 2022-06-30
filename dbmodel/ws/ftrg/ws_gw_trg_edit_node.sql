@@ -685,6 +685,18 @@ BEGIN
 					INSERT INTO inp_tank 
 					SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow  
 					FROM inp_inlet WHERE node_id = OLD.node_id;
+					
+				ELSIF (OLD.epa_type = 'RESERVOIR') and (NEW.epa_type = 'INLET') THEN
+		      DELETE FROM inp_inlet WHERE node_id = OLD.node_id;
+					INSERT INTO inp_inlet (node_id, pattern_id, head)
+					SELECT NEW.node_id, pattern_id, head
+					FROM inp_reservoir WHERE node_id = OLD.node_id;
+
+		    ELSIF (OLD.epa_type = 'INLET') and (NEW.epa_type = 'RESERVOIR') THEN
+					DELETE FROM inp_reservoir WHERE node_id = OLD.node_id;
+					INSERT INTO inp_reservoir (node_id, pattern_id, head)
+					SELECT NEW.node_id, pattern_id, head
+					FROM inp_inlet WHERE node_id = OLD.node_id;
 		    END IF;
 		
 		    IF v_inp_table IS NOT NULL THEN
