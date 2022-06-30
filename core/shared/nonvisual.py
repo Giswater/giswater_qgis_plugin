@@ -17,6 +17,7 @@ except ImportError:
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
 from ..utils.matplotlib_widget import MplCanvas
@@ -1840,6 +1841,11 @@ class GwNonVisual:
 
         is_new = (lidco_id is None) or duplicate
 
+        # Manage decimal validation for QLineEdit
+        widget_list = self.dialog.findChildren(QLineEdit)
+        for widget in widget_list:
+            tools_qt.double_validator(widget, 0, 9999999, 3)
+
         # Populate LID Type combo
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
@@ -1850,7 +1856,7 @@ class GwNonVisual:
         sql = f"SELECT id FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.dialog.drain_8, rows)
+            tools_qt.fill_combo_values(self.dialog.cmb_control_curve, rows)
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog))
@@ -1927,8 +1933,13 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_lidtype, str(lidtype), 0)
 
         for i in range(dialog.tab_lidlayers.count()):
-            if dialog.tab_lidlayers.isTabVisible(i):
-                tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
+            if Qgis.QGIS_VERSION_INT >= 32000:
+                if not dialog.tab_lidlayers.isTabVisible(i):
+                    continue
+            else:
+                if not dialog.tab_lidlayers.isTabEnabled(i):
+                    continue
+
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
                 visible_widgets = [widget for widget in child_list if
@@ -1996,9 +2007,17 @@ class GwNonVisual:
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
             if tab_name not in lidtabs:
-                tab_lidlayers.setTabVisible(i, False)
+                if Qgis.QGIS_VERSION_INT >= 32000:
+                    tab_lidlayers.setTabVisible(i, False)
+                else:
+                    tab_lidlayers.setTabEnabled(i, False)
+
             else:
-                tab_lidlayers.setTabVisible(i, True)
+                if Qgis.QGIS_VERSION_INT >= 32000:
+                    tab_lidlayers.setTabVisible(i, True)
+                else:
+                    tab_lidlayers.setTabEnabled(i, True)
+
                 if tab_name == 'DRAIN':
                     if lid_id == 'RD':
                         tab_lidlayers.setTabText(i, "Roof Drainage")
@@ -2014,29 +2033,36 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
-                        'RG': {'lbl_surface_6', 'surface_6'},
-                        'GR': {'lbl_surface_5', 'surface_5'},
-                        'IT': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
-                        'PP': {'lbl_surface_6', 'surface_6', 'lbl_drain_5', 'drain_5'},
-                        'RB': {'lbl_storage_4', 'storage_4', 'lbl_storage_5', 'storage_5'},
-                        'RD': {'lbl_surface_3', 'surface_3', 'lbl_surface_6', 'surface_6',
+        widgets_hide = {'BC': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
+                        'RG': {'lbl_surface_6', 'txt_surface_side_slope'},
+                        'GR': {'lbl_surface_5', 'txt_surface_slope'},
+                        'IT': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
+                        'PP': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
+                        'RB': {'lbl_storage_4', 'txt_seepage_rate', 'lbl_storage_5', 'txt_clogging_factor_storage'},
+                        'RD': {'lbl_surface_3', 'txt_vegetation_volume', 'lbl_surface_6', 'txt_surface_side_slope',
                                'lbl_drain_3','lbl_drain_4', 'lbl_drain_5', 'lbl_drain_6',
-                               'lbl_drain_7', 'lbl_drain_8', 'lbl_drain_9', 'drain_3',
-                               'drain_4', 'drain_5', 'drain_6', 'drain_7', 'drain_8',},
+                               'lbl_drain_7', 'lbl_drain_8', 'lbl_drain_9', 'txt_flow_exponent',
+                               'txt_offset', 'txt_drain_delay', 'txt_open_level', 'txt_closed_level', 'cmb_control_curve',},
                         'VS': {''}}
 
         # Hide widgets in list
         for i in range(dialog.tab_lidlayers.count()):
-            if dialog.tab_lidlayers.isTabVisible(i):
-                # List of children
-                list = dialog.tab_lidlayers.widget(i).children()
-                for y in list:
-                    if type(y) != QGridLayout:
-                        y.show()
-                        for j in widgets_hide[lid_id]:
-                            if j == y.objectName():
-                                y.hide()
+            if Qgis.QGIS_VERSION_INT >= 32000:
+                if not dialog.tab_lidlayers.isTabVisible(i):
+                    continue
+            else:
+                if not dialog.tab_lidlayers.isTabEnabled(i):
+                    continue
+
+            # List of children
+            list = dialog.tab_lidlayers.widget(i).children()
+            for y in list:
+                if type(y) != QGridLayout:
+                    y.show()
+                    for j in widgets_hide[lid_id]:
+                        if j == y.objectName():
+                            y.hide()
+
 
 
     def _manage_lids_images(self, lidco_id):
@@ -2128,14 +2154,14 @@ class GwNonVisual:
 
     def _insert_lids_values(self, dialog, lidco_id, lidco_type):
 
-        control_values = {'BC': {'soil_2', 'storage_2'},
-                    'RG': {'soil_2', 'storage_2'},
-                    'GR': {'soil_2', 'drainmat_2'},
-                    'IT': {'storage_2'},
-                    'PP': {'pavement_2', 'storage_2'},
+        control_values = {'BC': {'txt_thickness', 'txt_thickness_storage'},
+                    'RG': {'txt_thickness', 'txt_thickness_storage'},
+                    'GR': {'txt_thickness', 'drainmat_2'},
+                    'IT': {'txt_thickness_storage'},
+                    'PP': {'txt_thinkness_pavement', 'txt_thickness_storage'},
                     'RB': {''},
                     'RD': {''},
-                    'VS': {'surface_2'}}
+                    'VS': {'txt_berm_height'}}
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
