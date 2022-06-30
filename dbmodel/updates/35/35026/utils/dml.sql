@@ -105,3 +105,11 @@ WHERE fid=451;
 --2022/06/28
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
 	VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled, layoutorder, project_type,  
+datatype, widgettype,  iseditable, standardvalue, layoutname)
+VALUES ('epa_automatic_inp2man_values', '{"status":false, "values":[
+{"sourceTable":"inp_tank", "query":"UPDATE ve_node_tank t SET  hmax=maxlevel  FROM inp_tank s "},
+{"sourceTable":"inp_valve", "query":"UPDATE ve_node_pr_reduc_valve t SET pression_exit=pressure FROM inp_valve s "}]}', 
+'Before insert - update of any feature, automatic update of columns on man tables from columns on inp table', 'EPA auto update inventory tables:', 
+true, 13, 'utils','json', 'text',true, '{"status":false}','lyt_admin_other');

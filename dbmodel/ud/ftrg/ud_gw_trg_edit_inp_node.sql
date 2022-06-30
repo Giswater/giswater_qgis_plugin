@@ -15,7 +15,7 @@ DECLARE
     v_sql varchar;
     v_old_nodetype varchar;
     v_new_nodetype varchar;    
-
+    v_input json;
 	
 	
 BEGIN
@@ -123,6 +123,10 @@ BEGIN
 	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param
 	        WHERE node_id=OLD.node_id;
         END IF;
+
+        v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');
+        -- inp2man_values
+		PERFORM gw_fct_man2inp_values(v_input);
 
         RETURN NEW;
 
