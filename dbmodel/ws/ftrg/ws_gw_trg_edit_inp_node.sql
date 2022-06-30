@@ -20,6 +20,7 @@ v_new_nodetype varchar;
 v_tablename varchar;
 v_pol_id varchar;
 v_node_id varchar;
+v_input json;
 
 BEGIN
 
@@ -122,6 +123,10 @@ BEGIN
         UPDATE node 
 		SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
         WHERE node_id=OLD.node_id;
+
+        v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');
+        -- inp2man_values
+		PERFORM gw_fct_man2inp_values(v_input);
 
 		RETURN NEW;
         

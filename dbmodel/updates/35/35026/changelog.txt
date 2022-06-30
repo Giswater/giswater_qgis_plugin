@@ -20,3 +20,4 @@
 - Add new Check redundant values on y-top_elev-elev (461) for ud
 - Add style to flowreg views in QGIS template and sys_style table
 - WS - Plan check - Find planified EPA pumps with 3 arcs (462)
+- New system parameter - epa_automatic_inp2man_values - Usued for updating inventory tables with EPA values.

@@ -426,3 +426,6 @@ VALUES(461, 'Check redundant values on y-top_elev-elev', 'ud', NULL, 'core', tru
 ON CONFLICT (fid) DO NOTHING;
 
 DELETE FROM config_param_system WHERE parameter  ='admin_debug';
+
+INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
+VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
