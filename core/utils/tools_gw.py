@@ -1543,7 +1543,7 @@ def add_hyperlink(field):
     if 'value' in field:
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
-    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
     real_name = widget.objectName()
