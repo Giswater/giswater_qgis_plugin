@@ -421,7 +421,7 @@ BEGIN
 			
 			IF v_visit_id IS NOT NULL THEN
 			
-				v_querystring = concat('SELECT true FROM om_visit WHERE status<>4 AND id = ', quote_nullable(v_visit_id),' AND lot_id = ',v_lot,' ORDER BY id desc LIMIT 1');
+				v_querystring = concat('SELECT true FROM om_visit WHERE status<>4 AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
 				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 50);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
