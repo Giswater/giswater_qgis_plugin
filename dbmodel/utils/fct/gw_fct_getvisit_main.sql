@@ -116,7 +116,6 @@ v_pageinfo json;
 v_layermanager json;
 v_filterfields json;
 v_data json;
-isnewvisit boolean default false;
 v_feature json;
 v_addfile json;
 v_deletefile json;
@@ -184,7 +183,6 @@ v_fields_aux json;
 v_disable_widget_name text[];
 v_fields_keys text[];
 v_field text;
-v_load_visit_aux boolean;
 v_user_name text;
 v_end_date text;
 
@@ -499,9 +497,6 @@ BEGIN
 			END IF;
 		END IF;
 	--END IF;
-	IF v_visitclass IS NOT NULL THEN
-		v_load_visit_aux = true;
-	END IF;
 	
 	--  get formname and tablename
 	
@@ -1000,8 +995,7 @@ BEGIN
 		
 		--show tab only if it is not new visit or offline is true
 		
-		--IF NOT v_new_visit THEN
-		IF NOT isnewvisit OR v_load_visit_aux THEN
+		IF NOT v_new_visit THEN
 			--filling tab (only if it's active)
 			
 			IF v_activefilestab THEN
