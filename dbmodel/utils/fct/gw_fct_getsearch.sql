@@ -265,9 +265,14 @@ BEGIN
 			SELECT ((value::json)->>'sys_id_field') INTO v_search_muni_id_field FROM config_param_system WHERE parameter='basic_search_muni';
 			SELECT ((value::json)->>'sys_search_field') INTO v_search_muni_search_field FROM config_param_system WHERE parameter='basic_search_muni';
 			SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM config_param_system WHERE parameter='basic_search_muni';
+		
+			-- get muni default from user variable
+			SELECT value INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
 
-			-- get muni default from map
-			v_search_vdef = (SELECT muni_id FROM ext_municipality m, v_edit_exploitation e WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) limit 1);
+			-- get muni default from user variable or map
+			IF v_search_vdef IS NULL THEN
+				v_search_vdef = (SELECT muni_id FROM ext_municipality m, v_edit_exploitation e WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) limit 1);
+			END IF;
 			
 			-- Init combo json
 			SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_muni';

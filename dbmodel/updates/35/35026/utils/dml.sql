@@ -110,3 +110,7 @@ VALUES ('epa_automatic_inp2man_values', '{"status":false, "values":[
 {"sourceTable":"inp_valve", "query":"UPDATE man_valve t SET pression_exit=pressure FROM inp_valve s "}]}', 
 'Before insert - update of any feature, automatic update of columns on man tables from columns on inp table', 'EPA auto update inventory tables:', 
 true, 13, 'utils','json', 'text',true, '{"status":false}','lyt_admin_other');
+
+INSERT INTO sys_param_user VALUES('basic_search_municipality_vdefault', 'config', 'Selected municipality will be the one in which the streetaxis will be searched', 'role_basic', NULL, 'Search municipality:', 'SELECT muni_id AS id , name as idval FROM ext_municipality WHERE muni_id IS NOT NULL AND active IS TRUE AND muni_id>0 ', NULL, true, 2, 'utils', false, NULL, 'muni_id', NULL, false, 'string', 'combo', false, NULL, NULL, 'lyt_basic', true, NULL, NULL, NULL, NULL, 'core');
+
+
