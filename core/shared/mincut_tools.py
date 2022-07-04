@@ -135,7 +135,8 @@ class GwMincutTools:
             msg = "There are no visible mincuts in the table. Try a different filter or make one"
             tools_qgis.show_message(msg)
             return
-        selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
+        selector_values = f"selector_mincut"
+        aux_params = f'"ids":{selected_mincuts}'
         mincut_selector = GwSelector()
 
         self.dlg_selector = GwSelectorUi()
@@ -145,7 +146,7 @@ class GwMincutTools:
         self.dlg_selector.rejected.connect(partial(tools_gw.save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(tools_gw.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab, aux_params=aux_params)
 
         tools_gw.open_dialog(self.dlg_selector, dlg_name='selector')
 
