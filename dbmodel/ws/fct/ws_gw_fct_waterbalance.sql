@@ -29,6 +29,9 @@ DECLARE
 v_fid integer = 441;
 v_expl integer;
 v_period text;
+v_allperiods boolean;
+rec text;
+v_querytext text;
 
 v_result json;
 v_result_info json;
@@ -53,6 +56,7 @@ BEGIN
 	-- getting input data 	
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
+	v_allperiods := (((p_data ->>'data')::json->>'parameters')::json->>'allPeriods')::boolean;
 	v_executegrafdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGrafDma';
 
 	IF v_executegrafdma THEN
@@ -73,32 +77,44 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
+	IF v_allperiods IS TRUE THEN
+		v_querytext ='SELECT DISTINCT id FROM ext_cat_period';
+	ELSE
+		v_querytext ='SELECT DISTINCT id FROM ext_cat_period WHERE id='||quote_literal(v_period)||'';
+	END IF;
 
-	INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
-	SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
-	ON CONFLICT (cat_period_id, dma_id) do nothing;
+	FOR rec IN EXECUTE v_querytext LOOP
+		
+		v_period=rec;
 
-	UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-					FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graf USING (node_id) GROUP BY cat_period_id, dma_id)a
-					WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+		INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
+		SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
+		ON CONFLICT (cat_period_id, dma_id) do nothing;
 
-	GET DIAGNOSTICS v_count = row_count;
-
-	UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
-						FROM ext_rtc_hydrometer_x_data d
-						JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
-						JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
+		UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
+						FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graf USING (node_id) GROUP BY cat_period_id, dma_id)a
 						WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
-	SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc,
-		(sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
-		FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+		GET DIAGNOSTICS v_count = row_count;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, 'Process done succesfully');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
+		UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
+							FROM ext_rtc_hydrometer_x_data d
+							JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
+							JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
+							WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+
+		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc,
+			(sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
+			FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+
+	END LOOP;
 
 	IF v_executegrafdma THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
@@ -108,7 +124,6 @@ BEGIN
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message ='INFO';
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message LIKE '---%';
 	END IF;
-
 	-- get results
 	
 	-- info

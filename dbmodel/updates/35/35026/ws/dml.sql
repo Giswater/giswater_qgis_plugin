@@ -139,4 +139,34 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES(462, 'Planified EPANET pumps with more than two acs', 'ws', NULL, 'core', true, 'Check plan-data', NULL) 
 ON CONFLICT (fid) DO NOTHING;
 
-	
+UPDATE config_report SET query_text='SELECT p.code as  "Period",e.name as "Exploitation", dma.name as "Dma", round(SUM(sum)::numeric,2) as sum FROM ext_rtc_hydrometer_x_data
+JOIN  ext_cat_period p on p.id=cat_period_id JOIN  rtc_hydrometer_x_connec Using (hydrometer_id)
+JOIN connec c using (connec_id) JOIN dma using(dma_id) JOIN exploitation e on e.expl_id=dma.expl_id GROUP BY dma_id,"Dma","Period","Exploitation" ',
+filterparam='[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY code","isNullValue":"true"}]'
+WHERE id=106;
+
+UPDATE config_report SET query_text='SELECT e.name as "Exploitation", dma.name as "Dma", p.code as  "Period", total_sys_input, auth_bill_met_export, 
+auth_bill_met_hydro, auth_bill_unmet, auth_unbill_met, auth_unbill_unmet, 
+loss_app_unath, loss_app_met_error, loss_app_data_error, loss_real_leak_main, 
+loss_real_leak_service, loss_real_storage, type, w.descript FROM om_waterbalance w 
+JOIN  ext_cat_period p on p.id=cat_period_id
+JOIN dma USING (dma_id) JOIN exploitation e on e.expl_id=dma.expl_id ',
+filterparam='[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY code","isNullValue":"true"}]'
+WHERE id=105;
+
+
+UPDATE config_toolbox SET inputparams='[{"widgetname":"executeGrafDma", "label":"Execute Graf for DMA:", "widgettype":"check","datatype":"boolean","tooltip":"If true, grafaanalytics mapzones will be triggered for DMA and expl selected" , "layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY code", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"allPeriods", "label":"Execute for all periods:","widgettype":"check","datatype":"boolean", "isMandatory":true, "tooltip":"Execute for all periods",  "layoutname":"grl_option_parameters","layoutorder":4, "value":""}]'
+WHERE id=3142;
