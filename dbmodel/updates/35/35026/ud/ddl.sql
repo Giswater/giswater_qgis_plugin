@@ -33,6 +33,9 @@ ALTER TABLE _inp_gully_ DROP CONSTRAINT inp_gully_gully_id_fkey;
 
 CREATE TABLE inp_netgully (
   node_id character varying(16) NOT NULL,
+  y0 numeric(12,4),
+  ysur numeric(12,4),
+  apond numeric(12,4),
   outlet_type varchar(30),
   custom_width double precision,
   custom_length double precision,

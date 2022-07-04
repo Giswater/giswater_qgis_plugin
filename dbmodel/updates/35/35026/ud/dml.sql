@@ -377,11 +377,11 @@ UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null FROM c
 columnname='gratecat2_id');
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active 
-AND feature_type = ''NODE'' AND id != ''NETGULLY'''
+AND feature_type = ''NODE''
 WHERE columnname = 'epa_type' AND formname like 've_nod%';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active 
-AND feature_type = ''NODE'' AND id != ''NETGULLY'''
+AND feature_type = ''NODE''
 WHERE columnname = 'epa_type' AND formname = 'v_edit_node';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active IS TRUE and feature_type = ''NODE'''
@@ -429,3 +429,7 @@ DELETE FROM config_param_system WHERE parameter  ='admin_debug';
 
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
 VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
+
+
+INSERT INTO inp_typevalue(typevalue, id, idval)
+VALUES ('typevalue_gully_method', 'UPC', 'UPC');
