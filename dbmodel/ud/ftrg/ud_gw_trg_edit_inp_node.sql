@@ -97,9 +97,7 @@ BEGIN
 
 	        IF NEW.weir_cd IS NULL AND NEW.outlet_type='W/0' THEN
 	            NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_weir_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-	        END IF;
-
-	        IF NEW.orifice_cd IS NULL AND NEW.outlet_type='W/0' THEN
+	        ELSIF NEW.orifice_cd IS NULL AND NEW.outlet_type='W/0' THEN
 	            NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_orifice_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	        END IF;
 
@@ -120,8 +118,9 @@ BEGIN
 	        SET custom_length=NEW.custom_length, efficiency=NEW.efficiency,
 	        outlet_type=NEW.outlet_type,  custom_width=NEW.custom_width,
 	        custom_depth=NEW.custom_depth, method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd,
-	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param
+	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, ysur=NEW.ysur,y0=NEW.y0,apond=NEW.apond
 	        WHERE node_id=OLD.node_id;
+	        
         END IF;
 
         v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');

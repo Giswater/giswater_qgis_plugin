@@ -356,7 +356,8 @@ SELECT 'v_edit_inp_netgully', formtype, tabname, columnname, layoutname, layouto
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
 dv_querytext,dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden
-FROM config_form_fields WHERE formname='v_edit_inp_storage' AND columnname IN ('ymax', 'custom_ymax', 'elev', 'custom_elev', 'sys_elev', 'nodecat_id')
+FROM config_form_fields WHERE formname='v_edit_inp_storage' AND columnname IN ('ymax', 'custom_ymax', 'elev', 'custom_elev', 'sys_elev', 'nodecat_id',
+'y0','ysur','apond')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields set dv_querytext_filterc=NULL,dv_parent_id=null  WHERE formname='v_edit_inp_netgully' AND (columnname='gratecat_id' OR 
@@ -429,7 +430,3 @@ DELETE FROM config_param_system WHERE parameter  ='admin_debug';
 
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
 VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
-
-
-INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('typevalue_gully_method', 'UPC', 'UPC');
