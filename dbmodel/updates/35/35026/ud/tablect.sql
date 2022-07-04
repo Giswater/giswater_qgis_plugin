@@ -15,3 +15,7 @@ ALTER TABLE gully ADD CONSTRAINT gully_gratecat2_id_fkey FOREIGN KEY (gratecat2_
 
 ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat2_id_fkey;
 ALTER TABLE man_netgully ADD CONSTRAINT man_netgully_gratecat2_id_fkey FOREIGN KEY (gratecat2_id) REFERENCES cat_grate (id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_epa_type_check;
+ALTER TABLE node ADD CONSTRAINT node_epa_type_check 
+CHECK (epa_type::text = ANY (ARRAY['JUNCTION'::text, 'STORAGE'::text, 'DIVIDER'::text, 'OUTFALL'::text, 'NETGULLY'::text, 'UNDEFINED'::text]));

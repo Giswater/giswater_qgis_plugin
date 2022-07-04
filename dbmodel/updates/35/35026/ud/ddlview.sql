@@ -467,9 +467,9 @@ CREATE OR REPLACE VIEW v_edit_inp_netgully AS
     i.efficiency
    FROM selector_sector s,
     v_node n
-     JOIN man_netgully USING (node_id)
      JOIN inp_netgully i USING (node_id)
-     JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN man_netgully USING (node_id)
+     LEFT JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
   WHERE n.sector_id = s.sector_id AND s.cur_user = "current_user"()::text;
 
 

@@ -560,9 +560,6 @@ BEGIN
 			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon, gratecat2_id, groove_length, groove_height, units_placement ) 
 			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 			NEW.groove, NEW.siphon, NEW.gratecat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
-
-			INSERT INTO inp_netgully (node_id) VALUES (NEW.node_id);
-	
 									 			
 		ELSIF v_man_table='man_chamber' THEN
 
@@ -625,6 +622,8 @@ BEGIN
 			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');			
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
+		ELSIF (NEW.epa_type = 'NETGULLY') THEN
+			INSERT INTO inp_netgully (node_id, y0, ysur, apond) VALUES (NEW.node_id, 0, 0, 0);
 		END IF;
 
 		-- man2inp_values
@@ -643,7 +642,9 @@ BEGIN
 			ELSIF (OLD.epa_type = 'OUTFALL') THEN
 				v_inp_table:= 'inp_outfall';    
 			ELSIF (OLD.epa_type = 'STORAGE') THEN
-				v_inp_table:= 'inp_storage';    
+				v_inp_table:= 'inp_storage'; 
+			ELSIF (OLD.epa_type = 'NETGULLY') THEN
+				v_inp_table:= 'inp_netgully';    
 			END IF;
 		
 			IF v_inp_table IS NOT NULL THEN
@@ -661,6 +662,8 @@ BEGIN
 				v_inp_table:= 'inp_outfall';  
 			ELSIF (NEW.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage';
+			ELSIF (NEW.epa_type = 'NETGULLY') THEN
+				v_inp_table:= 'inp_netgully'; 
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||') ON CONFLICT (node_id) DO NOTHING';
@@ -841,11 +844,6 @@ BEGIN
 		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;
-		END IF;
-
-		-- net gully management
-		IF NEW.sys_type !='NETGULLY' AND OLD.sys_type = 'NETGULLY' THEN
-			DELETE FROM inp_netgully WHERE node_id = OLD.node_id;
 		END IF;
 
 		-- man addfields update
