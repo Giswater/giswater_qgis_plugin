@@ -694,7 +694,7 @@ BEGIN
 					END IF;
 					
 
-					RAISE NOTICE 'Manage conflicts';
+					RAISE NOTICE 'Check for conflicts';
 
 					-- manage conflicts
 					FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
@@ -711,7 +711,7 @@ BEGIN
 
 	
 					LOOP
-						RAISE NOTICE 'Manage conflicts -> %', rec_conflict;
+						RAISE NOTICE 'Managing conflicts -> %', rec_conflict;
 				
 						-- update & count features
 						--arc
@@ -771,6 +771,9 @@ BEGIN
 			
 			-- fill config table for dma
 			IF v_class = 'DMA' THEN
+				
+				RAISE NOTICE 'Filling om_waterbalance_dma_graf ';
+			
 				v_querytext = 'INSERT INTO om_waterbalance_dma_graf (node_id, '||quote_ident(v_field)||', flow_sign)
 				(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
 				CASE 
@@ -944,7 +947,7 @@ BEGIN
 		END IF;
 	END IF;
 	
-	-- get results
+	RAISE NOTICE 'Getting results';
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) order by criticity desc, id asc) row;
