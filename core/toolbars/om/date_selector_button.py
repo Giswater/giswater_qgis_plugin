@@ -8,8 +8,8 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
+from qgis.PyQt.QtCore import QDate, Qt
+from qgis.PyQt.QtWidgets import QDateEdit, QPushButton, QDockWidget
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwSelectorDateUi
@@ -21,13 +21,36 @@ from .... import global_vars
 class GwDateSelectorButton(GwAction):
     """ Button 84: Date selector """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, dates_docker=False):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+
+        self.dates_docker = dates_docker
 
 
     def clicked_event(self):
         self._open_date_selector()
 
+
+    def manage_dates_docker(self, date_from, date_to, open=False):
+        """
+        Manage label for the dates docker
+            :param date_from: from date in yyyy-mm-dd format
+            :param date_to: to date in yyyy-mm-dd format
+            :param open: if it has to create a new docker or just update it
+        """
+
+        date_from_split = date_from.split('-')
+        date_from = f"{date_from_split[2]}/{date_from_split[1]}/{date_from_split[0]}"
+        date_to_split = date_to.split('-')
+        date_to = f"{date_to_split[2]}/{date_to_split[1]}/{date_to_split[0]}"
+        title = f"Dates: {date_from} - {date_to}"
+
+        if global_vars.session_vars['dates_docker'] is None:
+            global_vars.session_vars['dates_docker'] = QDockWidget(title)
+        else:
+            global_vars.session_vars['dates_docker'].setWindowTitle(title)
+        if open:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['dates_docker'])
 
     # region private functions
 
@@ -70,6 +93,9 @@ class GwDateSelectorButton(GwAction):
                    f" SET (from_date, to_date) = ('{from_date}', '{to_date}')"
                    f" WHERE cur_user = '{self.current_user}'")
         tools_db.execute_sql(sql)
+
+        if self.dates_docker:
+            self.manage_dates_docker(from_date, to_date, open=True)
 
         tools_gw.close_dialog(self.dlg_selector_date)
         tools_qgis.refresh_map_canvas()
