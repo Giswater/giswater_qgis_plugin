@@ -107,7 +107,7 @@ class GwAuxPointAddButton(GwMaptool):
             tools_qgis.show_info(message)
 
         # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
+        self.snapper_manager.store_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()
@@ -118,6 +118,7 @@ class GwAuxPointAddButton(GwMaptool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
+        self.iface.setActiveLayer(self.layer_points)
 
         # Check for default base layer
         self.vdefault_layer = None
@@ -136,6 +137,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.point_1 = None
         self.point_2 = None
+        self.snapper_manager.recover_snapping_options()
 
         # Call parent method
         super().deactivate()
@@ -253,6 +255,7 @@ class GwAuxPointAddButton(GwMaptool):
                 self._init_create_point_form(self.point_1, self.point_2)
 
         elif event.button() == Qt.RightButton:
+            self.snapper_manager.recover_snapping_options()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
 

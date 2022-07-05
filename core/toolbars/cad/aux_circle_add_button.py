@@ -96,7 +96,7 @@ class GwAuxCircleAddButton(GwMaptool):
             tools_qgis.show_info(message)
 
         # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
+        self.snapper_manager.store_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()
@@ -109,6 +109,7 @@ class GwAuxCircleAddButton(GwMaptool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
+        self.iface.setActiveLayer(self.layer_circle)
 
         # Check for default base layer
         self.vdefault_layer = None
@@ -126,6 +127,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def deactivate(self):
 
+        self.snapper_manager.recover_snapping_options()
         # Call parent method
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
@@ -222,6 +224,7 @@ class GwAuxCircleAddButton(GwMaptool):
             self._init_create_circle_form(point)
 
         elif event.button() == Qt.RightButton:
+            self.snapper_manager.recover_snapping_options()
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()
