@@ -430,3 +430,11 @@ INSERT INTO config_param_system (parameter, value, descript, label, isenabled, p
 VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
 
 UPDATE cat_feature_gully SET epa_default = 'NETGULLY' WHERE type  = 'NETGULLY';
+
+INSERT INTO inp_netgully (node_id, y0, ysur, apond)
+SELECT node_id, y0, ysur, apond FROM inp_junction JOIN node USING (node_id) JOIN cat_feature_node ON id = node_type WHERE type = 'NETGULLY'
+ON CONFLICT (node_id) DO NOTHING;
+
+DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM inp_junction JOIN node USING (node_id) JOIN cat_feature_node ON id = node_type WHERE type = 'NETGULLY');
+
+
