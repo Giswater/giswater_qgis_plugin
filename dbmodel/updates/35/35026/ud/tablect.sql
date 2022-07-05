@@ -19,3 +19,7 @@ ALTER TABLE man_netgully ADD CONSTRAINT man_netgully_gratecat2_id_fkey FOREIGN K
 ALTER TABLE node DROP CONSTRAINT IF EXISTS node_epa_type_check;
 ALTER TABLE node ADD CONSTRAINT node_epa_type_check 
 CHECK (epa_type::text = ANY (ARRAY['JUNCTION'::text, 'STORAGE'::text, 'DIVIDER'::text, 'OUTFALL'::text, 'NETGULLY'::text, 'UNDEFINED'::text]));
+
+ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_inp_check;
+ALTER TABLE cat_feature_node
+ADD CONSTRAINT cat_feature_node_inp_check CHECK (epa_default::text = ANY (ARRAY['JUNCTION'::text, 'STORAGE'::text, 'DIVIDER'::text, 'OUTFALL'::text, 'NETGULLY'::text, 'UNDEFINED'::text]));

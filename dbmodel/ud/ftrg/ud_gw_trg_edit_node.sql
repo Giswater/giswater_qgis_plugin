@@ -57,6 +57,13 @@ v_srid integer;
 v_force_delete boolean;
 v_system_id text;
 
+v_gully_outlet_type text;
+v_gully_method text;
+v_gully_weir_cd float;
+v_gully_orifice_cd float;
+v_gully_efficiency float;
+
+
 -- automatic_man2inp_values
 v_man_view text;
 v_input json;
@@ -77,6 +84,14 @@ BEGIN
 	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+
+
+	-- get user variables
+	v_gully_outlet_type = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_outlet_type_vdefault' AND cur_user = current_user);
+	v_gully_method = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_method_vdefault' AND cur_user = current_user);
+	v_gully_weir_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_weir_cd_vdefault' AND cur_user = current_user);
+	v_gully_orifice_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_orifice_cd_vdefault' AND cur_user = current_user);
+	v_gully_efficiency = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_efficiency_vdefault' AND cur_user = current_user);
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -623,7 +638,8 @@ BEGIN
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
 		ELSIF (NEW.epa_type = 'NETGULLY') THEN
-			INSERT INTO inp_netgully (node_id, y0, ysur, apond) VALUES (NEW.node_id, 0, 0, 0);
+			INSERT INTO inp_netgully (node_id, y0, ysur, apond, outlet_type, method, weir_cd, orifice_cd, efficiency) 
+			VALUES (NEW.node_id, 0, 0, 0, v_gully_outlet_type, v_gully_method, v_gully_weir_cd, v_gully_orifice_cd, v_gully_efficiency);
 		END IF;
 
 		-- man2inp_values
@@ -668,6 +684,14 @@ BEGIN
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||') ON CONFLICT (node_id) DO NOTHING';
 				EXECUTE v_sql;
+
+				IF (NEW.epa_type = 'NETGULLY') THEN
+					UPDATE inp_netgully SET outlet_type = v_gully_outlet_type, method = v_gully_method, weir_cd = v_gully_weir_cd,
+					orifice_cd = v_gully_orifice_cd, efficiency = v_gully_efficiency
+					WHERE node_id = OLD.node_id;
+
+				END IF;
+
 			END IF;
 		END IF;
 

@@ -69,13 +69,13 @@ ON CONFLICT (fid) DO NOTHING;
 DELETE FROM sys_param_user where id = 'epa_gully_outlet_type_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_outlet_type_vdefault', 'config', 'Default value for enable /disable gully. Two options are available (Sink, To network). In case of Sink water is lossed.',
-'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_outlet_type''' ,'To network', 'core', true ,'1D/2D Gully outlet_type vdefault:', 'lyt_epa',2)
+'role_epa', true, 'ud', true, 'text', 'combo', true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_outlet_type''' ,'To network', 'core', true ,'1D/2D Gully outlet_type vdefault:', 'lyt_epa',2)
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user where id = 'epa_gully_method_vdefault';
 INSERT INTO sys_param_user(id, formname, descript, sys_role, isenabled, project_type, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, dv_querytext, vdefault, source, iseditable, label, layoutname, layoutorder)
 VALUES ('epa_gully_method_vdefault', 'config', 'Default value for calculation method on gullies. Two options are available (UPC, W/O).',
-'role_epa', true, 'ud', true, 'text', 'combo', false, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_method''' ,'W/O', 'core', true ,'1D/2D Gully calculation method vdefault:', 'lyt_epa',3)
+'role_epa', true, 'ud', true, 'text', 'combo', true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''typevalue_gully_method''' ,'W/O', 'core', true ,'1D/2D Gully calculation method vdefault:', 'lyt_epa',3)
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_param_user where id = 'epa_gully_weir_cd_vdefault';
@@ -196,10 +196,10 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('typevalue_gully_outlet_type', 'SINK', 'SINK');
+VALUES ('typevalue_gully_outlet_type', 'Sink', 'Sink');
 
 INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('typevalue_gully_outlet_type', 'TO NETWORK', 'TO NETWORK');
+VALUES ('typevalue_gully_outlet_type', 'To network', 'To network');
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
 VALUES ('inp_typevalue', 'typevalue_gully_outlet_type', 'inp_gully', 'outlet_type',null ,true);
@@ -428,3 +428,5 @@ DELETE FROM config_param_system WHERE parameter  ='admin_debug';
 
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type, datatype) 
 VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
+
+UPDATE cat_feature_gully SET epa_default = 'NETGULLY' WHERE type  = 'NETGULLY';

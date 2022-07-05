@@ -202,16 +202,23 @@ BEGIN
 		INSERT INTO inp_divider
 		SELECT node_id FROM node WHERE state >0 and epa_type = 'DIVIDER'
 		ON CONFLICT (node_id) DO NOTHING;
-		
+
+		INSERT INTO inp_netgully
+		SELECT node_id FROM node WHERE state >0 and epa_type = 'NETGULLY'
+		ON CONFLICT (node_id) DO NOTHING;
+
 		DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_storage WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_outfall WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_divider WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_netgully WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_junction WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'JUNCTION');
 		DELETE FROM inp_storage WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'STORAGE');
 		DELETE FROM inp_outfall WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'OUTFALL');
 		DELETE FROM inp_divider WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'DIVIDER');
+		DELETE FROM inp_netgully WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = 'NETGULLY');
+
 
 		-- arc ud
 		INSERT INTO inp_conduit
