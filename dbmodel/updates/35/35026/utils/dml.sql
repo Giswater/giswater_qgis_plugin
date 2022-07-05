@@ -113,4 +113,4 @@ true, 13, 'utils','json', 'text',true, '{"status":false}','lyt_admin_other');
 
 INSERT INTO sys_param_user VALUES('basic_search_municipality_vdefault', 'config', 'Selected municipality will be the one in which the streetaxis will be searched', 'role_basic', NULL, 'Search municipality:', 'SELECT muni_id AS id , name as idval FROM ext_municipality WHERE muni_id IS NOT NULL AND active IS TRUE AND muni_id>0 ', NULL, true, 2, 'utils', false, NULL, 'muni_id', NULL, false, 'string', 'combo', false, NULL, NULL, 'lyt_basic', true, NULL, NULL, NULL, NULL, 'core');
 
-
+DELETE FROM config_form_fields WHERE columnname='_pol_id_';
