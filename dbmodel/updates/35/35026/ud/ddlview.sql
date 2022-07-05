@@ -746,3 +746,15 @@ union
 	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
 	USING (outlet_id)
   WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
+
+
+CREATE OR REPLACE VIEW vi_junctions AS 
+ SELECT temp_node.node_id,
+    temp_node.elev,
+    temp_node.ymax,
+    temp_node.y0,
+    temp_node.ysur,
+    temp_node.apond,
+    concat(';', temp_node.sector_id, ' ', temp_node.node_type) AS other
+   FROM temp_node
+  WHERE temp_node.epa_type::text IN('JUNCTION', 'NETGULLY');
