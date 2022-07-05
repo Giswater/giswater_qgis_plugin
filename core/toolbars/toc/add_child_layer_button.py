@@ -81,9 +81,7 @@ class GwAddChildLayerButton(GwAction):
                         widget.setStyleSheet("margin: 5px 5px 5px 8px;")
                         widgetAction = QWidgetAction(menu)
                         widgetAction.setDefaultWidget(widget)
-                        widgetAction.defaultWidget().stateChanged.connect(
-                            partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'],
-                                    context['level_2'], context['level_3'], menu))
+                        widgetAction.defaultWidget().stateChanged.connect(partial(self._manage_load_all, menu))
                         menu.addAction(widgetAction)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}_load_all"] = True
                     # LEVEL 3 - LAYER
@@ -101,9 +99,7 @@ class GwAddChildLayerButton(GwAction):
                         widget.setStyleSheet("margin: 5px 5px 5px 8px;")
                         widgetAction = QWidgetAction(menu)
                         widgetAction.setDefaultWidget(widget)
-                        widgetAction.defaultWidget().stateChanged.connect(
-                            partial(self._manage_load_all, json_result['body']['data']['fields'], context['level_1'],
-                                    context['level_2'], None, menu))
+                        widgetAction.defaultWidget().stateChanged.connect(partial(self._manage_load_all, menu))
                         menu.addAction(widgetAction)
                         dict_menu[f"{context['level_1']}_{context['level_2']}_load_all"] = True
                     # LEVEL 2 - LAYER
@@ -138,31 +134,9 @@ class GwAddChildLayerButton(GwAction):
         main_menu.exec_(click_point)
 
 
-    def _manage_load_all(self, fields, group, sub_group, sub_sub_group, menu, state=None):
+    def _manage_load_all(self, menu, state=None):
 
         if state == 2:
-            for field in fields:
-                if field['context'] is not None:
-                    context = json.loads(field['context'])
-                    if ('level_3' in context and context['level_3'] == sub_sub_group) or \
-                       (sub_sub_group is None and context['level_1'] == group and context['level_2'] == sub_group):
-                        layer_name = field['tableName']
-                        if field['geomField'] == "None":
-                            the_geom = None
-                        else:
-                            the_geom = field['geomField']
-                        geom_field = field['tableId']
-                        # If layer is configured but it doesn't exist in schema, ignore it
-                        if not geom_field:
-                            continue
-                        geom_field = geom_field.replace(" ", "")
-                        style_id = field['style_id']
-                        group = context['level_1']
-                        sub_group = context['level_2']
-
-                        layer = tools_qgis.get_layer_by_tablename(layer_name)
-                        if layer is None:
-                            tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group, style_id, field['layerName'], sub_sub_group=sub_sub_group)
             for child in menu.actions():
                 if not child.isChecked():
                     child.defaultWidget().setChecked(True)

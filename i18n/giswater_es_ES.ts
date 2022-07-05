@@ -197,10 +197,6 @@
 			<translation>Selector de sectores de planificación</translation>
 		</message>
 		<message>
-			<source>50_text</source>
-			<translation>Gestionar coste de la red</translation>
-		</message>
-		<message>
 			<source>99_text</source>
 			<translation>Configuración</translation>
 		</message>
@@ -241,10 +237,6 @@
 			<translation>Añadir visita</translation>
 		</message>
 		<message>
-			<source>309_text</source>
-			<translation>Planificador de incidencias</translation>
-		</message>
-		<message>
 			<source>toolbar_plan_name</source>
 			<translation>Giswater - Masterplan</translation>
 		</message>
@@ -281,8 +273,16 @@
 			<translation>Nuevo objeto no visual</translation>
 		</message>
 		<message>
+			<source>50_text</source>
+			<translation>Gestionar coste de la red</translation>
+		</message>
+		<message>
+			<source>309_text</source>
+			<translation>Gestor de incidencias</translation>
+		</message>
+		<message>
 			<source>218_text</source>
-			<translation>Planificador de objetos no visuales</translation>
+			<translation>Gestor de objetos no visuales</translation>
 		</message>
 	</context>
 

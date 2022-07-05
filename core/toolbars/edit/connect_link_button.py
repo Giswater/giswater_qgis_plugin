@@ -174,7 +174,7 @@ class GwConnectLinkButton(GwMaptool):
 
     def manage_result(self, result, layer):
 
-        if result is not False and result['status'] != 'Failed':
+        if result and result['status'] != 'Failed':
             self.dlg_dtext = GwDialogTextUi('connect_to_network')
             tools_gw.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_accept.hide()
@@ -186,6 +186,8 @@ class GwConnectLinkButton(GwMaptool):
                 self.dlg_dtext.rejected.connect(partial(self.manage_gully_result))
             tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
             tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+        else:
+            tools_qgis.show_warning("gw_fct_setlinktonetwork (Check log messages)", title='Function error')
 
         layer.removeSelection()
 

@@ -70,15 +70,14 @@ class GwToolBoxTask(GwTask):
             pks = tools_qgis.get_primary_key(layer)
             if pks:
                 pks = pks.split(",")
-            if len(pks) > 1:
-                open_char = '{'
-                close_char = '}'
+                if len(pks) > 1:
+                    open_char = '{'
+                    close_char = '}'
             feature_id_list = f'"id":{open_char}'
             if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
                 feature_id_list += close_char
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
-                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
                 if len(pks) > 1:
                     for pk in pks:
                         feature_id_list += f'"{pk}":[ '
@@ -89,7 +88,7 @@ class GwToolBoxTask(GwTask):
                             feature_id_list = feature_id_list[:-2] + '], '
                 else:
                     for feature in features:
-                        feature_id = feature.attribute(feature_type + "_id")
+                        feature_id = feature.attribute(pks[0])
                         feature_id_list += f'"{feature_id}", '
                 if len(features) > 0:
                     feature_id_list = feature_id_list[:-2] + close_char

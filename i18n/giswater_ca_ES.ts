@@ -197,10 +197,6 @@
 			<translation>Selector de sector de planificació</translation>
 		</message>
 		<message>
-			<source>50_text</source>
-			<translation>Gestinar cost de la xarxa</translation>
-		</message>
-		<message>
 			<source>99_text</source>
 			<translation>Configuració</translation>
 		</message>
@@ -241,10 +237,6 @@
 			<translation>Afegir visita</translation>
 		</message>
 		<message>
-			<source>309_text</source>
-			<translation>Planificador d'incidencies</translation>
-		</message>
-		<message>
 			<source>toolbar_plan_name</source>
 			<translation>Giswater - Masterplan</translation>
 		</message>
@@ -281,8 +273,16 @@
 			<translation>Nou objecte no visual</translation>
 		</message>
 		<message>
+			<source>50_text</source>
+			<translation>Gestionar cost de la xarxa</translation>
+		</message>
+		<message>
+			<source>309_text</source>
+			<translation>Gestor d'incidencies</translation>
+		</message>
+		<message>
 			<source>218_text</source>
-			<translation>Planificador d'objectes no visuals</translation>
+			<translation>Gestor d'objectes no visuals</translation>
 		</message>
 	</context>
 

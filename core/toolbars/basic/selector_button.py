@@ -18,7 +18,7 @@ class GwSelectorButton(GwAction):
 
     def clicked_event(self):
 
-        selector_type = '"selector_basic"'
+        selector_type = "selector_basic"
 
         # Show form in docker?
         tools_gw.init_docker('qgis_form_docker')

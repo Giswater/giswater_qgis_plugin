@@ -23,7 +23,7 @@ class GwEpaFileManager(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, go2epa):
+    def __init__(self, description, go2epa, timer=None):
 
         super().__init__(description)
         self.go2epa = go2epa
@@ -31,6 +31,7 @@ class GwEpaFileManager(GwTask):
         self.rpt_result = None
         self.fid = 140
         self.function_name = None
+        self.timer = timer
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
@@ -98,6 +99,8 @@ class GwEpaFileManager(GwTask):
         self.dlg_go2epa.btn_accept.setEnabled(True)
 
         self._close_file()
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             return
 
@@ -339,24 +342,37 @@ class GwEpaFileManager(GwTask):
         if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_path = folder_path.replace('.inp', f'.dat')
             aditional_file = open(aditional_path, "w")
             read = True
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
                 if bool(re.match('\[(.*?)\]', row['text'])) and \
-                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
+                        ('GULLY' in row['text'] or 'LINK' in row['text'] or
                          'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+
                     read = True
                     if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
                        'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
                         save_file = True
                 elif bool(re.match('\[(.*?)\]', row['text'])):
                     read = False
+
                 if 'text' in row and row['text'] is not None and read:
+
                     line = row['text'].rstrip() + "\n"
-                    aditional_file.write(line)
+
+                    if not bool(re.match(';;(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
+                        #TODO:: Manage space on text "To Network" instead of harcoded replace
+                        line = re.sub(' +', ';', line)
+                        line = line.replace('To;network', 'To network')
+                        aditional_file.write(line)
+
+                    elif not bool(re.match(';;-(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
+                        line = re.sub(' +', ';', line)
+                        line = re.sub(';;', '', line)
+                        aditional_file.write(line)
 
             self._close_file(aditional_file)
 

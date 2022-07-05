@@ -36,6 +36,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInterpolate
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting
 is_inserting = False
@@ -483,6 +484,8 @@ class GwInfo(QObject):
         result = self._get_feature_type(complet_result)
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
+        if global_vars.project_type == 'ud':
+            self._check_elev_y()
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
@@ -1651,6 +1654,12 @@ class GwInfo(QObject):
 
         dialog = kwargs['dialog']
         field = kwargs['field']
+        # If button text is empty it's because node_1/2 is not present.
+        # Then we create a QLineEdit to input a node to be connected.
+        if not field.get('value'):
+            widget = self._manage_text(**kwargs)
+            widget.editingFinished.connect(partial(self._run_settopology, widget, **kwargs))
+            return widget
         widget = tools_gw.add_button(dialog, field, module=self)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
@@ -1662,8 +1671,12 @@ class GwInfo(QObject):
         """
 
         field = kwargs['field']
+        dialog = kwargs['dialog']
+        new_feature = kwargs['new_feature']
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
+        if type(widget) == GwHyperLinkLineEdit:
+            widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
         return widget
 
 
@@ -1821,6 +1834,11 @@ class GwInfo(QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg)
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            QgsProject.instance().blockSignals(False)
+            return False
+
+        if self._has_elev_and_y_json(_json):
             tools_qt.set_action_checked("actionEdit", True, dialog)
             QgsProject.instance().blockSignals(False)
             return False
@@ -2111,6 +2129,14 @@ class GwInfo(QObject):
         return widget
 
 
+    def _set_auto_update_hyperlink(self, field, dialog, widget, new_feature=None):
+
+        if self._check_tab_data(dialog):
+            widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+
+        return widget
+
+
     def _reload_fields(self, dialog, result, p_widget):
         """
         :param dialog: QDialog where find and set widgets
@@ -2219,6 +2245,39 @@ class GwInfo(QObject):
         return widget
 
 
+    def _run_settopology(self, widget, **kwargs):
+        """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
+
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        complet_result = kwargs['complet_result']
+        feature_id = complet_result['body']['feature']['id']
+        text = tools_qt.get_text(dialog, widget, return_string_null=True)
+
+        feature = f'"id": "{feature_id}"'
+        extras = f'"fields":{{"{widget.property("columnname")}":"{text}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_response = tools_gw.execute_procedure('gw_fct_settopology', body)
+        if json_response and json_response['status'] != "Failed":
+            # Refresh canvas & send a message
+            tools_qgis.refresh_map_canvas()
+            tools_qgis.show_info("Node set correctly")
+
+            # Delete lineedit
+            widget.deleteLater()
+            # Create button with field from kwargs and value from {text}
+            kwargs['field']['value'] = f"{text}"
+            new_widget = self._manage_button(**kwargs)
+            if new_widget is None:
+                return
+            # Add button to layout
+            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                layout.addWidget(new_widget, int(field['layoutorder']), 2)
+            return
+        tools_qgis.show_warning("Error setting node")
+
+
     def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
@@ -2257,6 +2316,257 @@ class GwInfo(QObject):
 
         self._enable_actions(dialog, self.layer.isEditable())
 
+
+    def _check_elev_y(self):
+        """ Show a warning if feature has both y and elev values """
+
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
+
+        msg = f"This {self.feature_type} has redundant data on "
+        # ARC
+        if self.feature_type == 'arc':
+            msg = f"{msg} both (elev & y) values. Review it and use only one."
+            fields1 = 'y1, custom_y1, elev1, custom_elev1'
+            sql = f"SELECT {fields1} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg)
+                    return False
+
+            fields2 = 'y2, custom_y2, elev2, custom_elev2'
+            sql = f"SELECT {fields2} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg)
+                    return False
+        # NODE
+        elif self.feature_type == 'node':
+            msg = f"{msg} all (elev & ymax & top_elev) values. Review it and use at most two."
+            fields = 'ymax, custom_ymax, elev, custom_elev, top_elev, custom_top_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                has_top_elev = (row[4], row[5]) != (None, None)
+                if False not in (has_y, has_elev, has_top_elev):
+                    tools_qgis.show_warning(msg)
+                    return False
+        return True
+
+
+    def _has_elev_and_y_json(self, _json):
+        """ :returns True if feature has both y and elev values. False otherwise  """
+
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
+
+        keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
+                     "y2", "custom_y2", "elev2", "custom_elev2",
+                     "ymax", "custom_ymax", "elev", "custom_elev", "top_elev", "custom_top_elev")
+
+        # Check that edited field is y or elev
+        has_modified = any(k in _json for k in keys_list)
+        if not has_modified:
+            return False
+
+        # Get edited fields
+        modified = [k for k in _json if k in keys_list]
+
+        if self.new_feature_id is not None:
+            return self._has_elev_y_json(_json, modified)
+
+        for k in modified:
+            if _json.get(k) in (None, ''):
+                continue
+            if self.feature_type == 'arc':
+                # If edited field is Y check if feature has ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev(arc_n=k[-1:])
+                    if has_elev:
+                        msg = f"This feature already has ELEV values! Review it and use only one"
+                        tools_qgis.show_warning(msg)
+                    return has_elev
+                # If edited field is ELEV check if feature has Y field
+                if 'elev' in k:
+                    has_y = self._has_y(arc_n=k[-1:])
+                    if has_y:
+                        msg = f"This feature already has Y values! Review it and use only one"
+                        tools_qgis.show_warning(msg)
+                    return has_y
+            elif self.feature_type == 'node':
+                # If edited field is Y check if feature has ELEV & TOP_ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev()
+                    has_top_elev = self._has_top_elev()
+                    if has_elev and has_top_elev:
+                        msg = f"This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_elev and has_top_elev
+                # If edited field is TOP_ELEV check if feature has Y & ELEV field
+                if 'top_elev' in k:
+                    has_y = self._has_y()
+                    has_elev = self._has_elev()
+                    if has_y and has_elev:
+                        msg = f"This feature already has Y & ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_y and has_elev
+                # If edited field is ELEV check if feature has Y & TOP_ELEV field
+                elif 'elev' in k:
+                    has_y = self._has_y()
+                    has_top_elev = self._has_top_elev()
+                    if has_y and has_top_elev:
+                        msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg)
+                    return has_y and has_top_elev
+
+        return False
+
+
+    def _has_elev_y_json(self, _json, modified):
+        """If we're creating new feature, check which keys are in json"""
+
+        if self.feature_type == 'node':
+            msg = f"This node has redundant data on (top_elev, ymax & elev) values. Review it and use at most two."
+            # y
+            ymax = _json.get('ymax')
+            custom_ymax = _json.get('custom_ymax')
+            has_ymax = (ymax, custom_ymax) != (None, None)
+            # elev
+            elev = _json.get('elev')
+            custom_elev = _json.get('custom_elev')
+            has_elev = (elev, custom_elev) != (None, None)
+            # top_elev
+            top_elev = _json.get('top_elev')
+            custom_top_elev = _json.get('custom_top_elev')
+            has_top_elev = (top_elev, custom_top_elev) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'ymax' in k:
+                    if has_elev and has_top_elev:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'top_elev' in k:
+                    if has_elev and has_ymax:
+                        tools_qgis.show_warning(msg)
+                        return True
+                elif 'elev' in k:
+                    if has_top_elev and has_ymax:
+                        tools_qgis.show_warning(msg)
+                        return True
+
+            return False
+
+        elif self.feature_type == 'arc':
+            msg = f"This arc has redundant data on both (elev & y) values. Review it and use only one."
+            # y1
+            y1 = _json.get('y1')
+            custom_y1 = _json.get('custom_y1')
+            has_y1 = (y1, custom_y1) != (None, None)
+            # elev1
+            elev1 = _json.get('elev1')
+            custom_elev1 = _json.get('custom_elev1')
+            has_elev1 = (elev1, custom_elev1) != (None, None)
+            # y2
+            y2 = _json.get('y2')
+            custom_y2 = _json.get('custom_y2')
+            has_y2 = (y2, custom_y2) != (None, None)
+            # elev2
+            elev2 = _json.get('elev2')
+            custom_elev2 = _json.get('custom_elev2')
+            has_elev2 = (elev2, custom_elev2) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'y1' in k:
+                    if has_elev1:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'elev1' in k:
+                    if has_y1:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'y2' in k:
+                    if has_elev2:
+                        tools_qgis.show_warning(msg)
+                        return True
+                if 'elev2' in k:
+                    if has_y2:
+                        tools_qgis.show_warning(msg)
+                        return True
+
+            return False
+
+        return False
+
+
+    def _has_y(self, arc_n=1):
+        """ :returns True if feature has y values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'y{arc_n}, custom_y{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'ymax, custom_ymax'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_elev(self, arc_n=1):
+        """ :returns True if feature has elev values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'elev{arc_n}, custom_elev{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'elev, custom_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_top_elev(self):
+        """ :returns True if feature has top_elev values. False otherwise """
+
+        if self.feature_type == 'node':
+            fields = 'top_elev, custom_top_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
 
     """ MANAGE TABS """
 
@@ -2491,7 +2801,24 @@ class GwInfo(QObject):
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_relations, table_relations)
+        self.tbl_relations.selectionModel().selectionChanged.connect(partial(self._manage_tab_relations_highlight, self.tbl_relations))
         self.tbl_relations.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_relations))
+
+
+    def _manage_tab_relations_highlight(self, qtable, selected):
+
+        # Get id of selected row
+        index = selected.indexes()
+        if not index:
+            self.rubber_band.reset()
+            return
+
+        # Get tablename
+        index = index[0]
+        table_name = qtable.model().record(index.row()).value("sys_table_id")
+        # Highlight feature
+        tools_qgis.hilight_feature_by_id(qtable, table_name, f"{table_name.split('_')[-1]}_id", self.rubber_band, 5,
+                                         index, table_field="feature_id")
 
 
     def _open_selected_feature(self, qtable):
@@ -2671,7 +2998,7 @@ class GwInfo(QObject):
     def _fill_tab_visit(self, geom_type):
         """ Fill tab Visit """
 
-        sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
+        sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}') AND ui_tablename IS NOT NULL"
         rows = tools_db.get_rows(sql)
         table_visit_node_dict = {}
         if not rows:
@@ -2679,7 +3006,6 @@ class GwInfo(QObject):
         for row in rows:
             table_visit_node_dict[row[0]] = str(row[1])
         self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
-        # self.tbl_visit_cf.doubleClicked.connect(self.open_visit)
 
 
     def _fill_tbl_visit(self, widget, table_name, filter_, geom_type):
@@ -2714,12 +3040,13 @@ class GwInfo(QObject):
         sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
                " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
                " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
-               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "' AND ui_tablename IS NOT NULL")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
 
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
+        widget.doubleClicked.connect(partial(self._open_generic_visit, widget, table_name))
         if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
             filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
             self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
@@ -2741,6 +3068,44 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+        # Manage config_form_tableview
+        tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
+
+
+    def _open_generic_visit(self, widget, table_name):
+
+        table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message)
+            return
+
+        visit_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            visit_id = widget.model().record(row).value("visit_id")
+            break
+
+        sql = (f"SELECT gw_fct_getfeatureinfo('{table_name}', '{visit_id}', 3, 100, 'false', 'visit_id', 'integer', '')")
+        row = tools_db.get_row(sql)
+        _json = json.dumps(row[0])
+        _json = f'{{"body":{{"data":{{"fields":{_json}}}}}}}'
+        result_json = json.loads(_json)
+
+        self.dlg_generic_visit = GwInfoGenericUi()
+        tools_gw.load_settings(self.dlg_generic_visit)
+        self.dlg_generic_visit.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
+        self.dlg_generic_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
+        tools_gw.build_dialog_info(self.dlg_generic_visit, result_json)
+
+        # Disable button accept for info on generic form
+        self.dlg_generic_visit.btn_accept.setEnabled(False)
+
+        self.dlg_generic_visit.rejected.connect(self.rubber_band.reset)
+        tools_gw.open_dialog(self.dlg_generic_visit, dlg_name='info_generic')
 
 
     def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
@@ -2749,8 +3114,6 @@ class GwInfo(QObject):
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
-
-        table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
         if date_from > date_to:
             message = "Selected date interval is not valid"
             tools_qgis.show_warning(message)
@@ -2764,9 +3127,15 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, self.filter)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter, value_filter)
-
             date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
             date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+
+            # Manage config_form_tableview
+            if len(table_name.split(".")) > 1:
+                tbl_name = table_name.split(".")[1]
+            else:
+                tbl_name = table_name
+            tools_gw.set_tablemodel_config(self.dlg_cf, widget, tbl_name)
 
         # Set filter to model
         expr = self.field_id + " = '" + self.feature_id + "'"
@@ -2798,39 +3167,45 @@ class GwInfo(QObject):
         self.visit_id = self.tbl_visit_cf.model().record(selected_row).value("visit_id")
         self.parameter_id = self.tbl_visit_cf.model().record(selected_row).value("parameter_id")
 
-        #Visit intervals
-        sql = f"SELECT lot_id, unit_id FROM om_visit WHERE id = '{self.visit_id}' "
-        row = tools_db.get_row(sql)
+        # Visit intervals
+        sql = f"SELECT value FROM config_param_system WHERE parameter = 'plugin_lotmanage'"
+        plugin_lot = tools_db.get_row(sql)
 
-        if row:
-            self.visit_lot_id = row[0]
-            self.visit_unit_id = row[1]
-            if self.visit_lot_id is not None and self.visit_unit_id is not None:
-                sql = f"SELECT * FROM om_unit_intervals WHERE unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
-                rows = tools_db.get_rows(sql)
-                if rows:
-                        btn_visit_intervals.setEnabled(True)
+        if plugin_lot:
 
-        #gallery
-        if type(table_name) is dict:
-            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
-
-        sql = (f"SELECT column_name FROM information_schema.columns "
-               f"WHERE table_name = '{table_name}' AND column_name='photo'")
-        column_exist = tools_db.get_row(sql)
-
-        if column_exist:
-            sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+            #Visit intervals
+            sql = f"SELECT lot_id, unit_id FROM om_visit WHERE id = '{self.visit_id}' "
             row = tools_db.get_row(sql)
-        else:
-            row = None
 
-        if not row:
-            return
+            if row:
+                self.visit_lot_id = row[0]
+                self.visit_unit_id = row[1]
+                if self.visit_lot_id is not None and self.visit_unit_id is not None:
+                    sql = f"SELECT * FROM om_unit_intervals WHERE unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
+                    rows = tools_db.get_rows(sql)
+                    if rows:
+                            btn_visit_intervals.setEnabled(True)
 
-        # If gallery 'True' or 'False'
-        if str(row[0]) == 'True':
-            btn_open_gallery.setEnabled(True)
+            #gallery
+            if type(table_name) is dict:
+                table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+            sql = (f"SELECT column_name FROM information_schema.columns "
+                   f"WHERE table_name = '{table_name}' AND column_name='photo'")
+            column_exist = tools_db.get_row(sql)
+
+            if column_exist:
+                sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+                row = tools_db.get_row(sql)
+            else:
+                row = None
+
+            if not row:
+                return
+
+            # If gallery 'True' or 'False'
+            if str(row[0]) == 'True':
+                btn_open_gallery.setEnabled(True)
 
 
     def _open_visit_files(self):
@@ -2849,7 +3224,7 @@ class GwInfo(QObject):
 
         self.visit_intervals_qtable = QTableView()
         filter = f"unit_id = {self.visit_unit_id} and lot_id = {self.visit_lot_id}"
-        tools_qt.fill_table(self.visit_intervals_qtable, 'om_unit_intervals', filter)
+        tools_qt.fill_table(self.visit_intervals_qtable, 'v_ui_om_unit_intervals', filter)
 
         self.visit_intervals_qtable.window().setWindowFlags(Qt.WindowStaysOnTopHint)
         self.visit_intervals_qtable.window().setWindowTitle("Visit Intervals")

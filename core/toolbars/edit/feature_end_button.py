@@ -188,7 +188,7 @@ class GwFeatureEndButton(GwAction):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = tools_gw.get_config_value('edit_workcat_vdefault')
+        row = tools_gw.get_config_value('edit_workcat_end_vdefault')
         if row:
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
