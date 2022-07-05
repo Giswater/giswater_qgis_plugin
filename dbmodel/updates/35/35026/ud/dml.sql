@@ -196,10 +196,10 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('typevalue_gully_outlet_type', 'SINK', 'SINK');
+VALUES ('typevalue_gully_outlet_type', 'Sink', 'Sink');
 
 INSERT INTO inp_typevalue(typevalue, id, idval)
-VALUES ('typevalue_gully_outlet_type', 'TO NETWORK', 'TO NETWORK');
+VALUES ('typevalue_gully_outlet_type', 'To network', 'To network');
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field,parameter_id, active)
 VALUES ('inp_typevalue', 'typevalue_gully_outlet_type', 'inp_gully', 'outlet_type',null ,true);
@@ -430,11 +430,3 @@ INSERT INTO config_param_system (parameter, value, descript, label, isenabled, p
 VALUES('edit_check_redundance_y_topelev_elev', 'FALSE', 'If true, a check for redundancy in y/elev/topelev fields will activate.', 'Enable redundancy check for y/elev/topelev values:', false, 'ud', 'boolean');
 
 UPDATE cat_feature_gully SET epa_default = 'NETGULLY' WHERE type  = 'NETGULLY';
-
-INSERT INTO inp_netgully (node_id, y0, ysur, apond)
-SELECT node_id, y0, ysur, apond FROM inp_junction JOIN node USING (node_id) JOIN cat_feature_node ON id = node_type WHERE type = 'NETGULLY'
-ON CONFLICT (node_id) DO NOTHING;
-
-DELETE FROM inp_junction WHERE node_id IN (SELECT node_id FROM inp_junction JOIN node USING (node_id) JOIN cat_feature_node ON id = node_type WHERE type = 'NETGULLY');
-
-

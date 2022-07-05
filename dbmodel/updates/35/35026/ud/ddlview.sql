@@ -534,9 +534,34 @@ SELECT
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY 1;
 
-
+drop view if exists vi_patterns;
  CREATE OR REPLACE VIEW vi_patterns AS 
-  SELECT inp_pattern_value.* from selector_expl s, inp_pattern p JOIN inp_pattern_value USING (pattern_id) 
+  SELECT p.pattern_id, p.pattern_type, 
+   inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18,
+    inp_pattern_value.factor_19,
+    inp_pattern_value.factor_20,
+    inp_pattern_value.factor_21,
+    inp_pattern_value.factor_22,
+    inp_pattern_value.factor_23,
+    inp_pattern_value.factor_24
+   from selector_expl s, inp_pattern p JOIN inp_pattern_value USING (pattern_id) 
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY 1;
 
@@ -633,3 +658,91 @@ CREATE OR REPLACE VIEW vi_subcatchments AS
 	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
 	USING (outlet_id);
 
+
+CREATE OR REPLACE VIEW vi_subareas AS 
+ SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.nimp,
+    v_edit_inp_subcatchment.nperv,
+    v_edit_inp_subcatchment.simp,
+    v_edit_inp_subcatchment.sperv,
+    v_edit_inp_subcatchment.zero,
+    v_edit_inp_subcatchment.routeto,
+    v_edit_inp_subcatchment.rted
+FROM v_edit_inp_subcatchment
+   JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id);
+
+
+CREATE OR REPLACE VIEW vi_infiltration AS 
+SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.curveno AS other1,
+    v_edit_inp_subcatchment.conduct_2 AS other2,
+    v_edit_inp_subcatchment.drytime_2 AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM ud_inp.v_edit_inp_subcatchment
+   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
+union
+SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.suction AS other1,
+    v_edit_inp_subcatchment.conduct AS other2,
+    v_edit_inp_subcatchment.initdef AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM ud_inp.v_edit_inp_subcatchment
+   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
+union
+SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.maxrate AS other1,
+    v_edit_inp_subcatchment.minrate AS other2,
+    v_edit_inp_subcatchment.decay AS other3,
+    v_edit_inp_subcatchment.drytime AS other4,
+    v_edit_inp_subcatchment.maxinfil AS other5
+   FROM ud_inp.v_edit_inp_subcatchment
+    JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+      JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
+union
+  SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.curveno AS other1,
+    v_edit_inp_subcatchment.conduct_2 AS other2,
+    v_edit_inp_subcatchment.drytime_2 AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM ud_inp.v_edit_inp_subcatchment
+   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   JOIN (
+	SELECT subc_id, outlet_id 
+	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
+	       JOIN temp_node ON outlet_id = node_id WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+	UNION
+	SELECT outlet_id, subc_id FROM inp_subcatchment WHERE "left"(inp_subcatchment.outlet_id::text, 1) != '{'::text)a) b
+	USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
