@@ -108,6 +108,7 @@ v_node_1 text;
 v_node_2 text;
 v_new_node_graf text;
 v_graf_arc_id TEXT;
+v_force_delete text;
 
 BEGIN
 
@@ -601,7 +602,11 @@ BEGIN
 					ELSIF v_state_node = 2 THEN --is psector
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres (it seems that does not recognize the new node inserted)
-						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
+						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
+					
+						-- manage plan_psector_force_delete in order to enable delete from old planified arcs
+						SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
+						UPDATE config_param_user SET value='true' WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 
 						IF v_state_arc=1 THEN -- ficticius arc
 
@@ -822,6 +827,8 @@ BEGIN
 							IF v_count = 0 THEN
 								DELETE FROM arc WHERE arc_id=v_arc_id;
 							END IF;
+						
+						UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 							
 						END IF;
 
