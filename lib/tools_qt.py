@@ -17,7 +17,7 @@ from encodings.aliases import aliases
 from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
-    QPersistentModelIndex, QCoreApplication, QTranslator
+    QPersistentModelIndex, QCoreApplication, QTranslator, QEvent
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
@@ -57,6 +57,20 @@ class GwHyperLinkLabel(QLabel):
     def mouseReleaseEvent(self, ev):
         self.clicked.emit()
         self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")
+
+
+class GwHyperLinkLineEdit(QLineEdit):
+
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        QLabel.__init__(self)
+        self.setStyleSheet("QLineEdit{color:blue; text-decoration: underline;}")
+
+    def mouseReleaseEvent(self, ev):
+        if self.isReadOnly():
+            self.clicked.emit()
+            self.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:purple; text-decoration: underline; border: none;}")
 
 
 def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -185,7 +199,7 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
         widget = dialog.findChild(QWidget, widget)
     text = None
     if widget:
-        if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel):
+        if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel, GwHyperLinkLineEdit):
             text = widget.text()
         elif type(widget) in (QDoubleSpinBox, QSpinBox):
             # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value,
@@ -529,7 +543,7 @@ def enable_dialog(dialog, enable, ignore_widgets=['', None]):
 
 
 def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers,
-                         sectionResizeMode=3, stretchLastSection=True):
+                         sectionResizeMode=3, stretchLastSection=True, sortingEnabled=True):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
@@ -537,6 +551,7 @@ def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_tr
     widget.horizontalHeader().setStretchLastSection(stretchLastSection)
     widget.horizontalHeader().setMinimumSectionSize(100)
     widget.setEditTriggers(edit_triggers)
+    widget.setSortingEnabled(sortingEnabled)
 
 
 def get_col_index_by_col_name(qtable, column_name):

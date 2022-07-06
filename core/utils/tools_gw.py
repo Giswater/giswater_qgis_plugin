@@ -44,7 +44,7 @@ from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
-from ...lib.tools_qt import GwHyperLinkLabel
+from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 
 def load_settings(dialog, plugin='core'):
@@ -76,6 +76,13 @@ def load_settings(dialog, plugin='core'):
 
 def save_settings(dialog, plugin='core'):
     """ Save user UI related with dialog position and size """
+
+    # Ensure that 'plugin' parameter isn't being populated with int from signal
+    try:
+        plugin = int(plugin)
+        plugin = 'core'
+    except ValueError:
+        pass
 
     try:
         x, y = dialog.geometry().x(), dialog.geometry().y()
@@ -538,6 +545,10 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
+    if sub_group:
+        sub_group = sub_group.capitalize()
+    if sub_sub_group:
+        sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
         connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
@@ -574,13 +585,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(layer, qml)
 
-            # Set layer config
-            if tablename:
-                feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
-                extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
-                body = create_body(feature=feature, extras=extras)
-                json_result = execute_procedure('gw_fct_getinfofromid', body)
-                config_layer_attributes(json_result, layer, alias)
+        # Set layer config
+        if tablename:
+            feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
+            extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+            body = create_body(feature=feature, extras=extras)
+            json_result = execute_procedure('gw_fct_getinfofromid', body)
+            config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -906,9 +917,11 @@ def enable_widgets(dialog, result, enable):
         for widget in widget_list:
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        if type(widget) == GwHyperLinkLineEdit:
+                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
@@ -933,11 +946,13 @@ def enable_all(dialog, result):
                 continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            if type(widget) == GwHyperLinkLineEdit:
+                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
                             widget.setStyleSheet(None)
@@ -1034,14 +1049,14 @@ def set_style_mapzones():
         categories = []
         status = mapzone['status']
         if status == 'Disable':
-            pass
+            continue
 
         if lyr:
             # Loop for each id returned on json
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                symbol.setOpacity(float(mapzone['opacity']))
+                symbol.setOpacity(int(mapzone['opacity']))
 
                 # Setting simp
                 R = random.randint(0, 255)
@@ -1155,7 +1170,9 @@ def build_dialog_info(dialog, result, my_json=None):
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
-        widget.setProperty('ismandatory', field['ismandatory'])
+
+        if 'ismandatory' in field:
+            widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field:
             order = field['layoutorder']
@@ -1217,6 +1234,10 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                signal = field.get('signal')
+                if signal:
+                    widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
+                    getattr(module, signal)(dialog)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'check':
                 widget = QCheckBox()
@@ -1433,7 +1454,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
 
-    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
         if widget.isReadOnly() and not ignore_editability:
             return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
@@ -1511,14 +1532,18 @@ def add_hyperlink(field):
 
     """
 
-    widget = GwHyperLinkLabel()
+    is_editable = field.get('iseditable')
+    if is_editable:
+        widget = GwHyperLinkLineEdit()
+    else:
+        widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
-    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
     real_name = widget.objectName()
@@ -3031,7 +3056,7 @@ def refresh_selectors(tab_name=None):
     """ Refreshes the selectors' UI if it's open """
 
     # Get the selector UI if it's open
-    windows = [x for x in QApplication.allWidgets() if not getattr(x, "isHidden", False)
+    windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                and (issubclass(type(x), GwSelectorUi))]
 
     if windows:
@@ -3405,6 +3430,17 @@ def get_vertex_flag(default_value):
         vertex_flag = default_value
 
     return vertex_flag
+
+
+def get_sysversion_addparam():
+    """ Gets addparam field from table sys_version """
+    sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
+    row = tools_db.get_row(sql, is_admin=True)
+
+    if row:
+        return row[0]
+
+    return None
 
 
 def create_giswater_menu(project_loaded=False):

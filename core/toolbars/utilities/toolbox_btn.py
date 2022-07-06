@@ -87,12 +87,14 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
-        if connect_signal is not None:
-            self.dlg_functions.rejected.connect(connect_signal)
+        if connect_signal:
+            for signal in connect_signal:
+                self.dlg_functions.finished.connect(signal)
 
         # Open form and set title
         self.dlg_functions.setWindowTitle(f"{self.function_selected}")
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+        return self.dlg_functions
 
     def remove_layers(self):
 
@@ -175,7 +177,7 @@ class GwToolBoxButton(GwAction):
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if json_result or json_result['status'] != 'Failed':
+        if json_result and json_result['status'] != 'Failed':
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
@@ -583,6 +585,13 @@ class GwToolBoxButton(GwAction):
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added, module)
                 self._load_settings_values(dialog, function)
                 self._load_parametric_values(dialog, function)
+                # Execute any connected signal
+                widgets = function[0].get('return_type')
+                if widgets:
+                    for w in function[0]['return_type']:
+                        signal = w.get('signal')
+                        if signal:
+                            getattr(module, signal)(dialog)
 
                 # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
                 # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,

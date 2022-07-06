@@ -16,13 +16,14 @@ class GwUpdateSchemaTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, admin, description, params):
+    def __init__(self, admin, description, params, timer=None):
 
         super().__init__(description)
         self.admin = admin
         self.params = params
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
+        self.timer = timer
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_show_info buttons
@@ -61,6 +62,9 @@ class GwUpdateSchemaTask(GwTask):
         # Enable red 'X' from dlg_readsql_show_info
         self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_show_info.show()
+
+        if self.timer:
+            self.timer.stop()
 
         if self.status:
             # Set info project

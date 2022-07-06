@@ -290,11 +290,29 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.btn_save_profile.setEnabled(True)
         for profile in parameters['body']['data']:
             if profile['profile_id'] == profile_id:
+                # Get data
                 self.initNode = profile['values']['initNode']
                 self.endNode = profile['values']['endNode']
-
-                self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 list_arcs = profile['values']['listArcs']
+
+                # Get arcs from profile
+                expr_filter = "\"arc_id\" IN ("
+                for arc in list_arcs.strip('][').split(', '):
+                    expr_filter += f"'{arc}', "
+                expr_filter = expr_filter[:-2] + ")"
+                expr = QgsExpression(expr_filter)
+                # Get a featureIterator from this expression:
+                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+
+                self.id_list = [i.id() for i in it]
+                if not self.id_list:
+                    message = "Couldn't draw profile. You may need to select another exploitation."
+                    tools_qgis.show_warning(message)
+                    return
+
+                # Set data in dialog
+                self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 self.dlg_draw_profile.tbl_list_arc.clear()
 
                 for arc in list_arcs.strip('][').split(', '):
@@ -306,18 +324,8 @@ class GwProfileButton(GwAction):
                 date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
                 tools_qt.set_calendar(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
 
-                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                # Select features in map
                 self._remove_selection()
-
-                expr_filter = "\"arc_id\" IN ("
-                for arc in list_arcs.strip('][').split(', '):
-                    expr_filter += f"'{arc}', "
-                expr_filter = expr_filter[:-2] + ")"
-                expr = QgsExpression(expr_filter)
-                # Get a featureIterator from this expression:
-                it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
-
-                self.id_list = [i.id() for i in it]
                 self.layer_arc.selectByIds(self.id_list)
 
                 # Center shortest path in canvas - ZOOM SELECTION

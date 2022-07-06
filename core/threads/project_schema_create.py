@@ -19,13 +19,14 @@ class GwCreateSchemaTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, admin, description, params):
+    def __init__(self, admin, description, params, timer=None):
 
         super().__init__(description)
         self.admin = admin
         self.params = params
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
+        self.timer = timer
 
         # Manage buttons & other dlg-related widgets
         # Disable dlg_readsql_create_project buttons
@@ -77,6 +78,8 @@ class GwCreateSchemaTask(GwTask):
         self.admin.dlg_readsql.btn_close.setEnabled(True)
 
         if self.isCanceled():
+            if self.timer:
+                self.timer.stop()
             self.setProgress(100)
             # Handle db exception
             if self.db_exception is not None:
@@ -91,6 +94,9 @@ class GwCreateSchemaTask(GwTask):
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+
+        if self.timer:
+            self.timer.stop()
 
         if self.finish_execution['import_data']:
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data', prefix=False)

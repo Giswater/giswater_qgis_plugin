@@ -7,15 +7,9 @@
   <trust active="0"/>
   <projectCrs>
     <spatialrefsys>
-      <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",ENSEMBLE["European Terrestrial Reference System 1989 ensemble",MEMBER["European Terrestrial Reference Frame 1989"],MEMBER["European Terrestrial Reference Frame 1990"],MEMBER["European Terrestrial Reference Frame 1991"],MEMBER["European Terrestrial Reference Frame 1992"],MEMBER["European Terrestrial Reference Frame 1993"],MEMBER["European Terrestrial Reference Frame 1994"],MEMBER["European Terrestrial Reference Frame 1996"],MEMBER["European Terrestrial Reference Frame 1997"],MEMBER["European Terrestrial Reference Frame 2000"],MEMBER["European Terrestrial Reference Frame 2005"],MEMBER["European Terrestrial Reference Frame 2014"],ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[0.1]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Europe between 0°E and 6°E: Andorra; Belgium - onshore and offshore; Denmark - offshore; Germany - offshore; Jan Mayen - offshore; Norway including Svalbard - onshore and offshore; Spain - onshore and offshore."],BBOX[37,0,82.45,6.01]],ID["EPSG",25831]]</wkt>
-      <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
       <srsid>__SRSID__</srsid>
       <srid>__SRID__</srid>
       <authid>__AUTHID__</authid>
-      <description>__DESCRIPTION__</description>
-      <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
-      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-      <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
     </spatialrefsys>
   </projectCrs>
   <layer-tree-group>
@@ -442,10 +436,10 @@
   <mapcanvas name="theMapCanvas" annotationsVisible="1">
     <units>meters</units>
     <extent>
-       <xmin>__XMIN__</xmin>
-       <ymin>__YMIN__</ymin>
-       <xmax>__XMAX__</xmax>
-       <ymax>__YMAX__</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -856,7 +850,7 @@
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -3957,16 +3951,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>ext_municipality20171204170633784</id>
       <datasource> __DATASOURCE__ key='muni_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ext_municipality" (the_geom)</datasource>
@@ -4336,16 +4330,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="1" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Line" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="LineString" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</id>
       <datasource> __DATASOURCE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_arc" (the_geom)</datasource>
@@ -4399,7 +4393,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -7429,16 +7423,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</id>
       <datasource> __DATASOURCE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_connec" (the_geom)</datasource>
@@ -7492,7 +7486,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -12407,16 +12401,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_dma20190515092620863</id>
       <datasource> __DATASOURCE__ key='dma_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dma" (the_geom)</datasource>
@@ -12470,7 +12464,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -12968,16 +12962,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="0" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_dqa_4e695ade_c45c_4562_afb6_1d3c41532a1b</id>
       <datasource> __DATASOURCE__ key='dqa_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dqa" (the_geom)</datasource>
@@ -13031,7 +13025,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -14342,16 +14336,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</id>
       <datasource> __DATASOURCE__ key='expl_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_exploitation" (the_geom)</datasource>
@@ -14405,7 +14399,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -14778,16 +14772,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_connec_3f7dd337_6df0_4fdc_a8e5_b39cf5df82e3</id>
       <datasource> __DATASOURCE__ key='connec_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_connec" (the_geom)</datasource>
@@ -15492,16 +15486,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_inlet_a8f4dbbd_7a09_47b1_8113_5ff238761c81</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_inlet" (the_geom)</datasource>
@@ -16005,16 +15999,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_junction_11ec702e_1241_4082_a3ad_9d41acbd369f</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_junction" (the_geom)</datasource>
@@ -16624,16 +16618,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="1" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Line" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="LineString" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_pipe_7cac74d1_cc0f_43d5_a009_cdb79d99644a</id>
       <datasource> __DATASOURCE__ key='arc_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_pipe" (the_geom)</datasource>
@@ -16687,7 +16681,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -17426,16 +17420,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_pump_6ec0af5d_5cc1_471e_b7c1_0843b1666242</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_pump" (the_geom)</datasource>
@@ -17928,16 +17922,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_reservoir_8e4b7f20_0323_4b40_b9e0_3fe1f70c0f71</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_reservoir" (the_geom)</datasource>
@@ -18344,16 +18338,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_shortpipe_33c10d7c_0592_45f7_9283_87b0eed50b27</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_shortpipe" (the_geom)</datasource>
@@ -19252,16 +19246,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_inp_valve_ed852bbb_ae38_4039_86b1_6cca6dadd1ee</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_valve" (the_geom)</datasource>
@@ -20335,16 +20329,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Line" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="1" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="LineString" simplifyLocal="1" hasScaleBasedVisibilityFlag="1" minScale="1500" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_link20160511142132204</id>
       <datasource> __DATASOURCE__ key='link_id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
@@ -20398,7 +20392,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -21077,16 +21071,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</id>
       <datasource> __DATASOURCE__ key='node_id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_node" (the_geom)</datasource>
@@ -21140,7 +21134,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -25178,16 +25172,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_presszone_d6c14d1a_a691_4ec8_a373_97438e05f219</id>
       <datasource> __DATASOURCE__ key='presszone_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_presszone" (the_geom)</datasource>
@@ -25241,7 +25235,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -25603,16 +25597,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_sector20171204170540567</id>
       <datasource> __DATASOURCE__ key='sector_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_sector" (the_geom)</datasource>
@@ -25666,7 +25660,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -26071,16 +26065,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="1" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="1" minScale="1500" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_ext_address20180201103159332</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_address" (the_geom)</datasource>
@@ -26683,16 +26677,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_ext_plot20180201103159443</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_plot" (the_geom)</datasource>
@@ -27200,16 +27194,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="1" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Line" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiLineString" simplifyLocal="1" hasScaleBasedVisibilityFlag="1" minScale="3000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_streetaxis" (the_geom)</datasource>
@@ -27263,7 +27257,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -27845,16 +27839,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Line" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="LineString" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="0" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_om_mincut_arc_0b67d4c7_c3e5_4fdf_aff6_33078cacec96</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_om_mincut_arc" (the_geom)</datasource>
@@ -27908,7 +27902,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -28314,16 +28308,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_om_mincut_cdd04177_e5c9_433b_9828_ba4e651f2c43</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_om_mincut" (anl_the_geom)</datasource>
@@ -28377,7 +28371,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -29193,16 +29187,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_om_mincut_connec_ff9f2dd2_aeb7_4283_bb51_bb070d81309b</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_om_mincut_connec" (the_geom)</datasource>
@@ -29256,7 +29250,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -29597,16 +29591,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_om_mincut_node_889396c9_30eb_40d5_bf2c_f464fff186a5</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_om_mincut_node" (the_geom)</datasource>
@@ -29660,7 +29654,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -29985,16 +29979,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Point" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="Point" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" minScale="100000000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_om_mincut_valve_c9c9c530_f8de_40a3_89c2_eef396ae238a</id>
       <datasource> __DATASOURCE__ key='id'  srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_om_mincut_valve" (the_geom)</datasource>
@@ -30048,7 +30042,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -30614,7 +30608,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -32010,7 +32004,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -32937,7 +32931,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -33957,7 +33951,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -34943,7 +34937,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -35844,16 +35838,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="1" minScale="5000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</id>
       <datasource> __DATASOURCE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_connec" (the_geom)</datasource>
@@ -35907,7 +35901,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -36251,16 +36245,16 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshEnabled="0" labelsEnabled="0" symbologyReferenceScale="-1" simplifyDrawingTol="1" geometry="Polygon" refreshOnNotifyEnabled="0" simplifyAlgorithm="0" autoRefreshTime="0" legendPlaceholderImage="" maxScale="0" readOnly="0" styleCategories="AllStyleCategories" type="vector" wkbType="MultiPolygon" simplifyLocal="1" hasScaleBasedVisibilityFlag="1" minScale="5000" refreshOnNotifyMessage="">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+          <xmin>__XMIN__</xmin>
+          <ymin>__YMIN__</ymin>
+          <xmax>__XMAX__</xmax>
+          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</id>
       <datasource> __DATASOURCE__ key='pol_id'  srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_node" (the_geom)</datasource>
@@ -36314,7 +36308,7 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <extent>
-          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="EPSG:25831" miny="0" maxz="0"/>
+          <spatial minx="0" minz="0" maxy="0" maxx="0" dimensions="2" crs="__AUTHID__" miny="0" maxz="0"/>
           <temporal>
             <period>
               <start></start>
@@ -37342,8 +37336,8 @@ LEFT JOIN sample_epanet.connec ON (((connec.connec_id)::text = (link.connec_id):
     <SpatialRefSys>
       <ProjectCRSID type="int">2104</ProjectCRSID>
       <ProjectCRSProj4String type="QString">+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</ProjectCRSProj4String>
-      <ProjectCrs type="QString">EPSG:25831</ProjectCrs>
-      <ProjectionsEnabled type="int">1</ProjectionsEnabled>
+       <ProjectCrs type="QString">__AUTHID__</ProjectCrs>
+       <ProjectionsEnabled type="int">1</ProjectionsEnabled>
     </SpatialRefSys>
     <Variables>
       <variableNames type="QStringList">

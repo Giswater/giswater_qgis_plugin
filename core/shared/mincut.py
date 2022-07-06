@@ -7,11 +7,13 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
-from datetime import datetime
+from sip import isdeleted
+from time import time
+from datetime import datetime, timedelta
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -36,6 +38,7 @@ class GwMincut:
         self.plugin_dir = global_vars.plugin_dir
         self.settings = global_vars.giswater_settings
         self.schema_name = global_vars.schema_name
+        self.timer = None
 
         # Create separate class to manage 'actionConfig'
         self.mincut_tools = GwMincutTools(self)
@@ -59,6 +62,7 @@ class GwMincut:
         self.previous_snapping = None
         self.emit_point = None
         self.vertex_marker = None
+        self.snapper_manager = None
 
         # Other variables
         self.col1 = "customer_code"
@@ -424,6 +428,8 @@ class GwMincut:
 
         self._refresh_tab_hydro()
 
+        self._load_widgets_values()
+
 
     def set_id_val(self):
 
@@ -511,8 +517,32 @@ class GwMincut:
             self.iface.setActiveLayer(layer_zoomed)
             self.iface.zoomToActiveLayer()
 
-
     # region private functions
+
+    def _load_widgets_values(self):
+
+        chk_use_planified = tools_gw.get_config_parser('dlg_mincut', 'chk_use_planified', "user", "session")
+        type = tools_gw.get_config_parser('dlg_mincut', 'type', "user", "session")
+        cause = tools_gw.get_config_parser('dlg_mincut', 'cause', "user", "session")
+
+        if chk_use_planified is not None:
+            tools_qt.set_checked(self.dlg_mincut, 'chk_use_planified', chk_use_planified)
+        if type is not None:
+            tools_qt.set_widget_text(self.dlg_mincut, 'type', type)
+        if cause is not None:
+            tools_qt.set_widget_text(self.dlg_mincut, 'cause', cause)
+
+
+    def _save_widgets_values(self):
+
+        chk_use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
+        type = tools_qt.get_text(self.dlg_mincut, 'type')
+        cause = tools_qt.get_text(self.dlg_mincut, 'cause')
+
+        tools_gw.set_config_parser('dlg_mincut', 'chk_use_planified', f"{chk_use_planified}")
+        tools_gw.set_config_parser('dlg_mincut', 'type', f"{type}")
+        tools_gw.set_config_parser('dlg_mincut', 'cause', f"{cause}")
+
 
     def _set_states(self):
         """ Serialize data of mincut states """
@@ -660,6 +690,9 @@ class GwMincut:
 
 
     def _real_start(self):
+
+        # Run fct like 'Refresh mincut' but with action="startMincut"
+        self._refresh_mincut(action="startMincut")
 
         date_start = QDate.currentDate()
         time_start = QTime.currentTime()
@@ -934,6 +967,7 @@ class GwMincut:
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, close=False)
                 tools_gw.open_dialog(self.dlg_dtext)
 
+        self._save_widgets_values()
         self.iface.actionPan().trigger()
         self._remove_selection()
 
@@ -967,8 +1001,8 @@ class GwMincut:
         self.dlg_mincut.mincutCanceled = True
 
         if self.mincut_class == 1:
-            if 'geometry' in result['body']['data']:
-                polygon = result['body']['data']['geometry']
+            polygon = result['body']['data'].get('geometry')
+            if polygon:
                 polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
                 if polygon[0] == '':
@@ -1803,7 +1837,17 @@ class GwMincut:
             # Create task to manage Mincut execution
             self.dlg_mincut.btn_cancel_task.show()
             self.dlg_mincut.btn_cancel.hide()
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
+
+            # Create timer
+            self.t0 = time()
+            if self.timer:
+                self.timer.stop()
+                del self.timer
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
+            self.timer.start(1000)
+
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
@@ -1882,23 +1926,29 @@ class GwMincut:
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
-                message = "Mincut done successfully"
-                tools_qgis.show_message(message, 3)
+                message = complet_result.get('message')
+                if not message:
+                    message = "Mincut done successfully"
+                    tools_qgis.show_message(message, 3)
+                else:
+                    tools_qgis.show_message(message.get('text'), message.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                tools_qgis.show_warning(message)
-                tools_qgis.restore_cursor()
-                self.action_mincut.setChecked(False)
-                return
+            polygon = complet_result['body']['data'].get('geometry')
+            if polygon:
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                if polygon[0] == '':
+                    message = "Error on create auto mincut, you need to review data"
+                    tools_qgis.show_warning(message)
+                    tools_qgis.restore_cursor()
+                    self.action_mincut.setChecked(False)
+                    return
 
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
@@ -1944,7 +1994,7 @@ class GwMincut:
         self.dlg_mincut.btn_accept.setEnabled(True)
 
 
-    def _refresh_mincut(self):
+    def _refresh_mincut(self, triggered=None, action="mincutNetwork"):
         """ B2-125: Refresh current mincut """
 
         # Manage if task is already running
@@ -1971,7 +2021,17 @@ class GwMincut:
             element_id = row['anl_feature_id']
             self.dlg_mincut.btn_cancel_task.show()
             self.dlg_mincut.btn_cancel.hide()
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
+
+            # Create timer
+            self.t0 = time()
+            if self.timer:
+                self.timer.stop()
+                del self.timer
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
+            self.timer.start(1000)
+
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, action=action, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished))
@@ -1994,22 +2054,27 @@ class GwMincut:
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
-                message = "Mincut done successfully"
-                tools_qgis.show_message(message, 3)
+                message = complet_result.get('message')
+                if not message:
+                    message = "Mincut done successfully"
+                    tools_qgis.show_message(message, 3)
+                else:
+                    tools_qgis.show_message(message.get('text'), message.get('level'))
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                tools_qgis.show_warning(message)
-                tools_qgis.restore_cursor()
-                return
+            polygon = complet_result['body']['data'].get('geometry')
+            if polygon:
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                if polygon[0] == '':
+                    message = "Error on create auto mincut, you need to review data"
+                    tools_qgis.show_warning(message)
+                    tools_qgis.restore_cursor()
+                    return
 
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
@@ -2018,7 +2083,8 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
         self.set_visible_mincut_layers()
-        self.snapper_manager.restore_snap_options(self.previous_snapping)
+        if self.snapper_manager:
+            self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
 
 
@@ -2451,5 +2517,20 @@ class GwMincut:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
 
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
     # endregion

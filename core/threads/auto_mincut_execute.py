@@ -16,12 +16,14 @@ class GwAutoMincutTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, description, mincut_class, element_id):
+    def __init__(self, description, mincut_class, element_id, action="mincutNetwork", timer=None):
 
         super().__init__(description)
         self.mincut_class = mincut_class
         self.element_id = element_id
+        self.mincut_action = action
         self.exception = None
+        self.timer = timer
 
 
     def run(self):
@@ -47,7 +49,7 @@ class GwAutoMincutTask(GwTask):
 
             tools_qt.set_widget_text(self.mincut_class.dlg_mincut, 'result_mincut_id', real_mincut_id)
             use_planified = tools_qt.is_checked(self.mincut_class.dlg_mincut, 'chk_use_planified')
-            extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
+            extras = (f'"action":"{self.mincut_action}", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
             self.body = tools_gw.create_body(extras=extras)
             tools_log.log_info(f"Task 'Mincut execute' execute procedure 'gw_fct_setmincut' with parameters: '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
@@ -75,6 +77,8 @@ class GwAutoMincutTask(GwTask):
         tools_log.log_info(f"Task 'Mincut execute' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
         tools_gw.manage_json_response(self.complet_result, sql, None)
 
+        if self.timer:
+            self.timer.stop()
         # If user cancel task
         if self.isCanceled():
             self.task_finished.emit([False, self.complet_result])

@@ -23,9 +23,11 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 class GwFeatureEndButton(GwAction):
     """ Button 68: End feature """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
+        self.feature_type = feature_type
 
 
     def clicked_event(self):
@@ -70,12 +72,19 @@ class GwFeatureEndButton(GwAction):
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+        # Remove tabs
+        params = ['arc', 'node', 'connec', 'gully', 'element']
+        if self.list_tabs:
+            for i in params:
+                if i not in self.list_tabs:
+                    tools_qt.remove_tab(self.dlg_work_end.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111", sub_folder="24x24")
@@ -127,7 +136,10 @@ class GwFeatureEndButton(GwAction):
         self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_work_end.feature_id, "arc_id")
+        if self.feature_type is None:
+            self.feature_type = "arc"
+        viewname=f"v_edit_{self.feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.feature_type + "_id"))
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
@@ -176,7 +188,7 @@ class GwFeatureEndButton(GwAction):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = tools_gw.get_config_value('edit_workcat_vdefault')
+        row = tools_gw.get_config_value('edit_workcat_end_vdefault')
         if row:
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 

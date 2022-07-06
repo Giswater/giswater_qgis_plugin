@@ -54,23 +54,8 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
-        # Removes all deprecated variables defined at giswater.config
-        tools_gw.remove_deprecated_config_vars()
-
-        # Get variables from qgis project
-        self._get_project_variables()
-
-        # Manage variables not configured
-        if 'project_role' not in global_vars.project_vars or ('project_role' in global_vars.project_vars and global_vars.project_vars['project_role'] in (None, '')):
-            global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
-
-        # Get water software from table 'sys_version'
-        global_vars.project_type = tools_gw.get_project_type()
-        if global_vars.project_type is None:
-            return
-
-        # Check if user has config files 'init' and 'session' and its parameters
-        tools_gw.user_params_to_userconfig()
+        # Get SRID from table node
+        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
 
         # Manage schema name
         tools_db.get_current_user()
@@ -78,6 +63,32 @@ class GwLoadProject(QObject):
         schema_name = layer_source['schema']
         if schema_name:
             global_vars.schema_name = schema_name.replace('"', '')
+
+        # Set PostgreSQL parameter 'search_path'
+        tools_db.set_search_path(layer_source['schema'])
+
+        # Get water software from table 'sys_version'
+        global_vars.project_type = tools_gw.get_project_type()
+        if global_vars.project_type is None:
+            return
+
+        # Get variables from qgis project
+        self._get_project_variables()
+
+        # Check if loaded project is ud or ws
+        if not self._check_project_type():
+            return
+
+        # Removes all deprecated variables defined at giswater.config
+        tools_gw.remove_deprecated_config_vars()
+
+
+        # Manage variables not configured
+        if 'project_role' not in global_vars.project_vars or ('project_role' in global_vars.project_vars and global_vars.project_vars['project_role'] in (None, '')):
+            global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
+
+        # Check if user has config files 'init' and 'session' and its parameters
+        tools_gw.user_params_to_userconfig()
 
         # Check for developers options
         value = tools_gw.get_config_parser('log', 'log_sql', "user", "init", False)
@@ -89,16 +100,11 @@ class GwLoadProject(QObject):
         global_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
         tools_qt.manage_translation(global_vars.plugin_name)
 
-        # Set PostgreSQL parameter 'search_path'
-        tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
         schema_exists = tools_db.check_schema(global_vars.schema_name)
         if not schema_exists:
             tools_qgis.show_warning("Selected schema not found", parameter=global_vars.schema_name)
-
-        # Get SRID from table node
-        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -227,6 +233,22 @@ class GwLoadProject(QObject):
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
                 tools_qgis.show_warning(msg, 20, title=title)
             return False
+
+        return True
+
+
+    def _check_project_type(self):
+        """ Check if loaded project is valid for Giswater """
+        # Check if table 'v_edit_node' is loaded
+        if global_vars.project_type not in ('ws', 'ud'):
+            return False
+
+        addparam = tools_gw.get_sysversion_addparam()
+        if addparam:
+            add_type = addparam.get("type")
+            if add_type and add_type.lower() not in ("ws", "ud"):
+                global_vars.project_loaded = True
+                return False
 
         return True
 

@@ -8,6 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
+from qgis.PyQt.QtWidgets import QComboBox
 
 from ... import global_vars
 from ..utils import tools_gw
@@ -306,6 +307,21 @@ def show_message(**kwargs):
 
     global_vars.signal_manager.show_message.emit(text, level, duration)
 
+
+def manage_duplicate_dscenario_copyfrom(dialog):
+    """ Function called in def build_dialog_options(...) -->  getattr(module, signal)(dialog) """
+
+    dscenario_id = tools_qt.get_combo_value(dialog, 'copyFrom')
+    sql = f"SELECT descript, parent_id, dscenario_type, active, expl_id FROM v_edit_cat_dscenario WHERE dscenario_id = {dscenario_id}"
+    row = tools_db.get_row(sql)
+
+    if row:
+        tools_qt.set_widget_text(dialog, 'name', "")
+        tools_qt.set_widget_text(dialog, 'descript', row[0])
+        tools_qt.set_widget_text(dialog, 'parent', row[1])
+        tools_qt.set_widget_text(dialog, 'type', row[2])
+        tools_qt.set_widget_text(dialog, 'active', row[3])
+        tools_qt.set_combo_value(dialog.findChild(QComboBox, 'expl'), f"{row[4]}", 0)
 
 # region unused functions atm
 

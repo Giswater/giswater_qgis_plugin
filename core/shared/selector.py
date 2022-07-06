@@ -24,15 +24,19 @@ class GwSelector:
         pass
 
 
-    def open_selector(self, selector_type='"selector_basic"', reload_dlg=None):
+    def open_selector(self, selector_type="selector_basic", reload_dlg=None):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
-
         if reload_dlg:
-            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+            aux_params = None
+            if selector_type == "selector_mincut":
+                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
+                aux_params = tools_gw.get_config_parser("selector_mincut", f"aux_params", "user", "session")
+            else:
+                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
-            self.get_selector(reload_dlg, selector_type, current_tab=current_tab)
+            self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params)
             return
 
         dlg_selector = GwSelectorUi()
@@ -79,7 +83,7 @@ class GwSelector:
                 widget.setFocus()
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, aux_params=None):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -105,7 +109,10 @@ class GwSelector:
             text_filter = ''
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
+        if aux_params:
+            tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
+            extras = f"{extras}, {aux_params}"
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
@@ -311,7 +318,7 @@ class GwSelector:
         tools_qgis.refresh_map_canvas()
 
         # Reload selectors dlg
-        self.open_selector(reload_dlg=dialog)
+        self.open_selector(selector_type, reload_dlg=dialog)
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)

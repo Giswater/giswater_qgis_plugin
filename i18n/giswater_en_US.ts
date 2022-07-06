@@ -197,10 +197,6 @@
 			<translation>Psector selector</translation>
 		</message>
 		<message>
-			<source>50_text</source>
-			<translation>Network cost manager</translation>
-		</message>
-		<message>
 			<source>99_text</source>
 			<translation>Config</translation>
 		</message>
@@ -241,10 +237,6 @@
 			<translation>Add visit</translation>
 		</message>
 		<message>
-			<source>309_text</source>
-			<translation>Incident manager</translation>
-		</message>
-		<message>
 			<source>toolbar_plan_name</source>
 			<translation>Giswater - Masterplan</translation>
 		</message>
@@ -279,6 +271,14 @@
 		<message>
 			<source>217_text</source>
 			<translation>New Non-Visual object</translation>
+		</message>
+		<message>
+			<source>50_text</source>
+			<translation>Network cost manager</translation>
+		</message>
+		<message>
+			<source>309_text</source>
+			<translation>Incident manager</translation>
 		</message>
 		<message>
 			<source>218_text</source>
