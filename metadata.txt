@@ -7,7 +7,6 @@ about=Disclaimer: This plugin is released using the open source GNU-GPL3 license
 version=3.5.026
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
-
 Changelog=Version 3.5.026
     - Improve performance of selecting features from document, element, visit, psector, etc.
     - New button in dscenario to add layers to ToC easily
