@@ -685,8 +685,8 @@ SELECT v_edit_inp_subcatchment.subc_id,
     v_edit_inp_subcatchment.drytime_2 AS other3,
     NULL::integer AS other4,
     NULL::double precision AS other5
-   FROM ud_inp.v_edit_inp_subcatchment
-   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   FROM v_edit_inp_subcatchment
+   JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
    JOIN (
 	SELECT subc_id, outlet_id 
 	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
@@ -702,8 +702,8 @@ SELECT v_edit_inp_subcatchment.subc_id,
     v_edit_inp_subcatchment.initdef AS other3,
     NULL::integer AS other4,
     NULL::double precision AS other5
-   FROM ud_inp.v_edit_inp_subcatchment
-   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   FROM v_edit_inp_subcatchment
+   JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
    JOIN (
 	SELECT subc_id, outlet_id 
 	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
@@ -719,8 +719,8 @@ SELECT v_edit_inp_subcatchment.subc_id,
     v_edit_inp_subcatchment.decay AS other3,
     v_edit_inp_subcatchment.drytime AS other4,
     v_edit_inp_subcatchment.maxinfil AS other5
-   FROM ud_inp.v_edit_inp_subcatchment
-    JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   FROM v_edit_inp_subcatchment
+    JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
       JOIN (
 	SELECT subc_id, outlet_id 
 	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
@@ -736,8 +736,8 @@ union
     v_edit_inp_subcatchment.drytime_2 AS other3,
     NULL::integer AS other4,
     NULL::double precision AS other5
-   FROM ud_inp.v_edit_inp_subcatchment
-   JOIN ud1.cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+   FROM v_edit_inp_subcatchment
+   JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
    JOIN (
 	SELECT subc_id, outlet_id 
 	FROM ( SELECT unnest(outlet_id::varchar[]) AS outlet_id, subc_id FROM inp_subcatchment
