@@ -305,6 +305,7 @@ BEGIN
 
 				--temporary remove topology control
 				UPDATE config_param_system set value = 'false' WHERE parameter='edit_state_topocontrol';
+				UPDATE config_param_user SET value = 'true' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
 
 				--loop over network feature types in order to get the data from each plan_psector_x_* table 
 				FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
@@ -353,14 +354,15 @@ BEGIN
 						END IF;
 						
 					END LOOP;
-					--reestablish topology control
-					UPDATE config_param_system set value = 'true' WHERE parameter='edit_state_topocontrol';
 					--show information about performed state update
-
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
+					"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
 				END LOOP;
-				
+			
+				--reestablish topology control
+				UPDATE config_param_system set value = 'true' WHERE parameter='edit_state_topocontrol';
+				UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;	
+			
 			END IF;
 		END IF;
 	END IF;
