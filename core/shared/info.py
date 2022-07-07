@@ -3068,8 +3068,8 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
-        # Manage config_form_tableview
-        tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
+            # Manage config_form_tableview
+            tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
 
 
     def _open_generic_visit(self, widget, table_name):
