@@ -591,7 +591,7 @@ BEGIN
 		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM audit_check_data WHERE result_id::integer = v_record.fid AND cur_user = current_user;		
+		DELETE FROM audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user;
 	END LOOP;
 
 	-- insert spacers for log
