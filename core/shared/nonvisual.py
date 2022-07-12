@@ -2033,15 +2033,15 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'RG': {'lbl_surface_6', 'txt_surface_side_slope'},
-                        'GR': {'lbl_surface_5', 'txt_surface_slope'},
-                        'IT': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'PP': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'RB': {'lbl_storage_4', 'txt_seepage_rate', 'lbl_storage_5', 'txt_clogging_factor_storage'},
-                        'RD': {'lbl_surface_3', 'txt_vegetation_volume', 'lbl_surface_6', 'txt_surface_side_slope',
-                               'lbl_drain_3','lbl_drain_4', 'lbl_drain_5', 'lbl_drain_6',
-                               'lbl_drain_7', 'lbl_drain_8', 'lbl_drain_9', 'txt_flow_exponent',
+        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'RG': {'lbl_surface_side_slope', 'txt_surface_side_slope'},
+                        'GR': {'lbl_surface_slope', 'txt_surface_slope'},
+                        'IT': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'PP': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'RB': {'lbl_seepage_rate', 'txt_seepage_rate', 'lbl_clogging_factor_storage', 'txt_clogging_factor_storage'},
+                        'RD': {'lbl_vegetation_volume', 'txt_vegetation_volume', 'lbl_surface_side_slope', 'txt_surface_side_slope',
+                               'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
+                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_flow_exponent',
                                'txt_offset', 'txt_drain_delay', 'txt_open_level', 'txt_closed_level', 'cmb_control_curve',},
                         'VS': {''}}
 
