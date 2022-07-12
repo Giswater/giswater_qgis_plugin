@@ -1198,7 +1198,7 @@ BEGIN
 	RAISE NOTICE '40 - Check nodes duplicated(106)';
 
 	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 106, t1.the_geom
-	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 1 AND a.state2 = 1';
+	FROM '||v_edit||'node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 1 AND a.state2 = 1';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -1279,36 +1279,39 @@ BEGIN
 
 	RAISE NOTICE '44 - Check redundant values on y-top_elev-elev (461)';
 
-	-- nodes
-	v_querytext = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM '||v_edit||'node WHERE (ymax is not null or custom_ymax is not null) 
-		      and (top_elev is not null or custom_top_elev is not null) and (elev is not null or custom_elev is not null)';
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
-		SELECT 461, node_id, nodecat_id, ''Redundant values on y-top_elev-elev'', the_geom, expl_id FROM (', v_querytext,')a');
+	IF v_project_type = 'UD' THEN
 
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '461', concat('WARNING-461 (anl_node): There is/are ',v_count,' nodes with redundancy on ymax, top_elev & elev values.'),v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '461','INFO: There are no nodes with redundancy on ymax, top_elev & elev values.',v_count);
-	END IF;
+		-- nodes
+		v_querytext = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM '||v_edit||'node WHERE (ymax is not null or custom_ymax is not null) 
+			      and (top_elev is not null or custom_top_elev is not null) and (elev is not null or custom_elev is not null)';
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
+			SELECT 461, node_id, nodecat_id, ''Redundant values on y-top_elev-elev'', the_geom, expl_id FROM (', v_querytext,')a');
 
-	-- arcs
-	v_querytext = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM '||v_edit||'arc WHERE (y1 is not null or custom_y1 is not null)  
-	               and  (elev1 is not null or custom_elev1 is not null)';
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (125, 2, '461', concat('WARNING-461 (anl_node): There is/are ',v_count,' nodes with redundancy on ymax, top_elev & elev values.'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (125, 1, '461','INFO: There are no nodes with redundancy on ymax, top_elev & elev values.',v_count);
+		END IF;
 
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		-- arcs
+		v_querytext = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM '||v_edit||'arc WHERE (y1 is not null or custom_y1 is not null)  
+			       and  (elev1 is not null or custom_elev1 is not null)';
 
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
-		SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '461', concat('WARNING-461 (anl_arc): There is/are ',v_count,' arcs with redundancy on y1/y2, elev1/elev2 values.'),v_count);
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '461','INFO: There are no arcs with redundancy on y1/y2, elev1/elev2 values.',v_count);
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
+
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (125, 2, '461', concat('WARNING-461 (anl_arc): There is/are ',v_count,' arcs with redundancy on y1/y2, elev1/elev2 values.'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (125, 1, '461','INFO: There are no arcs with redundancy on y1/y2, elev1/elev2 values.',v_count);
+		END IF;
 	END IF;
 
 
