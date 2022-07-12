@@ -645,11 +645,19 @@ class GwInfo(QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                if field['layoutorder'] is None:
+                    message = "The field layoutorder is not configured for"
+                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg)
+                elif field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
+            else:
+                message = "The field layoutname is not configured for"
+                msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                tools_qgis.show_message(message, 2, parameter=msg)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
