@@ -262,6 +262,8 @@ BEGIN
 				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user);
 			ELSIF (aux_json->>'parentId') = 'arc_id' THEN -- specific case for arc_id as parent
 				v_selected_id = p_id;
+			ELSIF (aux_json->>'parentId') = 'team_id' THEN -- specific case for team_id as parent
+				v_selected_id = p_values_array->>'team_id';
 			ELSE 
 				v_querystring = concat('SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND feature_field_id=',quote_literal(quote_ident(aux_json->>'parentId')));
