@@ -75,7 +75,7 @@ BEGIN
 	DELETE FROM temp_node WHERE (result_id = v_fid::text);
 	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('NODE TOPOLOGICAL CONSISTENCY ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CALCULATE THE REACH OF HYDRANTS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
 	-- select version
@@ -177,7 +177,7 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT st_union(the_geom) as the_geom
+  	FROM (SELECT ST_Union(the_geom) as the_geom
   	FROM  anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
