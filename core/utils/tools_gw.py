@@ -616,6 +616,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     text_result = None
     temp_layers_added = []
     srid = global_vars.data_epsg
+    i = 0
     for k, v in list(data.items()):
         if str(k) == "info":
             text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
@@ -636,7 +637,11 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     tools_qgis.remove_layer_from_toc(aux_layer_name, group)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
-                fill_layer_temp(v_layer, data, k, counter, group)
+                fill_layer_temp(v_layer, data, k, counter, group=group, sort_val=i)
+
+                # Increase iterator
+                i = i + 1
+
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
                     qml_path = data[k]['qmlPath']
                     tools_qgis.load_qml(v_layer, qml_path)
@@ -864,7 +869,7 @@ def disable_tab_log(dialog):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
-def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
+def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers', sort_val=None):
     """
     :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
     :param data: Json
@@ -907,7 +912,7 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
     my_group = root.findGroup(group)
     if my_group is None:
         my_group = root.insertGroup(0, group)
-    my_group.insertLayer(0, virtual_layer)
+    my_group.insertLayer(sort_val, virtual_layer)
 
 
 def enable_widgets(dialog, result, enable):
@@ -2060,7 +2065,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
         tools_qt.manage_exception("Unhandled Error")
 
 
-def manage_json_return(json_result, sql, rubber_band=None):
+def manage_json_return(json_result, sql, rubber_band=None, i=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
@@ -2077,6 +2082,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
     try:
         margin = None
         opacity = 100
+        i = 0
 
         if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
             margin = return_manager['zoom']['margin']
@@ -2116,8 +2122,10 @@ def manage_json_return(json_result, sql, rubber_band=None):
                     counter = len(json_result['body']['data'][key]['features'])
                     geometry_type = json_result['body']['data'][key]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter, sort_val=i)
 
-                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter)
+                    # Increase iterator
+                    i = i+1
 
                     # Get values for set layer style
                     opacity = 100
