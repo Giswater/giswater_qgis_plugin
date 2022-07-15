@@ -421,9 +421,9 @@ BEGIN
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
-raise notice 'AAA - % --- %',v_tablename, v_tabname;
+
 	-- getting filter fields
-	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, v_filter_values)
 		INTO v_filter_fields;
 		
 		--  setting values of filter fields
