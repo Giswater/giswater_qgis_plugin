@@ -185,9 +185,10 @@ v_fields_keys text[];
 v_field text;
 v_user_name text;
 v_end_date text;
-
 v_cur_user text;
 v_prev_cur_user text;
+v_inherit_values json;
+v_column text;
 
 BEGIN
 	
@@ -833,6 +834,28 @@ BEGIN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
 						END IF;
 					END IF;
+				
+					-- TO IMPROVE visitclass x visitclass (inherit values)
+					SELECT inherit_values INTO v_inherit_values FROM config_visit_class WHERE id = v_visitclass;
+					IF v_inherit_values IS NOT NULL THEN
+						--FOREACH v_column in ARRAY (v_inherit_values->>'column')
+						v_column = 'insp_tram_estat';
+						--LOOP
+							IF (aux_json->>'columnname') = v_column THEN						
+								-- agafem la vista de visites, el valor del feature_id amb la data de visita més recent
+								/*EXECUTE 'SELECT '||v_column||' FROM '||v_inherit_values->>''table''||' WHERE '||v_inherit_values->>'idNanme'||' = v_featureid
+								ORDER BY date DESC limit 1'
+								INTO v_value;*/
+								SELECT insp_tram_estat_v INTO v_value FROM ve_visit_tram_insp WHERE arc_id = v_featureid
+								ORDER BY startdate DESC limit 1;
+								
+								-- set inherit value to form (already on config_form_fields)
+								v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_value);	
+							END IF;
+						--END LOOP;
+					END IF;
+				
+
 					
 					-- setting parameter in case of singleparameter visit
 					IF v_ismultievent IS FALSE THEN
