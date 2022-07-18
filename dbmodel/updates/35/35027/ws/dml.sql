@@ -28,8 +28,8 @@ VALUES (3160, 'Calculate the reach of hydrants', '{"featureType":["node"]}',
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function(id, function_name, style, layermanager, actions)
-VALUES ('3160','gw_fct_graphanalytics_hidrant','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+VALUES ('3160','gw_fct_graphanalytics_hidrant','{"style":{"point":{"style":"unique", "values":{"width":3.5, "color":[255,165,1], "transparency":1}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":1}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null,null) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)

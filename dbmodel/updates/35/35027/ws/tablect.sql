@@ -13,6 +13,4 @@ ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_exploitation_id_fkey FORE
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_muni_id_fkey FOREIGN KEY (muni_id)
 REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_muni_id_fkey FOREIGN KEY (muni_id)
-REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_unique UNIQUE(muni_id, id);
+ALTER TABLE om_streetaxis ADD CONSTRAINT ext_streetaxis_unique UNIQUE(muni_id, id);
