@@ -203,7 +203,12 @@ class Giswater(QObject):
         tools_gw.initialize_parsers()
 
         # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
-        tools_gw.check_old_userconfig(global_vars.user_folder_dir)
+        try:
+            tools_gw.check_old_userconfig(global_vars.user_folder_dir)
+        except Exception as e:
+            # This may happen if the user doesn't have permission to move/delete files
+            msg = "Exception while moving/deleting old user config files"
+            tools_log.log_warning(msg, parameter=e)
         tools_gw.user_params_to_userconfig()
 
         # Set logger parameters min_log_level and log_limit_characters
