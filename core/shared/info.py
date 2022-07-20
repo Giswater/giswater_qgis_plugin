@@ -657,7 +657,7 @@ class GwInfo(QObject):
             else:
                 message = "The field layoutname is not configured for"
                 msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(message, 2, parameter=msg)
+                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -1928,7 +1928,7 @@ class GwInfo(QObject):
             msg_level = json_result['message']['level']
             if msg_level is None:
                 msg_level = 1
-            tools_qgis.show_message(msg_text, message_level=msg_level)
+            tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
             self._reload_fields(dialog, json_result, p_widget)
 
             if thread:
@@ -2672,7 +2672,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         element_id = ""
@@ -2739,7 +2739,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         inf_text = ""
@@ -2835,7 +2835,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         row = selected_list[0].row()
@@ -2893,7 +2893,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         index = selected_list[0]
@@ -2917,7 +2917,7 @@ class GwInfo(QObject):
         selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         row = selected_list[0].row()
@@ -3088,7 +3088,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         visit_id = ""
@@ -3806,7 +3806,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
         elif len(selected_list) > 1:
             message = "Select just one document"
@@ -3988,7 +3988,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         index = selected_list[0]
