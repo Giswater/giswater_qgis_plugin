@@ -1072,7 +1072,7 @@ def set_style_mapzones():
                         R = id['stylesheet']['color'][0]
                         G = id['stylesheet']['color'][1]
                         B = id['stylesheet']['color'][2]
-                    except TypeError:
+                    except (TypeError, KeyError):
                         R = random.randint(0, 255)
                         G = random.randint(0, 255)
                         B = random.randint(0, 255)
