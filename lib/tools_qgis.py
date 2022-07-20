@@ -31,7 +31,8 @@ from .. import global_vars
 user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context': 'ui_message'}
 
 
-def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
+def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True,
+                 dialog=iface):
     """
     Show message to the user with selected message level
         :param text: The text to be shown (String)
@@ -62,14 +63,15 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    iface.messageBar().pushMessage(title, msg, message_level, duration)
+    dialog.messageBar().pushMessage(title, msg, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
         global_vars.logger.info(text)
 
 
-def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True):
+def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True,
+                      dialog=iface):
     """
     Show message to the user with selected message level and a button to open the url
         :param text: The text to be shown (String)
@@ -105,14 +107,14 @@ def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, 
     widget.layout().addWidget(button)
 
     # Show the message
-    iface.messageBar().pushWidget(widget, message_level, duration)
+    dialog.messageBar().pushWidget(widget, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
         global_vars.logger.info(text)
 
 
-def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show information message to the user
         :param text: The text to be shown (String)
@@ -122,10 +124,10 @@ def show_info(text, duration=10, context_name=None, parameter=None, logger_file=
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 0, duration, context_name, parameter, title, logger_file)
+    show_message(text, 0, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
-def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show warning message to the user
         :param text: The text to be shown (String)
@@ -135,10 +137,10 @@ def show_warning(text, duration=10, context_name=None, parameter=None, logger_fi
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 1, duration, context_name, parameter, title, logger_file)
+    show_message(text, 1, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
-def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show critical message to the user
         :param text: The text to be shown (String)
@@ -148,7 +150,7 @@ def show_critical(text, duration=10, context_name=None, parameter=None, logger_f
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 2, duration, context_name, parameter, title, logger_file)
+    show_message(text, 2, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
 def get_visible_layers(as_str_list=False, as_list=False):
