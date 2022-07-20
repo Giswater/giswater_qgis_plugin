@@ -2210,7 +2210,7 @@ class GwNonVisual:
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, commit=False)
 
-        if (not json_result) or ('status' in json_result and json_result['status'] == 'Failed'):
+        if (not json_result) or (json_result.get('status') in (None, 'Failed')):
             global_vars.dao.rollback()
             return False
 
