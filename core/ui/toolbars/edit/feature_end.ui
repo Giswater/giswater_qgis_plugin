@@ -25,8 +25,8 @@
   <property name="windowTitle">
    <string>End feature</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
     <widget class="QWidget" name="centralwidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
