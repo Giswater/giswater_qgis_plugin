@@ -41,9 +41,9 @@ def add_query_layer(**kwargs):
     """ Create and add a QueryLayer to ToC """
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
-    query = kwargs['query']
-    layer_name = kwargs['layerName'] if 'layerName' in kwargs else 'QueryLayer'
-    group = kwargs['group'] if 'group' in kwargs else 'GW Layers'
+    query = kwargs.get('query')
+    layer_name = kwargs.get('layerName', default='QueryLayer')
+    group = kwargs.get('group', default='GW Layers')
 
     uri = tools_db.get_uri()
 
@@ -95,7 +95,7 @@ def refresh_attribute_table(**kwargs):
                 set_column_visibility(**kwargs)
 
             # Set multiline fields according table config_form_fields.widgetcontrols['setMultiline']
-            if field['widgetcontrols'] is not None and 'setMultiline' in field['widgetcontrols'] and field['widgetcontrols']['setMultiline']:
+            if field['widgetcontrols'] is not None and field['widgetcontrols'].get('setMultiline'):
                 kwargs = {"layer": layer, "field": field, "fieldIndex": field_idx}
                 set_column_multiline(**kwargs)
             # Set alias column
@@ -195,7 +195,7 @@ def set_column_multiline(**kwargs):
         return
 
     if field['widgettype'] == 'text':
-        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols'] and field['widgetcontrols']['setMultiline']:
+        if field['widgetcontrols'] and field['widgetcontrols'].get('setMultiline'):
             editor_widget_setup = QgsEditorWidgetSetup(
                 'TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
@@ -238,7 +238,7 @@ def load_qml(**kwargs):
         return False
 
     # Get qml path
-    qml_path = kwargs['qmlPath'] if 'qmlPath' in kwargs else None
+    qml_path = kwargs.get('qmlPath')
 
     if not os.path.exists(qml_path):
         tools_log.log_warning("File not found", parameter=qml_path)
@@ -286,7 +286,7 @@ def get_selector(**kwargs):
     Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
     """
 
-    tab_name = kwargs['tab'] if 'tab' in kwargs else None
+    tab_name = kwargs.get('tab')
     global_vars.signal_manager.refresh_selectors.emit(tab_name)
 
 
@@ -301,9 +301,9 @@ def show_message(**kwargs):
     Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
     """
 
-    text = kwargs['text'] if 'text' in kwargs else 'No message found'
-    level = kwargs['level'] if 'level' in kwargs else 1
-    duration = kwargs['duration'] if 'duration' in kwargs else 10
+    text = kwargs.get('text', default='No message found')
+    level = kwargs.get('level', default=1)
+    duration = kwargs.get('duration', default=10)
 
     global_vars.signal_manager.show_message.emit(text, level, duration)
 
