@@ -117,7 +117,7 @@ class GwWorkspaceManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if field.get('hidden'): continue
             model = self.tbl_wrkspcm.model()
             if model is None:
                 model = QStandardItemModel()
@@ -236,8 +236,8 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
-            if 'message' in result and result['message']:
-                message = result['message']
+            message = result.get('message')
+            if message:
                 tools_qgis.show_message(message['text'], message['level'])
             self._fill_tbl(self.filter_name.text())
 
@@ -266,8 +266,8 @@ class GwWorkspaceManagerButton(GwAction):
             result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
             if result and result['status'] == "Accepted":
-                if 'message' in result and result['message']:
-                    message = result['message']
+                message = result.get('message')
+                if message:
                     tools_qgis.show_message(message['text'], message['level'])
                 self._fill_tbl(self.filter_name.text())
 
@@ -302,8 +302,8 @@ class GwWorkspaceManagerButton(GwAction):
             result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
             if result and result['status'] == "Accepted":
-                if 'message' in result and result['message']:
-                    message = result['message']
+                message = result.get('message')
+                if message:
                     tools_qgis.show_message(message['text'], message['level'])
 
             self._fill_tbl(self.filter_name.text())
@@ -321,8 +321,9 @@ class GwWorkspaceManagerButton(GwAction):
 
         if result and result['status'] == "Accepted":
             value = "0"
-            if 'userValues' in result['body']['data']:
-                for user_value in result['body']['data']['userValues']:
+            userValues = result['body']['data'].get('userValues')
+            if userValues:
+                for user_value in userValues:
                     if user_value['parameter'] == 'utils_workspace_vdefault' and user_value['value']:
                         value = user_value['value']
             self._set_labels_current_workspace(value=value, result=result)

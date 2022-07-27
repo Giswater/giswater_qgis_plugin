@@ -181,8 +181,7 @@ class GwCatalog:
         widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self._fill_combo(widget, field)
-        if 'selectedId' in field:
-            tools_qt.set_combo_value(widget, field['selectedId'], 0)
+        tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
 
         return widget
 
@@ -199,10 +198,12 @@ class GwCatalog:
         widget.clear()
         widget.blockSignals(False)
         combolist = []
-        if 'comboIds' in field:
-            for i in range(0, len(field['comboIds'])):
-                if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
-                    elem = [field['comboIds'][i], field['comboNames'][i]]
+        comboIds = field.get('comboIds')
+        comboNames = field.get('comboNames')
+        if None not in (comboIds, comboNames):
+            for i in range(0, len(comboIds)):
+                if comboIds[i] is not None and comboNames[i] is not None:
+                    elem = [comboIds[i], comboNames[i]]
                     combolist.append(elem)
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo

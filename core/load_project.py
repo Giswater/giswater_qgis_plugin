@@ -84,7 +84,8 @@ class GwLoadProject(QObject):
 
 
         # Manage variables not configured
-        if 'project_role' not in global_vars.project_vars or ('project_role' in global_vars.project_vars and global_vars.project_vars['project_role'] in (None, '')):
+        project_role = global_vars.project_vars.get('project_role')
+        if project_role in (None, ''):
             global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
 
         # Check if user has config files 'init' and 'session' and its parameters
@@ -475,9 +476,11 @@ class GwLoadProject(QObject):
         status, result = self._manage_layers()
         if not status:
             return False
-        if result and 'variables' in result['body']:
-            if 'setQgisLayers' in result['body']['variables']:
-                if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
+        if result:
+            variables = result['body'].get('variables')
+            if variables:
+                setQgisLayers = variables.get('setQgisLayers')
+                if setQgisLayers in (False, 'False', 'false'):
                     return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
@@ -524,12 +527,12 @@ class GwLoadProject(QObject):
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                if 'variables' in result['body']:
-                    if 'useGuideMap' in result['body']['variables']:
-                        guided_map = result['body']['variables']['useGuideMap']
-                        if guided_map:
-                            tools_log.log_info("manage_guided_map")
-                            self._manage_guided_map()
+                variables = result['body'].get('variables')
+                if variables:
+                    guided_map = variables.get('useGuidedMap')
+                    if guided_map:
+                        tools_log.log_info("manage_guided_map")
+                        self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
             finally:

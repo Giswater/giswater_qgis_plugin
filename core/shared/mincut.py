@@ -1922,9 +1922,10 @@ class GwMincut:
         if signal[1]:
             complet_result = signal[1]
             real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            mincutOverlap = complet_result.get('mincutOverlap')
+            if mincutOverlap not in (None, ""):
                 message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
+                tools_qt.show_info_box(message, parameter=mincutOverlap)
             else:
                 message = complet_result.get('message')
                 if not message:
@@ -2050,9 +2051,10 @@ class GwMincut:
 
         if signal[1]:
             complet_result = signal[1]
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            mincutOverlap = complet_result.get('mincutOverlap')
+            if mincutOverlap not in (None, ""):
                 message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
+                tools_qt.show_info_box(message, parameter=mincutOverlap)
             else:
                 message = complet_result.get('message')
                 if not message:
