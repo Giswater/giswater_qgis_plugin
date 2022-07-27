@@ -107,6 +107,8 @@ class GwSelector:
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
+        if '"' in selector_type:
+            selector_type = selector_type.strip('"')
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
