@@ -159,6 +159,23 @@ class GwLoadProject(QObject):
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
+        # Only get the x.y.zzz, not x.y.zzz.n
+        try:
+            plugin_version_l = str(plugin_version).split('.')
+            if len(plugin_version_l) >= 4:
+                plugin_version = f'{plugin_version_l[0]}'
+                for i in range(1, 3):
+                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+        except Exception:
+            pass
+        try:
+            project_version_l = str(project_version).split('.')
+            if len(project_version_l) >= 4:
+                project_version = f'{project_version_l[0]}'
+                for i in range(1, 3):
+                    project_version = f"{project_version}.{project_version_l[i]}"
+        except Exception:
+            pass
         if project_version == plugin_version:
             message = "Project read finished"
             tools_log.log_info(message)
