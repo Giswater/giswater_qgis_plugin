@@ -158,9 +158,9 @@ BEGIN
 			END IF;
 
 		--find if there is an arc related to node
-		SELECT string_agg(v_arc.arc_id,',')  INTO v_arc_id FROM v_arc 
-		LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text 
+		SELECT string_agg(arc.arc_id,',')  INTO v_arc_id FROM arc 
+		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
      	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id);
 
 		IF v_arc_id IS NULL THEN

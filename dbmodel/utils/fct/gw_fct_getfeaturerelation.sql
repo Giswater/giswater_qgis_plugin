@@ -122,14 +122,24 @@ BEGIN
 			END IF;
 		END IF;
 
-		--check arcs related to node
-		SELECT string_agg(v_arc.arc_id,',')  INTO v_connect_arc FROM v_arc 
-		LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text 
-     	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id);
+		--check arcs related to node (on service)
+		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc 
+		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
+     	WHERE (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=1;
 
 		IF v_connect_arc IS NOT NULL THEN
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature (on service): ',v_connect_arc ));
+		END IF;
+	
+		--check arcs related to node (obsolete)
+		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc 
+		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
+     	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=0;
+
+		IF v_connect_arc IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature (obsolete): ',v_connect_arc ));
 		END IF;
 
 		--check related polygon
