@@ -3,3 +3,4 @@
 - New table of ws - om_streetaxis for tramified streeter
 - New function gw_fct_graphanalytics_hidrant & gw_fct_graphanalytics_hidrant_recursive for finding calculating reach of hydrants
 - Add node rotation logics on UD projects
+- Create edit_custom_link variable with google maps style and harmonize edit_feature_usefid_on_linkid the same way
