@@ -227,7 +227,7 @@ class GwCatalog:
             widget.setFocus()
         else:
             message = "Widget not found"
-            tools_qgis.show_message(message, 2, parameter=str(widget_name))
+            tools_qgis.show_message(message, 2, parameter=str(widget_name), dialog=previous_dialog)
 
         tools_gw.close_dialog(self.dlg_catalog)
 
