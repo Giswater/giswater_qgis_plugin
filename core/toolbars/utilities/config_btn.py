@@ -231,7 +231,7 @@ class GwConfigButton(GwAction):
 
             except Exception as e:
                 msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
-                tools_qgis.show_message(msg, 2)
+                tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
 
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
