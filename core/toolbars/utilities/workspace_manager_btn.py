@@ -197,7 +197,7 @@ class GwWorkspaceManagerButton(GwAction):
         selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_workspace_manager)
             return
 
         # Get selected workspace id
@@ -224,7 +224,7 @@ class GwWorkspaceManagerButton(GwAction):
         selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_workspace_manager)
             return
 
         # Get selected workspace id
@@ -238,7 +238,7 @@ class GwWorkspaceManagerButton(GwAction):
         if result and result['status'] == "Accepted":
             if 'message' in result and result['message']:
                 message = result['message']
-                tools_qgis.show_message(message['text'], message['level'])
+                tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
             self._fill_tbl(self.filter_name.text())
 
 
@@ -251,7 +251,7 @@ class GwWorkspaceManagerButton(GwAction):
         selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_workspace_manager)
             return
 
         # Get selected workspace id
@@ -268,7 +268,7 @@ class GwWorkspaceManagerButton(GwAction):
             if result and result['status'] == "Accepted":
                 if 'message' in result and result['message']:
                     message = result['message']
-                    tools_qgis.show_message(message['text'], message['level'])
+                    tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
                 self._fill_tbl(self.filter_name.text())
 
 
@@ -281,7 +281,7 @@ class GwWorkspaceManagerButton(GwAction):
         selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_workspace_manager)
             return
 
         # Get selected workspace id
@@ -304,7 +304,7 @@ class GwWorkspaceManagerButton(GwAction):
             if result and result['status'] == "Accepted":
                 if 'message' in result and result['message']:
                     message = result['message']
-                    tools_qgis.show_message(message['text'], message['level'])
+                    tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
 
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(name="", result=result)
