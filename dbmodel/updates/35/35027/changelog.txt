@@ -6,3 +6,4 @@
 - Create edit_custom_link variable with google maps style and harmonize edit_feature_usefid_on_linkid the same way
 - Enhance delete feature: allow delete nodes connected to obsolete arcs (bug fix) and show on_service/obsolete arcs on getfeaturerelation
 - Plan check - control number of rows on plan_price (fid:465)
+- Add the_geom on v_om_waterbalance views
