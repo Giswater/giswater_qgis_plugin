@@ -2022,13 +2022,14 @@ class GwAdminButton:
 
                 if complet_result['status'] == 'Failed':
                     msg = f'The importation process has failed!'
-                    if 'replace' in complet_result['body']['data']:
+                    replace = complet_result['body']['data'].get('replace')
+                    if replace is not None:
                         msg += f'<br>This can be fixed in the next dialog.'
                     msg += f'<br>See Info log for more details.'
                     self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
-                    if 'replace' in complet_result['body']['data']:
-                        retry = self._build_replace_dlg(complet_result['body']['data']['replace'])
+                    if replace is not None:
+                        retry = self._build_replace_dlg(replace)
                         if retry:
                             sql = "DELETE FROM temp_csv WHERE fid = 239;"
                             tools_db.execute_sql(sql, commit=False)
@@ -2968,14 +2969,16 @@ class GwAdminButton:
     def _manage_json_message(self, json_result, parameter=None, title=None):
         """ Manage message depending result @status """
 
-        if 'message' in json_result:
+        message = json_result.get('message')
+        if message:
 
-            level = 1
-            if 'level' in json_result['message']:
-                level = int(json_result['message']['level'])
-            if 'text' in json_result['message']:
-                msg = json_result['message']['text']
+            level = message.get('level')
+            if level is not None:
+                level = int(level)
             else:
+                level = 1
+            msg = message.get('text')
+            if msg is None:
                 msg = "Key on returned json from ddbb is missed"
 
             tools_qgis.show_message(msg, level, parameter=parameter, title=title)

@@ -47,9 +47,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     global user_parameters
 
     # Get optional parameter 'show_message_durations'
-    dev_duration = None
-    if 'show_message_durations' in user_parameters:
-        dev_duration = user_parameters['show_message_durations']
+    dev_duration = user_parameters.get('show_message_durations')
     # If is set, use this value
     if dev_duration not in (None, "None"):
         if message_level in (1, 2) and int(dev_duration) < 10:
@@ -86,9 +84,7 @@ def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, 
     global user_parameters
 
     # Get optional parameter 'show_message_durations'
-    dev_duration = None
-    if 'show_message_durations' in user_parameters:
-        dev_duration = user_parameters['show_message_durations']
+    dev_duration = user_parameters.get('show_message_durations')
     # If is set, use this value
     if dev_duration not in (None, "None"):
         if message_level in (1, 2) and int(dev_duration) < 10:

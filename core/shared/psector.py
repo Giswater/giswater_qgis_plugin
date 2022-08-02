@@ -513,7 +513,7 @@ class GwPsector:
                                            table="config_param_system")[0]
         for widget in widgets:
             if 'widget_total' in widget.objectName():
-                total_result =  float(total_result) + float(widget.text().replace(symbol, '').strip())
+                total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
         tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
 
@@ -1078,7 +1078,7 @@ class GwPsector:
 
         if close_dlg:
             json_result = self.set_plan()
-            if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result.get('status') == 'Accepted':
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 

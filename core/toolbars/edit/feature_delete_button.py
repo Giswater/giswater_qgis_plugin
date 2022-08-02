@@ -151,7 +151,7 @@ class GwFeatureDeleteButton(GwAction):
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         result = tools_gw.execute_procedure('gw_fct_getfeaturerelation', body)
-        if not result or ('status' in result and result['status'] == 'Failed'):
+        if not result or result.get('status') == 'Failed':
             return False
 
         # Construct message result
@@ -181,7 +181,7 @@ class GwFeatureDeleteButton(GwAction):
             tools_qgis.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
             return
 
-        if 'status' in complet_result and complet_result['status'] == 'Failed':
+        if complet_result.get('status') == 'Failed':
             return False
 
         # Populate tab info

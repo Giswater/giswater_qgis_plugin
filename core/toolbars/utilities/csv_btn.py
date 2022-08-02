@@ -169,8 +169,9 @@ class GwCSVButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-            if 'message' in result:
-                msg = result['message']['text']
+            message = result.get('message')
+            if message:
+                msg = message.get('text')
                 tools_qt.show_info_box(msg)
 
 
@@ -339,7 +340,7 @@ class GwCSVButton(GwAction):
         body = tools_gw.create_body(extras=values)
         result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 
-        if result and 'status' in result and result['status'] == 'Accepted':
+        if result and result.get('status') == 'Accepted':
             return True
 
         return False

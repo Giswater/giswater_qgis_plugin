@@ -97,7 +97,8 @@ class GwSearch:
                     label.setObjectName('lbl_' + field['label'])
                     label.setText(field['label'].capitalize())
 
-                    if 'tooltip' in field:
+                    tooltip = field.get('tooltip')
+                    if tooltip:
                         label.setToolTip(field['tooltip'])
                     else:
                         label.setToolTip(field['label'].capitalize())
@@ -488,8 +489,7 @@ class GwSearch:
         widget.setProperty('columnname', field['columnname'])
         list_items = self._get_list_items(widget, field)
         tools_qt.fill_combo_values(widget, list_items, 1)
-        if 'selectedId' in field:
-            tools_qt.set_combo_value(widget, field['selectedId'], 0)
+        tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
         # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self._clear_lineedits))
 
@@ -510,12 +510,15 @@ class GwSearch:
         widget.clear()
         widget.blockSignals(False)
         list_items = []
-        if 'comboIds' in field:
-            for i in range(0, len(field['comboIds'])):
-                if 'comboFeature' in field:
-                    elem = [field['comboIds'][i], field['comboNames'][i], field['comboFeature'][i]]
+        comboIds = field.get('comboIds')
+        comboNames = field.get('comboNames')
+        comboFeature = field.get('comboFeature')
+        if None not in (comboIds, comboNames):
+            for i in range(0, len(comboIds)):
+                if comboFeature:
+                    elem = [comboIds[i], comboNames[i], comboFeature[i]]
                 else:
-                    elem = [field['comboIds'][i], field['comboNames'][i]]
+                    elem = [comboIds[i], comboNames[i]]
                 list_items.append(elem)
         return list_items
 

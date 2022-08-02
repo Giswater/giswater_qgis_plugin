@@ -654,7 +654,7 @@ class GwInfo(QObject):
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
-            else:
+            elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"
                 msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
                 tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
