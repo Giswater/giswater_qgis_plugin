@@ -329,11 +329,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement;
 	IF v_table_count>v_count THEN
 		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
+		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '346', 1,'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
+		VALUES (115, '346', 1,'INFO: The number of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
 	END IF;
 
 	--check plan_arc_x_pavemen pavcat_id column (347)
@@ -502,6 +502,22 @@ BEGIN
 			VALUES (115, '462' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
 		END IF;		
 	END IF;
+
+	--check if number of rows in plan_price
+	EXECUTE 'SELECT count(*) FROM plan_price'
+	INTO v_count; 
+
+	IF v_count > 700 THEN
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (115, '465', 3, FALSE, concat('ERROR-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+	ELSIF v_count > 300 THEN
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (115, '465', 2, FALSE, concat('WARNING-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '465', 1,'INFO: The number of rows on plan price is acceptable.',v_count);
+	END IF;
+
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false

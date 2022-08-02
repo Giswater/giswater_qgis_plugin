@@ -26,5 +26,5 @@ WHERE parameter = 'edit_custom_link';
 
 DELETE FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid';
 
-
-
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (465, 'Check number of rows in a plan_price table', 'utils',null, 'core', true, 'Check plan-config',null) ON CONFLICT (fid) DO NOTHING;
