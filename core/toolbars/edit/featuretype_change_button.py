@@ -211,7 +211,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
             else:
                 message = "Field catalog_id required!"
-                tools_qgis.show_warning(message)
+                tools_qgis.show_warning(message, dialog=self.dlg_change)
                 return
 
         else:

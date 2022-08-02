@@ -255,7 +255,7 @@ class GwDocument(QObject):
 
         if doc_type in (None, '', -1):
             message = "You need to insert doc_type"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
             return
 
         # Check if this document already exists
@@ -374,7 +374,7 @@ class GwDocument(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()

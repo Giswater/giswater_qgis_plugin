@@ -181,7 +181,7 @@ class GwSearch:
                 self._write_to_csv(dialog, folder_path, all_rows)
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
 
 
     def refresh_tab(self, tab_name="tab_hydro"):
@@ -787,7 +787,7 @@ class GwSearch:
             writer.writerows(all_rows)
         tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
-        tools_qgis.show_info(message)
+        tools_qgis.show_info(message, dialog=dialog)
 
 
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
@@ -826,7 +826,7 @@ class GwSearch:
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -907,7 +907,7 @@ class GwSearch:
                         length = length + row[0]
                     else:
                         message = "Some data is missing. Check gis_length for arc"
-                        tools_qgis.show_warning(message, parameter=arc_id)
+                        tools_qgis.show_warning(message, parameter=arc_id, dialog=self.items_dialog)
                         return
                 if extension is not None:
                     widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
@@ -930,7 +930,7 @@ class GwSearch:
         doc_id = dialog.doc_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Check if document already exist
@@ -940,7 +940,7 @@ class GwSearch:
         row = tools_db.get_row(sql)
         if row:
             msg = "Document already exist"
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Insert into new table
@@ -949,7 +949,7 @@ class GwSearch:
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_qgis.show_info(message)
+            tools_qgis.show_info(message, dialog=dialog)
 
         dialog.tbl_document.model().select()
 

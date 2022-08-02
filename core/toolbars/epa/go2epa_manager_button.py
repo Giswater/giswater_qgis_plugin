@@ -210,7 +210,7 @@ class GwGo2EpaManagerButton(GwAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
 
         inf_text = ""

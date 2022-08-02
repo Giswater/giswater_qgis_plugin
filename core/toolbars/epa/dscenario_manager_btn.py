@@ -167,7 +167,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
             return
 
         # Get selected dscenario id
@@ -188,7 +188,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
             return
 
         # Get selected dscenario id
@@ -296,7 +296,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_dscenario)
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -486,7 +486,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
             return
 
         # Get selected feature_id

@@ -378,7 +378,7 @@ class GwInfo(QObject):
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
-                    tools_qgis.show_message(msg)
+                    tools_qgis.show_message(msg, dialog=dialog)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
@@ -648,7 +648,7 @@ class GwInfo(QObject):
                 if field['layoutorder'] is None:
                     message = "The field layoutorder is not configured for"
                     msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg)
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
                 elif field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
@@ -657,7 +657,7 @@ class GwInfo(QObject):
             elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"
                 msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                tools_qgis.show_message(message, 2, parameter=msg)
+                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -742,7 +742,7 @@ class GwInfo(QObject):
                 path = widget.text()
                 status, message = tools_os.open_file(path)
                 if status is False and message is not None:
-                    tools_qgis.show_warning(message, parameter=path)
+                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
         except Exception:
             pass
 
@@ -1530,7 +1530,7 @@ class GwInfo(QObject):
         if 'widgettype' in field and not field['widgettype']:
             message = "The field widgettype is not configured for"
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-            tools_qgis.show_message(message, 2, parameter=msg)
+            tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
             return label, widget
 
         try:
@@ -1539,7 +1539,7 @@ class GwInfo(QObject):
         except Exception as e:
             msg = (f"{type(e).__name__}: {e} WHERE columname='{field['columnname']}' "
                    f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-            tools_qgis.show_message(msg, 2)
+            tools_qgis.show_message(msg, 2, dialog=dialog)
             return label, widget
 
         return label, widget
@@ -1841,7 +1841,7 @@ class GwInfo(QObject):
 
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             tools_qt.set_action_checked("actionEdit", True, dialog)
             QgsProject.instance().blockSignals(False)
             return False
@@ -1928,7 +1928,7 @@ class GwInfo(QObject):
             msg_level = json_result['message']['level']
             if msg_level is None:
                 msg_level = 1
-            tools_qgis.show_message(msg_text, message_level=msg_level)
+            tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
             self._reload_fields(dialog, json_result, p_widget)
 
             if thread:
@@ -2269,7 +2269,7 @@ class GwInfo(QObject):
         if json_response and json_response['status'] != "Failed":
             # Refresh canvas & send a message
             tools_qgis.refresh_map_canvas()
-            tools_qgis.show_info("Node set correctly")
+            tools_qgis.show_info("Node set correctly", dialog=dialog)
 
             # Delete lineedit
             widget.deleteLater()
@@ -2283,7 +2283,7 @@ class GwInfo(QObject):
             if layout is not None:
                 layout.addWidget(new_widget, int(field['layoutorder']), 2)
             return
-        tools_qgis.show_warning("Error setting node")
+        tools_qgis.show_warning("Error setting node", dialog=dialog)
 
 
     def _open_catalog(self, tab_type, feature_type, child_type):
@@ -2343,7 +2343,7 @@ class GwInfo(QObject):
                 has_y = (row[0], row[1]) != (None, None)
                 has_elev = (row[2], row[3]) != (None, None)
                 if has_y and has_elev:
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return False
 
             fields2 = 'y2, custom_y2, elev2, custom_elev2'
@@ -2353,7 +2353,7 @@ class GwInfo(QObject):
                 has_y = (row[0], row[1]) != (None, None)
                 has_elev = (row[2], row[3]) != (None, None)
                 if has_y and has_elev:
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return False
         # NODE
         elif self.feature_type == 'node':
@@ -2366,7 +2366,7 @@ class GwInfo(QObject):
                 has_elev = (row[2], row[3]) != (None, None)
                 has_top_elev = (row[4], row[5]) != (None, None)
                 if False not in (has_y, has_elev, has_top_elev):
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return False
         return True
 
@@ -2402,14 +2402,14 @@ class GwInfo(QObject):
                     has_elev = self._has_elev(arc_n=k[-1:])
                     if has_elev:
                         msg = f"This feature already has ELEV values! Review it and use only one"
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_elev
                 # If edited field is ELEV check if feature has Y field
                 if 'elev' in k:
                     has_y = self._has_y(arc_n=k[-1:])
                     if has_y:
                         msg = f"This feature already has Y values! Review it and use only one"
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y
             elif self.feature_type == 'node':
                 # If edited field is Y check if feature has ELEV & TOP_ELEV field
@@ -2418,7 +2418,7 @@ class GwInfo(QObject):
                     has_top_elev = self._has_top_elev()
                     if has_elev and has_top_elev:
                         msg = f"This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_elev and has_top_elev
                 # If edited field is TOP_ELEV check if feature has Y & ELEV field
                 if 'top_elev' in k:
@@ -2426,7 +2426,7 @@ class GwInfo(QObject):
                     has_elev = self._has_elev()
                     if has_y and has_elev:
                         msg = f"This feature already has Y & ELEV values! Review it and use at most two"
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y and has_elev
                 # If edited field is ELEV check if feature has Y & TOP_ELEV field
                 elif 'elev' in k:
@@ -2434,7 +2434,7 @@ class GwInfo(QObject):
                     has_top_elev = self._has_top_elev()
                     if has_y and has_top_elev:
                         msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return has_y and has_top_elev
 
         return False
@@ -2463,15 +2463,15 @@ class GwInfo(QObject):
                     continue
                 if 'ymax' in k:
                     if has_elev and has_top_elev:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
                 if 'top_elev' in k:
                     if has_elev and has_ymax:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
                 elif 'elev' in k:
                     if has_top_elev and has_ymax:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
 
             return False
@@ -2500,19 +2500,19 @@ class GwInfo(QObject):
                     continue
                 if 'y1' in k:
                     if has_elev1:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
                 if 'elev1' in k:
                     if has_y1:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
                 if 'y2' in k:
                     if has_elev2:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
                 if 'elev2' in k:
                     if has_y2:
-                        tools_qgis.show_warning(msg)
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                         return True
 
             return False
@@ -2672,7 +2672,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         element_id = ""
@@ -2692,7 +2692,7 @@ class GwInfo(QObject):
         object_id = tools_qt.get_text(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
-            tools_qgis.show_warning(message, parameter=table_object + "_id")
+            tools_qgis.show_warning(message, parameter=table_object + "_id", dialog=self.dlg_cf)
             return
 
         # Check if this object exists
@@ -2701,7 +2701,7 @@ class GwInfo(QObject):
                " WHERE " + field_object_id + " = '" + object_id + "'")
         row = tools_db.get_row(sql)
         if not row:
-            tools_qgis.show_warning("Object id not found", parameter=object_id)
+            tools_qgis.show_warning("Object id not found", parameter=object_id, dialog=self.dlg_cf)
             return
 
         # Check if this object is already associated to current feature
@@ -2716,7 +2716,7 @@ class GwInfo(QObject):
         # If object already exist show warning message
         if row:
             message = "Object already associated with this feature"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
 
         # If object not exist perform an INSERT
         else:
@@ -2739,7 +2739,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         inf_text = ""
@@ -2835,7 +2835,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         row = selected_list[0].row()
@@ -2893,7 +2893,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         index = selected_list[0]
@@ -2917,7 +2917,7 @@ class GwInfo(QObject):
         selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         row = selected_list[0].row()
@@ -2925,7 +2925,7 @@ class GwInfo(QObject):
         if url != '':
             status, message = tools_os.open_file(url)
             if status is False and message is not None:
-                tools_qgis.show_warning(message, parameter=url)
+                tools_qgis.show_warning(message, parameter=url, dialog=self.dlg_cf)
 
 
     def _fill_tbl_hydrometer(self, qtable, table_name):
@@ -3041,7 +3041,7 @@ class GwInfo(QObject):
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         # Fill ComboBox cmb_visit_class
@@ -3088,7 +3088,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         visit_id = ""
@@ -3124,7 +3124,7 @@ class GwInfo(QObject):
         date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         if type(table_name) is dict:
@@ -3225,7 +3225,7 @@ class GwInfo(QObject):
             # Open selected document
             status, message = tools_os.open_file(path[0])
             if status is False and message is not None:
-                tools_qgis.show_warning(message, parameter=path[0])
+                tools_qgis.show_warning(message, parameter=path[0], dialog=self.dlg_cf)
 
 
     def _open_visit_intervals(self):
@@ -3396,7 +3396,7 @@ class GwInfo(QObject):
             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
-        self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self._open_file)
+        self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(partial(self._open_file, self.dlg_event_full))
         tools_qt.set_tableview_config(self.dlg_event_full.tbl_docs_x_event)
         tools_gw.open_dialog(self.dlg_event_full, 'visit_event_full')
 
@@ -3437,7 +3437,7 @@ class GwInfo(QObject):
                 model.appendRow(item)
 
 
-    def _open_file(self):
+    def _open_file(self, dialog):
 
         # Get row index
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
@@ -3445,7 +3445,7 @@ class GwInfo(QObject):
         path = index.sibling(index.row(), column_index).data()
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
-            tools_qgis.show_warning(message, parameter=path)
+            tools_qgis.show_warning(message, parameter=path, dialog=dialog)
 
 
     def _tbl_event_clicked(self, table_name):
@@ -3490,7 +3490,7 @@ class GwInfo(QObject):
         date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         # Cascade filter
@@ -3543,7 +3543,7 @@ class GwInfo(QObject):
         date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         format_low = 'yyyy-MM-dd 00:00:00.000'
@@ -3590,7 +3590,7 @@ class GwInfo(QObject):
         expl_id = tools_qt.get_combo_value(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=self.dlg_cf)
             return
 
         manage_visit = GwVisit()
@@ -3648,11 +3648,11 @@ class GwInfo(QObject):
 
                 if not os.path.exists(path):
                     message = "File not found"
-                    tools_qgis.show_warning(message, parameter=path)
+                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
                 else:
                     status, message = tools_os.open_file(path)
                     if status is False and message is not None:
-                        tools_qgis.show_warning(message, parameter=path)
+                        tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
 
         else:
             # If more then one document is attached open dialog with list of documents
@@ -3742,7 +3742,7 @@ class GwInfo(QObject):
         # Set model of selected widget
         message = tools_qt.fill_table(widget, f"{self.schema_name}.{table_name}", expr_filter)
         if message:
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
 
         # Set signals
         doc_type.currentIndexChanged.connect(partial(self._set_filter_table_man, widget))
@@ -3777,7 +3777,7 @@ class GwInfo(QObject):
         date_to = self.date_document_to.date()
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         # Create interval dates
@@ -3806,11 +3806,11 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
         elif len(selected_list) > 1:
             message = "Select just one document"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         # Get document path (can be relative or absolute)
@@ -3818,7 +3818,7 @@ class GwInfo(QObject):
         path = widget.model().record(row).value("path")
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
-            tools_qgis.show_warning(message, parameter=path)
+            tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
 
 
     def _manage_new_document(self, dialog, doc_id=None, feature=None):
@@ -3988,7 +3988,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
         index = selected_list[0]
@@ -4030,7 +4030,7 @@ class GwInfo(QObject):
 
             result = json_result['body']['data']
             if 'fields' not in result:
-                tools_qgis.show_message("No listValues for: " + json_result['body']['data'], 2)
+                tools_qgis.show_message("No listValues for: " + json_result['body']['data'], 2, dialog=self.dlg_cf)
             else:
                 for field in json_result['body']['data']['fields']:
                     label = QLabel()
@@ -4113,7 +4113,7 @@ class GwInfo(QObject):
                 tools_qt.set_stylesheet(widget, "border: 2px solid red")
         if missing_mandatory:
             message = "Mandatory field is missing. Please, set a value"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Form handling so that the user cannot change values until the process is finished

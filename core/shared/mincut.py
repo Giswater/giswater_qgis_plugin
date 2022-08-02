@@ -1588,7 +1588,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_connec)
             return
 
         del_id = []
@@ -1641,7 +1641,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_hydro)
             return
 
         del_id = []
@@ -2282,7 +2282,7 @@ class GwMincut:
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_comp)
             return
 
         # Check if template file exists
@@ -2293,7 +2293,7 @@ class GwMincut:
 
         if not os.path.exists(template_path):
             message = "File not found"
-            tools_qgis.show_warning(message, parameter=template_path)
+            tools_qgis.show_warning(message, parameter=template_path, dialog=self.dlg_comp)
             return
 
         # Check if composer exist

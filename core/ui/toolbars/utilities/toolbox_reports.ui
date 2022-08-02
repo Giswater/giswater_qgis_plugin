@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Reports</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_6">
+   <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_5">
      <item row="0" column="0">
       <widget class="QGroupBox" name="grb_info">
@@ -77,7 +77,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QGroupBox" name="grb_filters">
@@ -93,14 +93,14 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="2" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="0">
       <widget class="QTableWidget" name="tbl_reports"/>
      </item>
     </layout>
    </item>
-   <item>
+   <item row="3" column="0">
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="3">
       <spacer name="horizontalSpacer">
@@ -176,7 +176,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="4" column="0">
     <layout class="QGridLayout" name="lyt_progress">
      <item row="0" column="1">
       <widget class="QProgressBar" name="progressBar">
