@@ -224,10 +224,13 @@ class GwToolBoxButton(GwAction):
             tools_gw.load_settings(self.dlg_reports)
 
             # Set description & query labels
-            sql = f"SELECT alias, query_text FROM config_report WHERE id = {self.function_selected}"
+            sql = f"SELECT alias, query_text, descript FROM config_report WHERE id = {self.function_selected}"
             row = tools_db.get_row(sql)
             if row:
-                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', row[0])
+                descript = row[2]
+                if descript in (None, 'null', ''):
+                    descript = row[0]
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', descript)
                 tools_qt.set_widget_text(self.dlg_reports, 'lbl_query', row[1])
 
             # Set listeners
