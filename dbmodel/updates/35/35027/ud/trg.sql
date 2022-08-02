@@ -13,4 +13,4 @@ DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON arc;
 
 CREATE TRIGGER gw_trg_arc_noderotation_update 
 AFTER INSERT OR DELETE OR UPDATE OF the_geom 
-ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_arc_noderotation_update();
+ON arc FOR EACH ROW EXECUTE PROCEDURE gw_trg_arc_noderotation_update();
