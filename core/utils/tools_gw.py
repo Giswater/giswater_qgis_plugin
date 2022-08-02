@@ -1617,12 +1617,14 @@ def fill_typeahead(completer, model, field, dialog, widget):
 
     if not widget:
         return
-    parent_id = field.get('parentId', default="")
+    parent_id = ""
+    if 'parentId' in field:
+        parent_id = field["parentId"]
 
     extras = f'"queryText":"{field["queryText"]}"'
     extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
     extras += f', "parentId":"{parent_id}"'
-    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(field["parentId"]))}"'
+    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(parent_id))}"'
     extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
     body = create_body(extras=extras)
     complet_list = execute_procedure('gw_fct_gettypeahead', body)
