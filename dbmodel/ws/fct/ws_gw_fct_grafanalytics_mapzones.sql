@@ -666,10 +666,11 @@ BEGIN
 
 				IF v_floodonlymapzone IS NULL THEN
 
-					RAISE NOTICE 'Disconnecteds';
+					RAISE NOTICE 'Disconnected';
 
 					-- disconnected arcs
-					SELECT arc_id, count(*) INTO v_count FROM temp_anlgraf WHERE trace is null GROUP BY arc_id HAVING count(*) > 1;
+					select count(*) INTO v_count FROM 
+					(SELECT arc_id, count(*) FROM temp_anlgraf WHERE trace is null GROUP BY arc_id HAVING count(*) > 1)a;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fid, criticity, error_message)
 						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
@@ -680,7 +681,8 @@ BEGIN
 
 					-- disconnected connecs
 					IF v_count > 0 THEN 
-						SELECT arc_id, count(*) INTO v_count FROM temp_anlgraf JOIN v_edit_connec USING (arc_id) WHERE trace is null GROUP BY arc_id HAVING count(*) > 1;
+						select count(*) INTO v_count FROM 
+						(SELECT arc_id, count(*) FROM temp_anlgraf JOIN v_edit_connec USING (arc_id) WHERE trace is null GROUP BY arc_id HAVING count(*) > 1)a;
 						IF v_count > 0 THEN
 							INSERT INTO audit_check_data (fid, criticity, error_message)
 							VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
