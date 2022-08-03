@@ -286,6 +286,9 @@ BEGIN
 
 				--delete definition from config_info_layer_x_type
 				DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+				
+				--delete definition from sys_table
+				DELETE FROM sys_table where id=OLD.child_layer;
 
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"form":{}, 	"feature":{"catFeature":"'||NEW.id||'"},
@@ -352,6 +355,9 @@ BEGIN
 
 			--delete definition from config_info_layer_x_type
 			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+
+			--delete definition from sys_table
+			DELETE FROM sys_table where id=OLD.child_layer;
 
 			-- delete sys_param_user parameters
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
