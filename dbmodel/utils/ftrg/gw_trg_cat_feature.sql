@@ -47,16 +47,16 @@ BEGIN
 
 	IF v_table = 'cat_feature_node' THEN
 
-		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_config') IS TRUE THEN
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_config') IS TRUE THEN
 
-			IF (NEW.graf_delimiter = 'MINSECTOR') THEN
-				INSERT INTO config_graf_valve VALUES (NEW.id) ON CONFLICT (id) DO NOTHING; 
+			IF (NEW.graph_delimiter = 'MINSECTOR') THEN
+				INSERT INTO config_graph_valve VALUES (NEW.id) ON CONFLICT (id) DO NOTHING; 
 			END IF;
 			
 		END IF;
 
 		IF v_projecttype ='WS' AND NEW.type ='VALVE' and NEW.isarcdivide IS TRUE THEN
-			INSERT INTO config_graf_valve (id)
+			INSERT INTO config_graph_valve (id)
 			VALUES (NEW.id) ON CONFLICT (id) DO NOTHING;
 		END IF;
 		

@@ -64,9 +64,9 @@ BEGIN
 	v_man_table:= TG_ARGV[0];
 
 	-- get dynamic mapzones status
-	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_issector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+	v_issector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 
 	-- get automatic insert for mapzone
 	v_isautoinsertsector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
@@ -579,9 +579,9 @@ BEGIN
 
 		END IF;
 
-		--insert tank into config_graf_inlet
+		--insert tank into config_graph_inlet
 		IF v_man_table='man_tank' THEN
-			INSERT INTO config_graf_inlet(node_id, expl_id, active)
+			INSERT INTO config_graph_inlet(node_id, expl_id, active)
 			VALUES (NEW.node_id, NEW.expl_id, TRUE);
 		END IF;
 
@@ -864,9 +864,9 @@ BEGIN
 			hmax=NEW.hmax
 			WHERE node_id=OLD.node_id;
 			
-			--update config_graf_inlet if exploitation changes
+			--update config_graph_inlet if exploitation changes
 			IF NEW.expl_id != OLD.expl_id THEN
-				UPDATE config_graf_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
+				UPDATE config_graph_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
 			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
@@ -1000,8 +1000,8 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		--remove node from config_graf_inlet
-		DELETE FROM config_graf_inlet WHERE node_id=OLD.node_id;
+		--remove node from config_graph_inlet
+		DELETE FROM config_graph_inlet WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 

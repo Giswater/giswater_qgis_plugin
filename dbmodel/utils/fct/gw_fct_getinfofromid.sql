@@ -114,7 +114,7 @@ v_islayer boolean;
 v_addschema text;
 v_return json;
 v_flag boolean = false;
-v_isgrafdelimiter boolean  = false;
+v_isgraphdelimiter boolean  = false;
 v_isepatoarc boolean  = false;
 v_nodetype text;
 v_isarcdivide boolean = false;
@@ -221,9 +221,9 @@ BEGIN
 
 		--check if is delimiter
 		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
-			IF (SELECT upper(graf_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
+			IF (SELECT upper(graph_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('DMA','PRESSZONE') THEN
-				v_isgrafdelimiter = TRUE;
+				v_isgraphdelimiter = TRUE;
 			ELSIF (SELECT upper(epa_default) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 					v_isepatoarc = TRUE;
@@ -252,8 +252,8 @@ BEGIN
 					v_isarcdivide = TRUE;
 				END IF;
 				IF upper(v_project_type) = 'WS' THEN
-					IF ((SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
-						v_isgrafdelimiter = TRUE;
+					IF ((SELECT upper(graph_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
+						v_isgraphdelimiter = TRUE;
 					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 						v_isepatoarc = TRUE;
 					END IF;
@@ -429,7 +429,7 @@ BEGIN
 	END IF;
 			
 	-- Get tabs for form
-	IF v_isgrafdelimiter THEN 
+	IF v_isgraphdelimiter THEN 
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
 			tabfunction as "tabFunction", b.tab as tabActions 
 			FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
@@ -485,7 +485,7 @@ BEGIN
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
 	IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
         	
-        IF v_isgrafdelimiter THEN 
+        IF v_isgraphdelimiter THEN 
 			-- Get form_tabs
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
 				tabfunction as "tabFunction", b.tab as tabActions  

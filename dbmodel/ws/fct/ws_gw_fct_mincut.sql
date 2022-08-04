@@ -192,9 +192,9 @@ BEGIN
 			-- call engine to determinate the isolated area
 			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
 			
-				-- call graf analytics function (step:1)
-				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
-				PERFORM gw_fct_grafanalytics_mincut(v_data);
+				-- call graph analytics function (step:1)
+				v_data = concat ('{"data":{"graphClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
+				PERFORM gw_fct_graphanalytics_mincut(v_data);
 			
 			ELSIF v_mincutversion = 3 THEN
 			
@@ -224,7 +224,7 @@ BEGIN
 					
 				ELSE
 					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM config_graf_inlet WHERE node_id = node_1_aux;
+					SELECT COUNT(*) INTO controlValue FROM config_graph_inlet WHERE node_id = node_1_aux;
 				
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
@@ -252,7 +252,7 @@ BEGIN
 					END IF;
 				ELSE
 					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM config_graf_inlet WHERE node_id = node_2_aux;
+					SELECT COUNT(*) INTO controlValue FROM config_graph_inlet WHERE node_id = node_2_aux;
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	

@@ -92,9 +92,9 @@ v_category text;
 v_function text;
 v_fluid text;
 v_location text;
-v_node1_graf text;
+v_node1_graph text;
 v_node_1 text;
-v_node2_graf  text; 
+v_node2_graph  text; 
 v_node_2 text;
 
 BEGIN
@@ -572,12 +572,12 @@ BEGIN
 
 			IF v_feature_type = 'node' THEN
 
-				-- check if old / new nodes they are grafdelimiters
-				EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf 
+				-- check if old / new nodes they are graphdelimiters
+				EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph 
 				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
 				INTO v_mapzone_old;
 
-				EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector''  THEN NULL ELSE lower(graf_delimiter) END AS graf 
+				EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector''  THEN NULL ELSE lower(graph_delimiter) END AS graph 
 				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
 				INTO v_mapzone_new;
 
@@ -611,20 +611,20 @@ BEGIN
 				
 			ELSIF v_feature_type = 'arc' THEN
 
-					--check if final nodes of arc are graf delimiters
-					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
+					--check if final nodes of arc are graph delimiters
+					EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
 					JOIN v_edit_node n1 ON n1.node_id=node_1
 					JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
 					WHERE a.arc_id='''||v_id||''';'
-					INTO v_node1_graf, v_node_1;
+					INTO v_node1_graph, v_node_1;
 
-					EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf,node_2 FROM v_edit_arc a 
+					EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
 					JOIN v_edit_node n2 ON n2.node_id=node_2
 					JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
 					WHERE a.arc_id='''||v_id||''';'
-					INTO v_node2_graf, v_node_2;
+					INTO v_node2_graph, v_node_2;
 										
-					IF v_node1_graf IS NOT NULL THEN 
+					IF v_node1_graph IS NOT NULL THEN 
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
 						"arcIdOld":'||v_old_feature_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
@@ -635,7 +635,7 @@ BEGIN
 						VALUES (v_fid, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
 					END IF;
 
-					IF v_node2_graf IS NOT NULL THEN 
+					IF v_node2_graph IS NOT NULL THEN 
 						
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 

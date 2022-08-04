@@ -23,7 +23,7 @@ SELECT node_id FROM anl_node WHERE fid = 233 AND cur_user=current_user
 SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user
 SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user
 SELECT * FROM audit_check_data WHERE fid = 139
-SELECT * FROM temp_anlgraf;
+SELECT * FROM temp_anlgraph;
 
 -- fid: main:139
 	other: 227,231,233,228,404,431,454
@@ -93,7 +93,7 @@ BEGIN
 		v_boundaryelem = 'outfall';
 	END IF;
 	
-	TRUNCATE temp_anlgraf;
+	TRUNCATE temp_anlgraph;
 	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404,431,454);
 	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
@@ -211,8 +211,8 @@ BEGIN
 
 	IF v_fid = 227 THEN
 	
-		-- fill the graf table
-		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+		-- fill the graph table
+		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
 		from temp_arc a
 		union all
@@ -222,8 +222,8 @@ BEGIN
 		
 	ELSIF v_fid = 139 THEN
 
-		-- fill the graf table
-		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+		-- fill the graph table
+		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
 		from rpt_inp_arc a where result_id = v_result_id
 		union all
@@ -233,18 +233,18 @@ BEGIN
 
 	END IF;
 
-	-- set boundary conditions of graf table
+	-- set boundary conditions of graph table
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_anlgraf
+		UPDATE temp_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
-		UPDATE temp_anlgraf
+		UPDATE temp_anlgraph
 			SET flag=1, water=1 
 			WHERE node_2 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 		
 	ELSIF v_project_type = 'UD' THEN
-		UPDATE temp_anlgraf
+		UPDATE temp_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_node WHERE epa_type='OUTFALL');
 	END IF;
@@ -252,7 +252,7 @@ BEGIN
 	-- inundation process
 	LOOP
 		v_cont = v_cont+1;
-		update temp_anlgraf n set water= 1, flag=n.flag+1 from v_anl_graf a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
+		update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 		GET DIAGNOSTICS v_affectedrows =row_count;
 		EXIT WHEN v_affectedrows = 0;
 		EXIT WHEN v_cont = 2000;
@@ -263,7 +263,7 @@ BEGIN
 		-- arc results
 		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
 		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
-			FROM temp_anlgraf a
+			FROM temp_anlgraph a
 			JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
 			WHERE result_id = v_result_id
 			GROUP BY a.arc_id,the_geom
@@ -273,7 +273,7 @@ BEGIN
 		-- arc results
 		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
 		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Disconnected arc from any ', v_boundaryelem)  
-			FROM temp_anlgraf a
+			FROM temp_anlgraph a
 			JOIN temp_arc b ON a.arc_id=b.arc_id
 			GROUP BY a.arc_id,the_geom
 			having max(water) = 0;
@@ -293,13 +293,13 @@ BEGIN
 	IF v_project_type = 'WS' THEN
 
 		RAISE NOTICE '6 - Check dry network (232)';	
-		DELETE FROM temp_anlgraf;
+		DELETE FROM temp_anlgraph;
 		v_cont = 0;
 
 		IF v_fid = 227 THEN
 
-			-- fill the graf table
-			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+			-- fill the graph table
+			INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
 			from temp_arc a
 			union all
@@ -309,8 +309,8 @@ BEGIN
 			
 		ELSIF v_fid = 139 THEN
 
-			-- fill the graf table
-			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+			-- fill the graph table
+			INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
 			from rpt_inp_arc a where result_id = v_result_id
 			union all
@@ -320,20 +320,20 @@ BEGIN
 
 		END IF;
 
-		-- set boundary conditions of graf table
-		UPDATE temp_anlgraf
+		-- set boundary conditions of graph table
+		UPDATE temp_anlgraph
 			SET flag =1 WHERE arc_id IN (SELECT arc_id FROM temp_arc WHERE status = 'CLOSED');
-		UPDATE temp_anlgraf
+		UPDATE temp_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
-		UPDATE temp_anlgraf
+		UPDATE temp_anlgraph
 			SET flag=1, water=1 
 			WHERE node_2 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
 		-- inundation process
 		LOOP
 			v_cont = v_cont+1;
-			update temp_anlgraf n set water= 1, flag=n.flag+1 from v_anl_graf a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
+			update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont = 2000;
@@ -344,7 +344,7 @@ BEGIN
 			-- dry arcs
 			INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
 			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Dry arc')  
-				FROM temp_anlgraf a
+				FROM temp_anlgraph a
 				JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
 				WHERE result_id = v_result_id
 				GROUP BY a.arc_id,the_geom
@@ -355,9 +355,9 @@ BEGIN
 			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM rpt_inp_node n
 				JOIN
 				(
-				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				UNION
-				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				)
 				a USING (node_id)
 				WHERE result_id = v_result_id;
@@ -372,9 +372,9 @@ BEGIN
 			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand') FROM rpt_inp_node n
 				JOIN
 				(
-				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				UNION
-				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				)
 				a USING (node_id)
 				WHERE n.demand > 0 AND result_id = v_result_id;
@@ -384,7 +384,7 @@ BEGIN
 			-- insert into result table arc results
 			INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
 			SELECT DISTINCT ON (a.arc_id) 232, a.arc_id, the_geom, concat('Dry arc')
-				FROM temp_anlgraf a
+				FROM temp_anlgraph a
 				JOIN temp_arc b ON a.arc_id=b.arc_id
 				GROUP BY a.arc_id,the_geom
 				having max(water) = 0;
@@ -394,9 +394,9 @@ BEGIN
 			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM temp_node n
 				JOIN
 				(
-				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				UNION
-				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				)
 				a USING (node_id);
 
@@ -405,9 +405,9 @@ BEGIN
 			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand'), demand FROM temp_node n
 				JOIN
 				(
-				SELECT node_1 AS node_id FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				UNION
-				SELECT node_2 FROM temp_anlgraf JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 				)
 				a USING (node_id)
 				WHERE n.demand > 0;

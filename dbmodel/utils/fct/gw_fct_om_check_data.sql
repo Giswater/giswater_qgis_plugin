@@ -257,26 +257,26 @@ BEGIN
 		VALUES (125, '188', 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
 	END IF;
 
-	RAISE NOTICE '10 - check if all tanks are defined in config_graf_inlet  (177)';
+	RAISE NOTICE '10 - check if all tanks are defined in config_graph_inlet  (177)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, expl_id FROM '||v_edit||'node 
 		JOIN cat_node ON nodecat_id=cat_node.id
 		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
 		JOIN value_state_type ON state_type = value_state_type.id
 		WHERE value_state_type.is_operative IS TRUE AND system_id = ''TANK'' and node_id NOT IN 
-		(SELECT node_id FROM config_graf_inlet WHERE active IS TRUE)';
+		(SELECT node_id FROM config_graph_inlet WHERE active IS TRUE)';
 		
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 		EXECUTE concat('SELECT string_agg(a.node_id::text,'','') FROM (',v_querytext,') a ') INTO v_feature_id;
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
-			SELECT 177, node_id, nodecat_id, ''Tanks not defined in config_graf_inlet'', the_geom, expl_id FROM (', v_querytext,')a');
+			SELECT 177, node_id, nodecat_id, ''Tanks not defined in config_graph_inlet'', the_geom, expl_id FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125,'177', 3, concat('ERROR-177 (anl_node): There is/are ',v_count,' tank(s) which are not defined on config_graf_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
+			VALUES (125,'177', 3, concat('ERROR-177 (anl_node): There is/are ',v_count,' tank(s) which are not defined on config_graph_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125, '177', 1, 'INFO: All tanks are defined in config_graf_inlet.',v_count);
+			VALUES (125, '177', 1, 'INFO: All tanks are defined in config_graph_inlet.',v_count);
 		END IF;
 	END IF;
 

@@ -163,22 +163,7 @@ BEGIN
 
 		VALUES (18, 'Sequence', v_sequence, true, concat ('CREATE SEQUENCE ',p_schemaname,'.',rec_table,' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1' ));
 	END LOOP;
-	
-	-- Set sequences
-	FOR rec_tablename IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL
-	LOOP 
-		SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=rec_tablename.id AND ordinal_position=1;
-		IF column_aux IS NOT NULL THEN 
-			EXECUTE 'ALTER TABLE '||p_schemaname||'.'||rec_tablename.id||' ALTER COLUMN '||column_aux||' SET DEFAULT nextval('' '||p_schemaname||'.'||rec_tablename.sys_sequence||' ''::regclass)';
-			INSERT INTO audit_check_data (fid, table_id, column_id, enabled, error_message)
-			VALUES (18, rec_tablename.id, column_aux, true, v_sql );
-		ELSE
-			INSERT INTO audit_check_data (fid, table_id, column_id, enabled, error_message)
-			VALUES (18, v_tablename, column_aux, FALSE, 'Due an unexpected reason it was not possible to set default sequence value' );
-		END IF;
-			
-	END LOOP;				
-			
+				
 	RETURN 'OK' ;
 END;
 $BODY$

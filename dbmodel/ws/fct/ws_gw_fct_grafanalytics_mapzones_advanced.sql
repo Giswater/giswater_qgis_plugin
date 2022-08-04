@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2768
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones_advanced(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones_advanced(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mapzones_advanced(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_advanced(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "15", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"SECTOR", "exploitation": "15", 
 "updateFeature":"TRUE", "updateMapZone":1, "debug":"FALSE"}}}');
 
-SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "1", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1", 
 "updateFeature":"TRUE", "updateMapZone":3}}}');
 
-SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "2", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2", 
 "updateFeature":"TRUE", "updateMapZone":0}}}');
 
 */
@@ -42,7 +42,7 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
-	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
+	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
@@ -65,11 +65,11 @@ BEGIN
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 
 	
-	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
+	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'"}}}');
 
-	RETURN gw_fct_grafanalytics_mapzones(v_data);
+	RETURN gw_fct_graphanalytics_mapzones(v_data);
 
 END;
 $BODY$

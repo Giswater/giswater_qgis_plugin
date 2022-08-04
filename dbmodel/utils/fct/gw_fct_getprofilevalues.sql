@@ -201,7 +201,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			v_level = 2;
-			v_message = concat('There is/are ',v_count, ' ',object_rec.idval,'(s) with id''s not integer on the system. It is not possible to build the graf matrix to check shortestpath.');	
+			v_message = concat('There is/are ',v_count, ' ',object_rec.idval,'(s) with id''s not integer on the system. It is not possible to build the graph matrix to check shortestpath.');	
 		END IF;
 	END LOOP;
 
@@ -311,7 +311,7 @@ BEGIN
 			('|| v_query_dijkstra ||')a
 			USING (node_id)';
 
-		-- looking for null values (in case of exists links graf will be disabled as below)
+		-- looking for null values (in case of exists links graph will be disabled as below)
 		IF v_project_type = 'UD' THEN
 			SELECT count(*) INTO v_count FROM anl_node WHERE (elev IS NULL or ymax is null OR top_elev is null) AND fid = 222 and cur_user = current_user;
 		ELSIF v_project_type = 'WS' THEN

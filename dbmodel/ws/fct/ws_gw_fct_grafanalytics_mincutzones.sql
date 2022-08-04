@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2712
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mincutzones(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mincutzones(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -26,15 +26,15 @@ INSERT INTO ws.anl_arc (fid, arc_id) SELECT DISTINCT ON(minsector_id) 134, minse
 
 -- start
 BEGIN;
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":50}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":50}}}');
 COMMIT;
 
 BEGIN;
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":90}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":90}}}');
 COMMIT;
 
 BEGIN;
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":91}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":91}}}');
 COMMIT;
 
 

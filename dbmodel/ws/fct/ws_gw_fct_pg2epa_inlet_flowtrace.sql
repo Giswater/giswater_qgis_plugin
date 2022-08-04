@@ -43,7 +43,7 @@ BEGIN
 	delete FROM anl_arc where cur_user=current_user AND fid = 139;
 	delete FROM anl_node where cur_user=current_user AND fid = 139;
 
-	-- fill the graf table
+	-- fill the graph table
 	insert into anl_mincut_arc_x_node (
 	select  arc.arc_id, case when node_1 is null then '00000' else node_1 end, current_user, null, case when node_2 is null then '00000' else node_2 end, null, 0, 0
 	from rpt_inp_arc arc
@@ -54,7 +54,7 @@ BEGIN
 	WHERE arc.result_id=p_result_id
 	) ON CONFLICT (arc_id, node_id, cur_user) DO NOTHING;
 	
-	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
+	-- Delete from the graph table all that rows that only exists one time (it means that arc don't have the correct topology)
 	DELETE FROM anl_mincut_arc_x_node WHERE cur_user=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 

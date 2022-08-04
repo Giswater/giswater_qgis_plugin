@@ -20,3 +20,16 @@ CREATE TABLE IF NOT EXISTS om_streetaxis
   expl_id integer NOT NULL,
   muni_id integer NOT NULL
 );
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"dqa", "column":"grafconfig", "newName":"graphconfig"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"dma", "column":"grafconfig", "newName":"graphconfig"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sector", "column":"grafconfig", "newName":"graphconfig"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"presszone", "column":"grafconfig", "newName":"graphconfig"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_node", "column":"graf_delimiter", "newName":"graph_delimiter"}}$$);
+
+
+ALTER TABLE om_waterbalance_dma_graf RENAME TO om_waterbalance_dma_graph;
+ALTER TABLE config_graf_valve RENAME TO config_graph_valve;
+ALTER TABLE config_graf_inlet RENAME TO config_graph_inlet;
+ALTER TABLE config_graf_checkvalve RENAME TO config_graph_checkvalve;

@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2022/07/13
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class", "column":"inherit_values", "dataType":"json"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"vehicle_id", "dataType":"integer"}}$$);
+--2022/08/04
 
-ALTER TABLE temp_anlgraf RENAME TO temp_anlgraph;
+ALTER VIEW v_anl_graf RENAME TO v_anl_graph;

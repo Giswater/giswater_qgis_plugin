@@ -96,7 +96,7 @@ BEGIN
 			--node
 			IF v_project_type = 'WS' THEN 
 				INSERT INTO v_edit_cat_feature_node(id, system_id, epa_default, isarcdivide, isprofilesurface, choose_hemisphere, 
-   	    code_autofill, double_geom, num_arcs, graf_delimiter, shortcut_key, link_path, descript, active)
+   	    code_autofill, double_geom, num_arcs, graph_delimiter, shortcut_key, link_path, descript, active)
 				SELECT csv1, csv2, csv3, csv4::boolean, csv5::boolean, csv6::boolean, 
 				csv7::boolean,csv8::json, csv9::integer, csv10, csv11, csv12, csv13, csv14::boolean
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);

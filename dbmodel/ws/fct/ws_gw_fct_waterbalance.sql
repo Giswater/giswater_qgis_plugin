@@ -13,8 +13,8 @@ $BODY$
 /*
 EXAMPLE
 -------
-SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executeGrafDma":"true", "exploitation":1, "period":"5"}}}$$)::text;
-SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executeGrafDma":true, "exploitation":2, "period":"5"}}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executegraphDma":"true", "exploitation":1, "period":"5"}}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executegraphDma":true, "exploitation":2, "period":"5"}}}$$)::text;
 
 CHECK
 -----
@@ -40,7 +40,7 @@ v_result_line json;
 v_version text;
 v_error_context text;
 v_count integer;
-v_executegrafdma boolean;
+v_executegraphdma boolean;
 v_updatemapzone integer;
 v_paramupdate double precision;
 v_data json;
@@ -57,16 +57,16 @@ BEGIN
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
 	v_allperiods := (((p_data ->>'data')::json->>'parameters')::json->>'allPeriods')::boolean;
-	v_executegrafdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGrafDma';
+	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executegraphDma';
 
-	IF v_executegrafdma THEN
+	IF v_executegraphdma THEN
 
-		v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_grafanalytics_vdefault');
-		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_grafanalytics_vdefault');
+		v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
+		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 			
-		v_data =  concat ('{"data":{"parameters":{"grafClass":"DMA", "exploitation": [',v_expl,'], "updateFeature":"TRUE", "updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate,'}}}');
+		v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": [',v_expl,'], "updateFeature":"TRUE", "updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate,'}}}');
 		
-		PERFORM gw_fct_grafanalytics_mapzones(v_data);
+		PERFORM gw_fct_graphanalytics_mapzones(v_data);
 		
 	END IF;
 
@@ -92,7 +92,7 @@ BEGIN
 		ON CONFLICT (cat_period_id, dma_id) do nothing;
 
 		UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-						FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graf USING (node_id) GROUP BY cat_period_id, dma_id)a
+						FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) GROUP BY cat_period_id, dma_id)a
 						WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
 		GET DIAGNOSTICS v_count = row_count;
@@ -116,11 +116,11 @@ BEGIN
 
 	END LOOP;
 
-	IF v_executegrafdma THEN
+	IF v_executegraphdma THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('-------------------------------------'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: Grafanalylitcs mapzones for DMA have been triggered'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: graphanalylitcs mapzones for DMA have been triggered'));
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message ='INFO';
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message LIKE '---%';
 	END IF;
@@ -136,7 +136,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	IF v_executegrafdma THEN
+	IF v_executegraphdma THEN
 
 		-- disconnected arcs
 		SELECT jsonb_agg(features.feature) INTO v_result
@@ -147,9 +147,9 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM 
-		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = 0
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
 		UNION
-		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraf USING (arc_id) WHERE water = -1
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
@@ -165,9 +165,9 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = 0
+		FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
 		UNION
-		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraf USING (arc_id) WHERE water = -1
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
 		UNION			
 		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
 		) row) features;

@@ -50,22 +50,22 @@ BEGIN
         IF v_project_type = 'WS' THEN
 
 		-- get mode	
-		v_statussector := (SELECT (value::json->>'SECTOR')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statuspresszone := (SELECT (value::json->>'PRESSZONE')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statusdma := (SELECT (value::json->>'DMA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statusdqa := (SELECT (value::json->>'DQA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statussector := (SELECT (value::json->>'SECTOR')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_statuspresszone := (SELECT (value::json->>'PRESSZONE')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_statusdma := (SELECT (value::json->>'DMA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_statusdqa := (SELECT (value::json->>'DQA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
 
 		-- get column to simbolize
-		v_colsector := (SELECT (value::json->>'SECTOR')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_colpresszone := (SELECT (value::json->>'PRESSZONE')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_colsector := (SELECT (value::json->>'SECTOR')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_colpresszone := (SELECT (value::json->>'PRESSZONE')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
 
 		-- get column to simbolize
-		v_opasector := (SELECT (value::json->>'SECTOR')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_opapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_opadma := (SELECT (value::json->>'DMA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_opadqa := (SELECT (value::json->>'DQA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_opasector := (SELECT (value::json->>'SECTOR')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_opapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_opadma := (SELECT (value::json->>'DMA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_opadqa := (SELECT (value::json->>'DQA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
 
 		-- get mapzone values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and stylesheet IS NOT NULL) row' INTO v_sector ;

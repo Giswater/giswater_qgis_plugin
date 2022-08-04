@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES
 
 -- fid: main: 101
 	om: 125
-	graf: 211
+	graph: 211
 	edit: 29
 	epa: 225
 	plan: 115
@@ -84,7 +84,7 @@ v_uservalues json;
 v_user_expl text;
 v_isaudit text;
 v_selection_mode text;
-v_ignoregrafanalytics boolean;
+v_ignoregraphanalytics boolean;
 v_ignoreepa boolean;
 v_ignoreplan boolean;
 v_usepsector boolean;
@@ -144,7 +144,7 @@ BEGIN
 	SELECT value INTO v_qgis_layers_setpropierties FROM config_param_user where parameter='qgis_layers_set_propierties' AND cur_user=current_user;
 
 	-- get system parameters
-	SELECT value::json->>'ignoreGrafanalytics' INTO v_ignoregrafanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
+	SELECT value::json->>'ignoregraphanalytics' INTO v_ignoregraphanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignorePlan' INTO v_ignoreplan FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'usePsectors' INTO v_usepsector FROM config_param_system WHERE parameter = 'admin_checkproject';
@@ -152,7 +152,7 @@ BEGIN
 	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = FALSE; END IF;
-	IF v_ignoregrafanalytics IS NULL THEN v_ignoregrafanalytics = FALSE; END IF;
+	IF v_ignoregraphanalytics IS NULL THEN v_ignoregraphanalytics = FALSE; END IF;
 	IF v_ignoreepa IS NULL THEN v_ignoreepa = FALSE; END IF;
 	IF v_ignoreplan IS NULL THEN v_ignoreplan = FALSE; END IF;
 
@@ -390,13 +390,13 @@ BEGIN
 			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
-			IF v_ignoregrafanalytics IS FALSE THEN
+			IF v_ignoregraphanalytics IS FALSE THEN
 				IF v_project_type = 'WS' THEN
-					EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
+					EXECUTE 'SELECT gw_fct_graphanalytics_check_data($${
 					"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "grafClass":"ALL"}}}$$)';
+					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "graphClass":"ALL"}}}$$)';
 					-- insert results 
-					UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
+					UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB graph):', split_part(error_message,': ',2))
 					WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 					INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)

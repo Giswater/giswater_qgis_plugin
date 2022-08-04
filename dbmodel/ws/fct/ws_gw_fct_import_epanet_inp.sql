@@ -111,7 +111,7 @@ BEGIN
 		IF v_delete_prev THEN
 			
 			DELETE FROM rpt_cat_result;
-			DELETE FROM config_graf_valve;
+			DELETE FROM config_graph_valve;
 
 			-- Disable constraints
 			PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
@@ -178,7 +178,7 @@ BEGIN
 			DELETE FROM rpt_inp_arc;
 			DELETE FROM rpt_inp_node;
 			DELETE FROM rpt_cat_result;
-			DELETE FROM config_graf_inlet;
+			DELETE FROM config_graph_inlet;
 		ELSE 
 			-- Disable constraints
 			PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
@@ -729,8 +729,8 @@ BEGIN
 			-- delete from arc
 			DELETE FROM arc WHERE state = 0;
 
-			-- config graf
-			INSERT INTO config_graf_inlet SELECT node_id, 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
+			-- config graph
+			INSERT INTO config_graph_inlet SELECT node_id, 1, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
 			
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);

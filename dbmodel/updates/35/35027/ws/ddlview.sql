@@ -52,3 +52,115 @@ CREATE OR REPLACE VIEW v_om_waterbalance_loss AS
         END AS eff,
 	the_geom
    FROM v_om_waterbalance;
+
+DROP VIEW vi_parent_dma;
+CREATE OR REPLACE VIEW vi_parent_dma AS 
+ SELECT DISTINCT ON (dma.dma_id) dma.dma_id,
+    dma.name,
+    dma.expl_id,
+    dma.macrodma_id,
+    dma.descript,
+    dma.undelete,
+    dma.minc,
+    dma.maxc,
+    dma.effc,
+    dma.pattern_id,
+    dma.link,
+    dma.graphconfig,
+    dma.the_geom
+   FROM dma
+     JOIN vi_parent_arc USING (dma_id);
+
+DROP VIEW v_edit_sector;
+CREATE OR REPLACE VIEW v_edit_sector AS 
+ SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.the_geom,
+    sector.undelete,
+    sector.graphconfig::text AS graphconfig,
+    sector.stylesheet::text AS stylesheet,
+    sector.active,
+    sector.parent_id,
+    sector.pattern_id
+   FROM selector_sector,
+    sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+DROP VIEW v_edit_dma;
+  CREATE OR REPLACE VIEW v_edit_dma AS 
+ SELECT dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.descript,
+    dma.the_geom,
+    dma.undelete,
+    dma.expl_id,
+    dma.pattern_id,
+    dma.link,
+    dma.minc,
+    dma.maxc,
+    dma.effc,
+    dma.graphconfig::text AS graphconfig,
+    dma.stylesheet::text AS stylesheet,
+    dma.active
+   FROM selector_expl,
+    dma
+  WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+DROP VIEW v_edit_presszone;
+CREATE OR REPLACE VIEW v_edit_presszone AS 
+ SELECT presszone.presszone_id,
+    presszone.name,
+    presszone.expl_id,
+    presszone.the_geom,
+    presszone.graphconfig::text AS graphconfig,
+    presszone.head,
+    presszone.stylesheet::text AS stylesheet,
+    presszone.active
+   FROM selector_expl,
+    presszone
+  WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+DROP VIEW v_edit_dqa;
+CREATE OR REPLACE VIEW v_edit_dqa AS 
+ SELECT dqa.dqa_id,
+    dqa.name,
+    dqa.expl_id,
+    dqa.macrodqa_id,
+    dqa.descript,
+    dqa.undelete,
+    dqa.the_geom,
+    dqa.pattern_id,
+    dqa.dqa_type,
+    dqa.link,
+    dqa.graphconfig::text AS graphconfig,
+    dqa.stylesheet::text AS stylesheet,
+    dqa.active
+   FROM selector_expl,
+    dqa
+  WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+DROP VIEW v_edit_cat_feature_node;
+CREATE OR REPLACE VIEW v_edit_cat_feature_node AS 
+ SELECT cat_feature.id,
+    cat_feature.system_id,
+    cat_feature_node.epa_default,
+    cat_feature_node.isarcdivide,
+    cat_feature_node.isprofilesurface,
+    cat_feature_node.choose_hemisphere,
+    cat_feature.code_autofill,
+    cat_feature_node.double_geom::text AS double_geom,
+    cat_feature_node.num_arcs,
+    cat_feature_node.graph_delimiter AS graph_delimiter,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_node USING (id);
+
+ALTER VIEW v_anl_grafanalytics_mapzones RENAME TO v_anl_graphanalytics_mapzones;

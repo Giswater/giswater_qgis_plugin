@@ -136,7 +136,7 @@ BEGIN
 			v_field:= (SELECT (v_jsonfield ->> 'key')) ;
 			v_value := (SELECT (v_jsonfield ->> 'value')) ;
 
-			-- getting closed status if exists to work with grafanalytics functions in case of valves
+			-- getting closed status if exists to work with graphanalytics functions in case of valves
 			IF v_field = 'closed' THEN
 				v_closedstatus = v_value;
 			END IF;

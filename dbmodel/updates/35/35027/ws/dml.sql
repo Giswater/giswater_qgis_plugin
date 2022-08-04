@@ -37,3 +37,13 @@ VALUES (463, 'Graph analysis for hydrants', 'ws',null, 'core', false, 'Function 
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (464, 'Graph analysis for hydrants - marking crossroads', 'ws',null, 'core', false, 'Function process',null) ON CONFLICT (fid) DO NOTHING;
+
+
+UPDATE config_param_system SET parameter='utils_graphanalytics_automatic_config' WHERE parameter ='utils_grafanalytics_automatic_config';
+UPDATE config_param_system SET parameter='utils_graphanalytics_automatic_trigger' WHERE parameter ='utils_grafanalytics_automatic_trigger';
+UPDATE config_param_system SET parameter='utils_graphanalytics_custom_geometry_constructor' WHERE parameter ='utils_grafanalytics_custom_geometry_constructor';
+UPDATE config_param_system SET parameter='utils_graphanalytics_dynamic_symbology' WHERE parameter ='utils_grafanalytics_dynamic_symbology';
+UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_feature' WHERE parameter ='utils_grafanalytics_lrs_feature';
+UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_graf' WHERE parameter ='utils_grafanalytics_lrs_graph';
+UPDATE config_param_system SET parameter='utils_graphanalytics_status' WHERE parameter ='utils_grafanalytics_status';
+UPDATE config_param_system SET parameter='utils_graphanalytics_vdefault' WHERE parameter ='utils_grafanalytics_vdefault';

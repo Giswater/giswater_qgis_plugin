@@ -208,7 +208,7 @@ BEGIN
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;	
-				ALTER TABLE config_graf_inlet DROP COLUMN if exists _to_arc;
+				ALTER TABLE config_graph_inlet DROP COLUMN if exists _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
 			ELSE
@@ -312,8 +312,8 @@ BEGIN
 
 			v_message='Project sucessfully created';
 			
-			-- automatize graf analytics config for ws
-			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
+			-- automatize graph analytics config for ws
+			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_graphanalytics_automatic_config'; 
 
 			-- UPDATE edit_check_redundance_y_topelev_elev
 			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';

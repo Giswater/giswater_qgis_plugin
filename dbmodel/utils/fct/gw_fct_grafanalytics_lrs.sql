@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2826
 
--- FUNCTION: SCHEMA_NAME.gw_fct_grafanalytics_lrs(json)
+-- FUNCTION: SCHEMA_NAME.gw_fct_graphanalytics_lrs(json)
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_lrs(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_lrs(
 	p_data json)
     RETURNS json
     LANGUAGE 'plpgsql'
@@ -20,7 +20,7 @@ AS $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitation":"1"}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_lrs('{"data":{"parameters":{"exploitation":"1"}}}');
 
 */
 
@@ -76,9 +76,9 @@ BEGIN
 	v_expl=json_agg(v_expl);	
 
 	-- get variables (from config_param_system)
-	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_graf');
-	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_feature');
-	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_feature');
+	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='utils_graphanalytics_lrs_graph');
+	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='utils_graphanalytics_lrs_feature');
+	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='utils_graphanalytics_lrs_feature');
 	
 	-- setting cost field when has not configure value
 	IF v_costfield IS NULL THEN
@@ -101,8 +101,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('DYNAMIC LINEAR REFERENCING SYSTEM'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 	
-	-- reset tables (graf & audit_log)
-	TRUNCATE temp_anlgraf;
+	-- reset tables (graph & audit_log)
+	TRUNCATE temp_anlgraph;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
@@ -133,12 +133,12 @@ BEGIN
 	-- cost: cost value (only when lrs analytics is used)
 	-- value: result value (only when lrs analytics is used)
 
-	-- create graf (all boundary conditions are opened, flag=0)
+	-- create graph (all boundary conditions are opened, flag=0)
 
 	v_queryarc = 'SELECT json_array_elements_text((value::json->>''ignoreArc'')::json) 
-				FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf''';
+				FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph''';
 			
-	EXECUTE 'INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf, length, cost, value )
+	EXECUTE 'INSERT INTO temp_anlgraph ( arc_id, node_1, node_2, water, flag, checkf, length, cost, value )
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND arc_id NOT IN ('||v_queryarc||')
 	UNION
@@ -147,35 +147,35 @@ BEGIN
 
 	-- getting v_querys of node header (node_id and toarc) from config variable
 	v_querynode = 'SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf''';
+				  FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph''';
 			
 	v_queryarc =  'SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' as node_id,
 			      json_array_elements_text(((json_array_elements_text((value::json->>''headers'')::json))::json->>''toArc'')::json) as to_arc 
-				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1,2';
+				  FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'' order by 1,2';
 
 	
 	EXECUTE 'select array_agg(a.node_id) from(
 	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
+	FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'')a'
 	into v_node_list;
 	--raise notice 'v_node_list,%',v_node_list;
-	-- close boundary conditions, setting flag=1 for all nodes that fits on graf delimiters
-	EXECUTE 'UPDATE temp_anlgraf SET flag=1 WHERE node_1::text IN ('||v_querynode||') OR  node_2::text IN ('||v_querynode||')';
+	-- close boundary conditions, setting flag=1 for all nodes that fits on graph delimiters
+	EXECUTE 'UPDATE temp_anlgraph SET flag=1 WHERE node_1::text IN ('||v_querynode||') OR  node_2::text IN ('||v_querynode||')';
 	
-	-- open boundary conditions, setting again flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
-	EXECUTE 'UPDATE temp_anlgraf SET flag=0 WHERE id IN (SELECT id FROM temp_anlgraf 
+	-- open boundary conditions, setting again flag=0 for graph delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
+	EXECUTE 'UPDATE temp_anlgraph SET flag=0 WHERE id IN (SELECT id FROM temp_anlgraph 
 								JOIN ('||v_queryarc||') a ON to_arc::integer=arc_id::integer 
 								WHERE node_id::integer=node_1::integer)';
 	--list only to_arc
 	v_queryarc =  'select json_array_elements_text(((json_array_elements_text((value::json->>''headers'')::json))::json->>''toArc'')::json) as to_arc 
-	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1';
+	FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'' order by 1';
 
 	-- starting process
 	LOOP
 		
-		-- looking to pick one graf header
+		-- looking to pick one graph header
 		--select header node and correct to_arc direction
-		v_querytext = 'SELECT * FROM temp_anlgraf WHERE node_1::text IN ('||v_querynode||') AND checkf = 0 
+		v_querytext = 'SELECT * FROM temp_anlgraph WHERE node_1::text IN ('||v_querynode||') AND checkf = 0 
 		AND arc_id::TEXT IN ('||v_queryarc||')  LIMIT 1';
 
 
@@ -194,14 +194,14 @@ BEGIN
 		EXIT WHEN v_feature.node_1 IS NULL;
 	
 		-- reset water flag
-		UPDATE temp_anlgraf SET water=0;
+		UPDATE temp_anlgraph SET water=0;
 		
 		-- set the starting element
-		v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE node_1='||quote_literal(v_feature.node_1)||' AND flag=0'; 
+		v_querytext = 'UPDATE temp_anlgraph SET water=1 WHERE node_1='||quote_literal(v_feature.node_1)||' AND flag=0'; 
 		EXECUTE v_querytext;
 
 		-- set the starting element (check)
-		v_querytext = 'UPDATE temp_anlgraf SET checkf=1 WHERE arc_id='||quote_literal(v_feature.arc_id)||''; 
+		v_querytext = 'UPDATE temp_anlgraph SET checkf=1 WHERE arc_id='||quote_literal(v_feature.arc_id)||''; 
 		EXECUTE v_querytext;
 
 		
@@ -213,9 +213,9 @@ BEGIN
 				v_current_value=0;
 			end if;
 
-			SELECT node_2::text INTO v_end_node FROM temp_anlgraf WHERE arc_id::text=v_header_arc AND node_1::text = v_header_node limit 1;
+			SELECT node_2::text INTO v_end_node FROM temp_anlgraph WHERE arc_id::text=v_header_arc AND node_1::text = v_header_node limit 1;
 
-			SELECT length * cost INTO v_current_value FROM temp_anlgraf WHERE arc_id::text = v_header_arc LIMIT 1;
+			SELECT length * cost INTO v_current_value FROM temp_anlgraph WHERE arc_id::text = v_header_arc LIMIT 1;
 
 			
 			v_acc_value = v_acc_value + v_current_value;
@@ -227,14 +227,14 @@ BEGIN
 				concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
 				FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
 		
-				EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
-				FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
+				EXECUTE 'UPDATE temp_anlgraph n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
+				FROM v_anl_graph a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
 				
 			ELSE
 				EXIT;
 			END IF;
 
-			EXECUTE 'SELECT count(arc_id) FROM temp_anlgraf WHERE node_1::text = '''||v_end_node||''' AND arc_id::text NOT IN ('||v_queryarc||') 
+			EXECUTE 'SELECT count(arc_id) FROM temp_anlgraph WHERE node_1::text = '''||v_end_node||''' AND arc_id::text NOT IN ('||v_queryarc||') 
 			and flag=0;'	
 			INTO v_count_feature;
 
@@ -244,7 +244,7 @@ BEGIN
 				IF v_end_node = ANY(v_node_list) THEN
 					v_bifurcation = 0;
 
-					EXECUTE 'SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = '||v_end_node||'::text 
+					EXECUTE 'SELECT arc_id::text FROM temp_anlgraph WHERE checkf= 0 AND node_1::text = '||v_end_node||'::text 
 					AND arc_id::text !='||v_header_arc||'::text and arc_id::TEXT not in ('||v_queryarc||') limit 1'
 					INTO v_header_arc;
 
@@ -256,8 +256,8 @@ BEGIN
 				ELSE 
 				--case when bifurcation node and arcs belong to the same branch
 					v_bifurcation = 1;
-					v_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
-					v_bif_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+					v_header_arc = (SELECT arc_id::text FROM temp_anlgraph WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+					v_bif_header_arc = (SELECT arc_id::text FROM temp_anlgraph WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
 				
 					v_header_node = v_end_node::text;
 					v_bif_header_node = v_end_node::text;
@@ -276,7 +276,7 @@ BEGIN
 			ELSE 
 				-- setting the header node of the next arc in order of spreading
 				v_bifurcation = 0;
-				v_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+				v_header_arc = (SELECT arc_id::text FROM temp_anlgraph WHERE node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
 	
 				v_header_node = v_end_node::text;
 
@@ -285,7 +285,7 @@ BEGIN
 				EXIT WHEN v_end_node = ANY(v_node_list);
 				EXECUTE 'SELECT a.end FROM (SELECT ((json_array_elements_text((value::json->>''headers'')::json))::json->>''node'') as node,
 				((json_array_elements_text((value::json->>''headers'')::json))::json->>''end'') as end 
-				FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1)a where a.node='''||v_feature.node_1||''';'
+				FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'' order by 1)a where a.node='''||v_feature.node_1||''';'
 				INTO v_end_bifurc;
 				--raise notice 'v_end_bifurc,%',v_end_bifurc;
 	
@@ -305,7 +305,7 @@ BEGIN
 	--set header nodes value to 0, insert missing headers into anl_node
 	EXECUTE 'select string_agg(quote_literal(a.node_id),'','') from(
 	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
+	FROM config_param_system WHERE parameter=''graphanalytics_lrs_graph'')a'
 	into v_node_string;
 	
 	--EXECUTE 'DELETE FROM anl_node WHERE fid = '||v_fid||' AND node_id::text IN ('||v_node_string||');';

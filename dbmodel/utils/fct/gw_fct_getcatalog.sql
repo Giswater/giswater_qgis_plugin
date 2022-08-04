@@ -59,7 +59,7 @@ v_featureid text;
 v_coordx numeric;
 v_coordy numeric;
 v_srid integer;
-v_grafdelimiter text;
+v_graphdelimiter text;
 v_formgroup text;
 v_querystring text;
 v_debug_vars json;
@@ -91,15 +91,15 @@ BEGIN
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 	
 	IF v_formname='new_mapzone' THEN
-		v_querystring = concat('SELECT lower(graf_delimiter) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),';');
+		v_querystring = concat('SELECT lower(graph_delimiter) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),';');
 		v_debug_vars := json_build_object('v_feature_type', v_feature_type);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_grafdelimiter;
+		EXECUTE v_querystring INTO v_graphdelimiter;
 
-		IF v_grafdelimiter IN ('dma','presszone') THEN
+		IF v_graphdelimiter IN ('dma','presszone') THEN
 			v_formgroup = 'new_mapzone';
-			v_formname = concat('new_', v_grafdelimiter);
+			v_formname = concat('new_', v_graphdelimiter);
 		END IF;
 
 	END IF;

@@ -13,11 +13,11 @@ $BODY$
 
 /*EXAMPLE
 
-SINGLE EVENT
-SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
-"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
-"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak67"}}}$$);
+	SINGLE EVENT
+	SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+	"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
+	"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
+	"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak67"}}}$$);
 
 		SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
 		"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
@@ -272,8 +272,9 @@ BEGIN
 		ELSIF v_action_type = 'parameter' THEN
 			
 			IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
-				INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_criticity)
-				VALUES (v_viewname, 'Editable view that saves visits', 'role_om', 0, 0);
+				INSERT INTO sys_table (id, descript, sys_role,context, alias, orderby)
+				SELECT v_viewname, 'Editable view that saves visits', 'role_om', '{"level_1":"OM","level_2":"VISIT"}', v_class_name, max(orderby)+1
+				FROM sys_table WHERE context ='{"level_1":"OM","level_2":"VISIT"}';
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (219, null, 4, concat('Insert view name into sys_table.'));
@@ -298,9 +299,9 @@ BEGIN
 				AND layoutname = ''data_1'';'
 				INTO v_layoutorder;
 
-				INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, layoutname,
+				INSERT INTO config_form_fields (formname, formtype, columnname, tabname, layoutorder, datatype, widgettype, label, layoutname,
 				iseditable, ismandatory, dv_querytext, hidden)
-				VALUES (v_viewname, 'visit', v_param_name,v_layoutorder,  v_data_type, v_widgettype, v_param_name, 'data_1',
+				VALUES (v_viewname, 'visit', v_param_name, 'form_visit', v_layoutorder,  v_data_type, v_widgettype, v_param_name, 'data_1',
 				v_iseditable, v_ismandatory, v_dv_querytext, false)
 				ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -419,7 +420,8 @@ raise notice 'classID,%',v_class_id;
 				END IF;
 
 			ELSE
-				 PERFORM audit_function(3024,2746);
+				 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+   			"data":{"message":"3024", "function":"2746","debug_msg":null}}$$);';
 			END IF;
 
 	ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
@@ -439,7 +441,8 @@ raise notice 'classID,%',v_class_id;
 			ELSE
 				UPDATE config_visit_class SET active = FALSE WHERE id = v_class_id;
 				
-				PERFORM audit_function(3026,2746);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+   			"data":{"message":"3026", "function":"2746","debug_msg":null}}$$);';
 			END IF;
 
 			EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
@@ -451,11 +454,12 @@ raise notice 'classID,%',v_class_id;
 
 			--create configuration and views for the alread defined classes and parameters
 			IF  v_ismultievent = TRUE THEN
-				INSERT INTO config_visit_class (id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
+				INSERT INTO config_visit_class (id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname) ON CONFLICT(id) DO NOTHING;
 
 				IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
-					INSERT INTO sys_table (id, context, descript, sys_role, sys_criticity, qgis_criticity, isdeprecated)
-					VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
+					INSERT INTO sys_table (id, descript, sys_role,context, alias, orderby)
+					SELECT v_viewname, 'Editable view that saves visits', 'role_om', '{"level_1":"OM","level_2":"VISIT"}', v_class_name, max(orderby)+1
+					FROM sys_table WHERE context ='{"level_1":"OM","level_2":"VISIT"}';
 					raise notice 'multi -  sys_table';
 				END IF;
 

@@ -104,7 +104,7 @@ BEGIN
 		v_presszone_id := json_extract_path_text (v_fields,'v_presszone_id')::text;
 		
 		IF v_catname IS NULL THEN
-			EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
+			EXECUTE 'SELECT lower(graph_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
 			WHERE child_layer = '||quote_literal(v_feature_table)||';'
 			INTO v_catname;
 		END IF;

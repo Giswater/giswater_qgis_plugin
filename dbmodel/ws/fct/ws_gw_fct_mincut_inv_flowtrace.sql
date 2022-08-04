@@ -55,8 +55,8 @@ BEGIN
 	-- Create the matrix to work with pgrouting
 	INSERT INTO temp_mincut 
 	SELECT a.id, a.source, a.target,
-		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_graf_checkvalve only direct sense
-		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_graf_checkvalve only reverse sense
+		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_graph_checkvalve only direct sense
+		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_graph_checkvalve only reverse sense
 		FROM (
 			SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 			(case when a.closed=true then -1 else 1 end) as cost,
@@ -76,12 +76,12 @@ BEGIN
 						
 				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=result_id_arg))	
 				UNION
-				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graf_inlet
+				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_inlet
 				)a 
 			ON a.arc_id=v_edit_arc.arc_id
 			WHERE node_1 is not null and node_2 is not null
 		)a	
-		LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_graf_checkvalve)b USING (id);
+		LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_graph_checkvalve)b USING (id);
 
 
 	-- Loop for all the proposed valves
@@ -91,11 +91,11 @@ BEGIN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
 		FOR rec_tank IN 
-		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graf_inlet
-		JOIN v_edit_node ON v_edit_node.node_id=config_graf_inlet.node_id
+		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_inlet
+		JOIN v_edit_node ON v_edit_node.node_id=config_graph_inlet.node_id
 		JOIN value_state_type ON state_type=value_state_type.id 
-		JOIN exploitation ON exploitation.expl_id=config_graf_inlet.expl_id
-		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graf_inlet.active IS TRUE 
+		JOIN exploitation ON exploitation.expl_id=config_graph_inlet.expl_id
+		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_inlet.active IS TRUE 
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id=result_id_arg)
 		ORDER BY 1
 		LOOP
@@ -189,7 +189,7 @@ BEGIN
 						PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
 					END IF;
 				ELSE
-					-- agg arc_id in order to collect into gw_fct_grafanalytics_mincut function
+					-- agg arc_id in order to collect into gw_fct_graphanalytics_mincut function
 					INSERT INTO temp_arc (arc_id, result_id) VALUES (element_id_arg, result_id_arg);						
 				END IF;
 			END IF;
@@ -199,10 +199,10 @@ BEGIN
 		END IF;	
 	END LOOP;
 
-	-- call graf analytics function
+	-- call graph analytics function
 	IF v_mincutversion = 4 OR v_mincutversion =  5 THEN
-		v_data = concat ('{"data":{"grafClass":"MINCUT", "step":2, "parameters":{"id":', result_id_arg ,'}}}');	
-		PERFORM gw_fct_grafanalytics_mincut(v_data);	
+		v_data = concat ('{"data":{"graphClass":"MINCUT", "step":2, "parameters":{"id":', result_id_arg ,'}}}');	
+		PERFORM gw_fct_graphanalytics_mincut(v_data);	
 	END IF;
 	
 	RETURN 1;

@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2970
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_config(p_data json)
 RETURNS json
 AS $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"grafClass":"PRESSZONE" }}}$$);
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"graphClass":"PRESSZONE" }}}$$);
 
 
 Mains:
@@ -20,15 +20,15 @@ Mains:
 2) Main issue is that takes header from mapconfig. If it is a false header we recommend to change the node_type
 3) It takes value from arc_id two arcs from header in order to act after arcdivide
 
-WARNING: Using this function config_form_fields is modified hidden mapzone_id and visibilize mapzone_name, also setting key of system variable 'utils_grafanalytics_status' as true
+WARNING: Using this function config_form_fields is modified hidden mapzone_id and visibilize mapzone_name, also setting key of system variable 'utils_graphanalytics_status' as true
 
 */
 
 DECLARE 
 rec record;
 v_mapzonefield text;
-v_graf_class text;
-v_graf_class_list text;
+v_graph_class text;
+v_graph_class_list text;
 v_mapzone_nodetype record;
 v_arc_layers text;
 v_arc_id1 text;
@@ -59,16 +59,16 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 
-	v_graf_class = (((p_data ->>'data')::json->>'parameters')::json->>'grafClass')::text;
+	v_graph_class = (((p_data ->>'data')::json->>'parameters')::json->>'graphClass')::text;
 
-	IF v_graf_class = 'PRESSZONE' THEN
-		v_graf_class_list = '(''PRESSZONE'', ''SECTOR'')';
+	IF v_graph_class = 'PRESSZONE' THEN
+		v_graph_class_list = '(''PRESSZONE'', ''SECTOR'')';
 		v_mapzonefield = 'presszone_id';
-	ELSIF v_graf_class = 'DMA' THEN
-		v_graf_class_list = '(''DMA'', ''SECTOR'')';
+	ELSIF v_graph_class = 'DMA' THEN
+		v_graph_class_list = '(''DMA'', ''SECTOR'')';
 		v_mapzonefield = 'dma_id';
-	ELSIF v_graf_class = 'SECTOR' THEN 
-		v_graf_class_list =  '(''SECTOR'')';
+	ELSIF v_graph_class = 'SECTOR' THEN 
+		v_graph_class_list =  '(''SECTOR'')';
 		v_mapzonefield = 'sector_id';
 	END IF;
 	
@@ -79,11 +79,11 @@ BEGIN
 	
 	/*
 	-- put hidden mapzone_id name
-	EXECUTE 'UPDATE config_form_fields SET hidden = true WHERE columnname = '''||lower(v_graf_class)||'_id'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
+	EXECUTE 'UPDATE config_form_fields SET hidden = true WHERE columnname = '''||lower(v_graph_class)||'_id'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
 	-- put visible mapzone_name field
-	EXECUTE 'UPDATE config_form_fields SET hidden = false WHERE columnname = '''||lower(v_graf_class)||'_name'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
+	EXECUTE 'UPDATE config_form_fields SET hidden = false WHERE columnname = '''||lower(v_graph_class)||'_name'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
 	-- set system variable
-	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'''||upper(v_graf_class)||''',''true''::boolean) WHERE parameter = ''utils_grafanalytics_status''';
+	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'''||upper(v_graph_class)||''',''true''::boolean) WHERE parameter = ''utils_graphanalytics_status''';
 	*/
 
 	-- delete old values on result table
@@ -100,14 +100,14 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 1, '-------');
 
 	--find delimiter node types
-	EXECUTE 'SELECT string_agg(quote_literal(id), '','') FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||''
+	EXECUTE 'SELECT string_agg(quote_literal(id), '','') FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||''
 	INTO v_mapzone_nodetype;
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
-	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE nodetype_id IN (SELECT id FROM cat_feature_node WHERE graf_delimiter IN '||v_graf_class_list||'))' 
+	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE nodetype_id IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||'))' 
 	LOOP	
 		--find defined sector value of node
 		EXECUTE 'SELECT '||v_mapzonefield||' FROM node WHERE node_id = '||rec.node_id||'::text'
@@ -149,8 +149,8 @@ BEGIN
 					IF v_node_mapzoneval = v_arc_1_mapzone THEN
 						v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id1,']}], "ignore":[]}'); 
 
-						EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
-						WHERE '||v_graf_class||'_id::text = '||quote_literal(v_node_mapzoneval)||'::text;';
+						EXECUTE 'UPDATE '||v_graph_class||' SET graphconfig= '''||v_json||''' 
+						WHERE '||v_graph_class||'_id::text = '||quote_literal(v_node_mapzoneval)||'::text;';
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (249, 1, concat('Configuration done for mapzone: ', v_node_mapzoneval,'.'));
 
@@ -189,8 +189,8 @@ BEGIN
 						IF v_node_mapzoneval = v_arc_2_mapzone THEN
 							v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id2,']}], "ignore":[]}'); 
 
-							EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
-							WHERE '||v_graf_class||'_id::text = '||quote_literal(v_node_mapzoneval)||'::text;';
+							EXECUTE 'UPDATE '||v_graph_class||' SET graphconfig= '''||v_json||''' 
+							WHERE '||v_graph_class||'_id::text = '||quote_literal(v_node_mapzoneval)||'::text;';
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (249, 1, concat('Configuration done for mapzone: ', v_node_mapzoneval,'.'));
 						END IF;
@@ -205,8 +205,8 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
-	FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id NOT IN (''0'', ''-1'');'
+	FOR rec IN  EXECUTE 'SELECT '||v_graph_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
+	FROM v_edit_'||v_graph_class||' WHERE graphconfig IS NULL AND '||v_graph_class||'_id NOT IN (''0'', ''-1'');'
 	LOOP
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (249, 2, concat('Mapzone not configured for header: ', rec.undone_mapzone_id,'. Closest arcs do not have good values.'));
@@ -223,7 +223,7 @@ BEGIN
 	WHERE cur_user="current_user"() AND fid=249 GROUP BY id, message)b
 	ORDER BY criticity desc, id asc) row;
 
-	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'||quote_literal(v_graf_class)||', true) WHERE parameter = ''utils_grafanalytics_status''';
+	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'||quote_literal(v_graph_class)||', true) WHERE parameter = ''utils_graphanalytics_status''';
 	
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';

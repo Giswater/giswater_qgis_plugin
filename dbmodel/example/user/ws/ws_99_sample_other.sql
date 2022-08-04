@@ -10,7 +10,7 @@ SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
 UPDATE arc SET presszone_id = 0;
 
-UPDATE config_param_system SET VALUE = '{"SECTOR":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true, "DMA":true}' WHERE parameter = 'utils_grafanalytics_status';
+UPDATE config_param_system SET VALUE = '{"SECTOR":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true, "DMA":true}' WHERE parameter = 'utils_graphanalytics_status';
 
 INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','void','void','Create example visits (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
@@ -27,8 +27,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 
-INSERT INTO config_graf_inlet VALUES (113766, 1);
-INSERT INTO config_graf_inlet VALUES (113952, 2);
+INSERT INTO config_graph_inlet VALUES (113766, 1);
+INSERT INTO config_graph_inlet VALUES (113952, 2);
 
 
 UPDATE arc SET pavcat_id = 'Asphalt';
@@ -75,12 +75,12 @@ FROM doc, om_visit;
 update rtc_hydrometer set link='https://www.giswater.org';
 
 update cat_feature_node SET isarcdivide=FALSE, num_arcs=0 WHERE id='AIR_VALVE';
-UPDATE cat_feature_node SET graf_delimiter='NONE';
-UPDATE cat_feature_node SET graf_delimiter='MINSECTOR' WHERE id IN('CHECK_VALVE', 'FL_CONTR_VALVE', 'GEN_PURP_VALVE', 'SHUTOFF_VALVE', 'THROTTLE_VALVE');
-UPDATE cat_feature_node SET graf_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VALVE', 'PR_REDUC_VALVE', 'PR_SUSTA_VALVE');
-UPDATE cat_feature_node SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
-UPDATE cat_feature_node SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
-UPDATE cat_feature_node SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
+UPDATE cat_feature_node SET graph_delimiter='NONE';
+UPDATE cat_feature_node SET graph_delimiter='MINSECTOR' WHERE id IN('CHECK_VALVE', 'FL_CONTR_VALVE', 'GEN_PURP_VALVE', 'SHUTOFF_VALVE', 'THROTTLE_VALVE');
+UPDATE cat_feature_node SET graph_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VALVE', 'PR_REDUC_VALVE', 'PR_SUSTA_VALVE');
+UPDATE cat_feature_node SET graph_delimiter='DQA' WHERE id IN('CLORINATHOR');
+UPDATE cat_feature_node SET graph_delimiter='DMA' WHERE id IN('FLOWMETER');
+UPDATE cat_feature_node SET graph_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
 update ext_rtc_hydrometer SET state_id=1;
 
@@ -313,10 +313,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE config_graf_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
+UPDATE config_graph_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE config_graf_inlet SET parameters = '{"inletArc":["114145"]}'
+UPDATE config_graph_inlet SET parameters = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';
@@ -371,7 +371,7 @@ update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosect
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
-INSERT INTO config_graf_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
+INSERT INTO config_graph_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
 
 UPDATE inp_connec SET demand  = 0.01;
 
@@ -566,7 +566,7 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_grafanalytics_status';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_graphanalytics_status';
 
 UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
 
@@ -614,7 +614,7 @@ UPDATE config_param_user SET value = gw_fct_json_object_set_key(value::json, 'au
 UPDATE sys_param_user SET vdefault = gw_fct_json_object_set_key(vdefault::json, 'autoRepair', 'true'::boolean) WHERE id = 'inp_options_debug';
 
 
-UPDATE cat_feature_node SET graf_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
+UPDATE cat_feature_node SET graph_delimiter = 'PRESSZONE' WHERE id = 'PUMP';
 
 UPDATE inp_junction SET pattern_id = 'PTN-JUNCTION';
 
@@ -635,7 +635,7 @@ UPDATE cat_arc SET connect_cost = 'N_WATER-CONNECT';
 
 UPDATE config_toolbox SET inputparams = 
 '[
-{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","tooltip": "Grafanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
+{"widgetname":"graphClass", "label":"graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
 "dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"$userExploitation"},

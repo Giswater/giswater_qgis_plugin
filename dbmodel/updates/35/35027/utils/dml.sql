@@ -28,3 +28,22 @@ DELETE FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (465, 'Check number of rows in a plan_price table', 'utils',null, 'core', true, 'Check plan-config',null) ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_downstream' WHERE function_name ='gw_fct_grafanalytics_downstream';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_downstream_recursive' WHERE function_name ='gw_fct_grafanalytics_downstream_recursive';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_upstream' WHERE function_name ='gw_fct_grafanalytics_upstream';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_upstream_recursive' WHERE function_name ='gw_fct_grafanalytics_upstream_recursive';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_minsector' WHERE function_name ='gw_fct_grafanalytics_minsector';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mincut' WHERE function_name ='gw_fct_grafanalytics_mincut';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mapzones' WHERE function_name ='gw_fct_grafanalytics_mapzones';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mincutzones' WHERE function_name ='gw_fct_grafanalytics_mincutzones';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mapzones_basic' WHERE function_name ='gw_fct_grafanalytics_mapzones_basic';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mapzones_advanced' WHERE function_name ='gw_fct_grafanalytics_mapzones_advanced';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_flowtrace' WHERE function_name ='gw_fct_grafanalytics_flowtrace';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_check_data' WHERE function_name ='gw_fct_grafanalytics_check_data';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_lrs' WHERE function_name ='gw_fct_grafanalytics_lrs';
+UPDATE sys_function SET function_name='gw_fct_graphanalytics_mapzones_config' WHERE function_name ='gw_fct_grafanalytics_mapzones_config';
+
+UPDATE config_toolbox SET alias='Check data for graphanalytics process' WHERE alias='Check data for grafanalytics process';
+UPDATE config_toolbox SET inputparams=replace(inputparams::text,'Graf', 'Graph')::json;
+UPDATE config_toolbox SET inputparams=replace(inputparams::text,'graf', 'graph')::json;
