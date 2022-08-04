@@ -174,6 +174,11 @@ v_new_visitclass integer;
 v_tram_exec_visit integer;
 v_tram_exec_visit_txt text;
 v_tram_exec_visit_widget_control json;
+
+v_emb_netejat integer;
+v_emb_netejat_txt text;
+v_emb_netejat_widget_control json;
+
 rec record;
 v_filter text;
 v_filter_aux text;
@@ -232,6 +237,7 @@ BEGIN
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
 	v_tram_exec_visit = ((p_data ->>'data')::json->>'fields')::json->>'tram_exec_visit';
+	v_emb_netejat = ((p_data ->>'data')::json->>'fields')::json->>'emb_netejat';
 	v_fields_aux = ((p_data ->>'data')::json->>'fields')::json;
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
@@ -443,6 +449,10 @@ BEGIN
 			
 			IF v_tram_exec_visit IS NULL THEN
 				v_tram_exec_visit=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'tram_exec_visit');
+			END IF;
+		
+			IF v_emb_netejat IS NULL THEN
+				v_emb_netejat=(SELECT value FROM om_visit_event WHERE visit_id = v_id::integer AND parameter_id = 'emb_netejat');
 			END IF;
             
 		END IF;
@@ -722,7 +732,7 @@ BEGIN
 			v_activedatatab = True;
 		END IF;
 		
-		
+		-- hide widgets tram_exec_visit
 		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''tram_exec_visit'' and formname = '''||v_formname||'''' INTO v_tram_exec_visit_widget_control;
 		
 		if v_tram_exec_visit IS NOT NULL THEN
@@ -734,6 +744,29 @@ BEGIN
 		ELSE
 		
 			FOR rec IN SELECT * FROM json_each_text(((v_tram_exec_visit_widget_control->>'hideWidgets')::JSON->>'tram_exec_visit')::json)
+			LOOP
+				v_filter_aux = rec.value;
+				v_filter_aux = left(v_filter_aux, -1);
+				v_filter_aux = right(v_filter_aux, -1);
+				v_filter_aux = replace(v_filter_aux, '"', '''');
+
+				v_filter = concat(v_filter_aux, ', ', v_filter);
+			END LOOP;		
+			v_filter = left(v_filter, -2);
+		END IF;
+	
+		-- hide widgets emb_netejat
+		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''emb_netejat'' and formname = '''||v_formname||'''' INTO v_emb_netejat_widget_control;
+		
+		if v_emb_netejat IS NOT NULL THEN
+		
+			v_filter = ((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json->>v_emb_netejat::text;
+			v_filter = left(v_filter, -1);
+			v_filter = right(v_filter, -1);
+			v_filter = replace(v_filter, '"', '''');
+		ELSE
+		
+			FOR rec IN SELECT * FROM json_each_text(((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json)
 			LOOP
 				v_filter_aux = rec.value;
 				v_filter_aux = left(v_filter_aux, -1);
@@ -832,6 +865,15 @@ BEGIN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit_txt::text);
 						ELSE
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
+						END IF;
+					END IF;
+				
+					IF (aux_json->>'columnname') = 'emb_netejat' THEN
+						IF v_emb_netejat IS NULL THEN
+							v_emb_netejat_txt = COALESCE(v_emb_netejat::text, '');
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_emb_netejat_txt::text);
+						ELSE
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_emb_netejat::text);
 						END IF;
 					END IF;
 				
@@ -965,6 +1007,15 @@ BEGIN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit_txt::text);
 						ELSE
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_tram_exec_visit::text);
+						END IF;
+					END IF;
+				
+					IF (aux_json->>'columnname') = 'emb_netejat' THEN
+						IF v_emb_netejat IS NULL THEN
+							v_emb_netejat_txt = COALESCE(v_emb_netejat::text, '');
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_emb_netejat_txt::text);
+						ELSE
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_emb_netejat::text);
 						END IF;
 					END IF;
 				
