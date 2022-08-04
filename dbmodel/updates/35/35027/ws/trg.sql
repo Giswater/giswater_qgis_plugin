@@ -29,7 +29,7 @@
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dqa
 	FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_dqa();
 
-	DROP TRIGGER IF EXISTS gw_trg_edit_cat_feature ON ws_sample35.v_edit_cat_feature_node;
+	DROP TRIGGER IF EXISTS gw_trg_edit_cat_feature ON v_edit_cat_feature_node;
 	CREATE TRIGGER gw_trg_edit_cat_feature
-	INSTEAD OF INSERT OR UPDATE OR DELETE ON ws_sample35.v_edit_cat_feature_node
-	FOR EACH ROW EXECUTE PROCEDURE ws_sample35.gw_trg_edit_cat_feature('node');
+	INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_cat_feature_node
+	FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_cat_feature('node');
