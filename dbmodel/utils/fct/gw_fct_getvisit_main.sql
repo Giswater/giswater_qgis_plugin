@@ -145,6 +145,7 @@ v_filterfeaturefield text;
 v_visitcat integer;
 v_visitextcode text;
 v_startdate text;
+v_incid_real_status text;
 v_enddate text;
 v_extvisitclass integer;
 v_existvisit_id integer;
@@ -546,6 +547,13 @@ BEGIN
 		v_formname := (SELECT formname FROM config_visit_class WHERE id=v_extvisitclass);
 		v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_extvisitclass);
 		v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_extvisitclass);
+		v_incid_real_status := (select t.idval from om_visit_event e join om_typevalue t on t.id=e.value and t.typevalue='incidencia_status'
+								where parameter_id='emb_incid_status' and visit_id=v_id::int8);
+		IF v_incid_real_status IS NULL THEN
+			v_incid_real_status := (select t.idval from om_visit_event e join om_typevalue t on t.id=e.value and t.typevalue='incidencia_status'
+						where parameter_id='node_incid_status' and visit_id=v_id::int8);
+		END IF;
+		
 
 	END IF;
 
@@ -756,26 +764,28 @@ BEGIN
 		END IF;
 	
 		-- hide widgets emb_netejat
-		EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''emb_netejat'' and formname = '''||v_formname||'''' INTO v_emb_netejat_widget_control;
-		
-		if v_emb_netejat IS NOT NULL THEN
-		
-			v_filter = ((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json->>v_emb_netejat::text;
-			v_filter = left(v_filter, -1);
-			v_filter = right(v_filter, -1);
-			v_filter = replace(v_filter, '"', '''');
-		ELSE
-		
-			FOR rec IN SELECT * FROM json_each_text(((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json)
-			LOOP
-				v_filter_aux = rec.value;
-				v_filter_aux = left(v_filter_aux, -1);
-				v_filter_aux = right(v_filter_aux, -1);
-				v_filter_aux = replace(v_filter_aux, '"', '''');
-
-				v_filter = concat(v_filter_aux, ', ', v_filter);
-			END LOOP;		
-			v_filter = left(v_filter, -2);
+		IF v_visitclass = 10 THEN
+			EXECUTE 'SELECT widgetcontrols FROM config_form_fields WHERE columnname = ''emb_netejat'' and formname = '''||v_formname||'''' INTO v_emb_netejat_widget_control;
+			
+			if v_emb_netejat IS NOT NULL THEN
+			
+				v_filter = ((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json->>v_emb_netejat::text;
+				v_filter = left(v_filter, -1);
+				v_filter = right(v_filter, -1);
+				v_filter = replace(v_filter, '"', '''');
+			ELSE
+			
+				FOR rec IN SELECT * FROM json_each_text(((v_emb_netejat_widget_control->>'hideWidgets')::JSON->>'emb_netejat')::json)
+				LOOP
+					v_filter_aux = rec.value;
+					v_filter_aux = left(v_filter_aux, -1);
+					v_filter_aux = right(v_filter_aux, -1);
+					v_filter_aux = replace(v_filter_aux, '"', '''');
+	
+					v_filter = concat(v_filter_aux, ', ', v_filter);
+				END LOOP;		
+				v_filter = left(v_filter, -2);
+			END IF;
 		END IF;
 
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
@@ -999,6 +1009,12 @@ BEGIN
 					-- disable visit type if project is offline
 					IF (aux_json->>'columnname') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
+				
+					-- setting incid_real_status
+					IF (aux_json->>'columnname') = 'incid_real_status' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_incid_real_status::text);	
+						RAISE NOTICE ' --- SETTING incid_real_status VALUE % ---', v_incid_real_status;
 					END IF;
 					
 					IF (aux_json->>'columnname') = 'tram_exec_visit' THEN
