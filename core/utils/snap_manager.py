@@ -64,6 +64,8 @@ class GwSnapManager(object):
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         # Get an array containing the snapping options for all the layers
         self.snapping_config = self.get_snapping_options()
         self.snapping_config.setEnabled(True)
@@ -73,6 +75,8 @@ class GwSnapManager(object):
     def set_snapping_status(self, enable=False):
         """ Enable/Disable snapping of all layers """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
 
         layers = tools_qgis.get_project_layers()
@@ -93,6 +97,8 @@ class GwSnapManager(object):
         :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (int or SnappingMode)
         """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         snapping_options = self.get_snapping_options()
         if snapping_options:
             QgsProject.instance().blockSignals(True)
@@ -105,6 +111,8 @@ class GwSnapManager(object):
     def config_snap_to_arc(self):
         """ Set snapping to 'arc' """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
         segment_flag = tools_gw.get_segment_flag(2)
@@ -122,6 +130,8 @@ class GwSnapManager(object):
     def config_snap_to_node(self):
         """ Set snapping to 'node' """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
         vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
@@ -138,6 +148,8 @@ class GwSnapManager(object):
     def config_snap_to_connec(self):
         """ Set snapping to 'connec' """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
         vertex_flag = tools_gw.get_vertex_flag(1)
@@ -156,6 +168,8 @@ class GwSnapManager(object):
     def config_snap_to_gully(self):
         """ Set snapping to 'gully' """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
         vertex_flag = tools_gw.get_vertex_flag(1)
@@ -174,6 +188,8 @@ class GwSnapManager(object):
     def config_snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
         """ Set snapping to @layer """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         if layer is None:
             return
 
@@ -188,6 +204,8 @@ class GwSnapManager(object):
     def restore_snap_options(self, snappings_options):
         """ Function that applies selected snapping configuration """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         QgsProject.instance().blockSignals(True)
         if snappings_options is None and self.snapping_config:
             snappings_options = self.snapping_config
@@ -199,6 +217,8 @@ class GwSnapManager(object):
     def recover_snapping_options(self):
         """ Function to restore the previous snapping configuration """
 
+        if global_vars.use_gw_snapping is not True:
+            return
         self.restore_snap_options(self.previous_snapping)
 
 

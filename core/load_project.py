@@ -125,8 +125,15 @@ class GwLoadProject(QObject):
         # Create menu
         tools_gw.create_giswater_menu(True)
 
+        # Get 'utils_use_gw_snapping' parameter
+        use_gw_snapping = tools_gw.get_config_value('utils_use_gw_snapping', table='config_param_system')
+        if use_gw_snapping:
+            use_gw_snapping = tools_os.set_boolean(use_gw_snapping[0])
+            global_vars.use_gw_snapping = use_gw_snapping
+
         # Manage snapping layers
-        self._manage_snapping_layers()
+        if global_vars.use_gw_snapping is True:
+            self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
