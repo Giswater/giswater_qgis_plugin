@@ -47,3 +47,8 @@ UPDATE sys_function SET function_name='gw_fct_graphanalytics_mapzones_config' WH
 UPDATE config_toolbox SET alias='Check data for graphanalytics process' WHERE alias='Check data for grafanalytics process';
 UPDATE config_toolbox SET inputparams=replace(inputparams::text,'Graf', 'Graph')::json;
 UPDATE config_toolbox SET inputparams=replace(inputparams::text,'graf', 'graph')::json;
+
+--2022/08/05
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type) 
+VALUES('utils_use_gw_snapping', 'TRUE', 'Variable to choose if the snapping config is managed by Giswater or not', FALSE, 'utils')
+ON CONFLICT (parameter) DO NOTHING;
