@@ -52,3 +52,7 @@ UPDATE config_toolbox SET inputparams=replace(inputparams::text,'graf', 'graph')
 INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type) 
 VALUES('utils_use_gw_snapping', 'TRUE', 'Variable to choose if the snapping config is managed by Giswater or not', FALSE, 'utils')
 ON CONFLICT (parameter) DO NOTHING;
+
+UPDATE sys_fprocess SET fprocess_type='Check graph-data' WHERE fprocess_type='Check graf-data';
+UPDATE sys_fprocess SET fprocess_type='Check graph-config' WHERE fprocess_type='Check graf-config';
+UPDATE config_csv SET descript= replace(descript,'graf','graph');

@@ -396,7 +396,7 @@ BEGIN
 					"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "graphClass":"ALL"}}}$$)';
 					-- insert results 
-					UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB graph):', split_part(error_message,': ',2))
+					UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAPH):', split_part(error_message,': ',2))
 					WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 					INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
