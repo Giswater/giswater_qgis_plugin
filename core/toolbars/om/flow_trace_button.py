@@ -91,7 +91,7 @@ class GwFlowTraceButton(GwMaptool):
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
             body = tools_gw.create_body(feature=feature_id)
-            result = tools_gw.execute_procedure('gw_fct_grafanalytics_upstream', body)
+            result = tools_gw.execute_procedure('gw_fct_graphanalytics_upstream', body)
             if not result or result['status'] == 'Failed':
                 return
 
