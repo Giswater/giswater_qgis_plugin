@@ -90,10 +90,10 @@ BEGIN
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
 	v_coldqa  := COALESCE(v_coldqa, '{}');
-	v_opasector  := COALESCE(v_opasector, '50');
-	v_opapresszone := COALESCE(v_opapresszone, '50');
-	v_opadma := COALESCE(v_opadma, '50');
-	v_opadqa := COALESCE(v_opadqa, '50');
+	v_opasector  := COALESCE(v_opasector, '0.5');
+	v_opapresszone := COALESCE(v_opapresszone, '0.5');
+	v_opadma := COALESCE(v_opadma, '0.5');
+	v_opadqa := COALESCE(v_opadqa, '0.5');
 	
 
 	--    Return
