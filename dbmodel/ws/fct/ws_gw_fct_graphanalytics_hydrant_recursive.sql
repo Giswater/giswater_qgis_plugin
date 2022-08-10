@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3162
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hidrant_recursive(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_hydrant_recursive(p_data json) 
 RETURNS json AS 
 $BODY$
 
@@ -37,7 +37,7 @@ v_query text;
 v_fid integer=463;
 v_fid_cross integer=464;
 v_schema text;
-v_hidrant text;
+v_hydrant text;
 BEGIN
 
 	-- Search path
@@ -49,7 +49,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_node_id = json_extract_path_text(p_data, 'nodeId')::text;
-	v_hidrant = json_extract_path_text(p_data, 'hidrantId')::text;
+	v_hydrant = json_extract_path_text(p_data, 'hydrantId')::text;
 	v_distance=json_extract_path_text(p_data, 'data','parameters','distance')::numeric;
 	v_currentDistance=json_extract_path_text(p_data, 'data','currentDistance')::numeric;
 	v_distance_left=json_extract_path_text(p_data, 'data','distanceLeft')::numeric;
@@ -61,7 +61,7 @@ BEGIN
 	IF v_distance_left IS NULL THEN
 		v_distance_left=v_distance;
 	END IF;
-	
+	raise notice 'v_distance_left,%',v_distance_left;
 	-- Check if the node is already computed
 	SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = v_fid;
 
@@ -108,8 +108,9 @@ BEGIN
 		
 			-- Insert arc into tables
 			--IF rec_table.arc_id NOT IN  (SELECT arc_id FROM anl_arc WHERE fid=v_fid) THEN 
-					INSERT INTO anl_arc (arc_id, fid, the_geom,length, descript) 
-					VALUES (rec_table.arc_id, v_fid, rec_table.the_geom, v_arclength, v_hidrant);
+					INSERT INTO anl_arc (arc_id, fid, the_geom,length, descript, expl_id, node_1) 
+					SELECT rec_table.arc_id, v_fid, rec_table.the_geom, v_arclength, v_hydrant, expl_id, v_hydrant FROM exploitation
+					WHERE ST_DWithin(rec_table.the_geom, exploitation.the_geom,0.01);
 			--END IF;
 			raise notice 'rec_table.arc_id,v_distance_left,%-%',rec_table.arc_id,v_distance_left;
 			v_currentDistance=v_currentDistance+v_arclength;
@@ -129,10 +130,10 @@ BEGIN
 
 				IF v_target_node IS NOT NULL THEN
 					-- Call recursive function weighting with the pipe capacity
-					EXECUTE 'SELECT gw_fct_graphanalytics_hidrant_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					EXECUTE 'SELECT gw_fct_graphanalytics_hydrant_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":["'||v_target_node||'"]},
 					"data":{"parameters":{"distance":'||v_distance||'},"currentDistance":'||v_currentDistance||',"distanceLeft":'||v_distance_left||'},
-					"nodeId":"'||v_target_node||'","hidrantId":"'||v_hidrant||'"}$$);';
+					"nodeId":"'||v_target_node||'","hydrantId":"'||v_hydrant||'"}$$);';
 				END IF;
 
 	 		ELSE
@@ -151,11 +152,13 @@ BEGIN
 					rec_table.the_geom=ST_Reverse(rec_table.the_geom);
 				end if;
 
-				RAISE NOTICE 'v_hidrant,% - arc, %',v_hidrant,rec_table.arc_id;
-
-				EXECUTE 'UPDATE anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 
-				length = st_length(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')) 
-				WHERE arc_id='||quote_literal(rec_table.arc_id)||' and fid='||v_fid||' and cur_user=current_user and descript='||quote_literal(v_hidrant)||';';
+				RAISE NOTICE 'v_hydrant,% - arc, %',v_hydrant,rec_table.arc_id;
+				
+				IF v_percent > 0.001 	THEN 
+					EXECUTE 'UPDATE anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 
+					length = st_length(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')) 
+					WHERE arc_id='||quote_literal(rec_table.arc_id)||' and fid='||v_fid||' and cur_user=current_user and descript='||quote_literal(v_hydrant)||';';
+				END IF;
 
 				IF v_percent < 1 THEN
 					EXECUTE 'UPDATE temp_arc SET flag=NULL WHERE arc_id='||quote_literal(rec_table.arc_id)||';';
@@ -173,10 +176,10 @@ BEGIN
 					v_distance_left=0; 
 				END IF;
 
-				EXECUTE 'SELECT gw_fct_graphanalytics_hidrant_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_graphanalytics_hydrant_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":["'||v_node_id||'"]},
 				"data":{"parameters":{"distance":'||v_distance||'},"currentDistance":0,"distanceLeft":'||v_distance_left||'},
-				"nodeId":"'||v_node_id||'","hidrantId":"'||v_hidrant||'"}$$);';
+				"nodeId":"'||v_node_id||'","hydrantId":"'||v_hydrant||'"}$$);';
 
 	 		END IF;
 		END LOOP;

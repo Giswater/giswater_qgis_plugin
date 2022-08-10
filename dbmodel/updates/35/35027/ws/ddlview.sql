@@ -164,3 +164,13 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_node AS
      JOIN cat_feature_node USING (id);
 
 ALTER VIEW v_anl_grafanalytics_mapzones RENAME TO v_anl_graphanalytics_mapzones;
+
+
+CREATE OR REPLACE VIEW v_edit_anl_hydrant AS
+SELECT  
+node_id, 
+nodecat_id,
+expl_id,
+the_geom
+FROM ws35_hidr.anl_node
+WHERE fid=465 AND cur_user=current_user;
