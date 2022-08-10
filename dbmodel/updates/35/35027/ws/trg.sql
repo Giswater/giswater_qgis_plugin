@@ -34,7 +34,7 @@ CREATE TRIGGER gw_trg_edit_cat_feature
 INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_cat_feature_node
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_cat_feature('node');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_anl_hydrant ON v_edit_anl_hydrant
+DROP TRIGGER IF EXISTS gw_trg_edit_anl_hydrant ON v_edit_anl_hydrant;
 CREATE TRIGGER gw_trg_edit_anl_hydrant
 INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_anl_hydrant
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_anl_hydrant('node');
