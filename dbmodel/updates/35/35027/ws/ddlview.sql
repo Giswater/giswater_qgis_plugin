@@ -172,5 +172,5 @@ node_id,
 nodecat_id,
 expl_id,
 the_geom
-FROM ws35_hidr.anl_node
+FROM anl_node
 WHERE fid=465 AND cur_user=current_user;

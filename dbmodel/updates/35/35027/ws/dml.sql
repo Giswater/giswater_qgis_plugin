@@ -40,6 +40,8 @@ VALUES (463, 'Graph analysis for hydrants', 'ws',null, 'core', false, 'Function 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (464, 'Graph analysis for hydrants - marking crossroads', 'ws',null, 'core', false, 'Function process',null) ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (465, 'Graph analysis for hydrants - hydrant proposal', 'ws',null, 'core', false, 'Function process',null) ON CONFLICT (fid) DO NOTHING;
 
 UPDATE config_param_system SET parameter='utils_graphanalytics_automatic_config' WHERE parameter ='utils_grafanalytics_automatic_config';
 UPDATE config_param_system SET parameter='utils_graphanalytics_automatic_trigger' WHERE parameter ='utils_grafanalytics_automatic_trigger';
@@ -49,3 +51,7 @@ UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_feature' WHER
 UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_graf' WHERE parameter ='utils_grafanalytics_lrs_graph';
 UPDATE config_param_system SET parameter='utils_graphanalytics_status' WHERE parameter ='utils_grafanalytics_status';
 UPDATE config_param_system SET parameter='utils_graphanalytics_vdefault' WHERE parameter ='utils_grafanalytics_vdefault';
+
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
+VALUES (3164,'gw_trg_edit_anl_hydrant','ws','trigger function','json','json','Function trigger to edit proposed hidrant layer - v_edit_anl_hydrant.',
+'role_om','core') ON CONFLICT (id) DO NOTHING;
