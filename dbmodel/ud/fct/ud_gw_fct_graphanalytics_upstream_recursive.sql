@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace_recursive(character varying);
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace_recursive(json);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_grafanalytics_upstream_recursive(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_upstream_recursive(p_data json) 
 RETURNS json AS 
 $BODY$
 
@@ -58,7 +58,7 @@ BEGIN
 			(rec_table.arc_id, rec_table.arc_type, rec_table.expl_id,220, rec_table.the_geom);
 
 			-- Call recursive function weighting with the pipe capacity
-			EXECUTE 'SELECT gw_fct_grafanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||rec_table.node_1||'"]},"data":{}}$$);';
+			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||rec_table.node_1||'"]},"data":{}}$$);';
  
 		END LOOP;
 
