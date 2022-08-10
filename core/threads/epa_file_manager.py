@@ -359,15 +359,9 @@ class GwEpaFileManager(GwTask):
 
                     line = row['text'].rstrip() + "\n"
 
-                    if not bool(re.match(';;(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
-                        #TODO:: Manage space on text "To Network" instead of harcoded replace
-                        line = re.sub(' +', ';', line)
-                        line = line.replace('To;network', 'To network')
-                        aditional_file.write(line)
-
-                    elif not bool(re.match(';;-(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
-                        line = re.sub(' +', ';', line)
+                    if not bool(re.match(';;-(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
                         line = re.sub(';;', '', line)
+                        line = re.sub(' +', ' ', line)
                         aditional_file.write(line)
 
             self._close_file(aditional_file)
