@@ -186,8 +186,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	IF v_tabname IS NULL THEN
@@ -491,7 +491,7 @@ BEGIN
 
     END IF;
 	
-	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	-- Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||

@@ -153,8 +153,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	-- Get values from config
@@ -182,7 +182,7 @@ BEGIN
 		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
 		
 		IF v_idname IS NULL THEN
-			EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 			
@@ -200,7 +200,7 @@ BEGIN
 
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
-		EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		RETURN v_return;
 	END IF;
 	
@@ -780,7 +780,7 @@ BEGIN
 	END LOOP;
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
 	
-	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	--    Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||

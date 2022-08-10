@@ -243,8 +243,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	--   Get editability of layer
@@ -279,7 +279,7 @@ BEGIN
 					v_message_aux = ((((v_message->>'body')::json->>'data')::json->>'info')::json->>'text')::text;
 					v_message_aux := COALESCE(v_message_aux, '');
 					
-					EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+					EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 					
 					RETURN ('{"status":"Warning", "message":"'||v_message_aux||'", "version":'||v_version||
 					 ',"body":{"feature":{"featureType":"visit", "tableName":"", "idName":"visit_id", "id":""}'||
@@ -1211,7 +1211,7 @@ BEGIN
 		v_id = '""';
 	END IF;
 	
-	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	-- Return
 	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "version":'||v_version||

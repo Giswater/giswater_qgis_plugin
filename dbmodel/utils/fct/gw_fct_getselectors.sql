@@ -92,8 +92,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	-- profilactic control of message
@@ -288,7 +288,7 @@ BEGIN
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
 	
-	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	-- Return
 	IF v_firsttab IS FALSE THEN

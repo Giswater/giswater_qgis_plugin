@@ -89,8 +89,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	-- profilactic control
@@ -368,7 +368,7 @@ BEGIN
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_action := COALESCE(v_action, 'null');
 	
-	EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 

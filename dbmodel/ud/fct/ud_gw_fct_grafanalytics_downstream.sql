@@ -47,8 +47,8 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	
 	v_prev_cur_user = current_user;
-	IF v_cur_user THEN
-		EXECUTE 'SET ROLE ' || v_cur_user || '';
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	-- Reset values
@@ -83,7 +83,7 @@ BEGIN
 		v_result_line = '{"geometryType":"", "features":[]}';
 		v_result_point = '{"geometryType":"", "features":[]}';
 		
-		EXECUTE 'SET ROLE ' || v_prev_cur_user || '';
+		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		
 		--  Return
 		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
