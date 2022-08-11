@@ -272,15 +272,15 @@ class GwDscenarioManagerButton(GwAction):
         if isdeleted(self.dlg_dscenario):
             return
 
-        table_name = f"{self.dlg_dscenario.main_tab.currentWidget().objectName()}"
+        self.table_name = f"{self.dlg_dscenario.main_tab.currentWidget().objectName()}"
         widget = self.dlg_dscenario.main_tab.currentWidget()
 
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
+        if self.schema_name not in self.table_name:
+            self.table_name = self.schema_name + "." + self.table_name
 
         # Set model
         model = QSqlTableModel(db=global_vars.qgis_db_credentials)
-        model.setTable(table_name)
+        model.setTable(self.table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
@@ -307,7 +307,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Set widget & model properties
         tools_qt.set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=set_edit_triggers, sectionResizeMode=0)
-        tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{table_name[len(f'{self.schema_name}.'):]}")
+        tools_gw.set_tablemodel_config(self.dlg_dscenario, widget, f"{self.table_name[len(f'{self.schema_name}.'):]}")
 
         # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
@@ -471,7 +471,13 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
+        rows = tools_db.get_rows(sql, add_empty_row=True)
+
+        if rows[0][0] == 'id':
+            sql = f"INSERT INTO {view} ({rows[1][0]}, {rows[2][0]})VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        else:
+            sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
