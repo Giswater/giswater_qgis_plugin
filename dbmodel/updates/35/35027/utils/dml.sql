@@ -56,3 +56,10 @@ ON CONFLICT (parameter) DO NOTHING;
 UPDATE sys_fprocess SET fprocess_type='Check graph-data' WHERE fprocess_type='Check graf-data';
 UPDATE sys_fprocess SET fprocess_type='Check graph-config' WHERE fprocess_type='Check graf-config';
 UPDATE config_csv SET descript= replace(descript,'graf','graph');
+
+--2022/08/10
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
+VALUES ('ve_pol_node', false, null, false, 'info_feature', null, 10, null, null) ON CONFLICT (layer_id) DO NOTHING;
+
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
+VALUES ('ve_pol_connec', false, null, false, 'info_feature', null, 11, null, null) ON CONFLICT (layer_id) DO NOTHING;

@@ -50,3 +50,17 @@ CREATE OR REPLACE VIEW v_anl_graphanalytics_upstream AS
            FROM temp_anlgraph temp_anlgraph_1
           WHERE temp_anlgraph_1.water = 1) a2 ON temp_anlgraph.node_2::text = a2.node_1::text
   WHERE temp_anlgraph.flag < 2 AND temp_anlgraph.water = 0 AND a2.flag = 0;
+
+--2022/08/10
+DROP VIEW ve_pol_gully;
+
+CREATE OR REPLACE VIEW ve_pol_gully AS 
+ SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom
+   FROM gully
+     JOIN v_state_gully USING (gully_id)
+     JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;

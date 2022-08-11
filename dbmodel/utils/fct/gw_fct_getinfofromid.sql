@@ -167,9 +167,10 @@ BEGIN
 	END IF;
 
 	-- special case of polygon
-	IF v_tablename = 'v_polygon' THEN
+	IF v_tablename = 'v_polygon' or v_tablename = 've_pol_node' or v_tablename = 've_pol_connec' or v_tablename = 've_pol_gully'THEN
 
-		SELECT feature_id, featurecat_id INTO v_id, v_tablename FROM v_polygon WHERE pol_id = v_id;
+		EXECUTE 'SELECT feature_id, featurecat_id  FROM '||v_tablename||' WHERE pol_id = '||quote_literal(v_id)||''
+		INTO v_id, v_tablename;
 		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE system_id = v_tablename LIMIT 1);
 		IF v_tablename IS NULL THEN v_tablename = 'v_edit_element'; END IF;
 		v_editable = true;

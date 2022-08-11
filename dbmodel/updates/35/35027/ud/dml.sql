@@ -13,5 +13,7 @@ INSERT INTO sys_param_user VALUES('edit_noderotation_update_dsbl', 'config', 'If
 
 -- 2022/08/10
 UPDATE sys_param_user SET descript = 'Default value for enable /disable gully. Two options are available (Sink, To_network). In case of Sink water is lossed.', vdefault = 'To_network' WHERE id = 'epa_gully_outlet_type_vdefault';
-UPDATE inp_typevalue SET id = 'To_network', idval = 'To_network' WHERE typevalue = 'typevalue_gully_outlet_type' AND id = 'To network'
+UPDATE inp_typevalue SET id = 'To_network', idval = 'To_network' WHERE typevalue = 'typevalue_gully_outlet_type' AND id = 'To network';
 
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
+VALUES ('ve_pol_gully', false, null, false, 'info_feature', null, 12, null, null) ON CONFLICT (layer_id) DO NOTHING;
