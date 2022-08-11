@@ -66,6 +66,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3042))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
+        self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
