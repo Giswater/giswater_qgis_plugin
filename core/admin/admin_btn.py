@@ -2156,7 +2156,7 @@ class GwAdminButton:
                             self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Another object has this name')
                             valid, all_valid = False, False
                     except Exception as e:
-                        print(f"{type(e).__name__}: {e}")
+                        tools_log.log_info(f"{type(e).__name__} --> {e}")
             if valid:
                 news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")

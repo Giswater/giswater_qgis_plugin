@@ -491,19 +491,19 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     try:
         global_vars.canvas.xyCoordinates.disconnect()
     except TypeError as e:
-        print(f"{type(e).__name__} --> {e}")
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if emit_point is not None:
         try:
             emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if vertex_marker is not None:
         try:
             vertex_marker.hide()
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if action_pan:
         iface.actionPan().trigger()

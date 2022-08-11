@@ -64,7 +64,7 @@ class GwCreateSchemaUtilsTask(GwTask):
             return True
 
         except KeyError as e:
-            print(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
             self.exception = e
             return False
 
