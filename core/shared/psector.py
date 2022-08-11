@@ -1082,8 +1082,9 @@ class GwPsector:
                 self.reload_states_selector()
                 tools_gw.close_dialog(self.dlg_plan_psector)
 
-        # Refresh selectors UI if open
-        tools_gw.refresh_selectors()
+        # Refresh selectors UI if it is open and and the form will close
+        if close_dlg:
+            tools_gw.refresh_selectors()
 
 
     def set_plan(self):
@@ -1518,6 +1519,7 @@ class GwPsector:
         self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
