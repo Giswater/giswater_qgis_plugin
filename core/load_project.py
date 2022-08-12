@@ -82,11 +82,8 @@ class GwLoadProject(QObject):
         # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
-
-        # Manage variables not configured
         project_role = global_vars.project_vars.get('project_role')
-        if project_role in (None, ''):
-            global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
+        global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
 
         # Check if user has config files 'init' and 'session' and its parameters
         tools_gw.user_params_to_userconfig()
