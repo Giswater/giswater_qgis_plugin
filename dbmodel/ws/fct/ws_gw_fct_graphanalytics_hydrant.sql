@@ -130,7 +130,7 @@ SET search_path = "SCHEMA_NAME", public;
 			END LOOP;
 
 			IF v_use_propsal IS TRUE THEN
-				EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM anl_node where fid='||v_fid_proposal||')a'
+				EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM anl_node where fid='||v_fid_proposal||' AND cur_user=current_user)a'
 				into v_proposal_array;	
 
 				IF v_proposal_array IS NOT NULL THEN
@@ -143,7 +143,7 @@ SET search_path = "SCHEMA_NAME", public;
 						FROM om_streetaxis b
 						WHERE a.expl_id = b.expl_id 
 						ORDER BY a.the_geom <-> b.the_geom
-						LIMIT 1) AS closest_street  WHERE a.node_id='||quote_literal(rec_hydrant)||''
+						LIMIT 1) AS closest_street  WHERE a.node_id='||quote_literal(rec_hydrant)||' AND cur_user=current_user AND fid='||v_fid_proposal||''
 						INTO v_closest_street, v_dist_street;
 						raise notice 'v_dist_street,%',v_dist_street;
 
@@ -154,7 +154,8 @@ SET search_path = "SCHEMA_NAME", public;
 						--insert point located on the closest street to the temporal table
 						EXECUTE 'INSERT INTO temp_node(result_id, node_id, the_geom)
 						SELECT '||v_fid||', '||rec_hydrant||', ST_ClosestPoint(s.the_geom, n.the_geom)
-						FROM anl_node n, om_streetaxis s WHERE n.node_id='||quote_literal(rec_hydrant)||' AND s.id='||quote_literal(v_closest_street)||';';
+						FROM anl_node n, om_streetaxis s WHERE n.node_id='||quote_literal(rec_hydrant)||' AND s.id='||quote_literal(v_closest_street)||'
+						AND cur_user=current_user AND fid='||v_fid_proposal||';';
 
 						--divide street on which hydrant is located and insert on temp table
 						EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_node.the_geom) FROM temp_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
@@ -234,20 +235,6 @@ SET search_path = "SCHEMA_NAME", public;
 		END LOOP;
 	END IF;
 
-	/*IF v_mode=1 HEN
-	raise notice '111';
-		INSERT INTO anl_node(the_geom, fid, expl_id, code)
-		SELECT the_geom, v_fid_proposal, expl_id,v_mode FROM(
-	  SELECT ST_Startpoint(the_geom) as the_geom,expl_id
-	  FROM  anl_arc  WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) 
-	  union SELECT  ST_Endpoint(the_geom) as the_geom, expl_id
-	  FROM  anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid))a
-	  WHERE NOT EXISTS (
-	  SELECT 1
-	  FROM temp_node AS par 
-	  WHERE ST_Intersects(a.the_geom,ST_Buffer(par.the_geom,0.001)));
-	END IF;
-*/
 	-- get results
 	--lines
 	v_result = null;
@@ -275,7 +262,7 @@ SET search_path = "SCHEMA_NAME", public;
 	 	) AS feature
 		FROM (SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
 	 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id=v_fid::text)
-	 	UNION SELECT node_id, 'HYDRANT PROPOSAL', the_geom FROM anl_node WHERE fid=v_fid_proposal)row) features;
+	 	UNION SELECT node_id, 'HYDRANT PROPOSAL', the_geom FROM anl_node WHERE fid=v_fid_proposal AND cur_user=current_user)row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}'); 
