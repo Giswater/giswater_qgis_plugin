@@ -14,3 +14,7 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTR
 ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_muni_id_fkey FOREIGN KEY (muni_id)
 REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_streetaxis ADD CONSTRAINT om_streetaxis_unique UNIQUE(muni_id, id);
+
+ALTER TABLE man_tank DROP CONSTRAINT IF EXISTS man_tank_pol_id_fkey;
+ALTER TABLE man_fountain DROP CONSTRAINT IF EXISTS man_fountain_pol_id_fkey;
+ALTER TABLE man_register DROP CONSTRAINT IF EXISTS man_register_pol_id_fkey;
