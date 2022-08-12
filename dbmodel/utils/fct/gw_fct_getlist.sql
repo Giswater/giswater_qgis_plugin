@@ -387,7 +387,7 @@ BEGIN
 	END IF;
 	-- calculating last page
 	IF v_limit IS NULL THEN
-		v_limit = 10;
+		v_limit = 25;
 	END IF;
 
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
