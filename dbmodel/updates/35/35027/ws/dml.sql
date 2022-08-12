@@ -55,3 +55,6 @@ UPDATE config_param_system SET parameter='utils_graphanalytics_vdefault' WHERE p
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
 VALUES (3164,'gw_trg_edit_anl_hydrant','ws','trigger function','json','json','Function trigger to edit proposed hidrant layer - v_edit_anl_hydrant.',
 'role_om','core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_edit_anl_hydrant', 'Editable view for new hydrant location. Used on tool for hydrant influence analysis', 'role_om', 'core');
