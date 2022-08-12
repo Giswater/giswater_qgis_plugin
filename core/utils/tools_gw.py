@@ -1178,7 +1178,7 @@ def build_dialog_info(dialog, result, my_json=None):
         if 'ismandatory' in field:
             widget.setProperty('ismandatory', field['ismandatory'])
 
-        if 'layoutorder' in field:
+        if 'layoutorder' in field and field['layoutorder'] is not None:
             order = field['layoutorder']
         grid_layout.addWidget(label, order, 0)
         grid_layout.addWidget(widget, order, 1)
