@@ -16,4 +16,19 @@ UPDATE sys_param_user SET descript = 'Default value for enable /disable gully. T
 UPDATE inp_typevalue SET id = 'To_network', idval = 'To_network' WHERE typevalue = 'typevalue_gully_outlet_type' AND id = 'To network';
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
-VALUES ('ve_pol_gully', false, null, false, 'info_feature', null, 12, null, null) ON CONFLICT (layer_id) DO NOTHING;
+VALUES ('ve_pol_gully', false, null, true, 'info_feature', null, 12, null, null) ON CONFLICT (layer_id) DO NOTHING;
+
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
+VALUES ('v_edit_inp_subcatchment', false, null, true, 'info_generic', 'Subcatchment',20,null,'{"geomType":"polygon"}');
+
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
+VALUES ('v_edit_raingage', false, null, true, 'info_generic', 'Raingage',16,null,null);
+
+UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' 
+FROM pg_attribute WHERE  attrelid = 'v_edit_raingage'::regclass AND attname=columnname AND formname='v_edit_raingage';
+
+UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute 
+WHERE  attrelid = 'v_edit_inp_subcatchment'::regclass AND attname=columnname AND formname='v_edit_inp_subcatchment';
+
+UPDATE config_form_fields SET dv_isnullvalue=true 
+WHERE formname='v_edit_inp_subcatchment' AND columnname='snow_id';

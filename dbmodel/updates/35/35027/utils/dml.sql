@@ -59,9 +59,18 @@ UPDATE config_csv SET descript= replace(descript,'graf','graph');
 
 --2022/08/10
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
-VALUES ('ve_pol_node', false, null, false, 'info_feature', null, 10, null, null) ON CONFLICT (layer_id) DO NOTHING;
+VALUES ('ve_pol_node', false, null, true, 'info_feature', null, 10, null, null) ON CONFLICT (layer_id) DO NOTHING;
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
-VALUES ('ve_pol_connec', false, null, false, 'info_feature', null, 11, null, null) ON CONFLICT (layer_id) DO NOTHING;
+VALUES ('ve_pol_connec', false, null, true, 'info_feature', null, 11, null, null) ON CONFLICT (layer_id) DO NOTHING;
 
 UPDATE config_fprocess SET active = true WHERE active is null;
+
+INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
+VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',25,null,null);
+
+UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v_edit_link';
+
+UPDATE config_form_fields SET layoutorder=a.maxid , layoutname='lyt_data_1' FROM
+(SELECT max(layoutorder)+1 as maxid FROM  config_form_fields WHERE formname='v_edit_link')a
+ WHERE columnname='ispsectorgeom' AND formname='v_edit_link';
