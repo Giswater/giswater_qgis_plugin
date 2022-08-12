@@ -63,3 +63,5 @@ VALUES ('ve_pol_node', false, null, false, 'info_feature', null, 10, null, null)
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam)
 VALUES ('ve_pol_connec', false, null, false, 'info_feature', null, 11, null, null) ON CONFLICT (layer_id) DO NOTHING;
+
+UPDATE config_fprocess SET active = true WHERE active is null;

@@ -12,3 +12,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visi
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"vehicle_id", "dataType":"integer"}}$$);
 
 ALTER TABLE temp_anlgraf RENAME TO temp_anlgraph;
+
+ALTER TABLE config_fprocess ALTER COLUMN active SET DEFAULT true;
