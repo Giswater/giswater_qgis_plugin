@@ -4191,27 +4191,31 @@ class GwInfo(QObject):
             self._cancel_snapping_tool(dialog, action)
             return
 
-        # Refresh all layers to avoid selecting old deleted features
-        global_vars.canvas.refreshAllLayers()
-        # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
-        # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if not result.isValid():
-            return
-        # Get the point. Leave selection
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
-        feat_id = snapped_feat.attribute(f'{options[option][0]}')
-        if option in ('arc', 'node'):
-            widget = dialog.findChild(QWidget, f"{options[option][1]}")
-            widget.setFocus()
-            tools_qt.set_widget_text(dialog, widget, str(feat_id))
-        elif option == 'set_to_arc':
-            # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-            #       def _set_to_arc(self, feat_id, child_type)
-            getattr(self, options[option][1])(feat_id, child_type)
-        self.snapper_manager.recover_snapping_options()
-        self._cancel_snapping_tool(dialog, action)
+        try:
+            # Refresh all layers to avoid selecting old deleted features
+            global_vars.canvas.refreshAllLayers()
+            # Get coordinates
+            event_point = self.snapper_manager.get_event_point(point=point)
+            # Snapping
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if not result.isValid():
+                return
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feat_id = snapped_feat.attribute(f'{options[option][0]}')
+            if option in ('arc', 'node'):
+                widget = dialog.findChild(QWidget, f"{options[option][1]}")
+                widget.setFocus()
+                tools_qt.set_widget_text(dialog, widget, str(feat_id))
+            elif option == 'set_to_arc':
+                # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+                #       def _set_to_arc(self, feat_id, child_type)
+                getattr(self, options[option][1])(feat_id, child_type)
+        except Exception as e:
+            tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
+        finally:
+            self.snapper_manager.recover_snapping_options()
+            self._cancel_snapping_tool(dialog, action)
 
 
     def _set_to_arc(self, feat_id, child_type):
