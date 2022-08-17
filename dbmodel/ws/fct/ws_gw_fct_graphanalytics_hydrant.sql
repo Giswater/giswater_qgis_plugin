@@ -35,12 +35,11 @@ v_status text;
 v_level integer;
 v_message text;
 v_audit_result text;
-v_cur_user text;
-v_prev_cur_user text;
+
 v_fid integer=463;
 v_fid_result integer=464;
 v_fid_proposal integer=465;
-v_hydrant integer;
+
 v_closest_street text;
 v_street_geom  public.geometry;
 v_intersect_loc  numeric;
@@ -57,6 +56,8 @@ v_dist_street numeric;
 v_mode integer;
 v_distance numeric;
 v_use_propsal boolean;
+v_use_psector boolean;
+v_query text;
 
 BEGIN
 
@@ -67,7 +68,8 @@ SET search_path = "SCHEMA_NAME", public;
 	v_node_json = ((p_data ->>'feature')::json->>'id'::text);
 	v_mode=json_extract_path_text(p_data, 'data','parameters','mode')::integer;
 	v_use_propsal=json_extract_path_text(p_data, 'data','parameters','useProposal')::boolean;
-	/*mode: 0 -influence area, 1:use hydrant proposal*/
+	v_use_psector=json_extract_path_text(p_data, 'data','parameters','usePsector')::boolean;
+	/*mode: 0 -influence area, 1:hydrant proposal*/
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -81,6 +83,17 @@ SET search_path = "SCHEMA_NAME", public;
 			
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CALCULATE THE REACH OF HYDRANTS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+
+	--store psector selector values
+	IF v_use_psector IS NOT TRUE THEN
+			-- save psector selector 
+			DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
+			INSERT INTO temp_table (fid, text_column)
+			SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+
+			-- set psector selector
+			DELETE FROM selector_psector WHERE cur_user=current_user;
+		END IF;
 
 	--CREATE ARRAY OF HYDRANTS
 	select array_agg(a) into v_node_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
@@ -145,7 +158,6 @@ SET search_path = "SCHEMA_NAME", public;
 						ORDER BY a.the_geom <-> b.the_geom
 						LIMIT 1) AS closest_street  WHERE a.node_id='||quote_literal(rec_hydrant)||' AND cur_user=current_user AND fid='||v_fid_proposal||''
 						INTO v_closest_street, v_dist_street;
-						raise notice 'v_dist_street,%',v_dist_street;
 
 						IF v_dist_street < 50 THEN
 
@@ -173,7 +185,6 @@ SET search_path = "SCHEMA_NAME", public;
 					END IF;
 				END LOOP;
 			END IF;
-			Raise notice 'v_proposal_arrayend,%',v_proposal_array;
 		END IF;
 					
 		--insert final street points on temp_node table
@@ -217,10 +228,9 @@ SET search_path = "SCHEMA_NAME", public;
 		IF v_use_propsal is true AND v_proposal_array IS NOT NULL THEN
 			v_node_array=array_cat(v_node_array, v_proposal_array);
 		END IF;
-		raise notice 'v_node_array,%',v_node_array;
+
 		--execute function for each hydrant
 		FOREACH rec_hydrant IN ARRAY(v_node_array) LOOP
-			raise notice 'rec_hydrant,%',rec_hydrant;
 
 			UPDATE temp_arc SET flag=null where result_id=v_fid::text;
 			DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid=v_fid_result);
@@ -233,6 +243,13 @@ SET search_path = "SCHEMA_NAME", public;
 			EXECUTE 'SELECT gw_fct_graphanalytics_hydrant_recursive($$'||p_data||'$$);'
 			INTO v_result_json;
 		END LOOP;
+	END IF;
+
+	-- restore state selector (if it's needed)
+	IF v_use_psector IS NOT TRUE THEN
+		INSERT INTO selector_psector (psector_id, cur_user)
+		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
+		ON CONFLICT (psector_id, cur_user) DO NOTHING;
 	END IF;
 
 	-- get results
@@ -251,18 +268,25 @@ SET search_path = "SCHEMA_NAME", public;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
+	IF v_use_propsal is true then
+		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
+		 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id='||v_fid||'::text)
+		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'', the_geom FROM anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
+	else
+		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
+		 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id='||v_fid||'::text)';
+	end if;
 	--points-hydrants
 	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
+	EXECUTE 'SELECT jsonb_agg(features.feature) 
 	FROM (
 		SELECT jsonb_build_object(
-	  'type',       'Feature',
-	  'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	  'properties', to_jsonb(row) - 'the_geom'
+	  ''type'',       ''Feature'',
+	  ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+	  ''properties'', to_jsonb(row) - ''the_geom''
 	 	) AS feature
-		FROM (SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
-	 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id=v_fid::text)
-	 	UNION SELECT node_id, 'HYDRANT PROPOSAL', the_geom FROM anl_node WHERE fid=v_fid_proposal AND cur_user=current_user)row) features;
+		FROM ('||v_query||')row) features'
+	 INTO v_result;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result,'}'); 

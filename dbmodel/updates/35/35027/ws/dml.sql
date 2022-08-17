@@ -25,7 +25,8 @@ INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, activ
 VALUES (3160, 'Calculate the reach of hydrants', '{"featureType":["node"]}', 
 '[{"widgetname":"distance", "label":"Firehose range:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":"1","value":"100"},
 {"widgetname":"mode", "label":"Process mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":"2","comboIds":["0","1"],"comboNames":["Influence area","Hydrant proposal"], "selectedId":"0"},
-{"widgetname":"useProposal", "label":"Use proposed hydrants:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"3", "value":""}]',
+{"widgetname":"useProposal", "label":"Use proposed hydrants:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"3", "value":""},
+{"widgetname":"usePsector", "label":"Use selected psectors:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"4", "value":""}]',
 'Function requires street data inserted on table om_streetaxis, where each street is divided into short lines between intersections.', true)
 ON CONFLICT (id) DO NOTHING;
 
