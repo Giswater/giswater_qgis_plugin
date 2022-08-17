@@ -4191,6 +4191,8 @@ class GwInfo(QObject):
             self._cancel_snapping_tool(dialog, action)
             return
 
+        # Refresh all layers to avoid selecting old deleted features
+        global_vars.canvas.refreshAllLayers()
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
         # Snapping
