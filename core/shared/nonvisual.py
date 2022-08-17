@@ -49,6 +49,7 @@ class GwNonVisual:
                          'v_edit_inp_timeseries': 'id', 'v_edit_inp_timeseries_value': 'timser_id',
                          'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
                          }
+        self.valid = (True, "")
 
 
     def get_nonvisual(self, object_name):
@@ -397,6 +398,7 @@ class GwNonVisual:
 
         # Control data depending on curve type
         valid = True
+        self.valid = (True, "")
         if column == 0:
             # If not first row, check if previous row has a smaller value than current row
             if row - 1 >= 0:
@@ -408,6 +410,7 @@ class GwNonVisual:
                         prev_value = float(prev_cell.data(0))
                         if cur_value < prev_value:
                             valid = False
+                            self.valid = (False, "Invalid curve. First column values must be ascending.")
 
         # If first check is valid, check all rows for column for final validation
         if valid:
@@ -441,6 +444,7 @@ class GwNonVisual:
                 if n > x_values[i-1]:
                     continue
                 valid = False
+                self.valid = (False, "Invalid curve. First column values must be ascending.")
                 break
             # If PUMP, check that y_values are descending
             curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
@@ -451,6 +455,7 @@ class GwNonVisual:
                     if n < y_values[i - 1]:
                         continue
                     valid = False
+                    self.valid = (False, "Invalid curve. Second column values must be descending.")
                     break
 
             if valid:
@@ -458,8 +463,7 @@ class GwNonVisual:
                 x_len = len([x for x in x_values if x is not None])  # Length of the x_values list without Nones
                 y_len = len([y for y in y_values if y is not None])  # Length of the y_values list without Nones
                 valid = x_len == y_len
-
-        self._set_curve_values_valid(dialog, valid)
+                self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
     def _manage_curve_plot(self, dialog, table, plot_widget, row, column):
@@ -526,10 +530,6 @@ class GwNonVisual:
         plot_widget.draw()
 
 
-    def _set_curve_values_valid(self, dialog, valid):
-        dialog.btn_accept.setEnabled(valid)
-
-
     def _accept_curves(self, dialog, is_new, curve_id):
         """ Manage accept button (insert & update) """
 
@@ -547,6 +547,11 @@ class GwNonVisual:
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
         if expl_id in (None, ''):
             expl_id = "null"
+
+        valid, msg = self.valid
+        if not valid:
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
 
         if is_new:
             # Check that there are no empty fields
