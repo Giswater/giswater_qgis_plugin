@@ -26,7 +26,7 @@ class GwFeatureEndButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
+        self.list_tabs = list_tabs
         self.feature_type = feature_type
 
 
