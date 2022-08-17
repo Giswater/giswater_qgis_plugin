@@ -266,11 +266,11 @@ UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'lab
 
 
 -- reorder sample
-UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link';
+UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link' AND (formname not in ('v_edit_link'));;
 UPDATE config_form_fields SET layoutorder =2 , layoutname ='lyt_bot_2' WHERE columnname ='verified';
-UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id';
+UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id' AND (formname not in ('v_edit_link'));;
 UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id';
-UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id';
+UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id' AND (formname not in ('v_edit_link'));;
 UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 
@@ -338,7 +338,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 18 where 
 
 UPDATE config_form_fields SET  hidden = true where columnname = 'macrodma_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'inventory';
-UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id';
+UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id' AND (formname not in ('v_edit_link'));;
 UPDATE config_form_fields SET  hidden = true where columnname = 'featurecat_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'connec_length';
 
@@ -347,17 +347,17 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' 
 UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
 
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND formname <> 'v_edit_dimensions';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state_type';
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
-UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id';
+UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 31 where columnname ='presszone_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND formname <> 'v_edit_dimensions';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id';
 
 
