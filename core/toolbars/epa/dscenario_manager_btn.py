@@ -469,6 +469,11 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_insert(self):
         """ Insert feature to dscenario via the button """
 
+        if self.dlg_dscenario.txt_feature_id.text() == '':
+            message = "You need to write a feature_id."
+            tools_qgis.show_warning(message)
+            return
+
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
