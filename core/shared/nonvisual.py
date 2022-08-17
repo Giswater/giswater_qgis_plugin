@@ -49,6 +49,7 @@ class GwNonVisual:
                          'v_edit_inp_timeseries': 'id', 'v_edit_inp_timeseries_value': 'timser_id',
                          'inp_lid': 'lidco_id', 'inp_lid_value': 'lidco_id',
                          }
+        self.valid = (True, "")
 
 
     def get_nonvisual(self, object_name):
@@ -126,7 +127,7 @@ class GwNonVisual:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.manager_dlg)
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -180,7 +181,7 @@ class GwNonVisual:
         selected_list = table.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Get selected workspace id
@@ -208,7 +209,7 @@ class GwNonVisual:
         selected_list = table.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Get selected workspace id
@@ -218,10 +219,8 @@ class GwNonVisual:
         message = "Are you sure you want to delete these records?"
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 0).data())
         if answer:
-            # Add quotes to id if not numeric
-            try:
-                value = int(value)
-            except ValueError:
+            # Add quotes to id if not inp_controls/inp_rules
+            if tablename not in ('inp_controls', 'inp_rules'):
                 value = f"'{value}'"
 
             # Delete values
@@ -231,7 +230,7 @@ class GwNonVisual:
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
                     msg = "There was an error deleting object values."
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return
 
@@ -241,7 +240,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting object."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -399,6 +398,7 @@ class GwNonVisual:
 
         # Control data depending on curve type
         valid = True
+        self.valid = (True, "")
         if column == 0:
             # If not first row, check if previous row has a smaller value than current row
             if row - 1 >= 0:
@@ -410,6 +410,7 @@ class GwNonVisual:
                         prev_value = float(prev_cell.data(0))
                         if cur_value < prev_value:
                             valid = False
+                            self.valid = (False, "Invalid curve. First column values must be ascending.")
 
         # If first check is valid, check all rows for column for final validation
         if valid:
@@ -443,6 +444,7 @@ class GwNonVisual:
                 if n > x_values[i-1]:
                     continue
                 valid = False
+                self.valid = (False, "Invalid curve. First column values must be ascending.")
                 break
             # If PUMP, check that y_values are descending
             curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
@@ -453,6 +455,7 @@ class GwNonVisual:
                     if n < y_values[i - 1]:
                         continue
                     valid = False
+                    self.valid = (False, "Invalid curve. Second column values must be descending.")
                     break
 
             if valid:
@@ -460,8 +463,7 @@ class GwNonVisual:
                 x_len = len([x for x in x_values if x is not None])  # Length of the x_values list without Nones
                 y_len = len([y for y in y_values if y is not None])  # Length of the y_values list without Nones
                 valid = x_len == y_len
-
-        self._set_curve_values_valid(dialog, valid)
+                self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
     def _manage_curve_plot(self, dialog, table, plot_widget, row, column):
@@ -528,10 +530,6 @@ class GwNonVisual:
         plot_widget.draw()
 
 
-    def _set_curve_values_valid(self, dialog, valid):
-        dialog.btn_accept.setEnabled(valid)
-
-
     def _accept_curves(self, dialog, is_new, curve_id):
         """ Manage accept button (insert & update) """
 
@@ -550,6 +548,11 @@ class GwNonVisual:
         if expl_id in (None, ''):
             expl_id = "null"
 
+        valid, msg = self.valid
+        if not valid:
+            tools_qgis.show_warning(msg, dialog=dialog)
+            return
+
         if is_new:
             # Check that there are no empty fields
             if not curve_id or curve_id == 'null':
@@ -563,12 +566,12 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting curve."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
             # Insert inp_curve_value
-            result = self._insert_curve_values(tbl_curve_value, curve_id)
+            result = self._insert_curve_values(dialog, tbl_curve_value, curve_id)
             if not result:
                 return
 
@@ -593,12 +596,12 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old curve values."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
             # Insert new curve values
-            result = self._insert_curve_values(tbl_curve_value, curve_id)
+            result = self._insert_curve_values(dialog, tbl_curve_value, curve_id)
             if not result:
                 return
 
@@ -611,7 +614,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
 
-    def _insert_curve_values(self, tbl_curve_value, curve_id):
+    def _insert_curve_values(self, dialog, tbl_curve_value, curve_id):
         """ Insert table values into v_edit_inp_curve_values """
 
         values = self._read_tbl_values(tbl_curve_value)
@@ -624,7 +627,7 @@ class GwNonVisual:
 
         if is_empty:
             msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             global_vars.dao.rollback()
             return False
 
@@ -640,7 +643,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting curve value."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return False
         return True
@@ -801,12 +804,12 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
             # Insert inp_pattern_value
-            result = self._insert_ws_pattern_values(tbl_pattern_value, pattern_id)
+            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id)
             if not result:
                 return
 
@@ -830,10 +833,10 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old curve values."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
-            result = self._insert_ws_pattern_values(tbl_pattern_value, pattern_id)
+            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id)
             if not result:
                 return
 
@@ -846,7 +849,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
 
-    def _insert_ws_pattern_values(self, tbl_pattern_value, pattern_id):
+    def _insert_ws_pattern_values(self, dialog, tbl_pattern_value, pattern_id):
         """ Insert table values into v_edit_inp_pattern_values """
 
         # Insert inp_pattern_value
@@ -860,7 +863,7 @@ class GwNonVisual:
 
         if is_empty:
             msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             global_vars.dao.rollback()
             return False
 
@@ -878,7 +881,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern value."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return False
 
@@ -1104,7 +1107,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -1133,7 +1136,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old pattern values."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
             result = self._insert_ud_pattern_values(dialog, pattern_type, pattern_id)
@@ -1164,7 +1167,7 @@ class GwNonVisual:
 
         if is_empty:
             msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             global_vars.dao.rollback()
             return False
 
@@ -1183,7 +1186,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern value."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return False
 
@@ -1343,7 +1346,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -1473,7 +1476,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -1701,7 +1704,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting timeseries."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -1709,7 +1712,7 @@ class GwNonVisual:
                 sql = ""  # No need to insert to inp_timeseries_value?
 
             # Insert inp_timeseries_value
-            result = self._insert_timeseries_value(tbl_timeseries_value, times_type, timeseries_id)
+            result = self._insert_timeseries_value(dialog, tbl_timeseries_value, times_type, timeseries_id)
             if not result:
                 return
 
@@ -1737,10 +1740,10 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old timeseries values."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
-            result = self._insert_timeseries_value(tbl_timeseries_value, times_type, timeseries_id)
+            result = self._insert_timeseries_value(dialog, tbl_timeseries_value, times_type, timeseries_id)
             if not result:
                 return
 
@@ -1753,7 +1756,7 @@ class GwNonVisual:
         tools_gw.close_dialog(dialog)
 
 
-    def _insert_timeseries_value(self, tbl_timeseries_value, times_type, timeseries_id):
+    def _insert_timeseries_value(self, dialog, tbl_timeseries_value, times_type, timeseries_id):
         """ Insert table values into v_edit_inp_timeseries_value """
 
         values = list()
@@ -1779,7 +1782,7 @@ class GwNonVisual:
 
         if is_empty:
             msg = "You need at least one row of values."
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dialog)
             global_vars.dao.rollback()
             return False
 
@@ -1789,7 +1792,7 @@ class GwNonVisual:
                     continue
                 if 'null' in (row[0], row[1], row[2]):
                     msg = "You have to fill in 'date', 'time' and 'value' fields!"
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
 
@@ -1799,7 +1802,7 @@ class GwNonVisual:
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
                     msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
         elif times_type == 'RELATIVE':
@@ -1809,7 +1812,7 @@ class GwNonVisual:
                     continue
                 if 'null' in (row[1], row[2]):
                     msg = "You have to fill in 'time' and 'value' fields!"
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
 
@@ -1819,7 +1822,7 @@ class GwNonVisual:
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
                     msg = "There was an error inserting pattern value."
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
 
@@ -2033,15 +2036,15 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'RG': {'lbl_surface_6', 'txt_surface_side_slope'},
-                        'GR': {'lbl_surface_5', 'txt_surface_slope'},
-                        'IT': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'PP': {'lbl_surface_6', 'txt_surface_side_slope', 'lbl_drain_5', 'txt_drain_delay'},
-                        'RB': {'lbl_storage_4', 'txt_seepage_rate', 'lbl_storage_5', 'txt_clogging_factor_storage'},
-                        'RD': {'lbl_surface_3', 'txt_vegetation_volume', 'lbl_surface_6', 'txt_surface_side_slope',
-                               'lbl_drain_3','lbl_drain_4', 'lbl_drain_5', 'lbl_drain_6',
-                               'lbl_drain_7', 'lbl_drain_8', 'lbl_drain_9', 'txt_flow_exponent',
+        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'RG': {'lbl_surface_side_slope', 'txt_surface_side_slope'},
+                        'GR': {'lbl_surface_slope', 'txt_surface_slope'},
+                        'IT': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'PP': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
+                        'RB': {'lbl_seepage_rate', 'txt_seepage_rate', 'lbl_clogging_factor_storage', 'txt_clogging_factor_storage'},
+                        'RD': {'lbl_vegetation_volume', 'txt_vegetation_volume', 'lbl_surface_side_slope', 'txt_surface_side_slope',
+                               'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
+                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_flow_exponent',
                                'txt_offset', 'txt_drain_delay', 'txt_open_level', 'txt_closed_level', 'cmb_control_curve',},
                         'VS': {''}}
 
@@ -2103,7 +2106,7 @@ class GwNonVisual:
 
                 if not result:
                     msg = "There was an error inserting lid."
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
 
@@ -2134,7 +2137,7 @@ class GwNonVisual:
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error deleting old lid values."
-                tools_qgis.show_warning(msg)
+                tools_qgis.show_warning(msg, dialog=dialog)
                 global_vars.dao.rollback()
                 return
 
@@ -2194,7 +2197,7 @@ class GwNonVisual:
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
                     msg = "There was an error inserting lid."
-                    tools_qgis.show_warning(msg)
+                    tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return False
         return True
@@ -2210,7 +2213,7 @@ class GwNonVisual:
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body, commit=False)
 
-        if (not json_result) or ('status' in json_result and json_result['status'] == 'Failed'):
+        if (not json_result) or (json_result.get('status') in (None, 'Failed')):
             global_vars.dao.rollback()
             return False
 

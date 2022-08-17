@@ -431,7 +431,7 @@ class GwVisit(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()
@@ -1077,7 +1077,7 @@ class GwVisit(QObject):
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Create interval dates
@@ -1368,7 +1368,7 @@ class GwVisit(QObject):
         path = index.sibling(index.row(), column_index).data()
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
-            tools_qgis.show_warning(message, parameter=path)
+            tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_event)
 
 
     def _populate_tbl_docs_x_event(self, event_id=0):
@@ -1510,7 +1510,7 @@ class GwVisit(QObject):
 
         elif len(selected_list) > 1:
             message = "More then one event selected. Select just one"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         # fetch the record
@@ -1691,11 +1691,11 @@ class GwVisit(QObject):
         # do the action
         if not event.delete(pks=selected_id):
             message = "Error deleting records"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         message = "Records deleted"
-        tools_qgis.show_info(message)
+        tools_qgis.show_info(message, dialog=self.dlg_add_visit)
 
         # update Table
         self.tbl_event.model().select()
@@ -1709,11 +1709,11 @@ class GwVisit(QObject):
         visit_id = self.visit_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
         if not visit_id:
             message = "You need to insert visit_id"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         # Insert into new table
@@ -1722,7 +1722,7 @@ class GwVisit(QObject):
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_qgis.show_info(message)
+            tools_qgis.show_info(message, dialog=self.dlg_add_visit)
 
         self.dlg_add_visit.tbl_document.model().select()
 
@@ -1751,7 +1751,7 @@ class GwVisit(QObject):
             status = tools_db.execute_sql(sql)
             if status:
                 message = "Documents deleted successfully"
-                tools_qgis.show_info(message)
+                tools_qgis.show_info(message, dialog=self.dlg_add_visit)
 
             self.tbl_document.model().select()
 

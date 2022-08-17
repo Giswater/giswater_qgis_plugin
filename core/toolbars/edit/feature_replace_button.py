@@ -411,12 +411,12 @@ class GwFeatureReplaceButton(GwMaptool):
         # Check null values
         if feature_type_new in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'New feature type'")
+            tools_qgis.show_warning(message, parameter="'New feature type'", dialog=dialog)
             return
 
         if featurecat_id in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'Catalog id'")
+            tools_qgis.show_warning(message, parameter="'Catalog id'", dialog=dialog)
             return
 
         # Ask question before executing

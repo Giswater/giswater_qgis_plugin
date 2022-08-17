@@ -91,7 +91,7 @@ class GwProjectCheckTask(GwTask):
             if layer_source['schema'] is None:
                 continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if 'schema' not in layer_source or layer_source['schema'] != global_vars.schema_name:
+            if layer_source.get('schema') != global_vars.schema_name:
                 continue
 
             schema_name = layer_source['schema']

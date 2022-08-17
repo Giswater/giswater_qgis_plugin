@@ -390,15 +390,15 @@ class GwElement:
         # Check mandatory fields
         message = "You need to insert value for field"
         if elementcat_id == '':
-            tools_qgis.show_warning(message, parameter="elementcat_id")
+            tools_qgis.show_warning(message, parameter="elementcat_id", dialog=self.dlg_add_element)
             return
         num_elements = tools_qt.get_text(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
-            tools_qgis.show_warning(message, parameter="num_elements")
+            tools_qgis.show_warning(message, parameter="num_elements", dialog=self.dlg_add_element)
             return
         state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
-            tools_qgis.show_warning(message, parameter="state_id")
+            tools_qgis.show_warning(message, parameter="state_id", dialog=self.dlg_add_element)
             return
 
         state_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state_type)
@@ -570,7 +570,7 @@ class GwElement:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()

@@ -107,6 +107,8 @@ class GwSelector:
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
+        if '"' in selector_type:
+            selector_type = selector_type.strip('"')
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
@@ -121,12 +123,11 @@ class GwSelector:
             return False
 
         # Get styles
-        stylesheet = json_result['body']['form']['style'] if 'style' in json_result['body']['form'] else None
+        stylesheet = json_result['body']['form'].get('style')
         color_rows = False
         if stylesheet:
             # Color selectors zebra-styled
-            if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
-                color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
+            color_rows = tools_os.set_boolean(stylesheet.get('rowsColor'), False)
 
         for form_tab in json_result['body']['form']['formTabs']:
 
@@ -144,8 +145,9 @@ class GwSelector:
                 main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
             else:
                 main_tab.addTab(tab_widget, form_tab['tabLabel'])
-            if 'typeaheadForced' in form_tab and form_tab['typeaheadForced'] is not None:
-                tab_widget.setProperty('typeahead_forced', form_tab['typeaheadForced'])
+            typeaheadForced = form_tab.get('typeaheadForced')
+            if typeaheadForced is not None:
+                tab_widget.setProperty('typeahead_forced', typeaheadForced)
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()

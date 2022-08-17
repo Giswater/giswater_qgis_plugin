@@ -252,7 +252,11 @@ class GwAuxPointAddButton(GwMaptool):
                 self.point_2 = point
 
             if self.point_1 is not None and self.point_2 is not None:
+                # Create form
                 self._init_create_point_form(self.point_1, self.point_2)
+                # Restart points variables
+                self.point_1 = None
+                self.point_2 = None
 
         elif event.button() == Qt.RightButton:
             self.snapper_manager.recover_snapping_options()

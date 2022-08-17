@@ -159,7 +159,7 @@ class GwConfigButton(GwAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                         if field['widgettype'] == 'typeahead':
                             completer = QCompleter()
-                            if 'dv_querytext' in field:
+                            if field.get('dv_querytext'):
                                 widget.setProperty('typeahead', True)
                                 model = QStringListModel()
                                 widget.textChanged.connect(
@@ -211,7 +211,7 @@ class GwConfigButton(GwAction):
 
                     elif field['widgettype'] == 'spinbox':
                         widget = QDoubleSpinBox()
-                        if 'value' in field and field['value'] is not None:
+                        if field.get('value') is not None:
                             value = float(str(field['value']))
                             widget.setValue(value)
                         widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
@@ -231,7 +231,7 @@ class GwConfigButton(GwAction):
 
             except Exception as e:
                 msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
-                tools_qgis.show_message(msg, 2)
+                tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
 
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
@@ -274,19 +274,21 @@ class GwConfigButton(GwAction):
         widget.clear()
         widget.blockSignals(False)
         combolist = []
-        if 'comboIds' in field:
-            for i in range(0, len(field['comboIds'])):
-                if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
-                    elem = [field['comboIds'][i], field['comboNames'][i]]
+        comboIds = field.get('comboIds')
+        comboNames = field.get('comboNames')
+        if None not in (comboIds, comboNames):
+            for i in range(0, len(comboIds)):
+                if comboIds[i] is not None and comboNames[i] is not None:
+                    elem = [comboIds[i], comboNames[i]]
                     combolist.append(elem)
 
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:
                 widget.addItem(record[1], record)
-        if 'value' in field:
-            if str(field['value']) != 'None':
-                tools_qt.set_combo_value(widget, field['value'], 0)
+        value = field.get('value')
+        if value not in (None, 'None'):
+            tools_qt.set_combo_value(widget, value, 0)
 
 
     def _get_dialog_changed_values(self, widget, tab, chk):

@@ -447,7 +447,7 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
     """ Connect to database with selected database @credentials """
 
     # Check if credential parameter 'service' is set
-    if 'service' in credentials and credentials['service']:
+    if credentials.get('service'):
         logged = connect_to_database_service(credentials['service'], credentials['sslmode'])
         return logged, credentials
 

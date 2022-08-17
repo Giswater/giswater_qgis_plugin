@@ -224,10 +224,13 @@ class GwToolBoxButton(GwAction):
             tools_gw.load_settings(self.dlg_reports)
 
             # Set description & query labels
-            sql = f"SELECT alias, query_text FROM config_report WHERE id = {self.function_selected}"
+            sql = f"SELECT alias, query_text, descript FROM config_report WHERE id = {self.function_selected}"
             row = tools_db.get_row(sql)
             if row:
-                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', row[0])
+                descript = row[2]
+                if descript in (None, 'null', ''):
+                    descript = row[0]
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', descript)
                 tools_qt.set_widget_text(self.dlg_reports, 'lbl_query', row[1])
 
             # Set listeners
@@ -311,11 +314,11 @@ class GwToolBoxButton(GwAction):
             label = None
             widget = None
 
-            if 'label' in field and field['label']:
+            if field.get('label'):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['widgetname'])
                 label.setText(field['label'].capitalize())
-                if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                if field.get('stylesheet') is not None and 'label' in field['stylesheet']:
                     label = tools_gw.set_stylesheet(field, label)
                 if 'tooltip' in field:
                     label.setToolTip(field['tooltip'])
@@ -417,7 +420,7 @@ class GwToolBoxButton(GwAction):
 
         for field in json_result['body']['data']['fields']:
 
-            if field['widgettype'] == 'list' and 'value' in field and field['value'] is not None:
+            if field['widgettype'] == 'list' and field.get('value') is not None:
                 numrows = len(field['value'])
                 numcols = len(field['value'][0])
                 self.dlg_reports.tbl_reports.setColumnCount(numcols)
@@ -435,7 +438,7 @@ class GwToolBoxButton(GwAction):
                         column_name = dict_keys[column]
                         item = f"{field['value'][row][column_name]}"
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
-            elif field['widgettype'] == 'list' and 'value' in field and field['value'] is None:
+            elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
 
@@ -598,11 +601,12 @@ class GwToolBoxButton(GwAction):
                 # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
                 # hide the other and mark the one that the user tells us.
                 # Options: "selectionType":"selected" //  "selectionType":"all"
-                if 'selectionType' in function[0]['input_params']:
-                    if 'selected' in function[0]['input_params']['selectionType']:
+                selectionType = function[0]['input_params'].get('selectionType')
+                if selectionType:
+                    if 'selected' in selectionType:
                         dialog.rbt_previous.setChecked(True)
                         dialog.rbt_layer.setVisible(False)
-                    elif 'all' in function[0]['input_params']['selectionType']:
+                    elif 'all' in selectionType:
                         dialog.rbt_layer.setChecked(True)
                         dialog.rbt_previous.setVisible(False)
 

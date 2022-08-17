@@ -8,8 +8,10 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QDialog, QShortcut
+from qgis.PyQt.QtWidgets import QDialog, QShortcut, QGridLayout, QSizePolicy
 from qgis.PyQt.QtGui import QKeySequence, QIcon
+
+from qgis.gui import QgsMessageBar
 
 from ... import global_vars
 from ..utils import tools_gw
@@ -23,6 +25,23 @@ class GwDialog(QDialog):
 
         super().__init__()
         self.setupUi(self)
+        # Create message bar
+        try:
+            self._messageBar = QgsMessageBar()
+            self.messageBar().setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+            for idx in range(self.layout().count(), 0, -1):
+                item = self.layout().itemAt(idx - 1)
+                row, column, rowSpan, columnSpan = self.layout().getItemPosition(idx - 1)
+                if item is not None:
+                    self.layout().removeItem(item)
+                    if item.widget() is not None:
+                        self.layout().addWidget(item.widget(), row + 1, column, rowSpan, columnSpan)
+                    elif item.layout() is not None:
+                        self.layout().addLayout(item.layout(), row + 1, column, rowSpan, columnSpan)
+            self.layout().addWidget(self.messageBar(), 0, 0, 1, -1)
+        except Exception:
+            self._messageBar = global_vars.iface
+
         self.subtag = subtag
         # Connect the help shortcut
         action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
@@ -57,3 +76,6 @@ class GwDialog(QDialog):
         except RuntimeError:
             # Multiples signals are emited when we use key_scape in order to close dialog
             pass
+
+    def messageBar(self):
+        return self._messageBar

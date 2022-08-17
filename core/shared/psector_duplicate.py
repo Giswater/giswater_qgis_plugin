@@ -64,7 +64,7 @@ class GwPsectorDuplicate(QObject):
         complet_result = tools_gw.execute_procedure('gw_fct_psector_duplicate', body)
         if not complet_result or complet_result['status'] == 'Failed':
             message = 'Function gw_fct_psector_duplicate executed with no result'
-            tools_qgis.show_message(message, 3)
+            tools_qgis.show_message(message, 3, dialog=self.dlg_duplicate_psector)
             return
 
         # Populate tab info

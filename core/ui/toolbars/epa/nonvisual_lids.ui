@@ -75,7 +75,7 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_control_name">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -88,7 +88,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="lbl_lid_type">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -142,7 +142,7 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="0">
-            <widget class="QLabel" name="lbl_surface2">
+            <widget class="QLabel" name="lbl_berm_height">
              <property name="text">
               <string>Berm Height (in. or mm)</string>
              </property>
@@ -159,7 +159,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="lbl_surface_3">
+            <widget class="QLabel" name="lbl_vegetation_volume">
              <property name="text">
               <string>Vegetation Volume Fraction</string>
              </property>
@@ -169,7 +169,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="lbl_surface_4">
+            <widget class="QLabel" name="lbl_surface_roughness">
              <property name="text">
               <string>Surface Roughness (Mannings n)</string>
              </property>
@@ -179,7 +179,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="lbl_surface_5">
+            <widget class="QLabel" name="lbl_surface_slope">
              <property name="text">
               <string>Surface Slope (percent)</string>
              </property>
@@ -213,7 +213,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="lbl_surface_6">
+            <widget class="QLabel" name="lbl_surface_side_slope">
              <property name="text">
               <string>Surface Side Slope (run / rise)</string>
              </property>
@@ -283,7 +283,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_15">
+            <widget class="QLabel" name="lbl_porosity">
              <property name="text">
               <string>Porosity    (volume fraction)</string>
              </property>
@@ -293,7 +293,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_16">
+            <widget class="QLabel" name="lbl_field_capacity">
              <property name="text">
               <string>Field Capacity (volume fraction)</string>
              </property>
@@ -313,7 +313,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_19">
+            <widget class="QLabel" name="lbl_wilting_point">
              <property name="text">
               <string>Wilting Point (volume fraction)</string>
              </property>
@@ -326,7 +326,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_11">
+            <widget class="QLabel" name="lbl_thickness">
              <property name="text">
               <string>Thickness (in. or mm)</string>
              </property>
@@ -346,7 +346,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_18">
+            <widget class="QLabel" name="lbl_conductivity">
              <property name="text">
               <string>Conductivity    (in/hr or mm/hr)</string>
              </property>
@@ -356,7 +356,7 @@
             </widget>
            </item>
            <item row="5" column="0">
-            <widget class="QLabel" name="label_20">
+            <widget class="QLabel" name="lbl_conducticity_slope">
              <property name="text">
               <string>Conductivity Slope</string>
              </property>
@@ -386,7 +386,7 @@
             </widget>
            </item>
            <item row="6" column="0">
-            <widget class="QLabel" name="label_17">
+            <widget class="QLabel" name="lbl_suction_head">
              <property name="text">
               <string>Suction Head (in. or mm)</string>
              </property>
@@ -423,7 +423,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_8">
+            <widget class="QLabel" name="lbl_thinkness_pavement">
              <property name="text">
               <string>Thickness (in. or mm)</string>
              </property>
@@ -440,7 +440,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="lbl_void_ratio_pavement">
              <property name="text">
               <string>Void Ratio (Void / Solids)</string>
              </property>
@@ -450,7 +450,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_10">
+            <widget class="QLabel" name="lbl_imprevious_surface">
              <property name="text">
               <string>Imprevious Surface Fraction</string>
              </property>
@@ -467,7 +467,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_7">
+            <widget class="QLabel" name="lbl__permeability">
              <property name="text">
               <string>Permeability    (in/hr or mm/hr)</string>
              </property>
@@ -480,7 +480,7 @@
             </widget>
            </item>
            <item row="5" column="0">
-            <widget class="QLabel" name="label_13">
+            <widget class="QLabel" name="lbl_regeneration_interval">
              <property name="text">
               <string>Regeneration Interval (days)</string>
              </property>
@@ -504,7 +504,7 @@
             </widget>
            </item>
            <item row="6" column="0">
-            <widget class="QLabel" name="label_14">
+            <widget class="QLabel" name="lbl_regeneration_fraction">
              <property name="text">
               <string>Regeneration Fraction</string>
              </property>
@@ -521,7 +521,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_12">
+            <widget class="QLabel" name="lbl_clogging_factor_pavement">
              <property name="text">
               <string>Clogging Factor</string>
              </property>
@@ -531,7 +531,7 @@
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QLineEdit" name="txt_refeneration_interval">
+            <widget class="QLineEdit" name="txt_regeneration_interval">
              <property name="text">
               <string>0</string>
              </property>
@@ -572,7 +572,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="lbl_storage_3">
+            <widget class="QLabel" name="lbl_void_ratio_storage">
              <property name="text">
               <string>Void Ratio (Voids / Solids)</string>
              </property>
@@ -596,7 +596,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="lbl_storage_2">
+            <widget class="QLabel" name="lbl_thickness_storage">
              <property name="text">
               <string>Thickness (in. or mm)</string>
              </property>
@@ -606,7 +606,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="lbl_storage_4">
+            <widget class="QLabel" name="lbl_seepage_rate">
              <property name="text">
               <string>Seepage Rate (in/hr or mm/hr)</string>
              </property>
@@ -616,7 +616,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="lbl_storage_5">
+            <widget class="QLabel" name="lbl_clogging_factor_storage">
              <property name="text">
               <string>Clogging Factor</string>
              </property>
@@ -649,7 +649,7 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_10">
            <item row="8" column="0" colspan="3">
-            <widget class="QLabel" name="lbl_drain_9">
+            <widget class="QLabel" name="lbl_flow_description">
              <property name="text">
               <string>*Flow is in in/hr or mm/hr; use 0 if there is no drain.</string>
              </property>
@@ -659,7 +659,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="lbl_drain_4">
+            <widget class="QLabel" name="lbl_offset">
              <property name="text">
               <string>Offset (in or mm)</string>
              </property>
@@ -669,7 +669,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="lbl_drain_2">
+            <widget class="QLabel" name="lbl__flow_coefficient">
              <property name="text">
               <string>Flow Coefficient*</string>
              </property>
@@ -686,7 +686,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="lbl_drain_3">
+            <widget class="QLabel" name="lbl_flow_exponent">
              <property name="text">
               <string>Flow Exponent</string>
              </property>
@@ -724,7 +724,7 @@
             </widget>
            </item>
            <item row="4" column="0" colspan="2">
-            <widget class="QLabel" name="lbl_drain_6">
+            <widget class="QLabel" name="lbl_open_level">
              <property name="text">
               <string>Open Level (in or mm)</string>
              </property>
@@ -734,7 +734,7 @@
             </widget>
            </item>
            <item row="6" column="0">
-            <widget class="QLabel" name="lbl_drain_8">
+            <widget class="QLabel" name="lbl_control_curve">
              <property name="text">
               <string>Control Curve</string>
              </property>
@@ -758,7 +758,7 @@
             </widget>
            </item>
            <item row="5" column="0" colspan="2">
-            <widget class="QLabel" name="lbl_drain_7">
+            <widget class="QLabel" name="lbl_closed_level">
              <property name="text">
               <string>Closed Level (in or mm)</string>
              </property>
@@ -768,7 +768,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="lbl_drain_5">
+            <widget class="QLabel" name="lbl_drain_delay">
              <property name="text">
               <string>Drain Delay (hrs)</string>
              </property>
@@ -822,7 +822,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_27">
+            <widget class="QLabel" name="lbl_void_fraction">
              <property name="text">
               <string>Void Fraction</string>
              </property>
@@ -832,7 +832,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_24">
+            <widget class="QLabel" name="lbl_roughness">
              <property name="text">
               <string>Roughness (Mannings n)</string>
              </property>
@@ -842,7 +842,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_25">
+            <widget class="QLabel" name="lbl_thickness_drainage">
              <property name="text">
               <string>Thickness (in. or mm)</string>
              </property>
@@ -879,7 +879,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_38">
+            <widget class="QLabel" name="lbl_flow_capacity">
              <property name="text">
               <string>Flow Capacity (in/hr or mm/hr)</string>
              </property>

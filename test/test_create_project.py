@@ -11,7 +11,7 @@ from qgis.core import QgsApplication, QgsProviderRegistry
 from .test_giswater import GwTest
 from ..core.admin.gis_file_create import GwGisFileCreate
 from .. import global_vars
-from ..lib import tools_db
+from ..lib import tools_db, tools_log
 
 
 # dummy instance to replace qgis.utils.iface
@@ -67,7 +67,7 @@ class GwTestQgis:
 
         if self.test_giswater.global_vars.session_vars['last_error']:
             msg = self.test_giswater.global_vars.session_vars['last_error']
-            print(f"Database connection error: {msg}")
+            tools_log.log_info(f"Database connection error: {msg}")
             return False
 
         return True

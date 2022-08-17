@@ -183,11 +183,12 @@ class GwInfoButton(GwMaptool):
         main_menu.addSeparator()
 
         # Open/close valve
-        if 'valve' in json_result['body']['data']:
-            valve_id = json_result['body']['data']['valve']['id']
-            valve_text = json_result['body']['data']['valve']['text']
-            valve_table = json_result['body']['data']['valve']['tableName']
-            valve_value = json_result['body']['data']['valve']['value']
+        valve = json_result['body']['data'].get('valve')
+        if valve:
+            valve_id = valve['id']
+            valve_text = valve['text']
+            valve_table = valve['tableName']
+            valve_value = valve['value']
             action_valve = QAction(f"{valve_text}", None)
             action_valve.triggered.connect(partial(self._toggle_valve_state, valve_id, valve_table, valve_value))
             action_valve.hovered.connect(partial(self._reset_rubber_bands))
