@@ -15,7 +15,8 @@ UPDATE sys_function SET project_type='utils' WHERE id=1346;
 
 INSERT INTO config_param_system
 ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
-VALUES('edit_custom_link', '{"google_maps":false}', 'Allow users to enable custom configurations to fill features ''link'' field', 'Custom link field', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+VALUES('edit_custom_link', '{"google_maps":false}', 'Allow users to enable custom configurations to fill features ''link'' field', 'Custom link field', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
+ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE config_param_system c
 SET value=gw_fct_json_object_set_key(c.value::json,'fid',a.value) 
@@ -67,9 +68,10 @@ VALUES ('ve_pol_connec', false, null, true, 'info_feature', null, 11, null, null
 UPDATE config_fprocess SET active = true WHERE active is null;
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
-VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',25,null,null);
+VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',25,null,null) ON CONFLICT (layer_id) DO NOTHING;;
 
-UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v_edit_link';
+UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute 
+WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v_edit_link';
 
 UPDATE config_form_fields SET layoutorder=a.maxid , layoutname='lyt_data_1' FROM
 (SELECT max(layoutorder)+1 as maxid FROM  config_form_fields WHERE formname='v_edit_link')a

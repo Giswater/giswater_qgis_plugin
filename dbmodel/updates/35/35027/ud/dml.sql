@@ -19,10 +19,10 @@ INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, 
 VALUES ('ve_pol_gully', false, null, true, 'info_feature', null, 12, null, null) ON CONFLICT (layer_id) DO NOTHING;
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
-VALUES ('v_edit_inp_subcatchment', false, null, true, 'info_generic', 'Subcatchment',20,null,'{"geomType":"polygon"}');
+VALUES ('v_edit_inp_subcatchment', false, null, true, 'info_generic', 'Subcatchment',20,null,'{"geomType":"polygon"}') ON CONFLICT (layer_id) DO NOTHING;
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
-VALUES ('v_edit_raingage', false, null, true, 'info_generic', 'Raingage',16,null,null);
+VALUES ('v_edit_raingage', false, null, true, 'info_generic', 'Raingage',16,null,null) ON CONFLICT (layer_id) DO NOTHING;
 
 UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' 
 FROM pg_attribute WHERE  attrelid = 'v_edit_raingage'::regclass AND attname=columnname AND formname='v_edit_raingage';
