@@ -218,10 +218,8 @@ class GwNonVisual:
         message = "Are you sure you want to delete these records?"
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 0).data())
         if answer:
-            # Add quotes to id if not numeric
-            try:
-                value = int(value)
-            except ValueError:
+            # Add quotes to id if not inp_controls/inp_rules
+            if tablename not in ('inp_controls', 'inp_rules'):
                 value = f"'{value}'"
 
             # Delete values
