@@ -35,7 +35,7 @@ CREATE OR REPLACE VIEW v_om_waterbalance_loss AS
             WHEN v_om_waterbalance.total > 0::double precision THEN ((100::numeric * (v_om_waterbalance.auth_bill + v_om_waterbalance.auth_unbill))::double precision / v_om_waterbalance.total)::numeric(12,2)
             ELSE 0::numeric(12,2)
         END AS eff,
-		the_geom
+      the_geom
    FROM v_om_waterbalance;
    
    
@@ -50,10 +50,10 @@ CREATE OR REPLACE VIEW v_om_waterbalance_loss AS
             WHEN v_om_waterbalance.total > 0::double precision THEN ((100::numeric * v_om_waterbalance.auth_bill)::double precision / v_om_waterbalance.total)::numeric(12,2)
             ELSE 0::numeric(12,2)
         END AS eff,
-	the_geom
+   the_geom
    FROM v_om_waterbalance;
 
-DROP VIEW vi_parent_dma;
+DROP VIEW IF EXISTS vi_parent_dma;
 CREATE OR REPLACE VIEW vi_parent_dma AS 
  SELECT DISTINCT ON (dma.dma_id) dma.dma_id,
     dma.name,
@@ -71,7 +71,7 @@ CREATE OR REPLACE VIEW vi_parent_dma AS
    FROM dma
      JOIN vi_parent_arc USING (dma_id);
 
-DROP VIEW v_edit_sector;
+DROP VIEW IF EXISTS v_edit_sector;
 CREATE OR REPLACE VIEW v_edit_sector AS 
  SELECT sector.sector_id,
     sector.name,
@@ -88,7 +88,7 @@ CREATE OR REPLACE VIEW v_edit_sector AS
     sector
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
-DROP VIEW v_edit_dma;
+DROP VIEW IF EXISTS v_edit_dma;
   CREATE OR REPLACE VIEW v_edit_dma AS 
  SELECT dma.dma_id,
     dma.name,
@@ -109,7 +109,7 @@ DROP VIEW v_edit_dma;
     dma
   WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-DROP VIEW v_edit_presszone;
+DROP VIEW IF EXISTS v_edit_presszone;
 CREATE OR REPLACE VIEW v_edit_presszone AS 
  SELECT presszone.presszone_id,
     presszone.name,
@@ -124,7 +124,7 @@ CREATE OR REPLACE VIEW v_edit_presszone AS
   WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-DROP VIEW v_edit_dqa;
+DROP VIEW IF EXISTS v_edit_dqa;
 CREATE OR REPLACE VIEW v_edit_dqa AS 
  SELECT dqa.dqa_id,
     dqa.name,
@@ -144,7 +144,7 @@ CREATE OR REPLACE VIEW v_edit_dqa AS
   WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-DROP VIEW v_edit_cat_feature_node;
+DROP VIEW IF EXISTS v_edit_cat_feature_node;
 CREATE OR REPLACE VIEW v_edit_cat_feature_node AS 
  SELECT cat_feature.id,
     cat_feature.system_id,
@@ -163,7 +163,7 @@ CREATE OR REPLACE VIEW v_edit_cat_feature_node AS
    FROM cat_feature
      JOIN cat_feature_node USING (id);
 
-ALTER VIEW v_anl_grafanalytics_mapzones RENAME TO v_anl_graphanalytics_mapzones;
+ALTER VIEW IF EXISTS v_anl_grafanalytics_mapzones RENAME TO v_anl_graphanalytics_mapzones;
 
 
 CREATE OR REPLACE VIEW v_edit_anl_hydrant AS

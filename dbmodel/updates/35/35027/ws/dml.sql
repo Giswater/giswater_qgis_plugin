@@ -58,4 +58,5 @@ VALUES (3164,'gw_trg_edit_anl_hydrant','ws','trigger function','json','json','Fu
 'role_om','core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_edit_anl_hydrant', 'Editable view for new hydrant location. Used on tool for hydrant influence analysis', 'role_om', 'core');
+VALUES ('v_edit_anl_hydrant', 'Editable view for new hydrant location. Used on tool for hydrant influence analysis', 'role_om', 'core')
+ON CONFLICT (id) DO NOTHING;

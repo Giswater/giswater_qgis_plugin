@@ -70,9 +70,20 @@ UPDATE config_fprocess SET active = true WHERE active is null;
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
 VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',25,null,null) ON CONFLICT (layer_id) DO NOTHING;;
 
-UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute 
-WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v_edit_link';
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='v_edit_link';
 
-UPDATE config_form_fields SET layoutorder=a.maxid , layoutname='lyt_data_1' FROM
-(SELECT max(layoutorder)+1 as maxid FROM  config_form_fields WHERE formname='v_edit_link')a
- WHERE columnname='ispsectorgeom' AND formname='v_edit_link';
+UPDATE config_form_fields SET layoutorder=1 WHERE formname='v_edit_link' AND columnname='link_id';
+UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_link' AND columnname='feature_type';
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_link' AND columnname='feature_id';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_link' AND columnname='exit_type';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_link' AND columnname='exit_id';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_link' AND columnname='state';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_link' AND columnname='expl_id';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_link' AND columnname='macrosector_id';
+UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_link' AND columnname='sector_id';
+UPDATE config_form_fields SET layoutorder=10 WHERE formname='v_edit_link' AND columnname='macrodma_id';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_link' AND columnname='dma_id';
+UPDATE config_form_fields SET layoutorder=12 WHERE formname='v_edit_link' AND columnname='gis_length';
+UPDATE config_form_fields SET layoutorder=13 WHERE formname='v_edit_link' AND columnname='userdefined_geom';
+UPDATE config_form_fields SET layoutorder=14 WHERE formname='v_edit_link' AND columnname='ispsectorgeom';
+UPDATE config_form_fields SET layoutorder=15 WHERE formname='v_edit_link' AND columnname='psector_rowid';

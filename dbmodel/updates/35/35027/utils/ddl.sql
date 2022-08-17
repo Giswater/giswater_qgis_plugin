@@ -11,6 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class", "column":"inherit_values", "dataType":"json"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"vehicle_id", "dataType":"integer"}}$$);
 
-ALTER TABLE temp_anlgraf RENAME TO temp_anlgraph;
+ALTER TABLE IF EXISTS temp_anlgraf RENAME TO temp_anlgraph;
 
 ALTER TABLE config_fprocess ALTER COLUMN active SET DEFAULT true;

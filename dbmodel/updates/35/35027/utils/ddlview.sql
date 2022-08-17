@@ -9,10 +9,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/08/04
 
-ALTER VIEW v_anl_graf RENAME TO v_anl_graph;
+ALTER VIEW IF EXISTS v_anl_graf RENAME TO v_anl_graph;
 
 --2022/08/10
-DROP VIEW ve_pol_connec;
+DROP VIEW IF EXISTS ve_pol_connec;
 
 CREATE OR REPLACE VIEW ve_pol_connec AS 
  SELECT polygon.pol_id,
@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW ve_pol_connec AS
      JOIN v_state_connec USING (connec_id)
      JOIN polygon ON polygon.feature_id::text = connec.connec_id::text;
 
-DROP VIEW ve_pol_node;
+DROP VIEW IF EXISTS ve_pol_node;
 
 CREATE OR REPLACE VIEW ve_pol_node AS 
  SELECT polygon.pol_id,
