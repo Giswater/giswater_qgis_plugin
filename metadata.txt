@@ -9,6 +9,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valencian
 
 Changelog=Version 3.5.027
     - Send messages to dialogs instead of to the canvas
+    - Allow starting a mincut from another point when a planified mincut is active
     - Add widget to hide querytext in toolbox report
     - Add new db variable to manage snapping configuration
     - Show message if curve is invalid (non-visual)

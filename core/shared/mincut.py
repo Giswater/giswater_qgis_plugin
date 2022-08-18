@@ -1967,7 +1967,7 @@ class GwMincut:
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
-            self.action_mincut.setDisabled(True)
+            self.action_mincut.setDisabled(False)
             self.action_refresh_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_change_valve_status.setDisabled(False)
@@ -1990,6 +1990,7 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
+        self.iface.actionPan().trigger()
 
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
