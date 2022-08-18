@@ -314,17 +314,13 @@ class GwLoadProject(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if global_vars.project_vars['main_schema'] is None or global_vars.project_vars['add_schema'] is None:
-                self.dlg_dtext = GwDialogTextUi()
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+            if global_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
+                    or global_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
                 msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
                       "which isn't. To do this, you need to configure the QGIS project setting this project's " \
                       "variables: gwMainSchema and gwAddSchema."
-
-                self.dlg_dtext.txt_infolog.setText(msg)
-                self.dlg_dtext.open()
+                tools_qt.show_info_box(msg)
                 return False
 
             # If there are layers with a different schema, the one that the user has in the project variable
