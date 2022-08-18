@@ -213,9 +213,9 @@ SET search_path = "SCHEMA_NAME", public;
 		UPDATE temp_arc a SET arc_id=b.row_id from (select row_number()over() as row_id, id from temp_arc where result_id=v_fid::text)b where a.id=b.id and result_id=v_fid::text;
 
 		--update temp_arc with values of node_1, node_2 from temp_node
-		UPDATE temp_arc a SET node_1=node_id FROM temp_node n WHERE ST_dwithin(St_startpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id::integer=v_fid ) AND node_1 IS NULL;
+		UPDATE temp_arc a SET node_1=node_id FROM temp_node n WHERE ST_dwithin(St_startpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text ) AND node_1 IS NULL;
 
-		UPDATE temp_arc a SET node_2=node_id FROM temp_node n WHERE ST_dwithin(St_endpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id::integer=v_fid) AND node_2 IS NULL;
+		UPDATE temp_arc a SET node_2=node_id FROM temp_node n WHERE ST_dwithin(St_endpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text) AND node_2 IS NULL;
 
 		--duplicate distance on proposal mode
 		IF v_mode=1 THEN
