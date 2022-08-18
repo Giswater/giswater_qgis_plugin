@@ -64,3 +64,72 @@ CREATE OR REPLACE VIEW ve_pol_gully AS
    FROM gully
      JOIN v_state_gully USING (gully_id)
      JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;
+
+
+
+CREATE OR REPLACE VIEW vi_infiltration AS 
+SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.curveno AS other1,
+    v_edit_inp_subcatchment.conduct_2 AS other2,
+    v_edit_inp_subcatchment.drytime_2 AS other3,
+    NULL::numeric AS other4,
+    NULL::double precision AS other5
+   FROM v_edit_inp_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+     JOIN ( SELECT a.subc_id,
+            a.outlet_id
+           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+                UNION
+                 SELECT inp_subcatchment.outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
+UNION
+ SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.suction AS other1,
+    v_edit_inp_subcatchment.conduct AS other2,
+    v_edit_inp_subcatchment.initdef AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM v_edit_inp_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+     JOIN ( SELECT a.subc_id,
+            a.outlet_id
+           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+                UNION
+                 SELECT inp_subcatchment.outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
+UNION
+ SELECT v_edit_inp_subcatchment.subc_id,
+    v_edit_inp_subcatchment.curveno AS other1,
+    v_edit_inp_subcatchment.conduct_2 AS other2,
+    v_edit_inp_subcatchment.drytime_2 AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM v_edit_inp_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+     JOIN ( SELECT a.subc_id,
+            a.outlet_id
+           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+                UNION
+                 SELECT inp_subcatchment.outlet_id,
+                    inp_subcatchment.subc_id
+                   FROM inp_subcatchment
+                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
