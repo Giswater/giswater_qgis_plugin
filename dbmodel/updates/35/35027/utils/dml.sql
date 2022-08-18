@@ -68,7 +68,7 @@ VALUES ('ve_pol_connec', false, null, true, 'info_feature', null, 11, null, null
 UPDATE config_fprocess SET active = true WHERE active is null;
 
 INSERT INTO config_info_layer(layer_id, is_parent, tableparent_id, is_editable, formtemplate,headertext, orderby, tableparentepa_id, addparam)
-VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',25,null,null) ON CONFLICT (layer_id) DO NOTHING;;
+VALUES ('v_edit_link', false, null, true, 'info_generic', 'Link',7,null,null) ON CONFLICT (layer_id) DO NOTHING;;
 
 UPDATE config_form_fields SET layoutorder=attnum, layoutname='lyt_data_1' FROM pg_attribute 
 WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v_edit_link';
