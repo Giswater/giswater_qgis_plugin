@@ -14,7 +14,11 @@ VALUES(462, 'Planified EPANET pumps with more than two acs', 'ws', NULL, 'core',
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
-VALUES (3160,'gw_fct_graphanalytics_hydrant','ws','function','json','json','Function to create influence buffer for hydrants.','role_om','core')
+VALUES (3160,'gw_fct_graphanalytics_hydrant','ws','function','json','json','Function that creates influence buffer for hydrants and helps defining new hydrant location.
+- Firehose range is the length of the influence buffer calculate over tramified street layer - om_streetaxis
+- Process mode: Influence area - calculates the influence buffer; Hydrant proposal - duplicates firehose range and allows defining location of new hydrants (usually at the end of the marked area)
+- Use proposed hydrants - Takes into account new hydrants inserted on auxiliar view v_edit_anl_hydrant. Those hydrants are not incorporated on inventory nor psector.
+- Use selected psector - Takes into account currently selected psector','role_om','core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
