@@ -74,7 +74,10 @@ BEGIN
 	v_node1_geom = (SELECT the_geom FROM node WHERE node_id = v_node1); 
 	v_node2_geom = (SELECT the_geom FROM node WHERE node_id = v_node2); 
 	v_arc_geom  = (SELECT the_geom FROM arc WHERE arc_id = v_id); 
-	
+
+	-- Temporarily disable topocontrol
+	UPDATE config_param_user SET value = true WHERE parameter = 'edit_disable_topocontrol' and cur_user = cur_user;
+
 	IF v_node1 IS NOT NULL THEN
 		UPDATE arc SET node_1 = v_node1 WHERE arc_id = v_id;
 		EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(v_id) USING v_arc_geom, v_node1_geom;			
@@ -86,6 +89,8 @@ BEGIN
 		EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(v_id) USING v_arc_geom, v_node2_geom;		
 	END IF;
 
+	-- Enable topocontrol
+	UPDATE config_param_user SET value = false WHERE parameter = 'edit_disable_topocontrol' and cur_user = cur_user;
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 	
 	-- Control NULL's

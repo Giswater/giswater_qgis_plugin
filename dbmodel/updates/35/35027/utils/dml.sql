@@ -76,3 +76,6 @@ WHERE  attrelid = 'v_edit_link'::regclass AND attname=columnname AND formname='v
 UPDATE config_form_fields SET layoutorder=a.maxid , layoutname='lyt_data_1' FROM
 (SELECT max(layoutorder)+1 as maxid FROM  config_form_fields WHERE formname='v_edit_link')a
  WHERE columnname='ispsectorgeom' AND formname='v_edit_link';
+
+ UPDATE sys_param_user SET ismandatory = true, vdefault = false WHERE id = 'edit_disable_topocontrol';
+ 
