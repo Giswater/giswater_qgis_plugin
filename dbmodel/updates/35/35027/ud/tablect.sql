@@ -12,3 +12,8 @@ ALTER TABLE man_chamber DROP CONSTRAINT IF EXISTS man_chamber_pol_id_fkey;
 ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_pol_id_fkey;
 ALTER TABLE man_storage DROP CONSTRAINT IF EXISTS man_storage_pol_id_fkey;
 ALTER TABLE man_wwtp DROP CONSTRAINT IF EXISTS man_wwtp_pol_id_fkey;
+
+
+--2022/08/19
+ALTER TABLE inp_dscenario_raingage ADD CONSTRAINT inp_dscenario_raingage_dscenario_rg_id_fkey FOREIGN KEY (rg_id)
+REFERENCES raingage (rg_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
