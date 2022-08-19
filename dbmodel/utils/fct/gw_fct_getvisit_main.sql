@@ -719,7 +719,7 @@ BEGIN
 	--END IF;
 	
 	-- WIP
-	IF v_fields_aux->>'unit_id' IS NOT NULL THEN
+	IF v_fields_aux->>'unit_id' IS NOT NULL AND v_lot IS NOT NULL THEN
 		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_fields_aux->>'unit_id')||' AND lot_id = '||v_lot||' ORDER BY startdate DESC LIMIT 1' INTO v_user_name, v_end_date;
 	ELSIF v_unit IS NOT NULL THEN
 		EXECUTE 'SELECT user_name, enddate FROM om_unit_intervals WHERE unit_id='||(v_unit)||' AND lot_id = '||v_lot||' ORDER BY startdate DESC LIMIT 1' INTO v_user_name, v_end_date;
