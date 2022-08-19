@@ -319,6 +319,15 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
 
+        # Refresh raster layer
+        layer = tools_qgis.get_layer_by_tablename('v_ext_raster_dem', schema_name='')
+        if layer:
+            layer.dataProvider().reloadData()
+            layer.triggerRepaint()
+            canvas_extent = global_vars.iface.mapCanvas().extent()
+            layer.setExtent(canvas_extent)
+            global_vars.iface.mapCanvas().refresh()
+
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
